@@ -1,17 +1,8 @@
 @import 'normalize.css';
-/* Playfair Display: chữ serif cho chứng chỉ. Phải là webfont chứ không dùng font hệ thống
-   (Georgia/Times) vì máy Linux thường không có, rơi về DejaVu Serif  font này thiếu chữ
-   Việt dựng sẵn nên "ắ" bị vỡ thành "ă" + dấu sắc rời. */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@600;700&display=swap');
 
 :root {
-  /* ══════════════════════════════════════════════════════════════
-     1. PRIMITIVE  bảng màu gốc. ĐỔI TÔNG THƯƠNG HIỆU CHỈ Ở ĐÂY.
-     Mỗi màu khai báo một lần duy nhất dưới dạng kênh RGB (--x-rgb)
-     để dùng được với alpha:  rgb(var(--primary-rgb) / 0.32)
-     ══════════════════════════════════════════════════════════════ */
 
-  /* Champagne  màu thương hiệu */
   --brand-50-rgb: 250 247 240;
   --brand-100-rgb: 243 235 218;
   --brand-150-rgb: 240 228 196;
@@ -38,9 +29,6 @@
   --brand-900: rgb(var(--brand-900-rgb));
   --text-on-dark: rgb(var(--text-on-dark-rgb));
 
-  /* Champagne CỐ ĐỊNH  cùng sắc với ramp brand ở theme premium nhưng KHÔNG
-     bị theme "normal" (teal) override. Dùng cho dấu hiệu nhận biết Premium
-     (badge, avatar) để nó luôn là vàng kim loại dù người xem đang ở theme nào. */
   --gold-100-rgb: 243 235 218;
   --gold-200-rgb: 232 213 163;
   --gold-400-rgb: 220 192 122;
@@ -54,7 +42,6 @@
   --gold-600: rgb(var(--gold-600-rgb));
   --gold-700: rgb(var(--gold-700-rgb));
 
-  /* Trung tính lạnh (neutral chính của app) */
   --slate-50-rgb: 248 250 252;
   --slate-100-rgb: 241 245 249;
   --slate-200-rgb: 226 232 240;
@@ -78,7 +65,6 @@
   --slate-900: rgb(var(--slate-900-rgb));
   --slate-950: rgb(var(--slate-950-rgb));
 
-  /* Trung tính  ramp thứ 2, nên gộp dần về slate */
   --gray-50-rgb: 249 250 251;
   --gray-100-rgb: 243 244 246;
   --gray-200-rgb: 229 231 235;
@@ -100,7 +86,6 @@
   --gray-800: rgb(var(--gray-800-rgb));
   --gray-900: rgb(var(--gray-900-rgb));
 
-  /* Lỗi / nguy hiểm */
   --red-50-rgb: 254 242 242;
   --red-100-rgb: 254 226 226;
   --red-200-rgb: 254 202 202;
@@ -116,7 +101,6 @@
   --red-600: rgb(var(--red-600-rgb));
   --red-700: rgb(var(--red-700-rgb));
 
-  /* Cảnh báo ấm */
   --orange-50-rgb: 255 247 237;
   --orange-100-rgb: 255 237 213;
   --orange-500-rgb: 249 115 22;
@@ -128,7 +112,6 @@
   --orange-600: rgb(var(--orange-600-rgb));
   --orange-700: rgb(var(--orange-700-rgb));
 
-  /* Cảnh báo / điểm nhấn vàng hổ phách */
   --amber-50-rgb: 255 251 235;
   --amber-100-rgb: 254 243 199;
   --amber-200-rgb: 253 230 138;
@@ -144,13 +127,11 @@
   --amber-600: rgb(var(--amber-600-rgb));
   --amber-700: rgb(var(--amber-700-rgb));
 
-  /* Vàng */
   --yellow-500-rgb: 234 179 8;
   --yellow-600-rgb: 202 138 4;
   --yellow-500: rgb(var(--yellow-500-rgb));
   --yellow-600: rgb(var(--yellow-600-rgb));
 
-  /* Thành công */
   --green-50-rgb: 240 253 244;
   --green-100-rgb: 220 252 231;
   --green-200-rgb: 187 247 208;
@@ -166,7 +147,6 @@
   --green-700: rgb(var(--green-700-rgb));
   --green-800: rgb(var(--green-800-rgb));
 
-  /* Thành công  ramp thứ 2, nên gộp dần về green */
   --emerald-50-rgb: 236 253 245;
   --emerald-100-rgb: 209 250 229;
   --emerald-200-rgb: 167 243 208;
@@ -184,7 +164,6 @@
   --emerald-700: rgb(var(--emerald-700-rgb));
   --emerald-800: rgb(var(--emerald-800-rgb));
 
-  /* Tông cũ trước khi đổi sang champagne  vẫn phủ phần lớn app */
   --teal-50-rgb: 240 253 250;
   --teal-200-rgb: 153 246 228;
   --teal-500-rgb: 20 184 166;
@@ -200,7 +179,6 @@
   --teal-900: rgb(var(--teal-900-rgb));
   --teal-950: rgb(var(--teal-950-rgb));
 
-  /* Thông tin */
   --sky-50-rgb: 240 249 255;
   --sky-100-rgb: 224 242 254;
   --sky-200-rgb: 186 230 253;
@@ -210,31 +188,23 @@
   --sky-200: rgb(var(--sky-200-rgb));
   --sky-700: rgb(var(--sky-700-rgb));
 
-  /* Phụ */
   --indigo-50-rgb: 238 242 255;
   --indigo-200-rgb: 199 210 254;
   --indigo-50: rgb(var(--indigo-50-rgb));
   --indigo-200: rgb(var(--indigo-200-rgb));
 
-  /* Phụ */
   --violet-500-rgb: 139 92 246;
   --violet-500: rgb(var(--violet-500-rgb));
 
   --black: #000;
   --white: #fff;
 
-  /* Neutral ấm  dẫn xuất từ tông champagne, đổi cùng lúc với brand */
   --warm-input: #f1ece2;
   --warm-hover: #f3efe6;
   --warm-border: #e4ddd0;
   --warm-border-strong: #d0c6b4;
   --warm-tag-bg: #faf4e6;
   --ink: #161823;
-
-  /* ══════════════════════════════════════════════════════════════
-     2. SEMANTIC  vai trò trong giao diện. Component chỉ nên dùng
-     tầng này; chỉ trỏ tới primitive, không viết mã màu trực tiếp.
-     ══════════════════════════════════════════════════════════════ */
 
   --primary: var(--brand-500);
   --primary-color: var(--brand-500);
@@ -246,7 +216,6 @@
   --brand-unique: var(--brand-200);
   --brand-unique-hover: var(--brand-400);
 
-  /* Dấu hiệu Premium  cố định champagne ở mọi theme (xem ramp --gold-*) */
   --premium-gradient: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-600) 100%);
   --premium-shadow: 0 4px 12px rgb(var(--gold-600-rgb) / 0.32);
   --premium-on-gradient: var(--ink);
@@ -260,7 +229,6 @@
   --text-on-dark-muted: rgb(var(--text-on-dark-rgb) / 0.72);
   --text-on-brand: var(--brand-900);
 
-  /* Chữ trên --primary-btn-bg: champagne sáng → mực tối; teal tối override ở theme normal */
   --on-primary-gradient: var(--text-on-brand);
   --on-primary-gradient-muted: var(--brand-800);
   --on-primary-gradient-subtle: var(--brand-700);
@@ -273,8 +241,6 @@
   --text-color: var(--ink);
   --text-secondary: var(--slate-500);
 
-  /* Nền trang trắng ở cả 2 theme. Trước đây là neutral ấm (#f6f3ec kem ở
-     premium / #f8fafc xám lạnh ở normal) nên trang nào cũng lẫn 2-3 sắc nền. */
   --bg-body: var(--white);
   --bg-white: var(--white);
   --input-bg: var(--warm-input);
@@ -304,9 +270,6 @@
 
   --primary-gradient: linear-gradient(135deg, var(--brand-200) 0%, var(--brand-500) 52%, var(--brand-600) 100%);
 
-  /* Banner hero đầu trang (PageHeader "Bài viết", hero lộ trình...): gradient
-     brand đậm → sáng, chữ TRẮNG. Đổi ở đây là mọi banner đổi theo. Khác
-     --brand-surface (khối đặc, chữ theo --on-primary-gradient). */
   --hero-gradient: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-500) 100%);
   --hero-shadow: 0 12px 30px var(--primary-alpha-28);
   --on-hero: var(--white);
@@ -316,19 +279,12 @@
   --on-hero-border: rgb(255 255 255 / 0.28);
   --on-hero-track: rgb(255 255 255 / 0.25);
 
-  /* Khối đặc mang màu thương hiệu: pagination active, avatar, huy hiệu chặng,
-     ô icon... Không phải nút. Chữ trên nền này dùng --on-primary-gradient.
-     Mỗi theme tự lấy --primary của mình (champagne brand-500 / teal brand-600). */
   --brand-surface: var(--primary);
 
-  /* Nút primary: nền TRẮNG, chữ màu thương hiệu, bóng mềm trung tính  kiểu
-     nút hành động trên banner (PageHeader .actionBtn). Không gradient, không
-     nền đặc: nền đặc champagne làm nút nặng và lẫn với banner gold. */
   --primary-btn-bg: var(--bg-white);
   --primary-btn-fg: var(--brand-700);
   --primary-btn-fg-hover: var(--brand-600);
   --primary-btn-shadow: 0 8px 18px rgb(0 0 0 / 0.08);
-  /* Hover kèm quầng viền sáng màu brand, giống nút ghost "Khám phá kỳ thi" */
   --primary-btn-shadow-hover: 0 12px 24px rgb(0 0 0 / 0.15), 0 0 0 3px var(--primary-alpha-20);
   --primary-btn-shadow-disabled: 0 4px 10px rgb(0 0 0 / 0.06);
 
@@ -340,10 +296,6 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
   --shadow-card: 0 14px 28px rgb(0 0 0 / 0.05), 0 10px 10px rgb(0 0 0 / 0.05);
-
-  /* ══════════════════════════════════════════════════════════════
-     3. TYPOGRAPHY / SPACING
-     ══════════════════════════════════════════════════════════════ */
 
   --font-family: 'Inter', sans-serif;
   --font-weight: 600;
@@ -378,15 +330,7 @@
   --radius-xl: 20px;
 }
 
-/* ══════════════════════════════════════════════════════════════
-   THEME "NORMAL" (user thường / khách)  tông TEAL (xanh ngọc
-   #0d9488) là theme GỐC ban đầu. Champagne (vàng) = premium, giữ
-   mặc định ở :root. Lưu ý: theme teal map --primary = brand-600
-   (champagne map brand-500), điểm nhấn --brand-unique là cam hổ phách,
-   nên phải override cả ramp lẫn các token semantic bị lệch vị trí.
-   ══════════════════════════════════════════════════════════════ */
 :root[data-theme='normal'] {
-  /* Ramp thương hiệu -> teal (xanh ngọc) */
   --brand-50-rgb: 240 253 250;
   --brand-100-rgb: 204 251 241;
   --brand-150-rgb: 179 247 234;
@@ -400,7 +344,6 @@
   --brand-900-rgb: 4 47 46;
   --text-on-dark-rgb: 226 232 240;
 
-  /* Semantic: teal dùng brand-600 làm primary (champagne dùng brand-500) */
   --primary: var(--brand-600);
   --primary-color: var(--brand-600);
   --accent-color: var(--brand-600);
@@ -408,11 +351,9 @@
   --hover-accent: var(--brand-700);
   --primary-rgb: var(--brand-600-rgb);
 
-  /* Điểm nhấn cam hổ phách của theme teal (#f59e0b / #d97706) */
   --brand-unique: var(--amber-500);
   --brand-unique-hover: var(--amber-600);
 
-  /* Alpha primary theo brand-600 */
   --primary-alpha-08: rgb(var(--brand-600-rgb) / 0.08);
   --primary-alpha-10: rgb(var(--brand-600-rgb) / 0.1);
   --primary-alpha-15: rgb(var(--brand-600-rgb) / 0.15);
@@ -421,11 +362,8 @@
   --primary-alpha-35: rgb(var(--brand-600-rgb) / 0.35);
   --primary-alpha-45: rgb(var(--brand-600-rgb) / 0.45);
 
-  /* Gradient theo teal. --brand-surface tự bám --primary = brand-600; nút
-     primary trắng nên bóng của nó trung tính, dùng chung định nghĩa ở :root. */
   --primary-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-500) 100%);
 
-  /* Gradient teal tối → chữ trắng (ngược champagne) */
   --on-primary-gradient: var(--white);
   --on-primary-gradient-muted: rgb(255 255 255 / 0.92);
   --on-primary-gradient-subtle: rgb(255 255 255 / 0.85);
@@ -435,14 +373,12 @@
   --on-primary-gradient-fill: var(--white);
   --on-primary-gradient-cta: var(--primary);
 
-  /* Neutral lạnh */
   --warm-input: #f1f5f9;
   --warm-hover: #f8f9fa;
   --warm-border: #e2e8f0;
   --warm-border-strong: #cbd5e1;
   --warm-tag-bg: #fff4e5;
 
-  /* Author tag = cam hổ phách */
   --author-tag-text: var(--amber-700);
   --author-tag-border: #fcd9a5;
 }
@@ -638,9 +574,6 @@ li {
   }
 }
 
-/* Trước đây file này là *.module.scss nên phải bọc :global() để class thoát khỏi hashing.
-   Nay đã là stylesheet global thật (Next không cho selector không-pure trong CSS Module),
-   mọi class ở đây đều là global — bỏ :global() đi. */
 .tag-badge {
   font-size: var(--font-size-ssm) !important;
   padding: 0.6rem 1.2rem !important;

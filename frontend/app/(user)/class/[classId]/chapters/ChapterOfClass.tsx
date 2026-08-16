@@ -69,7 +69,6 @@ const ChapterOfClass = () => {
       await deleteChapterMutation.mutateAsync(selectedChapter.chapterId);
       toast.success('Xóa chương thành công!');
     } catch (error: any) {
-      // any có chủ đích: lỗi Axios, đọc error.response.data.message (BE không có type lỗi)
       toast.error(
         error.response?.data?.message ||
         'Không thể xóa chương. Vui lòng thử lại.',
@@ -151,7 +150,6 @@ const ChapterOfClass = () => {
                       <IoCalendarOutline />
                       <span>
                         Cập nhật:{' '}
-                        {/* createdAt optional theo type nhưng BE luôn trả — giữ hành vi bản JS cũ */}
                         {new Date(chapter.createdAt!).toLocaleDateString(
                           'vi-VN',
                         )}

@@ -88,7 +88,6 @@ export function useTargetDashboard(examTypeId: string) {
     latestEnhanced: data.latestEnhanced,
     isLoading: dashboardQuery.isLoading,
     error: dashboardQuery.error
-      // Giữ nguyên cách lấy message của bản .js (axios error không có type sẵn).
       ? (dashboardQuery.error as any)?.response?.data?.message || dashboardQuery.error.message
       : null,
   };

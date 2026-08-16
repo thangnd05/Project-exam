@@ -25,7 +25,6 @@ const enhancedResultKeys = {
   detail: (userTestId: string) => ['enhanced-result', userTestId],
 };
 
-// Entry trong map enhancedById: hoặc data enhanced, hoặc marker lỗi {error: true}.
 type EnhancedEntry = Partial<EnhancedResultResponse> & { error?: boolean };
 
 function formatDuration(seconds: number | null | undefined): string {

@@ -46,7 +46,6 @@ import styles from '../CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-
 const COLLECTION_SCOPED_MODES: string[] = [
   SELECTION_MODES.RANDOM_BY_COLLECTION,
   SELECTION_MODES.SEQUENTIAL,
@@ -63,7 +62,6 @@ type BankSource = (typeof BANK_SOURCES)[keyof typeof BANK_SOURCES];
 
 const ALL_CHAPTERS = '__ALL__';
 
-/** Form tạo đề từ kho: mọi ô input là chuỗi, ép số lúc submit. */
 type BankTestInfo = {
   title: string;
   description: string;
@@ -201,8 +199,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
 
   const createTestMutation = useMutation({
     mutationFn: async (partsToAdd: any[]) => {
-      // BE phân biệt `null` (không đặt) với field vắng mặt, CreateTestRequest khai optional
-      // -> cast qua unknown để giữ nguyên body request của bản JS.
       const testData = await createTest({
         title: testInfo.title.trim(),
         description: testInfo.description || null,

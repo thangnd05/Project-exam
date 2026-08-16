@@ -28,7 +28,6 @@ import createModalStyles from './CreateTestModal.module.scss';
 
 const cxCreate = classNames.bind(createModalStyles);
 
-/** Đề truyền vào có thể là TestResponse hoặc dữ liệu cũ (id / examType lồng) từ trang quản lý. */
 export type EditableTest = TestResponse & {
   id?: string;
   examType?: { examTypeId?: string };
@@ -45,7 +44,6 @@ type UpdateTestVariables = { testId: string; payload: CreateTestRequest };
 
 const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) => {
   const canSetPricing = useHasPermission(PermissionCode.TEST_MANAGE_PRICING);
-  // Các list dưới đây nhận nhiều dạng response cũ (mảng | {data} | {content}) nên để any[] có chủ đích.
   const [examTypes, setExamTypes] = useState<any[]>([]);
   const [examCategories, setExamCategories] = useState<any[]>([]);
   const [questionCollections, setQuestionCollections] = useState<any[]>([]);
@@ -204,7 +202,6 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
         : Number(formData.costCoins),
     };
 
-    // BE nhận `null` để xoá field (khác undefined) nên giữ nguyên payload, cast qua unknown.
     updateMutation.mutate({
       testId: (test!.testId || test!.id) as string,
       payload: payload as unknown as CreateTestRequest,
@@ -213,7 +210,6 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
   const groupedQuestions = useMemo(() => {
     if (!testDetail?.parts) return [];
-    // Response cũ có part.examPart / part.questions phẳng nên duyệt bằng any có chủ đích.
     return (testDetail.parts as any[]).map((part: any, partIndex: number) => {
       const partName =
         part?.examPart?.name ||

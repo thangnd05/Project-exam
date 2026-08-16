@@ -26,7 +26,6 @@ type EmailRecipientsModalProps = {
   onClose: () => void;
 };
 
-/** Nhật ký gửi của một email: ai nhận, thành công hay lỗi, lỗi vì sao. */
 function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps) {
   const [page, setPage] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');

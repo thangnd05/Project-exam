@@ -6,7 +6,6 @@ import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import type { ExamTypeResponse, PlanResponse } from '@/app/types';
 
-/** Plan kèm tên loại kỳ thi đã map sẵn ở FE để hiển thị badge. */
 export type PlanListItem = PlanResponse & { examTypeName?: string };
 
 export const learningPlanListKeys = {
@@ -98,8 +97,7 @@ export function useLearningPlanList({
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error
-      ? // err any có chủ đích: lỗi Axios, đọc response.data.message (BE không có type lỗi)
-        (query.error as any)?.response?.data?.message
+      ? (query.error as any)?.response?.data?.message
         || query.error.message
         || 'Không tải được danh sách plan'
       : null,

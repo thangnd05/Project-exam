@@ -104,10 +104,6 @@
   flex-shrink: 0;
 }
 
-/*
-  Khu "thi lấy chứng chỉ": viền và nền pha màu thương hiệu để nổi hẳn so với khu bộ đề,
-  vì đây là bài thi dẫn tới chứng chỉ chứ không phải đề luyện thường.
-*/
 .certificate-section {
   margin-bottom: 28px;
   padding: 16px 22px;
@@ -117,7 +113,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Mở ra mới cần chỗ cho lưới đề bên dưới; lúc đóng khu này chỉ cao bằng một thanh tiêu đề. */
 .certificate-section.open {
   padding-bottom: 24px;
 }

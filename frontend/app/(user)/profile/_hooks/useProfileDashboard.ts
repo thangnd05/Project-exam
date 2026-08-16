@@ -14,12 +14,10 @@ import type {
   UserTargetResponse,
 } from '@/app/types';
 
-/* Part requirement đã gắn thêm tên Part (join từ danh sách exam parts ở FE) */
 export interface ProfileTargetPart extends UserTargetPartResponse {
   examPartName?: string;
 }
 
-/* Mục tiêu hiển thị ở dashboard cá nhân: target + tên loại đề + parts đã sort/đặt tên */
 export interface ProfileTarget extends Omit<UserTargetResponse, 'partRequirements'> {
   examTypeName?: string;
   partRequirements: ProfileTargetPart[];

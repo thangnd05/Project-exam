@@ -129,7 +129,6 @@ function GeneratePlan() {
 
         setListRefreshKey((k) => k + 1);
       },
-      // err any có chủ đích: lỗi Axios, đọc response.data.message (BE không có type lỗi)
       onError: (err: any) => {
         setError(err?.response?.data?.message || err.message || 'Lỗi không xác định');
       },

@@ -7,7 +7,6 @@ import { uploadPostImage, createPost, updatePost } from '@/app/apis/postApi';
 const DEFAULT_THUMBNAIL_URL =
   'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1350&q=80';
 
-/* Ảnh chèn inline trong editor: giữ file gốc + data URL base64 đã nhúng tạm vào nội dung */
 export interface InlinePostImage {
   file: File;
   base64Url: string;
@@ -81,7 +80,6 @@ export function useSavePost({ onSuccess }: { onSuccess?: () => void } = {}) {
     onSuccess: () => {
       if (onSuccess) onSuccess();
     },
-    // any có chủ đích: lỗi axios (err.response) không có type sẵn trong dự án
     onError: (err: any, variables) => {
       toast.error(
         err.response?.data?.message || (variables.isEditing ? 'Lỗi khi cập nhật bài viết!' : 'Lỗi khi đăng bài viết!'),

@@ -1,7 +1,6 @@
 import { PassageType, QuestionType } from '@/app/enums';
 import type { ExamPart, ExamQuestion, QuestionIndexMap } from '@/app/components/exam-layout/examLayoutTypes';
 
-// Dữ liệu mẫu cho phần xem trước của layout builder (trang admin exam-types/[examTypeId]/layout).
 export const sampleExamData: { visibleParts: ExamPart[] } = {
   visibleParts: [
     {

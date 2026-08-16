@@ -21,7 +21,6 @@ export const authKeys = {
   currentUser: CURRENT_USER_QUERY_KEY,
 };
 
-/* Biến mutation cho reset password: chỉ cần token + mật khẩu mới (confirm check ở form). */
 interface ResetPasswordVariables {
   token: string;
   newPassword: string;

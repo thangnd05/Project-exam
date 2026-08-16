@@ -16,10 +16,6 @@ export function useExamCategories() {
       .catch(() => setExamCategories([]));
   }, []);
 
-  /*
-    Nhóm đề có cấp chứng chỉ chỉ dành cho người quản trị đề. Backend cũng bỏ qua nếu người
-    dùng thường gửi lên, ẩn luôn ở đây để không ai chọn rồi thắc mắc sao lưu xong lại mất.
-  */
   const canPickCertificateCategory =
     Array.isArray(permissions) && permissions.includes(PermissionCode.TEST_MANAGE);
 

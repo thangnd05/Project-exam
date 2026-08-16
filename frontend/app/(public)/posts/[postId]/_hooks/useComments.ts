@@ -14,8 +14,6 @@ interface UpdateCommentVariables {
   data: CommentRequest;
 }
 
-/* Callback tuỳ chọn truyền lúc khởi tạo hook; các tham số sau (data/error, variables)
-   để rest any[] có chủ đích cho khớp chữ ký callback của react-query v5 */
 interface MutationCallbacks<TData, TVariables> {
   onSuccess?: (data: TData, variables: TVariables, ...rest: any[]) => void;
   onError?: (error: Error, variables: TVariables, ...rest: any[]) => void;

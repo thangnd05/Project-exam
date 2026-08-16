@@ -18,8 +18,6 @@ function selectedIdsOf(item: SessionReviewItem): string[] {
 
 function itemStatus(item: SessionReviewItem): string {
   if (selectedIdsOf(item).length === 0) return 'unanswered';
-  // TODO: BE serialize cờ đúng/sai là `correct` (Jackson bỏ tiền tố is), type SessionReviewItem
-  // khai `isCorrect` — giữ nguyên field behavior của bản .js cũ, cast any có chủ đích.
   return (item as any).correct ? 'correct' : 'incorrect';
 }
 

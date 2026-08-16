@@ -333,8 +333,6 @@ function PostDetail() {
                 setReplyContent('');
               }}>Trả lời</button>
               <span className={cx('time')}>{new Date(comment.createdAt ?? '').toLocaleString('vi-VN')}</span>
-              {/* any có chủ đích: code cũ so sánh `user.id` trong khi AuthUser chuẩn hoá chỉ có
-                  `userId` — giữ nguyên biểu thức để không đổi hành vi hiện tại của nút Sửa/Xóa */}
               {user && (user as any).id === comment.userId && (
                 <>
                   <button onClick={() => {

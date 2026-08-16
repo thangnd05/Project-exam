@@ -21,17 +21,12 @@ import type { TestPartResponse, TestResponse, UserAnswerRequest } from '@/app/ty
 import { enrichTestWithPassageMedia } from './passageUtils';
 import { useExamFlowNavigation } from './useExamFlowNavigation';
 
-/**
- * Đề đang làm. Endpoint /user-test-info còn trả thêm vài mã trạng thái runtime
- * (PAYMENT_REQUIRED, FORBIDDEN) chưa có trong enum TestStatus nên `status` nới về string.
- */
 type ActiveTest = Omit<TestResponse, 'testId' | 'status'> & {
   testId?: string;
   status?: string;
   parts: TestPartResponse[];
 };
 
-/* BE nhận `mode` dạng chuỗi tự do ("practice") chứ không phải enum UserTestMode -> ép kiểu tại chỗ. */
 const PRACTICE_MODE_PARAM = 'practice' as UserTestMode;
 
 export function useTestSession() {
@@ -136,8 +131,6 @@ export function useTestSession() {
         setTest(enriched);
 
         if (testData.status === 'LOGIN_REQUIRED') {
-          // `from` + `flash` đi qua query string (Next không có location.state) — cùng giao
-          // ước với AuthGuard, LoginPage đọc hai tham số này.
           router.push(
             `/login?${new URLSearchParams({
               from: `/tests/${testId}/start`,
@@ -222,7 +215,6 @@ export function useTestSession() {
         }
       })
       .catch(() => setStatus('error'));
-    // flow.restoreStepState is stable
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [testId, sessionKey, isPractice, selectedPartIds, router, isGuest, guestCfg]);
 
@@ -242,7 +234,6 @@ export function useTestSession() {
           );
           if (saved?.startedAt) setStartedAt(saved.startedAt);
         } catch {
-          /* ignore */
         }
         setStatus('active');
         return;
@@ -364,7 +355,6 @@ export function useTestSession() {
     }
   };
 
-  // React 19 buộc useRef phải có giá trị khởi tạo tường minh.
   const handleSubmitRef = useRef<(() => Promise<void>) | undefined>(undefined);
   handleSubmitRef.current = handleSubmit;
 
@@ -380,7 +370,6 @@ export function useTestSession() {
     return end;
   }, [isPractice, startedAt, test?.durationMinutes, test?.availableTo]);
 
-  // Bài có giờ tự nộp khi hết thời gian (đếm ngược ở client).
   useEffect(() => {
     if (status !== 'active') return undefined;
     if (deadline == null) {

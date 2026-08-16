@@ -1,12 +1,6 @@
 import { getPassageMediaByPassageId } from '@/app/apis/passageMediaApi';
 import type { ExamFlowStep } from '@/app/components/exam-layout/examLayoutTypes';
 
-/*
-  Passage trả về từ nhiều endpoint khác nhau nên các helper dưới đây phải dò cả camelCase lẫn
-  snake_case (passageMedias / passageMediaList / passage_media...). DTO chuẩn không mô tả hết
-  các biến thể đó -> để `any` có chủ đích, giữ nguyên chuỗi fallback của bản JS.
-*/
-
 export const hasMediaList = (p: any) => {
   const list = p?.passageMedias ?? p?.passageMediaList ?? p?.passage_media;
   return Array.isArray(list) && list.length > 0;
@@ -31,7 +25,6 @@ export const passageHasAudio = (passage: any) => {
 export const isListeningStep = (step?: ExamFlowStep | null) =>
   !!step && (step.audioGated === true || step.sectionType === 'LISTENING');
 
-/** Bổ sung passage_media cho các passage chưa kèm sẵn; giữ nguyên hình dạng đề truyền vào. */
 export async function enrichTestWithPassageMedia<T extends { parts?: any[] }>(
   testData: T,
 ): Promise<T> {

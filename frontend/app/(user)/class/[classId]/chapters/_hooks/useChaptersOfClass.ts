@@ -16,8 +16,6 @@ export const chapterKeys = {
   classInfo: (classId: string) => ['class-info', classId],
 };
 
-// API trả mảng, nhưng giữ nhánh phòng hờ dạng phân trang { content } như bản JS cũ
-// (data as any vì nhánh { content } không nằm trong kiểu trả về đã khai báo của API)
 const normalizeChapters = (data: ChapterResponse[]): ChapterResponse[] =>
   Array.isArray(data) ? data : ((data as any)?.content ?? []);
 
@@ -57,7 +55,6 @@ export function useChaptersOfClass(classId: string) {
   };
 }
 
-// error để any có chủ đích: consumer đọc error.response?.data?.message theo shape của axios.
 type MutationCallbacks<TData, TVariables> = Pick<
   UseMutationOptions<TData, any, TVariables>,
   'onSuccess' | 'onError'

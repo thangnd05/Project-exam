@@ -21,7 +21,6 @@
   padding: 10px clamp(16px, 3vw, 28px);
 }
 
-/* —— 3-zone layout: Brand | Nav | Utils —— */
 .barRow {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -177,12 +176,6 @@
 }
 
 .new-test {
-  /* Đây là <Button> của react-bootstrap nên luôn kèm class .btn, mà .btn:hover
-     và .btn:active ghi đè background-color + color qua các biến --bs-btn-*.
-     Với variant rỗng thì mấy biến đó không có giá trị nên hover = nền trong
-     suốt. Hồi nút còn gradient thì không lộ, vì gradient nằm ở background-image
-      Bootstrap chỉ đụng background-color. Cấp giá trị cho chính biến của
-     Bootstrap thay vì đấu specificity. */
   --bs-btn-color: var(--primary-btn-fg);
   --bs-btn-bg: var(--primary-btn-bg);
   --bs-btn-border-color: transparent;
@@ -204,7 +197,6 @@
   white-space: nowrap;
   padding: 9px 16px;
   background: var(--primary-btn-bg);
-  /* Nút trắng nằm trên header tối: bóng đen vô hình nên dùng quầng brand */
   box-shadow: 0 4px 18px rgb(var(--primary-rgb) / 0.3);
   transition:
     box-shadow 0.2s ease,
@@ -420,7 +412,6 @@
   display: none;
 }
 
-/* —— Tablet / laptop nhỏ —— */
 @media (min-width: 992px) and (max-width: 1199.98px) {
   .home,
   .menuTitle {

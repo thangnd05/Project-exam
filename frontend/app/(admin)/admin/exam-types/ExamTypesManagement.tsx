@@ -14,8 +14,6 @@ import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/a
 import {useExamTypes} from '@/app/hooks/useExamTypes';
 import type {ExamTypeResponse} from '@/app/types';
 
-// Dùng chung bộ style cây 2 cấp với trang bộ sưu tập câu hỏi (một nguồn duy nhất,
-// đổi style cây là cả 2 trang cùng ăn theo).
 import styles from '@/app/(admin)/admin/question-collections/QuestionCollectionsManagement.module.scss';
 
 const cx = classNames.bind(styles);
@@ -283,7 +281,6 @@ function ExamTypesManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      // BE chấp nhận durationMinutes null để gỡ giá trị — DTO FE khai optional nên ép kiểu tại đây
       const payload = buildExamTypePayload(formState, {hasChildren: editingHasChildren}) as any;
       if (editingTypeId) {
         await updateMutation.mutateAsync({id: editingTypeId, payload});

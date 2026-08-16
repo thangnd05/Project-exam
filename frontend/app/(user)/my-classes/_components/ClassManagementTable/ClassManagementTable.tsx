@@ -12,7 +12,6 @@ import type { ClassStudentResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-// Hàng trong bảng = lớp của tôi + cờ isTeacher gắn thêm ở ClassListContainer
 type ClassRow = ClassStudentResponse & { isTeacher?: boolean };
 
 type ClassManagementTableProps = {

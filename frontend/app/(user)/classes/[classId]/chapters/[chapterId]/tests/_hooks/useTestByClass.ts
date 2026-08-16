@@ -10,8 +10,6 @@ export const testByClassKeys = {
   chapterTests: (classId: string, chapterId: string) => ['class-chapter-tests', classId, chapterId],
 };
 
-// API trả mảng, nhưng giữ nhánh phòng hờ dạng bọc { data } như bản JS cũ
-// (data as any vì nhánh { data } không nằm trong kiểu trả về đã khai báo của API)
 const normalizeTests = (data: TestResponse[]): TestResponse[] =>
   Array.isArray(data) ? data : Array.isArray((data as any)?.data) ? (data as any).data : [];
 

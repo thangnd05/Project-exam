@@ -7,8 +7,6 @@ import type { NoteRequest, NoteResponse } from '@/app/types';
 
 type SaveNoteVariables = { noteId: string | null; payload: NoteRequest };
 
-// Callback pass-through nhận ...args: any[] để khớp chữ ký onSuccess/onError của
-// react-query v5 (đủ tham số); TError = any vì consumer đọc err.response?.data?.message.
 export function useSaveNote({
   onSuccess,
   onError,

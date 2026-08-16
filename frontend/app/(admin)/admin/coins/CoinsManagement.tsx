@@ -20,7 +20,6 @@ import { useAdminCoins, useCoinUserOptions } from './_hooks/useAdminCoins';
 
 interface CoinFormState {
   userId: string;
-  // balance giữ number | string: input number của react-bootstrap trả string khi gõ
   balance: number | string;
 }
 

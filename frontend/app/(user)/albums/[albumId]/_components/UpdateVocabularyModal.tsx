@@ -54,7 +54,6 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabu
         setEditVocab({ ...editVocab, [name]: value });
     };
 
-    // e nhận từ onClick của footer nên luôn có mặt lúc chạy; để optional cho khớp type () => void
     const handleUpdate = (e?: React.SyntheticEvent) => {
         if (!editVocab.word.trim() || !editVocab.meaning.trim()) {
             toast.warning(' Vui lòng điền đầy đủ từ vựng và nghĩa!');
@@ -62,7 +61,6 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabu
         }
 
         e?.preventDefault();
-        // vocab! an toàn: modal chỉ mở khi đã chọn từ vựng để sửa
         updateMutation.mutate({
             vocabId: vocab!.vocabId,
             data: { ...editVocab, albumId: vocab!.albumId },

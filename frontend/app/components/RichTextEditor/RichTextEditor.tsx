@@ -4,21 +4,6 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 're
 import type Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 
-/**
- * Trình soạn thảo dựng thẳng trên `quill@2`, thay cho `react-quill`.
- *
- * Vì sao tự viết: react-quill@2 gọi `findDOMNode` — API đã bị xoá ở React 19, nên nó là thứ
- * duy nhất chặn đường nâng React. Wrapper này giữ nguyên giao ước cũ mà 2 chỗ đang dùng cần:
- *   - `onChange(html, delta, source)` — EmailEditorModal chỉ nhận `source === 'user'` để Quill
- *     chuẩn hoá HTML lúc nạp không ghi đè nội dung thật.
- *   - `getEditor()` qua ref — CreatePostModal cần instance để chèn ảnh vào đúng vị trí con trỏ.
- *   - Cấu trúc DOM `.quill > (.ql-toolbar + .ql-container)` y như react-quill, để SCSS sẵn có
- *     không phải sửa một dòng nào.
- *
- * Quill chạm `document` ngay khi nạp module nên phải `import()` bên trong effect (chỉ chạy ở
- * trình duyệt) — nhờ vậy chỗ gọi không cần bọc `next/dynamic` nữa.
- */
-
 export type RichTextEditorHandle = {
   getEditor: () => Quill | null;
 };
@@ -42,8 +27,6 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, RichTextEditorProps>(fun
   const quillRef = useRef<Quill | null>(null);
   const [ready, setReady] = useState(false);
 
-  // Giữ trong ref để effect khởi tạo không phải chạy lại mỗi lần prop đổi (khởi tạo lại Quill
-  // sẽ mất con trỏ và toàn bộ lịch sử undo).
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   const initialValueRef = useRef(value);
@@ -60,7 +43,6 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, RichTextEditorProps>(fun
       const { default: QuillCtor } = await import('quill');
       if (cancelled || !containerRef.current) return;
 
-      // Quill biến chính div này thành .ql-container và chèn .ql-toolbar ngay trước nó.
       const editorHost = document.createElement('div');
       containerRef.current.appendChild(editorHost);
 
@@ -87,21 +69,16 @@ const RichTextEditor = forwardRef<RichTextEditorHandle, RichTextEditorProps>(fun
     return () => {
       cancelled = true;
       quillRef.current = null;
-      // Dọn sạch DOM Quill đã dựng để lần mount sau không bị nhân đôi thanh công cụ.
       if (container) container.innerHTML = '';
     };
   }, []);
 
-  // Đồng bộ khi giá trị được đổi TỪ BÊN NGOÀI (mở modal với nội dung có sẵn, reset form...).
-  // So sánh với HTML hiện tại để không ghi đè lúc người dùng đang gõ — nếu không, mỗi phím bấm
-  // sẽ đẩy con trỏ về đầu.
   useEffect(() => {
     const quill = quillRef.current;
     if (!quill || !ready) return;
     const current = quill.root.innerHTML;
     const next = value || '';
     if (next === current) return;
-    // Quill để lại '<p><br></p>' khi rỗng; coi đó là tương đương chuỗi rỗng.
     if (!next && current === '<p><br></p>') return;
     quill.clipboard.dangerouslyPasteHTML(next, 'silent');
   }, [value, ready]);

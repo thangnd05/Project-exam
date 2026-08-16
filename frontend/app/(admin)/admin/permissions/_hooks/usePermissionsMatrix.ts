@@ -6,7 +6,6 @@ import {getRoles, updateRolePermissions} from '@/app/apis/roleApi';
 import {getPermissions} from '@/app/apis/permissionApi';
 import {CURRENT_USER_QUERY_KEY} from '@/app/contexts/AuthContext';
 
-/** Ma trận quyền theo vai trò: roleId -> tập code quyền được tick. */
 export type PermissionMatrix = Record<string, Set<string>>;
 
 export const permissionsKeys = {
@@ -42,8 +41,6 @@ export function usePermissionsMatrix() {
       ),
     onSuccess: () => {
       qc.invalidateQueries({queryKey: permissionsKeys.roles()});
-      // Nếu vừa sửa chính vai trò của mình thì backend đã đổi quyền ngay, nhưng sidebar và
-      // ProtectedRoute vẫn đang dùng danh sách quyền lấy lúc đăng nhập  nạp lại /me cho khớp.
       qc.invalidateQueries({queryKey: CURRENT_USER_QUERY_KEY});
     },
   });

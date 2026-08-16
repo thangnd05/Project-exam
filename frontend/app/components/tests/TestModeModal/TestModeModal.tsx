@@ -28,10 +28,8 @@ export const testModeKeys = {
   partResources: (testId?: string) => ['test-part-resources', testId],
 };
 
-/** BE luôn trả examPartId ở parts-summary — siết lại để dùng làm key/Set. */
 type PartSummary = TestPartSummaryResponse & { examPartId: string };
 
-/** Lựa chọn chế độ làm bài: 'full' = full test có giờ, 'practice' = luyện theo Part (không giờ). */
 export type TestModeSelection = {
   mode: 'full' | 'practice';
   examPartIds?: string[];

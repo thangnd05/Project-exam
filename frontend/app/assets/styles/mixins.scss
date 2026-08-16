@@ -1,11 +1,3 @@
-// Mixin dùng chung cho các *.module.scss (nút, kích thước...).
-//
-// Tách khỏi GlobalStyles.scss vì hai file phục vụ hai việc khác nhau:
-//   - GlobalStyles.scss: CSS global thật (token :root, reset, utility) — nạp MỘT LẦN ở app/layout.js
-//   - mixins.scss: chỉ có @mixin, không sinh ra CSS khi import — module nào cần thì @import
-//
-// Trước đây 34 file module @import thẳng GlobalStyles.module.scss chỉ để lấy mixin, kéo theo
-// ~785 dòng token bị nhân bản vào từng file. Giờ import file này thì không còn nhân bản nữa.
 
 @mixin primaryGradientButton {
   background: var(--primary-btn-bg);
@@ -14,9 +6,6 @@
   transition: all 0.25s ease;
   box-shadow: var(--primary-btn-shadow);
 
-  /* Hover: viền brand hiện ra như nút ghost "Khám phá kỳ thi". Nền giữ trắng
-     nên viền là tín hiệu chính; base đã có border 1px trong suốt sẵn để không
-     nhảy layout khi viền xuất hiện. */
   &:hover {
     background: var(--primary-btn-bg);
     border-color: var(--primary);

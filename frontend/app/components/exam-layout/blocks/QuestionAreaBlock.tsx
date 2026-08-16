@@ -19,13 +19,10 @@ import type {
   QuestionIndexMap,
 } from '@/app/components/exam-layout/examLayoutTypes';
 import type { LayoutQuestionArea } from '@/app/components/exam-layout/layoutSchema';
-// Các block dùng chung class của trang làm bài; scss đặt cạnh engine để bớt import chéo.
 import styles from '@/app/components/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);
 
-// BE trả PassageResponse { content, mediaUrl, passageType, passageMedias[] }
-// và PassageMediaResponse { mediaUrl, mediaType, content }.
 const mediaListOf = (passage: ExamPassage): PassageMediaResponse[] =>
   Array.isArray(passage?.passageMedias) ? passage!.passageMedias! : [];
 
@@ -49,7 +46,6 @@ type QuestionAreaBlockProps = {
   handleAnswerChange: AnswerChangeHandler;
   config?: LayoutQuestionArea;
 
-  /** Chế độ PAGED: hiện từng câu/nhóm một (nghe tự chuyển, đọc bấm) */
   isPaged?: boolean;
   flowSteps?: ExamFlowStep[];
   currentStepIndex?: number;

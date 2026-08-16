@@ -39,7 +39,6 @@ type TestListContainerProps = {
   countdowns?: Record<string, number>;
   handleDeleteTest?: (testId: string) => void;
   emptyState?: React.ReactNode;
-  // Prop nhận vào nhưng hiện chưa dùng — giữ nguyên như bản JS cũ
   loading?: boolean;
   onRefresh?: () => void;
   footer?: React.ReactNode;

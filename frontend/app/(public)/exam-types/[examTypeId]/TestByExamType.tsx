@@ -125,15 +125,9 @@ function TestByExamType() {
     </div>
   );
 
-  /*
-    Khu thi lấy chứng chỉ tách khỏi danh sách đề thường (backend đã loại các đề này khỏi
-    danh sách phẳng) để người học thấy ngay đích cuối của loại đề. Backend trả mảng rỗng
-    khi loại đề chưa có mẫu chứng chỉ đang bật, lúc đó khu này tự ẩn.
-  */
   const certificateTests = certificateExam?.tests ?? [];
   const certificateSection = certificateTests.length > 0 && (
     <div className={cx('certificate-section', { open: certificateOpen })}>
-      {/* Mặc định đóng: phần lớn lượt vào trang là để luyện đề, thi lấy chứng chỉ chỉ mở khi cần. */}
       <button
         type="button"
         className={cx('certificate-head')}

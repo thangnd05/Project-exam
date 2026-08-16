@@ -200,7 +200,6 @@
 
 .grid {
   display: grid;
-  // Cùng bề ngang thẻ quay hero (196px), tối đa 4 cột.
   grid-template-columns: repeat(auto-fit, 196px);
   justify-content: center;
   align-content: start;

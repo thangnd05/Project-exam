@@ -15,9 +15,6 @@ import {useAdminCrud} from '@/app/hooks/useAdminCrud';
 import {examTypeKeys} from '@/app/hooks/examTypeKeys';
 import type {ExamTypeLayoutResponse, ExamTypeRequest, ExamTypeResponse} from '@/app/types';
 
-// Hook dùng chung cho nhiều route admin (exam-types, exam-types/[examTypeId]/layout)
-// và tags (_hooks/useTags dùng lại examTypeKeys) nên đặt ở app/hooks thay vì _hooks của 1 route.
-// Key gom ở app/hooks/examTypeKeys.ts, re-export tại đây để các import cũ giữ nguyên.
 export {examTypeKeys};
 
 export function useExamTypes() {

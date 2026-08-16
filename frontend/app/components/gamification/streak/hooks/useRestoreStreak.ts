@@ -7,7 +7,6 @@ import { STREAK_QUERY_KEY } from '@/app/contexts/StreakContext';
 import { COINS_QUERY_KEY } from '@/app/contexts/CoinContext';
 import type { StreakResponse } from '@/app/types';
 
-// error để any có chủ đích: consumer đọc error?.response?.data?.message theo shape của axios.
 type UseRestoreStreakOptions = Pick<
   UseMutationOptions<StreakResponse, any, void>,
   'onSuccess' | 'onError'

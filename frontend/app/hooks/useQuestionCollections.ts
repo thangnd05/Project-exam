@@ -8,7 +8,6 @@ export const questionCollectionKeys = {
   list: ['question-collections'],
 };
 
-// API đã trả mảng, vẫn giữ fallback data/content của bản JS cho response cũ -> `any` có chủ đích.
 const normalizeCollections = (data: any): QuestionCollectionResponse[] =>
   Array.isArray(data) ? data : data?.data || data?.content || [];
 

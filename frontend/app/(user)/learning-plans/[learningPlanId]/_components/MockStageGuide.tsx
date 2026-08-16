@@ -12,10 +12,6 @@ import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss'
 
 const cx = classNames.bind(styles);
 
-/**
- * Tìm bài đã hoàn thành SAU khi lộ trình này được tạo (bài mock "chốt kết quả").
- * Ưu tiên bài trọn đề; bỏ qua chính bài nguồn của lộ trình.
- */
 function findFreshMock(tests: UserTestResponse[] | undefined, plan: PlanResponse): UserTestResponse | null {
   const planCreatedAt = plan.createdAt ? new Date(plan.createdAt).getTime() : 0;
   const candidates = (tests || []).filter((t) => {

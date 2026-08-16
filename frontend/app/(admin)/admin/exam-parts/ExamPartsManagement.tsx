@@ -142,7 +142,6 @@ function ExamPartsManagement() {
       return;
     }
 
-    // BE chấp nhận skillId null để bỏ gán skill — DTO FE khai optional nên ép kiểu tại đây
     const payload = {
       examTypeId: formState.exam_type_id,
       skillId: formState.skill_id || null,

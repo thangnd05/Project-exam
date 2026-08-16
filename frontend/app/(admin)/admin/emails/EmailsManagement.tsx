@@ -58,8 +58,6 @@ function EmailsManagement() {
     );
   }, [autoEmails, keyword]);
 
-  // Lấy lại từ danh sách thay vì giữ bản chụp lúc bấm: sau khi gửi lại email lỗi, số liệu
-  // trong modal nhật ký phải đổi theo.
   const logEmail = useMemo(() => {
     if (!logEmailId) {
       return null;

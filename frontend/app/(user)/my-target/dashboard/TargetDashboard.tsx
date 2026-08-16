@@ -1,17 +1,12 @@
 'use client';
 
-
 import { useEffect, useMemo, useState } from 'react';
-// classnames thường cho gọi trực tiếp classNames(a, b) — bản 'classnames/bind' khai báo
-// this-context nên TS không cho gọi unbound; runtime hai bản là cùng một hàm.
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
 import { sortPartsByLookup } from '@/app/utils/partOrder';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
-// Bản .js cũ dùng useSearchParamsState mà quên import (chạy tới trang này là ReferenceError) —
-// bổ sung import đúng hook dùng chung khi chuyển sang TS.
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import MockHistoryPanel from './_components/MockHistoryPanel';
 import TargetDashboardPartChart, { type PartChartRow } from './_components/TargetDashboardPartChart';
@@ -50,8 +45,6 @@ function TargetDashboard() {
     [plans],
   );
 
-  // Bước kế tiếp: đang có lộ trình thì vào thẳng bản đồ ải, chưa có thì đi sinh lộ trình.
-  // Dashboard đã nắm đủ plans/latestMock nên không phải gọi thêm API để biết đi đâu.
   const nextStepTo = useMemo(() => {
     if (activePlan) return `/learning-plans/${activePlan.learningPlanId}`;
     if (latestMock?.userTestId) return `/learning-plans/generate?userTestId=${latestMock.userTestId}`;
@@ -270,12 +263,10 @@ function TargetDashboard() {
         </>
       )}
 
-      {/* Ngoài gate hasTarget: chưa đặt mục tiêu vẫn phải xem được bài đã làm. */}
       {!loading && (
         <MockHistoryPanel examTypeId={examTypeId} examTypeName={examTypeName} />
       )}
 
-      {/* Hành động chốt trang  đặt cuối để người dùng đọc hết số liệu rồi mới quyết. */}
       {!loading && (
         <div className={cx('actionBar', 'dashboardFooterActions')}>
           <ButtonPrime as="link" href={nextStepTo} variant="primary" size="lg">

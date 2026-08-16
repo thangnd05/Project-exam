@@ -46,7 +46,6 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
             setJsonInput(cleanedJson);
             toast.success('Chuẩn hóa dữ liệu thành công!');
         } catch (err: any) {
-            // err để any có chủ đích: có thể là SyntaxError hoặc lỗi Axios (đọc err.response)
             console.error('Lỗi chuẩn hóa AI:', err);
 
             let errorMsg;
@@ -63,7 +62,6 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
         }
     };
 
-    // e nhận từ onClick của footer nên luôn có mặt lúc chạy; để optional cho khớp type () => void
     const handleSave = async (e?: React.SyntheticEvent) => {
         e?.preventDefault();
 
@@ -72,7 +70,6 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
             return;
         }
 
-        // payload là any có chủ đích: kết quả JSON.parse từ input người dùng, chỉ kiểm tra runtime
         let payload;
         try {
             payload = JSON.parse(jsonInput);

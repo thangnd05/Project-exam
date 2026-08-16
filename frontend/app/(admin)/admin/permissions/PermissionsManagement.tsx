@@ -171,7 +171,6 @@ function PermissionsManagement() {
           </thead>
           <tbody>
             {permissionGroups.map(([groupName, items]) => {
-              // `code!`: BE luôn trả code, type PermissionResponse khai báo optional.
               const codes = items.map((item) => item.code!);
               return (
                 <React.Fragment key={groupName}>

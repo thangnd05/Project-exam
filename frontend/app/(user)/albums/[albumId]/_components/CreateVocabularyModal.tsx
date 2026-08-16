@@ -33,7 +33,6 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVoca
         setNewVocab({ ...newVocab, [name]: value });
     };
 
-    // e nhận từ onClick của footer nên luôn có mặt lúc chạy; để optional cho khớp type () => void
     const handleSave = (e?: React.SyntheticEvent) => {
         if (!newVocab.word.trim() || !newVocab.meaning.trim()) {
             toast.warning(' Vui lòng điền đầy đủ từ vựng và nghĩa!');

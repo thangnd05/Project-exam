@@ -1,9 +1,5 @@
 'use client';
 
-/**
- * Lưới an toàn cuối cùng: bắt lỗi ném ra từ chính root layout — lúc đó error.tsx của
- * từng nhóm route chưa kịp dựng nên phải tự render cả <html>/<body>.
- */
 export default function GlobalError({
   error,
   reset,

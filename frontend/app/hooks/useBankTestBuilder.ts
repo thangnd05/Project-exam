@@ -13,7 +13,6 @@ export const SELECTION_MODES = {
 
 export type SelectionMode = (typeof SELECTION_MODES)[keyof typeof SELECTION_MODES];
 
-/** Câu hỏi lấy từ kho: QuestionResponse của BE + vài field cũ (id/passageId) mà bản JS vẫn fallback. */
 export type BankQuestion = QuestionResponse & {
   id?: string;
   passageId?: string | null;
@@ -32,7 +31,6 @@ export interface PartConfig {
 
 export type PartConfigMap = Record<string, PartConfig>;
 
-/** Tham số lọc kho câu hỏi của getQuestionsByPart (kho cá nhân / lớp / quản trị). */
 export interface BankLoadParams {
   classId?: string;
   chapterId?: string;
@@ -102,7 +100,6 @@ export function useBankTestBuilder({ getScopedQuestions }: UseBankTestBuilderOpt
     }));
     return getQuestionsByPart(examPartId, params)
       .then((data) => {
-        // API đã trả mảng, vẫn giữ fallback data/questions của bản JS cho response cũ.
         const raw = data as any;
         const list: BankQuestion[] = Array.isArray(raw) ? raw : raw?.data ?? raw?.questions ?? [];
         setPartConfigs((prev) => ({

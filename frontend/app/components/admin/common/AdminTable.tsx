@@ -21,12 +21,9 @@ function buildPageItems(current: number, total: number): Array<number | '...'> {
   return items;
 }
 
-// `any` có chủ đích cho bản ghi hàng: mỗi trang admin có kiểu dữ liệu riêng,
-// các trang tiêu thụ vẫn là .js nên chưa ràng generic chi tiết được.
 export type AdminTableColumn = {
   key: string;
   header?: React.ReactNode;
-  /* Tên class căn lề trong adminKit (vd 'center') */
   align?: string;
   width?: number | string;
   render?: (row: any, index: number) => React.ReactNode;

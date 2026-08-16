@@ -10,7 +10,6 @@ export const testHistoryKeys = {
   info: (testId?: string) => ['test-info', testId],
 };
 
-// API đã trả mảng, vẫn giữ fallback `data` của bản JS cho response cũ -> `any` có chủ đích.
 const normalizeAttempts = (payload: any): UserTestResponse[] =>
   Array.isArray(payload) ? payload : Array.isArray(payload?.data) ? payload.data : [];
 

@@ -27,8 +27,6 @@ function ensureQuestionNav(blocks: LayoutBlock[]): LayoutBlock[] {
   return defaultNav ? [defaultNav, ...blocks] : blocks;
 }
 
-// Layout lưu ở DB dạng chuỗi JSON (ExamTypeLayoutResponse.config) hoặc object đã parse,
-// nên đầu vào là unknown và trả về any có chủ đích trước khi merge với default.
 function parseRaw(raw: unknown): any {
   if (!raw) return null;
 

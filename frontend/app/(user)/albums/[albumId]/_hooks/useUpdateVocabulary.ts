@@ -6,7 +6,6 @@ import type { VocabularyRequest, VocabularyResponse } from '@/app/types';
 
 type UpdateVocabularyVariables = { vocabId: string; data: VocabularyRequest };
 
-// TError = any có chủ đích: lỗi Axios, caller đọc err.response (BE không có type lỗi)
 type UseUpdateVocabularyOptions = Omit<
   UseMutationOptions<VocabularyResponse, any, UpdateVocabularyVariables>,
   'mutationFn'

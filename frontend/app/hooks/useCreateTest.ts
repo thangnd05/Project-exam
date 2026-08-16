@@ -13,17 +13,12 @@ export const CREATOR_TYPES = {
 
 export type CreatorType = (typeof CREATOR_TYPES)[keyof typeof CREATOR_TYPES];
 
-/** Một đáp án đang soạn trong form (chưa gửi BE nên vẫn giữ cờ isCorrect). */
 export interface DraftAnswer {
   answerLabel: string;
   answerText: string;
   isCorrect: boolean;
 }
 
-/**
- * Câu hỏi đang soạn: khác QuestionResponse của BE vì còn giữ File chưa upload và
- * questionType chỉ toggle giữa 'MCQ' / 'MSQ' (checkbox "Nhiều đáp án đúng") nên để string.
- */
 export interface DraftQuestion {
   questionText: string;
   questionType: string;
@@ -36,7 +31,6 @@ export interface DraftQuestion {
   answers: DraftAnswer[];
 }
 
-/** Passage đang soạn (nhiều đoạn text qua extraContents, xem memory passage-multi-text-design). */
 export interface DraftPassage {
   content: string;
   contentTranslation: string;
@@ -51,7 +45,6 @@ export interface DraftGroup {
   questions: DraftQuestion[];
 }
 
-/** Form thông tin đề: mọi ô input đều là chuỗi, ép số ngay lúc submit. */
 export interface TestInfoForm {
   title: string;
   description: string;

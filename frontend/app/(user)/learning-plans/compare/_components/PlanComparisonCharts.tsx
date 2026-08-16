@@ -17,7 +17,6 @@ import { planStageLabel, planStatusLabel } from '@/app/utils/planLabels';
 import styles from '../PlanComparison.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
 
-/** Một dòng dữ liệu chart — status/planStage để string vì có cả 'ABANDONED' ngoài enum. */
 export type PlanComparisonChartRow = {
   key: string;
   label: string;
@@ -44,8 +43,6 @@ function barColor(status?: string) {
   return COLOR_DEFAULT;
 }
 
-// Props do recharts bơm vào lúc render — payload để any[] có chủ đích (type TooltipProps của
-// recharts không khớp shape custom row)
 function PlanComparisonTooltip({ active, payload }: { active?: boolean; payload?: any[] }) {
   if (!active || !payload?.length) {
     return null;
@@ -121,7 +118,6 @@ function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsP
           <div className={cx('statTile')}>
             <span className={cx('statTileLabel')}>Tăng từ plan đầu</span>
             <strong
-              // classnames/bind gọi thẳng như classnames thường — type .d.ts không cho, runtime OK
               className={(classNames as any)(cx('statTileValue'), {
                 [cx('statTileDeltaUp')]: totalDelta > 0,
                 [cx('statTileDeltaDown')]: totalDelta < 0,

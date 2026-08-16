@@ -30,7 +30,6 @@ type QuestionBlockProps = {
     index: number;
     removeQuestionFn: (index: number) => void;
     updateQuestionTextFn: (index: number, value: string) => void;
-    /** field/value động theo tên field của DraftQuestion nên để any có chủ đích */
     updateQuestionFieldFn?: (index: number, field: string, value: any) => void;
     updateAnswerFn: (index: number, answerIndex: number, field: string, value: any) => void;
     addAnswerFn?: (index: number) => void;
@@ -38,7 +37,6 @@ type QuestionBlockProps = {
     addMediaFilesFn: (index: number, files: FileList | null) => void;
     removeMediaFileFn: (index: number, fileIndex: number) => void;
     setPassageTypeFn?: (index: number, passageType: string) => void;
-    // Tag lấy từ useBaseMetaData (chưa typed) nên để any có chủ đích.
     availableTags?: any[];
     withMedia?: boolean;
     minQuestions?: number;

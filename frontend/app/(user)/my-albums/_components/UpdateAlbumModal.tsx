@@ -58,7 +58,6 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalP
             description: description
         };
 
-        // album! an toàn: modal chỉ mở khi đã chọn album để sửa
         updateMutation.mutate({ albumId: album!.albumId, payload });
     };
 

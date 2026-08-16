@@ -2,15 +2,6 @@
 
 import {useMutation, useQuery, useQueryClient, type QueryKey} from '@tanstack/react-query';
 
-/**
- * Khuôn CRUD dùng chung cho các trang admin: 1 query danh sách + create/update/delete,
- * mọi mutation thành công đều invalidate lại đúng queryKey đó.
- *
- * Hook nào có thêm query/mutation riêng thì gọi factory rồi bổ sung, không cần copy khuôn.
- */
-
-// `any` có chủ đích: payload/response của từng trang admin khác nhau hoàn toàn,
-// consumer (hook riêng của từng trang) vẫn là .js nên chưa ràng kiểu chi tiết được.
 type CrudFn = (variables: any) => Promise<any>;
 
 const asList = (data: any): any[] => (Array.isArray(data) ? data : data?.content ?? []);

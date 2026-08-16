@@ -19,8 +19,6 @@ function suggestNextTarget(current: number | null | undefined): number | null {
 }
 
 function TargetAchieved() {
-  // Bản .js cũ destructure kiểu react-router `const [searchParams] = ...` — useSearchParams
-  // của Next trả thẳng ReadonlyURLSearchParams, sửa lại để gọi .get() đúng.
   const searchParams = useSearchParams();
   const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
 

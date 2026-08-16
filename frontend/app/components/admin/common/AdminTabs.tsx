@@ -17,13 +17,6 @@ type AdminTabsProps = {
   onSelect?: (key?: string) => void;
 };
 
-/**
- * Tab chuyển khu vực trong một trang quản trị. Bọc Nav của bootstrap để mọi trang dùng
- * chung một kiểu: tab chưa chọn màu chữ phụ, tab đang chọn màu thương hiệu kèm gạch chân
- * — mặc định của bootstrap là chữ xanh link, lạc hẳn với phần còn lại của admin.
- *
- * items: [{ key, label }]
- */
 function AdminTabs({items = [], activeKey, onSelect}: AdminTabsProps) {
   return (
     <Nav

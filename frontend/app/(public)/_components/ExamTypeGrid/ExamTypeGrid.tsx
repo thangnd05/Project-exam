@@ -15,10 +15,8 @@ import styles from './ExamTypeGrid.module.scss';
 const cx = classNames.bind(styles);
 
 const SKELETON_COUNT = 6;
-// Tuple để khớp type Easing (cubic-bezier) của framer-motion, tránh widen thành number[].
 const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
-// API khai báo trả mảng nhưng normalize phòng cả dạng bọc {data}/{content} → any có chủ đích.
 const normalizeExamTypes = (payload: any): ExamTypeResponse[] => {
   if (Array.isArray(payload)) return payload;
   if (payload && Array.isArray(payload.data)) return payload.data;
@@ -26,7 +24,6 @@ const normalizeExamTypes = (payload: any): ExamTypeResponse[] => {
   return [];
 };
 
-// { id, name, imageUrl } khi đang xem tầng con; null = lưới gốc.
 type DrillState = {
   id: string;
   name?: string;
@@ -66,7 +63,6 @@ function ExamTypeGrid() {
     isError: childrenError,
   } = useQuery({
     queryKey: childrenQueryKey(drillId),
-    // enabled đảm bảo drillId != null khi queryFn chạy.
     queryFn: () => getExamTypeChildren(drillId as string),
     enabled: drillId != null,
     select: normalizeExamTypes,
@@ -171,7 +167,6 @@ function ExamTypeGrid() {
                   exit="exit"
                   transition={{duration: reduceMotion ? 0.15 : 0.42, ease: EASE}}
                 >
-                  {/* Giữ chiều cao bằng tầng drill (có drillBar) để khung không nhảy size. */}
                   <div className={cx('drillBar', 'drillBarSpacer')} aria-hidden="true" />
                   <div className={cx('grid')}>
                     {examTypes.map((type) => (

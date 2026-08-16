@@ -19,8 +19,6 @@ export const classMemberKeys = {
   pending: (classId: string) => ['class-pending', classId],
 };
 
-// API trả mảng, nhưng giữ nhánh phòng hờ dạng phân trang { content } như bản JS cũ
-// (data as any vì nhánh { content } không nằm trong kiểu trả về đã khai báo của API)
 const normalizeList = (data: ClassMemberResponse[]): ClassMemberResponse[] =>
   (Array.isArray(data) ? data : ((data as any)?.content ?? []));
 
@@ -75,7 +73,6 @@ export function useClassMembers(classId: string) {
   const refreshMembers = () =>
     Promise.all([membersQuery.refetch(), pendingQuery.refetch()]);
 
-  // error để any có chủ đích: consumer đọc err.response?.data?.error theo shape của axios.
   const approveMemberMutation = useMutation<MessageResponse, any, ClassMemberActionRequest>({
     mutationFn: approveMember,
     onSuccess: invalidateMembers,

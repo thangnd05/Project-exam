@@ -62,7 +62,6 @@ type ClassListContainerProps = {
   onEditClass?: (classData: ClassStudentResponse) => void;
   onDeleteClass?: (classData: ClassStudentResponse) => void;
   onManageStudents?: (classId: string) => void;
-  // Prop nhận vào nhưng hiện chưa dùng — giữ nguyên như bản JS cũ
   emptyMessage?: React.ReactNode;
 };
 

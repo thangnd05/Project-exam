@@ -3,7 +3,6 @@
   width: 100%;
   height: 500px;
   --hub-shift: -142px;
-  // Kéo cả cụm cho cân giữa sân khấu.
   --ring-shift: -20px;
   perspective: 1400px;
   perspective-origin: 50% 50%;
@@ -74,7 +73,6 @@
   pointer-events: auto;
   position: relative;
   color: #fff;
-  // Champagne glow  highlight kem, nền ấm.
   background:
     radial-gradient(circle at 42% 28%, rgb(var(--brand-200-rgb) / 0.28), transparent 52%),
     radial-gradient(circle at 50% 55%, var(--brand-800) 0%, var(--brand-900) 78%);
@@ -109,8 +107,6 @@
     cursor: not-allowed;
   }
 
-  // Quầng năng lượng phập phồng quanh quả cầu (tách khỏi .hub để không đụng
-  // transform hover của nút).
   &::before {
     content: '';
     position: absolute;
@@ -241,7 +237,6 @@
   color: var(--brand-300);
 }
 
-// Có logo thật thì để trần cho to, không nhốt trong khung tròn.
 .logo {
   width: 6.6rem;
   height: 6.6rem;
@@ -270,8 +265,6 @@
   color: rgb(var(--brand-200-rgb) / 0.85);
 }
 
-// Layout dồn 1 cột từ 960px: orbit cũng chuyển chế độ gọn từ đây (khớp mốc JS
-// useIsNarrow = 960). radiusX tự co theo bề rộng stage nên vừa tablet lẫn phone.
 @media (max-width: 960px) {
   .stage {
     height: 370px;
@@ -303,8 +296,6 @@
   }
 }
 
-// Phone rất hẹp: thu nhỏ chữ trong hub cho gọn (kích thước thẻ giữ nguyên để
-// khớp phép tính bán kính bên JS).
 @media (max-width: 480px) {
   .stage {
     height: 340px;

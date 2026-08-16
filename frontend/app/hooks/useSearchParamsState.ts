@@ -1,12 +1,5 @@
 'use client';
 
-// useSearchParams của Next chỉ ĐỌC, còn bản react-router trả về cặp [params, setParams].
-// Hook này dựng lại vế ghi để 4 trang đang lọc theo query không phải viết lại logic:
-// vẫn nhận cả object, URLSearchParams, hoặc hàm (prev) => next như trước.
-//
-// Mặc định push (thêm một mục lịch sử) đúng như react-router; truyền {replace: true} nếu
-// không muốn người dùng phải bấm Back nhiều lần chỉ vì đổi bộ lọc.
-
 import { useCallback } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 

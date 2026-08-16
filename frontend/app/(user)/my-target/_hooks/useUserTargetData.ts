@@ -18,7 +18,6 @@ export const userTargetKeys = {
   current: (examTypeId?: string) => ['user-target', examTypeId],
 };
 
-// API có nơi trả mảng trần, có nơi bọc page {content} — giữ nhánh phòng thủ của bản .js cũ.
 const asArray = <T>(data: T[] | { content?: T[] } | null | undefined): T[] =>
   Array.isArray(data) ? data : Array.isArray(data?.content) ? data.content : [];
 

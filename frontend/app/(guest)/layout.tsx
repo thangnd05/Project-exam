@@ -1,9 +1,5 @@
-// Suspense là BẮT BUỘC: Next yêu cầu mọi component dùng useSearchParams() phải nằm trong
-// một ranh giới Suspense, nếu không trang sẽ không prerender được.
 import { Suspense } from 'react';
 import Loading from '@/app/components/Loading/Loading';
-
-// Khách chưa đăng nhập cũng vào được (luồng làm bài thử).
 
 import AuthGuard from '@/app/components/AuthGuard/AuthGuard';
 import DefaultLayout from '@/app/components/layouts/DefaultLayout';

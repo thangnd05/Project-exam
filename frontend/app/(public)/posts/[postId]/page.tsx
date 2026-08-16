@@ -25,7 +25,6 @@ export async function generateMetadata({ params }: PageProps<'/posts/[postId]'>)
   if (!post) return {};
 
   const title = post.title || 'Bài viết';
-  // API bài viết không có trường mô tả riêng -> rút gọn từ nội dung HTML.
   const description = toPlainText(post.content) || undefined;
   const cover = post.thumbnailUrl || post.thumbnail || undefined;
   const images = cover ? [{ url: cover }] : undefined;

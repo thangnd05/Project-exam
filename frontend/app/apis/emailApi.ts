@@ -32,7 +32,6 @@ export const getEmailRecipients = (emailId: string, {page = 0, size = 20}: Email
     .then((response) => response.data);
 };
 
-/** Danh sách người dùng để chọn người nhận; lọc theo vai trò/premium làm ở phía giao diện. */
 export const getEmailAudience = (): Promise<MailAudienceOptionResponse[]> => {
   return axios.get(`${ADMIN_BASE_URL}/audience`).then((response) => response.data);
 };

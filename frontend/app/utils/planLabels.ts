@@ -19,7 +19,6 @@ export const PLAN_STAGE_LABEL: Record<string, string> = {
   MOCK: 'Thi thử',
 };
 
-/** Trạng thái ải (task)  dùng chung roadmap + lịch sử. */
 export const TASK_STATUS: Record<string, { text: string; variant: string }> = {
   PASSED: { text: 'Đã vượt', variant: 'badgeSuccess' },
   ACTIVE: { text: 'Chưa vượt', variant: 'badgePrimary' },
@@ -29,7 +28,6 @@ export const TASK_STATUS: Record<string, { text: string; variant: string }> = {
 
 export const CAPSTONE_TYPES: Set<string> = new Set(['PART_CAPSTONE_1', 'PART_CAPSTONE_2']);
 
-// Map mã noticeCode từ BE (trạng thái) sang câu chữ hiển thị.
 export const PLAN_NOTICE_TEXT: Record<string, string> = {
   EMPTY_POOL_SKIPPED: 'Ải này chưa có câu hỏi nào trong kho nên đã được bỏ qua  hãy chọn ải khác.',
   EMPTY_POOL_RETRY: 'Ải này hiện chưa có câu hỏi để luyện lại. Hãy chọn ải khác.',
@@ -48,7 +46,6 @@ export const taskStatusLabel = (status?: string | null): string =>
 export const taskStatusVariant = (status?: string | null): string =>
   TASK_STATUS[status as string]?.variant || 'badgeMuted';
 
-/** Tên hiển thị ải  capstone map từ taskType, tag lấy tên thật từ BE. */
 export function taskDisplayName(task?: PlanTaskResponse | null): string {
   if (!task) return '—';
   if (task.taskType === PlanTaskType.PART_CAPSTONE_1) return 'Ải cuối chặng  lần 1';
@@ -60,13 +57,11 @@ export function isCapstoneTask(task?: PlanTaskResponse | null): boolean {
   return CAPSTONE_TYPES.has(task?.taskType as string);
 }
 
-/** Câu tóm tắt cho lộ trình vừa sinh  ghép từ số liệu trong PlanResponse. */
 export function buildPlanSummary(plan: PlanResponse): string {
   const target = plan.targetScore == null ? 'đạt mục tiêu' : `đạt ${plan.targetScore} điểm`;
   return `Readiness ${plan.baselineReadiness ?? 0}%. ${plan.totalTasks ?? 0} ải cho Part chưa đạt mục tiêu, để ${target}.`;
 }
 
-/** Câu thông báo sau khi sinh lại theo mục tiêu mới  nói rõ giữ được gì, phải làm lại gì. */
 export function buildResyncMessage(plan?: PlanResponse | null): string {
   if (plan?.targetAchieved) {
     return 'Bạn đã đạt mục tiêu mới  lộ trình hiện tại được đánh dấu hoàn thành, chưa cần lộ trình mới.';

@@ -87,7 +87,6 @@ const MyClasses = () => {
   if (loading) {
     return (
       <div className={cx('loading-container')}>
-        {/* size 'lg' as any: type react-bootstrap chỉ nhận 'sm' nhưng bản JS cũ truyền 'lg' */}
         <Spinner animation="grow" variant="primary" size={'lg' as any} />
         <p>Đang chuẩn bị giảng đường của bạn...</p>
       </div>

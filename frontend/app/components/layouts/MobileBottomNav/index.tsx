@@ -30,9 +30,6 @@ import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 
-// Component feature còn là .js nên TS suy props sai (coi prop không default là bắt buộc).
-// Cast any tạm thời — bỏ cast khi file này chuyển sang TS.
-
 const cx = classNames.bind(styles);
 
 const HIDDEN_PREFIXES = [
@@ -50,11 +47,9 @@ function isHiddenRoute(pathname: string) {
 
 function MobileBottomNav() {
   const pathname = usePathname();
-  // Bảng chọn dùng portal vào document.body nên phải chờ đã ở client mới dựng.
   const mounted = useMounted();
   const router = useRouter();
   const {user, logout, roleName} = useAuth();
-  // Tạo bài kiểm tra là việc của quản trị, người dùng thường không thấy nút này.
   const canCreateTest = roleName === 'ADMIN';
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
   const [activeSheet, setActiveSheet] = useState<'class' | 'menu' | null>(null);
@@ -92,10 +87,6 @@ function MobileBottomNav() {
     pathname.startsWith('/practice/');
   const isProfileActive = pathname.startsWith('/profile');
 
-  /**
-   * Thao tác mở modal không đi qua router nên ProtectedRoute không chặn được  phải tự
-   * kiểm tra đăng nhập tại đây.
-   */
   const requireLogin = (message: string) => {
     if (user) {
       return false;
@@ -279,8 +270,6 @@ function MobileBottomNav() {
                   )}
 
                   <div className={cx('menuList')}>
-                    {/* Vẫn hiện khi chưa đăng nhập: ProtectedRoute sẽ đưa về trang đăng nhập
-                        kèm lời nhắc rồi quay lại đúng trang này sau khi đăng nhập. */}
                     <Link
                       href={routes.myTarget}
                       className={cx('menuItem')}

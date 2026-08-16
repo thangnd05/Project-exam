@@ -71,7 +71,6 @@ export function useIssuedCertificates(params: IssuedCertificateParams) {
     queryFn: () => getIssuedCertificates(params),
   });
 
-  // Cả thu hồi lẫn xoá đều đổi số chứng chỉ còn hiệu lực nên phải làm mới cả bảng mẫu.
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: ['admin-certificates', 'issued'] });
     queryClient.invalidateQueries({ queryKey: certificateAdminKeys.templates });

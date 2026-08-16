@@ -20,14 +20,10 @@ import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import {useCosmetics} from '@/app/hooks/useCosmetics';
 
-// Component feature còn là .js nên TS suy props sai (coi prop không default là bắt buộc).
-// Cast any tạm thời — bỏ cast khi file này chuyển sang TS.
-
 const cx = classNames.bind(style);
 
 function Header() {
   const {user, logout, roleName} = useAuth();
-  // Tạo bài kiểm tra là việc của quản trị, người dùng thường không thấy nút này.
   const canCreateTest = roleName === 'ADMIN';
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
   const [showJoinModal, setShowJoinModal] = useState(false);
@@ -41,10 +37,6 @@ function Header() {
     router.push(routes.home);
   };
 
-  /**
-   * Các thao tác mở modal không đi qua router nên ProtectedRoute không chặn được  phải tự
-   * kiểm tra đăng nhập tại đây.
-   */
   const requireLogin = (message: string) => {
     if (user) {
       return false;
@@ -71,7 +63,6 @@ function Header() {
     } else if (modalType === 'create') {
       setShowCreateModal(true);
     } else {
-      // Nhánh này chỉ chạy khi được gọi kèm targetRoute (không có modalType).
       router.push(targetRoute as string);
     }
   };
@@ -80,7 +71,6 @@ function Header() {
     <header className={cx('wrapper')}>
       <div className={cx('pill')}>
         <div className={cx('barRow')}>
-          {/* Zone 1  Brand */}
           <div className={cx('zoneLeft')}>
             <Link href={routes.home} className={cx('brand')}>
               <span className={cx('brandInner')}>
@@ -96,7 +86,6 @@ function Header() {
             </Link>
           </div>
 
-          {/* Zone 2  Primary navigation (desktop) */}
           <nav className={cx('zoneCenter')} aria-label="Điều hướng chính">
             <div className={cx('navTrack')}>
               {/* TẠM: nhường chỗ "Bài viết" cho tra cứu chứng chỉ, bỏ comment để trả lại như cũ.
@@ -164,7 +153,6 @@ function Header() {
             </div>
           </nav>
 
-          {/* Zone 3  CTA + stats + account */}
           <div className={cx('zoneRight')}>
             {user && (
               <div className={cx('mobileHeaderActions')}>

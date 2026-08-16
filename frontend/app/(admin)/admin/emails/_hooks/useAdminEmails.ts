@@ -30,7 +30,6 @@ export const emailKeys = {
   audience: ['admin-emails', 'audience'],
 };
 
-// Trang rỗng fallback chỉ cần đúng các field UI dùng (không có size/hasNext của PageResponse).
 type EmailListPage<T> = Pick<PageResponse<T>, 'content' | 'totalPages' | 'totalElements' | 'currentPage'>;
 
 const emptyPage = {content: [], totalPages: 1, totalElements: 0, currentPage: 0};
@@ -61,7 +60,6 @@ export function useEmailRecipients(emailId: string | null | undefined, page: num
     queryKey: emailKeys.recipients(emailId, page),
     queryFn: () => getEmailRecipients(emailId as string, {page, size}),
     enabled: Boolean(emailId),
-    // Worker gửi nền nên trạng thái đổi sau khi mở bảng  tự làm mới trong lúc đang xem.
     refetchInterval: 5000,
   });
   return {

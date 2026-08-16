@@ -12,7 +12,7 @@ export const congratsSeenKey = (learningPlanId: string): string => `plan-congrat
 export const markCongratsSeen = (learningPlanId: string): void => {
   try {
     localStorage.setItem(congratsSeenKey(learningPlanId), '1');
-  } catch { /* ignore */ }
+  } catch {}
 };
 
 const CONFETTI_COLORS = ['#fbbf24', '#34d399', '#60a5fa', '#f472b6', '#a78bfa', '#f87171'];

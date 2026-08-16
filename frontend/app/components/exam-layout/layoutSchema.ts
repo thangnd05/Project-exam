@@ -20,7 +20,6 @@ export const BLOCK_TYPES = {
 
 export type BlockType = (typeof BLOCK_TYPES)[keyof typeof BLOCK_TYPES];
 
-/** Thuộc tính riêng của từng yếu tố, layout builder (trang admin) chỉnh trực tiếp. */
 export interface LayoutBlockProps {
   label?: string;
   toggleLabel?: string;
@@ -50,7 +49,6 @@ export interface LayoutTheme {
 
 export interface LayoutQuestionArea {
   passagePosition?: string;
-  /** 'scroll' = cuộn hết đề, 'paged' = từng câu/nhóm một (xem memory paged-presentation-mode) */
   navigationMode?: string;
   columns?: number;
   maxWidth?: number | null;

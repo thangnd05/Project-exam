@@ -16,9 +16,6 @@
   overflow: hidden;
   width: 1000px;
   max-width: 95%;
-  // Form đăng ký cao hơn form đăng nhập (4 ô nhập + ô captcha 78px). Thẻ này cắt phần
-  // tràn (overflow: hidden phục vụ hiệu ứng trượt) nên phải chừa đủ chiều cao, thiếu là
-  // mất tiêu đề ở trên và nút bấm ở dưới.
   min-height: 700px;
   display: block;
 }
@@ -35,7 +32,6 @@
   padding: 30px 50px;
   text-align: center;
   width: 50%;
-  // Lưới an toàn cho màn hình thấp: cho cuộn trong cột thay vì cắt mất nút bấm.
   overflow-y: auto;
 
   form {
@@ -253,22 +249,17 @@
     gap: 8px;
   }
 
-  // Ô reCAPTCHA có kích thước cố định 304px của Google, canh giữa cho cân với form.
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
 }
 
-// Widget của Google có kích thước cố định 304x78px và nằm trong iframe nên CSS của mình
-// không với tới bên trong được. Việc duy nhất phải làm là chừa đúng chỗ cho nó: khai báo
-// đủ bề rộng và cấm flex bóp lại, nếu không nội dung bên trong iframe sẽ bị xuống dòng.
 .recaptchaBox {
   width: 304px;
   min-height: 78px;
   flex-shrink: 0;
 
-  // Màn hình quá hẹp thì thu nhỏ theo tỉ lệ, tràn ra ngoài thẻ còn xấu hơn.
   @media (max-width: 360px) {
     transform: scale(0.85);
     transform-origin: center top;

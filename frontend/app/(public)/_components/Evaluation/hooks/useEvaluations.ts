@@ -32,7 +32,6 @@ export function useEvaluations() {
   };
 }
 
-// Theo convention hooks chung (useMyClasses): Pick callback từ UseMutationOptions cho khớp arity.
 type UseCreateEvaluationOptions = Pick<
   UseMutationOptions<EvaluationResponse, any, EvaluationRequest>,
   'onSuccess' | 'onError'

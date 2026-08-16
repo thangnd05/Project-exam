@@ -41,7 +41,6 @@ export function useRecoveryResourceView(resourceId?: string) {
       }
 
       const markdownText = await viewResourceContent(resourceId as string);
-      // marked.parse khai báo string | Promise<string>; không bật async nên luôn là string.
       const renderedHtml = marked.parse(markdownText) as string;
       return { resource: data, markdownHtml: DOMPurify.sanitize(renderedHtml) };
     },

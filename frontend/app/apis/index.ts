@@ -1,4 +1,3 @@
-// Đầu mối tra các hàm gọi API theo domain.
 export * from './adminAuditApi';
 export * from './analyticsApi';
 export * from './authApi';
@@ -39,5 +38,3 @@ export * from './userTestApi';
 export * from './vocabularyAlbumApi';
 export * from './vocabularyApi';
 
-// axiosClient là default export (instance) -> import trực tiếp '@/app/apis/axiosClient'.
-// classMemberApi cũng export `getMyClasses` nhưng trả kiểu khác classApi, nên để import riêng.

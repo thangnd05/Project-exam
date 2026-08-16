@@ -1,4 +1,3 @@
-// Hook dùng chung cho nhiều route.
 export * from './examTypeKeys';
 export * from './plan-cache';
 export * from './useAdminCrud';
@@ -35,6 +34,3 @@ export * from './useTargetDashboard';
 export * from './useTestSubmission';
 export * from './useUpdateQuestion';
 
-// useGeneratePlan cũng export một `useExamTypes` RIÊNG (lấy loại đề chuẩn cho trang lập kế
-// hoạch, khác bản CRUD admin trong useExamTypes.ts) nên không gom vào đây — import trực tiếp
-// '@/app/hooks/useGeneratePlan'.

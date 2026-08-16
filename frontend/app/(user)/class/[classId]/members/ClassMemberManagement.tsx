@@ -49,7 +49,6 @@ const ClassMemberManagement = () => {
       });
       toast.success('Duyệt học sinh thành công!');
     } catch (err: any) {
-      // any có chủ đích: lỗi Axios, đọc err.response.data.error (BE không có type lỗi)
       console.error('Lỗi duyệt học sinh:', err);
       const msg = err?.response?.data?.error || 'Không thể duyệt học sinh';
       toast.error(msg);
@@ -65,7 +64,6 @@ const ClassMemberManagement = () => {
       const result = await approveAllMutation.mutateAsync(classId);
       toast.success(result.message || 'Đã duyệt tất cả học sinh!');
     } catch (err: any) {
-      // any có chủ đích: lỗi Axios, đọc err.response.data.error (BE không có type lỗi)
       console.error('Lỗi duyệt tất cả:', err);
       const msg = err?.response?.data?.error || 'Không thể duyệt tất cả';
       toast.error(msg);
@@ -83,7 +81,6 @@ const ClassMemberManagement = () => {
       setShowDeleteModal(false);
       setMemberToDelete(null);
     } catch (err: any) {
-      // any có chủ đích: lỗi Axios, đọc err.response.data.error (BE không có type lỗi)
       console.error('Lỗi xóa học sinh:', err);
       const msg = err?.response?.data?.error || 'Không thể xóa học sinh';
       toast.error(msg);
@@ -100,7 +97,6 @@ const ClassMemberManagement = () => {
   const getSortedMembers = (members: ClassMemberResponse[]) => {
     const sorted = [...members];
     sorted.sort((a, b) => {
-      // any có chủ đích: giá trị so sánh đổi kiểu string -> number tuỳ cột (giữ logic bản JS cũ)
       let aVal: any = a[sortConfig.key];
       let bVal: any = b[sortConfig.key];
       if (sortConfig.key === 'fullName') {
@@ -211,7 +207,6 @@ const ClassMemberManagement = () => {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('loading-container')}>
-          {/* size 'lg' as any: type react-bootstrap chỉ nhận 'sm' nhưng bản JS cũ truyền 'lg' */}
           <Spinner animation="grow" variant="primary" size={'lg' as any} />
           <p>Đang tải danh sách học sinh...</p>
         </div>

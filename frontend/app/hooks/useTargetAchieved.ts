@@ -17,7 +17,6 @@ export const targetAchievedKeys = {
   detail: (examTypeId?: string) => ['target-achieved', examTypeId],
 };
 
-// API có nơi trả mảng trần, có nơi bọc page {content} — any có chủ đích để giữ nhánh phòng thủ cũ.
 const normalizeExamTypes = (data: any): ExamTypeResponse[] =>
   (Array.isArray(data) ? data : data?.content ?? []);
 
@@ -67,7 +66,6 @@ export function useTargetAchieved(examTypeId: string) {
     latestMock: detailQuery.data?.latestMock ?? null,
     enhanced: detailQuery.data?.enhanced ?? null,
     isLoading: detailQuery.isLoading,
-    // Giữ nguyên cách lấy message của bản .js (axios error không có type sẵn).
     error: err ? ((err as any)?.response?.data?.message || err.message) : null,
   };
 }

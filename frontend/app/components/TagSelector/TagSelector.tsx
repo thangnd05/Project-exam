@@ -8,7 +8,6 @@ import styles from './TagSelector.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Tag từ API (tagId, parentId, name...) — chưa có type riêng nên để any có chủ đích.
 type TagSelectorProps = {
     tags?: any[];
     selectedIds?: any[];

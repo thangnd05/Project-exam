@@ -2,7 +2,6 @@
 
 import {forwardRef, useEffect, useImperativeHandle, useRef} from 'react';
 
-// Script của Google gắn grecaptcha vào window; chưa có @types nên khai báo any có chủ đích.
 declare global {
   interface Window {
     grecaptcha?: any;
@@ -14,7 +13,6 @@ const SCRIPT_SRC = 'https://www.google.com/recaptcha/api.js?render=explicit&hl=v
 
 let scriptPromise: Promise<any> | null = null;
 
-/** Nạp script của Google đúng một lần cho cả ứng dụng, kể cả khi có nhiều ô cùng lúc. */
 function loadRecaptchaScript(): Promise<any> {
   if (window.grecaptcha?.render) {
     return Promise.resolve(window.grecaptcha);
@@ -28,7 +26,6 @@ function loadRecaptchaScript(): Promise<any> {
     const script = (existing || document.createElement('script')) as HTMLScriptElement;
 
     const handleLoad = () => {
-      // Script đã tải xong nhưng grecaptcha còn khởi tạo tiếp, phải chờ ready.
       window.grecaptcha.ready(() => resolve(window.grecaptcha));
     };
 
@@ -62,15 +59,6 @@ export type RecaptchaCheckboxHandle = {
   reset: () => void;
 };
 
-/**
- * Ô "Tôi không phải là người máy" (reCAPTCHA v2).
- *
- * Không dùng thư viện bọc sẵn để khỏi thêm phụ thuộc: widget này chỉ cần script của Google
- * cộng một lời gọi grecaptcha.render.
- *
- * Token trả về qua onChange chỉ sống vài phút và dùng được một lần  backend xác minh lại
- * với Google, nên bỏ qua bước đó thì bot gọi thẳng API vẫn đăng ký được.
- */
 const RecaptchaCheckbox = forwardRef<RecaptchaCheckboxHandle, RecaptchaCheckboxProps>(
   function RecaptchaCheckbox({siteKey, onChange, className}, ref) {
     const containerRef = useRef<HTMLDivElement>(null);

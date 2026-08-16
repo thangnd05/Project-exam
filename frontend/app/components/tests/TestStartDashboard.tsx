@@ -6,11 +6,6 @@ import styles from '@/app/components/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);
 
-/**
- * Đáp án chỉ dùng để tô "đã làm / chưa làm" trên lưới điều hướng nên khai rộng:
- * trang làm bài đưa vào ExamUserAnswer, trang học theo lộ trình đưa vào map lựa chọn
- * riêng (selectedAnswerId có thể là mảng khi câu nhiều đáp án).
- */
 export type DashboardAnswer = {
   selectedAnswerId?: string | string[] | null;
   selectedAnswerIds?: string[] | null;
@@ -22,7 +17,6 @@ type TestStartDashboardProps = {
   userAnswers: Record<string, DashboardAnswer | undefined>;
   onScrollToQuestion: (questionId: string) => void;
   columns?: number | null;
-  /** Chế độ PAGED (từng câu/nhóm một): câu ngoài bước hiện tại bị khoá. */
   isPaged?: boolean;
   canNavigateToQuestion?: ((questionId: string) => boolean) | null;
   currentQuestionIds?: Set<string> | null;

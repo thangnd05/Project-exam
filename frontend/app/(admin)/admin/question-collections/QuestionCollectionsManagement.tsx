@@ -267,7 +267,6 @@ function QuestionCollectionsManagement() {
 
       const trimmedOrder = String(formState.displayOrder).trim();
       const parsedOrder = trimmedOrder === '' ? null : Number.parseInt(trimmedOrder, 10);
-      // BE chấp nhận displayOrder null để gỡ ghim thứ tự — DTO FE khai optional nên ép kiểu tại đây
       const payload = {
         name: normalizedName,
         description: formState.description.trim(),

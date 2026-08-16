@@ -1,4 +1,3 @@
-// Hàm thuần dùng chung.
 export * from './apiError';
 export * from './authRedirect';
 export * from './collectionTree';
@@ -15,5 +14,3 @@ export * from './recoveryResource';
 export * from './taskProgress';
 export * from './termTips';
 export * from './visitorId';
-// testStatusHelper cũng export `formatDateTime` (định dạng khác format-date-time.ts),
-// nên import trực tiếp '@/app/utils/testStatusHelper' để khỏi nhập nhằng.

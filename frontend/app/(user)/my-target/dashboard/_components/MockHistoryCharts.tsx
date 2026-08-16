@@ -37,7 +37,6 @@ export type MockChartPoint = {
 
 type MockHistoryTooltipProps = {
   active?: boolean;
-  // payload của recharts tooltip — any có chủ đích, chỉ đọc payload[0].payload.
   payload?: any[];
 };
 

@@ -28,16 +28,10 @@ import type { MonthPerformance, NameValue } from '@/app/types/admin';
 
 const brand = brandColors;
 
-// Bản ghi theo ngày cho các chart truy cập/hoạt động (BE trả field nào thì chart đọc field đó).
 type DayTrafficDatum = { day?: string; users?: number; exams?: number; guests?: number };
-// Lượt truy cập theo khung giờ trong ngày.
 type HourDatum = { hour?: string | number; visits?: number };
-// Phân bố điểm theo dải.
 type ScoreRangeDatum = { range?: string; count?: number };
-// Sparkline nhận dataKey động nên bản ghi để Record<string, any> có chủ đích.
 type SparkDatum = Record<string, any>;
-// Tooltip tự vẽ: recharts clone element rồi bơm props lúc runtime, lúc khai báo JSX chưa có
-// nên dùng Partial cho khớp thực tế.
 type ChartTooltipProps = Partial<TooltipContentProps<number, string>>;
 
 const VIZ = { primary: brand.accent, accent: brand.unique, muted: '#94a3b8' };

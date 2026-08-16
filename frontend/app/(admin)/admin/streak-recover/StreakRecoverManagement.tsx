@@ -10,7 +10,6 @@ import { AdminCard, AdminFieldError, AdminPageHeader } from '@/app/components/ad
 import { useStreakRecoverConfig } from './_hooks/useStreakRecoverConfig';
 
 function StreakRecoverManagement() {
-  // costCoins giữ number | string: input number của react-bootstrap trả string khi gõ
   const [costCoins, setCostCoins] = useState<number | string>(50);
   const [active, setActive] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');

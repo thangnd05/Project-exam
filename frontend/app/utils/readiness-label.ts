@@ -28,7 +28,6 @@ const READINESS_CLASS: Record<string, string> = {
   NOT_READY: 'readinessNotReady',
 };
 
-// Bậc Quick Challenge  duyệt từ cao xuống, lấy bậc đầu tiên đạt min.
 const QUICK_CHALLENGE_TIERS = [
   { min: 85, level: 'EXCELLENT', title: 'Xuất sắc' },
   { min: 60, level: 'GOOD', title: 'Khá tốt' },
@@ -69,7 +68,6 @@ export interface GaugeView {
   gaugeLevel: string | null;
 }
 
-/** Dựng dữ liệu hiển thị cho card gauge từ facts của enhanced result. */
 export function buildGaugeView(
   enhanced: Pick<
     EnhancedResultResponse,
@@ -128,7 +126,6 @@ export function buildGaugeView(
   };
 }
 
-/** Text cho khối "Việc cần làm ngay"; null = không có gì cần nhắc. */
 export function buildRecoveryMessage({
   hasTarget,
   isTargetMet,

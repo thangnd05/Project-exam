@@ -29,7 +29,6 @@ import styles from './Practice.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Phần tử audio có gắn thêm hàm dọn listener autoplay (giữ nguyên cơ chế của bản JS cũ)
 type AutoplayAudioElement = HTMLAudioElement & {
     _cleanupAutoplay?: (() => void) | null;
 };
@@ -106,7 +105,6 @@ const Practice = () => {
     const handleSubmit = async () => {
         if (!question) return;
 
-        // Non-null (!) an toàn: nút submit chỉ bấm được khi đã chọn đáp án (canSubmit)
         const payload: PracticeCheckRequest =
             question.type === 'MULTICHOICE'
                 ? {

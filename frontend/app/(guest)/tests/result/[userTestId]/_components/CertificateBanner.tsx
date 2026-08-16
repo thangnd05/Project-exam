@@ -19,14 +19,8 @@ type CertificateBannerProps = {
   enabled: boolean;
 };
 
-/**
- * Băng chứng chỉ ở trang kết quả. Ba trạng thái tương ứng ba thông điệp khác nhau:
- * vừa nhận được, đã có sẵn từ lần thi trước, và chưa đủ điểm (nói rõ còn thiếu bao nhiêu).
- * Đề không thuộc nhóm cấp chứng chỉ thì không hiện gì.
- */
 function CertificateBanner({ userTestId, enabled }: CertificateBannerProps) {
   const router = useRouter();
-  // Khách làm bài không bao giờ được cấp chứng chỉ nên chỉ hỏi khi đã biết chắc là người đã đăng nhập.
   const { data } = useAttemptCertificate(userTestId, enabled);
 
   if (!data || data.state === AttemptCertificateState.NOT_APPLICABLE) {

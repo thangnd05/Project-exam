@@ -28,12 +28,10 @@ export const getCertificateById = (certificateId: string): Promise<CertificateRe
   return axios.get(`${BASE_URL}/${certificateId}`).then((res) => res.data);
 };
 
-/** Tra cứu công khai, không cần đăng nhập. */
 export const verifyCertificate = (code: string): Promise<CertificateVerifyResponse> => {
   return axios.get(`${BASE_URL}/verify/${encodeURIComponent(code)}`).then((res) => res.data);
 };
 
-/** Trang kết quả hỏi lượt làm bài này có chứng chỉ chưa. */
 export const getCertificateByAttempt = (userTestId: string): Promise<AttemptCertificateResponse> => {
   return axios.get(`${BASE_URL}/by-attempt/${userTestId}`).then((res) => res.data);
 };
@@ -62,7 +60,6 @@ export const revokeCertificate = (certificateId: string, reason?: string): Promi
   return axios.post(`${ADMIN_BASE_URL}/${certificateId}/revoke`, { reason }).then((res) => res.data);
 };
 
-/** Xoá hẳn chứng chỉ đã cấp (khác thu hồi: mã tra cứu biến mất luôn). */
 export const deleteIssuedCertificate = (certificateId: string): Promise<MessageResponse> => {
   return axios.delete(`${ADMIN_BASE_URL}/${certificateId}`).then((res) => res.data);
 };

@@ -19,7 +19,6 @@ import type {
   TagResponse,
 } from '@/app/types';
 
-/** Passage trong form: các field đều là chuỗi để bind thẳng vào input. */
 type EditPassageForm = {
   passageType: string;
   content: string;
@@ -27,7 +26,6 @@ type EditPassageForm = {
   mediaUrl: string;
 };
 
-/** Một đáp án trong form; `id` null = đáp án mới thêm, chưa có ở BE. */
 type EditQuestionOption = {
   id: string | null;
   answerLabel: string;
@@ -47,10 +45,6 @@ type EditQuestionFormData = {
   options: EditQuestionOption[];
 };
 
-/**
- * Payload gửi lên. Rộng hơn QuestionCreateRequest một chút: field trống gửi thẳng `null`
- * (BE hiểu là xoá) và answers còn kèm `id` kiểu cũ — giữ nguyên như bản JS.
- */
 type UpdateQuestionPayload = {
   classId: string | null;
   examPartId: string | null;
@@ -140,7 +134,6 @@ export function useEditQuestionModal({
 
         let mappedOptions: EditQuestionOption[] = [];
         if (questionDetail.answers && questionDetail.answers.length > 0) {
-          // `any` có chủ đích: giữ nguyên fallback id/content kiểu cũ của bản JS.
           mappedOptions = questionDetail.answers.map((ans: any) => ({
             id: ans.answerId || ans.id || null,
             answerLabel: ans.answerLabel,
@@ -371,7 +364,6 @@ export function useEditQuestionModal({
     }
 
     updateMutation.mutate(
-      // payload rộng hơn QuestionCreateRequest (null + field `id` cũ) nên ép kiểu đúng một chỗ.
       { questionId: questionId as string, data: data as QuestionCreateRequest | FormData, config },
       {
         onSuccess: () => {

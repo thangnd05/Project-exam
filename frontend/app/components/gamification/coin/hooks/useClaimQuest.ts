@@ -6,7 +6,6 @@ import { claimQuest, QUESTS_QUERY_KEY } from '@/app/apis/questApi';
 import { COINS_QUERY_KEY } from '@/app/contexts/CoinContext';
 import type { QuestClaimResponse } from '@/app/types';
 
-// error để any có chủ đích: consumer đọc error?.response?.data?.message theo shape của axios.
 type UseClaimQuestOptions = Pick<
   UseMutationOptions<QuestClaimResponse, any, string>,
   'onSuccess' | 'onError'

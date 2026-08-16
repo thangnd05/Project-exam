@@ -41,10 +41,6 @@ export function useCertificateVerification(code?: string) {
   });
 }
 
-/**
- * Trạng thái chứng chỉ của một lượt làm bài. Chỉ gọi khi đã đăng nhập  khách làm bài
- * không bao giờ được cấp chứng chỉ nên hỏi cũng vô ích.
- */
 export function useAttemptCertificate(userTestId?: string, enabled = true) {
   return useQuery({
     queryKey: certificateKeys.byAttempt(userTestId),

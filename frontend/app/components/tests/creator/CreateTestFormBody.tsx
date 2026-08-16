@@ -41,7 +41,6 @@ const ACCEPT_BY_TYPE = {
   DOCUMENT: '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 };
 
-/** 'personal' = đề cá nhân, 'class' = đề gắn với lớp + chapter */
 export type CreateTestMode = 'personal' | 'class';
 
 type CreateTestFormBodyProps = {
@@ -206,7 +205,6 @@ const CreateTestFormBody = ({
   };
 
   const normTag = (s?: string | null) => (s || '').trim().toLowerCase();
-  // availableTags đến từ useBaseMetaData (chưa typed) nên tag để any có chủ đích.
   const resolveTagNamesToIds = (tagNames: string[] = []): string[] => {
     if (!tagNames.length || !availableTags.length) return [];
     const byId = new Map<string, any>(availableTags.map((t: any) => [t.tagId, t]));
@@ -253,7 +251,6 @@ const CreateTestFormBody = ({
     return ids;
   };
 
-  // Câu hỏi parse từ file Word (previewDocument) — cấu trúc lỏng nên nhận any rồi chuẩn hoá về DraftQuestion.
   const normalizeParsedQuestions = (parsedQuestions: any[] = []): DraftQuestion[] => (
     parsedQuestions.map((question) => {
       const tagNames: string[] = question.tagNames || [];

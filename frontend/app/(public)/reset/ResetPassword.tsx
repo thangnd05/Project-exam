@@ -12,11 +12,7 @@ import { useResetPasswordMutation } from '@/app/hooks/useAuthActions';
 const cx = classNames.bind(style);
 
 function ResetPassWord() {
-  // useSearchParams của Next trả thẳng ReadonlyURLSearchParams (bản react-router cũ trả tuple
-  // nên destructure [searchParams] — leftover đó khiến .get() không chạy, đã sửa khi chuyển TS).
   const searchParams = useSearchParams();
-  // Link trong email đặt lại mật khẩu trỏ tới /reset?token=... nên điền sẵn giúp người dùng;
-  // ô nhập vẫn giữ để ai copy token thủ công vẫn dùng được.
   const [token, setToken] = useState(() => searchParams.get('token') || '');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -43,7 +39,6 @@ function ResetPassWord() {
         router.push(routes.login);
       }, 2000);
     } catch (err: any) {
-      // any có chủ đích: lỗi axios (err.response) chưa có type dùng chung trong dự án
       if (err.response && err.response.status === 400) {
         setError('Token không hợp lệ hoặc đã hết hạn!');
       }

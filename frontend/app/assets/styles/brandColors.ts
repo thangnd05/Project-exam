@@ -1,11 +1,3 @@
-/**
- * Bảng màu thương hiệu cho các chỗ BẮT BUỘC dùng JS (Recharts, react-simple-maps,
- * SVG inline, <input type="color">) — nơi không viết được var(--...) trong CSS.
- *
- * KHÔNG khai màu ở đây. Giá trị đọc thẳng từ các primitive `--brand-*-rgb`
- * trong GlobalStyles.scss, nên đổi tông vẫn chỉ sửa đúng một file.
- * Các hằng dưới đây chỉ là phao cứu sinh khi chưa có DOM (test, SSR).
- */
 
 const FALLBACK: Record<string, string> = {
   'brand-50': '#faf7f0',
@@ -23,7 +15,6 @@ const FALLBACK: Record<string, string> = {
 
 const cache = new Map<string, string>();
 
-/** Đọc `--<token>-rgb` (dạng "201 168 75") từ :root và đổi sang hex. */
 function readToken(token: string): string {
   if (cache.has(token)) return cache.get(token)!;
   let hex = FALLBACK[token];
@@ -32,7 +23,7 @@ function readToken(token: string): string {
     const channels = raw.match(/\d+/g);
     if (channels && channels.length >= 3) {
       hex = '#' + channels.slice(0, 3).map((c) => Number(c).toString(16).padStart(2, '0')).join('');
-      cache.set(token, hex); // chỉ nhớ khi đọc được thật, tránh đóng băng giá trị dự phòng
+      cache.set(token, hex);
     }
   }
   return hex;
@@ -60,10 +51,6 @@ const ALIASES = {
 
 export type BrandColorKey = keyof typeof ALIASES;
 
-/**
- * Mỗi khoá là một getter đọc token lúc gọi (không phải giá trị tĩnh), nên phải khai kiểu
- * tường minh: `Object.defineProperties` trả về `{}` với TypeScript.
- */
 export type BrandColors = Record<BrandColorKey, string>;
 
 export const brandColors = Object.defineProperties(

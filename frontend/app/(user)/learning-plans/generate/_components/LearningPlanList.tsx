@@ -113,7 +113,6 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
     setSwitchTarget(null);
     switchMutation.mutate(planId, {
       onSuccess: () => reload(),
-      // err any có chủ đích: lỗi Axios, đọc response.data.message (BE không có type lỗi)
       onError: (err: any) => toast.error(err?.response?.data?.message || 'Lỗi khi chuyển lộ trình'),
     });
   }, [switchTarget, switchMutation, reload]);
@@ -124,7 +123,6 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
     setDeleteTarget(null);
     deleteMutation.mutate(planId, {
       onSuccess: () => reload(),
-      // err any có chủ đích: lỗi Axios, đọc response.data.message (BE không có type lỗi)
       onError: (err: any) => toast.error(err?.response?.data?.message || 'Lỗi khi xóa lộ trình'),
     });
   }, [deleteTarget, deleteMutation, reload]);
@@ -322,7 +320,6 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
                 <button
                   type="button"
                   className={cx('btn', 'btnGhost', 'btnSm')}
-                  // Giữ nguyên behavior .js cũ (truyền thẳng refetch làm handler) — cast vì chữ ký khác MouseEventHandler
                   onClick={reload as any}
                   disabled={loading}
                 >

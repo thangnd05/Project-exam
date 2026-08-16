@@ -53,13 +53,10 @@ export function useDashboardStats() {
 }
 
 export function useMonthlyPerformance(year?: number) {
-  // Generic tường minh vì spread `as any` bên dưới làm TS mất suy luận kiểu từ queryFn.
   const query = useQuery<MonthlyPerformanceResponse>({
     queryKey: dashboardKeys.monthlyPerformance(year),
     queryFn: () => getMonthlyPerformance(year),
     staleTime: 60 * 1000,
-    // `as any`: TanStack v5 đã bỏ option boolean `keepPreviousData` (hiện là no-op) —
-    // giữ nguyên từ bản .js, không đổi behavior. // TODO: cân nhắc placeholderData: keepPreviousData
     ...({keepPreviousData: true} as any),
   });
 
@@ -87,12 +84,10 @@ export function useContentInsights() {
 }
 
 export function useTrafficLocations(month?: string) {
-  // Generic tường minh vì spread `as any` bên dưới làm TS mất suy luận kiểu từ queryFn.
   const query = useQuery<TrafficLocationsResponse>({
     queryKey: dashboardKeys.trafficLocations(month),
     queryFn: () => getTrafficLocations(month),
     staleTime: 60 * 1000,
-    // `as any`: như trên — option v4 đã bị bỏ ở v5, giữ nguyên từ bản .js. // TODO
     ...({keepPreviousData: true} as any),
   });
 
@@ -107,12 +102,10 @@ export function useTrafficLocations(month?: string) {
 }
 
 export function useTrafficHeatmap(endDate?: string) {
-  // Generic tường minh vì spread `as any` bên dưới làm TS mất suy luận kiểu từ queryFn.
   const query = useQuery<DayHours[]>({
     queryKey: dashboardKeys.trafficHeatmap(endDate),
     queryFn: () => getTrafficHeatmap(endDate),
     staleTime: 30 * 1000,
-    // `as any`: như trên — option v4 đã bị bỏ ở v5, giữ nguyên từ bản .js. // TODO
     ...({keepPreviousData: true} as any),
   });
 

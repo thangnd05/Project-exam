@@ -18,7 +18,6 @@ import type {QuickChallengeCardResponse} from '@/app/types/test';
 
 const cx = classNames.bind(styles);
 
-// API khai báo trả mảng nhưng normalize phòng cả dạng bọc {data}/{content} → any có chủ đích.
 const normalizeExamTypes = (payload: any): ExamTypeResponse[] => {
   if (Array.isArray(payload)) return payload;
   if (payload && Array.isArray(payload.data)) return payload.data;

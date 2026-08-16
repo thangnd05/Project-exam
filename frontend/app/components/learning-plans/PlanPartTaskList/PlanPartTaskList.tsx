@@ -112,7 +112,6 @@ function PlanPartTaskList({
   onStudyTask,
   roadmapHeading = null,
 }: PlanPartTaskListProps) {
-  // BE đã sắp partGroups theo ExamPart.displayOrder  FE chỉ render.
   const orderedGroups = partGroups;
   const fallbackOpen = useMemo(
     () => defaultOpenParts(orderedGroups, recommendedTaskId),

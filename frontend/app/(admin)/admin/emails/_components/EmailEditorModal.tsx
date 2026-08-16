@@ -34,8 +34,6 @@ const QUILL_MODULES = {
     ['bold', 'italic', 'underline', 'strike'],
     [{color: []}, {background: []}],
     [{list: 'ordered'}, {list: 'bullet'}],
-    // Tách thành 4 nút riêng thay vì dropdown: dropdown 4 mục rất dễ bấm nhầm "căn đều"
-    // (justify) thành "căn giữa", mà một dòng ngắn căn đều thì trông y hệt căn trái.
     [{align: ''}, {align: 'center'}, {align: 'right'}, {align: 'justify'}],
     ['link', 'blockquote'],
     ['clean'],
@@ -56,15 +54,9 @@ type EmailEditorModalProps = {
   onClose: () => void;
 };
 
-/**
- * Soạn nội dung email bằng trình soạn thảo. Backend tự đổi HTML của trình soạn thảo sang
- * style inline lúc gửi (EmailHtmlNormalizer) vì hộp thư không đọc CSS ngoài.
- */
 function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
   const isAuto = email?.type === EmailType.AUTO;
   const isEditing = Boolean(email?.emailId);
-  // Khung chung là HTML email viết tay (div lồng nhau, style inline)  nạp vào trình soạn
-  // thảo là mất hết bố cục, nên chỉ cho sửa ở dạng HTML.
   const isLayout = email?.code === 'LAYOUT_BASE';
 
   const [form, setForm] = useState<EmailFormState>(emptyForm);
@@ -235,8 +227,6 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
           <RichTextEditor
             theme="snow"
             value={form.bodyHtml}
-            // Chỉ nhận thay đổi do người dùng gõ. Quill chuẩn hóa lại HTML ngay khi nạp và
-            // cũng bắn onChange  nhận luôn thì chỉ mở modal lên đã làm hỏng nội dung.
             onChange={(value, _delta, source) => {
               if (source === 'user') {
                 setField('bodyHtml', value);
@@ -315,7 +305,6 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
           <div className="small text-muted mb-1">
             Bản xem trước (đã lồng vào khung chung, biến thay bằng dữ liệu của bạn):
           </div>
-          {/* iframe sandbox: cách ly CSS của trang admin và chặn mọi script trong nội dung. */}
           <iframe
             title="Xem trước email"
             srcDoc={previewHtml}

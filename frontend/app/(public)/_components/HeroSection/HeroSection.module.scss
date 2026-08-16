@@ -1,7 +1,6 @@
 .hero {
   position: relative;
   isolation: isolate;
-  // Phủ trọn khung nhìn: main đã bị kéo lên -72px nên hero bắt đầu từ đỉnh màn hình.
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
@@ -73,8 +72,6 @@
 
 .copy {
   max-width: 640px;
-  // Cột hình cao hơn cột chữ; canh giữa làm chữ tụt xuống dưới quả cầu nên cho
-  // đỉnh khối chữ ngang với đỉnh quả cầu.
   align-self: start;
   margin-top: 12px;
 
@@ -220,8 +217,6 @@
 
 .stage {
   position: relative;
-  // Cho sân khấu tràn sang phải, ăn vào lề trống của trang: khối chữ vẫn thẳng
-  // hàng với các section dưới mà vành vẫn có thêm đất để rộng ra.
   --stage-bleed: clamp(0px, calc((100vw - 1180px) / 2 - 16px), 140px);
   width: calc(100% + var(--stage-bleed));
   margin-right: calc(var(--stage-bleed) * -1);
@@ -243,15 +238,12 @@
 }
 
 .switcher {
-  // Hai nút tách ra hai bên trục ngang của vành quỹ đạo, không xếp thành hàng dưới.
   display: contents;
 }
 
 .switchPrev,
 .switchNext {
   position: absolute;
-  // Kẹp hai bên quả cầu: cùng độ cao với nó, cách tâm --nav-x. Ở độ cao này
-  // vành không với tới nên thẻ quét ngang không bao giờ chui dưới nút.
   top: 72px;
   left: 50%;
   transform: translate(calc(-50% + var(--nav-x, 0px)), -50%);
@@ -272,8 +264,6 @@
   border-radius: 50%;
   border: 1.5px solid rgba(255, 255, 255, 0.28);
   background: rgb(var(--brand-900-rgb) / 0.35);
-  // Thẻ ở nửa trên vành có lúc lướt qua sau nút; blur cho ra chất kính, nhìn
-  // thành lớp trước - lớp sau thay vì chồng lộn xộn.
   backdrop-filter: blur(8px);
   color: #fff;
   cursor: pointer;
@@ -355,12 +345,10 @@
 }
 
 @media (max-width: 960px) {
-  // Layout dồn 1 cột: ẩn cụm "Cuộn xuống" cho gọn.
   .scrollCue {
     display: none;
   }
 
-  // Trả hai nút ‹ › về thành hàng dưới vành cho gọn.
   .switcher {
     display: flex;
     align-items: center;

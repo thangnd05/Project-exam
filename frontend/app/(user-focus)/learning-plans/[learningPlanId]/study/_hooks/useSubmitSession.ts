@@ -14,7 +14,6 @@ type SubmitSessionVariables = {
 
 type UseSubmitSessionOptions = {
   onSuccess?: (data: SubmitSessionResponse, variables: SubmitSessionVariables, ...rest: unknown[]) => void;
-  // err để any có chủ đích: lỗi Axios, caller đọc err.response.data.message (BE không có type lỗi)
   onError?: (err: any) => void;
 };
 

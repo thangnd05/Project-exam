@@ -9,7 +9,6 @@ import { SELECTION_MODES } from '@/app/hooks/useBankTestBuilder';
 import type { PartConfigMap } from '@/app/hooks/useBankTestBuilder';
 import type { CreateTestRequest } from '@/app/types';
 
-/** Form thông tin đề: mọi field là chuỗi để bind thẳng vào input. */
 export type BankTestInfo = {
   title: string;
   description: string;
@@ -46,7 +45,6 @@ type UseCreateTestFromBankParams = {
   setNotification: (notification: NotificationState) => void;
 };
 
-/** Part cần thêm vào đề — lấy từ danh sách examParts của loại kỳ thi. */
 type PartToAdd = { examPartId: string; name?: string };
 
 export function useCreateTestFromBank({
@@ -58,8 +56,6 @@ export function useCreateTestFromBank({
 }: UseCreateTestFromBankParams) {
   return useMutation({
     mutationFn: async (partsToAdd: PartToAdd[]) => {
-      // BE phân biệt `null` (không đặt) với field vắng mặt, CreateTestRequest khai optional
-      // -> cast qua unknown để giữ nguyên body request của bản JS.
       const testData = await createTest({
         title: testInfo.title.trim(),
         description: testInfo.description || null,

@@ -1,5 +1,3 @@
-// Query key dùng chung cho exam-type: trang public ((public)/_components/ExamTypeGrid, HeroSection),
-// các hook admin (useExamTypes, useTags) cùng trỏ về một nguồn nên invalidate không bị lệch key.
 export const examTypeKeys = {
   all: ['exam-types'],
   standard: ['exam-types', 'standard'],

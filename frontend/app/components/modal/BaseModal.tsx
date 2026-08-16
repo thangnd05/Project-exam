@@ -53,8 +53,6 @@ function BaseModal({
 
   const mounted = useMounted();
 
-
-  // Portal cần document.body -> chỉ dựng sau khi đã ở client (xem useMounted).
   if (!show || !mounted) return null;
 
   return ReactDOM.createPortal(

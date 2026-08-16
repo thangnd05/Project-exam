@@ -9,8 +9,6 @@ export const planComparisonKeys = {
   plans: (examTypeId?: string) => ['learning-plans', examTypeId],
 };
 
-// Giữ nhánh { content } phòng hờ dạng phân trang như bản JS cũ (data as any vì nhánh này
-// không nằm trong kiểu trả về đã khai báo của API)
 const normalizeList = <T>(data: T[]): T[] =>
   Array.isArray(data) ? data : Array.isArray((data as any)?.content) ? (data as any).content : [];
 
@@ -34,8 +32,7 @@ export function usePlanComparison(examTypeId?: string) {
     isLoading: plansQuery.isLoading,
     isError: plansQuery.isError,
     error: plansQuery.error
-      ? // err any có chủ đích: lỗi Axios, đọc response.data.message (BE không có type lỗi)
-        (plansQuery.error as any)?.response?.data?.message || plansQuery.error.message
+      ? (plansQuery.error as any)?.response?.data?.message || plansQuery.error.message
       : null,
   };
 }

@@ -10,7 +10,6 @@ import styles from '@/app/components/exam-layout/blocks/GatedAudioPlayer.module.
 
 const cx = classNames.bind(styles);
 
-/** Audio khoá (gated): người làm bài không tua được, nghe hết clip mới sang bước kế (chế độ PAGED). */
 type GatedAudioPlayerProps = {
   urls?: string[];
   onCompleted?: () => void;

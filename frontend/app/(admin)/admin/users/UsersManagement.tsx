@@ -139,7 +139,6 @@ function UsersManagement() {
     setShowCreateModal(false);
   };
 
-  // Event dùng chung cho cả Form.Control/Select/Check nên để ChangeEvent<any> có chủ đích.
   const updateCreateField = (field: keyof CreateFormState) => (event: React.ChangeEvent<any>) => {
     const value =
       field === 'verified' || field === 'isPremium'
@@ -163,7 +162,6 @@ function UsersManagement() {
         userName,
         email,
         password: createForm.password,
-        // `as any`: API type khai báo roleId?: string nhưng behavior cũ gửi null khi bỏ trống — giữ nguyên. // TODO
         roleId: (createForm.roleId || null) as any,
         verified: createForm.verified,
         isPremium: createForm.isPremium,

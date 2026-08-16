@@ -1,15 +1,4 @@
-// CSS global gom từ các file *.module.scss.
-//
-// Vì sao có file này: những khối dưới đây nhắm vào selector KHÔNG thuộc module — `.modal-content`
-// của Bootstrap, `body`, `:root` — nhưng lại nằm trong file .module.scss. Vite cho qua, còn Next
-// bắt CSS Module phải "pure" (mọi selector phải chứa ít nhất một class/id local) nên build đỏ.
-//
-// Bản chất chúng LUÔN là global: CSS được bundle nên vẫn áp cho toàn app dù đang mở trang nào.
-// Chuyển ra đây là về đúng chỗ, KHÔNG đổi hành vi. Nạp một lần duy nhất ở app/layout.js.
-//
-// Về lâu dài nên xoá dần khối override Bootstrap ở đây bằng cách bỏ hẳn Bootstrap.
 
-/* ─── từ (user)/my-albums/MyAlbum.module.scss ─── */
 .modal-content {
     border: none;
     border-radius: var(--radius-xl);
@@ -69,7 +58,6 @@
     }
 }
 
-/* ─── từ app/components/admin/common/adminKit.module.scss ─── */
 input.form-control,
 .form-select {
   height: 42px;
@@ -98,13 +86,11 @@ input.form-control,
   }
 }
 
-/* ─── từ (public)/posts/[postId]/PostDetail.module.scss ─── */
 :root {
   --font-blog-heading: 'Source Serif 4', Georgia, serif;
   --blog-reading-width: 720px;
 }
 
-/* ─── từ app/(bare)/resources/[resourceId]/RecoveryResourceView.module.scss ─── */
 body.recovery-resource-print-page {
   background: var(--bg-body);
 }
@@ -127,7 +113,6 @@ body.recovery-resource-print-page #recovery-resource-print-root {
     width: 100%;
   }
 }
-/* ─── từ (user)/certificates/[certificateId]/CertificateDetail.module.scss ─── */
 @media print {
 body {
     background: var(--white);

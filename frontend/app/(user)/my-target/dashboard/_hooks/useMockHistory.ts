@@ -55,7 +55,6 @@ export function useMockHistory(
     chartTests: chartQuery.data?.content ?? [],
     tablePage: tableQuery.data ?? null,
     isLoading: chartQuery.isLoading || tableQuery.isLoading,
-    // Giữ nguyên cách lấy message của bản .js (axios error không có type sẵn).
     error: err ? (err as any)?.response?.data?.message || err.message : null,
     targetScore: examTypeFilter ? targetQuery.data ?? null : null,
   };

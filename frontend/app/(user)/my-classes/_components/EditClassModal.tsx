@@ -17,7 +17,6 @@ const cx = classNames.bind(styles);
 type EditClassModalProps = {
   show: boolean;
   onClose: () => void;
-  // Lớp chọn từ danh sách my-classes (không có description) — modal tự fetch chi tiết khi thiếu
   classData?: (ClassStudentResponse & { description?: string }) | null;
   onSuccess?: (data: ClassResponse) => void;
 };

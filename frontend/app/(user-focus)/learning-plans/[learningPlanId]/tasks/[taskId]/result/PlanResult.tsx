@@ -25,8 +25,6 @@ function PlanResult() {
   const goToPicker = () => router.push(`/learning-plans/${learningPlanId}`);
   const retry = () => router.push(`/learning-plans/${learningPlanId}/study?taskId=${taskId}`);
 
-  // Vượt ải cuối → toàn bộ lộ trình đã xong: bật modal chúc mừng
-  // và đánh dấu đã xem để trang kế hoạch không hiện lại lần nữa.
   const allTasksDone = !!sessionResult?.passed && sessionResult?.planStage === PlanStage.MOCK;
   useEffect(() => {
     if (!allTasksDone) return;

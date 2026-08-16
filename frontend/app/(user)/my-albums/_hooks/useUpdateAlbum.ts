@@ -9,7 +9,6 @@ type UpdateAlbumVariables = { albumId: string; payload: VocabularyAlbumRequest }
 
 type UseUpdateAlbumOptions = {
   onSuccess?: (data: VocabularyAlbumResponse, ...rest: unknown[]) => void;
-  // err để any có chủ đích: lỗi Axios, caller đọc err.response.data.message (BE không có type lỗi)
   onError?: (err: any) => void;
 };
 

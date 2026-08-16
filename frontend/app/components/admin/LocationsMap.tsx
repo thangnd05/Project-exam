@@ -88,7 +88,6 @@ const LocationsMap = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
                 style={{ width: '100%', height: 'auto' }}
             >
                 <Geographies geography={worldGeo}>
-                    {/* react-simple-maps không có type — geo/geographies để any có chủ đích */}
                     {({ geographies }: { geographies: any[] }) =>
                         geographies.map((geo: any) => {
                             const name = geo.properties.name;

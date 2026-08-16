@@ -69,8 +69,6 @@ function CertificateVerify() {
   const state = isError ? CertificateVerifyState.NOT_FOUND : result?.state;
   const view = (state && STATE_VIEW[state]) || STATE_VIEW.NOT_FOUND;
   const StateIcon = view.icon;
-  // Tra được thì vẽ lại đúng tấm chứng chỉ như trang xem của chủ sở hữu, kể cả bản
-  // đã thu hồi/hết hạn  người tra cứu cần đối chiếu với bản đang cầm trên tay.
   const showCertificate = Boolean(result) && state !== CertificateVerifyState.NOT_FOUND;
 
   return (

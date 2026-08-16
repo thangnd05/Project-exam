@@ -86,7 +86,6 @@ const AlbumDetail = () => {
   if (loading)
     return (
       <div className={cx('loading-box')}>
-        {/* size="lg" không có trong type của react-bootstrap (chỉ 'sm') nhưng giữ nguyên DOM như bản JS cũ */}
         <Spinner animation="grow" variant="primary" size={'lg' as any} />
         <p>Đang mài giũa kiến thức...</p>
       </div>

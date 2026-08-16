@@ -26,7 +26,6 @@ type MotionItemProps = {
   children?: React.ReactNode;
   className?: string;
   variants?: Variants;
-  // Các prop motion còn lại (initial, animate, transition...) chuyển thẳng xuống motion.div
   [key: string]: any;
 };
 
@@ -48,7 +47,6 @@ type MotionSectionProps = {
   amount?: number;
   once?: boolean;
   stagger?: boolean;
-  // Các prop motion còn lại chuyển thẳng xuống component
   [key: string]: any;
 };
 

@@ -108,9 +108,6 @@ const TestResult = () => {
                   <>
                     <span className={cx("label")}>Điểm số</span>
                     <div className={cx("points")}>
-                      {/* Bản react-router cũ còn nhánh location.state?.score do trang trước
-                          truyền sang; Next không có location.state nên bỏ — `result` từ API
-                          vốn đã là nguồn chính, nhánh kia chỉ là dự phòng. */}
                       {result?.totalScore?.toFixed(2) || "0.00"}
                     </div>
                   </>

@@ -1,11 +1,3 @@
-/*
-  Mọi kích thước bên trong tính theo cqw (phần trăm bề rộng của chính chứng chỉ) nên
-  chứng chỉ co giãn nguyên khối: xem trên điện thoại, trên trang admin hay in ra giấy
-  đều giữ đúng bố cục.
-
-  Màu trang trí đều pha từ --certificate-accent bằng color-mix, vì accent là mã màu tự do
-  admin nhập ở mẫu  không tách được ra kênh RGB để dùng rgb(... / alpha).
-*/
 .canvas {
   container-type: inline-size;
   position: relative;
@@ -17,13 +9,10 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
   overflow: hidden;
-  /* Giữ nền hoa văn và con dấu khi in  mặc định trình duyệt bỏ hết màu nền. */
   print-color-adjust: exact;
   -webkit-print-color-adjust: exact;
 
   --certificate-accent: var(--brand-600);
-  /* Chữ trang trọng. Playfair Display có sẵn bộ chữ Việt nên tên có dấu (ắ, ễ, ừ...)
-     hiện đúng ở mọi máy; các font dự phòng chỉ dùng khi tải webfont thất bại. */
   --certificate-serif: 'Playfair Display', 'Noto Serif', Georgia, 'Times New Roman', serif;
 }
 
@@ -44,7 +33,6 @@
   overflow: hidden;
 }
 
-/* Viền trong mảnh, tạo khung kép kiểu văn bằng. */
 .frame::before {
   content: '';
   position: absolute;
@@ -55,10 +43,6 @@
   pointer-events: none;
 }
 
-/*
-  Hoa văn nền: quầng sáng accent ở đỉnh + lưới chéo rất mờ. Đủ để tờ giấy không trắng
-  trơn nhưng vẫn in ra sạch, không nuốt mực.
-*/
 .frame::after {
   content: '';
   position: absolute;
@@ -82,7 +66,6 @@
   pointer-events: none;
 }
 
-/* Nội dung phải nằm trên lớp hoa văn. */
 .head,
 .body,
 .foot,
@@ -92,7 +75,6 @@
   z-index: 1;
 }
 
-/* Góc trang trí: hai nét vuông góc ở bốn góc khung. */
 .corner {
   position: absolute;
   width: 5cqw;
@@ -162,7 +144,6 @@
   object-fit: contain;
 }
 
-/* Huy hiệu thay logo khi mẫu chưa gắn ảnh: vòng tròn accent có ngôi sao ở giữa. */
 .emblem {
   position: relative;
   width: 6.4cqw;
@@ -192,7 +173,6 @@
   color: var(--text-secondary);
 }
 
-/* Dải phân cách  ◆  giữa phần đầu và phần thân. */
 .ornament {
   display: flex;
   align-items: center;
@@ -254,10 +234,6 @@
   color: var(--text-secondary);
 }
 
-/*
-  Tên người nhận là điểm nhìn chính: chữ serif lớn, gạch chân bằng dải accent mờ dần
-  hai đầu thay cho đường kẻ ngang cứng.
-*/
 .recipient {
   position: relative;
   margin: 0;
@@ -350,7 +326,6 @@
   color: var(--certificate-accent);
 }
 
-/* Con dấu tròn ở giữa chân trang, ngay trên mã tra cứu. */
 .seal {
   display: flex;
   align-items: center;
@@ -392,10 +367,6 @@
   letter-spacing: 0.12cqw;
 }
 
-/*
-  Ảnh chữ ký thường có nhiều khoảng trắng ở dưới nên hạ xuống sát tên người ký
-  bằng margin âm, cho giống nét ký tay đặt ngay trên dòng tên.
-*/
 .signature {
   max-height: 12cqw;
   max-width: 30cqw;
@@ -403,7 +374,6 @@
   object-fit: contain;
 }
 
-/* Giữ chỗ ký cố định kể cả khi mẫu chưa nhập tên, tránh cột chữ ký nhảy layout. */
 .signName {
   min-height: 2.2cqw;
   min-width: 20cqw;

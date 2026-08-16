@@ -117,8 +117,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (user) expiredToastShownRef.current = false;
   }, [user]);
 
-  // Theme toàn app theo trạng thái premium: premium -> tông vàng kim loại
-  // (mặc định :root), user thường/khách -> tông xanh dương (data-theme="normal").
   useEffect(() => {
     document.documentElement.dataset.theme = user?.isPremium ? 'premium' : 'normal';
   }, [user?.isPremium]);

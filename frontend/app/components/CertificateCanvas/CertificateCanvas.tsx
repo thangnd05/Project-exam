@@ -7,8 +7,6 @@ import styles from './CertificateCanvas.module.scss';
 
 const cx = classNames.bind(styles);
 
-/* Chữ trên chứng chỉ để tiếng Anh cho giống chứng chỉ quốc tế, nên ngày cũng theo
-   kiểu Anh ("15 August 2026") chứ không phải 15/08/2026. */
 const formatDate = (value?: string) => {
   if (!value) return '--';
   return new Date(value).toLocaleDateString('en-GB', {
@@ -24,7 +22,6 @@ type CertificateCanvasProps = {
   certificateCode?: string;
   issuedAt?: string;
   expiresAt?: string;
-  /** Chữ chìm cảnh báo, ví dụ "ĐÃ THU HỒI" hoặc "XEM TRƯỚC". */
   watermark?: string;
 };
 

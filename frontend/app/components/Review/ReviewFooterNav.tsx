@@ -8,7 +8,6 @@ import styles from '@/app/assets/styles/ReviewFooter.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Item dựng từ data API (chưa có type riêng) -> id để any có chủ đích.
 type ReviewFooterNavItem = {
   id: any;
   status?: string;

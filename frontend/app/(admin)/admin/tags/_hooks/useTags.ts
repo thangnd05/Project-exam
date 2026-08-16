@@ -12,7 +12,6 @@ export const tagKeys = {
   byExamType: (examTypeId?: string | null) => ['admin-tags', examTypeId ?? null],
 };
 
-// API luôn trả name cho tag — ép required để trang tree khỏi phải check undefined.
 export interface AdminTag extends TagResponse {
   name: string;
   children?: AdminTag[];

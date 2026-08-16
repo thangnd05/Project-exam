@@ -53,7 +53,6 @@ function PlanDetail() {
   const resyncMutation = useResyncPlan({
     onSuccess: (updatedPlan) => {
       toast.success(buildResyncMessage(updatedPlan));
-      // Cập nhật tại chỗ nên vẫn là plan này  query đã invalidate, trang tự refetch.
     },
     onError: (err) => {
       toast.error(err?.response?.data?.message || 'Không cập nhật được lộ trình');
@@ -66,12 +65,11 @@ function PlanDetail() {
     }
   }, [loading, plan]);
 
-  // Lần đầu thấy plan đã vượt hết ải → hiện modal chúc mừng (mỗi plan một lần).
   useEffect(() => {
     if (!plan || plan.planStage !== PlanStage.MOCK || plan.status === LearningPlanStatus.REPLACED) return;
     try {
       if (localStorage.getItem(congratsSeenKey(plan.learningPlanId))) return;
-    } catch { /* localStorage bị chặn thì vẫn hiện modal */ }
+    } catch {}
     setShowCongrats(true);
   }, [plan]);
 

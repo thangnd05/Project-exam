@@ -3,13 +3,6 @@
 import { Suspense } from 'react';
 import Loading from '@/app/components/Loading/Loading';
 
-// Khu quản trị. Quyền khác nhau theo từng trang nên không khai cứng được ở đây —
-// tra theo pathname trong bảng adminPermissionByPath, đúng như bản react-router cũ làm.
-//
-// Lưu ý: /admin/create-test-from-bank và /admin/personal-question-bank tuy nằm dưới /admin
-// nhưng là trang của người dùng thường (chỉ cần đăng nhập), nên chúng nằm ở nhóm (user)
-// chứ không ở đây — route group của Next không ảnh hưởng tới URL nên hai nhánh cùng tồn tại được.
-
 import { usePathname } from 'next/navigation';
 import AuthGuard from '@/app/components/AuthGuard/AuthGuard';
 import AdminLayout from '@/app/components/layouts/AdminLayout';

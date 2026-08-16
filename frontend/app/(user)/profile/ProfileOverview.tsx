@@ -37,7 +37,6 @@ const formatDateTime = (value?: string | null) => {
   return parsedDate.toLocaleString('vi-VN');
 };
 
-/* Các format helper nhận unknown vì dữ liệu tới từ nhiều nguồn (API + recharts formatter) */
 const formatNumber = (value: unknown) => {
   const safeValue = Number(value) || 0;
   return safeValue.toLocaleString('vi-VN');

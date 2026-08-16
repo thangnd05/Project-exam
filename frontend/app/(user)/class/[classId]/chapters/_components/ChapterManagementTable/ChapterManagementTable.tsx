@@ -44,7 +44,6 @@ function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}: Chapt
               </td>
               <td>
                 <span className={cx('chapter-date')}>
-                  {/* createdAt optional theo type nhưng BE luôn trả — giữ hành vi bản JS cũ */}
                   {new Date(chapter.createdAt!).toLocaleDateString('vi-VN')}
                 </span>
               </td>

@@ -11,11 +11,8 @@ export const taskHistoryKeys = {
   sessions: (planId?: string, taskId?: string) => ['task-sessions', planId, taskId],
 };
 
-// err any có chủ đích: lỗi Axios, đọc response.data.message (BE không có type lỗi)
 const errMessage = (err: any): string | null => err?.response?.data?.message || err?.message || null;
 
-// Giữ nhánh { content } phòng hờ dạng phân trang như bản JS cũ (data as any vì nhánh này
-// không nằm trong kiểu trả về đã khai báo của API)
 const normalizeSessions = (data: TaskSessionHistoryResponse[]): TaskSessionHistoryResponse[] =>
   Array.isArray(data) ? data : Array.isArray((data as any)?.content) ? (data as any).content : [];
 

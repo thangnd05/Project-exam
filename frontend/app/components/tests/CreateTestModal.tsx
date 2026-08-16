@@ -11,7 +11,6 @@ const cx = classNames.bind(styles);
 type CreateTestModalProps = {
   show?: boolean;
   onClose: () => void;
-  /** 'personal' = đề cá nhân, 'class' = đề trong lớp/chapter */
   mode?: CreateTestMode;
   classId?: string;
   chapterId?: string;

@@ -136,7 +136,6 @@ function CosmeticShop() {
 
   const renderCard = (item: CosmeticResponse) => {
     const busy = busyId === item.cosmeticId;
-    // costCoins optional trong DTO nhưng BE luôn trả — dùng ! giữ nguyên hành vi cũ.
     const canAfford = balance >= item.costCoins!;
 
     return (

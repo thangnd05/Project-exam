@@ -9,13 +9,6 @@ type ErrorViewProps = {
   reset: () => void;
 };
 
-/**
- * Giao diện cho `error.tsx` của App Router.
- *
- * ErrorBoundary class trong providers.tsx chỉ bắt được lỗi render phía client; lỗi ném ra
- * khi Next render ở server thì phải có file error.tsx mới chặn được — nếu không người dùng
- * gặp trang trắng của Next.
- */
 function ErrorView({ error, reset }: ErrorViewProps) {
   useEffect(() => {
     console.error(error);

@@ -13,7 +13,6 @@ export const categoriesKeys = {
     all: ['admin-categories'],
 };
 
-// API luôn trả name cho danh mục — ép required để trang khỏi phải check undefined.
 export interface AdminCategory extends CategoryResponse {
     name: string;
 }

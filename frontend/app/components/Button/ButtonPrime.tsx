@@ -17,7 +17,6 @@ type ButtonPrimeProps = {
   className?: string;
   children?: React.ReactNode;
   type?: 'button' | 'submit' | 'reset';
-  // Các prop còn lại chuyển thẳng xuống button/Link/a (href, onClick, aria-*...)
   [key: string]: any;
 };
 

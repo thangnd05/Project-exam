@@ -20,8 +20,6 @@ const parseOptionalId = (value: string) => {
   return trimmed === '' ? null : trimmed;
 };
 
-// `any` có chủ đích: 2 helper phòng thủ nhiều shape user cũ (id/userId/user_id, fullName/full_name...)
-// mà UserResponse hiện tại không khai đủ.
 const getUserIdValue = (user: any) => user?.id ?? user?.userId ?? user?.user_id ?? null;
 
 const getUserDisplayName = (user: any) =>
@@ -85,7 +83,6 @@ function TestsManagement() {
         )?.name || `ID ${test.examTypeId}`
       ).toLowerCase();
       return (
-        // BE luôn trả title — non-null assertion để giữ nguyên biểu thức gốc
         test.title!.toLowerCase().includes(keyword) ||
         (test.description || '').toLowerCase().includes(keyword) ||
         typeName.includes(keyword)
@@ -122,8 +119,6 @@ function TestsManagement() {
       return;
     }
 
-    // `any` có chủ đích: BE chấp nhận null để gỡ liên kết (classId/chapterId/description...)
-    // trong khi DTO FE khai optional string nên ép kiểu tại đây.
     const payload: any = {
       title: normalizedTitle,
       description: formState.description.trim() || null,

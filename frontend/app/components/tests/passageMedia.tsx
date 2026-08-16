@@ -10,7 +10,6 @@ const cx = classNames.bind(styles);
 const AUDIO_EXT = /\.(mp3|wav|ogg|m4a)(\?.*)?$/i;
 const IMAGE_EXT = /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i;
 
-/** Media của passage đã chuẩn hoá để hiển thị (mediaType viết hoa, id có thể null). */
 export type PassageMediaItem = {
   id: string | null;
   mediaUrl: string;
@@ -20,7 +19,6 @@ export type PassageMediaItem = {
 const passageMediaOf = (questionDetail?: QuestionAdminResponse | null) =>
   Array.isArray(questionDetail?.passageMedia) ? questionDetail!.passageMedia! : [];
 
-/** Media của passage, kèm fallback passage.mediaUrl khi chưa tách sang passage_media. */
 export const getPassageMediaItems = (
   questionDetail?: QuestionAdminResponse | null,
 ): PassageMediaItem[] => {
@@ -48,7 +46,6 @@ export const getPassageMediaItems = (
   return items;
 };
 
-/** Các đoạn text phụ của passage (passage_media type = TEXT). */
 export const getExtraTextContents = (questionDetail?: QuestionAdminResponse | null): string[] =>
   passageMediaOf(questionDetail)
     .filter((m) => (m?.mediaType || '').toUpperCase() === 'TEXT')
@@ -70,7 +67,6 @@ type PassageMediaCardProps = {
   actions?: React.ReactNode;
 };
 
-/** Thẻ hiển thị 1 media; `actions` để trang edit chèn nút xoá. */
 export function PassageMediaCard({item, index, actions = null}: PassageMediaCardProps) {
   const url = item.mediaUrl;
   const kind = resolveMediaKind(item);

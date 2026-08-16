@@ -22,30 +22,16 @@ const ORBIT_PERIOD_MS = 20_000;
 const ORBIT_SPEED = (Math.PI * 2) / ORBIT_PERIOD_MS;
 const MANUAL_PAUSE_MS = 1600;
 
-// radiusY >= bán kính hub + nửa chiều cao thẻ (đã nhân scale 1.1) thì thẻ ở vị trí
-// trước (đáy vành) mới không đè lên hub. radiusX tính theo bề ngang thật của sân
-// khấu nên vành luôn quét ngang hết chỗ có được.
-// Giữ đúng tỉ lệ elip của quỹ đạo gốc (radiusX : radiusY : radiusZ = 250:90:150)
-// để nhịp quay có chiều sâu thật. Hub treo phía trên hàng thẻ (--hub-shift trong
-// scss), thoả: hubShift + bán kính hub <= radiusY - nửa chiều cao thẻ (đã nhân
-// scale 1.1) - khoảng hở.
 const RING = {
   wide: {cardWidth: 196, radiusY: 110, maxRadiusX: 320, sideRoom: 8},
-  // Preset gọn dùng chung cho tablet→phone: maxRadiusX rộng để tablet trải đủ,
-  // còn máy hẹp thì radiusX tự co theo bề rộng stage (clamp bên dưới).
   narrow: {cardWidth: 140, radiusY: 88, maxRadiusX: 220, sideRoom: 8},
 };
 const MIN_RADIUS_X = 96;
 
-// Kéo ngang bao nhiêu px thì quỹ đạo quay trọn 1 vòng (theo bán kính hiện tại).
 const DRAG_TURN_FACTOR = 3.6;
-// Di chuyển quá ngưỡng này mới tính là kéo (để không nuốt cú click chọn thẻ).
 const DRAG_TOLERANCE_PX = 6;
-// Quán tính khi thả tay: chiếu vận tốc thêm chừng này mili-giây.
 const FLICK_PROJECTION_MS = 140;
-// Hằng số thời gian của chuyển động trượt về nấc gần nhất (càng lớn càng thong thả).
 const SETTLE_TAU_MS = 170;
-// Biên độ nghiêng theo chuột (độ). Giữ nhỏ vì bán kính vành lớn.
 const TILT_Y_DEG = 4;
 const TILT_X_DEG = 2.5;
 
@@ -116,15 +102,11 @@ function getOrbitTransform(theta: number, radius: OrbitRadius) {
   const depth = (Math.cos(theta) + 1) / 2;
 
   return {
-    // fanX: chỉ dùng khi có đúng 2 thẻ  nếu không thẻ phía sau sẽ nằm khuất
-    // hoàn toàn sau thẻ trước (cả hai cùng x = 0). sin(theta/2) liên tục nên
-    // không gây giật khi quay.
     x: Math.sin(theta) * radius.radiusX + Math.sin(theta / 2) * radius.fanX,
     y: Math.cos(theta) * radius.radiusY,
     z: Math.cos(theta) * radius.radiusZ,
     opacity: 0.55 + 0.45 * depth,
     depth,
-    // Gần như billboard: thẻ hướng về người xem, chỉ nghiêng nhẹ theo hướng bay.
     rotateY: -Math.sin(theta) * 10,
     zIndex: Math.round(50 + Math.cos(theta) * 50),
   };
@@ -174,8 +156,6 @@ const QuickTestOrbit = forwardRef<QuickTestOrbitHandle, QuickTestOrbitProps>(
   const hoverCountRef = useRef(0);
   const pointerPausedRef = useRef(false);
   const previousFrontRef = useRef(0);
-  // Giá trị khởi tạo (preset RING) khác shape với radius tính toán, nhưng được gán
-  // lại ngay mỗi lượt render bên dưới nên không bao giờ đọc phải shape cũ → cast.
   const radiusRef = useRef<OrbitRadius>(RING.wide as unknown as OrbitRadius);
   const stageRef = useRef<HTMLDivElement | null>(null);
   const countRef = useRef(0);
@@ -199,8 +179,6 @@ const QuickTestOrbit = forwardRef<QuickTestOrbitHandle, QuickTestOrbitProps>(
       MIN_RADIUS_X,
       preset.maxRadiusX,
     );
-    // Quỹ đạo chỉ là đường tròn thật trong 3D khi radiusY² + radiusZ² = radiusX².
-    // Lệch khỏi hệ thức này là mắt thấy ngay "sai sai".
     const radiusY = Math.min(preset.radiusY, radiusX - 1);
     const radiusZ = Math.sqrt(radiusX * radiusX - radiusY * radiusY);
 
@@ -241,10 +219,6 @@ const QuickTestOrbit = forwardRef<QuickTestOrbitHandle, QuickTestOrbitProps>(
         s = states[i] = {active: null, frontish: null, z: null};
       }
 
-      // translate(-50%, -50%) đặt cuối + transform-origin 0 0: thẻ tự căn giữa
-      // quanh điểm quỹ đạo, không cần biết trước kích thước thẻ.
-      // Không nhân scale thủ công: perspective đã tự thu nhỏ thẻ ở xa, nhân
-      // thêm là tính độ sâu hai lần nên chuyển động trông giả.
       el.style.transform = `translate3d(${t.x}px, ${t.y}px, ${t.z}px) rotateY(${t.rotateY}deg) translate(-50%, -50%)`;
       el.style.opacity = String(t.opacity);
       el.style.setProperty('--frontness', t.depth.toFixed(3));
@@ -352,7 +326,6 @@ const QuickTestOrbit = forwardRef<QuickTestOrbitHandle, QuickTestOrbitProps>(
     [count, settleTo, step],
   );
 
-  // Luôn về đúng nấc: làm tròn vị trí hiện tại rồi cộng/trừ một bước.
   const nudge = useCallback(
     (direction: number) => {
       if (count < 2) return;
@@ -384,7 +357,6 @@ const QuickTestOrbit = forwardRef<QuickTestOrbitHandle, QuickTestOrbitProps>(
       const deltaMs = last == null ? 0 : Math.min(ts - last, 64);
 
       if (dragRef.current) {
-        // Đang kéo: góc quay do pointermove quyết định.
       } else if (settleRef.current != null) {
         const target = settleRef.current;
         const diff = target - rotationRef.current;
@@ -450,7 +422,6 @@ const QuickTestOrbit = forwardRef<QuickTestOrbitHandle, QuickTestOrbitProps>(
         moved: false,
         startRotation: rotationRef.current,
         rotPerPx: TWO_PI / (radiusRef.current.radiusX * DRAG_TURN_FACTOR),
-        // Gán thật ở dưới (sau khi có onMove/onEnd), trước khi đăng ký listener.
         cleanup: () => {},
       };
 
@@ -511,21 +482,15 @@ const QuickTestOrbit = forwardRef<QuickTestOrbitHandle, QuickTestOrbitProps>(
 
   useEffect(() => () => dragRef.current?.cleanup(), []);
 
-  // Nghiêng nhẹ cả cụm theo vị trí con trỏ  cảm giác 3D của bản three.js nhưng
-  // chỉ tốn 2 biến CSS.
   const onStagePointerMove = useCallback(
     (e: React.PointerEvent<HTMLDivElement>) => {
       const el = stageRef.current;
-      // Chỉ chuột mới nghiêng: chạm thì không có hover để trả về 0.
-      // Đang kéo thì thôi, không chồng thêm chuyển động.
       if (!el || reduceMotion || dragRef.current || e.pointerType !== 'mouse') {
         return;
       }
       const rect = el.getBoundingClientRect();
       const px = (e.clientX - rect.left) / rect.width - 0.5;
       const py = (e.clientY - rect.top) / rect.height - 0.5;
-      // Biên độ phải nhỏ: nghiêng θ đẩy thẻ ở rìa lùi/tiến radiusX·sin(θ) theo
-      // trục z, với radiusX ~300 thì 12° đã là ~60px  thẻ trông như bị hụt về sau.
       el.style.setProperty('--tilt-y', `${(px * TILT_Y_DEG).toFixed(2)}deg`);
       el.style.setProperty('--tilt-x', `${(-py * TILT_X_DEG).toFixed(2)}deg`);
     },
@@ -556,7 +521,6 @@ const QuickTestOrbit = forwardRef<QuickTestOrbitHandle, QuickTestOrbitProps>(
   const frontTest = count > 0 ? tests[frontIndex] : null;
 
   const openFront = useCallback(() => {
-    // Kéo xong thả tay ngay trên hub thì không tính là bấm.
     if (didSwipeRef.current) {
       didSwipeRef.current = false;
       return;

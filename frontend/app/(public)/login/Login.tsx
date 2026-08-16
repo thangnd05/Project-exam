@@ -24,7 +24,6 @@ import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/component
 
 const cx = classNames.bind(style);
 
-// Chưa cấu hình khóa (máy dev) thì bỏ qua bước xác minh thay vì chặn đăng ký.
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
 
 function Login() {
@@ -53,8 +52,6 @@ function Login() {
   const backendBaseUrl = getApiBaseUrl();
   const GOOGLE_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/google`;
 
-  // Trước kia hai thứ này đi qua location.state của react-router; Next không có nên chuyển
-  // sang query: ?mode=signin|signup và ?flash=<thông báo>. Xem shared/ui/AuthGuard.js.
   useEffect(() => {
     const mode = searchParams.get('mode');
     if (mode) {
@@ -98,7 +95,6 @@ function Login() {
         throw new Error("User data invalid");
       }
     } catch (err: any) {
-      // any có chủ đích: lỗi axios (err.response) chưa có type dùng chung trong dự án
       setMessage(
         err.response?.data?.message ||
         "Đăng nhập thất bại. Vui lòng thử lại!"
@@ -135,7 +131,6 @@ function Login() {
       // toast.info('Vui lòng vào email vừa đăng ký để xác thực tài khoản!');
       setIsSignUp(false);
     } catch (err: any) {
-      // any có chủ đích: lỗi axios (err.response) chưa có type dùng chung trong dự án
       const errorMessage =
         err.response?.data?.message ||
         (err.response?.status === 500
@@ -144,8 +139,6 @@ function Login() {
       setMessage(errorMessage);
       setMessageType('error');
     } finally {
-      // Mỗi token chỉ dùng được một lần, dù thành công hay thất bại đều phải làm mới ô
-      // xác minh cho lần đăng ký sau.
       recaptchaRef.current?.reset();
       setRecaptchaToken('');
       setLoading(false);

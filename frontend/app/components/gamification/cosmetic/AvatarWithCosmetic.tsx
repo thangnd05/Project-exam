@@ -6,8 +6,6 @@ import styles from './AvatarWithCosmetic.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Nhận cả CosmeticResponse từ API lẫn equipped cosmetics từ CosmeticContext
-// (Record<string, any>) — chỉ đọc các field optional nên dùng Partial.
 type CosmeticLike = Partial<CosmeticResponse>;
 
 function resolveStyle(frame?: CosmeticLike | null) {
@@ -18,8 +16,6 @@ function resolveStyle(frame?: CosmeticLike | null) {
 }
 
 type AvatarWithCosmeticProps = {
-  // src/fallbackSrc có thể là URL string hoặc StaticImageData (import ảnh tĩnh của Next)
-  // — để any có chủ đích, giữ nguyên hành vi cũ.
   src?: any;
   fallbackSrc?: any;
   alt?: string;
@@ -45,8 +41,6 @@ function AvatarWithCosmetic({ src, fallbackSrc, alt = 'Avatar', name, size = 40,
   const pad = isColor || isEffect ? ring : 0;
   const box = size + pad * 2;
 
-  // Không có ảnh thật (rỗng hoặc chỉ là avatar mặc định ui-avatars) => hiện
-  // chữ cái đầu với nền theo theme (--primary-gradient: teal thường / vàng premium)
   const label = (name || (alt !== 'Avatar' ? alt : '') || '').trim();
   const initial = label ? label.charAt(0).toUpperCase() : '';
   const isDefaultAvatar = !src || /ui-avatars\.com/i.test(src);

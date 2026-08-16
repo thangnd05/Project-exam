@@ -38,10 +38,6 @@ export const questionBankKeys = {
   partQuestions: (partId?: string, scope?: string) => ['question-bank', 'part-questions', partId, scope],
 };
 
-/*
-  Các normalize dưới đây nhận cả mảng lẫn bọc data/content/questions của response cũ nên
-  tham số để `any` có chủ đích (API hiện tại đã trả mảng).
-*/
 const normalizeCollections = (data: any): QuestionCollectionResponse[] =>
   Array.isArray(data) ? data : (data?.data || data?.content || []);
 
@@ -76,9 +72,6 @@ type UsePersonalQuestionBankParams = {
   includeChildCollections: boolean;
 };
 
-/**
- * Data layer for PersonalQuestionBank — page keeps only UI/modal state.
- */
 export function usePersonalQuestionBank({
   bankScope,
   examTypeId,

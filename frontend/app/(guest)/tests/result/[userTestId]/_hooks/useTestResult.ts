@@ -8,7 +8,6 @@ import { getUserTestInfo } from '@/app/apis/testApi';
 import { getEnhancedResult, getGuestEnhancedResult } from '@/app/apis/enhancedResultApi';
 import type { EnhancedResultResponse, ResultSummaryResponse } from '@/app/types';
 
-/** Tổng kết điểm + mốc thời gian của lượt làm (ghép từ 2 endpoint). */
 export type TestResultSummary = ResultSummaryResponse & {
   startedAt?: string;
   finishedAt?: string;

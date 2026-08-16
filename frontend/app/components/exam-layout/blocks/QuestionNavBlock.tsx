@@ -3,7 +3,6 @@
 import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 
-// Các block dùng chung class của trang làm bài; scss đặt cạnh engine để bớt import chéo.
 import styles from '@/app/components/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);

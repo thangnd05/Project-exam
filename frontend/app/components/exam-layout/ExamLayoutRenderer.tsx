@@ -23,7 +23,6 @@ import type {
   ExamUserAnswers,
   QuestionIndexMap,
 } from '@/app/components/exam-layout/examLayoutTypes';
-// Trang làm bài và engine layout dùng chung class; scss đặt cạnh engine để bớt import chéo.
 import pageStyles from '@/app/components/exam-layout/TestStart.module.scss';
 import zoneStyles from '@/app/components/exam-layout/examLayout.module.scss';
 
@@ -31,7 +30,6 @@ const cx = classNames.bind(pageStyles);
 const zx = classNames.bind(zoneStyles);
 
 function buildThemeStyle(theme: LayoutTheme = {}): React.CSSProperties {
-  // CSS custom property (--primary...) không nằm trong CSSProperties nên gom vào record rồi cast.
   const style: Record<string, string> = {};
   if (theme.primary) {
     style['--primary'] = theme.primary;
@@ -54,14 +52,11 @@ type ExamLayoutRendererProps = {
   formatTime: (seconds: number) => string;
   isSubmitting?: boolean;
   handleSubmit?: () => void;
-  /** preview = render trong layout builder (không gắn portal/scroll của trang làm bài) */
   preview?: boolean;
-  /** interactive = cho phép click chọn yếu tố trong layout builder */
   interactive?: boolean;
   selectedId?: string | null;
   onSelectBlock?: (blockId: string) => void;
 
-  /** Chế độ PAGED: từng câu/nhóm một */
   isPaged?: boolean;
   flowSteps?: ExamFlowStep[];
   currentStepIndex?: number;

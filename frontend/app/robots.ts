@@ -7,7 +7,6 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      // Khu riêng tư và khu quản trị không có gì đáng index, lại còn tốn ngân sách thu thập.
       disallow: ['/admin/', '/my-', '/learning-plans/', '/tests/', '/profile', '/oauth2/'],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,

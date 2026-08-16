@@ -6,7 +6,6 @@ import {getLoginAuditLogs} from '@/app/apis/adminAuditApi';
 import {keepPreviousData} from '@/app/configs/queryClient';
 import type {AuditLogResponse, PageResponse} from '@/app/types';
 
-/** Bản ghi đăng nhập đã chuẩn hoá (snake_case) cho bảng admin. */
 export interface LoginAuditRow {
   id: string;
   login_time: string;

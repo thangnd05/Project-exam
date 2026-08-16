@@ -57,7 +57,6 @@ export const getTestsByCollection = (collectionId: string, { page = 0, size = 12
     .then((res) => res.data);
 };
 
-/** Khu "thi lấy chứng chỉ" của một loại đề: đề + điều kiện đạt, backend đã lọc sẵn. */
 export const getCertificateExamsByExamType = (examTypeId: string): Promise<CertificateExamListResponse> => {
   return axios
     .get(`${BASE_URL}/certificate-exams/by-exam-type/${examTypeId}`)

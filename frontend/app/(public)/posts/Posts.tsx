@@ -151,8 +151,6 @@ function Posts() {
                   <span>{new Date(post.createdAt ?? '').toLocaleDateString('vi-VN')}</span>
                 </div>
                 <h3>{post.title}</h3>
-                {/* any có chủ đích: PostSummaryResponse từ BE không có field `summary`
-                    (runtime luôn fallback về title) — giữ nguyên biểu thức cũ, không đổi hành vi */}
                 <p className={cx('cardExcerpt')}>{(post as any).summary || post.title}</p>
                 <div className={cx('cardFooter')}>
                   <div className={cx('author')}>

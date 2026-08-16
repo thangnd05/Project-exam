@@ -22,7 +22,6 @@ export function useExamFlowNavigation({
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [maxStepIndex, setMaxStepIndex] = useState(0);
 
-  // Chế độ PAGED (từng câu/nhóm một) bật theo cấu hình layout của loại đề.
   const isPaged = (layoutConfig?.questionArea?.navigationMode || 'scroll') === 'paged';
 
   const allQuestions = useMemo<ExamQuestion[]>(

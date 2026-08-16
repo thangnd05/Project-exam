@@ -95,7 +95,6 @@ function MilestonesManagement() {
     examTypes,
     examParts,
     skills,
-    // TODO: ScoringConversionResponse có field optional trong khi ConversionLike yêu cầu bắt buộc — cast any có chủ đích
     scoringConversions: scoringConversions as any,
     selectedExamTypeId: examTypeFilter,
   });

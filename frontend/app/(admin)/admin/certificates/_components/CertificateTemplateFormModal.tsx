@@ -9,7 +9,6 @@ import type { ExamTypeResponse } from '@/app/types';
 
 export interface CertificateTemplateFormState {
   examTypeId: string;
-  // passScore/validMonths giữ number | string: input number trả string khi gõ, '' khi trống
   passScore: number | string;
   title: string;
   subtitle: string;
@@ -36,10 +35,6 @@ interface CertificateTemplateFormModalProps {
   submitting: boolean;
 }
 
-/**
- * Form mẫu chứng chỉ. Khung xem trước dùng đúng component vẽ chứng chỉ thật nên
- * admin thấy trước chính xác cái người học sẽ nhận.
- */
 function CertificateTemplateFormModal({
   show,
   isEditing,

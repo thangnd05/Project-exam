@@ -41,7 +41,6 @@ export function usePosts({ page = 0, categoryId = null, keyword = '', status = '
   const listParams = { page, categoryId, keyword, status };
   const postsQuery = useQuery({
     queryKey: postsKeys.list(listParams),
-    // categoryId null -> undefined: getPosts bỏ qua param falsy nên hành vi không đổi
     queryFn: () => getPosts({ page, size: PAGE_SIZE, categoryId: categoryId ?? undefined, keyword, status }),
     select: selectPosts,
     placeholderData: keepPreviousData,
@@ -61,7 +60,6 @@ export function usePosts({ page = 0, categoryId = null, keyword = '', status = '
 export function usePostDetail(postId?: string, { enabled = true }: { enabled?: boolean } = {}) {
   const query = useQuery({
     queryKey: postsKeys.detail(postId),
-    // postId chắc chắn có khi query chạy vì enabled đã chặn trường hợp rỗng
     queryFn: () => getPostById(postId as string),
     enabled: enabled && !!postId,
   });

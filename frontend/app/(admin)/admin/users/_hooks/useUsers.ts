@@ -7,7 +7,6 @@ import {getRoles} from '@/app/apis/roleApi';
 import {createUser, deleteUser, getUsers, updateUser} from '@/app/apis/userApi';
 import type {PageResponse, RoleResponse, UserResponse, UserUpsertRequest} from '@/app/types';
 
-/** Hàng người dùng đã chuẩn hoá (snake_case) cho bảng admin. */
 export interface AdminUserRow {
   user_id: string;
   user_name: string;
@@ -19,7 +18,6 @@ export interface AdminUserRow {
   created_at: string | null;
 }
 
-/** Vai trò đã chuẩn hoá cho dropdown lọc/gán vai trò. */
 export interface AdminUserRoleOption {
   role_id: string;
   role_name: string;
@@ -40,8 +38,6 @@ export const usersKeys = {
   roles: () => ['admin-roles'],
 };
 
-// `any` có chủ đích: BE trả camelCase (UserResponse) nhưng normalize còn fallback
-// các field snake_case/legacy (user_id, username...) không có trong type.
 const normalizeUser = (user: any): AdminUserRow => ({
   user_id: String(user.userId ?? user.user_id ?? user.id ?? ''),
   user_name: user.userName ?? user.user_name ?? user.username ?? '',

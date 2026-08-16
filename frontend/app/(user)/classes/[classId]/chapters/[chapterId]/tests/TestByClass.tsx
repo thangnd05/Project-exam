@@ -54,7 +54,6 @@ function TestByClass() {
       const updatedCountdowns: Record<string, number> = {};
       tests.forEach((test) => {
         if (test.availableFrom) {
-          // .getTime() để trừ 2 mốc thời gian (bản JS cũ trừ trực tiếp 2 Date)
           const diff = new Date(test.availableFrom).getTime() - now.getTime();
           if (diff > 0) updatedCountdowns[test.testId] = diff;
         }

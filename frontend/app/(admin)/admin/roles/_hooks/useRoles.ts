@@ -14,7 +14,6 @@ import {useAdminCrud} from '@/app/hooks/useAdminCrud';
 import {CURRENT_USER_QUERY_KEY} from '@/app/contexts/AuthContext';
 import type {PermissionResponse, RoleRequest, RoleResponse} from '@/app/types';
 
-/** Hàng vai trò đã chuẩn hoá (snake_case) cho bảng admin. */
 export interface AdminRoleRow {
   role_id: string;
   role_name: string;
@@ -58,13 +57,11 @@ export function useRoles() {
     mutationFn: ({id, codes}: {id: string; codes: string[]}) => updateRolePermissions(id, codes),
     onSuccess: () => {
       qc.invalidateQueries({queryKey: roleKeys.roles});
-      // Quyền của chính mình có thể vừa đổi  nạp lại /me để menu/route khớp với backend.
       qc.invalidateQueries({queryKey: CURRENT_USER_QUERY_KEY});
     },
   });
 
   return {
-    // `as AdminRoleRow[]`: useAdminCrud là khuôn any-based, mapItem đã đảm bảo shape này.
     roleList: crud.items as AdminRoleRow[],
     permissionCatalog: permissionsQuery.data ?? [],
     isLoading: crud.isLoading,

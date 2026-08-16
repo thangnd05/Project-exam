@@ -22,7 +22,6 @@ type CreatePostModalProps = {
   onClose: () => void;
   onRefresh?: () => void;
   categories?: CategoryResponse[];
-  /* Bài viết đang sửa — null/không truyền khi tạo mới */
   editingPost?: PostResponse | null;
 };
 
@@ -76,7 +75,6 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          // readAsDataURL luôn trả về string
           const base64Url = e.target?.result as string;
           setInlineImages((prev) => [...prev, { file, base64Url }]);
 

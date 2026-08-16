@@ -37,7 +37,6 @@ function isAnswered(question: QuestionResponse, selections: Record<string, strin
     : Boolean(selected);
 }
 
-// Gom các câu hỏi cùng passage vào một nhóm để chỉ hiển thị đoạn văn/audio một lần.
 type QuestionGroup = { passage: PassageResponse | null; questions: QuestionResponse[] };
 
 function groupQuestionsByPassage(questions?: QuestionResponse[] | null): QuestionGroup[] {
@@ -222,7 +221,6 @@ function PlanStudy() {
           const taskId = taskIdFromUrl || session?.activeTask?.taskId;
           router.push(`/learning-plans/${learningPlanId}/tasks/${taskId}/result`);
         },
-        // err any có chủ đích: lỗi Axios, đọc response.data.message (BE không có type lỗi)
         onError: (err: any) => setFormError(err?.response?.data?.message || err.message),
       },
     );

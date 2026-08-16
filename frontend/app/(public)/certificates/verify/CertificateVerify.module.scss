@@ -38,7 +38,6 @@
   }
 }
 
-/* Nhãn nút ngắn nên không được xuống dòng khi ô nhập chiếm hết chỗ. */
 .searchButton {
   flex-shrink: 0;
   white-space: nowrap;
@@ -65,10 +64,6 @@
   color: var(--text-secondary);
 }
 
-/*
-  Kết quả chỉ là một dải trạng thái mảnh phía trên, phần nhìn chính nhường cho tấm
-  chứng chỉ bên dưới  để người tra cứu đối chiếu thẳng với bản đang cầm.
-*/
 .status {
   display: flex;
   align-items: center;

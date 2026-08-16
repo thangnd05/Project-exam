@@ -118,7 +118,6 @@ function QuestModal({show, onClose}: QuestModalProps) {
   };
 
   const renderQuestCard = (quest: UserQuestResponse) => {
-    // target/currentProgress là optional trong DTO nhưng BE luôn trả — dùng ! giữ nguyên hành vi cũ.
     const hasTarget = quest.conditionType !== QuestConditionType.NONE && quest.target! > 0;
     const progressPct = hasTarget
       ? Math.min(100, Math.round((quest.currentProgress! / quest.target!) * 100))

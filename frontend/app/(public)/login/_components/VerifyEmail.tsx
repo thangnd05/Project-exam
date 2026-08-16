@@ -91,6 +91,4 @@ export default function VerifyEmailPage() {
 }
 */
 
-// Toàn bộ component đang nằm trong comment (tính năng đã tắt); export rỗng để file vẫn là
-// module hợp lệ với isolatedModules.
 export {};

@@ -23,7 +23,6 @@ const EvaluationModal = ({ show, onClose, onSuccess }: EvaluationModalProps) => 
     const createMutation = useCreateEvaluation();
     const submitting = createMutation.isPending;
 
-    // Được gọi cả từ <form onSubmit> (FormEvent) lẫn nút footer (MouseEvent) → nhận SyntheticEvent chung.
     const handleReviewSubmit = (e?: React.SyntheticEvent) => {
         e?.preventDefault();
         if (!content.trim()) {

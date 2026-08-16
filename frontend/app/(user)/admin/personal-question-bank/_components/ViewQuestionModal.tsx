@@ -166,7 +166,6 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
                 {answers.map((ans: any, idx) => {
                   const label =
                     ans.answerLabel || String.fromCharCode(65 + idx);
-                  // `any` có chủ đích: giữ nguyên fallback content/id kiểu cũ của bản JS.
                   const text = ans.answerText || ans.content || '';
                   const isCorrect = !!ans.isCorrect;
                   return (

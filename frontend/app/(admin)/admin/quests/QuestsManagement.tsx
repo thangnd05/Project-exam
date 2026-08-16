@@ -30,7 +30,6 @@ const CONDITION_TYPES = [
 interface QuestFormState {
   title: string;
   description: string;
-  // rewardCoins/conditionTarget giữ number | string: input number trả string khi gõ
   rewardCoins: number | string;
   conditionType: QuestConditionType;
   conditionTarget: number | string;
@@ -124,7 +123,6 @@ function QuestsManagement() {
       return;
     }
 
-    // Cast QuestRequest: fromDateTimeLocalInput trả string | null (giữ nguyên hành vi gửi null lên API)
     const payload = {
       title: formState.title.trim(),
       description: formState.description.trim(),

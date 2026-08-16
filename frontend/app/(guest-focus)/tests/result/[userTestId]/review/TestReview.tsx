@@ -134,11 +134,6 @@ const TestReview = () => {
     return () => clearTimeout(timer);
   }, [loading, test]);
 
-  /*
-    Passage/media ở đây đọc rất nhiều biến thể field (camelCase lẫn snake_case, gộp cả
-    fallback từ câu hỏi đầu tiên) mà DTO chuẩn không mô tả hết -> để `any` có chủ đích,
-    giữ nguyên chuỗi fallback của bản JS.
-  */
   const hasPassageContent = (passage: any, fallbackObj: any) => {
     const content =
       passage?.content ??

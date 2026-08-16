@@ -106,8 +106,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
       return;
     }
 
-    // any có chủ đích: code cũ đọc userInfo.userId trong khi type UserResponse (khớp BE) chỉ có
-    // `id` — giữ nguyên hành vi khi chuyển TS, cần đối chiếu lại BE trước khi sửa logic.
     const userId = (userInfo as any)?.userId;
 
     if (!userId) {
@@ -140,7 +138,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
       }
       closeModal();
     } catch (error: any) {
-      // any có chủ đích: lỗi axios (error.response) chưa có type dùng chung trong dự án
       const apiMessage = error.response?.data?.message || 'Cập nhật thất bại. Vui lòng thử lại.';
       toast.error(apiMessage);
     }

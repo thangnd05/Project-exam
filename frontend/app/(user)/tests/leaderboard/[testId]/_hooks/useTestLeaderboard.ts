@@ -11,7 +11,6 @@ export const testLeaderboardKeys = {
   leaderboard: (id?: string) => ['test-leaderboard', id],
 };
 
-/** Dòng xếp hạng: UserTestResponse của BE + vài tên field cũ mà bản JS vẫn fallback khi hiển thị. */
 export type LeaderboardRow = UserTestResponse & {
   fullName?: string;
   username?: string;
@@ -50,7 +49,6 @@ export function useTestLeaderboard(testId?: string) {
 
   let errorMessage = '';
   if (leaderboardQuery.isError) {
-    // Lỗi từ axios nên phải đọc `response.status` — Error chuẩn của react-query không có field này.
     errorMessage =
       (leaderboardQuery.error as any)?.response?.status === 403
         ? 'Bạn không có quyền xem bảng xếp hạng của đề này (đề thuộc lớp riêng).'

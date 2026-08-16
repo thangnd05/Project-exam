@@ -102,7 +102,6 @@ function ExamCategoriesManagement() {
 
     setErrorMessage('');
     try {
-      // BE chấp nhận description null để xoá mô tả — DTO FE khai optional string nên ép kiểu tại đây
       const payload = buildPayload(formState) as any;
       if (editingId) {
         await updateMutation.mutateAsync({id: editingId, payload});

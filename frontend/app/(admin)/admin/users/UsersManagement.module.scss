@@ -10,7 +10,6 @@ $text-secondary: var(--slate-500);
 .userAvatar {
     width: 42px;
     height: 42px;
-    // User thường: tông teal (xanh ngọc)
     background: linear-gradient(135deg, var(--teal-600) 0%, var(--teal-500) 100%);
     border-radius: 12px;
     display: flex;
@@ -23,7 +22,6 @@ $text-secondary: var(--slate-500);
     box-shadow: 0 4px 10px rgb(var(--teal-600-rgb) / 0.25);
     text-transform: uppercase;
 
-    // User premium: champagne kim loại (đồng bộ tông thương hiệu premium)
     &.premium {
         background: var(--premium-gradient);
         box-shadow: var(--premium-shadow);

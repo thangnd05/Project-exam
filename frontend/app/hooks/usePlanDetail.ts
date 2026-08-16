@@ -19,8 +19,7 @@ export function usePlanDetail(learningPlanId?: string) {
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error
-      ? // err any có chủ đích: lỗi Axios, đọc response.data.message (BE không có type lỗi)
-        (query.error as any)?.response?.data?.message || query.error.message
+      ? (query.error as any)?.response?.data?.message || query.error.message
       : null,
   };
 }

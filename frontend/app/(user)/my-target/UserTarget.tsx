@@ -3,8 +3,6 @@
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-// classnames thường cho gọi trực tiếp classNames(a, b) — bản 'classnames/bind' khai báo
-// this-context nên TS không cho gọi unbound; runtime hai bản là cùng một hàm.
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -24,8 +22,6 @@ const cx = classNamesBind.bind(styles);
 const planCx = classNamesBind.bind(planStyles);
 
 function UserTarget() {
-  // Bản .js cũ destructure kiểu react-router `const [searchParams] = ...` — useSearchParams
-  // của Next trả thẳng ReadonlyURLSearchParams, sửa lại để gọi .get() đúng.
   const searchParams = useSearchParams();
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [targetScore, setTargetScore] = useState('');
@@ -62,12 +58,10 @@ function UserTarget() {
     examTypes,
     examParts,
     skills,
-    // ConversionLike của hook bắt buộc numCorrect/convertedScore, response BE để optional — any có chủ đích.
     scoringConversions: scoringConversions as any,
     selectedExamTypeId,
   });
 
-  // Đồng bộ form (điểm mục tiêu, % từng part) theo mục tiêu server trả về.
   useEffect(() => {
     if (!selectedExamTypeId) {
       setTargetScore('');
@@ -97,7 +91,6 @@ function UserTarget() {
     if (!targetScore || filteredParts.length === 0) return [];
     if (matchedMilestone && matchedMilestone.partRequirements) {
       const mapped = matchedMilestone.partRequirements.map((pr) => ({
-        // BE luôn trả examPartId cho part requirement của milestone.
         examPartId: pr.examPartId as string,
         requiredPercentage: pr.requiredPercentage ?? 0,
       }));
@@ -138,7 +131,6 @@ function UserTarget() {
               ? 'Đã cập nhật mục tiêu. Lộ trình đang chạy sẽ hiện nút "Cập nhật theo mục tiêu mới"  bấm là xong, không cần thi lại.'
               : 'Đã lưu mục tiêu! Sang tab "Lập kế hoạch" để sinh lộ trình.',
           );
-          // Card "Mục tiêu hiện tại" nằm đầu trang  kéo lên cho user thấy ngay.
           window.scrollTo({ top: 0, behavior: 'smooth' });
         },
         onError: () => toast.error('Lỗi khi lưu mục tiêu.'),

@@ -62,7 +62,6 @@ export const useTestSubmission = ({
     const queryClient = useQueryClient();
 
     const invalidateQuestionBank = () => {
-      // Matches questionBankKeys.* prefix in usePersonalQuestionBank
       queryClient.invalidateQueries({ queryKey: ['question-bank'] });
     };
 
@@ -143,8 +142,6 @@ export const useTestSubmission = ({
         mutationFn: async (creatorType: CreatorType) => {
             if (creatorType === CREATOR_TYPES.TEST) {
                 const manualQuestions = questions.filter(hasValidManualQuestion);
-                // BE phân biệt `null` (xoá/không đặt) với field vắng mặt, trong khi CreateTestRequest
-                // khai optional -> cast qua unknown để giữ nguyên body request của bản JS.
                 const testData = await createTest({
                     title: testInfo.title,
                     description: testInfo.description,
@@ -170,7 +167,6 @@ export const useTestSubmission = ({
                             ? Number(testInfo.costCoins)
                             : null,
                 } as unknown as CreateTestRequest);
-                // Một số response cũ trả `id` thay vì `testId` — giữ fallback của bản JS.
                 const newTestId = testData.testId || (testData as any).id;
                 const partData = await createTestPart({
                     testId: String(newTestId),

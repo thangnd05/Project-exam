@@ -1,10 +1,3 @@
-/**
- * Đầu mối import cho component dùng chung.
- *
- * Chỉ gom các component ĐƠN LẺ. Các nhóm theo lĩnh vực (admin/, tests/, layouts/, modal/,
- * gamification/, learning-plans/, exam-layout/, icons/, Review/, Notes/, Recaptcha/) vẫn import
- * theo đường dẫn — gom cả vào đây sẽ kéo hàng chục component client vào mọi chỗ chỉ cần một cái.
- */
 export { default as AuthGuard } from './AuthGuard/AuthGuard';
 export { default as CertificateCanvas } from './CertificateCanvas/CertificateCanvas';
 export { default as CreateClassModal } from './CreateClassModal/CreateClassModal';

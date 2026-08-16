@@ -50,8 +50,6 @@ const mapCollectionFromApi = (collection: QuestionCollectionResponse): Collectio
 
 const normalizeCollections = (data: QuestionCollectionResponse[]): CollectionItem[] =>
   (Array.isArray(data) ? data : []).map(mapCollectionFromApi);
-// `any` có chủ đích: giữ nhánh phòng thủ data?.data / data?.content của code cũ
-// dù API hiện tại đã trả thẳng mảng ExamTypeResponse[].
 const normalizeExamTypes = (data: any): ExamTypeResponse[] =>
   Array.isArray(data) ? data : data?.data ?? data?.content ?? [];
 

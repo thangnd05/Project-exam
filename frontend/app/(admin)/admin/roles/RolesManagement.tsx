@@ -340,7 +340,6 @@ function RolesManagement() {
               Tích vào hành động mà vai trò này được phép thực hiện.
             </p>
             {permissionGroups.map(([groupName, items]) => {
-              // `code!`: BE luôn trả code, type PermissionResponse khai báo optional.
               const codes = items.map((item) => item.code!);
               const allChecked = codes.every((code) => permSelected.has(code));
               return (

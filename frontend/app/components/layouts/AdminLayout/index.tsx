@@ -120,7 +120,6 @@ function AdminLayout({children}: AdminLayoutProps) {
   const pathname = usePathname();
   const {permissions} = useAuth();
 
-  // Chỉ hiện mục mà vai trò hiện tại mở được  bấm vào rồi mới ăn 403 thì rất khó chịu.
   const visibleGroups = useMemo(() => {
     const allowed = Array.isArray(permissions) ? permissions : [];
     return adminRouteGroups

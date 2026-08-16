@@ -82,7 +82,6 @@ function MyAlbum() {
   if (loading)
     return (
       <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-        {/* size="lg" không có trong type của react-bootstrap (chỉ 'sm') nhưng giữ nguyên DOM như bản JS cũ */}
         <Spinner animation="grow" variant="primary" size={'lg' as any} />
         <p className="mt-3 fw-bold text-primary fs-4">Đang chuẩn bị kho tàng từ vựng...</p>
       </div>

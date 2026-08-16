@@ -16,14 +16,12 @@ export const myClassesKeys = {
   all: ['my-classes'],
 };
 
-// BE có thể trả kèm message ngoài 2 danh sách lớp (field không khai báo trong MyClassesResponse)
 const normalizeMyClasses = (data: MyClassesResponse) => ({
   teachingClasses: data?.teachingClasses || [],
   learningClasses: data?.learningClasses || [],
   message: (data as { message?: string })?.message || '',
 });
 
-/** Domain-unwrapped hook (prefer this shape for feature hooks). */
 export function useMyClasses() {
   const classesQuery = useQuery({
     queryKey: myClassesKeys.all,
@@ -41,7 +39,6 @@ export function useMyClasses() {
   };
 }
 
-// error để any có chủ đích: consumer đọc err.response?.data?.message theo shape của axios.
 type MutationCallbacks<TData, TVariables> = Pick<
   UseMutationOptions<TData, any, TVariables>,
   'onSuccess' | 'onError'

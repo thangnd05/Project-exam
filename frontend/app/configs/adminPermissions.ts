@@ -1,13 +1,5 @@
 import { PERMISSIONS as P, type PermissionCode } from './permissions';
 
-/**
- * Quyền tối thiểu để mở từng trang admin — đúng quyền mà backend đòi ở API của trang đó,
- * để một vai trò tự tạo (không phải ADMIN) vẫn vào được đúng phần được giao.
- *
- * Dùng ở hai nơi: layout của nhóm (admin) để chặn truy cập, và AdminLayout để ẩn mục
- * sidebar mà người dùng không mở được. Thêm trang admin mới thì khai ở đây, nếu không
- * trang đó sẽ KHÔNG bị chặn quyền.
- */
 export const adminPermissionByPath: Record<string, PermissionCode> = {
   '/admin/dashboard': P.DASHBOARD_VIEW,
   '/admin/users': P.USER_MANAGE,
@@ -40,13 +32,6 @@ export const adminPermissionByPath: Record<string, PermissionCode> = {
 
 export default adminPermissionByPath;
 
-/**
- * Tra quyền theo pathname THẬT của trình duyệt.
- *
- * Không dùng tra khoá trực tiếp được vì có route động: khoá là '/admin/exam-types/:examTypeId/layout'
- * còn pathname là '/admin/exam-types/abc-123/layout'. Tra thẳng sẽ trả undefined ⇒ trang đó
- * mất luôn lớp kiểm quyền, nên phải so khớp theo mẫu.
- */
 export function findAdminPermission(pathname: string | null | undefined): PermissionCode | undefined {
   if (!pathname) return undefined;
   const direct = adminPermissionByPath[pathname];

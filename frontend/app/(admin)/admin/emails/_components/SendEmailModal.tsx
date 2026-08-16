@@ -22,10 +22,6 @@ type SendEmailModalProps = {
   onClose: () => void;
 };
 
-/**
- * Chọn người nhận rồi gửi. Backend chỉ nhận danh sách userId  mọi cách lọc (vai trò,
- * premium, từ khóa) làm ngay tại đây nên thêm tiêu chí lọc mới không phải đụng backend.
- */
 function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
   const [keyword, setKeyword] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');

@@ -68,7 +68,6 @@ function CertificatesManagement() {
   const [tab, setTab] = useState('templates');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // ---- mẫu chứng chỉ
   const {
     templates,
     examTypes,
@@ -85,7 +84,6 @@ function CertificatesManagement() {
   const [deletingTemplate, setDeletingTemplate] = useState<CertificateTemplateResponse | null>(null);
   const [templateSearch, setTemplateSearch] = useState('');
 
-  // ---- chứng chỉ đã cấp
   const [issuedPage, setIssuedPage] = useState(0);
   const [issuedKeyword, setIssuedKeyword] = useState('');
   const [issuedStatus, setIssuedStatus] = useState('');
@@ -290,7 +288,6 @@ function CertificatesManagement() {
 
       <AdminFieldError message={errorMessage} />
       {isError && <AdminFieldError message="Không tải được danh sách mẫu chứng chỉ." />}
-      {/* Không báo lỗi thì bảng rỗng trông y hệt "chưa cấp chứng chỉ nào". */}
       {issuedError && <AdminFieldError message="Không tải được danh sách chứng chỉ đã cấp." />}
 
       <AdminTabs

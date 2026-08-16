@@ -1,9 +1,3 @@
-// Root layout của Next App Router.
-//
-// Đây là nơi duy nhất còn giữ phần <html>/<body> mà trước kia nằm ở index.html của Vite.
-// Mỗi URL giờ là một route Next thật (react-router đã gỡ) — xem MIGRATION-NEXT.md.
-// Metadata khai ở đây là mặc định cho MỌI trang; trang nào cần riêng thì tự khai
-// `metadata`/`generateMetadata` trong page.tsx của nó để đè lên (template `%s | ...`).
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';

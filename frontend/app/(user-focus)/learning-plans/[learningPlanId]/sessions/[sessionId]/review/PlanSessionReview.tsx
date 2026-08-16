@@ -12,8 +12,6 @@ const cx = classNames.bind(styles);
 
 function PlanSessionReview() {
   const { learningPlanId, sessionId } = useParams<{ learningPlanId: string; sessionId: string }>();
-  // Bản .js cũ destructure kiểu react-router `const [searchParams] = ...` — useSearchParams
-  // của Next trả thẳng ReadonlyURLSearchParams, sửa lại để gọi .get() đúng.
   const searchParams = useSearchParams();
   const taskId = searchParams.get('taskId');
   const router = useRouter();

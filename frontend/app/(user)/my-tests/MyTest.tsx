@@ -99,7 +99,6 @@ function MyTest() {
   if (loading) {
     return (
       <div className={cx('loading-box')}>
-        {/* size "lg" nằm ngoài type của react-bootstrap (chỉ có 'sm') nhưng code cũ vẫn truyền — giữ nguyên hành vi */}
         <Spinner animation="grow" variant="primary" size={'lg' as any} />
         <p>Đang tải bộ sưu tập đề thi...</p>
       </div>

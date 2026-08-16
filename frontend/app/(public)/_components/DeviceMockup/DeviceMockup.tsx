@@ -37,8 +37,6 @@ function BrowserPlaceholder() {
 }
 
 type DeviceMockupProps = {
-  // src đến từ static import ảnh trong module .js (type-level là StaticImageData,
-  // runtime đang gắn thẳng vào <img>) → any có chủ đích để giữ nguyên hành vi.
   src?: any;
   alt?: string;
   className?: string;

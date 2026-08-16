@@ -64,7 +64,6 @@ interface CosmeticFormState {
   description: string;
   type: CosmeticType;
   frameStyle: string;
-  // costCoins/displayOrder giữ number | string: input number trả string khi gõ
   costCoins: number | string;
   assetValue: string;
   imageUrl: string;

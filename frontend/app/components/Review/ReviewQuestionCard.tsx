@@ -11,7 +11,6 @@ type ReviewQuestionCardProps = {
   status?: string;
   questionText?: React.ReactNode;
   mode?: 'options' | 'fill';
-  /** Đáp án từ API (answerId, answerLabel, answerText, isCorrect) — chưa có type riêng */
   answers?: any[];
   selectedAnswerIds?: any[];
   correctAnswerId?: any;

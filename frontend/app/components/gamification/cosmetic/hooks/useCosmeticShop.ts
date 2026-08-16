@@ -7,7 +7,6 @@ import { COINS_QUERY_KEY } from '@/app/contexts/CoinContext';
 import { EQUIPPED_COSMETICS_QUERY_KEY } from '@/app/contexts/CosmeticContext';
 import type { CosmeticResponse } from '@/app/types';
 
-// error để any có chủ đích: consumer đọc error?.response?.data?.message theo shape của axios.
 type MutationCallbacks<TData> = Pick<
   UseMutationOptions<TData, any, string>,
   'onSuccess' | 'onError'

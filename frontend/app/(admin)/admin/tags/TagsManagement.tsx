@@ -227,7 +227,6 @@ function TagsManagement() {
       return;
     }
     setErrorMessage('');
-    // BE chấp nhận parentId/sortOrder null để gỡ giá trị — DTO FE khai optional nên ép kiểu tại đây
     const payload = {
       name: formState.name.trim(),
       examTypeId,

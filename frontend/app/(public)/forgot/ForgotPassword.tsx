@@ -36,7 +36,6 @@ function ForgotPassword() {
         router.push(routes.reset);
       }, 6000);
     } catch (error: any) {
-      // any có chủ đích: lỗi axios (error.response) chưa có type dùng chung trong dự án
       if (error.response) {
         setError(error.response.data.message || 'Đã xảy ra lỗi!');
       } else {

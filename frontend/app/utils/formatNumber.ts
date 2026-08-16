@@ -1,7 +1,3 @@
-/**
- * Rút gọn số lớn cho UI chật (header badge…).
- * Hover/tooltip nên dùng formatFullNumber để hiện số dư chính xác.
- */
 export function formatCompactNumber(value: number | string | null | undefined): string {
   const n = Number(value);
   if (!Number.isFinite(n) || n < 0) {

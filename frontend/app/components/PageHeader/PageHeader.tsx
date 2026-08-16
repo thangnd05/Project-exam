@@ -18,11 +18,8 @@ type PageHeaderProps = {
   className?: string;
   description?: React.ReactNode;
   labelClassName?: string;
-  /* Khối riêng của trang, nằm ngay dưới tiêu đề (hàng badge, chip...) */
   meta?: React.ReactNode;
-  /* Khối riêng của trang, chạy hết chiều ngang dưới cùng banner (thanh tiến độ...) */
   footer?: React.ReactNode;
-  /* Banner gọn hơn (padding + tiêu đề nhỏ lại) */
   compact?: boolean;
   children?: React.ReactNode;
 };
@@ -47,7 +44,6 @@ const PageHeader = ({
 }: PageHeaderProps) => {
   return (
     <div className={cx('headerHero', { hasFooter: Boolean(footer), compact }, className)}>
-      {/* display:contents khi không có footer -> giữ nguyên layout của các trang cũ */}
       <div className={cx('heroMain')}>
         <div className={cx('heroContent')}>
           {label && <span className={cx('label', labelClassName)}>{label}</span>}
