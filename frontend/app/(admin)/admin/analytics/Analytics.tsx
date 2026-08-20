@@ -20,9 +20,6 @@ import styles from './Analytics.module.scss';
 
 const cx = classNames.bind(styles);
 
-// recharts (~250KB) và react-simple-maps + world-atlas (~180KB) chỉ dùng ở đúng trang này.
-// Nạp rời để chúng không lọt vào chunk dùng chung của mọi trang admin.
-// Lưu ý: tuỳ chọn của next/dynamic phải viết thẳng dạng object literal, tách ra biến là build lỗi.
 const MonthlyActivityCombo = dynamic(
     () => import('@/app/components/admin/AdminCharts').then((m) => m.MonthlyActivityCombo),
     { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },

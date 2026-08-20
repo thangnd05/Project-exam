@@ -9,16 +9,13 @@ import { fetchPublicJson } from '@/app/utils/serverApi';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
-// Sitemap được cache như một trang ISR: dựng lại mỗi giờ thay vì mỗi lượt bot ghé.
 export const revalidate = 3600;
 
 const STATIC_PATHS = ['', '/about', '/posts', '/policy', '/service', '/certificates/verify'];
 
-// Chỉ lấy vài trăm mục mới nhất; nhiều hơn thì phải tách sitemap index, chưa cần tới.
 const MAX_POSTS = 500;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Backend chết thì các nhánh này trả null và sitemap co lại còn phần tĩnh — không để build vỡ.
   const [posts, examTypes, resources] = await Promise.all([
     fetchPublicJson<PageResponse<PostSummaryResponse>>(`/api/posts?page=0&size=${MAX_POSTS}`, 3600),
     fetchPublicJson<ExamTypeResponse[]>('/api/exam-types', 3600),

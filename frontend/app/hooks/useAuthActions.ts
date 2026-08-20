@@ -12,7 +12,6 @@ import {
   login,
   register,
   resetPassword,
-  // [TẮT XÁC THỰC EMAIL] verifyEmail,
 } from '@/app/apis/authApi';
 import type { AuthMessageResponse, LoginRequest, RegisterRequest, UserResponse } from '@/app/types';
 import { CURRENT_USER_QUERY_KEY } from '@/app/contexts/AuthContext';
@@ -61,14 +60,6 @@ export function useResetPasswordMutation(
     ...options,
   });
 }
-
-// [TẮT XÁC THỰC EMAIL]
-// export function useVerifyEmailMutation(options = {}) {
-//   return useMutation({
-//     mutationFn: verifyEmail,
-//     ...options,
-//   });
-// }
 
 export function useCurrentUserQuery(
   options: Omit<UseQueryOptions<UserResponse>, 'queryKey' | 'queryFn'> = {},

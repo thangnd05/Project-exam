@@ -113,7 +113,6 @@ const TestReview = () => {
   }, [flatQuestions]);
 
   const scrollToQuestion = (qid: string) => {
-    // scrollIntoView cuộn cả cột câu hỏi (scroller riêng) lẫn trang, không như window.scrollTo
     document
       .getElementById(`rq-${qid}`)
       ?.scrollIntoView({ behavior: "smooth", block: "center" });

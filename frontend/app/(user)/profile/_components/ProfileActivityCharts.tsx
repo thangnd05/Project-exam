@@ -13,9 +13,6 @@ import {
 } from 'recharts';
 import { brandColors } from '@/app/assets/styles/brandColors';
 
-// Tách khỏi ProfileOverview để recharts (~250KB) không nằm trong chunk của trang hồ sơ:
-// hai biểu đồ này nằm dưới màn hình đầu và chỉ hiện khi có dữ liệu hoạt động.
-
 const chartColors = brandColors;
 
 const formatDuration = (minutes: unknown) => {

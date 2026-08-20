@@ -7,7 +7,6 @@ import type { CountryTraffic } from '@/app/types/admin';
 
 const cx = classNames.bind(styles);
 
-// Tách khỏi LocationsMap: bảng xếp hạng chỉ là text, không cần react-simple-maps.
 export const flagLabel = (code?: string) => {
     if (code === 'LO') return '🏠';
     if (!code || code.length !== 2 || code === '??') return '🌐';
@@ -15,7 +14,6 @@ export const flagLabel = (code?: string) => {
 };
 
 export const TopCountriesList = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
-
     const visible = countries.filter((c) => c.code !== 'LO' && c.name !== 'Local');
     const max = visible.reduce((m, c) => Math.max(m, c.value), 0) || 1;
     if (!visible.length) {

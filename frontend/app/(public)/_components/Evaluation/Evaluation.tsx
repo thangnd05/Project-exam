@@ -16,7 +16,6 @@ import EvaluationModal from './modals/EvaluationModal';
 import {useEvaluations} from './hooks/useEvaluations';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
-// Carousel nặng (~40KB) và luôn nằm dưới màn hình đầu — nạp khi render tới.
 const Slider = dynamic(() => import('react-slick'), { ssr: false });
 
 const cx = classNames.bind(styles);

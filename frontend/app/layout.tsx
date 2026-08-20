@@ -1,4 +1,3 @@
-
 import { Inter, Playfair_Display } from 'next/font/google';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
@@ -6,9 +5,6 @@ import '@/app/assets/styles/GlobalStyles/GlobalStyles.scss';
 import '@/app/assets/styles/global-overrides.scss';
 import Providers from './providers';
 
-// Self-host qua next/font: font đi kèm bundle, không còn @import chặn render sang
-// fonts.googleapis.com, và Next tự chèn fallback đo sẵn nên chữ không nhảy khi font về.
-// Bắt buộc có subset 'vietnamese' — toàn bộ nội dung là tiếng Việt.
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
   display: 'swap',

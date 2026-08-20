@@ -26,7 +26,6 @@ import { useToggleReact, useToggleSavePost } from './_hooks/usePostReactions';
 import { ReactType } from '@/app/enums';
 import type { CommentResponse } from '@/app/types';
 
-// Carousel nặng (~40KB) và luôn nằm dưới màn hình đầu — nạp khi render tới.
 const Slider = dynamic(() => import('react-slick'), { ssr: false });
 
 const cx = classNames.bind(styles);
@@ -80,7 +79,6 @@ function PostDetail() {
     setLikeCount(post.reactCounts?.LIKE || 0);
     setBookmarked(!!post.currentUserSaved);
     setSaveCount(post.saveCount || 0);
-
   }, [post?.id]);
 
   const skipFirstCosmeticSync = useRef(true);

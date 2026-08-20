@@ -20,7 +20,6 @@ import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss'
 
 const cx = classNames.bind(styles);
 
-// Biểu đồ recharts nằm trong tab lịch sử, người dùng phải bấm mở mới thấy — nạp khi cần.
 const MockHistoryCharts = dynamic(() => import('./MockHistoryCharts'), { ssr: false });
 
 const PAGE_SIZE = 10;
@@ -107,7 +106,6 @@ function MockHistoryPanel({ examTypeId, examTypeName }: MockHistoryPanelProps) {
       else if (q.data !== undefined) map[id] = q.data;
     });
     return map;
-
   }, [enhancedSignature]);
 
   const chartLoading = chartTests.some((t) => {
@@ -147,7 +145,6 @@ function MockHistoryPanel({ examTypeId, examTypeName }: MockHistoryPanelProps) {
   }, [chartTests, enhancedById]);
 
   const loadEnhanced = (userTestId: string) => {
-
     setRequestedIds((prev) => {
       if (prev.has(userTestId)) return prev;
       const next = new Set(prev);

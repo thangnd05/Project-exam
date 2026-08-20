@@ -90,14 +90,6 @@ function Header() {
 
           <nav className={cx('zoneCenter')} aria-label="Điều hướng chính">
             <div className={cx('navTrack')}>
-              {/* TẠM: nhường chỗ "Bài viết" cho tra cứu chứng chỉ, bỏ comment để trả lại như cũ.
-              <Link
-                href={routes.posts}
-                className={cx('home', {active: pathname === routes.posts})}
-              >
-                Bài viết
-              </Link>
-              */}
               <Link
                 href={routes.certificateVerifyHome}
                 className={cx('home', {active: pathname === routes.certificateVerifyHome})}

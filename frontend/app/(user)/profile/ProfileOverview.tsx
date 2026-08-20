@@ -22,7 +22,6 @@ import {
 
 const cx = classNames.bind(styles);
 
-// recharts nằm trong hai biểu đồ dưới màn hình đầu — tách ra để trang hồ sơ nhẹ hơn.
 const DailyActivityBar = dynamic(
   () => import('./_components/ProfileActivityCharts').then((m) => m.DailyActivityBar),
   { ssr: false },

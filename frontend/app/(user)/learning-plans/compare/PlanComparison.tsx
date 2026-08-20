@@ -18,7 +18,6 @@ import { LearningPlanStatus } from '@/app/enums';
 const cx = classNames.bind(styles);
 const pageCx = classNames.bind(pageStyles);
 
-// recharts chỉ cần khi đã có ≥2 lộ trình để so sánh — tách khỏi bundle của trang.
 const PlanComparisonCharts = dynamic(() => import('./_components/PlanComparisonCharts'), {
   ssr: false,
 });

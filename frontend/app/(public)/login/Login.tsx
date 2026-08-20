@@ -77,14 +77,12 @@ function Login() {
     setMessage("");
 
     try {
-
       const userData = await loginMutation.mutateAsync({
         identifier: loginIdentifier,
         password: loginPassword,
       });
 
       if (userData?.id) {
-
         await claimGuestAfterLogin();
 
         login(userData);
@@ -124,11 +122,9 @@ function Login() {
         recaptchaToken,
       });
 
-      // [TẮT XÁC THỰC EMAIL] Tài khoản active ngay, không cần vào mail bấm link nữa.
       setMessage(data.message || 'Đăng ký thành công! Bạn có thể đăng nhập ngay.');
       setMessageType('success');
       toast.success('Đăng ký thành công! Đăng nhập để bắt đầu nhé.');
-      // toast.info('Vui lòng vào email vừa đăng ký để xác thực tài khoản!');
       setIsSignUp(false);
     } catch (err: any) {
       const errorMessage =

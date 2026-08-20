@@ -38,7 +38,6 @@ function BrowserPlaceholder() {
 }
 
 type DeviceMockupProps = {
-  /** Ảnh chụp màn hình, import tĩnh từ app/assets/images để next/image có sẵn kích thước. */
   src?: StaticImageData;
   alt?: string;
   className?: string;
@@ -57,8 +56,6 @@ export default function DeviceMockup({src, alt = '', className}: DeviceMockupPro
           <span className={cx('camera')} aria-hidden="true" />
           <div className={cx('display', {displayPlaceholder: !showImg})}>
             {showImg ? (
-              // fill: khung .display đã có position/aspect-ratio, ảnh chỉ việc phủ kín.
-              // sizes cho Next biết ảnh không bao giờ rộng quá ~640px để chọn bản nhỏ nhất.
               <Image
                 className={cx('shot')}
                 src={src}

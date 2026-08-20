@@ -3,8 +3,6 @@ import type { ExamTypeResponse } from '@/app/types';
 import { fetchPublicJson, fetchPublicResource } from '@/app/utils/serverApi';
 import TestByCollection from './TestByCollection';
 
-// /api/question-collections yêu cầu đăng nhập nên không lấy được tên bộ đề ở server;
-// lấy tên loại đề (endpoint công khai) để tiêu đề vẫn có ngữ cảnh thật.
 export async function generateMetadata({
   params,
 }: PageProps<'/exam-types/[examTypeId]/collections/[collectionId]'>) {
@@ -29,7 +27,6 @@ export default async function Page({
   params,
 }: PageProps<'/exam-types/[examTypeId]/collections/[collectionId]'>) {
   const { examTypeId } = await params;
-  // Chỉ kiểm được loại đề; bộ đề nằm sau endpoint cần đăng nhập nên để client báo lỗi.
   const res = await fetchPublicResource<ExamTypeResponse>(
     `/api/exam-types/${encodeURIComponent(examTypeId)}`,
   );
