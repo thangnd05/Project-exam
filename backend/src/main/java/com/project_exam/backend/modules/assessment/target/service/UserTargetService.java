@@ -1,9 +1,17 @@
 package com.project_exam.backend.modules.assessment.target.service;
 
-import com.project_exam.backend.modules.assessment.target.domain.*;
-import com.project_exam.backend.modules.assessment.target.dto.*;
+import com.project_exam.backend.modules.assessment.target.domain.TargetPartRequirement;
+import com.project_exam.backend.modules.assessment.target.domain.UserTarget;
+import com.project_exam.backend.modules.assessment.target.domain.UserTargetPart;
+import com.project_exam.backend.modules.assessment.target.dto.UserPartRequirementRequest;
+import com.project_exam.backend.modules.assessment.target.dto.UserTargetPartResponse;
+import com.project_exam.backend.modules.assessment.target.dto.UserTargetRequest;
+import com.project_exam.backend.modules.assessment.target.dto.UserTargetResponse;
 import com.project_exam.backend.modules.assessment.target.mapper.UserTargetMapper;
-import com.project_exam.backend.modules.assessment.target.repository.*;
+import com.project_exam.backend.modules.assessment.target.repository.ExamTargetMilestoneRepository;
+import com.project_exam.backend.modules.assessment.target.repository.TargetPartRequirementRepository;
+import com.project_exam.backend.modules.assessment.target.repository.UserTargetPartRepository;
+import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -57,7 +57,6 @@ import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswer
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
 
-import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.user.service.AdminUserProvider;
 
 import com.project_exam.backend.modules.classroom.member.repository.ClassMemberRepository;

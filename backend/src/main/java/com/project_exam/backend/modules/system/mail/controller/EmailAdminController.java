@@ -1,6 +1,12 @@
 package com.project_exam.backend.modules.system.mail.controller;
 
-import com.project_exam.backend.modules.system.mail.dto.*;
+import com.project_exam.backend.modules.system.mail.dto.EmailPreviewRequest;
+import com.project_exam.backend.modules.system.mail.dto.EmailPreviewResponse;
+import com.project_exam.backend.modules.system.mail.dto.EmailRecipientResponse;
+import com.project_exam.backend.modules.system.mail.dto.EmailResponse;
+import com.project_exam.backend.modules.system.mail.dto.EmailSaveRequest;
+import com.project_exam.backend.modules.system.mail.dto.EmailSendRequest;
+import com.project_exam.backend.modules.system.mail.dto.MailAudienceOptionResponse;
 import com.project_exam.backend.modules.system.mail.service.EmailAdminService;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.security.PermissionCatalog;

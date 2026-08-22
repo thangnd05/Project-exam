@@ -2,7 +2,10 @@ package com.project_exam.backend.modules.assessment.target.service;
 
 import com.project_exam.backend.modules.assessment.target.domain.ExamTargetMilestone;
 import com.project_exam.backend.modules.assessment.target.domain.TargetPartRequirement;
-import com.project_exam.backend.modules.assessment.target.dto.*;
+import com.project_exam.backend.modules.assessment.target.dto.MilestoneRequest;
+import com.project_exam.backend.modules.assessment.target.dto.MilestoneResponse;
+import com.project_exam.backend.modules.assessment.target.dto.PartRequirementRequest;
+import com.project_exam.backend.modules.assessment.target.dto.PartRequirementResponse;
 import com.project_exam.backend.modules.assessment.target.mapper.MilestoneMapper;
 import com.project_exam.backend.modules.assessment.target.repository.ExamTargetMilestoneRepository;
 import com.project_exam.backend.modules.assessment.target.repository.TargetPartRequirementRepository;
