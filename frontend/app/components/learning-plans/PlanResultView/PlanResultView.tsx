@@ -18,7 +18,7 @@ function selectedIdsOf(item: SessionReviewItem): string[] {
 
 function itemStatus(item: SessionReviewItem): string {
   if (selectedIdsOf(item).length === 0) return 'unanswered';
-  return (item as any).correct ? 'correct' : 'incorrect';
+  return item.isCorrect ? 'correct' : 'incorrect';
 }
 
 type PlanResultViewProps = {

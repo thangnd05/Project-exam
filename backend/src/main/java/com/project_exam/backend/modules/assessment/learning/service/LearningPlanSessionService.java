@@ -210,7 +210,7 @@ public class LearningPlanSessionService {
         int total = sessionQuestions.size();
         int accuracy = session.getAccuracy() != null ? session.getAccuracy() : 0;
         int correct = (int) reviewItems.stream()
-                .filter(SubmitSessionResponse.ReviewItem::isCorrect)
+                .filter(item -> Boolean.TRUE.equals(item.getIsCorrect()))
                 .count();
         boolean passed = Boolean.TRUE.equals(session.getPassed());
 

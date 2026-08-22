@@ -31,7 +31,7 @@ public class SubmitSessionResponse {
         private String selectedAnswerId;
         private List<String> selectedAnswerIds;
         private String correctAnswerId;
-        private boolean isCorrect;
+        private Boolean isCorrect;
         private String explanation;
     }
 
@@ -42,6 +42,6 @@ public class SubmitSessionResponse {
         private String answerId;
         private String answerText;
         private String answerLabel;
-        private boolean isCorrect;
+        private Boolean isCorrect;
     }
 }
