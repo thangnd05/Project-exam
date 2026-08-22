@@ -3,8 +3,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { markVocabKnown } from '@/app/apis/practiceQuestionApi';
 import type { MessageResponse } from '@/app/types';
-import { albumKeys } from '@/app/(user)/my-albums/_hooks/useMyAlbums';
-import { albumDeltaKeys } from '@/app/(user)/albums/[albumId]/_hooks/useAlbumVocabularies';
+import { albumKeys } from '@/app/apis/vocabularyAlbumApi';
+import { albumDeltaKeys } from '@/app/apis/vocabularyApi';
 
 type UseMarkVocabKnownOptions = {
   onSuccess?: (data: MessageResponse, ...rest: unknown[]) => void;

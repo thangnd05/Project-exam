@@ -1,11 +1,10 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getMyAlbums, deleteAlbum } from '@/app/apis/vocabularyAlbumApi';
+import { getMyAlbums, deleteAlbum, albumKeys } from '@/app/apis/vocabularyAlbumApi';
 import type { VocabularyAlbumResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
-export const albumKeys = { my: ['my-albums'] };
 
 const normalizeAlbums = (data: VocabularyAlbumResponse[]): VocabularyAlbumResponse[] =>
   Array.isArray(data) ? data : ((data as any)?.content ?? []);

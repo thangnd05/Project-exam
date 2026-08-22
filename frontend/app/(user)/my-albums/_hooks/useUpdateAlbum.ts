@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateAlbum } from '@/app/apis/vocabularyAlbumApi';
 import type { VocabularyAlbumRequest, VocabularyAlbumResponse } from '@/app/types';
-import { albumKeys } from './useMyAlbums';
+import { albumKeys } from '@/app/apis/vocabularyAlbumApi';
 
 type UpdateAlbumVariables = { albumId: string; payload: VocabularyAlbumRequest };
 

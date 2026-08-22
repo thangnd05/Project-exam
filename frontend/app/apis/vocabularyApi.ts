@@ -3,6 +3,11 @@ import type { VocabularyRequest, VocabularyResponse } from '@/app/types';
 
 const BASE_URL = '/api/vocabularies';
 
+/** Khoá cache danh sách từ trong một album — dùng chung bởi albums/[albumId] và practice/[albumId]. */
+export const albumDeltaKeys = {
+  vocabularies: (albumId?: string) => ['album-vocabularies', albumId],
+};
+
 export const getVocabulariesByAlbum = (albumId: string): Promise<VocabularyResponse[]> => {
   return axios.get(`${BASE_URL}/album/${albumId}`).then((res) => res.data);
 };

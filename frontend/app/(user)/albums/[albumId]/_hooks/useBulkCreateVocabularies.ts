@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { bulkCreateVocabularies } from '@/app/apis/vocabularyApi';
 import type { VocabularyRequest, VocabularyResponse } from '@/app/types';
-import { albumDeltaKeys } from './useAlbumVocabularies';
+import { albumDeltaKeys } from '@/app/apis/vocabularyApi';
 
 type UseBulkCreateVocabulariesOptions = {
   onSuccess?: (data: VocabularyResponse[], ...rest: unknown[]) => void;

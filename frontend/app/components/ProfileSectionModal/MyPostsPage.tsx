@@ -12,7 +12,7 @@ import { fetchPostById } from '@/app/hooks/usePosts';
 import CreatePostModal from '@/app/components/CreatePostModal/CreatePostModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import routes from '@/app/configs/Routes';
-import { useMyPosts } from '../_hooks/useMyPosts';
+import { useMyPosts } from './useMyPosts';
 import type { PostResponse, PostSummaryResponse } from '@/app/types';
 import styles from './PostsListPage.module.scss';
 

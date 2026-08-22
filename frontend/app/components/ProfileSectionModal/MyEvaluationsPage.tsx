@@ -9,7 +9,7 @@ import {toast} from 'react-toastify';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
-import {useMyEvaluations} from '../_hooks/useMyEvaluations';
+import {useMyEvaluations} from './useMyEvaluations';
 import type { EvaluationResponse } from '@/app/types';
 import styles from './MyEvaluationsPage.module.scss';
 

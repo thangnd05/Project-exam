@@ -80,7 +80,7 @@ mang tên nó, không còn hàng chục `index.js` trùng tên như cấu trúc 
 | Cần tìm | Vào đâu |
 |---|---|
 | Component/hook chỉ một trang dùng | `_components/`, `_hooks/` ngay trong thư mục trang |
-| Component dùng ≥2 nơi | `app/components/` (xem `index.ts` để biết có sẵn những gì) |
+| Component dùng ≥2 nơi | `app/components/` (mỗi component một thư mục, không có barrel) |
 | Hàm gọi API | `app/apis/<tên>Api.ts` |
 | Kiểu dữ liệu backend trả về | `app/types/` |
 | Màu, biến CSS | `app/assets/styles/GlobalStyles/` |

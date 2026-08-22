@@ -3,6 +3,13 @@ import type { VocabularyAlbumRequest, VocabularyAlbumResponse } from '@/app/type
 
 const BASE_URL = '/api/vocabulary-albums';
 
+/**
+ * Khoá cache của album. Để cạnh API vì ba route (my-albums, albums/[albumId], practice/[albumId])
+ * cùng invalidate nó — trước đây key nằm trong _hooks của my-albums nên hai route kia phải với
+ * sang thư mục riêng của route khác.
+ */
+export const albumKeys = { my: ['my-albums'] };
+
 export const getMyAlbums = (): Promise<VocabularyAlbumResponse[]> => {
   return axios.get(`${BASE_URL}/my-albums`).then((res) => res.data);
 };

@@ -1,9 +1,9 @@
 'use client';
 
 import BaseModal from '@/app/components/modal/BaseModal';
-import MyEvaluationsPage from '@/app/(user)/profile/_components/MyEvaluationsPage';
-import MyPostsPage from '@/app/(user)/profile/_components/MyPostsPage';
-import SavedPostsPage from '@/app/(user)/profile/_components/SavedPostsPage';
+import MyEvaluationsPage from './MyEvaluationsPage';
+import MyPostsPage from './MyPostsPage';
+import SavedPostsPage from './SavedPostsPage';
 
 type SectionConfig = {
   title: string;

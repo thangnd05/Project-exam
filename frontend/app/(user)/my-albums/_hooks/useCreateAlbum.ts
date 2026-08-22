@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createAlbum } from '@/app/apis/vocabularyAlbumApi';
 import type { VocabularyAlbumRequest, VocabularyAlbumResponse } from '@/app/types';
-import { albumKeys } from './useMyAlbums';
+import { albumKeys } from '@/app/apis/vocabularyAlbumApi';
 
 type UseCreateAlbumOptions = {
   onSuccess?: (data: VocabularyAlbumResponse, ...rest: unknown[]) => void;

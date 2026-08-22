@@ -1,13 +1,10 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getVocabulariesByAlbum, deleteVocabulary } from '@/app/apis/vocabularyApi';
+import { getVocabulariesByAlbum, deleteVocabulary, albumDeltaKeys } from '@/app/apis/vocabularyApi';
 import type { VocabularyResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
-export const albumDeltaKeys = {
-  vocabularies: (albumId?: string) => ['album-vocabularies', albumId],
-};
 
 const normalizeVocabularies = (data: VocabularyResponse[]): VocabularyResponse[] =>
   Array.isArray(data) ? data : Array.isArray((data as any)?.content) ? (data as any).content : [];

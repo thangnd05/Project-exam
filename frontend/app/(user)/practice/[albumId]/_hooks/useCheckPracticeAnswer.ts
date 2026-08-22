@@ -3,8 +3,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { checkPracticeAnswer } from '@/app/apis/practiceQuestionApi';
 import type { PracticeCheckRequest, PracticeCheckResponse } from '@/app/types';
-import { albumKeys } from '@/app/(user)/my-albums/_hooks/useMyAlbums';
-import { albumDeltaKeys } from '@/app/(user)/albums/[albumId]/_hooks/useAlbumVocabularies';
+import { albumKeys } from '@/app/apis/vocabularyAlbumApi';
+import { albumDeltaKeys } from '@/app/apis/vocabularyApi';
 
 type UseCheckPracticeAnswerOptions = {
   onSuccess?: (data: PracticeCheckResponse, ...rest: unknown[]) => void;

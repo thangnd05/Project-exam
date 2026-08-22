@@ -25,8 +25,6 @@ export const CosmeticProvider = ({ children }: { children: React.ReactNode }) =>
     queryKey: EQUIPPED_COSMETICS_QUERY_KEY,
     queryFn: getMyEquippedCosmetics,
     enabled: isAuthenticated,
-    staleTime: 0,
-    refetchOnWindowFocus: true,
   });
 
   const frame = isAuthenticated ? data?.frame ?? null : null;
