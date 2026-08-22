@@ -8,7 +8,7 @@ import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
 import type { VocabularyResponse } from '@/app/types';
-import { useUpdateVocabulary } from '../_hooks/useUpdateVocabulary';
+import { useUpdateVocabulary } from '../_hooks/useAlbumVocabularies';
 
 const cx = classNames.bind(styles);
 

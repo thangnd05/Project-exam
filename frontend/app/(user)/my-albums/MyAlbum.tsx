@@ -17,7 +17,7 @@ import PageHeader from '@/app/components/PageHeader/PageHeader';
 import PageHeaderViewToggle from '@/app/components/PageHeader/PageHeaderViewToggle';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import AlbumManagementTable from './_components/AlbumManagementTable/AlbumManagementTable';
-import { useMyAlbums } from './_hooks/useMyAlbums';
+import { useMyAlbums } from './_hooks/useAlbums';
 import type { VocabularyAlbumResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);

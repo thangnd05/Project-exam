@@ -9,7 +9,7 @@ import CommonFormModal from "@/app/components/modal/CommonFormModal";
 import ModalActionFooter from "@/app/components/modal/ModalActionFooter";
 import styles from "@/app/components/modal/CommonFormModal.module.scss";
 import type { VocabularyAlbumResponse } from "@/app/types";
-import { useUpdateAlbum } from "../_hooks/useUpdateAlbum";
+import { useUpdateAlbum } from "../_hooks/useAlbums";
 
 const cx = classNames.bind(styles);
 

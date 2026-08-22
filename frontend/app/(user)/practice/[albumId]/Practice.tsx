@@ -4,9 +4,11 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { getTtsUrl } from '@/app/utils/mediaUrl';
 import { useStreak } from '@/app/hooks/useStreak';
-import { useMarkVocabKnown } from './_hooks/useMarkVocabKnown';
-import { useCheckPracticeAnswer } from './_hooks/useCheckPracticeAnswer';
-import { useGeneratePracticeQuestion } from './_hooks/useGeneratePracticeQuestion';
+import {
+  useCheckPracticeAnswer,
+  useGeneratePracticeQuestion,
+  useMarkVocabKnown,
+} from './_hooks/usePractice';
 import {Container, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';

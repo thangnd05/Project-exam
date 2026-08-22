@@ -7,7 +7,7 @@ import { FaEdit, FaInfoCircle } from "react-icons/fa";
 import CommonFormModal from "@/app/components/modal/CommonFormModal";
 import ModalActionFooter from "@/app/components/modal/ModalActionFooter";
 import styles from "@/app/components/modal/CommonFormModal.module.scss";
-import { useCreateAlbum } from '../_hooks/useCreateAlbum';
+import { useCreateAlbum } from '../_hooks/useAlbums';
 
 const cx = classNames.bind(styles);
 

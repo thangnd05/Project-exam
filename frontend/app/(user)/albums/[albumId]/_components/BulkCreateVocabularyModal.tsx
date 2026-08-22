@@ -9,7 +9,7 @@ import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
-import { useBulkCreateVocabularies } from '../_hooks/useBulkCreateVocabularies';
+import { useBulkCreateVocabularies } from '../_hooks/useAlbumVocabularies';
 
 const cx = classNames.bind(styles);
 
