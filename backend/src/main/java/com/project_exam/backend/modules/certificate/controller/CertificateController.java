@@ -3,7 +3,9 @@ package com.project_exam.backend.modules.certificate.controller;
 import com.project_exam.backend.modules.certificate.dto.AttemptCertificateResponse;
 import com.project_exam.backend.modules.certificate.dto.CertificateResponse;
 import com.project_exam.backend.modules.certificate.dto.CertificateVerifyResponse;
+import com.project_exam.backend.modules.certificate.dto.PublicCertificateResponse;
 import com.project_exam.backend.modules.certificate.service.CertificateService;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,15 @@ public class CertificateController {
     @GetMapping("/verify/{code}")
     public ResponseEntity<CertificateVerifyResponse> verify(@PathVariable String code) {
         return ResponseEntity.ok(certificateService.verify(code));
+    }
+
+    /** Danh sách chứng chỉ đã cấp, công khai cho cả khách chưa đăng nhập. */
+    @GetMapping("/public")
+    public ResponseEntity<PageResponse<PublicCertificateResponse>> findPublicFeed(
+            @RequestParam(required = false) String examTypeId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size) {
+        return ResponseEntity.ok(certificateService.findPublicFeed(examTypeId, page, size));
     }
 
     @GetMapping("/by-attempt/{userTestId}")

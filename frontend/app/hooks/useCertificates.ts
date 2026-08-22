@@ -1,11 +1,12 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 import {
   getCertificateByAttempt,
   getCertificateById,
   getMyCertificates,
+  getPublicCertificates,
   verifyCertificate,
 } from '@/app/apis/certificateApi';
 
@@ -14,6 +15,7 @@ export const certificateKeys = {
   detail: (certificateId?: string) => ['certificates', 'detail', certificateId],
   verify: (code?: string) => ['certificates', 'verify', code],
   byAttempt: (userTestId?: string) => ['certificates', 'by-attempt', userTestId],
+  publicFeed: (examTypeId?: string) => ['certificates', 'public', 'feed', examTypeId || 'all'],
 };
 
 export function useMyCertificates() {
@@ -47,5 +49,19 @@ export function useAttemptCertificate(userTestId?: string, enabled = true) {
     queryFn: () => getCertificateByAttempt(userTestId as string),
     enabled: Boolean(userTestId) && enabled,
     retry: false,
+  });
+}
+
+/**
+ * Danh sách chứng chỉ đã cấp (công khai), tải thêm theo trang.
+ * Trần size do backend áp (24), truyền lớn hơn cũng bị cắt.
+ */
+export function usePublicCertificates(examTypeId?: string, pageSize = 12) {
+  return useInfiniteQuery({
+    queryKey: certificateKeys.publicFeed(examTypeId),
+    queryFn: ({ pageParam = 0 }) =>
+      getPublicCertificates({ examTypeId, page: pageParam as number, size: pageSize }),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => (lastPage?.hasNext ? lastPage.currentPage + 1 : undefined),
   });
 }

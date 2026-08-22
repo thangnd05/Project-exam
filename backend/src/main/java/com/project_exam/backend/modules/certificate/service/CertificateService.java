@@ -14,17 +14,23 @@ import com.project_exam.backend.modules.certificate.dto.AttemptCertificateRespon
 import com.project_exam.backend.modules.certificate.dto.CertificateDesign;
 import com.project_exam.backend.modules.certificate.dto.CertificateResponse;
 import com.project_exam.backend.modules.certificate.dto.CertificateVerifyResponse;
+import com.project_exam.backend.modules.certificate.dto.PublicCertificateResponse;
 import com.project_exam.backend.modules.certificate.mapper.CertificateMapper;
 import com.project_exam.backend.modules.certificate.repository.CertificateTemplateRepository;
 import com.project_exam.backend.modules.certificate.repository.UserCertificateRepository;
 import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AppTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,6 +60,8 @@ public class CertificateService {
     private static final int CODE_LENGTH = 6;
     private static final int CODE_MAX_ATTEMPTS = 5;
     private static final SecureRandom RANDOM = new SecureRandom();
+    /** Trần trang cho bảng vinh danh: khách không kéo được cả bảng bằng một request. */
+    private static final int PUBLIC_MAX_PAGE_SIZE = 24;
 
     private final UserCertificateRepository userCertificateRepository;
     private final CertificateTemplateRepository certificateTemplateRepository;
@@ -217,6 +225,21 @@ public class CertificateService {
         return userCertificateRepository.findByCertificateCode(code.trim().toUpperCase())
                 .map(c -> certificateMapper.toVerifyResponse(c, resolveState(c)))
                 .orElseGet(() -> certificateMapper.notFound(code));
+    }
+
+    // ------------------------------------------------------------------ công khai
+
+    /** Danh sách chứng chỉ đã cấp, công khai. Mới cấp trước, lọc được theo loại đề. */
+    @Transactional(readOnly = true)
+    public PageResponse<PublicCertificateResponse> findPublicFeed(String examTypeId, int page, int size) {
+        int safePage = Math.max(0, page);
+        int safeSize = Math.min(Math.max(1, size), PUBLIC_MAX_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "issuedAt"));
+        String examTypeFilter = (examTypeId == null || examTypeId.isBlank()) ? null : examTypeId;
+
+        Page<UserCertificate> result = userCertificateRepository
+                .findPublicFeed(examTypeFilter, Instant.now(), pageable);
+        return PageResponse.from(result, certificateMapper::toPublicResponse);
     }
 
     private String resolveState(UserCertificate certificate) {

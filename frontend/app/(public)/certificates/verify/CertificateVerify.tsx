@@ -4,52 +4,17 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Container, Spinner, Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import { BadgeCheck, Search, ShieldAlert, ShieldX, Clock, type LucideIcon } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
 import { useCertificateVerification } from '@/app/hooks/useCertificates';
 import { CertificateVerifyState } from '@/app/enums';
+import CertificateWall from './_components/CertificateWall';
+import { getCertificateStateView } from './_components/certificateStateView';
 import styles from './CertificateVerify.module.scss';
 
 const cx = classNames.bind(styles);
-
-type StateView = {
-  icon: LucideIcon;
-  tone: string;
-  heading: string;
-  message: string;
-  watermark?: string;
-};
-
-const STATE_VIEW: Record<CertificateVerifyState, StateView> = {
-  VALID: {
-    icon: BadgeCheck,
-    tone: 'valid',
-    heading: 'Chứng chỉ hợp lệ',
-    message: 'Chứng chỉ này do hệ thống cấp và đang còn hiệu lực.',
-  },
-  REVOKED: {
-    icon: ShieldX,
-    tone: 'invalid',
-    heading: 'Chứng chỉ đã bị thu hồi',
-    message: 'Chứng chỉ từng được cấp nhưng đã bị thu hồi, không còn giá trị sử dụng.',
-    watermark: 'REVOKED',
-  },
-  EXPIRED: {
-    icon: Clock,
-    tone: 'warning',
-    heading: 'Chứng chỉ đã hết hạn',
-    message: 'Chứng chỉ này đã quá thời hạn hiệu lực.',
-    watermark: 'EXPIRED',
-  },
-  NOT_FOUND: {
-    icon: ShieldAlert,
-    tone: 'invalid',
-    heading: 'Không tìm thấy chứng chỉ',
-    message: 'Không có chứng chỉ nào mang mã này. Hãy kiểm tra lại mã tra cứu.',
-  },
-};
 
 function CertificateVerify() {
   const { code } = useParams<{ code?: string }>();
@@ -67,7 +32,7 @@ function CertificateVerify() {
   };
 
   const state = isError ? CertificateVerifyState.NOT_FOUND : result?.state;
-  const view = (state && STATE_VIEW[state]) || STATE_VIEW.NOT_FOUND;
+  const view = getCertificateStateView(state);
   const StateIcon = view.icon;
   const showCertificate = Boolean(result) && state !== CertificateVerifyState.NOT_FOUND;
 
@@ -104,30 +69,30 @@ function CertificateVerify() {
           </div>
         )}
 
-        {!isLoading && code && (
-          <>
-            <div className={cx('status', view.tone)}>
-              <StateIcon size={26} className={cx('statusIcon')} />
-              <div className={cx('statusText')}>
-                <h2 className={cx('statusHeading')}>{view.heading}</h2>
-                <p className={cx('statusMessage')}>{view.message}</p>
-              </div>
-            </div>
-
-            {showCertificate && (
-              <div className={cx('canvasWrap')}>
-                <CertificateCanvas
-                  design={result?.design}
-                  recipientName={result?.recipientName}
-                  certificateCode={result?.certificateCode}
-                  issuedAt={result?.issuedAt}
-                  expiresAt={result?.expiresAt}
-                  watermark={view.watermark}
-                />
-              </div>
-            )}
-          </>
+        {!isLoading && code && showCertificate && (
+          <div className={cx('canvasWrap')}>
+            <CertificateCanvas
+              design={result?.design}
+              recipientName={result?.recipientName}
+              certificateCode={result?.certificateCode}
+              issuedAt={result?.issuedAt}
+              expiresAt={result?.expiresAt}
+              watermark={view.watermark}
+            />
+          </div>
         )}
+
+        {!isLoading && code && !showCertificate && (
+          <div className={cx('status', view.tone)}>
+            <StateIcon size={26} className={cx('statusIcon')} />
+            <div className={cx('statusText')}>
+              <h2 className={cx('statusHeading')}>{view.heading}</h2>
+              <p className={cx('statusMessage')}>{view.message}</p>
+            </div>
+          </div>
+        )}
+
+        <CertificateWall />
       </Container>
     </div>
   );

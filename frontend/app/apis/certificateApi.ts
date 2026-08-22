@@ -7,10 +7,17 @@ import type {
   CertificateVerifyResponse,
   MessageResponse,
   PageResponse,
+  PublicCertificateResponse,
 } from '@/app/types';
 
 const BASE_URL = '/api/certificates';
 const ADMIN_BASE_URL = '/api/admin/certificates';
+
+interface PublicCertificateParams {
+  examTypeId?: string;
+  page?: number;
+  size?: number;
+}
 
 interface IssuedCertificateSearchParams {
   examTypeId?: string;
@@ -30,6 +37,12 @@ export const getCertificateById = (certificateId: string): Promise<CertificateRe
 
 export const verifyCertificate = (code: string): Promise<CertificateVerifyResponse> => {
   return axios.get(`${BASE_URL}/verify/${encodeURIComponent(code)}`).then((res) => res.data);
+};
+
+export const getPublicCertificates = (
+  params?: PublicCertificateParams,
+): Promise<PageResponse<PublicCertificateResponse>> => {
+  return axios.get(`${BASE_URL}/public`, { params }).then((res) => res.data);
 };
 
 export const getCertificateByAttempt = (userTestId: string): Promise<AttemptCertificateResponse> => {

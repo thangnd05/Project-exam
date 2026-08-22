@@ -92,6 +92,19 @@ export interface CertificateVerifyResponse {
   design?: CertificateDesign;
 }
 
+/** Một dòng bảng vinh danh công khai — không kèm certificateId/điểm số, link đi qua mã tra cứu. */
+export interface PublicCertificateResponse {
+  certificateCode?: string;
+  recipientName?: string;
+  title?: string;
+  examTypeId?: string;
+  examTypeName?: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  logoUrl?: string;
+  accentColor?: string;
+}
+
 export interface RevokeCertificateRequest {
   reason?: string;
 }

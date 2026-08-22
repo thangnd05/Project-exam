@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +34,20 @@ public interface UserCertificateRepository extends JpaRepository<UserCertificate
             GROUP BY c.templateId
             """)
     List<Object[]> countActiveGroupedByTemplate();
+
+    /**
+     * Danh sách công khai: chỉ chứng chỉ còn hiệu lực, mới cấp trước.
+     * Chứng chỉ bị thu hồi hoặc hết hạn không lên danh sách.
+     */
+    @Query("""
+            SELECT c FROM UserCertificate c
+            WHERE c.status = com.project_exam.backend.modules.certificate.domain.UserCertificate.Status.ACTIVE
+              AND (c.expiresAt IS NULL OR c.expiresAt > :now)
+              AND (:examTypeId IS NULL OR c.examTypeId = :examTypeId)
+            """)
+    Page<UserCertificate> findPublicFeed(@Param("examTypeId") String examTypeId,
+                                         @Param("now") Instant now,
+                                         Pageable pageable);
 
     @Query("""
             SELECT c FROM UserCertificate c
