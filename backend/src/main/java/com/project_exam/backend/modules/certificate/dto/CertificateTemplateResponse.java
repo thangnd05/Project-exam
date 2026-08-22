@@ -20,6 +20,7 @@ public class CertificateTemplateResponse {
 
     private String title;
     private String subtitle;
+    private String bodyText;
     private String footerNote;
     private String logoUrl;
     private String backgroundUrl;

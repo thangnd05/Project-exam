@@ -21,6 +21,8 @@ import lombok.NoArgsConstructor;
 public class CertificateDesign {
     private String title;
     private String subtitle;
+    /** Câu mô tả giữa chứng chỉ; null = frontend dùng câu mặc định theo tên loại đề. */
+    private String bodyText;
     private String footerNote;
     private String logoUrl;
     private String backgroundUrl;

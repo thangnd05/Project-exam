@@ -7,6 +7,17 @@ import styles from './CertificateCanvas.module.scss';
 
 const cx = classNames.bind(styles);
 
+/** Chỗ chèn tên loại đề trong câu mô tả cấu hình được ở mẫu chứng chỉ. */
+const EXAM_TYPE_TOKEN = '{examType}';
+
+/** Tách câu cấu hình theo {examType} rồi in đậm tên loại đề ở mỗi chỗ chèn. */
+const renderBodyText = (text: string, examTypeName?: string) =>
+  text.split(EXAM_TYPE_TOKEN).flatMap((chunk, index) =>
+    index === 0
+      ? [chunk]
+      : [<strong key={`token-${index}`}>{examTypeName || ''}</strong>, chunk],
+  );
+
 const formatDate = (value?: string) => {
   if (!value) return '--';
   return new Date(value).toLocaleDateString('en-GB', {
@@ -29,6 +40,7 @@ function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, e
   const accent = design?.accentColor;
   const issuedYear = issuedAt ? new Date(issuedAt).getFullYear() : null;
   const signatureName = design?.signatureName || design?.issuerName;
+  const bodyText = design?.bodyText?.trim();
 
   return (
     <div
@@ -63,11 +75,15 @@ function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, e
           <p className={cx('presentedTo')}>This certificate is proudly presented to</p>
           <p className={cx('recipient')}>{recipientName || '---'}</p>
 
-          {design?.examTypeName && (
-            <p className={cx('reason')}>
-              for successfully completing and passing the{' '}
-              <strong>{design.examTypeName}</strong> examination
-            </p>
+          {bodyText ? (
+            <p className={cx('reason')}>{renderBodyText(bodyText, design?.examTypeName)}</p>
+          ) : (
+            design?.examTypeName && (
+              <p className={cx('reason')}>
+                for successfully completing and passing the{' '}
+                <strong>{design.examTypeName}</strong> examination
+              </p>
+            )
           )}
           {design?.footerNote && <p className={cx('note')}>{design.footerNote}</p>}
         </div>

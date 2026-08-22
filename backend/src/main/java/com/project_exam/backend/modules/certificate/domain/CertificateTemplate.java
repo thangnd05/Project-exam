@@ -41,6 +41,13 @@ public class CertificateTemplate {
     @Column(length = 300)
     private String subtitle;
 
+    /**
+     * Câu mô tả ở giữa chứng chỉ. Bỏ trống thì frontend dùng câu mặc định
+     * "for successfully completing and passing the &lt;loại đề&gt; examination".
+     */
+    @Column(name = "body_text", length = 500)
+    private String bodyText;
+
     @Column(name = "footer_note", length = 500)
     private String footerNote;
 

@@ -12,6 +12,7 @@ export interface CertificateTemplateFormState {
   passScore: number | string;
   title: string;
   subtitle: string;
+  bodyText: string;
   footerNote: string;
   logoUrl: string;
   backgroundUrl: string;
@@ -48,6 +49,7 @@ function CertificateTemplateFormModal({
   const previewDesign = {
     title: formState.title || 'Chứng nhận hoàn thành',
     subtitle: formState.subtitle,
+    bodyText: formState.bodyText,
     footerNote: formState.footerNote,
     logoUrl: formState.logoUrl,
     backgroundUrl: formState.backgroundUrl,
@@ -127,6 +129,21 @@ function CertificateTemplateFormModal({
               onChange={(event) => onChangeField('subtitle', event.target.value)}
               placeholder="VD: Chứng nhận hoàn thành bài thi thử toàn phần"
             />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Nội dung chính</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={2}
+              value={formState.bodyText}
+              onChange={(event) => onChangeField('bodyText', event.target.value)}
+              placeholder="for successfully completing and passing the {examType} examination"
+            />
+            <Form.Text className="text-muted">
+              Câu nằm dưới tên người nhận. Bỏ trống = dùng câu mặc định theo tên loại đề.
+              Gõ <code>{'{examType}'}</code> ở chỗ muốn chèn tên loại đề (sẽ được in đậm).
+            </Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">

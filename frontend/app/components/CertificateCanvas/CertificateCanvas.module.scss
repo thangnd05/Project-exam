@@ -263,8 +263,11 @@
 
 .reason {
   margin: 0.8cqw 0 0;
+  max-width: 80cqw;
   font-size: 1.9cqw;
   color: var(--text-color);
+  /* Câu mô tả cấu hình ở mẫu có thể nhiều dòng, giữ nguyên chỗ xuống dòng admin gõ. */
+  white-space: pre-line;
 }
 
 .note {

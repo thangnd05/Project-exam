@@ -3,6 +3,8 @@ import { AttemptCertificateState, CertificateStatus, CertificateVerifyState } fr
 export interface CertificateDesign {
   title?: string;
   subtitle?: string;
+  /** Câu mô tả giữa chứng chỉ; bỏ trống thì dùng câu mặc định theo tên loại đề. */
+  bodyText?: string;
   footerNote?: string;
   logoUrl?: string;
   backgroundUrl?: string;
@@ -45,6 +47,7 @@ export interface CertificateTemplateRequest {
   passScore: number;
   title: string;
   subtitle?: string;
+  bodyText?: string;
   footerNote?: string;
   logoUrl?: string;
   backgroundUrl?: string;
@@ -65,6 +68,7 @@ export interface CertificateTemplateResponse {
   passScore?: number;
   title?: string;
   subtitle?: string;
+  bodyText?: string;
   footerNote?: string;
   logoUrl?: string;
   backgroundUrl?: string;

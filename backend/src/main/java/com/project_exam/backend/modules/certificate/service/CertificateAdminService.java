@@ -105,6 +105,7 @@ public class CertificateAdminService {
         template.setPassScore(request.getPassScore());
         template.setTitle(request.getTitle());
         template.setSubtitle(request.getSubtitle());
+        template.setBodyText(request.getBodyText());
         template.setFooterNote(request.getFooterNote());
         template.setLogoUrl(request.getLogoUrl());
         template.setBackgroundUrl(request.getBackgroundUrl());

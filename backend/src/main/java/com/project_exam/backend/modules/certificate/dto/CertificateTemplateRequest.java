@@ -24,6 +24,9 @@ public class CertificateTemplateRequest {
     private String subtitle;
 
     @Size(max = 500)
+    private String bodyText;
+
+    @Size(max = 500)
     private String footerNote;
 
     @Size(max = 500)
