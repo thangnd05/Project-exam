@@ -9,8 +9,6 @@ import com.project_exam.backend.modules.assessment.exam.dto.PassageQuestionGroup
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCreateRequest;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
-import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
-import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;

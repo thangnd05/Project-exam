@@ -21,12 +21,6 @@ import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminRespons
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCreateRequest;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
-import com.project_exam.backend.modules.assessment.exam.dto.PassageMediaResponse;
-import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
-import com.project_exam.backend.modules.assessment.exam.dto.AnswerAdminResponse;
-import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
-import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
-import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.assessment.exam.mapper.PassageMapper;
 import com.project_exam.backend.modules.assessment.exam.mapper.PassageMediaMapper;
 import com.project_exam.backend.modules.assessment.exam.mapper.AnswerMapper;
