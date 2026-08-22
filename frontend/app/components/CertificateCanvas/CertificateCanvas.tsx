@@ -96,7 +96,7 @@ function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, e
             {design?.signatureImageUrl && (
               <img className={cx('signature')} src={design.signatureImageUrl} alt="" />
             )}
-            <span className={cx('signName')}>{signatureName || ''}</span>
+            {signatureName && <span className={cx('signName')}>{signatureName}</span>}
             <span className={cx('footHint')}>
               {design?.signatureTitle || 'Authorized signature'}
             </span>

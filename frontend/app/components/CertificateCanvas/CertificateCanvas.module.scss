@@ -296,8 +296,8 @@
 }
 
 .signCol {
-  text-align: right;
-  align-items: flex-end;
+  text-align: center;
+  align-items: center;
 }
 
 .footLabel {
@@ -370,12 +370,11 @@
 .signature {
   max-height: 12cqw;
   max-width: 30cqw;
-  margin-bottom: -2cqw;
+  margin-bottom: -1cqw;
   object-fit: contain;
 }
 
 .signName {
-  min-height: 2.2cqw;
   min-width: 20cqw;
   font-family: var(--certificate-serif);
   font-size: 1.9cqw;

@@ -12,6 +12,13 @@ import styles from './CertificatePreviewModal.module.scss';
 
 const cx = classNames.bind(styles);
 
+/**
+ * Modal ôm vừa tấm chứng chỉ (tỉ lệ 297/210) để không sinh thanh cuộn: bề ngang tối đa
+ * suy từ chiều cao còn lại của modal (max-height 90vh trừ header ~9rem và padding body 6rem),
+ * cộng lại phần padding, và không vượt 96rem.
+ */
+const MODAL_MAX_WIDTH = 'min(96rem, calc((90vh - 15rem) * 297 / 210 + 6rem))';
+
 type CertificatePreviewModalProps = {
   /** Mã chứng chỉ đang xem; rỗng nghĩa là đóng modal. */
   code?: string | null;
@@ -31,7 +38,7 @@ function CertificatePreviewModal({ code, onClose }: CertificatePreviewModalProps
       show={Boolean(code)}
       onClose={onClose}
       title={result?.recipientName || 'Chứng chỉ'}
-      maxWidth="100rem"
+      maxWidth={MODAL_MAX_WIDTH}
     >
       {isLoading && (
         <div className={cx('state')}>
