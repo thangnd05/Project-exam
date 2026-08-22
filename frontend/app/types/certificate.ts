@@ -107,6 +107,8 @@ export interface PublicCertificateResponse {
   expiresAt?: string;
   logoUrl?: string;
   accentColor?: string;
+  /** Phần trình bày chụp lúc cấp, để danh sách vẽ bản thu nhỏ của chính tấm chứng chỉ. */
+  design?: CertificateDesign;
 }
 
 export interface RevokeCertificateRequest {

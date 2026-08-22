@@ -2,11 +2,11 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import { Award, BadgeCheck } from 'lucide-react';
+import { Award, Maximize2 } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
 import { usePublicCertificates } from '@/app/hooks/useCertificates';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import CertificatePreviewModal from './CertificatePreviewModal';
@@ -14,7 +14,13 @@ import styles from './CertificateWall.module.scss';
 
 const cx = classNames.bind(styles);
 
-const formatDate = (value?: string) => (value ? new Date(value).toLocaleDateString('vi-VN') : '--');
+const NEW_DAYS = 7;
+const DAY_MS = 24 * 60 * 60 * 1000;
+const SKELETON_COUNT = 4;
+
+/** Chứng chỉ vừa cấp trong tuần được gắn nhãn cho khu trưng bày trông "đang sống". */
+const isRecent = (value?: string) =>
+  Boolean(value) && Date.now() - new Date(value as string).getTime() < NEW_DAYS * DAY_MS;
 
 function CertificateWall() {
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -22,7 +28,7 @@ function CertificateWall() {
   const [previewCode, setPreviewCode] = useState<string | null>(null);
 
   /** Click trái thường mở popup; ctrl/giữa/chuột phải vẫn mở trang tra cứu như link bình thường. */
-  const handleRowClick = (event: React.MouseEvent<HTMLAnchorElement>, code?: string) => {
+  const handleCardClick = (event: React.MouseEvent<HTMLAnchorElement>, code?: string) => {
     if (!code || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     setPreviewCode(code);
@@ -43,9 +49,11 @@ function CertificateWall() {
       </header>
 
       {isLoading && (
-        <div className={cx('state')}>
-          <Spinner animation="border" size="sm" /> Đang tải danh sách...
-        </div>
+        <ul className={cx('grid')} aria-hidden="true">
+          {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+            <li key={index} className={cx('skeleton')} />
+          ))}
+        </ul>
       )}
 
       {isError && <div className={cx('state')}>Không tải được danh sách chứng chỉ.</div>}
@@ -58,38 +66,39 @@ function CertificateWall() {
       )}
 
       {certificates.length > 0 && (
-        <ul className={cx('list')}>
+        <ul className={cx('grid')}>
           {certificates.map((certificate) => (
             <li key={certificate.certificateCode}>
               <Link
-                className={cx('row')}
+                className={cx('card')}
                 href={`/certificates/verify/${certificate.certificateCode}`}
-                onClick={(event) => handleRowClick(event, certificate.certificateCode)}
-                style={
-                  certificate.accentColor
-                    ? ({ '--row-accent': certificate.accentColor } as React.CSSProperties)
-                    : undefined
-                }
+                onClick={(event) => handleCardClick(event, certificate.certificateCode)}
+                aria-label={`Xem chứng chỉ ${certificate.certificateCode} của ${certificate.recipientName}`}
               >
-                {certificate.logoUrl ? (
-                  <img className={cx('logo')} src={certificate.logoUrl} alt="" />
-                ) : (
-                  <span className={cx('emblem')} aria-hidden="true">
-                    <BadgeCheck size={20} />
+                <CertificateCanvas
+                  design={certificate.design}
+                  recipientName={certificate.recipientName}
+                  certificateCode={certificate.certificateCode}
+                  issuedAt={certificate.issuedAt}
+                  expiresAt={certificate.expiresAt}
+                />
+
+                {isRecent(certificate.issuedAt) && (
+                  <span
+                    className={cx('badge')}
+                    style={
+                      certificate.accentColor
+                        ? ({ '--badge-accent': certificate.accentColor } as React.CSSProperties)
+                        : undefined
+                    }
+                  >
+                    Mới
                   </span>
                 )}
 
-                <div className={cx('rowMain')}>
-                  <span className={cx('name')}>{certificate.recipientName}</span>
-                  <span className={cx('title')}>
-                    {certificate.title || certificate.examTypeName}
-                  </span>
-                </div>
-
-                <div className={cx('rowMeta')}>
-                  <span className={cx('code')}>{certificate.certificateCode}</span>
-                  <span className={cx('date')}>Cấp ngày {formatDate(certificate.issuedAt)}</span>
-                </div>
+                <span className={cx('overlay')} aria-hidden="true">
+                  <Maximize2 size={16} /> Xem chứng chỉ
+                </span>
               </Link>
             </li>
           ))}

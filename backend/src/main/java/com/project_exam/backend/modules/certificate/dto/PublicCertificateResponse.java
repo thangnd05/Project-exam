@@ -26,8 +26,7 @@ public class PublicCertificateResponse {
     private String examTypeName;
     private Instant issuedAt;
     private Instant expiresAt;
-
-    /** Lấy từ snapshot phôi, để vẽ huy hiệu nhỏ đúng nhận diện của loại chứng chỉ. */
     private String logoUrl;
     private String accentColor;
+    private CertificateDesign design;
 }

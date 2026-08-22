@@ -3,7 +3,7 @@
 }
 
 .sectionHead {
-  margin-bottom: 1.6rem;
+  margin-bottom: 2rem;
 
   h2 {
     margin: 0 0 0.4rem;
@@ -45,109 +45,102 @@
   }
 }
 
-.list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(34rem, 1fr));
+  gap: 2.4rem;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.row {
-  --row-accent: var(--primary);
-
-  display: flex;
-  align-items: center;
-  gap: 1.4rem;
-  padding: 1.4rem 1.8rem;
-  border: 1px solid var(--border-color);
-  border-left: 3px solid var(--row-accent);
-  border-radius: var(--radius-md);
-  background: var(--bg-white);
+/**
+ * Thẻ là bản thu nhỏ của chính tấm chứng chỉ (CertificateCanvas tự co theo bề ngang
+ * nhờ container query), phủ thêm nhãn "Mới" và lớp mời bấm khi rê chuột.
+ */
+.card {
+  position: relative;
+  display: block;
+  border-radius: var(--radius-lg);
   text-decoration: none;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 
   &:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--border-strong);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  &:hover .overlay {
+    opacity: 1;
   }
 }
 
-.logo {
-  width: 3.6rem;
-  height: 3.6rem;
-  object-fit: contain;
-  flex-shrink: 0;
+.badge {
+  --badge-accent: var(--amber-600);
+
+  position: absolute;
+  top: -0.8rem;
+  right: -0.8rem;
+  z-index: 2;
+  padding: 0.3rem 1.1rem;
+  border-radius: 999px;
+  background: var(--badge-accent);
+  color: var(--white);
+  font-size: var(--font-size-xs2);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.05rem;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-md);
 }
 
-.emblem {
-  display: inline-flex;
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 3.6rem;
-  height: 3.6rem;
-  flex-shrink: 0;
-  border-radius: 50%;
-  color: var(--row-accent);
-  background: var(--primary-alpha-10);
-}
-
-.rowMain {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-  flex: 1;
-}
-
-.name {
-  font-size: var(--font-size-base);
+  gap: 0.6rem;
+  border-radius: var(--radius-lg);
+  background: rgb(var(--slate-900-rgb) / 0.45);
+  color: var(--white);
+  font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--text-color);
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 
-.title {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
+.skeleton {
+  aspect-ratio: 297 / 210;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    100deg,
+    var(--slate-100) 30%,
+    var(--slate-200) 50%,
+    var(--slate-100) 70%
+  );
+  background-size: 300% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
 }
 
-.rowMeta {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.2rem;
-  flex-shrink: 0;
-  text-align: right;
-}
+@keyframes shimmer {
+  from {
+    background-position: 150% 0;
+  }
 
-.code {
-  font-family: 'Courier New', monospace;
-  font-size: var(--font-size-sm);
-  color: var(--text-color);
-}
-
-.date {
-  font-size: var(--font-size-xs2);
-  color: var(--text-secondary);
+  to {
+    background-position: -50% 0;
+  }
 }
 
 .more {
   display: flex;
   justify-content: center;
-  margin-top: 2rem;
+  margin-top: 2.4rem;
 }
 
-@media (max-width: 767px) {
-  .row {
-    align-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  .rowMeta {
-    align-items: flex-start;
-    width: 100%;
-    text-align: left;
-    padding-left: 5rem;
+@media (max-width: 575px) {
+  .grid {
+    grid-template-columns: 1fr;
   }
 }

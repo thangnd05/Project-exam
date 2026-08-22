@@ -123,6 +123,7 @@ public class CertificateMapper {
                 .expiresAt(certificate.getExpiresAt())
                 .logoUrl(design.getLogoUrl())
                 .accentColor(design.getAccentColor())
+                .design(design)
                 .build();
     }
 
