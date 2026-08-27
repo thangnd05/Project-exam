@@ -41,7 +41,8 @@
   min-width: 0;
   display: flex;
   justify-content: center;
-  overflow: hidden;
+  // Không cắt overflow: dropdown "Lớp học" xổ xuống ngoài vùng thanh nav
+  overflow: visible;
 }
 
 .zoneRight {
@@ -97,15 +98,7 @@
   gap: 2px;
   max-width: 100%;
   min-width: 0;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
   padding: 2px 4px;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
 }
 
 .home {
@@ -389,6 +382,16 @@
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
   padding: 6px 0;
+
+  // Cầu nối vô hình bù khe 8px, giữ hover liên tục từ nút xuống menu
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -10px;
+    height: 10px;
+  }
 
   :global(.dropdown-item) {
     white-space: nowrap;

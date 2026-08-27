@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {Button, Dropdown} from 'react-bootstrap';
 import Image from 'next/image';
-import {useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {toast} from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import style from './header.module.scss';
@@ -23,6 +23,9 @@ import {useCosmetics} from '@/app/hooks/useCosmetics';
 
 const cx = classNames.bind(style);
 
+// Trễ đóng khi rê chuột qua khe hở giữa nút và menu
+const CLASS_MENU_CLOSE_DELAY = 160;
+
 function Header() {
   const {user, logout, roleName} = useAuth();
   const canCreateTest = roleName === 'ADMIN';
@@ -30,8 +33,42 @@ function Header() {
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
+  const [showClassMenu, setShowClassMenu] = useState(false);
+  const classMenuTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+
+  const clearClassMenuTimer = useCallback(() => {
+    if (classMenuTimer.current) {
+      clearTimeout(classMenuTimer.current);
+      classMenuTimer.current = null;
+    }
+  }, []);
+
+  useEffect(() => clearClassMenuTimer, [clearClassMenuTimer]);
+
+  // Chỉ mở bằng hover trên thiết bị có chuột, thiết bị cảm ứng vẫn dùng tap
+  const canHover = () => window.matchMedia?.('(hover: hover)').matches ?? false;
+
+  const handleClassMenuEnter = () => {
+    if (!canHover()) return;
+    clearClassMenuTimer();
+    setShowClassMenu(true);
+  };
+
+  const handleClassMenuLeave = () => {
+    if (!canHover()) return;
+    clearClassMenuTimer();
+    classMenuTimer.current = setTimeout(
+      () => setShowClassMenu(false),
+      CLASS_MENU_CLOSE_DELAY,
+    );
+  };
+
+  const handleClassMenuToggle = (nextShow: boolean) => {
+    clearClassMenuTimer();
+    setShowClassMenu(nextShow);
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -55,6 +92,8 @@ function Header() {
     modalType: string | null = null,
   ) => {
     e.preventDefault();
+    clearClassMenuTimer();
+    setShowClassMenu(false);
     if (requireLogin('Bạn cần đăng nhập để thao tác lớp học!')) {
       return;
     }
@@ -114,7 +153,14 @@ function Header() {
               >
                 Bài đã tạo
               </Link>
-              <Dropdown className={cx('customMenu')} align="start">
+              <Dropdown
+                className={cx('customMenu')}
+                align="start"
+                show={showClassMenu}
+                onToggle={handleClassMenuToggle}
+                onMouseEnter={handleClassMenuEnter}
+                onMouseLeave={handleClassMenuLeave}
+              >
                 <Dropdown.Toggle
                   as="button"
                   type="button"
