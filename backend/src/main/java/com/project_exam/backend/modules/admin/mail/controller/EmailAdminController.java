@@ -1,4 +1,4 @@
-package com.project_exam.backend.modules.system.mail.controller;
+package com.project_exam.backend.modules.admin.mail.controller;
 
 import com.project_exam.backend.modules.system.mail.dto.EmailPreviewRequest;
 import com.project_exam.backend.modules.system.mail.dto.EmailPreviewResponse;

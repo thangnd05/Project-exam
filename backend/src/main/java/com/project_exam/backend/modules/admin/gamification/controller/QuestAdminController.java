@@ -1,4 +1,4 @@
-package com.project_exam.backend.modules.gamification.quest.controller;
+package com.project_exam.backend.modules.admin.gamification.controller;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.gamification.quest.dto.QuestRequest;

@@ -1,4 +1,4 @@
-package com.project_exam.backend.modules.gamification.streak.controller;
+package com.project_exam.backend.modules.admin.gamification.controller;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 
 import com.project_exam.backend.modules.gamification.streak.dto.StreakRecoverConfigRequest;

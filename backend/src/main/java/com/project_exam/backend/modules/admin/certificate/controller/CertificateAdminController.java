@@ -1,4 +1,4 @@
-package com.project_exam.backend.modules.certificate.controller;
+package com.project_exam.backend.modules.admin.certificate.controller;
 
 import com.project_exam.backend.modules.certificate.dto.CertificateResponse;
 import com.project_exam.backend.modules.certificate.dto.CertificateTemplateRequest;
