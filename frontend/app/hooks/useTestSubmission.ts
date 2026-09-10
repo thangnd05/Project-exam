@@ -225,6 +225,7 @@ export const useTestSubmission = ({
                     classId: mode === 'class' && classId ? String(classId) : null,
                     chapterId: mode === 'class' && chapterId ? String(chapterId) : null,
                     collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
+                    usageScope: testInfo.usageScope,
                     questions: questions.map((q, index) => ({
                         questionNumber: index + 1,
                         questionType: q.questionType,
@@ -259,6 +260,7 @@ export const useTestSubmission = ({
                     classId: mode === 'class' && classId ? String(classId) : null,
                     chapterId: mode === 'class' && chapterId ? String(chapterId) : null,
                     collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
+                    usageScope: testInfo.usageScope,
                     groups: groups.map((group) => ({
                         passage: {
                             passageType: group.passage.passageType,

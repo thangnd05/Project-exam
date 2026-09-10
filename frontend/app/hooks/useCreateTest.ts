@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useBaseMetaData } from '@/app/hooks/useBaseMetaData';
 import { useTestSubmission } from '@/app/hooks/useTestSubmission';
+import { QuestionUsageScope } from '@/app/enums';
 
 export const CREATOR_TYPES = {
   TEST: 'test',
@@ -57,6 +58,8 @@ export interface TestInfoForm {
   availableTo: string;
   collectionId: string;
   costCoins: string;
+  /** Chỉ dùng cho hai tab tạo câu vào kho; tab tạo đề luôn sinh câu thi. */
+  usageScope: QuestionUsageScope;
 }
 
 export interface CreatorNotification {
@@ -133,6 +136,7 @@ export const useCreateTest = ({
     availableTo: '',
     collectionId: '',
     costCoins: '',
+    usageScope: QuestionUsageScope.EXAM,
   });
 
   const [questions, setQuestions] = useState<DraftQuestion[]>([cloneEmptyQuestion()]);

@@ -1,4 +1,4 @@
-import { MediaType, PassageType, QuestionType } from '@/app/enums';
+import { MediaType, PassageType, QuestionType, QuestionUsageScope } from '@/app/enums';
 
 export interface TagRequest {
   name?: string;
@@ -71,6 +71,8 @@ export interface QuestionCreateRequest {
   questionType?: QuestionType;
   answers?: AnswerRequest[];
   isBank?: boolean;
+  /** Bỏ trống khi sửa câu = giữ nguyên scope cũ. */
+  usageScope?: QuestionUsageScope;
   collectionId?: string;
   explanation?: string;
   tagIds?: string[];
@@ -107,6 +109,8 @@ export interface BulkCreateQuestionsToBankRequest {
   classId?: string;
   chapterId?: string;
   questions?: NormalQuestionRequest[];
+  /** Áp cho cả lô. */
+  usageScope?: QuestionUsageScope;
 }
 
 export interface PassageQuestionGroupRequest {
@@ -119,6 +123,8 @@ export interface BulkPassageGroupRequest {
   classId?: string;
   chapterId?: string;
   groups?: PassageQuestionGroupRequest[];
+  /** Áp cho cả lô. */
+  usageScope?: QuestionUsageScope;
 }
 
 export interface BulkQuestionWithPassageRequest {
@@ -127,6 +133,8 @@ export interface BulkQuestionWithPassageRequest {
   chapterId?: string;
   passage?: PassageRequest;
   questions?: NormalQuestionRequest[];
+  /** Áp cho cả lô. */
+  usageScope?: QuestionUsageScope;
 }
 
 export interface QuestionAdminResponse {
@@ -139,6 +147,7 @@ export interface QuestionAdminResponse {
   examTypeId?: string;
   classId?: string;
   isBank?: boolean;
+  usageScope?: QuestionUsageScope;
   collectionId?: string;
   passage?: PassageResponse;
   passageMedia?: PassageMediaResponse[];

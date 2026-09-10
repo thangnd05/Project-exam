@@ -8,6 +8,7 @@ import { getTagsFlatByExamType } from '@/app/apis/tagApi';
 import { useQuestionCollections } from '@/app/hooks/useQuestionCollections';
 import { useUpdateQuestion } from '@/app/hooks/useUpdateQuestion';
 import { useDeletePassageMedia } from '@/app/hooks/useDeletePassageMedia';
+import { QuestionUsageScope } from '@/app/enums';
 import {
   getExtraTextContents,
   getPassageMediaItems,
@@ -41,6 +42,7 @@ type EditQuestionFormData = {
   questionText: string;
   explanation: string;
   isBank: boolean;
+  usageScope: QuestionUsageScope;
   passage: EditPassageForm;
   options: EditQuestionOption[];
 };
@@ -54,6 +56,7 @@ type UpdateQuestionPayload = {
   explanation: string;
   collectionId: string;
   isBank: boolean;
+  usageScope: QuestionUsageScope;
   tagIds: string[];
   answers: Array<AnswerRequest & { id: string | null }>;
   passage?: {
@@ -107,6 +110,7 @@ export function useEditQuestionModal({
     questionText: '',
     explanation: '',
     isBank: true,
+    usageScope: QuestionUsageScope.EXAM,
     passage: { ...EMPTY_PASSAGE },
     options: [],
   });
@@ -154,6 +158,7 @@ export function useEditQuestionModal({
             collectionId: questionDetail.collectionId || '',
             isBank:
               questionDetail.isBank !== undefined ? questionDetail.isBank : true,
+            usageScope: questionDetail.usageScope ?? QuestionUsageScope.EXAM,
             passage: questionDetail.passage
               ? {
                   passageType: questionDetail.passage.passageType || 'READING',
@@ -321,6 +326,7 @@ export function useEditQuestionModal({
       explanation: formData.explanation || '',
       collectionId: formData.collectionId ? String(formData.collectionId) : '',
       isBank: formData.isBank,
+      usageScope: formData.usageScope,
       answers: formData.options.map((opt) => ({
         id: opt.id,
         answerId: opt.id ?? undefined,

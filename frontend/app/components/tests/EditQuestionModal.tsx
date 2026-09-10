@@ -11,6 +11,7 @@ import classNames from 'classnames/bind';
 import { CheckCircle2, Pencil, Trash2 } from 'lucide-react';
 import { PassageMediaList } from './passageMedia';
 import { useEditQuestionModal } from '@/app/hooks/useEditQuestionModal';
+import { QuestionUsageScope } from '@/app/enums';
 import styles from './EditQuestionModal.module.scss';
 import createStyles from '@/app/components/tests/CreateTestModal.module.scss';
 
@@ -106,6 +107,27 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                     />
                   </Col>
                 )}
+
+                <Col md={12}>
+                  <label className={cx('formLabel')}>Mục đích sử dụng</label>
+                  <select
+                    className={cxCreate('inputModern')}
+                    value={formData.usageScope}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        usageScope: e.target.value as QuestionUsageScope,
+                      })
+                    }
+                  >
+                    <option value={QuestionUsageScope.EXAM}>
+                      Câu thi &mdash; chỉ dùng khi ra đề
+                    </option>
+                    <option value={QuestionUsageScope.PRACTICE}>
+                      Câu ôn tập &mdash; chỉ dùng cho lộ trình
+                    </option>
+                  </select>
+                </Col>
 
                 <Col md={12}>
                   <label className={cx('formLabel')}>Nguồn (Collection)</label>

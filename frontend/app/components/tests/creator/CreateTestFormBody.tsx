@@ -30,6 +30,7 @@ import CreateFromBankBody from './CreateFromBankBody';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
 import { buildCollectionTree } from '@/app/utils/collectionTree';
+import { QuestionUsageScope } from '@/app/enums';
 import styles from '../CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -534,6 +535,26 @@ const CreateTestFormBody = ({
                         {c.depth > 0 ? `    └ ${c.name}` : c.name}
                       </option>
                     ))}
+                  </select>
+                </div>
+              </Col>
+            )}
+            {(activeCreatorType === CREATOR_TYPES.BULK || activeCreatorType === CREATOR_TYPES.PASSAGE) && (
+              <Col md={4}>
+                <div className={cx('formGroupModern')}>
+                  <label>Mục đích sử dụng *</label>
+                  <select
+                    className={cx('inputModern')}
+                    value={testInfo.usageScope}
+                    onChange={(e) =>
+                      setTestInfo({
+                        ...testInfo,
+                        usageScope: e.target.value as QuestionUsageScope,
+                      })
+                    }
+                  >
+                    <option value={QuestionUsageScope.EXAM}>Câu thi (ra đề)</option>
+                    <option value={QuestionUsageScope.PRACTICE}>Câu ôn tập (lộ trình)</option>
                   </select>
                 </div>
               </Col>

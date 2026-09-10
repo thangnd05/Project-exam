@@ -1,4 +1,4 @@
-import { QuestionType, TestStatus } from '@/app/enums';
+import { QuestionType, QuestionUsageScope, TestStatus } from '@/app/enums';
 import type { PassageMediaResponse, PassageResponse, QuestionGroupAdminResponse } from './question';
 
 export interface AnswerResponse {
@@ -14,6 +14,7 @@ export interface QuestionResponse {
   questionText?: string;
   questionType?: QuestionType;
   isBank?: boolean;
+  usageScope?: QuestionUsageScope;
   passage?: PassageResponse;
   passageMedia?: PassageMediaResponse[];
   testPartId?: string;
