@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.BulkQuestionWithPass
 import com.project_exam.backend.modules.assessment.exam.dto.CreateQuestionAndAttachRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.NormalQuestionRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageQuestionGroupRequest;
+import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCreateRequest;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
@@ -185,6 +186,7 @@ public class QuestionController {
             @RequestParam String examPartId,
             @RequestParam(required = false) String classId,
             @RequestParam(required = false) String chapterId,
+            @RequestParam(required = false) Question.UsageScope usageScope,
             HttpServletRequest httpRequest
     ) throws IOException {
         String userId = authUtils.getUserId(httpRequest);
@@ -193,6 +195,7 @@ public class QuestionController {
                 examPartId,
                 classId,
                 chapterId,
+                usageScope,
                 userId
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(responses);

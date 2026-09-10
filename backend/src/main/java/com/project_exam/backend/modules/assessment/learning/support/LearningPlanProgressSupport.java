@@ -1,5 +1,6 @@
 package com.project_exam.backend.modules.assessment.learning.support;
 
+import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlan;
 import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanTask;
@@ -80,8 +81,10 @@ public class LearningPlanProgressSupport {
     private boolean hasQuestionsForTask(LearningPlanTask task) {
         PlanTaskType taskType = task.getTaskType() != null ? task.getTaskType() : PlanTaskType.TAG;
         if (taskType == PlanTaskType.TAG) {
-            return questionRepository.existsByTagAndExamPart(task.getTagId(), task.getExamPartId());
+            return questionRepository.existsByTagAndExamPart(
+                    task.getTagId(), task.getExamPartId(), Question.UsageScope.FOR_PRACTICE_NAMES);
         }
-        return questionRepository.existsByExamPartId(task.getExamPartId());
+        return questionRepository.existsByExamPartId(
+                task.getExamPartId(), Question.UsageScope.FOR_PRACTICE);
     }
 }

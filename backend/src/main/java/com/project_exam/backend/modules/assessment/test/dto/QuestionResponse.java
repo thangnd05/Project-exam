@@ -17,6 +17,7 @@ public class QuestionResponse {
     private String questionText;
     private Question.QuestionType questionType;
     private Boolean isBank;
+    private Question.UsageScope usageScope;
     private PassageResponse passage;
     private List<PassageMediaResponse> passageMedia;
     private String testPartId;

@@ -127,18 +127,18 @@ public class QuestionService {
         if (classId == null) {
             return questionRepository
                     .findByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
-                            examPartId, currentUserId);
+                            examPartId, currentUserId, Question.UsageScope.FOR_EXAM);
         }
 
         if (chapterId != null) {
             return questionRepository
                     .findByExamPartIdAndClassIdAndChapterId(
-                            examPartId, classId, chapterId);
+                            examPartId, classId, chapterId, Question.UsageScope.FOR_EXAM);
         }
 
         return questionRepository
                 .findByExamPartIdAndClassId(
-                        examPartId, classId);
+                        examPartId, classId, Question.UsageScope.FOR_EXAM);
     }
 
     private Map<String, Passage> loadPassagesById(List<Question> questions) {
@@ -246,7 +246,8 @@ public class QuestionService {
         if (adminIds.isEmpty()) {
             return Collections.emptyList();
         }
-        List<Question> questions = questionRepository.findAdminBankByExamPart(examPartId, adminIds);
+        List<Question> questions = questionRepository.findAdminBankByExamPart(
+                examPartId, adminIds, Question.UsageScope.FOR_EXAM);
         if (questions.isEmpty()) {
             return Collections.emptyList();
         }
@@ -258,7 +259,8 @@ public class QuestionService {
         if (adminIds.isEmpty()) {
             return 0L;
         }
-        return questionRepository.countAdminBankByExamPart(examPartId, adminIds);
+        return questionRepository.countAdminBankByExamPart(
+                examPartId, adminIds, Question.UsageScope.FOR_EXAM);
     }
 
     private Set<String> getAccessibleClassIds(String currentUserId) {
@@ -297,8 +299,10 @@ public class QuestionService {
         String resolvedClassId = resolveCurrentUserClassId(currentUserId, classId);
 
         List<Question> questions = (chapterId != null)
-                ? questionRepository.findByClassIdAndChapterIdAndCreatedByAndIsBankTrue(resolvedClassId, chapterId, currentUserId)
-                : questionRepository.findByClassIdAndCreatedByAndIsBankTrue(resolvedClassId, currentUserId);
+                ? questionRepository.findByClassIdAndChapterIdAndCreatedByAndIsBankTrue(
+                        resolvedClassId, chapterId, currentUserId, Question.UsageScope.FOR_EXAM)
+                : questionRepository.findByClassIdAndCreatedByAndIsBankTrue(
+                        resolvedClassId, currentUserId, Question.UsageScope.FOR_EXAM);
 
         if (questions.isEmpty()) {
             return List.of();
@@ -315,9 +319,11 @@ public class QuestionService {
         String resolvedClassId = resolveCurrentUserClassId(currentUserId, classId);
 
         if (chapterId != null) {
-            return questionRepository.countByClassIdAndChapterIdAndCreatedByAndIsBankTrue(resolvedClassId, chapterId, currentUserId);
+            return questionRepository.countByClassIdAndChapterIdAndCreatedByAndIsBankTrue(
+                    resolvedClassId, chapterId, currentUserId, Question.UsageScope.FOR_EXAM);
         }
-        return questionRepository.countByClassIdAndCreatedByAndIsBankTrue(resolvedClassId, currentUserId);
+        return questionRepository.countByClassIdAndCreatedByAndIsBankTrue(
+                resolvedClassId, currentUserId, Question.UsageScope.FOR_EXAM);
     }
 
     public List<NormalQuestionRequest> previewQuestionsFromDocument(MultipartFile file) throws IOException {
@@ -340,6 +346,7 @@ public class QuestionService {
             String examPartId,
             String classId,
             String chapterId,
+            Question.UsageScope usageScope,
             String currentUserId
     ) throws IOException {
         if (file == null || file.isEmpty()) {
@@ -354,7 +361,8 @@ public class QuestionService {
                 examPartId,
                 classId,
                 chapterId,
-                parsedQuestions
+                parsedQuestions,
+                resolveUsageScope(usageScope)
         );
 
         return createBulkQuestionsToBankNoPassage(bulkRequest, currentUserId, Collections.emptyMap());
@@ -406,6 +414,8 @@ public class QuestionService {
             question.setExplanation(parsedQuestion.getExplanation());
             question.setCreatedBy(currentUserId);
             question.setIsBank(Boolean.FALSE);
+            // Import gắn thẳng vào đề: câu thi.
+            question.setUsageScope(Question.UsageScope.EXAM);
             if (classId != null) {
                 question.setClassId(classId);
             }
@@ -502,14 +512,17 @@ public class QuestionService {
             classAccessGuard.requireMemberOrTeacher(classId, currentUserId);
             classAccessGuard.requireChapterInClass(chapterId, classId);
             if (chapterId != null) {
-                return questionRepository.countByExamPartIdAndClassIdAndChapterId(examPartId, classId, chapterId);
+                return questionRepository.countByExamPartIdAndClassIdAndChapterId(
+                        examPartId, classId, chapterId, Question.UsageScope.FOR_EXAM);
             }
-            return questionRepository.countByExamPartIdAndClassId(examPartId, classId);
+            return questionRepository.countByExamPartIdAndClassId(
+                    examPartId, classId, Question.UsageScope.FOR_EXAM);
         }
         if (chapterId != null) {
             throw new BadRequestException("Khi có chapterId thì phải có classId.");
         }
-        return questionRepository.countByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(examPartId, currentUserId);
+        return questionRepository.countByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
+                examPartId, currentUserId, Question.UsageScope.FOR_EXAM);
     }
 
     @Transactional
@@ -569,6 +582,7 @@ public class QuestionService {
             if (request.getChapterId() != null) question.setChapterId(request.getChapterId());
             if (qReq.getCollectionId() != null) question.setCollectionId(qReq.getCollectionId());
             question.setIsBank(Boolean.TRUE);
+            question.setUsageScope(resolveUsageScope(request.getUsageScope()));
             question.setQuestionNumber(resolveBankQuestionNumber(baseMax, qReq, batchIndex++));
             question = questionRepository.save(question);
 
@@ -613,6 +627,7 @@ public class QuestionService {
             question.setExplanation(qReq.getExplanation());
             question.setCreatedBy(currentUserId);
             question.setIsBank(Boolean.TRUE);
+            question.setUsageScope(resolveUsageScope(request.getUsageScope()));
 
             if (request.getClassId() != null)
                 question.setClassId(request.getClassId());
@@ -736,6 +751,8 @@ public class QuestionService {
         question.setExplanation(request.getExplanation());
         question.setCreatedBy(currentUserId);
         question.setIsBank(Boolean.FALSE);
+        // Câu viết thẳng vào một đề cụ thể thì đương nhiên là câu thi.
+        question.setUsageScope(Question.UsageScope.EXAM);
 
         if (request.getClassId() != null) question.setClassId(request.getClassId());
         if (request.getChapterId() != null) question.setChapterId(request.getChapterId());
@@ -976,6 +993,15 @@ public class QuestionService {
         return buildQuestionAdminResponse(question, passage, updatedAnswers);
     }
 
+    /**
+     * Lô cũ (client chưa gửi usageScope) mặc định là câu thi — giữ nguyên hành vi
+     * trước khi tách EXAM/PRACTICE, đừng đổi thành PRACTICE nếu không muốn câu cũ
+     * tự chui vào lộ trình.
+     */
+    private Question.UsageScope resolveUsageScope(Question.UsageScope requested) {
+        return requested != null ? requested : Question.UsageScope.EXAM;
+    }
+
     private void applyScalarFields(Question question, QuestionCreateRequest request) {
         if (request.getExamPartId() != null) question.setExamPartId(request.getExamPartId());
         if (request.getClassId() != null) question.setClassId(request.getClassId());
@@ -983,6 +1009,7 @@ public class QuestionService {
         if (request.getQuestionText() != null) question.setQuestionText(request.getQuestionText());
         if (request.getQuestionType() != null) question.setQuestionType(request.getQuestionType());
         if (request.getIsBank() != null) question.setIsBank(request.getIsBank());
+        if (request.getUsageScope() != null) question.setUsageScope(request.getUsageScope());
 
         if (request.getExplanation() != null) {
             question.setExplanation(request.getExplanation().isBlank() ? null : request.getExplanation());
@@ -1145,6 +1172,7 @@ public class QuestionService {
                 question.setExplanation(qReq.getExplanation());
                 question.setCreatedBy(currentUserId);
                 question.setIsBank(true);
+                question.setUsageScope(resolveUsageScope(request.getUsageScope()));
 
                 if (request.getClassId() != null)
                     question.setClassId(request.getClassId());
@@ -1189,11 +1217,13 @@ public class QuestionService {
         Integer max;
         if (classId != null && chapterId != null) {
             max = questionRepository.findMaxQuestionNumberByExamPartAndClassAndChapter(
-                    examPartId, classId, chapterId);
+                    examPartId, classId, chapterId, Question.UsageScope.FOR_EXAM);
         } else if (classId != null) {
-            max = questionRepository.findMaxQuestionNumberByExamPartAndClass(examPartId, classId);
+            max = questionRepository.findMaxQuestionNumberByExamPartAndClass(
+                    examPartId, classId, Question.UsageScope.FOR_EXAM);
         } else {
-            max = questionRepository.findMaxQuestionNumberPersonal(examPartId, createdBy);
+            max = questionRepository.findMaxQuestionNumberPersonal(
+                    examPartId, createdBy, Question.UsageScope.FOR_EXAM);
         }
         return max == null ? 0 : max;
     }

@@ -531,13 +531,14 @@ public class LearningPlanSessionService {
             String userId, String tagId, String examPartId, int count) {
         int poolSize = LearningPlanQuestionTargets.poolFetchSize(count);
         List<String> pool = questionRepository.findRandomQuestionIdsByTagAndExamPart(
-                tagId, examPartId, poolSize);
+                tagId, examPartId, Question.UsageScope.FOR_PRACTICE_NAMES, poolSize);
         return selectFromPool(userId, pool, count);
     }
 
     private List<String> pickQuestionsForPart(String userId, String examPartId, int count) {
         int poolSize = LearningPlanQuestionTargets.poolFetchSize(count);
-        List<String> pool = questionRepository.findRandomQuestionIdsByExamPartId(examPartId, poolSize);
+        List<String> pool = questionRepository.findRandomQuestionIdsByExamPartId(
+                examPartId, Question.UsageScope.FOR_PRACTICE_NAMES, poolSize);
         return selectFromPool(userId, pool, count);
     }
 

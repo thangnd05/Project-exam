@@ -154,16 +154,18 @@ public class TestQuestionAssignmentService {
             Set<String> adminIds = adminUserProvider.adminUserIds();
             candidates = adminIds.isEmpty()
                     ? new ArrayList<>()
-                    : new ArrayList<>(questionRepository.findAdminBankByExamPart(examPartId, adminIds));
+                    : new ArrayList<>(questionRepository.findAdminBankByExamPart(
+                            examPartId, adminIds, Question.UsageScope.FOR_EXAM));
         } else if (request.getClassId() != null && request.getChapterId() != null) {
             candidates = new ArrayList<>(questionRepository.findByExamPartIdAndClassIdAndChapterId(
-                    examPartId, request.getClassId(), request.getChapterId()));
+                    examPartId, request.getClassId(), request.getChapterId(),
+                    Question.UsageScope.FOR_EXAM));
         } else if (request.getClassId() != null) {
             candidates = new ArrayList<>(questionRepository.findByExamPartIdAndClassId(
-                    examPartId, request.getClassId()));
+                    examPartId, request.getClassId(), Question.UsageScope.FOR_EXAM));
         } else {
             candidates = new ArrayList<>(questionRepository.findByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
-                    examPartId, currentUserId));
+                    examPartId, currentUserId, Question.UsageScope.FOR_EXAM));
         }
 
         if (request.getCollectionId() != null && !request.getCollectionId().isBlank()) {

@@ -162,6 +162,7 @@ public class LearningMapper {
                 .questionText(q.getQuestionText())
                 .questionType(q.getQuestionType())
                 .isBank(q.getIsBank())
+                .usageScope(q.getUsageScope())
                 .passage(passage)
                 .answers(answers)
                 .build();

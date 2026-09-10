@@ -269,6 +269,7 @@ public class TestMapper {
                 .questionText(q.getQuestionText())
                 .questionType(q.getQuestionType())
                 .isBank(q.getIsBank())
+                .usageScope(q.getUsageScope())
                 .testPartId(testPartId)
                 .answers(answers)
                 .build();
@@ -327,6 +328,7 @@ public class TestMapper {
                 .examTypeId(examTypeId)
                 .classId(q.getClassId())
                 .isBank(q.getIsBank())
+                .usageScope(q.getUsageScope())
                 .answers(answers)
                 .build();
     }

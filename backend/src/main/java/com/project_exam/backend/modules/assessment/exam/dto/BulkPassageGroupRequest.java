@@ -1,5 +1,6 @@
 package com.project_exam.backend.modules.assessment.exam.dto;
 
+import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import lombok.Data;
 
 import java.util.List;
@@ -11,5 +12,8 @@ public class BulkPassageGroupRequest {
     private String chapterId;
 
     private List<PassageQuestionGroupRequest> groups;
+
+    /** Áp cho cả lô, xem ghi chú ở BulkQuestionWithPassageRequest. */
+    private Question.UsageScope usageScope;
 }
 
