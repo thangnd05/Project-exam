@@ -1,4 +1,4 @@
-package com.project_exam.backend.modules.audit.controller;
+package com.project_exam.backend.modules.admin.audit.controller;
 
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.audit.dto.AuditLogResponse;
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/audits")
+@RequestMapping("/api/admin/audits")
 @RequiredArgsConstructor
-public class AuditLogController {
+public class AuditLogAdminController {
 
     private final AuditLogService auditLogService;
     private final AuthUtils authUtils;

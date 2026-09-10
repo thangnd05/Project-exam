@@ -2,7 +2,7 @@ import axios from './axiosClient';
 import type { ExamPartRequest, ExamPartResponse } from '@/app/types';
 
 const BASE_URL = '/api/exam-parts';
-const ADMIN_BASE_URL = '/api/exam-parts';
+const ADMIN_BASE_URL = '/api/admin/exam-parts';
 
 export const getExamParts = (): Promise<ExamPartResponse[]> => {
   return axios.get(BASE_URL).then((response) => response.data);

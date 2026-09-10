@@ -80,19 +80,19 @@ export const getCategories = (): Promise<CategoryResponse[]> => {
 };
 
 export const createCategory = (data: CategoryRequest): Promise<CategoryResponse> => {
-  return axios.post('/api/categories', data).then((response) => response.data);
+  return axios.post('/api/admin/categories', data).then((response) => response.data);
 };
 
 export const updateCategory = (categoryId: string, data: CategoryRequest): Promise<CategoryResponse> => {
-  return axios.put(`/api/categories/${categoryId}`, data).then((response) => response.data);
+  return axios.put(`/api/admin/categories/${categoryId}`, data).then((response) => response.data);
 };
 
 export const deleteCategory = (categoryId: string): Promise<void> => {
-  return axios.delete(`/api/categories/${categoryId}`).then((response) => response.data);
+  return axios.delete(`/api/admin/categories/${categoryId}`).then((response) => response.data);
 };
 
 export const updatePostStatus = (postId: string, status: string): Promise<PostResponse> => {
-  return axios.patch(`${BASE_URL}/${postId}/status`, { status }).then((response) => response.data);
+  return axios.patch(`/api/admin/posts/${postId}/status`, { status }).then((response) => response.data);
 };
 
 export const deletePost = (postId: string): Promise<void> => {

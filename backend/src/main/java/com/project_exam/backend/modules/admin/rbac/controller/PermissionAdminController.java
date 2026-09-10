@@ -1,4 +1,4 @@
-package com.project_exam.backend.modules.users.rbac.controller;
+package com.project_exam.backend.modules.admin.rbac.controller;
 
 import com.project_exam.backend.modules.users.rbac.dto.PermissionResponse;
 import com.project_exam.backend.modules.users.rbac.repository.PermissionRepository;
@@ -15,9 +15,9 @@ import java.util.Comparator;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/permissions")
+@RequestMapping("/api/admin/permissions")
 @RequiredArgsConstructor
-public class PermissionController {
+public class PermissionAdminController {
 
     private final PermissionRepository permissionRepository;
     private final AuthUtils authUtils;

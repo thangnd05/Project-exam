@@ -1,4 +1,4 @@
-package com.project_exam.backend.modules.assessment.exam.controller;
+package com.project_exam.backend.modules.admin.exam.controller;
 
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerAdminResponse;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/answers")
+@RequestMapping("/api/admin/answers")
 @RequiredArgsConstructor
-public class AnswerController {
+public class AnswerAdminController {
     private final AnswerService answerService;
     private final AuthUtils authUtils;
 

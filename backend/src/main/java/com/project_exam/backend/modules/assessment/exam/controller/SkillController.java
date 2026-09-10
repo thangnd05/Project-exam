@@ -3,8 +3,6 @@ package com.project_exam.backend.modules.assessment.exam.controller;
 import com.project_exam.backend.modules.assessment.exam.dto.SkillRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.SkillResponse;
 import com.project_exam.backend.modules.assessment.exam.service.SkillService;
-import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +17,6 @@ import java.util.List;
 public class SkillController {
 
     private final SkillService skillService;
-    private final AuthUtils authUtils;
 
     @GetMapping
     public ResponseEntity<List<SkillResponse>> getAll() {
@@ -31,25 +28,4 @@ public class SkillController {
         return ResponseEntity.ok(skillService.findById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<SkillResponse> create(@Valid @RequestBody SkillRequest request) {
-        authUtils.requirePermission(PermissionCatalog.SKILL_MANAGE);
-        return ResponseEntity.status(HttpStatus.CREATED).body(skillService.create(request));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<SkillResponse> update(
-            @PathVariable String id,
-            @Valid @RequestBody SkillRequest request
-    ) {
-        authUtils.requirePermission(PermissionCatalog.SKILL_MANAGE);
-        return ResponseEntity.ok(skillService.update(id, request));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        authUtils.requirePermission(PermissionCatalog.SKILL_MANAGE);
-        skillService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
 }

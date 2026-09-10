@@ -2,6 +2,7 @@ import axios from './axiosClient';
 import type { RecoveryResourceRequest, RecoveryResourceResponse } from '@/app/types';
 
 const BASE_URL = '/api/recovery-resources';
+const ADMIN_BASE_URL = '/api/admin/recovery-resources';
 
 export const getAllResources = (): Promise<RecoveryResourceResponse[]> =>
   axios.get(BASE_URL).then((res) => res.data);
@@ -27,7 +28,7 @@ export const createResource = (request: RecoveryResourceRequest, file?: File | n
   fd.append('request', JSON.stringify(request));
   if (file) fd.append('file', file);
   return axios
-    .post(BASE_URL, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+    .post(ADMIN_BASE_URL, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
     .then((res) => res.data);
 };
 
@@ -37,14 +38,14 @@ export const updateResource = (resourceId: string, request: RecoveryResourceRequ
     fd.append('request', JSON.stringify(request));
     fd.append('file', file);
     return axios
-      .put(`${BASE_URL}/${resourceId}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
+      .put(`${ADMIN_BASE_URL}/${resourceId}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } })
       .then((res) => res.data);
   }
-  return axios.put(`${BASE_URL}/${resourceId}`, request).then((res) => res.data);
+  return axios.put(`${ADMIN_BASE_URL}/${resourceId}`, request).then((res) => res.data);
 };
 
 export const deleteResource = (resourceId: string): Promise<void> =>
-  axios.delete(`${BASE_URL}/${resourceId}`).then(() => {});
+  axios.delete(`${ADMIN_BASE_URL}/${resourceId}`).then(() => {});
 
 export const viewResourceContent = (resourceId: string): Promise<string> =>
   axios

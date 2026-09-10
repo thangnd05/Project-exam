@@ -1,7 +1,7 @@
 import axios from './axiosClient';
 import type { AuditLogResponse, PageResponse } from '@/app/types';
 
-const BASE_AUDIT_URL = '/api/audits';
+const BASE_AUDIT_URL = '/api/admin/audits';
 
 interface AuditLogListParams {
   page?: number;

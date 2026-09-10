@@ -2,6 +2,7 @@ import axios from './axiosClient';
 import type { ScoringConversionRequest, ScoringConversionResponse } from '@/app/types';
 
 const BASE_URL = '/api/scoring-conversions';
+const ADMIN_BASE_URL = '/api/admin/scoring-conversions';
 
 export const getScoringConversions = (): Promise<ScoringConversionResponse[]> => {
   return axios.get(BASE_URL).then((response) => response.data);
@@ -22,13 +23,13 @@ export const getScoringConversionsBySkill = (skillId?: string, examTypeId?: stri
 };
 
 export const createScoringConversion = (payload: ScoringConversionRequest): Promise<ScoringConversionResponse> => {
-  return axios.post(BASE_URL, payload).then((response) => response.data);
+  return axios.post(ADMIN_BASE_URL, payload).then((response) => response.data);
 };
 
 export const createScoringConversionsBulk = (payload: ScoringConversionRequest[]): Promise<ScoringConversionResponse[]> => {
-  return axios.post(`${BASE_URL}/bulk`, payload).then((response) => response.data);
+  return axios.post(`${ADMIN_BASE_URL}/bulk`, payload).then((response) => response.data);
 };
 
 export const deleteScoringConversion = (conversionId: string): Promise<void> => {
-  return axios.delete(`${BASE_URL}/${conversionId}`).then(() => {});
+  return axios.delete(`${ADMIN_BASE_URL}/${conversionId}`).then(() => {});
 };

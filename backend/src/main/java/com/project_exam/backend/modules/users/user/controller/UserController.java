@@ -7,7 +7,6 @@ import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.users.user.dto.UserResponse;
 import com.project_exam.backend.modules.users.user.service.UserService;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,24 +29,6 @@ public class UserController {
     private final UserService userService;
     private final ObjectMapper objectMapper;
     private final AuthUtils authUtils;
-
-    @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        authUtils.requirePermission(PermissionCatalog.USER_MANAGE);
-        return ResponseEntity.ok(userService.findAllResponses());
-    }
-
-    @GetMapping("/paged")
-    public ResponseEntity<PageResponse<UserResponse>> getUsersPaged(
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "20") Integer size,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String roleId,
-            @RequestParam(required = false) Boolean verified
-    ) {
-        authUtils.requirePermission(PermissionCatalog.USER_MANAGE);
-        return ResponseEntity.ok(userService.findAllPaged(page, size, keyword, roleId, verified));
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(
@@ -83,14 +64,6 @@ public class UserController {
     ) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(userService.getMyActivity(userId, month, year));
-    }
-
-    @PostMapping
-    public ResponseEntity<UserResponse> createUser(
-            @Valid @RequestBody UserUpsertRequest request
-    ) {
-        authUtils.requirePermission(PermissionCatalog.USER_MANAGE);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

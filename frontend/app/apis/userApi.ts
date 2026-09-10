@@ -8,6 +8,7 @@ import type {
 } from '@/app/types';
 
 const BASE_URL = '/api/users';
+const ADMIN_BASE_URL = '/api/admin/users';
 
 interface UserListParams {
   page?: number;
@@ -32,12 +33,12 @@ export const getUsers = ({page = 0, size = 10, keyword, roleId, verified}: UserL
   }
 
   return axios
-    .get(`${BASE_URL}/paged?${params.toString()}`)
+    .get(`${ADMIN_BASE_URL}/paged?${params.toString()}`)
     .then((response) => response.data);
 };
 
 export const createUser = (payload: UserUpsertRequest): Promise<UserResponse> => {
-  return axios.post(BASE_URL, payload).then((response) => response.data);
+  return axios.post(ADMIN_BASE_URL, payload).then((response) => response.data);
 };
 
 export const deleteUser = (userId: string): Promise<void> => {

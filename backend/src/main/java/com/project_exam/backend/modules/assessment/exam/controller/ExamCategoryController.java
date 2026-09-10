@@ -3,8 +3,6 @@ package com.project_exam.backend.modules.assessment.exam.controller;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamCategoryRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamCategoryResponse;
 import com.project_exam.backend.modules.assessment.exam.service.ExamCategoryService;
-import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +17,6 @@ import java.util.List;
 public class ExamCategoryController {
 
     private final ExamCategoryService examCategoryService;
-    private final AuthUtils authUtils;
 
     @GetMapping
     public ResponseEntity<List<ExamCategoryResponse>> getAll() {
@@ -36,25 +33,4 @@ public class ExamCategoryController {
         return ResponseEntity.ok(examCategoryService.findByCode(code));
     }
 
-    @PostMapping
-    public ResponseEntity<ExamCategoryResponse> create(@Valid @RequestBody ExamCategoryRequest request) {
-        authUtils.requirePermission(PermissionCatalog.EXAM_CATEGORY_MANAGE);
-        return ResponseEntity.status(HttpStatus.CREATED).body(examCategoryService.create(request));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ExamCategoryResponse> update(
-            @PathVariable String id,
-            @Valid @RequestBody ExamCategoryRequest request
-    ) {
-        authUtils.requirePermission(PermissionCatalog.EXAM_CATEGORY_MANAGE);
-        return ResponseEntity.ok(examCategoryService.update(id, request));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        authUtils.requirePermission(PermissionCatalog.EXAM_CATEGORY_MANAGE);
-        examCategoryService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
 }

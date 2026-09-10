@@ -21,7 +21,7 @@ interface TestPagingParams {
 }
 
 export const getAdminTests = (): Promise<TestAdminResponse[]> => {
-  return axios.get(`${BASE_URL}/admin`).then((res) => res.data);
+  return axios.get('/api/admin/tests').then((res) => res.data);
 };
 
 export const getMyTests = ({ page = 0, size = 12 }: TestPagingParams = {}): Promise<PageResponse<TestResponse>> => {

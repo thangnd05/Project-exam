@@ -186,26 +186,10 @@ public class TestController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/admin")
-    public List<TestAdminResponse> getAllTestsByAdmin() {
-        authUtils.requirePermission(PermissionCatalog.TEST_MANAGE);
-        return testService.getAllTestsByAdmin();
-    }
-
     @GetMapping("/my")
     public List<TestResponse> getMyTests(HttpServletRequest request) {
         String userId = authUtils.getUserId(request);
         return testService.getTestsByUser(userId);
-    }
-
-    @GetMapping("/admin/by-exam-type/{examTypeId}")
-    public ResponseEntity<List<TestAdminResponse>> getAdminTestsByExamType(@PathVariable String examTypeId) {
-        authUtils.requirePermission(PermissionCatalog.TEST_MANAGE);
-        List<TestAdminResponse> adminTests = testService.getAllTestsByAdmin()
-                .stream()
-                .filter(t -> t.getExamTypeId().equals(examTypeId))
-                .toList();
-        return ResponseEntity.ok(adminTests);
     }
 
     @GetMapping("/user/by-exam-type/{examTypeId}")

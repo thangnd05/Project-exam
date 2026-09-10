@@ -14,7 +14,6 @@ import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,12 +47,6 @@ public class UserTestController {
 
     @Value("${app.frontend.origin}")
     private String frontendOrigin;
-
-    @GetMapping
-    public ResponseEntity<List<UserTestResponse>> getAll() {
-        authUtils.requirePermission(PermissionCatalog.ATTEMPT_MANAGE);
-        return ResponseEntity.ok(userTestService.findAllResponses());
-    }
 
     @GetMapping("/{userTestId}")
     public ResponseEntity<UserTestResponse> getUserTestById(

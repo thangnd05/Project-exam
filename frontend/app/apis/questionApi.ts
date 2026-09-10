@@ -14,6 +14,8 @@ import type {
 } from '@/app/types';
 
 const BASE_URL = '/api/questions';
+// Mặt quản trị tách controller riêng ở backend (QuestionAdminController).
+const ADMIN_BASE_URL = '/api/admin/questions';
 const MULTIPART = { headers: { 'Content-Type': 'multipart/form-data' } };
 
 interface QuestionBankFilterParams {
@@ -76,11 +78,11 @@ export const UNCLASSIFIED_COLLECTION = '__NONE__';
 export const searchAdminQuestions = (
   params: AdminQuestionSearchParams = {},
 ): Promise<PageResponse<AdminQuestionListItem>> => {
-  return axios.get(`${BASE_URL}/admin/search`, { params }).then((res) => res.data);
+  return axios.get(`${ADMIN_BASE_URL}/search`, { params }).then((res) => res.data);
 };
 
 export const bulkUpdateQuestions = (
   payload: BulkUpdateQuestionsRequest,
 ): Promise<BulkUpdateQuestionsResponse> => {
-  return axios.patch(`${BASE_URL}/admin/bulk`, payload).then((res) => res.data);
+  return axios.patch(`${ADMIN_BASE_URL}/bulk`, payload).then((res) => res.data);
 };
