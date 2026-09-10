@@ -31,6 +31,7 @@ const routes = {
   adminClasses: '/admin/classes',
   adminTests: '/admin/tests',
   adminCategories: '/admin/categories',
+  adminQuestions: '/admin/questions',
   adminQuestionCollections: '/admin/question-collections',
   adminPosts: '/admin/posts',
   adminMilestones: '/admin/milestones',

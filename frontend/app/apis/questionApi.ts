@@ -1,7 +1,12 @@
 import type { AxiosRequestConfig } from 'axios';
 import axios from './axiosClient';
 import type {
+  AdminQuestionListItem,
+  AdminQuestionSearchParams,
+  BulkUpdateQuestionsRequest,
+  BulkUpdateQuestionsResponse,
   NormalQuestionRequest,
+  PageResponse,
   PassageQuestionGroupRequest,
   QuestionAdminResponse,
   QuestionCreateRequest,
@@ -63,4 +68,19 @@ export const bulkCreateQuestions = (formData: FormData): Promise<QuestionAdminRe
 
 export const bulkCreateQuestionGroups = (formData: FormData): Promise<QuestionAdminResponse[]> => {
   return axios.post(`${BASE_URL}/bulk-groups`, formData, MULTIPART).then((res) => res.data);
+};
+
+/** Giá trị collectionId đặc biệt để lọc nhóm câu chưa xếp bộ sưu tập. */
+export const UNCLASSIFIED_COLLECTION = '__NONE__';
+
+export const searchAdminQuestions = (
+  params: AdminQuestionSearchParams = {},
+): Promise<PageResponse<AdminQuestionListItem>> => {
+  return axios.get(`${BASE_URL}/admin/search`, { params }).then((res) => res.data);
+};
+
+export const bulkUpdateQuestions = (
+  payload: BulkUpdateQuestionsRequest,
+): Promise<BulkUpdateQuestionsResponse> => {
+  return axios.patch(`${BASE_URL}/admin/bulk`, payload).then((res) => res.data);
 };

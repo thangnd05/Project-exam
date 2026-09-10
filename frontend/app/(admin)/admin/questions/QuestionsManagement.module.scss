@@ -1,0 +1,190 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+// ------------------------------------------------------------------ bộ lọc
+
+.filterRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filterInput {
+  flex: 1 1 18rem;
+  min-width: 0;
+  padding: 0.9rem 1.2rem;
+  border: 1px solid var(--gray-200);
+  border-radius: 0.8rem;
+  background: var(--bg-white);
+  color: var(--text-color);
+  font-size: var(--font-size-smd);
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-alpha-35);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background: var(--gray-50);
+    color: var(--gray-500);
+  }
+}
+
+.errorBox {
+  padding: 1.2rem 1.6rem;
+  border: 1px solid var(--red-200);
+  border-radius: 0.8rem;
+  background: var(--red-50);
+  color: var(--red-700);
+  font-size: var(--font-size-smd);
+}
+
+// -------------------------------------------------------------- ô trong bảng
+
+.checkbox {
+  width: 1.7rem;
+  height: 1.7rem;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.questionCell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  // Nội dung câu là cột co giãn, chặn để bảng không bị kéo ngang vô hạn.
+  max-width: 60rem;
+}
+
+.questionText {
+  color: var(--text-color);
+  line-height: 1.45;
+}
+
+.questionMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--font-size-sm);
+  color: var(--gray-500);
+}
+
+.tagChip {
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  background: var(--brand-50);
+  color: var(--accent-act-color);
+  font-weight: 500;
+}
+
+.stackedCell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.muted {
+  color: var(--gray-500);
+  font-size: var(--font-size-sm);
+}
+
+.scopePill {
+  display: inline-block;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  background: var(--gray-100);
+  color: var(--gray-700);
+
+  &.practice {
+    background: var(--amber-100);
+    color: var(--amber-700);
+  }
+}
+
+.rowBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.2rem;
+  height: 3.2rem;
+  border: 1px solid var(--gray-200);
+  border-radius: 0.7rem;
+  background: var(--bg-white);
+  color: var(--gray-700);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: var(--gray-50);
+    color: var(--accent-act-color);
+    border-color: var(--primary);
+  }
+
+  &.danger:hover {
+    background: var(--red-50);
+    border-color: var(--red-400);
+    color: var(--red-600);
+  }
+}
+
+// ------------------------------------------------------ modal sửa hàng loạt
+
+.bulkForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+.bulkIntro {
+  margin: 0;
+  font-size: var(--font-size-smd);
+  color: var(--gray-700);
+  line-height: 1.5;
+}
+
+.bulkField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  label {
+    font-size: var(--font-size-smd);
+    font-weight: 600;
+    color: var(--text-color);
+  }
+}
+
+.bulkInput {
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--gray-200);
+  border-radius: 0.8rem;
+  background: var(--bg-white);
+  color: var(--text-color);
+  font-size: var(--font-size-smd);
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-alpha-35);
+  }
+}
+
+.bulkError {
+  padding: 1rem 1.2rem;
+  border-radius: 0.8rem;
+  background: var(--red-50);
+  color: var(--red-700);
+  font-size: var(--font-size-smd);
+}

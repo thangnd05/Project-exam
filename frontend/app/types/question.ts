@@ -155,6 +155,50 @@ export interface QuestionAdminResponse {
   tags?: TagResponse[];
 }
 
+/** Một dòng trong bảng quản lý câu hỏi của admin (không kèm đáp án/passage). */
+export interface AdminQuestionListItem {
+  questionId: string;
+  questionNumber?: number;
+  questionText?: string;
+  questionType?: QuestionType;
+  usageScope?: QuestionUsageScope;
+  isBank?: boolean;
+  createdAt?: string;
+  examPartId?: string;
+  examPartName?: string;
+  examTypeId?: string;
+  examTypeName?: string;
+  collectionId?: string;
+  collectionName?: string;
+  tagNames?: string[];
+}
+
+export interface AdminQuestionSearchParams {
+  examTypeId?: string;
+  examPartId?: string;
+  collectionId?: string;
+  usageScope?: QuestionUsageScope;
+  questionType?: QuestionType;
+  isBank?: boolean;
+  keyword?: string;
+  page?: number;
+  size?: number;
+}
+
+/** null/undefined ở mỗi trường = giữ nguyên; clearCollection = gỡ khỏi bộ sưu tập. */
+export interface BulkUpdateQuestionsRequest {
+  questionIds: string[];
+  usageScope?: QuestionUsageScope | null;
+  collectionId?: string | null;
+  clearCollection?: boolean;
+  isBank?: boolean | null;
+}
+
+export interface BulkUpdateQuestionsResponse {
+  updatedCount: number;
+  missingQuestionIds?: string[];
+}
+
 export interface QuestionGroupAdminResponse {
   passage?: PassageResponse;
   questions?: QuestionAdminResponse[];

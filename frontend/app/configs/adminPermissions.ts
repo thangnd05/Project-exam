@@ -19,6 +19,7 @@ export const adminPermissionByPath: Record<string, PermissionCode> = {
   '/admin/audit-login': P.AUDIT_VIEW,
   '/admin/categories': P.POST_CATEGORY_MANAGE,
   '/admin/posts': P.POST_MODERATE,
+  '/admin/questions': P.QUESTION_MANAGE,
   '/admin/question-collections': P.QUESTION_COLLECTION_MANAGE,
   '/admin/tags': P.TAG_MANAGE,
   '/admin/recovery-resources': P.RECOVERY_RESOURCE_MANAGE,
