@@ -10,7 +10,12 @@ import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCreateRequest;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
+import com.project_exam.backend.modules.assessment.exam.dto.AdminQuestionListItemResponse;
+import com.project_exam.backend.modules.assessment.exam.dto.BulkUpdateQuestionsRequest;
+import com.project_exam.backend.modules.assessment.exam.dto.BulkUpdateQuestionsResponse;
+import com.project_exam.backend.modules.assessment.exam.service.AdminQuestionService;
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +38,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class QuestionController {
     private final QuestionService questionService;
+    private final AdminQuestionService adminQuestionService;
     private final ObjectMapper objectMapper;
     private final AuthUtils authUtils;
 
@@ -40,6 +46,37 @@ public class QuestionController {
     public ResponseEntity<List<QuestionAdminResponse>> getAllQuestions() {
         authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         return ResponseEntity.ok(questionService.findAllAdminSummaries());
+    }
+
+    /**
+     * Bảng quản lý câu hỏi của admin: phân trang + lọc. Khác {@code GET /api/questions}
+     * ở chỗ không trả toàn bộ ngân hàng về một lượt.
+     */
+    @GetMapping("/admin/search")
+    public ResponseEntity<PageResponse<AdminQuestionListItemResponse>> searchForAdmin(
+            @RequestParam(required = false) String examTypeId,
+            @RequestParam(required = false) String examPartId,
+            @RequestParam(required = false) String collectionId,
+            @RequestParam(required = false) Question.UsageScope usageScope,
+            @RequestParam(required = false) Question.QuestionType questionType,
+            @RequestParam(required = false) Boolean isBank,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
+        return ResponseEntity.ok(adminQuestionService.search(
+                examTypeId, examPartId, collectionId, usageScope, questionType, isBank,
+                keyword, page, size));
+    }
+
+    /** Sửa hàng loạt thuộc tính chung (mục đích sử dụng, bộ sưu tập, cờ kho). */
+    @PatchMapping("/admin/bulk")
+    public ResponseEntity<BulkUpdateQuestionsResponse> bulkUpdateForAdmin(
+            @Valid @RequestBody BulkUpdateQuestionsRequest request
+    ) {
+        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
+        return ResponseEntity.ok(adminQuestionService.bulkUpdate(request));
     }
 
     @GetMapping("/{id}")

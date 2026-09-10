@@ -2,6 +2,7 @@ package com.project_exam.backend.modules.assessment.exam.repository;
 
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -21,7 +22,7 @@ import java.util.List;
  * cái kia thì UI báo kho có N câu nhưng bốc ra được ít hơn — luôn sửa theo cặp.
  */
 @Repository
-public interface QuestionRepository extends JpaRepository<Question, String> {
+public interface QuestionRepository extends JpaRepository<Question, String>, JpaSpecificationExecutor<Question> {
 
     List<Question> findByExamPartId(String examPartId);
     List<Question> findByPassageId(String passageId);
