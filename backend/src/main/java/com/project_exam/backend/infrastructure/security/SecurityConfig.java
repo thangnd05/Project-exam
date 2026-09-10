@@ -127,6 +127,17 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
+                        // Luật khớp theo THỨ TỰ, cái đầu tiên trúng là thắng. Chốt chặn
+                        // /api/admin/** phải đứng trên mọi permitAll bên dưới: các permitAll
+                        // đó dùng prefix rộng (/api/tests/**, /api/exam-types/**...), nên nếu
+                        // để sau, chỉ cần ai đó thêm một prefix chạm vào /api/admin là toàn bộ
+                        // bề mặt quản trị thành public mà không ai nhận ra.
+                        //
+                        // Đây CHỈ là chốt "phải đăng nhập". Quyền cụ thể vẫn do RBAC quyết
+                        // trong từng method (authUtils.requirePermission) — xem ghi chú ở
+                        // package com.project_exam.backend.modules.admin.
+                        .requestMatchers("/api/admin/**").authenticated()
+
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/exam-types/**",
