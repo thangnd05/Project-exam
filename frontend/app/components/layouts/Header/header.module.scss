@@ -273,19 +273,20 @@
 }
 
 .username {
+  display: block;
+  max-width: 120px;
   font-weight: 600;
   font-size: var(--font-size-md);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--text-on-dark);
 }
 
 .userNameWrapper {
-  display: none;
+  display: flex;
   align-items: center;
-
-  @media (min-width: 1400px) {
-    display: flex;
-  }
+  min-width: 0;
 }
 
 .custom-dropdown {
@@ -446,8 +447,9 @@
     gap: 10px;
   }
 
-  .userNameWrapper {
-    display: none;
+  // Header chật ở khoảng này: thu hẹp tên thay vì ẩn hẳn
+  .username {
+    max-width: 80px;
   }
 
   .brandName {
