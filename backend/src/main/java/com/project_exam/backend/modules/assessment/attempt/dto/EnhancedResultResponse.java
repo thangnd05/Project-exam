@@ -18,6 +18,8 @@ public class EnhancedResultResponse {
 
     private String examCategoryCode;
     private String examTypeId;
+    /** Thang điểm của loại đề (DEFAULT, TOEIC_SCALE, AWS_SCALE) để FE hiển thị đúng trần/sàn điểm. */
+    private String scoringMethod;
 
     private List<PartBreakdownResponse> partBreakdown;
 

@@ -130,6 +130,12 @@
         letter-spacing: -1px;
         margin: 0 auto;
     }
+
+    .scale-hint {
+        margin-top: 6px;
+        font-size: 1.3rem;
+        color: var(--text-secondary);
+    }
 }
 
 .stats-grid {

@@ -7,15 +7,18 @@ import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import { useTargetAchieved } from '@/app/hooks/useTargetAchieved';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import { getScoreScale } from '@/app/utils/scoreScale';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
 
-function suggestNextTarget(current: number | null | undefined): number | null {
+/** Mốc gợi ý kế tiếp, chặn theo trần thang điểm của loại đề (AWS là 1000, không phải 990). */
+function suggestNextTarget(current: number | null | undefined, maxScore: number): number | null {
   if (current == null) return null;
+  if (current >= maxScore) return null;
   const step = 50;
-  const next = Math.min(990, Math.round((current + step) / 10) * 10);
-  return next > current ? next : current + 10;
+  const next = Math.min(maxScore, Math.round((current + step) / 10) * 10);
+  return next > current ? next : Math.min(maxScore, current + 10);
 }
 
 function TargetAchieved() {
@@ -33,10 +36,17 @@ function TargetAchieved() {
     enhanced && (!enhanced.examTypeId || enhanced.examTypeId === examTypeId);
   const isAchieved = Boolean(target?.achievedAt)
     || (enhancedMatches && enhanced?.isTargetMet === true);
+  const scoreScale = useMemo(
+    () => getScoreScale(examTypes.find((et) => et.examTypeId === examTypeId)?.scoringMethod),
+    [examTypes, examTypeId],
+  );
   const nextSuggestion = useMemo(() => {
     if (!target?.targetScore) return null;
-    return suggestNextTarget(target.targetScore);
-  }, [target]);
+    return suggestNextTarget(target.targetScore, scoreScale.max);
+  }, [target, scoreScale]);
+  const stretchSuggestion = nextSuggestion != null
+    ? Math.min(scoreScale.max, nextSuggestion + 50)
+    : null;
 
   return (
     <div className={cx('wrapper')}>
@@ -136,10 +146,10 @@ function TargetAchieved() {
                   </div>
                   <div className={cx('suggestCard')}>
                     <div className={cx('suggestLabel')}>Vượt xa hơn</div>
-                    <div className={cx('suggestValue')}>{Math.min(990, nextSuggestion + 50)}</div>
+                    <div className={cx('suggestValue')}>{stretchSuggestion}</div>
                     <ButtonPrime
                       as="link"
-                      href={`/my-target?examTypeId=${examTypeId}&suggest=${Math.min(990, nextSuggestion + 50)}`}
+                      href={`/my-target?examTypeId=${examTypeId}&suggest=${stretchSuggestion}`}
                       variant="outline"
                       size="sm"
                     >

@@ -50,9 +50,10 @@ function formatDuration(seconds: number | null | undefined): string {
 type MockHistoryPanelProps = {
   examTypeId: string;
   examTypeName?: string;
+  scoringMethod?: string | null;
 };
 
-function MockHistoryPanel({ examTypeId, examTypeName }: MockHistoryPanelProps) {
+function MockHistoryPanel({ examTypeId, examTypeName, scoringMethod }: MockHistoryPanelProps) {
   const [tableOpen, setTableOpen] = useState(false);
   const [page, setPage] = useState(0);
 
@@ -178,6 +179,7 @@ function MockHistoryPanel({ examTypeId, examTypeName }: MockHistoryPanelProps) {
             targetScore={targetScore}
             loading={chartLoading}
             examTypeName={examTypeName || ''}
+            scoringMethod={scoringMethod}
           />
         )}
 

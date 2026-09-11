@@ -94,10 +94,11 @@ function TargetDashboard() {
   }, [target, examParts]);
 
   const readinessLevel = enhancedMatchesType ? latestEnhanced?.readinessLevel : null;
-  const examTypeName = useMemo(
-    () => examTypes.find((et) => et.examTypeId === examTypeId)?.name || '',
+  const selectedExamType = useMemo(
+    () => examTypes.find((et) => et.examTypeId === examTypeId),
     [examTypes, examTypeId],
   );
+  const examTypeName = selectedExamType?.name || '';
 
   return (
     <div className={cx('wrapper')}>
@@ -264,7 +265,11 @@ function TargetDashboard() {
       )}
 
       {!loading && (
-        <MockHistoryPanel examTypeId={examTypeId} examTypeName={examTypeName} />
+        <MockHistoryPanel
+          examTypeId={examTypeId}
+          examTypeName={examTypeName}
+          scoringMethod={selectedExamType?.scoringMethod}
+        />
       )}
 
       {!loading && (
