@@ -8,7 +8,7 @@ import { getTagsFlatByExamType } from '@/app/apis/tagApi';
 import { useQuestionCollections } from '@/app/hooks/useQuestionCollections';
 import { useUpdateQuestion } from '@/app/hooks/useUpdateQuestion';
 import { useDeletePassageMedia } from '@/app/hooks/useDeletePassageMedia';
-import { QuestionUsageScope } from '@/app/enums';
+import { QuestionType, QuestionUsageScope } from '@/app/enums';
 import {
   getExtraTextContents,
   getPassageMediaItems,
@@ -236,13 +236,15 @@ export function useEditQuestionModal({
     setExtraContents((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  const isMsq = formData.questionType === QuestionType.MSQ;
+
   const handleOptionChange = (
     idx: number,
     field: 'isCorrect' | 'content',
     value: boolean | string,
   ) => {
     const updated = [...formData.options];
-    if (field === 'isCorrect' && value) {
+    if (field === 'isCorrect' && !isMsq && value) {
       for (let i = 0; i < updated.length; i += 1) {
         updated[i] = { ...updated[i], isCorrect: i === idx };
       }
@@ -250,6 +252,24 @@ export function useEditQuestionModal({
       updated[idx] = { ...updated[idx], [field]: value } as EditQuestionOption;
     }
     setFormData({ ...formData, options: updated });
+  };
+
+  const toggleMsq = (checked: boolean) => {
+    setFormData((prev) => {
+      if (checked) {
+        return { ...prev, questionType: QuestionType.MSQ };
+      }
+      // MSQ -> MCQ: chỉ giữ lại đáp án đúng đầu tiên
+      const firstCorrect = prev.options.findIndex((opt) => opt.isCorrect);
+      return {
+        ...prev,
+        questionType: QuestionType.MCQ,
+        options: prev.options.map((opt, i) => ({
+          ...opt,
+          isCorrect: i === firstCorrect,
+        })),
+      };
+    });
   };
 
   const addAnswer = () => {
@@ -317,6 +337,12 @@ export function useEditQuestionModal({
   };
 
   const handleSave = () => {
+    const correctCount = formData.options.filter((opt) => opt.isCorrect).length;
+    if (correctCount === 0) {
+      toast.warning('Vui lòng chọn ít nhất một đáp án đúng.');
+      return;
+    }
+
     const payload: UpdateQuestionPayload = {
       classId: formData.classId ? String(formData.classId) : null,
       examPartId: formData.examPartId ? String(formData.examPartId) : null,
@@ -403,6 +429,8 @@ export function useEditQuestionModal({
     addExtraContent,
     updateExtraContent,
     removeExtraContent,
+    isMsq,
+    toggleMsq,
     handleOptionChange,
     addAnswer,
     removeAnswer,

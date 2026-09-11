@@ -32,9 +32,30 @@ import java.util.regex.Pattern;
 public class QuestionDocumentImportService {
     private static final Logger log = LoggerFactory.getLogger(QuestionDocumentImportService.class);
 
-    private static final List<String> ALLOWED_LABELS = List.of("A", "B", "C", "D");
+    private static final List<String> ALLOWED_LABELS =
+            List.of("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
 
-    private static final String ALLOWED_LABEL_CLASS = "[A-D]";
+    private static final String ALLOWED_LABEL_CLASS =
+            "[" + ALLOWED_LABELS.get(0) + "-" + ALLOWED_LABELS.get(ALLOWED_LABELS.size() - 1) + "]";
+
+    /**
+     * Nhãn dễ nhầm với chữ thường trong câu: "I" vừa là đại từ tiếng Anh vừa là số La Mã.
+     * Nhãn này chỉ được chấp nhận khi có dấu ngăn rõ ràng ("I." / "I)" ), không chấp nhận
+     * dạng trần "I nội dung".
+     */
+    private static final String AMBIGUOUS_BARE_LABEL = "I";
+
+    /** Lớp nhãn dùng cho dạng trần (không dấu ngăn) - trừ {@link #AMBIGUOUS_BARE_LABEL}. */
+    private static final String BARE_LABEL_CLASS =
+            "[" + ALLOWED_LABELS.get(0) + "-" + ALLOWED_LABELS.get(ALLOWED_LABELS.size() - 1)
+                    + "&&[^" + AMBIGUOUS_BARE_LABEL + "]]";
+
+    /**
+     * Số lựa chọn của một bộ đáp án "đầy đủ" thông thường (A-D).
+     * Dùng cho heuristic nhận biết câu hỏi đã đủ đáp án; tách khỏi {@link #ALLOWED_LABELS}
+     * để việc hỗ trợ thêm nhãn E-J không làm đổi hành vi của tài liệu 4 đáp án.
+     */
+    private static final int FULL_OPTION_SET_SIZE = 4;
 
     private static final String QUESTION_KEYWORDS = "Câu|Question|Bài";
 
@@ -52,9 +73,14 @@ public class QuestionDocumentImportService {
     private static final List<String> SKIPPABLE_PREFIXES = List.of(
             "part ",
             "choose the correct answer",
-            "choose a, b, c, or d",
-            "i."
+            "choose a, b, c, or d"
     );
+
+    /**
+     * Tiêu đề đánh số La Mã ("I. LISTENING"). Chỉ bỏ qua khi KHÔNG đang ở giữa bộ đáp án
+     * của một câu hỏi, vì "I." cũng có thể là nhãn đáp án thứ 9.
+     */
+    private static final String ROMAN_SECTION_PREFIX = "i.";
 
     private static final List<String> SKIPPABLE_CONTAINS = List.of(
             "reading & writing",
@@ -72,14 +98,25 @@ public class QuestionDocumentImportService {
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
+    /**
+     * Dấu ngăn giữa nhãn đáp án và nội dung. Gạch nối chỉ tính là dấu ngăn khi KHÔNG dính
+     * liền chữ cái, để "E-mail" / "A-list" không bị hiểu nhầm thành nhãn đáp án.
+     */
+    private static final String OPTION_DELIMITER = "(?:[\\.\\):]|-(?!\\p{L}))(?![-_]{2,})";
+
+    /** Chặn các viết tắt dễ nhầm với nhãn đáp án: "A.M.", "e.g.", "i.e." */
+    private static final String NOT_ABBREVIATION = "(?![MmGgEe]\\.)";
+
     private static final Pattern OPTION_PATTERN = Pattern.compile(
-            "^\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?(?:\\s*[\\.\\):\\-](?![-_]{2,})|\\s+(?![-_]{2,}))\\s*(.*)$",
+            "^\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?"
+                    + "(?:\\s*" + OPTION_DELIMITER + NOT_ABBREVIATION
+                    + "|(?<!" + AMBIGUOUS_BARE_LABEL + ")\\s+(?![-_]{2,}))\\s*(.*)$",
             Pattern.CASE_INSENSITIVE
     );
 
     private static final Pattern OPTION_LABEL_START = Pattern.compile(
-            "(?:^|\\s)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s*[\\.\\):\\-](?![-_]{2,})(?![Mm]\\.)"
-                    + "|(?:^|\\s{2,}|\\t)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s+(?![-_]{2,})",
+            "(?:^|\\s)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s*" + OPTION_DELIMITER + NOT_ABBREVIATION
+                    + "|(?:^|\\s{2,}|\\t)\\s*\\(?(" + BARE_LABEL_CLASS + ")\\)?\\s+(?![-_]{2,})",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -112,6 +149,12 @@ public class QuestionDocumentImportService {
             "^\\s*(?:Tags?|Thẻ|Nhãn)\\s*[:\\-]\\s*(.*)$",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
+
+    /** Độ dài tối đa của phần "Tags: ..." bị gộp chung dòng tiêu đề câu mới được coi là tag. */
+    private static final int MAX_INLINE_TAG_SPEC_LENGTH = 200;
+
+    /** Dấu hiệu phần text là câu văn (đề câu) chứ không phải danh sách tên tag. */
+    private static final Pattern SENTENCE_BREAK_PATTERN = Pattern.compile("[.?!]\\s");
 
     private static final Pattern TRANSLATION_START_PATTERN = Pattern.compile(
             "^\\s*(?:Dịch(?:\\s*nghĩa)?|Bản\\s*dịch|Translation)\\s*[:\\.\\-]?\\s*(.*)$",
@@ -493,7 +536,8 @@ public class QuestionDocumentImportService {
             }
 
             String text = pl.text;
-            if (isSkippableLine(text)) {
+            boolean insideQuestionOptions = currentQuestion != null && !currentQuestion.options.isEmpty();
+            if (isSkippableLine(text, insideQuestionOptions)) {
                 return;
             }
 
@@ -539,7 +583,9 @@ public class QuestionDocumentImportService {
                 pendingText.setLength(0);
                 pendingTranslation.setLength(0);
                 pendingPassageBlank = false;
-                currentQuestion = new ParsedQuestion(qm.group(1), extractQuestionText(qm));
+                currentQuestion = new ParsedQuestion(qm.group(1), "");
+
+                currentQuestion.questionText = consumeInlineTags(extractQuestionText(qm));
                 lastLabel = null;
                 return;
             }
@@ -582,14 +628,7 @@ public class QuestionDocumentImportService {
             if (currentQuestion != null && !inPassageHeader) {
                 Matcher tagm = TAGS_START_PATTERN.matcher(text);
                 if (tagm.matches()) {
-                    String body = tagm.group(1) == null ? "" : tagm.group(1).trim();
-
-                    for (String name : body.split(";")) {
-                        String n = name.trim();
-                        if (!n.isEmpty() && !currentQuestion.tagNames.contains(n)) {
-                            currentQuestion.tagNames.add(n);
-                        }
-                    }
+                    addTagNames(tagm.group(1));
                     return;
                 }
             }
@@ -633,6 +672,48 @@ public class QuestionDocumentImportService {
             handleContinuationLine(text);
         }
 
+        private void addTagNames(String body) {
+            String raw = body == null ? "" : body.trim();
+            for (String name : raw.split(";")) {
+                String n = name.trim();
+                if (!n.isEmpty() && !currentQuestion.tagNames.contains(n)) {
+                    currentQuestion.tagNames.add(n);
+                }
+            }
+        }
+
+        /**
+         * Khi file Markdown được chuyển sang Word, dòng "Tags: ..." nằm ngay dưới "Câu N."
+         * thường bị gộp vào cùng một đoạn (xuống dòng mềm trong Markdown = dấu cách).
+         * Tách phần tag ra khỏi đề câu, trả về phần đề câu còn lại.
+         */
+        private String consumeInlineTags(String stem) {
+            if (stem == null || stem.isBlank()) {
+                return "";
+            }
+            Matcher tagm = TAGS_START_PATTERN.matcher(stem);
+            if (!tagm.matches()) {
+                return stem;
+            }
+            String body = tagm.group(1) == null ? "" : tagm.group(1).trim();
+            if (!looksLikeTagSpecOnly(body)) {
+
+                return stem;
+            }
+            addTagNames(body);
+            return "";
+        }
+
+        /**
+         * Phần sau "Tags:" chỉ được coi là danh sách tag khi nó ngắn và không chứa câu văn -
+         * tránh trường hợp cả đề câu cũng bị gộp vào cùng đoạn rồi bị hiểu thành tên tag.
+         */
+        private boolean looksLikeTagSpecOnly(String body) {
+            return !body.isEmpty()
+                    && body.length() <= MAX_INLINE_TAG_SPEC_LENGTH
+                    && !SENTENCE_BREAK_PATTERN.matcher(body).find();
+        }
+
         private void appendExplanation(String addition) {
             String separator = pendingExplanationBlank ? "\n\n" : "\n";
             currentQuestion.explanation = appendLine(currentQuestion.explanation, addition, separator);
@@ -657,7 +738,7 @@ public class QuestionDocumentImportService {
             String label = rawLabel.toUpperCase(Locale.ROOT);
 
             if (currentQuestion.options.containsKey(label)) {
-                boolean nearlyComplete = currentQuestion.options.size() >= ALLOWED_LABELS.size() - 1;
+                boolean nearlyComplete = currentQuestion.options.size() >= FULL_OPTION_SET_SIZE - 1;
                 if (nearlyComplete) {
                     log.warn(
                             "Question no='{}' option '{}' duplicated -> treat as next question (missing number)",
@@ -715,7 +796,7 @@ public class QuestionDocumentImportService {
             if (currentQuestion.options.isEmpty()) {
 
                 currentQuestion.questionText = appendLine(currentQuestion.questionText, text, "\n");
-            } else if (currentQuestion.options.size() >= ALLOWED_LABELS.size()) {
+            } else if (currentQuestion.options.size() >= FULL_OPTION_SET_SIZE) {
 
                 if (pendingText.length() > 0) {
                     pendingText.append("\n");
@@ -1059,7 +1140,7 @@ public class QuestionDocumentImportService {
         return SECTION_HEADING_OPTION_LIKE_PATTERN.matcher(text).matches();
     }
 
-    private boolean isSkippableLine(String text) {
+    private boolean isSkippableLine(String text, boolean insideQuestionOptions) {
         String trimmed = text == null ? "" : text.trim();
         if (trimmed.isEmpty()) {
             return true;
@@ -1078,7 +1159,7 @@ public class QuestionDocumentImportService {
                 return true;
             }
         }
-        return false;
+        return !insideQuestionOptions && lower.startsWith(ROMAN_SECTION_PREFIX);
     }
 
     private String getOptionLabel(String text) {

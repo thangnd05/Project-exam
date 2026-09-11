@@ -120,6 +120,7 @@ class PublicEndpointApprovalTest {
             "GET /api/tests/usertest/{testId}",
             "GET /api/tests/quick-challenge",
             "GET /api/tests/by-class/{classId}",
+            "GET /api/tests/certificate-exams/by-exam-type/{examTypeId}",
             "GET /api/tests/collections/by-exam-type/{examTypeId}",
             "GET /api/tests/user/by-exam-type/{examTypeId}",
             "GET /api/tests/user/by-collection/{collectionId}",

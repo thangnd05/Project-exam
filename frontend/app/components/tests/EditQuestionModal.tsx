@@ -50,6 +50,8 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
     addExtraContent,
     updateExtraContent,
     removeExtraContent,
+    isMsq,
+    toggleMsq,
     handleOptionChange,
     addAnswer,
     removeAnswer,
@@ -298,17 +300,45 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                 </Col>
 
                 <Col md={12}>
-                  <div className={cx('sectionTitle')}>Đáp án</div>
+                  <div
+                    className={cx('sectionTitle')}
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '1.2rem',
+                    }}
+                  >
+                    <span>Đáp án</span>
+                    <label
+                      className="d-flex align-items-center gap-1 mb-0 fw-normal"
+                      style={{ fontSize: '1.3rem', cursor: 'pointer' }}
+                      title="Cho phép nhiều đáp án đúng (chấm đúng-hết)"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isMsq}
+                        onChange={(e) => toggleMsq(e.target.checked)}
+                      />
+                      Nhiều đáp án đúng
+                    </label>
+                  </div>
                 </Col>
 
                 {formData.options.map((opt, idx) => (
                   <Col md={6} key={idx} className="mb-2">
                     <div className={cxCreate('answerItem')}>
                       <input
-                        type="radio"
+                        type={isMsq ? 'checkbox' : 'radio'}
                         name="question-correct-answer"
                         checked={opt.isCorrect}
-                        onChange={() => handleOptionChange(idx, 'isCorrect', true)}
+                        onChange={(e) =>
+                          handleOptionChange(
+                            idx,
+                            'isCorrect',
+                            isMsq ? e.target.checked : true,
+                          )
+                        }
                       />
                       <span className="ms-2 fw-bold">{opt.answerLabel}.</span>
                       <input
