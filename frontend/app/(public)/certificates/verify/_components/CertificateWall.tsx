@@ -18,7 +18,6 @@ const NEW_DAYS = 7;
 const DAY_MS = 24 * 60 * 60 * 1000;
 const SKELETON_COUNT = 4;
 
-/** Chứng chỉ vừa cấp trong tuần được gắn nhãn cho khu trưng bày trông "đang sống". */
 const isRecent = (value?: string) =>
   Boolean(value) && Date.now() - new Date(value as string).getTime() < NEW_DAYS * DAY_MS;
 
@@ -27,7 +26,6 @@ function CertificateWall() {
     usePublicCertificates();
   const [previewCode, setPreviewCode] = useState<string | null>(null);
 
-  /** Click trái thường mở popup; ctrl/giữa/chuột phải vẫn mở trang tra cứu như link bình thường. */
   const handleCardClick = (event: React.MouseEvent<HTMLAnchorElement>, code?: string) => {
     if (!code || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();

@@ -31,7 +31,6 @@ public class CertificateTemplateResponse {
     private String signatureImageUrl;
     private Integer validMonths;
 
-    /** Số chứng chỉ còn hiệu lực đã cấp theo mẫu này. */
     private Long issuedCount;
 
     private Instant createdAt;

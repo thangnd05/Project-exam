@@ -90,11 +90,8 @@ function QuestionsManagement() {
     deleteMutation,
   } = useAdminQuestionList(params);
 
-  // Đổi bộ lọc thì luôn về trang đầu, nếu không sẽ rơi vào trang trống.
   const resetToFirstPage = () => setPage(0);
 
-  // Bỏ chọn khi rời trang / đổi bộ lọc: giữ lại id của trang cũ rồi bấm sửa
-  // hàng loạt sẽ ghi vào những câu admin không còn nhìn thấy.
   useEffect(() => {
     setSelectedIds(new Set());
   }, [params]);

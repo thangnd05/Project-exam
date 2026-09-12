@@ -52,10 +52,6 @@ export function useAttemptCertificate(userTestId?: string, enabled = true) {
   });
 }
 
-/**
- * Danh sách chứng chỉ đã cấp (công khai), tải thêm theo trang.
- * Trần size do backend áp (24), truyền lớn hơn cũng bị cắt.
- */
 export function usePublicCertificates(examTypeId?: string, pageSize = 12) {
   return useInfiniteQuery({
     queryKey: certificateKeys.publicFeed(examTypeId),

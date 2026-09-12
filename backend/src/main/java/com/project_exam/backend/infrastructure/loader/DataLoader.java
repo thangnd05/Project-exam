@@ -67,8 +67,6 @@ public class DataLoader implements CommandLineRunner {
             }
         }
 
-        // Server đã nhận request được từ trước khi CommandLineRunner chạy xong, nên nếu vừa cấp
-        // thêm quyền cho ADMIN thì xoá cache để không phục vụ bộ quyền thiếu đến hết TTL.
         roleAuthorityCache.invalidateAll();
 
         Role userRole = roleRepository.findByRoleName("USER");

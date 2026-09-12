@@ -9,22 +9,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Biến HTML của trình soạn thảo thành HTML chạy được trong hộp thư.
- *
- * Trình soạn thảo (Quill) xuất ra HTML ngữ nghĩa kèm class riêng  ví dụ
- * {@code <p class="ql-align-center">}  trong khi email client bỏ qua CSS ngoài và phần
- * lớn không đọc cả thẻ {@code <style>}; muốn hiển thị đúng thì mọi định dạng phải nằm ở
- * thuộc tính style ngay trên thẻ. Lớp này làm đúng việc đó: dịch class của editor thành
- * style inline và gắn style mặc định cho các thẻ thường gặp.
- *
- * Nguyên tắc: KHÔNG đè style tác giả đã tự viết. Thẻ nào đã có {@code style} thì giữ
- * nguyên, nhờ vậy các mẫu viết tay (nút bấm, khung màu) không bị phá khi đi qua đây.
- */
 @Component
 public class EmailHtmlNormalizer {
 
-    /** Style mặc định gắn cho thẻ chưa có style riêng. */
     private static final Map<String, String> DEFAULT_STYLES = Map.ofEntries(
             Map.entry("h1", "font-size:24px;font-weight:bold;color:#0f766e;margin:0 0 12px;"),
             Map.entry("h2", "font-size:20px;font-weight:bold;color:#0f766e;margin:0 0 12px;"),
@@ -49,7 +36,6 @@ public class EmailHtmlNormalizer {
             "ql-align-justify", "text-align:justify;"
     );
 
-    /** Cỡ chữ của trình soạn thảo cũng là class, phải quy ra px cụ thể cho hộp thư. */
     private static final Map<String, String> SIZE_CLASSES = Map.of(
             "ql-size-small", "font-size:13px;",
             "ql-size-large", "font-size:20px;",
@@ -66,8 +52,6 @@ public class EmailHtmlNormalizer {
         Document document = Jsoup.parseBodyFragment(html);
         document.outputSettings().prettyPrint(false);
 
-        // Email client không chạy script và bỏ qua <style>; giữ lại chỉ tổ khiến thư bị
-        // đánh dấu spam.
         document.select("script, style").remove();
 
         for (Element element : document.body().select("*")) {
@@ -111,7 +95,7 @@ public class EmailHtmlNormalizer {
         if (style.length() > 0) {
             element.attr("style", style.toString());
         }
-        // Class của editor vô nghĩa trong email vì không có bảng style đi kèm.
+
         element.removeAttr("class");
     }
 

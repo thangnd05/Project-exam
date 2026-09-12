@@ -1,14 +1,10 @@
-/**
- * Thang điểm theo scoringMethod của loại đề. Nguồn DUY NHẤT cho mọi chỗ FE cần
- * biết min/max điểm (ô nhập mục tiêu, trục biểu đồ, gợi ý mục tiêu kế tiếp).
- * Trước đây mỗi nơi hardcode 990 nên loại đề AWS (100-1000) bị cắt ngọn.
- */
+
 
 export type ScoreScale = {
-  /** Điểm thấp nhất có thể đạt (AWS: sai hết vẫn được 100). */
+
   min: number;
   max: number;
-  /** true = thang quy đổi có điểm sàn > 0 (AWS_SCALE). */
+
   scaled: boolean;
 };
 
@@ -21,7 +17,6 @@ export function getScoreScale(scoringMethod?: string | null): ScoreScale {
     : DEFAULT_SCORE_SCALE;
 }
 
-/** Quy điểm về % để so với các ngưỡng tính theo % (yêu cầu từng Part, độ sẵn sàng). */
 export function scoreToPercent(score: number | string, scale: ScoreScale): number {
   const span = scale.max - scale.min;
   if (span <= 0) return 0;

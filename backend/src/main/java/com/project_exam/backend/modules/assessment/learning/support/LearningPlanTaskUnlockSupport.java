@@ -18,7 +18,6 @@ public class LearningPlanTaskUnlockSupport {
 
     private final LearningPlanTaskRepository taskRepository;
 
-    /** PASSED hoặc SKIPPED đều được coi là đã xong ải (mở khóa bước tiếp theo). */
     public void onTaskCleared(LearningPlanTask clearedTask, String learningPlanId) {
         if (clearedTask.getTaskType() == PlanTaskType.TAG) {
             tryUnlockCapstoneOne(learningPlanId, clearedTask.getExamPartId());
@@ -29,10 +28,6 @@ public class LearningPlanTaskUnlockSupport {
         }
     }
 
-    /**
-     * Sửa plan cũ bị kẹt: tag đã SKIPPED/PASSED mà capstone vẫn LOCKED.
-     * @return true nếu có thay đổi trạng thái task
-     */
     public boolean reconcileLockedTasks(String learningPlanId) {
         List<LearningPlanTask> tasks =
                 taskRepository.findByLearningPlanIdOrderByTaskOrderAsc(learningPlanId);

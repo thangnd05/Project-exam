@@ -19,7 +19,7 @@ public class QuestionCreateRequest {
     private List<AnswerRequest> answers;
 
     private Boolean isBank;
-    /** Bỏ trống khi sửa câu = giữ nguyên scope cũ. */
+
     private Question.UsageScope usageScope;
     private String collectionId;
     private String explanation;

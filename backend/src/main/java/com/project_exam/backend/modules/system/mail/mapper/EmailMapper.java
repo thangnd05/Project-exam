@@ -14,7 +14,6 @@ import java.util.Map;
 @Component
 public class EmailMapper {
 
-    /** Số liệu gửi của một email, đếm sẵn theo trạng thái. */
     public record SendStats(long total, long sent, long failed, long pending) {
         public static final SendStats EMPTY = new SendStats(0, 0, 0, 0);
     }

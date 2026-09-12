@@ -14,7 +14,7 @@ import type {
 } from '@/app/types';
 
 const BASE_URL = '/api/questions';
-// Mặt quản trị tách controller riêng ở backend (QuestionAdminController).
+
 const ADMIN_BASE_URL = '/api/admin/questions';
 const MULTIPART = { headers: { 'Content-Type': 'multipart/form-data' } };
 
@@ -72,7 +72,6 @@ export const bulkCreateQuestionGroups = (formData: FormData): Promise<QuestionAd
   return axios.post(`${BASE_URL}/bulk-groups`, formData, MULTIPART).then((res) => res.data);
 };
 
-/** Giá trị collectionId đặc biệt để lọc nhóm câu chưa xếp bộ sưu tập. */
 export const UNCLASSIFIED_COLLECTION = '__NONE__';
 
 export const searchAdminQuestions = (

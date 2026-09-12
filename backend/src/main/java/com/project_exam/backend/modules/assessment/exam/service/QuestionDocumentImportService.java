@@ -38,23 +38,12 @@ public class QuestionDocumentImportService {
     private static final String ALLOWED_LABEL_CLASS =
             "[" + ALLOWED_LABELS.get(0) + "-" + ALLOWED_LABELS.get(ALLOWED_LABELS.size() - 1) + "]";
 
-    /**
-     * Nhãn dễ nhầm với chữ thường trong câu: "I" vừa là đại từ tiếng Anh vừa là số La Mã.
-     * Nhãn này chỉ được chấp nhận khi có dấu ngăn rõ ràng ("I." / "I)" ), không chấp nhận
-     * dạng trần "I nội dung".
-     */
     private static final String AMBIGUOUS_BARE_LABEL = "I";
 
-    /** Lớp nhãn dùng cho dạng trần (không dấu ngăn) - trừ {@link #AMBIGUOUS_BARE_LABEL}. */
     private static final String BARE_LABEL_CLASS =
             "[" + ALLOWED_LABELS.get(0) + "-" + ALLOWED_LABELS.get(ALLOWED_LABELS.size() - 1)
                     + "&&[^" + AMBIGUOUS_BARE_LABEL + "]]";
 
-    /**
-     * Số lựa chọn của một bộ đáp án "đầy đủ" thông thường (A-D).
-     * Dùng cho heuristic nhận biết câu hỏi đã đủ đáp án; tách khỏi {@link #ALLOWED_LABELS}
-     * để việc hỗ trợ thêm nhãn E-J không làm đổi hành vi của tài liệu 4 đáp án.
-     */
     private static final int FULL_OPTION_SET_SIZE = 4;
 
     private static final String QUESTION_KEYWORDS = "Câu|Question|Bài";
@@ -76,10 +65,6 @@ public class QuestionDocumentImportService {
             "choose a, b, c, or d"
     );
 
-    /**
-     * Tiêu đề đánh số La Mã ("I. LISTENING"). Chỉ bỏ qua khi KHÔNG đang ở giữa bộ đáp án
-     * của một câu hỏi, vì "I." cũng có thể là nhãn đáp án thứ 9.
-     */
     private static final String ROMAN_SECTION_PREFIX = "i.";
 
     private static final List<String> SKIPPABLE_CONTAINS = List.of(
@@ -98,13 +83,8 @@ public class QuestionDocumentImportService {
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
-    /**
-     * Dấu ngăn giữa nhãn đáp án và nội dung. Gạch nối chỉ tính là dấu ngăn khi KHÔNG dính
-     * liền chữ cái, để "E-mail" / "A-list" không bị hiểu nhầm thành nhãn đáp án.
-     */
     private static final String OPTION_DELIMITER = "(?:[\\.\\):]|-(?!\\p{L}))(?![-_]{2,})";
 
-    /** Chặn các viết tắt dễ nhầm với nhãn đáp án: "A.M.", "e.g.", "i.e." */
     private static final String NOT_ABBREVIATION = "(?![MmGgEe]\\.)";
 
     private static final Pattern OPTION_PATTERN = Pattern.compile(
@@ -150,10 +130,8 @@ public class QuestionDocumentImportService {
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
-    /** Độ dài tối đa của phần "Tags: ..." bị gộp chung dòng tiêu đề câu mới được coi là tag. */
     private static final int MAX_INLINE_TAG_SPEC_LENGTH = 200;
 
-    /** Dấu hiệu phần text là câu văn (đề câu) chứ không phải danh sách tên tag. */
     private static final Pattern SENTENCE_BREAK_PATTERN = Pattern.compile("[.?!]\\s");
 
     private static final Pattern TRANSLATION_START_PATTERN = Pattern.compile(
@@ -682,11 +660,6 @@ public class QuestionDocumentImportService {
             }
         }
 
-        /**
-         * Khi file Markdown được chuyển sang Word, dòng "Tags: ..." nằm ngay dưới "Câu N."
-         * thường bị gộp vào cùng một đoạn (xuống dòng mềm trong Markdown = dấu cách).
-         * Tách phần tag ra khỏi đề câu, trả về phần đề câu còn lại.
-         */
         private String consumeInlineTags(String stem) {
             if (stem == null || stem.isBlank()) {
                 return "";
@@ -704,10 +677,6 @@ public class QuestionDocumentImportService {
             return "";
         }
 
-        /**
-         * Phần sau "Tags:" chỉ được coi là danh sách tag khi nó ngắn và không chứa câu văn -
-         * tránh trường hợp cả đề câu cũng bị gộp vào cùng đoạn rồi bị hiểu thành tên tag.
-         */
         private boolean looksLikeTagSpecOnly(String body) {
             return !body.isEmpty()
                     && body.length() <= MAX_INLINE_TAG_SPEC_LENGTH

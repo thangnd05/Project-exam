@@ -3,7 +3,7 @@ import { AttemptCertificateState, CertificateStatus, CertificateVerifyState } fr
 export interface CertificateDesign {
   title?: string;
   subtitle?: string;
-  /** Câu mô tả giữa chứng chỉ; bỏ trống thì dùng câu mặc định theo tên loại đề. */
+
   bodyText?: string;
   footerNote?: string;
   logoUrl?: string;
@@ -96,7 +96,6 @@ export interface CertificateVerifyResponse {
   design?: CertificateDesign;
 }
 
-/** Một dòng bảng vinh danh công khai - không kèm certificateId/điểm số, link đi qua mã tra cứu. */
 export interface PublicCertificateResponse {
   certificateCode?: string;
   recipientName?: string;
@@ -107,7 +106,7 @@ export interface PublicCertificateResponse {
   expiresAt?: string;
   logoUrl?: string;
   accentColor?: string;
-  /** Phần trình bày chụp lúc cấp, để danh sách vẽ bản thu nhỏ của chính tấm chứng chỉ. */
+
   design?: CertificateDesign;
 }
 

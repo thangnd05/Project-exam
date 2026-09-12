@@ -92,8 +92,6 @@ public class AuthService {
         String jti = UUID.randomUUID().toString();
         refreshTokenStore.createFamily(user.getUserId(), familyId, jti);
 
-        // Không đưa roleId vào token: phân quyền đọc lại từ DB mỗi request nên claim này chỉ là
-        // dữ liệu lạc hậu chờ ai đó lỡ tin.
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", user.getUserId());
         claims.put("fid", familyId);
@@ -270,7 +268,6 @@ public class AuthService {
         //     throw new BadRequestException("Không thể gửi email xác thực.");
         // }
 
-        // Thay bằng email chào mừng. Gửi nền, mail lỗi không làm hỏng lượt đăng ký.
         mailService.sendAuto(MailTemplateCode.WELCOME_REGISTER, user.getEmail(), user.getUserId(),
                 Map.of(
                         "fullName", user.getFullName(),
@@ -290,10 +287,6 @@ public class AuthService {
         return enrichWithRoleAndPermissions(userMapper.toResponse(user), user.getRoleId());
     }
 
-    /**
-     * Chỉ lấy userId từ token. Vai trò/quyền cố ý KHÔNG đọc từ đây: token là ảnh chụp lúc đăng
-     * nhập, còn phân quyền phải theo DB hiện tại (xem AuthUtils.hasPermission).
-     */
     public String getCurrentUserId(HttpServletRequest request) {
         try {
             Claims claims = jwtService.extractAllClaimsFromRequest(request);
@@ -354,7 +347,6 @@ public class AuthService {
         return AuthMessageResponse.builder().message("Đổi mật khẩu thành công").build();
     }
 
-    /** Cảnh báo bảo mật: mật khẩu vừa đổi, dù là tự đổi hay qua luồng quên mật khẩu. */
     private void notifyPasswordChanged(User user) {
         mailService.sendAuto(MailTemplateCode.PASSWORD_CHANGED, user.getEmail(), user.getUserId(),
                 Map.of(

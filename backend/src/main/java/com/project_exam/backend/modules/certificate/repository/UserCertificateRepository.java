@@ -26,7 +26,6 @@ public interface UserCertificateRepository extends JpaRepository<UserCertificate
 
     long countByStatus(UserCertificate.Status status);
 
-    /** [templateId, số chứng chỉ còn hiệu lực] cho bảng mẫu ở trang quản trị. */
     @Query("""
             SELECT c.templateId, COUNT(c) FROM UserCertificate c
             WHERE c.status = com.project_exam.backend.modules.certificate.domain.UserCertificate.Status.ACTIVE
@@ -35,10 +34,6 @@ public interface UserCertificateRepository extends JpaRepository<UserCertificate
             """)
     List<Object[]> countActiveGroupedByTemplate();
 
-    /**
-     * Danh sách công khai: chỉ chứng chỉ còn hiệu lực, mới cấp trước.
-     * Chứng chỉ bị thu hồi hoặc hết hạn không lên danh sách.
-     */
     @Query("""
             SELECT c FROM UserCertificate c
             WHERE c.status = com.project_exam.backend.modules.certificate.domain.UserCertificate.Status.ACTIVE

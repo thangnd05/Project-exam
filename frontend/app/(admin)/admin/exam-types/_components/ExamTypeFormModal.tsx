@@ -1,6 +1,5 @@
 'use client';
 
-
 import {Form} from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';

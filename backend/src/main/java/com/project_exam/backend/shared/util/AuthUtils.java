@@ -19,7 +19,6 @@ public class AuthUtils {
         return authService.getCurrentUserId(request);
     }
 
-    /** Returns userId when authenticated; otherwise null (for public endpoints with optional auth). */
     public String findUserIdOrNull(HttpServletRequest request) {
         try {
             return getUserId(request);
@@ -28,14 +27,6 @@ public class AuthUtils {
         }
     }
 
-    /**
-     * Kiểm tra quyền theo authorities trong SecurityContext  được JwtAuthenticationFilter dựng
-     * lại từ DB ở mỗi request, KHÔNG lấy từ claim của token. Nhờ vậy đổi vai trò của user hoặc
-     * gỡ quyền của vai trò là có hiệu lực ngay, không phải chờ access token hết hạn.
-     *
-     * Vì lý do đó, đừng thêm lại kiểu lấy roleId từ token để tự so sánh: token là ảnh chụp lúc
-     * đăng nhập nên sẽ lạc hậu.
-     */
     public boolean hasPermission(String permissionCode) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) return false;

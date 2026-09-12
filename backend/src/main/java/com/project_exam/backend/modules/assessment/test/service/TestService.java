@@ -101,8 +101,7 @@ public class TestService {
     private final com.project_exam.backend.modules.assessment.exam.mapper.PassageMediaMapper passageMediaMapper;
     private final com.project_exam.backend.modules.assessment.test.mapper.TestMapper testMapper;
     private final com.project_exam.backend.modules.assessment.exam.repository.QuestionCollectionRepository questionCollectionRepository;
-    /* Chỉ dùng repository của module chứng chỉ, không dùng service: CertificateService đã phụ
-       thuộc ngược lại vào luồng nộp bài nên tiêm service vào đây sẽ thành vòng lặp bean. */
+
     private final CertificateTemplateRepository certificateTemplateRepository;
     private final UserCertificateRepository userCertificateRepository;
 
@@ -140,7 +139,6 @@ public class TestService {
         Map<String, ExamType> examTypeMap = examTypeRepository.findAllById(examTypeIds).stream()
                 .collect(Collectors.toMap(ExamType::getExamTypeId, et -> et));
 
-        // Load testPart / examPart / skill của tất cả đề 1 lần thay vì 3 query mỗi đề.
         Map<String, List<TestPart>> testPartsByTestId = testPartRepository
                 .findByTestIdIn(tests.stream().map(Test::getTestId).toList()).stream()
                 .collect(Collectors.groupingBy(TestPart::getTestId));
@@ -247,9 +245,6 @@ public class TestService {
         Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) return PageResponse.empty(safePage, safeSize);
 
-        /* Đề cấp chứng chỉ đã có khu riêng ở đầu trang nên không lặp lại ở danh sách này.
-           Chỉ giấu khi loại đề thật sự có mẫu chứng chỉ đang bật - không thì khu riêng cũng
-           không hiện, giấu ở đây nữa là đề biến mất khỏi trang. */
         Set<String> certificateCategoryIds = hasActiveCertificateTemplate(examTypeId)
                 ? certificateCategoryIds()
                 : Set.of();
@@ -267,7 +262,6 @@ public class TestService {
                 .isPresent();
     }
 
-    /** Id các nhóm đề được đánh dấu cấp chứng chỉ (thường chỉ có Full Mock). */
     private Set<String> certificateCategoryIds() {
         return examCategoryRepository.findAll().stream()
                 .filter(c -> Boolean.TRUE.equals(c.getCertificateEligible()))
@@ -275,10 +269,6 @@ public class TestService {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Khu "thi lấy chứng chỉ" của trang loại đề. Chỉ trả về đề khi loại đề thật sự cấp được
-     * chứng chỉ (có mẫu đang bật), tránh mời người học thi một bài không dẫn tới đâu.
-     */
     public CertificateExamListResponse getCertificateExamsByExamType(String examTypeId, String userId) {
         CertificateTemplate template = certificateTemplateRepository.findByExamTypeId(examTypeId)
                 .filter(t -> Boolean.TRUE.equals(t.getActive()))

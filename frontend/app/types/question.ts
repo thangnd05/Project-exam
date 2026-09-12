@@ -71,7 +71,7 @@ export interface QuestionCreateRequest {
   questionType?: QuestionType;
   answers?: AnswerRequest[];
   isBank?: boolean;
-  /** Bỏ trống khi sửa câu = giữ nguyên scope cũ. */
+
   usageScope?: QuestionUsageScope;
   collectionId?: string;
   explanation?: string;
@@ -109,7 +109,7 @@ export interface BulkCreateQuestionsToBankRequest {
   classId?: string;
   chapterId?: string;
   questions?: NormalQuestionRequest[];
-  /** Áp cho cả lô. */
+
   usageScope?: QuestionUsageScope;
 }
 
@@ -123,7 +123,7 @@ export interface BulkPassageGroupRequest {
   classId?: string;
   chapterId?: string;
   groups?: PassageQuestionGroupRequest[];
-  /** Áp cho cả lô. */
+
   usageScope?: QuestionUsageScope;
 }
 
@@ -133,7 +133,7 @@ export interface BulkQuestionWithPassageRequest {
   chapterId?: string;
   passage?: PassageRequest;
   questions?: NormalQuestionRequest[];
-  /** Áp cho cả lô. */
+
   usageScope?: QuestionUsageScope;
 }
 
@@ -155,7 +155,6 @@ export interface QuestionAdminResponse {
   tags?: TagResponse[];
 }
 
-/** Một dòng trong bảng quản lý câu hỏi của admin (không kèm đáp án/passage). */
 export interface AdminQuestionListItem {
   questionId: string;
   questionNumber?: number;
@@ -185,7 +184,6 @@ export interface AdminQuestionSearchParams {
   size?: number;
 }
 
-/** null/undefined ở mỗi trường = giữ nguyên; clearCollection = gỡ khỏi bộ sưu tập. */
 export interface BulkUpdateQuestionsRequest {
   questionIds: string[];
   usageScope?: QuestionUsageScope | null;

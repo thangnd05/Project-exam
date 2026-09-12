@@ -24,8 +24,6 @@ public class CertificateAdminController {
     private final CertificateAdminService certificateAdminService;
     private final AuthUtils authUtils;
 
-    // ------------------------------------------------------------------ mẫu chứng chỉ
-
     @GetMapping("/templates")
     public ResponseEntity<List<CertificateTemplateResponse>> findAllTemplates() {
         authUtils.requirePermission(PermissionCatalog.CERTIFICATE_MANAGE);
@@ -52,8 +50,6 @@ public class CertificateAdminController {
         certificateAdminService.deleteTemplate(templateId);
         return ResponseEntity.ok(MessageResponse.of("Đã xoá mẫu chứng chỉ"));
     }
-
-    // ------------------------------------------------------------------ chứng chỉ đã cấp
 
     @GetMapping
     public ResponseEntity<PageResponse<CertificateResponse>> searchIssued(

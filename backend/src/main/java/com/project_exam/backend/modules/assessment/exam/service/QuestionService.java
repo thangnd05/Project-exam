@@ -414,7 +414,7 @@ public class QuestionService {
             question.setExplanation(parsedQuestion.getExplanation());
             question.setCreatedBy(currentUserId);
             question.setIsBank(Boolean.FALSE);
-            // Import gắn thẳng vào đề: câu thi.
+
             question.setUsageScope(Question.UsageScope.EXAM);
             if (classId != null) {
                 question.setClassId(classId);
@@ -751,7 +751,7 @@ public class QuestionService {
         question.setExplanation(request.getExplanation());
         question.setCreatedBy(currentUserId);
         question.setIsBank(Boolean.FALSE);
-        // Câu viết thẳng vào một đề cụ thể thì đương nhiên là câu thi.
+
         question.setUsageScope(Question.UsageScope.EXAM);
 
         if (request.getClassId() != null) question.setClassId(request.getClassId());
@@ -993,11 +993,6 @@ public class QuestionService {
         return buildQuestionAdminResponse(question, passage, updatedAnswers);
     }
 
-    /**
-     * Lô cũ (client chưa gửi usageScope) mặc định là câu thi - giữ nguyên hành vi
-     * trước khi tách EXAM/PRACTICE, đừng đổi thành PRACTICE nếu không muốn câu cũ
-     * tự chui vào lộ trình.
-     */
     private Question.UsageScope resolveUsageScope(Question.UsageScope requested) {
         return requested != null ? requested : Question.UsageScope.EXAM;
     }

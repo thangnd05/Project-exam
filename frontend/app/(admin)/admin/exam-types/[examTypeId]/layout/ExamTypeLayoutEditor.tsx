@@ -38,7 +38,6 @@ import { brandColors } from '@/app/assets/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
-
 const FONT_OPTIONS = ['Inter', 'Roboto', 'Arial', 'Times New Roman', 'Georgia'];
 
 const formatTime = (seconds: number | null | undefined) => {

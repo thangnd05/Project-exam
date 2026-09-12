@@ -416,10 +416,6 @@ public class EnhancedResultService {
         return tags;
     }
 
-    /**
-     * Cấu trúc đề (TestPart + TestQuestion) đọc MỘT lần cho cả lượt dựng kết quả:
-     * trước đây getAnalyzedQuestionIds và buildQuestionNumberMap mỗi bên đọc lại 2 bảng này.
-     */
     private record TestLayout(List<TestPart> parts, Map<String, List<TestQuestion>> questionsByPart) {
     }
 
@@ -451,10 +447,6 @@ public class EnhancedResultService {
         return numberMap;
     }
 
-    /**
-     * Readiness = trung bình % đúng của từng Skill (mỗi Skill trọng số như nhau), gộp từ partBreakdown.
-     * Không dựng DTO theo Skill vì FE chỉ hiển thị readiness + breakdown theo Part.
-     */
     private int calculateReadinessScore(List<PartBreakdownResponse> partBreakdown, double overallPercentage) {
         Map<String, int[]> skillStats = new LinkedHashMap<>();
         for (PartBreakdownResponse part : partBreakdown) {

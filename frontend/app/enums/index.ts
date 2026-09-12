@@ -5,7 +5,6 @@ export enum QuestionType {
   ESSAY = 'ESSAY',
 }
 
-/** Câu này sinh ra để ra đề thi hay để ôn tập/lộ trình. Khớp Question.UsageScope ở backend. */
 export enum QuestionUsageScope {
   EXAM = 'EXAM',
   PRACTICE = 'PRACTICE',

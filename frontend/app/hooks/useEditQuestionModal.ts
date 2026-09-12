@@ -259,7 +259,7 @@ export function useEditQuestionModal({
       if (checked) {
         return { ...prev, questionType: QuestionType.MSQ };
       }
-      // MSQ -> MCQ: chỉ giữ lại đáp án đúng đầu tiên
+
       const firstCorrect = prev.options.findIndex((opt) => opt.isCorrect);
       return {
         ...prev,

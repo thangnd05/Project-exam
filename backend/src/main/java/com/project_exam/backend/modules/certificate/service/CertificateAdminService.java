@@ -38,8 +38,6 @@ public class CertificateAdminService {
     private final ExamTypeRepository examTypeRepository;
     private final CertificateMapper certificateMapper;
 
-    // ------------------------------------------------------------------ mẫu chứng chỉ
-
     @Transactional(readOnly = true)
     public List<CertificateTemplateResponse> findAllTemplates() {
         List<CertificateTemplate> templates = certificateTemplateRepository.findAll();
@@ -80,7 +78,6 @@ public class CertificateAdminService {
         CertificateTemplate template = certificateTemplateRepository.findById(templateId)
                 .orElseThrow(() -> new NotFoundException("Mẫu chứng chỉ không tồn tại"));
 
-        // Đổi loại đề của mẫu sẽ làm lệch chứng chỉ đã cấp, nên chỉ cho sửa nội dung.
         if (request.getExamTypeId() != null && !request.getExamTypeId().equals(template.getExamTypeId())) {
             throw new BadRequestException("Không đổi được loại đề của mẫu đã tạo. Hãy tạo mẫu mới cho loại đề kia.");
         }
@@ -130,8 +127,6 @@ public class CertificateAdminService {
                 .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]));
     }
 
-    // ------------------------------------------------------------------ chứng chỉ đã cấp
-
     @Transactional(readOnly = true)
     public PageResponse<CertificateResponse> searchIssued(String examTypeId, String status,
                                                           String keyword, int page, int size) {
@@ -164,11 +159,6 @@ public class CertificateAdminService {
         return certificateMapper.toResponse(userCertificateRepository.save(certificate), true);
     }
 
-    /**
-     * Xoá hẳn một chứng chỉ đã cấp. Khác thu hồi: thu hồi giữ lại dấu vết để người tra cứu
-     * biết chứng chỉ từng tồn tại nhưng hết giá trị, còn xoá là mã tra cứu biến mất hoàn toàn.
-     * Dành cho bản cấp nhầm/cấp thử, nên để đó chỉ làm bẩn dữ liệu.
-     */
     @Transactional
     public void deleteIssued(String certificateId) {
         UserCertificate certificate = userCertificateRepository.findById(certificateId)

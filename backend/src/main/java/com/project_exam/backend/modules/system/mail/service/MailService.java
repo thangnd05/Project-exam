@@ -18,13 +18,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Điểm vào duy nhất để gửi email trong hệ thống.
- *
- * Nguyên tắc: gửi mail KHÔNG được làm hỏng nghiệp vụ gọi nó. Mọi lỗi (thiếu mẫu, SMTP
- * chết...) đều nuốt lại và ghi vào email_recipients để admin gửi lại, chứ không ném
- * ngược lên khiến người dùng đăng ký hụt hay đổi mật khẩu hụt.
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -45,10 +38,8 @@ public class MailService {
     @Value("${app.mail.site-name}")
     private String siteName;
 
-    /** Nội dung một email đã render xong, sẵn sàng đẩy ra SMTP. */
     public record RenderedMail(String subject, String bodyHtml) {}
 
-    /** Biến dùng được ở mọi template, không cần bên gọi truyền. */
     public Map<String, String> globalVars() {
         Map<String, String> vars = new HashMap<>();
         vars.put("siteName", siteName);
@@ -61,14 +52,6 @@ public class MailService {
         return instant == null ? "" : DATE_TIME.format(AppTime.local(instant));
     }
 
-    /**
-     * Gửi một mail AUTO theo mã template.
-     *
-     * @param code    mã trong {@link MailTemplateCode}
-     * @param toEmail địa chỉ nhận (truyền riêng vì mail đổi email phải gửi về địa chỉ cũ)
-     * @param userId  chủ tài khoản liên quan, có thể null
-     * @param vars    biến riêng của mail này, gộp thêm với {@link #globalVars()}
-     */
     public void sendAuto(String code, String toEmail, String userId, Map<String, String> vars) {
         if (toEmail == null || toEmail.isBlank()) {
             return;
@@ -91,15 +74,13 @@ public class MailService {
         }
     }
 
-    /** Render tiêu đề + nội dung rồi bọc vào khung LAYOUT_BASE. */
     public RenderedMail render(String subject, String bodyHtml, Map<String, String> vars) {
         Map<String, String> merged = globalVars();
         if (vars != null) {
             merged.putAll(vars);
         }
         String renderedSubject = renderer.render(subject, merged);
-        // Nội dung soạn bằng trình soạn thảo phải đổi sang style inline mới hiển thị đúng
-        // trong hộp thư. Khung LAYOUT_BASE thì không cần vì vốn đã là HTML email viết tay.
+
         String renderedContent = htmlNormalizer.toEmailHtml(renderer.render(bodyHtml, merged));
         return new RenderedMail(renderedSubject, wrapLayout(renderedContent, merged));
     }
@@ -114,12 +95,6 @@ public class MailService {
         return renderer.render(layout.getBodyHtml(), layoutVars);
     }
 
-    /**
-     * Ghi một dòng nhật ký rồi đẩy gửi nền.
-     *
-     * Nội dung đã render được truyền thẳng cho luồng gửi chứ không lưu xuống bảng: dòng
-     * nhật ký chỉ cần biết gửi email nào, cho ai, kết quả ra sao.
-     */
     public void queueAndDispatch(String emailId, String userId, String toEmail, RenderedMail mail) {
         EmailRecipient recipient = new EmailRecipient();
         recipient.setEmailId(emailId);
@@ -130,10 +105,6 @@ public class MailService {
         dispatchAfterCommit(recipient.getRecipientId(), toEmail, mail);
     }
 
-    /**
-     * Chờ transaction của bên gọi commit xong mới bắn luồng gửi. Nếu bắn ngay, luồng nền
-     * có thể chạy trước lúc commit và không thấy dòng recipient vừa insert.
-     */
     private void dispatchAfterCommit(String recipientId, String toEmail, RenderedMail mail) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             mailDispatcher.dispatchAsync(recipientId, toEmail, mail.subject(), mail.bodyHtml());

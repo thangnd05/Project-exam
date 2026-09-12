@@ -249,7 +249,6 @@ public class LearningPlanSessionService {
         return "Hoàn thành tất cả ải tag của Part này trước khi mở ải tổng ôn.";
     }
 
-    /** Trạm hiện tại của plan; cột NOT NULL nên chỉ null-safe cho dữ liệu cũ. */
     private PlanStage effectiveStage(LearningPlan plan) {
         return plan.getPlanStage() != null ? plan.getPlanStage() : PlanStage.FOUNDATION;
     }
@@ -660,7 +659,6 @@ public class LearningPlanSessionService {
                 (int) cleared);
     }
 
-    /** Đoạn văn + media (audio/ảnh) kèm câu hỏi, để FE hiển thị được câu Reading/Listening. */
     private Map<String, PassageResponse> loadPassageDtos(List<Question> questions) {
         Set<String> passageIds = questions.stream()
                 .map(Question::getPassageId)

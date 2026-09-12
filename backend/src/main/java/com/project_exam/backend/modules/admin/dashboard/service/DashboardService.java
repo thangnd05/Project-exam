@@ -125,7 +125,6 @@ public class DashboardService {
         LocalDateTime monthStart = month.atDay(1).atStartOfDay();
         LocalDateTime monthEnd = month.plusMonths(1).atDay(1).atStartOfDay();
 
-        // quét sớm 1 ngày để nhận diện phiên bắt đầu từ tháng trước, rồi loại chúng ra
         List<Object[]> rows = pageVisitRepository.findLocationRowsBetween(
                 AppTime.instant(monthStart.minusDays(1)), AppTime.instant(monthEnd));
 
@@ -147,7 +146,6 @@ public class DashboardService {
             prevKey = key;
             prevTime = ts;
 
-            // chỉ tính phiên bắt đầu trong tháng và đến từ IP công cộng
             if (!newSession || ts.isBefore(monthStart) || code == null || "LO".equals(code)) continue;
 
             countByCode.computeIfAbsent(code, k -> new long[1])[0]++;

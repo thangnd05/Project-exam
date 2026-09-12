@@ -13,9 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TrafficLocationsResponse {
-    /** Tháng đang xem, định dạng yyyy-MM. */
+
     private String month;
-    /** Tổng lượt truy cập (số phiên) từ IP công cộng trong tháng; bỏ qua truy cập local. */
+
     private long totalVisits;
     private List<String> availableMonths;
     private List<CountryTraffic> topCountries;

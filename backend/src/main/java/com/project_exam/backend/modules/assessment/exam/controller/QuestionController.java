@@ -36,9 +36,6 @@ public class QuestionController {
     private final ObjectMapper objectMapper;
     private final AuthUtils authUtils;
 
-    // Các endpoint quản trị (duyệt toàn bộ ngân hàng, sửa hàng loạt) nằm ở
-    // QuestionAdminController - /api/admin/questions.
-
     @GetMapping("/{id}")
     public ResponseEntity<QuestionAdminResponse> getQuestionById(
             @PathVariable String id,

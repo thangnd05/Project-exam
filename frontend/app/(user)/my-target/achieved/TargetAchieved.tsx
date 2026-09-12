@@ -12,7 +12,6 @@ import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss'
 
 const cx = classNames.bind(styles);
 
-/** Mốc gợi ý kế tiếp, chặn theo trần thang điểm của loại đề (AWS là 1000, không phải 990). */
 function suggestNextTarget(current: number | null | undefined, maxScore: number): number | null {
   if (current == null) return null;
   if (current >= maxScore) return null;

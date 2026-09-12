@@ -16,12 +16,6 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 
-/**
- * Mặt quản trị của vocabularies, tách khỏi controller dùng chung theo khuôn
- * QuestAdminController/CoinAdminController: cùng module, cùng service và
- * repository, chỉ tách controller theo đối tượng dùng. Mọi method ở đây đều
- * cần quyền nên khó sót requirePermission hơn là trộn với endpoint người dùng.
- */
 @RestController
 @RequestMapping("/api/admin/vocabularies")
 @RequiredArgsConstructor

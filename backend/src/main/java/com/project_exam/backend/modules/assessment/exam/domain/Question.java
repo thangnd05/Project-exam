@@ -70,30 +70,19 @@ public class Question {
     @Column(name = "question_number")
     private Integer questionNumber;
 
-    /**
-     * Câu này sinh ra để ra đề thi hay để ôn tập. Hai luồng bốc câu (tạo đề từ kho
-     * và sinh phiên lộ trình) trước đây múc chung một hồ nên câu ôn tập lọt vào đề
-     * và ngược lại; cột này là ranh giới đó.
-     */
     @Column(name = "usage_scope", nullable = false)
     @Enumerated(EnumType.STRING)
     private UsageScope usageScope = UsageScope.EXAM;
 
     public enum UsageScope {
-        /** Chỉ dùng khi ra đề thi. */
+
         EXAM,
-        /** Chỉ dùng cho lộ trình học và các phiên ôn tập. */
+
         PRACTICE;
 
-        /**
-         * Tập scope mà mỗi luồng được phép bốc. Tách hằng số ở đây để nếu sau này
-         * thêm giá trị (ví dụ BOTH dùng được cả hai) thì chỉ sửa đúng hai dòng này,
-         * không phải đi lục lại hơn hai chục câu query.
-         */
         public static final List<UsageScope> FOR_EXAM = List.of(EXAM);
         public static final List<UsageScope> FOR_PRACTICE = List.of(PRACTICE);
 
-        /** Bản chuỗi cho các native query (so sánh thẳng với cột varchar). */
         public static final List<String> FOR_EXAM_NAMES = List.of(EXAM.name());
         public static final List<String> FOR_PRACTICE_NAMES = List.of(PRACTICE.name());
     }

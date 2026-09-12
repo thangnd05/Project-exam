@@ -78,7 +78,7 @@ type MockHistoryChartsProps = {
   targetScore?: number | null;
   loading?: boolean;
   examTypeName?: string;
-  /** scoringMethod của loại đề: quyết định trục điểm (AWS_SCALE là 100-1000). */
+
   scoringMethod?: string | null;
 };
 

@@ -6,10 +6,6 @@ import lombok.*;
 
 import java.time.Instant;
 
-/**
- * Mẫu chứng chỉ của một loại đề. Chứng chỉ chỉ có Đạt / Chưa đạt nên điều kiện cấp
- * gói gọn trong passScore, phần còn lại thuần trình bày.
- */
 @Entity
 @Table(name = "certificate_templates", indexes = {
         @Index(name = "idx_certificate_templates_exam_type_id", columnList = "exam_type_id", unique = true)
@@ -31,7 +27,6 @@ public class CertificateTemplate {
     @Column(nullable = false)
     private Boolean active = true;
 
-    /** Ngưỡng đạt theo thang điểm của loại đề (AWS_SCALE: 100-1000, chuẩn AWS là 720). */
     @Column(name = "pass_score", nullable = false)
     private Integer passScore;
 
@@ -41,10 +36,6 @@ public class CertificateTemplate {
     @Column(length = 300)
     private String subtitle;
 
-    /**
-     * Câu mô tả ở giữa chứng chỉ. Bỏ trống thì frontend dùng câu mặc định
-     * "for successfully completing and passing the &lt;loại đề&gt; examination".
-     */
     @Column(name = "body_text", length = 500)
     private String bodyText;
 
@@ -72,7 +63,6 @@ public class CertificateTemplate {
     @Column(name = "signature_image_url", length = 500)
     private String signatureImageUrl;
 
-    /** null = chứng chỉ vô thời hạn. */
     @Column(name = "valid_months")
     private Integer validMonths;
 

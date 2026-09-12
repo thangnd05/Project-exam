@@ -15,6 +15,5 @@ public class BulkCreateQuestionsToBankRequest {
     private String chapterId;
     private List<NormalQuestionRequest> questions;
 
-    /** Áp cho cả lô, xem ghi chú ở BulkQuestionWithPassageRequest. */
     private Question.UsageScope usageScope;
 }

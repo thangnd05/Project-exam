@@ -81,7 +81,7 @@ public class PostService {
         for (Object[] row : reactRepository.countGroupedByTypeForPost(postId)) {
             byType.put((React.ReactType) row[0], ((Number) row[1]).longValue());
         }
-        // Giữ nguyên thứ tự khai báo enum và bỏ type có count = 0, như bản cũ.
+
         Map<String, Long> counts = new LinkedHashMap<>();
         for (React.ReactType type : React.ReactType.values()) {
             long count = byType.getOrDefault(type, 0L);

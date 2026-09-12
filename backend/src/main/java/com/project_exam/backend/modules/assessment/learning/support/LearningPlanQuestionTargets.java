@@ -27,7 +27,6 @@ public final class LearningPlanQuestionTargets {
 
     }
 
-    /** Ưu tiên target đã lưu trên task; không có thì fallback theo loại ải. */
     public static int resolveTargetCount(Integer storedTarget, PlanTaskType taskType, ExamPart part) {
         if (storedTarget != null && storedTarget > 0) {
             return storedTarget;

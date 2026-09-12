@@ -43,7 +43,6 @@ const TestResult = () => {
   const loading = authLoading || isLoading;
   const error = isError ? "Không thể tải kết quả bài thi này" : "";
 
-  // Điểm là số nguyên ở BE; thang tuỳ loại đề (AWS_SCALE sàn 100 - trần 1000).
   const scoreScale = getScoreScale(enhanced?.scoringMethod);
 
   const formatTime = (start?: string, end?: string) => {

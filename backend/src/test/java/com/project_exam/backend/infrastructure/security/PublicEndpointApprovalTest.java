@@ -19,23 +19,8 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/**
- * Chốt danh sách endpoint gọi được KHÔNG cần đăng nhập.
- *
- * Lý do tồn tại: GET /api/tests/admintest/{testId} từng nằm trong vùng permitAll của
- * SecurityConfig mà quên gọi requirePermission, thành ra ai cũng tải được đáp án của mọi đề.
- * Không có gì báo, vì "quên một dòng" thì compiler không thấy.
- *
- * Test này liệt kê mọi handler rơi vào vùng permitAll rồi so với danh sách đã duyệt bên dưới.
- * Thêm endpoint mới vào vùng public là test đỏ  buộc người thêm phải chọn: gắn kiểm tra quyền,
- * hay ghi tên nó vào đây một cách có ý thức.
- *
- * LƯU Ý: PERMIT_ALL phải soi gương với SecurityConfig.authorizeHttpRequests. Sửa một bên thì
- * sửa cả hai.
- */
 class PublicEndpointApprovalTest {
 
-    /** (method, ant-pattern)  "*" nghĩa là mọi HTTP method. Chép từ SecurityConfig. */
     private static final List<String[]> PERMIT_ALL = List.of(
             new String[]{"POST", "/api/auth/**"},
             new String[]{"GET", "/api/exam-types/**"},
@@ -55,13 +40,8 @@ class PublicEndpointApprovalTest {
             new String[]{"POST", "/api/analytics/visit"}
     );
 
-    /**
-     * Endpoint public đã được duyệt. Mỗi dòng ở đây là một lời khẳng định: "gọi được mà không
-     * đăng nhập là đúng ý đồ". Nhóm theo mục đích cho dễ soát lại.
-     */
     private static final Set<String> APPROVED_PUBLIC_ENDPOINTS = Set.of(
-            // Đăng nhập / đăng ký / quên mật khẩu. change-password & logout tuy nằm trong
-            // /api/auth/** nhưng tự lấy danh tính từ token nên không đăng nhập là hỏng ngay.
+
             "POST /api/auth/login",
             "POST /api/auth/register",
             "POST /api/auth/refresh",
@@ -70,7 +50,6 @@ class PublicEndpointApprovalTest {
             "POST /api/auth/reset-password",
             "POST /api/auth/change-password",
 
-            // Danh mục tra cứu: khách chưa đăng nhập vẫn phải duyệt được kho đề.
             "GET /api/exam-types",
             "GET /api/exam-types/standard",
             "GET /api/exam-types/flexible",
@@ -86,7 +65,6 @@ class PublicEndpointApprovalTest {
             "GET /api/milestones",
             "GET /api/milestones/{id}",
 
-            // Kho tài liệu ôn tập  nội dung học, không phải đáp án đề thi.
             "GET /api/recovery-resources",
             "GET /api/recovery-resources/{resourceId}",
             "GET /api/recovery-resources/{resourceId}/view",
@@ -95,7 +73,6 @@ class PublicEndpointApprovalTest {
             "GET /api/recovery-resources/by-part/{examPartId}",
             "GET /api/recovery-resources/by-parts",
 
-            // Blog + đánh giá: nội dung công khai.
             "GET /api/posts",
             "GET /api/posts/me",
             "GET /api/posts/saved",
@@ -110,8 +87,6 @@ class PublicEndpointApprovalTest {
             "GET /api/evaluations/me",
             "GET /api/evaluations/{id}",
 
-            // Thông tin đề cho người làm bài. KHÔNG được có endpoint nào trả đáp án đúng ở đây:
-            // muốn xem đáp án phải đi qua /api/user-tests/{userTestId}/review-test.
             "GET /api/tests",
             "GET /api/tests/my",
             "GET /api/tests/my-tests",
@@ -127,7 +102,6 @@ class PublicEndpointApprovalTest {
             "GET /api/tests/{testId}/can-start",
             "GET /api/tests/{testId}/parts-summary",
 
-            // Luồng làm bài của khách: danh tính là guest session, kiểm tra trong service.
             "POST /api/user-tests/guest",
             "GET /api/user-tests/guest/check-active",
             "GET /api/user-tests/guest/{userTestId}",
@@ -138,11 +112,8 @@ class PublicEndpointApprovalTest {
             "GET /api/user-answers/guest/user-test/{userTestId}/result",
             "GET /api/user-answers/guest/user-test/{userTestId}/result/enhanced",
 
-            // Tra cứu chứng chỉ bằng mã in trên chứng chỉ: nhà tuyển dụng cầm link phải xem
-            // được mà không cần tài khoản. Chỉ trả tên người nhận + tình trạng, không có điểm.
             "GET /api/certificates/verify/{code}",
 
-            // Đếm lượt truy cập, gọi từ mọi trang kể cả khách.
             "POST /api/analytics/visit"
     );
 

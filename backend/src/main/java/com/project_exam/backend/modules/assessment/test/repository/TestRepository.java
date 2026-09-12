@@ -39,14 +39,9 @@ public interface TestRepository extends JpaRepository<Test, String> {
     long countByClassIdIsNullAndCreatedByInAndCollectionIdIn(
             Collection<String> createdByIds, Collection<String> collectionIds);
 
-    /** Đề thi lấy chứng chỉ của một loại đề, để tách ra khu riêng ở trang loại đề. */
     List<Test> findByExamTypeIdAndClassIdIsNullAndCreatedByInAndExamCategoryIdIn(
             String examTypeId, Collection<String> createdByIds, Collection<String> examCategoryIds);
 
-    /**
-     * Danh sách đề thường: bỏ ra các nhóm đề cấp chứng chỉ vì chúng đã có khu riêng,
-     * để cùng một đề không hiện hai lần trên trang.
-     */
     @Query("""
             SELECT t FROM Test t
             WHERE t.examTypeId = :examTypeId

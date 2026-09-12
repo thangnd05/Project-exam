@@ -6,12 +6,6 @@ import lombok.*;
 import java.time.Instant;
 import java.util.List;
 
-/**
- * Một dòng trong bảng quản lý câu hỏi của admin.
- *
- * Cố tình KHÔNG mang theo đáp án, passage hay media: bảng chỉ cần đủ để nhận ra
- * câu và lọc, còn nội dung đầy đủ đã có ở modal sửa câu (getQuestionDetailAdmin).
- */
 @Getter
 @Builder
 @AllArgsConstructor

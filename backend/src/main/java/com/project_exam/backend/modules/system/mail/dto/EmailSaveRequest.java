@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-/** Dùng chung cho tạo email MANUAL và sửa nội dung email (cả AUTO lẫn MANUAL). */
 @Data
 public class EmailSaveRequest {
 

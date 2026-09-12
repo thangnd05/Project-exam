@@ -58,7 +58,7 @@ export interface TestInfoForm {
   availableTo: string;
   collectionId: string;
   costCoins: string;
-  /** Chỉ dùng cho hai tab tạo câu vào kho; tab tạo đề luôn sinh câu thi. */
+
   usageScope: QuestionUsageScope;
 }
 

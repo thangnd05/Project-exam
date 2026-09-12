@@ -34,7 +34,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/** Nghiệp vụ cho trang quản trị email: sửa mẫu tự động, soạn và gửi email thủ công. */
 @Service
 @RequiredArgsConstructor
 public class EmailAdminService {
@@ -46,8 +45,6 @@ public class EmailAdminService {
     private final EmailMapper emailMapper;
     private final MailService mailService;
     private final MailQueueWorker mailQueueWorker;
-
-    // ------------------------------------------------------------------ đọc
 
     public List<EmailResponse> findAuto() {
         List<Email> emails = emailRepository.findByTypeOrderByCodeAsc(EmailType.AUTO);
@@ -77,10 +74,6 @@ public class EmailAdminService {
                 recipient -> emailMapper.toRecipientResponse(recipient, usersById));
     }
 
-    /**
-     * Danh sách người dùng để giao diện tự chọn người nhận. Trả kèm vai trò và cờ premium
-     * để frontend lọc, backend không cần khái niệm "nhóm người nhận".
-     */
     public List<MailAudienceOptionResponse> findAudienceOptions() {
         Map<String, String> roleNames = roleRepository.findAll().stream()
                 .collect(Collectors.toMap(Role::getRoleId, Role::getRoleName, (a, b) -> a));
@@ -97,8 +90,6 @@ public class EmailAdminService {
                         .build())
                 .toList();
     }
-
-    // ------------------------------------------------------------------ ghi
 
     @Transactional
     public EmailResponse createManual(EmailSaveRequest request, String adminId) {
@@ -120,7 +111,7 @@ public class EmailAdminService {
     @Transactional
     public EmailResponse update(String emailId, EmailSaveRequest request, String adminId) {
         Email email = getEmail(emailId);
-        // Mẫu AUTO giữ nguyên `code` và `type`  code Java tham chiếu trực tiếp tới chúng.
+
         if (email.getType() == EmailType.MANUAL) {
             email.setName(request.getName());
             email.setDescription(request.getDescription());
@@ -145,7 +136,6 @@ public class EmailAdminService {
         emailRepository.delete(email);
     }
 
-    /** Xếp hàng gửi tới danh sách người dùng được chọn rồi bắn worker chạy nền. */
     @Transactional
     public EmailResponse send(String emailId, List<String> userIds, String adminId) {
         Email email = getEmail(emailId);
@@ -180,8 +170,7 @@ public class EmailAdminService {
     @Transactional
     public EmailResponse retryFailed(String emailId) {
         Email email = getEmail(emailId);
-        // Mail AUTO không gửi lại được: nội dung phụ thuộc dữ liệu dùng một lần của lần gửi
-        // đó (link đặt lại mật khẩu có token) mà hệ thống cố ý không lưu lại.
+
         if (email.getType() == EmailType.AUTO) {
             throw new BadRequestException(
                     "Email tự động không gửi lại được, người dùng cần thực hiện lại thao tác.");
@@ -194,8 +183,6 @@ public class EmailAdminService {
         return emailMapper.toResponse(email, statsFor(List.of(email)).get(emailId));
     }
 
-    // ------------------------------------------------- xem trước & gửi thử
-
     public EmailPreviewResponse preview(EmailPreviewRequest request, String adminId) {
         MailService.RenderedMail mail = mailService.render(
                 request.getSubject(), request.getBodyHtml(), sampleVars(adminId));
@@ -205,7 +192,6 @@ public class EmailAdminService {
                 .build();
     }
 
-    /** Gửi thử nội dung đang soạn (chưa cần lưu) về một địa chỉ để kiểm tra hiển thị. */
     @Transactional
     public void testSend(String emailId, EmailPreviewRequest request, String adminId) {
         getEmail(emailId);
@@ -222,7 +208,6 @@ public class EmailAdminService {
         mailService.queueAndDispatch(emailId, adminId, toEmail, mail);
     }
 
-    /** Dữ liệu mẫu để mọi biến {{...}} đều hiện ra giá trị thật khi xem trước. */
     private Map<String, String> sampleVars(String adminId) {
         User admin = adminId == null ? null : userRepository.findById(adminId).orElse(null);
         Map<String, String> vars = new HashMap<>();
@@ -239,17 +224,11 @@ public class EmailAdminService {
         return vars;
     }
 
-    // -------------------------------------------------------------- nội bộ
-
     private Email getEmail(String emailId) {
         return emailRepository.findById(emailId)
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy email"));
     }
 
-    /**
-     * Worker chỉ được chạy sau khi các dòng người nhận đã commit, nếu không luồng nền có
-     * thể quét bảng trước lúc dữ liệu hiện ra và tưởng không có gì để gửi.
-     */
     private void runWorkerAfterCommit(String emailId) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
             mailQueueWorker.run(emailId);

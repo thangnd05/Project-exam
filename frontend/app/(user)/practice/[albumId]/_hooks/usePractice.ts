@@ -20,10 +20,6 @@ type MutationCallbacks<T> = {
   onError?: (err: any) => void;
 };
 
-/**
- * Luyện tập làm đổi tiến độ từ vựng, nên vừa phải làm mới danh sách album (số từ đã thuộc
- * hiện ở màn my-albums) vừa làm mới danh sách từ trong album đang luyện.
- */
 const invalidateAlbumProgress = (qc: QueryClient, albumId?: string) => {
   qc.invalidateQueries({ queryKey: albumKeys.my });
   qc.invalidateQueries({ queryKey: albumDeltaKeys.vocabularies(albumId) });
