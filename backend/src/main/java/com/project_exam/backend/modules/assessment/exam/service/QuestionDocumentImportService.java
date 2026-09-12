@@ -628,7 +628,8 @@ public class QuestionDocumentImportService {
             Matcher om = OPTION_PATTERN.matcher(text);
             if (om.matches() && currentQuestion != null && !inPassageHeader && !isSectionHeadingOptionLike(text)) {
                 ParsedOption parsedOption = parseOptionText(om.group(2));
-                if (isLikelyOptionLine(text, parsedOption.optionText)) {
+                if (isLikelyOptionLine(text, parsedOption.optionText)
+                        && !isQuestionStemStart(text)) {
                     handleOptionLine(om.group(1), parsedOption, pl.isStyled);
                     return;
                 }
@@ -701,6 +702,21 @@ public class QuestionDocumentImportService {
             }
             collector.setPassageTranslation(pendingTranslation.toString().trim());
             passageSegments.clear();
+        }
+
+        /**
+         * "A company must..." / "A CFO mixes three S3 tools." is a stem, not an
+         * option: a bare label with no delimiter, arriving before any option and
+         * before any stem text, can only be the beginning of the question.
+         */
+        private boolean isQuestionStemStart(String text) {
+            if (currentQuestion == null || !currentQuestion.options.isEmpty()) {
+                return false;
+            }
+            if (currentQuestion.questionText != null && !currentQuestion.questionText.isBlank()) {
+                return false;
+            }
+            return !hasOptionDelimiter(text);
         }
 
         private void handleOptionLine(String rawLabel, ParsedOption parsedOption, boolean isStyled) {
@@ -908,7 +924,24 @@ public class QuestionDocumentImportService {
         if (trimmed.length() < 2) {
             return false;
         }
+        if (hasOptionDelimiter(trimmed)) {
+            return true;
+        }
 
+        String t = optionText == null ? "" : optionText.trim();
+        if (t.isEmpty()) {
+            return false;
+        }
+        int wordCount = t.split("\\s+").length;
+        return t.length() <= MAX_INLINE_OPTION_CHARS && wordCount <= MAX_INLINE_OPTION_WORDS;
+    }
+
+    /**
+     * True when the line reads "A." / "(A)" / "A:" / "A-", i.e. the label is
+     * followed by a real delimiter instead of just a space.
+     */
+    private boolean hasOptionDelimiter(String line) {
+        String trimmed = cleanWhitespace(line);
         int i = 0;
         while (i < trimmed.length() && Character.isWhitespace(trimmed.charAt(i))) {
             i++;
@@ -926,19 +959,11 @@ public class QuestionDocumentImportService {
         while (i < trimmed.length() && Character.isWhitespace(trimmed.charAt(i))) {
             i++;
         }
-        if (i < trimmed.length()) {
-            char c = trimmed.charAt(i);
-            if (c == '.' || c == ')' || c == ':' || c == '-') {
-                return true;
-            }
-        }
-
-        String t = optionText == null ? "" : optionText.trim();
-        if (t.isEmpty()) {
+        if (i >= trimmed.length()) {
             return false;
         }
-        int wordCount = t.split("\\s+").length;
-        return t.length() <= MAX_INLINE_OPTION_CHARS && wordCount <= MAX_INLINE_OPTION_WORDS;
+        char c = trimmed.charAt(i);
+        return c == '.' || c == ')' || c == ':' || c == '-';
     }
 
     private List<String> splitLineByOptionLabels(String line) {
@@ -947,13 +972,29 @@ public class QuestionDocumentImportService {
         }
         Matcher m = OPTION_LABEL_START.matcher(line);
         List<Integer> starts = new ArrayList<>();
+        char expectedLabel = 0;
         while (m.find()) {
 
             int s = m.group(1) != null ? m.start(1) : m.start(2);
+            String rawLabel = m.group(1) != null ? m.group(1) : m.group(2);
+            char label = Character.toUpperCase(rawLabel.charAt(0));
 
             if (s > 0 && line.charAt(s - 1) == '(') {
                 s--;
             }
+
+            if (!acceptsLabelInSequence(label, expectedLabel, s)) {
+
+                log.debug(
+                        "Ignore mid-line label '{}' at {} (expected '{}') in line: {}",
+                        label,
+                        s,
+                        expectedLabel == 0 ? "A" : expectedLabel,
+                        line
+                );
+                continue;
+            }
+            expectedLabel = (char) (label + 1);
             starts.add(s);
         }
         if (starts.isEmpty()) {
@@ -977,6 +1018,21 @@ public class QuestionDocumentImportService {
             }
         }
         return out;
+    }
+
+    /**
+     * A label only opens a new option when it continues the A, B, C... run.
+     * The first label of a line may be anything when the line starts with it
+     * (that is a normal one-option-per-paragraph document); a label found in
+     * the middle of a line must be "A" or the successor of the previous one,
+     * otherwise sentences ending in a bare letter ("...in account B.",
+     * "...into VPC A.") would be cut into phantom options.
+     */
+    private boolean acceptsLabelInSequence(char label, char expectedLabel, int start) {
+        if (expectedLabel == 0) {
+            return start == 0 || label == ALLOWED_LABELS.get(0).charAt(0);
+        }
+        return label == expectedLabel;
     }
 
     private boolean isOptionSegmentStyled(XWPFParagraph para, String segmentText) {

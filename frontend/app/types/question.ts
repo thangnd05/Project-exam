@@ -127,6 +127,26 @@ export interface BulkPassageGroupRequest {
   usageScope?: QuestionUsageScope;
 }
 
+export interface QuestionJsonImportRequest {
+  version?: number;
+  examPartId?: string;
+  classId?: string;
+  chapterId?: string;
+  usageScope?: QuestionUsageScope;
+  questions?: NormalQuestionRequest[];
+  groups?: PassageQuestionGroupRequest[];
+}
+
+export interface QuestionJsonImportPreviewResponse {
+  valid: boolean;
+  questionCount: number;
+  groupCount: number;
+  errors: string[];
+  warnings: string[];
+  questions: NormalQuestionRequest[];
+  groups: PassageQuestionGroupRequest[];
+}
+
 export interface BulkQuestionWithPassageRequest {
   examPartId?: string;
   classId?: string;

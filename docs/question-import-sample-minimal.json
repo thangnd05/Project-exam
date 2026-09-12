@@ -1,0 +1,22 @@
+{
+  "questions": [
+    {
+      "questionText": "2 + 2 = ?",
+      "answers": [
+        { "text": "3", "correct": false },
+        { "text": "4", "correct": true },
+        { "text": "5", "correct": false },
+        { "text": "6", "correct": false }
+      ]
+    },
+    {
+      "questionText": "Thủ đô của Việt Nam là?",
+      "answers": [
+        { "text": "Hà Nội", "correct": true },
+        { "text": "Huế", "correct": false },
+        { "text": "Đà Nẵng", "correct": false },
+        { "text": "TP. Hồ Chí Minh", "correct": false }
+      ]
+    }
+  ]
+}
