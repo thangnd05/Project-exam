@@ -152,7 +152,7 @@ function PlanComparison() {
                       <strong>Bài thi nguồn:</strong>{' '}
                       {p.sourceUserTestId ? (
                         <Link href={`/tests/result/${p.sourceUserTestId}`}>Xem kết quả</Link>
-                      ) : '—'}
+                      ) : '-'}
                     </li>
                     <li className={cx('muted')}>
                       Tạo: {formatDate(p.createdAt)}

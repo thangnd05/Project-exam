@@ -12,7 +12,7 @@ import java.util.List;
  * kèm điều kiện đạt lấy từ mẫu chứng chỉ đang bật.
  *
  * Danh sách rỗng khi loại đề chưa có mẫu chứng chỉ bật hoặc chưa có đề nào thuộc nhóm
- * cấp chứng chỉ — frontend cứ thế ẩn cả khu, không phải tự suy luận.
+ * cấp chứng chỉ - frontend cứ thế ẩn cả khu, không phải tự suy luận.
  */
 @Data
 @Builder

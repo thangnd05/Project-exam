@@ -122,7 +122,7 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
           {node.duration_minutes !== '' && node.duration_minutes != null && (
             <span className={cx('description')}>{node.duration_minutes} phút</span>
           )}
-          {node.description && <span className={cx('description')}>— {node.description}</span>}
+          {node.description && <span className={cx('description')}>- {node.description}</span>}
         </div>
         <div className={cx('treeNodeActions')}>
           {level === 0 && (

@@ -268,7 +268,7 @@ function ExamTypeLayoutEditor() {
               >
                 <span className={cx('zoneTitle')}>{zone.label}</span>
                 {blocksByZone[zone.key].length === 0 && (
-                  <span className={cx('zoneEmpty')}>— thả yếu tố vào đây </span>
+                  <span className={cx('zoneEmpty')}>- thả yếu tố vào đây </span>
                 )}
                 {blocksByZone[zone.key].map((block) => {
                   const meta = BLOCK_META[block.type] || { label: block.type };

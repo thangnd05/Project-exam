@@ -15,7 +15,7 @@ export type PartChartRow = {
 
 function formatPercent(value: number | null | undefined): string {
   if (value == null || Number.isNaN(value)) {
-    return '—';
+    return '-';
   }
   return `${Number(value).toFixed(1)}%`;
 }
@@ -31,7 +31,7 @@ function PartRowTooltip({ row }: { row: PartChartRow }) {
       </div>
       <div className={cx('partChartTooltipRow')}>
         <span className={cx('partChartTooltipLabel')}>Hiện tại</span>
-        <strong>{hasCurrent ? formatPercent(row.current) : '—'}</strong>
+        <strong>{hasCurrent ? formatPercent(row.current) : '-'}</strong>
       </div>
       <p className={cx('partChartTooltipStatus')}>
         {row.current == null

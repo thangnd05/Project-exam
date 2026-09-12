@@ -23,7 +23,7 @@ const SITE_NAME = 'WinDe Exam';
 const DESCRIPTION =
   'Nền tảng luyện thi & thi thử chứng chỉ trực tuyến: đề bám sát format thật, ' +
   'chấm điểm tự động, chẩn đoán điểm yếu và lộ trình học cá nhân hoá.';
-const TITLE = `${SITE_NAME} — Luyện thi & thi thử chứng chỉ trực tuyến`;
+const TITLE = `${SITE_NAME} - Luyện thi & thi thử chứng chỉ trực tuyến`;
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),

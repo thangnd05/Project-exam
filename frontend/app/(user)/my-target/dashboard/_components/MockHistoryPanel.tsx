@@ -31,7 +31,7 @@ const enhancedResultKeys = {
 type EnhancedEntry = Partial<EnhancedResultResponse> & { error?: boolean };
 
 function formatDuration(seconds: number | null | undefined): string {
-  if (seconds == null) return '—';
+  if (seconds == null) return '-';
   const sec = Math.max(0, Math.floor(Number(seconds)));
   const days = Math.floor(sec / 86400);
   const hours = Math.floor((sec % 86400) / 3600);
@@ -224,10 +224,10 @@ function MockHistoryPanel({ examTypeId, examTypeName, scoringMethod }: MockHisto
                       <tr key={t.userTestId}>
                         <td>{totalElements - (currentPage * PAGE_SIZE + idx)}</td>
                         <td className={cx('small')}>{formatDate(t.finishedAt)}</td>
-                        <td>{t.testTitle || '—'}</td>
+                        <td>{t.testTitle || '-'}</td>
                         <td className={cx('right')}>
                           <strong>
-                            {(enhancedLoaded ? e.totalScore : t.totalScore) ?? '—'}
+                            {(enhancedLoaded ? e.totalScore : t.totalScore) ?? '-'}
                           </strong>
                         </td>
                         <td className={cx('right')}>
@@ -255,7 +255,7 @@ function MockHistoryPanel({ examTypeId, examTypeName, scoringMethod }: MockHisto
                               <span className={cx('badge', 'badgeMuted')}>Chưa set</span>
                             )
                           ) : (
-                            '—'
+                            '-'
                           )}
                         </td>
                         <td className={cx('small')}>{formatDuration(t.durationTaken)}</td>

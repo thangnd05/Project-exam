@@ -134,7 +134,7 @@ public class SecurityConfig {
                         // bề mặt quản trị thành public mà không ai nhận ra.
                         //
                         // Đây CHỈ là chốt "phải đăng nhập". Quyền cụ thể vẫn do RBAC quyết
-                        // trong từng method (authUtils.requirePermission) — xem ghi chú ở
+                        // trong từng method (authUtils.requirePermission) - xem ghi chú ở
                         // package com.project_exam.backend.modules.admin.
                         .requestMatchers("/api/admin/**").authenticated()
 

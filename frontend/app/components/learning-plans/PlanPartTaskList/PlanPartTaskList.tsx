@@ -50,7 +50,7 @@ function labelSide(i: number) {
 
 function shortMapLabel(name?: string, max = 32) {
   if (!name) return '';
-  const primary = name.split(/\s*[–—(]/)[0].trim();
+  const primary = name.split(/\s*[-–—(]/)[0].trim();
   if (primary.length <= max) return primary;
   const cut = primary.slice(0, max - 1).replace(/\s+\S*$/, '');
   return `${cut || primary.slice(0, max - 1)}…`;

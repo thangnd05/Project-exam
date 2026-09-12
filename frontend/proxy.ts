@@ -9,7 +9,7 @@ import { NextResponse, type NextRequest } from 'next/server';
  * Chạy được là nhờ proxy trong next.config.mjs: browser gọi /api trên chính domain FE nên
  * cookie `accessToken` (HttpOnly, do Spring set) thuộc về domain FE và middleware đọc được.
  * Nếu bỏ proxy mà gọi thẳng backend thì cookie rơi vào domain khác, middleware sẽ không
- * thấy gì — lúc đó phải tắt file này, đừng để nó đá nhầm người đang đăng nhập ra ngoài.
+ * thấy gì - lúc đó phải tắt file này, đừng để nó đá nhầm người đang đăng nhập ra ngoài.
  *
  * Đây chỉ là lớp lọc thô "có phiên hay chưa" để bỏ cú nháy spinner của AuthGuard.
  * Việc xác thực chữ ký token và kiểm tra quyền chi tiết vẫn do backend + AuthGuard làm.
@@ -18,7 +18,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 const AUTH_COOKIE = 'accessToken';
 
 // Đường dẫn công khai nằm lọt bên trong một prefix cần đăng nhập.
-// /certificates/[certificateId] cần đăng nhập, nhưng /certificates/verify thì không —
+// /certificates/[certificateId] cần đăng nhập, nhưng /certificates/verify thì không -
 // đó là trang tra cứu chứng chỉ dành cho nhà tuyển dụng.
 const PUBLIC_EXCEPTIONS = ['/certificates/verify'];
 

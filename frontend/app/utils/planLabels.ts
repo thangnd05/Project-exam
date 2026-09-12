@@ -41,16 +41,16 @@ export const isPracticeAttempt = (
 ): boolean => (userTest?.practicePartIds?.length ?? 0) > 0;
 
 export const taskStatusLabel = (status?: string | null): string =>
-  TASK_STATUS[status as string]?.text || status || '—';
+  TASK_STATUS[status as string]?.text || status || '-';
 
 export const taskStatusVariant = (status?: string | null): string =>
   TASK_STATUS[status as string]?.variant || 'badgeMuted';
 
 export function taskDisplayName(task?: PlanTaskResponse | null): string {
-  if (!task) return '—';
+  if (!task) return '-';
   if (task.taskType === PlanTaskType.PART_CAPSTONE_1) return 'Ải cuối chặng  lần 1';
   if (task.taskType === PlanTaskType.PART_CAPSTONE_2) return 'Ải cuối chặng  lần 2';
-  return task.tagName || '—';
+  return task.tagName || '-';
 }
 
 export function isCapstoneTask(task?: PlanTaskResponse | null): boolean {
@@ -73,8 +73,8 @@ export function buildResyncMessage(plan?: PlanResponse | null): string {
   return 'Đã cập nhật theo mục tiêu mới  tiến độ giữ nguyên.';
 }
 
-export const planStatusLabel = (status?: string | null): string => PLAN_STATUS_LABEL[status as string] || status || '—';
+export const planStatusLabel = (status?: string | null): string => PLAN_STATUS_LABEL[status as string] || status || '-';
 
 export const planStatusVariant = (status?: string | null): string => PLAN_STATUS_VARIANT[status as string] || 'badgeMuted';
 
-export const planStageLabel = (stage?: string | null): string => PLAN_STAGE_LABEL[stage as string] || stage || '—';
+export const planStageLabel = (stage?: string | null): string => PLAN_STAGE_LABEL[stage as string] || stage || '-';

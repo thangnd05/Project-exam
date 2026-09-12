@@ -158,7 +158,7 @@ function TargetAchieved() {
                   </div>
                   <div className={cx('suggestCard')}>
                     <div className={cx('suggestLabel')}>Tự nhập</div>
-                    <div className={cx('suggestValue')} style={{ fontSize: 'var(--font-size-lg)' }}>—</div>
+                    <div className={cx('suggestValue')} style={{ fontSize: 'var(--font-size-lg)' }}>-</div>
                     <ButtonPrime
                       as="link"
                       href={`/my-target?examTypeId=${examTypeId}`}
@@ -179,23 +179,23 @@ function TargetAchieved() {
               <ul style={{ paddingLeft: '2rem', margin: 0, fontSize: 'var(--font-size-ssm)' }}>
                 <li>
                   <Link href={`/my-target?examTypeId=${examTypeId}`}>Đặt mục tiêu mới</Link>
-                  {' '}— chỉnh điểm + aim từng Part.
+                  {' '}- chỉnh điểm + aim từng Part.
                 </li>
                 <li>
                   <Link href={`/learning-plans/compare?examTypeId=${examTypeId}`}>
                     Xem hành trình các lộ trình
                   </Link>
-                  {' '}— độ sẵn sàng #1 → #N qua từng bài thi thử.
+                  {' '}- độ sẵn sàng #1 → #N qua từng bài thi thử.
                 </li>
                 <li>
                   <Link href={`/my-target/dashboard?examTypeId=${examTypeId}`}>
                     Tổng quan mục tiêu
                   </Link>
-                  {' '}— biểu đồ độ sẵn sàng theo thời gian và các bài đã làm.
+                  {' '}- biểu đồ độ sẵn sàng theo thời gian và các bài đã làm.
                 </li>
                 <li>
                   <Link href="/">Làm thêm bài</Link>
-                  {' '}— duy trì phong độ, chờ thi thật.
+                  {' '}- duy trì phong độ, chờ thi thật.
                 </li>
               </ul>
             </div>

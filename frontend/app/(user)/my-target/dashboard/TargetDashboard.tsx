@@ -196,7 +196,7 @@ function TargetDashboard() {
             <div className={cx('statTile')}>
               <div className={cx('statLabel')}>Độ sẵn sàng bài gần nhất</div>
               <div className={cx('statValue')}>
-                {enhancedMatchesType ? `${latestEnhanced?.readinessScore ?? '—'}%` : '—'}
+                {enhancedMatchesType ? `${latestEnhanced?.readinessScore ?? '-'}%` : '-'}
               </div>
               {readinessLevel ? (
                 <span
@@ -220,7 +220,7 @@ function TargetDashboard() {
                 <>
                   <div className={cx('statValue')}>Lộ trình #{activePlan.planSequence ?? '?'}</div>
                   <div className={cx('statHint')}>
-                    Ban đầu {activePlan.baselineReadiness ?? '—'}% ·{' '}
+                    Ban đầu {activePlan.baselineReadiness ?? '-'}% ·{' '}
                     {activePlan.passedTasks ?? 0}/{activePlan.totalTasks ?? 0} ải đã pass
                   </div>
                   <div className={pageCx('statTileFooter')}>

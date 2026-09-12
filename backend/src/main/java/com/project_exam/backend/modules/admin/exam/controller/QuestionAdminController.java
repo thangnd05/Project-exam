@@ -30,7 +30,7 @@ import java.util.List;
  * là trộn lẫn với các endpoint của học viên/giáo viên.
  *
  * Lưu ý: SecurityConfig KHÔNG có luật riêng cho /api/admin/**, quyền vẫn do
- * requirePermission trong từng method quyết định — đổi path không tự làm nó an toàn hơn.
+ * requirePermission trong từng method quyết định - đổi path không tự làm nó an toàn hơn.
  */
 @RestController
 @RequestMapping("/api/admin/questions")

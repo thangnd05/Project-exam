@@ -161,7 +161,7 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
           ) : notes.length === 0 ? (
             <div className={cx('stateBox', 'empty')}>
               <IoDocumentTextOutline className={cx('emptyIcon')} />
-              <span>Sổ tay còn trống — ghi lại điều bạn hay quên nhé.</span>
+              <span>Sổ tay còn trống - ghi lại điều bạn hay quên nhé.</span>
             </div>
           ) : (
             notes.map((note) => (

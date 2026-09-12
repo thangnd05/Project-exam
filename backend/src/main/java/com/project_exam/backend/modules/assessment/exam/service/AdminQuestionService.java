@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * và sửa hàng loạt các thuộc tính chung.
  *
  * Tách khỏi {@link QuestionService} vì đây là góc nhìn quản trị: KHÔNG áp
- * usage_scope theo luồng như hai nhánh ra đề / ôn tập — admin phải nhìn thấy
+ * usage_scope theo luồng như hai nhánh ra đề / ôn tập - admin phải nhìn thấy
  * mọi câu thì mới gắn nhãn lại được.
  */
 @Service

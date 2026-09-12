@@ -15,11 +15,11 @@ import java.util.List;
  * Lưu ý về tham số {@code scopes} có mặt ở phần lớn query bên dưới:
  * mỗi query chỉ phục vụ MỘT luồng, và luồng đó quyết định bốc câu EXAM hay
  * PRACTICE. Truyền qua tham số thay vì viết cứng trong câu query để chỗ gọi
- * nói rõ nó đang lấy câu loại nào — xem
+ * nói rõ nó đang lấy câu loại nào - xem
  * {@link Question.UsageScope#FOR_EXAM} và {@link Question.UsageScope#FOR_PRACTICE}.
  *
  * Mỗi {@code find*} đều có một {@code count*} song song. Sửa cái này mà quên
- * cái kia thì UI báo kho có N câu nhưng bốc ra được ít hơn — luôn sửa theo cặp.
+ * cái kia thì UI báo kho có N câu nhưng bốc ra được ít hơn - luôn sửa theo cặp.
  */
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, String>, JpaSpecificationExecutor<Question> {

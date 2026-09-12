@@ -42,7 +42,7 @@ function readinessCopy(level?: string | null): ReadinessCopy {
 }
 
 export function getReadinessLabel(level?: string | null): string {
-  if (!level) return '—';
+  if (!level) return '-';
   return readinessCopy(level).label;
 }
 

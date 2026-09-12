@@ -994,7 +994,7 @@ public class QuestionService {
     }
 
     /**
-     * Lô cũ (client chưa gửi usageScope) mặc định là câu thi — giữ nguyên hành vi
+     * Lô cũ (client chưa gửi usageScope) mặc định là câu thi - giữ nguyên hành vi
      * trước khi tách EXAM/PRACTICE, đừng đổi thành PRACTICE nếu không muốn câu cũ
      * tự chui vào lộ trình.
      */

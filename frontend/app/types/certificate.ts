@@ -96,7 +96,7 @@ export interface CertificateVerifyResponse {
   design?: CertificateDesign;
 }
 
-/** Một dòng bảng vinh danh công khai — không kèm certificateId/điểm số, link đi qua mã tra cứu. */
+/** Một dòng bảng vinh danh công khai - không kèm certificateId/điểm số, link đi qua mã tra cứu. */
 export interface PublicCertificateResponse {
   certificateCode?: string;
   recipientName?: string;

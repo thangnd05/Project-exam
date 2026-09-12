@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Sửa hàng loạt các thuộc tính "chung" của câu hỏi (không đụng nội dung câu,
- * đáp án hay passage — những thứ đó phải sửa từng câu).
+ * đáp án hay passage - những thứ đó phải sửa từng câu).
  *
  * Quy ước ba trạng thái cho mỗi trường:
  *   - field == null            -> không đổi

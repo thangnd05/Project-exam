@@ -91,7 +91,7 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
               ? ` · ${node.total_question_count} gộp con`
               : ''}
           </span>
-          {node.description && <span className={cx('description')}>— {node.description}</span>}
+          {node.description && <span className={cx('description')}>- {node.description}</span>}
         </div>
         <div className={cx('treeNodeActions')}>
           {level === 0 && (

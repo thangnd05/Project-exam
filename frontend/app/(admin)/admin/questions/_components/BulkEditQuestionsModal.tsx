@@ -14,7 +14,7 @@ import styles from '../QuestionsManagement.module.scss';
 
 const cx = classNames.bind(styles);
 
-/** Giá trị select "để nguyên" — phân biệt với chuỗi rỗng của option thật. */
+/** Giá trị select "để nguyên" - phân biệt với chuỗi rỗng của option thật. */
 const KEEP = '';
 const CLEAR_COLLECTION = '__CLEAR__';
 
@@ -129,8 +129,8 @@ function BulkEditQuestionsModal({
             onChange={(e) => setBankChoice(e.target.value)}
           >
             <option value={KEEP}>-- Giữ nguyên --</option>
-            <option value="true">Có — dùng lại được khi ra đề</option>
-            <option value="false">Không — chỉ thuộc đề đã gắn</option>
+            <option value="true">Có - dùng lại được khi ra đề</option>
+            <option value="false">Không - chỉ thuộc đề đã gắn</option>
           </select>
         </div>
 

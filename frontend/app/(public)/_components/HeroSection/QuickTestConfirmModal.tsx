@@ -31,7 +31,7 @@ function QuickTestConfirmModal({show, test, onClose, onConfirm}: QuickTestConfir
       : 'Không giới hạn';
 
   const questionLabel =
-    test.totalQuestions != null ? `${test.totalQuestions} câu hỏi` : '— câu hỏi';
+    test.totalQuestions != null ? `${test.totalQuestions} câu hỏi` : '- câu hỏi';
 
   return (
     <BaseModal

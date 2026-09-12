@@ -248,7 +248,7 @@ public class TestService {
         if (adminIds.isEmpty()) return PageResponse.empty(safePage, safeSize);
 
         /* Đề cấp chứng chỉ đã có khu riêng ở đầu trang nên không lặp lại ở danh sách này.
-           Chỉ giấu khi loại đề thật sự có mẫu chứng chỉ đang bật — không thì khu riêng cũng
+           Chỉ giấu khi loại đề thật sự có mẫu chứng chỉ đang bật - không thì khu riêng cũng
            không hiện, giấu ở đây nữa là đề biến mất khỏi trang. */
         Set<String> certificateCategoryIds = hasActiveCertificateTemplate(examTypeId)
                 ? certificateCategoryIds()
