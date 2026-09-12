@@ -48,12 +48,15 @@ function labelSide(i: number) {
   return nodeX(i) >= 50 ? 'right' : 'left';
 }
 
-function shortMapLabel(name?: string, max = 32) {
+function shortMapLabel(name?: string, max = 48) {
   if (!name) return '';
-  const primary = name.split(/\s*[-–—(]/)[0].trim();
-  if (primary.length <= max) return primary;
-  const cut = primary.slice(0, max - 1).replace(/\s+\S*$/, '');
-  return `${cut || primary.slice(0, max - 1)}…`;
+  // Keep kebab-case names (Amazon-Aurora-...). Only drop a subtitle after
+  // " - ", an en/em dash, or "(". Then turn remaining hyphens into spaces.
+  const primary = name.split(/\s+[-–—]\s+|\s*[–—]\s*|\s*\(/)[0].trim();
+  const readable = primary.replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+  if (readable.length <= max) return readable;
+  const cut = readable.slice(0, max - 1).replace(/\s+\S*$/, '');
+  return `${cut || readable.slice(0, max - 1)}…`;
 }
 
 function buildPathD(from: number, to: number) {
