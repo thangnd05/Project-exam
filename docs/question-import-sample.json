@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "usageScope": "EXAM",
+
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "Choose the word whose underlined part differs from the other three: \"chairs\"",
+      "explanation": "\"chairs\" phát âm /z/, ba từ còn lại phát âm /s/.",
+      "tagNames": ["Phát âm", "Ngữ âm"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "chairs", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "books", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "cats", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "maps", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MSQ",
+      "questionText": "Những phát biểu nào sau đây đúng về thì hiện tại hoàn thành?",
+      "tagNames": ["Ngữ pháp"],
+      "answers": [
+        { "answerText": "Diễn tả hành động bắt đầu trong quá khứ và còn liên quan đến hiện tại", "isCorrect": true },
+        { "answerText": "Thường đi với \"since\" và \"for\"", "isCorrect": true },
+        { "answerText": "Luôn đi với \"yesterday\"", "isCorrect": false },
+        { "answerText": "Chỉ dùng cho hành động trong tương lai", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "FILL_BLANK",
+      "questionText": "She has lived here ______ 2010.",
+      "explanation": "Mốc thời gian cụ thể nên dùng \"since\".",
+      "answers": [
+        { "answerText": "since", "isCorrect": true },
+        { "answerText": "Since", "isCorrect": true }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "ESSAY",
+      "questionText": "Write a paragraph (120-150 words) about the benefits of learning a foreign language.",
+      "answers": [
+        { "answerText": "Learning a foreign language opens the door to new cultures..." }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionText": "Dạng ngắn gọn: bỏ questionType và answerLabel, hệ thống tự suy ra MCQ và gán nhãn A, B, C, D.",
+      "answers": [
+        { "text": "Đáp án A", "correct": false },
+        { "text": "Đáp án B", "correct": true },
+        { "text": "Đáp án C", "correct": false },
+        { "text": "Đáp án D", "correct": false }
+      ]
+    }
+  ],
+
+  "groups": [
+    {
+      "passage": {
+        "passageType": "READING",
+        "content": "Coffee is one of the most popular drinks in the world. It was first discovered in Ethiopia, where a goat herder noticed his animals became energetic after eating certain berries. Today, Vietnam is the second largest coffee exporter on the planet, with most of its production coming from the Central Highlands.",
+        "contentTranslation": "Cà phê là một trong những thức uống phổ biến nhất trên thế giới...",
+        "extraContents": [
+          "Ghi chú: herder (n) - người chăn gia súc"
+        ]
+      },
+      "questions": [
+        {
+          "questionNumber": 6,
+          "questionType": "MCQ",
+          "questionText": "Where was coffee first discovered?",
+          "answers": [
+            { "answerLabel": "A", "answerText": "Vietnam", "isCorrect": false },
+            { "answerLabel": "B", "answerText": "Ethiopia", "isCorrect": true },
+            { "answerLabel": "C", "answerText": "Brazil", "isCorrect": false },
+            { "answerLabel": "D", "answerText": "Colombia", "isCorrect": false }
+          ]
+        },
+        {
+          "questionNumber": 7,
+          "questionType": "MCQ",
+          "questionText": "According to the passage, Vietnam is the ______ largest coffee exporter.",
+          "answers": [
+            { "answerLabel": "A", "answerText": "first", "isCorrect": false },
+            { "answerLabel": "B", "answerText": "second", "isCorrect": true },
+            { "answerLabel": "C", "answerText": "third", "isCorrect": false },
+            { "answerLabel": "D", "answerText": "fourth", "isCorrect": false }
+          ]
+        }
+      ]
+    },
+    {
+      "passage": {
+        "passageType": "LISTENING",
+        "content": "Listen to the conversation and answer the question.",
+        "mediaUrl": "https://res.cloudinary.com/demo/video/upload/sample-audio.mp3"
+      },
+      "questions": [
+        {
+          "questionNumber": 8,
+          "questionType": "MCQ",
+          "questionText": "What are the speakers mainly discussing?",
+          "answers": [
+            { "answerLabel": "A", "answerText": "A weekend trip", "isCorrect": true },
+            { "answerLabel": "B", "answerText": "A job interview", "isCorrect": false },
+            { "answerLabel": "C", "answerText": "A cooking class", "isCorrect": false },
+            { "answerLabel": "D", "answerText": "A football match", "isCorrect": false }
+          ]
+        }
+      ]
+    }
+  ]
+}

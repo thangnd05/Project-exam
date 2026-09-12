@@ -19,6 +19,8 @@ public class EnhancedResultResponse {
     private String examCategoryCode;
     private String examTypeId;
 
+    private String scoringMethod;
+
     private List<PartBreakdownResponse> partBreakdown;
 
     private int percentage;

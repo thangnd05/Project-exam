@@ -28,14 +28,12 @@ public class EmailAdminController {
     private final EmailAdminService emailAdminService;
     private final AuthUtils authUtils;
 
-    /** Các mẫu email tự động (đăng ký, đổi mật khẩu...)  cố định, chỉ sửa nội dung. */
     @GetMapping("/auto")
     public ResponseEntity<List<EmailResponse>> getAutoEmails() {
         authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         return ResponseEntity.ok(emailAdminService.findAuto());
     }
 
-    /** Các email admin tự soạn. */
     @GetMapping("/manual")
     public ResponseEntity<PageResponse<EmailResponse>> getManualEmails(
             @RequestParam(defaultValue = "0") int page,
@@ -55,7 +53,6 @@ public class EmailAdminController {
         return ResponseEntity.ok(emailAdminService.findRecipients(emailId, page, size));
     }
 
-    /** Danh sách người dùng để giao diện chọn người nhận (kèm vai trò, cờ premium để lọc). */
     @GetMapping("/audience")
     public ResponseEntity<List<MailAudienceOptionResponse>> getAudienceOptions() {
         authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);

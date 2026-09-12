@@ -13,12 +13,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-/**
- * Xác minh token reCAPTCHA với Google.
- *
- * Bắt buộc phải kiểm ở backend: token do trình duyệt gửi lên, bot hoàn toàn có thể gọi
- * thẳng API đăng ký và bỏ qua widget, chỉ có bước đối chiếu với Google mới chặn được.
- */
 @Slf4j
 @Service
 public class RecaptchaService {
@@ -27,7 +21,6 @@ public class RecaptchaService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    /** Tắt mặc định để máy dev chưa có khóa vẫn đăng ký được. */
     @Value("${app.recaptcha.enabled:false}")
     private boolean enabled;
 
@@ -74,7 +67,7 @@ public class RecaptchaService {
             }
             return success;
         } catch (Exception e) {
-            // Google lỗi mạng thì không chặn người dùng thật lại; ghi log để còn biết.
+
             log.warn("Không gọi được dịch vụ xác minh reCAPTCHA: {}", e.getMessage());
             return true;
         }

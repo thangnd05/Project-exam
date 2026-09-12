@@ -171,7 +171,7 @@ function QuestsManagement() {
   };
 
   const formatDate = (value?: string) =>
-    value ? new Date(value).toLocaleString('vi-VN') : '—';
+    value ? new Date(value).toLocaleString('vi-VN') : '-';
 
   const columns: AdminTableColumn[] = [
     {

@@ -45,10 +45,6 @@ public class CertificateMapper {
         }
     }
 
-    /**
-     * Chứng chỉ cũ vẫn phải đọc được kể cả khi snapshot hỏng, nên lỗi parse trả về
-     * design rỗng chứ không ném  người dùng thà thấy chứng chỉ trơ còn hơn lỗi 500.
-     */
     public CertificateDesign readSnapshot(String snapshot) {
         if (snapshot == null || snapshot.isBlank()) {
             return CertificateDesign.builder().build();
@@ -110,7 +106,6 @@ public class CertificateMapper {
                 .build();
     }
 
-    /** Dòng danh sách công khai: đọc phần trình bày từ snapshot, bỏ hết dữ liệu riêng của chủ sở hữu. */
     public PublicCertificateResponse toPublicResponse(UserCertificate certificate) {
         CertificateDesign design = readSnapshot(certificate.getTemplateSnapshot());
         return PublicCertificateResponse.builder()

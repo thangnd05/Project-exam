@@ -178,8 +178,8 @@ function TestsManagement() {
       header: 'Lớp / chương',
       render: (test: TestAdminResponse) =>
         test.classId != null || (test as any).chapterId != null
-          ? `Lớp ${test.classId ?? '—'} / Chương ${(test as any).chapterId ?? '—'}`
-          : '—',
+          ? `Lớp ${test.classId ?? '-'} / Chương ${(test as any).chapterId ?? '-'}`
+          : '-',
     },
     {
       key: 'createdBy',

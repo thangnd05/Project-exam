@@ -22,12 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
-/**
- * Mặt quản trị của posts, tách khỏi controller dùng chung theo khuôn
- * QuestAdminController/CoinAdminController: cùng module, cùng service và
- * repository, chỉ tách controller theo đối tượng dùng. Mọi method ở đây đều
- * cần quyền nên khó sót requirePermission hơn là trộn với endpoint người dùng.
- */
 @RestController
 @RequestMapping("/api/admin/posts")
 @RequiredArgsConstructor

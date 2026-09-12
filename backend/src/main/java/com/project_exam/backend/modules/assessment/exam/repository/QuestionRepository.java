@@ -11,16 +11,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * Lưu ý về tham số {@code scopes} có mặt ở phần lớn query bên dưới:
- * mỗi query chỉ phục vụ MỘT luồng, và luồng đó quyết định bốc câu EXAM hay
- * PRACTICE. Truyền qua tham số thay vì viết cứng trong câu query để chỗ gọi
- * nói rõ nó đang lấy câu loại nào — xem
- * {@link Question.UsageScope#FOR_EXAM} và {@link Question.UsageScope#FOR_PRACTICE}.
- *
- * Mỗi {@code find*} đều có một {@code count*} song song. Sửa cái này mà quên
- * cái kia thì UI báo kho có N câu nhưng bốc ra được ít hơn — luôn sửa theo cặp.
- */
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, String>, JpaSpecificationExecutor<Question> {
 
@@ -32,10 +22,6 @@ public interface QuestionRepository extends JpaRepository<Question, String>, Jpa
     @Query(value = "SELECT * FROM questions WHERE exam_part_id = :examPartId ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
     List<Question> findRandomByExamPart(@Param("examPartId") String examPartId, @Param("limit") int limit);
 
-    /**
-     * Bốc ngẫu nhiên chỉ lấy question_id: ORDER BY RANDOM() phải sort toàn bộ câu của Part,
-     * chiếu về 1 cột id để Postgres không kéo theo nội dung câu hỏi (pool tới 600 dòng/phiên).
-     */
     @Query(value = """
             SELECT question_id FROM questions
             WHERE exam_part_id = :examPartId AND usage_scope IN (:scopes)
@@ -303,10 +289,6 @@ public interface QuestionRepository extends JpaRepository<Question, String>, Jpa
 
     long countByCollectionIdIn(Collection<String> collectionIds);
 
-    /**
-     * questionNumber đánh số theo kho ra đề nên MAX cũng phải tính trong đúng
-     * phạm vi EXAM, nếu không câu PRACTICE sẽ đẩy số nhảy cóc.
-     */
     @Query("""
         SELECT COALESCE(MAX(q.questionNumber), 0) FROM Question q
         WHERE q.examPartId = :examPartId
@@ -362,7 +344,6 @@ public interface QuestionRepository extends JpaRepository<Question, String>, Jpa
             @Param("creatorIds") Collection<String> creatorIds,
             @Param("scopes") Collection<Question.UsageScope> scopes);
 
-    /** Xem ghi chú ở {@link #findRandomQuestionIdsByExamPartId}: chỉ chiếu question_id. */
     @Query(value = """
             SELECT q.question_id FROM questions q
             INNER JOIN question_tags qt ON qt.question_id = q.question_id

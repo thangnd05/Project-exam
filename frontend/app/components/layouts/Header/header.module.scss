@@ -41,7 +41,7 @@
   min-width: 0;
   display: flex;
   justify-content: center;
-  // Không cắt overflow: dropdown "Lớp học" xổ xuống ngoài vùng thanh nav
+
   overflow: visible;
 }
 
@@ -384,7 +384,6 @@
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
   padding: 6px 0;
 
-  // Cầu nối vô hình bù khe 8px, giữ hover liên tục từ nút xuống menu
   &::before {
     content: '';
     position: absolute;
@@ -447,7 +446,6 @@
     gap: 10px;
   }
 
-  // Header chật ở khoảng này: thu hẹp tên thay vì ẩn hẳn
   .username {
     max-width: 80px;
   }

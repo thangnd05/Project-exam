@@ -20,6 +20,5 @@ public class RegisterRequest {
     @NotBlank(message = "Password không được để trống")
     private String password;
 
-    /** Token của widget "Tôi không phải là người máy"; backend đối chiếu lại với Google. */
     private String recaptchaToken;
 }

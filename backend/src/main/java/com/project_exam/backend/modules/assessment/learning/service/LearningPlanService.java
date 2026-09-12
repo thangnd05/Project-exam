@@ -83,7 +83,6 @@ public class LearningPlanService {
     private final LearningPlanProgressSupport progressSupport;
     private final LearningPlanTaskUnlockSupport taskUnlockSupport;
 
-    /** Bài chẩn đoán mới → lộ trình mới (một lộ trình gắn với đúng một bài chẩn đoán). */
     @Transactional
     public PlanResponse generatePlan(String userId, GeneratePlanRequest request) {
         Blueprint blueprint = prepareBlueprint(userId, request);
@@ -94,11 +93,6 @@ public class LearningPlanService {
         return createPlanFromBlueprint(userId, request, blueprint);
     }
 
-    /**
-     * Đổi mục tiêu không phải là chẩn đoán mới nên không đẻ lộ trình: cập nhật ngay trên lộ trình
-     * đang học theo ngưỡng mục tiêu hiện tại. Ải giữ nguyên taskId nên tiến độ và lịch sử phiên
-     * học không mất; ải đã vượt mà chưa tới ngưỡng mới thì mở lại.
-     */
     @Transactional
     public PlanResponse resyncPlan(String userId, String learningPlanId) {
         LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
@@ -122,12 +116,12 @@ public class LearningPlanService {
         }
 
         PlanChanges changes = applyBlueprintInPlace(plan, blueprint);
-        // healPlan chỉ tiến chứ không lùi, nên có ải mới/mở lại thì tự đưa về giai đoạn nền tảng.
+
         if (changes.added() > 0 || changes.reopened() > 0) {
             plan.setPlanStage(PlanStage.FOUNDATION);
             planRepository.save(plan);
         }
-        // Ngược lại, mục tiêu hạ xuống có thể làm lộ trình xong luôn → cho sang MOCK ngay.
+
         progressSupport.healPlan(plan);
 
         List<LearningPlanTask> tasks =
@@ -142,10 +136,6 @@ public class LearningPlanService {
         return response;
     }
 
-    /**
-     * Phần chung của sinh mới và cập nhật: chẩn đoán từ bài thi nguồn rồi dựng danh sách ải
-     * theo mục tiêu hiện tại. Không đụng tới bảng lộ trình.
-     */
     private Blueprint prepareBlueprint(String userId, GeneratePlanRequest request) {
         UserTest userTest = userTestRepository.findById(request.getUserTestId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy bài thi nguồn"));
@@ -188,8 +178,6 @@ public class LearningPlanService {
                 ? Set.of()
                 : new HashSet<>(request.getFocusExamPartIds());
 
-        // Nạp lười: chỉ nhánh dự phòng "Part không có tag nào trong kết quả" mới cần, nên đường
-        // thường tốn 0 query thay vì đọc lại testPart + testQuestion + questions (lần thứ 3).
         Supplier<Map<String, List<String>>> questionIdsByPart =
                 lazy(() -> buildQuestionIdsByPartForTest(userTest.getTestId()));
 
@@ -433,7 +421,6 @@ public class LearningPlanService {
         return part.getPercentage() < requiredPercent;
     }
 
-    /** Supplier nhớ kết quả: loader chỉ chạy lần đầu có người gọi get(). */
     private static <T> Supplier<T> lazy(Supplier<T> loader) {
         return new Supplier<>() {
             private T value;
@@ -551,7 +538,6 @@ public class LearningPlanService {
         return sortOrder != null ? sortOrder : Integer.MAX_VALUE;
     }
 
-    /** tag = null khi lấy tag từ kho câu (không có số liệu chẩn đoán riêng cho tag đó). */
     private TaskCandidate buildTaskCandidate(
             String tagId,
             TagBreakdownResponse tag,
@@ -605,11 +591,6 @@ public class LearningPlanService {
         return focusPartIds.isEmpty() || focusPartIds.contains(examPartId);
     }
 
-    /**
-     * Áp danh sách ải mới lên chính lộ trình đang học: ải trùng khoá (Part + loại ải + tag) chỉ
-     * đổi ngưỡng nên giữ nguyên taskId cùng toàn bộ tiến độ và lịch sử phiên; ải mới thì thêm;
-     * ải không còn cần thì xoá nếu chưa ai đụng, còn đã có lịch sử thì giữ lại và xếp cuối.
-     */
     private PlanChanges applyBlueprintInPlace(LearningPlan plan, Blueprint blueprint) {
         plan.setUserTargetId(blueprint.userTarget().getUserTargetId());
         plan.setTargetScore(blueprint.targetScore());
@@ -637,7 +618,7 @@ public class LearningPlanService {
                 task = newTaskFrom(planId, c, order++);
                 added++;
             } else {
-                // Cùng bài chẩn đoán nên baseline không đổi, chỉ ngưỡng vượt ải chạy theo mục tiêu.
+
                 task.setPassAccuracy(c.passAccuracy());
                 task.setTargetQuestionCount(c.targetQuestionCount());
                 task.setTaskOrder(order++);
@@ -661,8 +642,7 @@ public class LearningPlanService {
                 toDelete.add(task);
                 continue;
             }
-            // Còn lịch sử thì giữ lại cho user xem, nhưng ải dở dang phải chuyển "bỏ qua"
-            // để khỏi kẹt lộ trình ở giai đoạn nền tảng khi nó không còn bắt buộc nữa.
+
             task.setTaskOrder(order++);
             if (!LearningPlanTaskUnlockSupport.isCleared(task)) {
                 task.setStatus(TaskStatus.SKIPPED);
@@ -684,7 +664,6 @@ public class LearningPlanService {
                 .collect(Collectors.toSet());
     }
 
-    /** Ải chưa từng làm và chưa bỏ qua thì xoá đi cũng không mất gì. */
     private static boolean hasProgress(LearningPlanTask task) {
         return LearningPlanTaskUnlockSupport.isCleared(task)
                 || (task.getAttemptCount() != null && task.getAttemptCount() > 0);
@@ -712,7 +691,6 @@ public class LearningPlanService {
         return examPartId + "|" + taskType + "|" + (tagId != null ? tagId : "");
     }
 
-    /** Kết quả chẩn đoán + danh sách ải cần có, chưa gắn với lộ trình nào. */
     private record Blueprint(
             boolean targetAchieved,
             String examTypeId,
@@ -728,7 +706,6 @@ public class LearningPlanService {
         }
     }
 
-    /** Hai thay đổi khiến lộ trình còn ải chưa xong  dùng để đưa planStage về nền tảng. */
     private record PlanChanges(int added, int reopened) {}
 
     private PlanResponse buildPlanResponse(

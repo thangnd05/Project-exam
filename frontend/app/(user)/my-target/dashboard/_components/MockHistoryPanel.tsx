@@ -31,7 +31,7 @@ const enhancedResultKeys = {
 type EnhancedEntry = Partial<EnhancedResultResponse> & { error?: boolean };
 
 function formatDuration(seconds: number | null | undefined): string {
-  if (seconds == null) return '—';
+  if (seconds == null) return '-';
   const sec = Math.max(0, Math.floor(Number(seconds)));
   const days = Math.floor(sec / 86400);
   const hours = Math.floor((sec % 86400) / 3600);
@@ -50,9 +50,10 @@ function formatDuration(seconds: number | null | undefined): string {
 type MockHistoryPanelProps = {
   examTypeId: string;
   examTypeName?: string;
+  scoringMethod?: string | null;
 };
 
-function MockHistoryPanel({ examTypeId, examTypeName }: MockHistoryPanelProps) {
+function MockHistoryPanel({ examTypeId, examTypeName, scoringMethod }: MockHistoryPanelProps) {
   const [tableOpen, setTableOpen] = useState(false);
   const [page, setPage] = useState(0);
 
@@ -178,6 +179,7 @@ function MockHistoryPanel({ examTypeId, examTypeName }: MockHistoryPanelProps) {
             targetScore={targetScore}
             loading={chartLoading}
             examTypeName={examTypeName || ''}
+            scoringMethod={scoringMethod}
           />
         )}
 
@@ -222,10 +224,10 @@ function MockHistoryPanel({ examTypeId, examTypeName }: MockHistoryPanelProps) {
                       <tr key={t.userTestId}>
                         <td>{totalElements - (currentPage * PAGE_SIZE + idx)}</td>
                         <td className={cx('small')}>{formatDate(t.finishedAt)}</td>
-                        <td>{t.testTitle || '—'}</td>
+                        <td>{t.testTitle || '-'}</td>
                         <td className={cx('right')}>
                           <strong>
-                            {(enhancedLoaded ? e.totalScore : t.totalScore) ?? '—'}
+                            {(enhancedLoaded ? e.totalScore : t.totalScore) ?? '-'}
                           </strong>
                         </td>
                         <td className={cx('right')}>
@@ -253,7 +255,7 @@ function MockHistoryPanel({ examTypeId, examTypeName }: MockHistoryPanelProps) {
                               <span className={cx('badge', 'badgeMuted')}>Chưa set</span>
                             )
                           ) : (
-                            '—'
+                            '-'
                           )}
                         </td>
                         <td className={cx('small')}>{formatDuration(t.durationTaken)}</td>

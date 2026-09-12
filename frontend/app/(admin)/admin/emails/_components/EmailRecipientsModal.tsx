@@ -54,7 +54,7 @@ function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps)
     }
   };
 
-  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString('vi-VN') : '—');
+  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString('vi-VN') : '-');
 
   const columns: AdminTableColumn[] = [
     {
@@ -80,7 +80,7 @@ function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps)
       key: 'error',
       header: 'Lỗi',
       render: (row: EmailRecipientResponse) => (
-        <span className="small text-danger">{row.errorMessage || '—'}</span>
+        <span className="small text-danger">{row.errorMessage || '-'}</span>
       ),
     },
     {key: 'sentAt', header: 'Gửi lúc', render: (row: EmailRecipientResponse) => formatDate(row.sentAt)},

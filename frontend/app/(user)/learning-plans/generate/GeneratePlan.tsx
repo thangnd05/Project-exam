@@ -253,7 +253,7 @@ function GeneratePlan() {
                   {filteredUserTests.map((t) => (
                     <option key={t.userTestId} value={t.userTestId}>
                       {t.testTitle ? `${t.testTitle}  ` : ''}
-                      {formatDate(t.finishedAt)} · Điểm {t.totalScore ?? '—'}
+                      {formatDate(t.finishedAt)} · Điểm {t.totalScore ?? '-'}
                       {isPracticeAttempt(t) ? ' · Luyện theo Part' : ''}
                     </option>
                   ))}
@@ -298,7 +298,7 @@ function GeneratePlan() {
         <div className={cx('card', 'cardPrimary')}>
           <div className={cx('cardHeader')} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
-              <strong>Lộ trình #{result.planSequence ?? '—'}:</strong>{' '}
+              <strong>Lộ trình #{result.planSequence ?? '-'}:</strong>{' '}
               <code className={cx('code')}>{result.learningPlanId.slice(0, 8)}…</code>
             </div>
             <button
@@ -316,7 +316,7 @@ function GeneratePlan() {
               <li>
                 <strong>Độ sẵn sàng (chẩn đoán):</strong>
                 <InfoTip text={TERM_TIPS.readiness} />{' '}
-                {result.baselineReadiness ?? '—'}% ({getReadinessLabel(result.readinessLevel)})
+                {result.baselineReadiness ?? '-'}% ({getReadinessLabel(result.readinessLevel)})
               </li>
               <li><strong>Mục tiêu:</strong> {result.targetScore ?? 'N/A'}</li>
               <li><strong>Ải:</strong> {result.totalTasks}</li>

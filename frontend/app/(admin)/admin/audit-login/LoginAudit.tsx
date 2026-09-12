@@ -47,9 +47,9 @@ function LoginAudit() {
       header: 'Thời gian',
       render: (row: LoginAuditRow) => formatDateTime(row.login_time),
     },
-    {key: 'action', header: 'Action', render: (row: LoginAuditRow) => row.action || '—'},
-    {key: 'user_id', header: 'User ID', render: (row: LoginAuditRow) => row.user_id ?? '—'},
-    {key: 'ip_address', header: 'IP', render: (row: LoginAuditRow) => row.ip_address || '—'},
+    {key: 'action', header: 'Action', render: (row: LoginAuditRow) => row.action || '-'},
+    {key: 'user_id', header: 'User ID', render: (row: LoginAuditRow) => row.user_id ?? '-'},
+    {key: 'ip_address', header: 'IP', render: (row: LoginAuditRow) => row.ip_address || '-'},
     {
       key: 'status',
       header: 'Trạng thái',
@@ -62,7 +62,7 @@ function LoginAudit() {
     {
       key: 'failure_reason',
       header: 'Lý do thất bại',
-      render: (row: LoginAuditRow) => row.failure_reason || '—',
+      render: (row: LoginAuditRow) => row.failure_reason || '-',
     },
     {
       key: 'user_agent',
@@ -71,7 +71,7 @@ function LoginAudit() {
         <span title={row.user_agent || ''}>
           {(row.user_agent || '').length > 48
             ? `${(row.user_agent || '').slice(0, 48)}…`
-            : row.user_agent || '—'}
+            : row.user_agent || '-'}
         </span>
       ),
     },

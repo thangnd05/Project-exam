@@ -45,7 +45,6 @@ class EmailHtmlNormalizerTest {
     void coChuNguoiDungChonDeLenCoMacDinhCuaThe() {
         String result = normalizer.toEmailHtml("<h2 class=\"ql-size-small\">Nhỏ</h2>");
 
-        // Hai khai báo cùng nằm trong một style, khai báo sau thắng.
         assertTrue(result.indexOf("font-size:13px;") > result.indexOf("font-size:20px"));
     }
 

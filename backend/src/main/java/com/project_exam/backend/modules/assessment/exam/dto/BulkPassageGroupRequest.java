@@ -13,7 +13,6 @@ public class BulkPassageGroupRequest {
 
     private List<PassageQuestionGroupRequest> groups;
 
-    /** Áp cho cả lô, xem ghi chú ở BulkQuestionWithPassageRequest. */
     private Question.UsageScope usageScope;
 }
 

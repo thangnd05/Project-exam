@@ -76,10 +76,6 @@ export function useBulkCreateVocabularies(
 
 type UpdateVocabularyVariables = { vocabId: string; data: VocabularyRequest };
 
-/**
- * Không tự invalidate: chỗ gọi đang tự quyết định làm gì sau khi sửa (đóng modal, cập nhật
- * tại chỗ), nên giữ nguyên hành vi cũ thay vì áp thêm refetch.
- */
 export function useUpdateVocabulary(
   options: Omit<
     UseMutationOptions<VocabularyResponse, any, UpdateVocabularyVariables>,

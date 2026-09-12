@@ -14,7 +14,6 @@ import { brandColors } from '@/app/assets/styles/brandColors';
 
 const cx = classNames.bind(styles);
 
-
 const TROPHY_COLORS: Record<number, string> = {
   1: brandColors.unique,
   2: '#94a3b8',

@@ -14,9 +14,9 @@ import { SessionStatus } from '@/app/enums';
 const cx = classNames.bind(styles);
 
 function pct(v?: number | string | null) {
-  if (v == null) return '—';
+  if (v == null) return '-';
   const n = typeof v === 'number' ? v : Number(v);
-  if (Number.isNaN(n)) return '—';
+  if (Number.isNaN(n)) return '-';
   return `${n.toFixed(2)}%`;
 }
 
@@ -91,7 +91,7 @@ function TaskHistory() {
           Trạng thái: {taskStatusLabel(task.status)}
         </span>
         <span className={cx('badge', 'badgeMuted')}>
-          Cần ≥ {pass != null ? `${pass}%` : '—'} để vượt ải
+          Cần ≥ {pass != null ? `${pass}%` : '-'} để vượt ải
         </span>
       </div>
 
@@ -100,7 +100,7 @@ function TaskHistory() {
           <div className={cx('statLabel')}>Lúc chẩn đoán</div>
           <div className={cx('statValue')}>{pct(baseline)}</div>
           <div className={cx('statHint')}>
-            Sai {task.wrongCountAtDiagnosis ?? '—'} câu
+            Sai {task.wrongCountAtDiagnosis ?? '-'} câu
           </div>
         </div>
 
@@ -128,7 +128,7 @@ function TaskHistory() {
 
         <div className={cx('statTile')}>
           <div className={cx('statLabel')}>Ngưỡng vượt ải</div>
-          <div className={cx('statValue')}>{pass != null ? `${pass}%` : '—'}</div>
+          <div className={cx('statValue')}>{pass != null ? `${pass}%` : '-'}</div>
           {best != null && pass != null && (
             <div className={cx('statHint', best >= pass ? 'successText' : 'warningText')}>
               {best >= pass ? 'Đã đạt ngưỡng' : `Còn ${(pass - best).toFixed(1)}%`}
@@ -163,7 +163,7 @@ function TaskHistory() {
             <div className={cx('progressLegend')}>
               <span>0%</span>
               <span className={cx('dangerText')}>
-                Pass {pass != null ? `${pass}%` : '—'}
+                Pass {pass != null ? `${pass}%` : '-'}
               </span>
               <span>100%</span>
             </div>
@@ -226,9 +226,9 @@ function TaskHistory() {
                   <td>{sessions.length - idx}</td>
                   <td className={cx('small')}>{formatDateTime(s.startedAt)}</td>
                   <td className={cx('small')}>{formatDateTime(s.submittedAt)}</td>
-                  <td className={cx('right')}>{s.questionCount ?? '—'}</td>
+                  <td className={cx('right')}>{s.questionCount ?? '-'}</td>
                   <td className={cx('right')}>
-                    {s.accuracy != null ? `${s.accuracy}%` : '—'}
+                    {s.accuracy != null ? `${s.accuracy}%` : '-'}
                   </td>
                   <td>
                     {s.status === SessionStatus.IN_PROGRESS ? (
@@ -238,7 +238,7 @@ function TaskHistory() {
                     ) : s.passed === false ? (
                       <span className={cx('badge', 'badgeMuted')}>Chưa đạt</span>
                     ) : (
-                      <span className={cx('muted', 'small')}>—</span>
+                      <span className={cx('muted', 'small')}>-</span>
                     )}
                   </td>
                   <td className={cx('right')}>
@@ -250,7 +250,7 @@ function TaskHistory() {
                         Xem đáp án
                       </Link>
                     ) : (
-                      <span className={cx('muted', 'small')}>—</span>
+                      <span className={cx('muted', 'small')}>-</span>
                     )}
                   </td>
                 </tr>

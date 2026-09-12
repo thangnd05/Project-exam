@@ -86,7 +86,7 @@ const getInitials = (name?: string) => {
 
 const shortExamName = (name?: string) => {
   if (!name) return '';
-  const primary = name.split(/\s*[–—]\s*/)[0].trim();
+  const primary = name.split(/\s*[-–—]\s*/)[0].trim();
   if (primary.length <= 40) return primary;
   const cut = primary.slice(0, 38).replace(/\s+\S*$/, '');
   return `${cut || primary.slice(0, 38)}…`;
@@ -565,7 +565,7 @@ const QuickTestOrbit = forwardRef<QuickTestOrbitHandle, QuickTestOrbitProps>(
               >
                 <span className={cx('hubLabel')}>Kiểm tra nhanh</span>
                 <span className={cx('hubNum')}>
-                  {frontTest?.totalQuestions || '—'}
+                  {frontTest?.totalQuestions || '-'}
                 </span>
                 <span className={cx('hubUnit')}>câu hỏi</span>
                 <span className={cx('hubCta')} aria-hidden="true">
@@ -642,7 +642,7 @@ function CardFace({test}: {test: QuickChallengeCardResponse}) {
       <h3 className={cx('name')} title={test.examTypeName}>
         {shortExamName(test.examTypeName)}
       </h3>
-      <span className={cx('count')}>{test.totalQuestions || '—'} câu</span>
+      <span className={cx('count')}>{test.totalQuestions || '-'} câu</span>
     </>
   );
 }

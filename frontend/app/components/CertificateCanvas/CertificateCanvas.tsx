@@ -7,10 +7,8 @@ import styles from './CertificateCanvas.module.scss';
 
 const cx = classNames.bind(styles);
 
-/** Chỗ chèn tên loại đề trong câu mô tả cấu hình được ở mẫu chứng chỉ. */
 const EXAM_TYPE_TOKEN = '{examType}';
 
-/** Tách câu cấu hình theo {examType} rồi in đậm tên loại đề ở mỗi chỗ chèn. */
 const renderBodyText = (text: string, examTypeName?: string) =>
   text.split(EXAM_TYPE_TOKEN).flatMap((chunk, index) =>
     index === 0

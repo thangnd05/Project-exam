@@ -136,13 +136,6 @@ public class UserTestService {
         return finalizeAttempt(userTest, Instant.now());
     }
 
-    /**
-     * Chốt một lượt làm bài: chấm điểm rồi chuyển sang COMPLETED.
-     *
-     * Dùng chung cho nộp bài thủ công và cho việc dọn bài quá giờ mà người dùng không nộp
-     * (đóng tab, mất mạng). finishedAt không bao giờ vượt quá hạn làm bài, nếu không thì
-     * bài dọn muộn 3 ngày sẽ hiện "làm trong 3 ngày".
-     */
     @Transactional
     public UserTest finalizeAttempt(UserTest userTest, Instant now) {
         Test test = testRepository.findById(userTest.getTestId())
@@ -175,10 +168,6 @@ public class UserTestService {
         return saved;
     }
 
-    /**
-     * Chấm xong thì xét cấp chứng chỉ. Chạy sau khi commit và nuốt lỗi: chứng chỉ là phần
-     * thưởng, hỏng thì cũng không được làm lượt nộp bài thất bại.
-     */
     private void issueCertificateAfterSubmit(UserTest userTest) {
         if (userTest.getUserId() == null || userTest.isPractice()) {
             return;
@@ -187,11 +176,6 @@ public class UserTestService {
         AfterCommitTasks.runQuietly(() -> certificateService.issueIfEligible(userTestId));
     }
 
-    /**
-     * Lượt làm bài quá giờ mà chưa nộp thì tự chốt, trả về true nếu vừa chốt.
-     * Không có bước này thì bài treo IN_PROGRESS vĩnh viễn: lần sau bấm "Làm bài" người dùng
-     * rơi lại đúng bài đã hết giờ, không lưu được đáp án nào và cũng không mở được lượt mới.
-     */
     @Transactional
     public boolean finalizeIfExpired(UserTest userTest) {
         if (userTest == null || userTest.getStatus() != UserTest.Status.IN_PROGRESS) {
@@ -433,7 +417,7 @@ public class UserTestService {
                                 userId, testId, UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE, practicePartIds)
                 : userTestRepository.findActiveUserTest(
                         userId, testId, UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE);
-        // Bài dở còn giờ thì vào tiếp; hết giờ thì chốt luôn rồi mở lượt mới bên dưới.
+
         if (existing.isPresent() && !finalizeIfExpired(existing.get())) {
             return existing.get();
         }
@@ -523,10 +507,6 @@ public class UserTestService {
         return userTestRepository.findActiveGuestUserTest(guestSessionId, testId, UserTest.Status.IN_PROGRESS);
     }
 
-    /**
-     * Như findActiveUserTest nhưng bài đã quá giờ thì chốt luôn và coi như không còn bài dở,
-     * để màn hình "bạn đang có bài làm dở" không mời người dùng quay lại một bài đã chết.
-     */
     @Transactional
     public Optional<UserTest> resolveActiveUserTest(String userId, String testId, String modeRaw,
                                                     List<String> examPartIds) {
@@ -658,11 +638,6 @@ public class UserTestService {
         return toSave.size();
     }
 
-    /**
-     * Backstop cho những bài có giờ mà người dùng không bao giờ quay lại: chốt điểm theo đáp án
-     * đã lưu được. Luồng tương tác (start / check-active) đã tự xử lý ngay khi người dùng quay
-     * lại, job này chỉ để bảng thống kê không đọng bài IN_PROGRESS treo mãi.
-     */
     @Transactional
     public int finalizeExpiredTimedAttempts(long staleAfterHours, int batchSize) {
         Instant now = Instant.now();

@@ -24,10 +24,6 @@ public class AsyncConfig {
         return executor;
     }
 
-    /**
-     * Luồng gửi email. Pool nhỏ vì SMTP chặn khi bị dội quá nhanh; CallerRunsPolicy thay
-     * vì Discard để mail bị dồn hàng thì chậm chứ không mất.
-     */
     @Bean(name = "mailExecutor")
     public Executor mailExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();

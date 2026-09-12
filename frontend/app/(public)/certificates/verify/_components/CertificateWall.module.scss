@@ -54,10 +54,6 @@
   list-style: none;
 }
 
-/**
- * Thẻ là bản thu nhỏ của chính tấm chứng chỉ (CertificateCanvas tự co theo bề ngang
- * nhờ container query), phủ thêm nhãn "Mới" và lớp mời bấm khi rê chuột.
- */
 .card {
   position: relative;
   display: block;

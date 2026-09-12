@@ -16,6 +16,7 @@ import {
 
 import { useAuth } from "@/app/hooks/useAuth";
 import { getGuestSessionId, guestHeaders } from "@/app/utils/guestSession";
+import { getScoreScale } from "@/app/utils/scoreScale";
 import { useTestResult } from "./_hooks/useTestResult";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";
 import CertificateBanner from "./_components/CertificateBanner";
@@ -41,6 +42,8 @@ const TestResult = () => {
 
   const loading = authLoading || isLoading;
   const error = isError ? "Không thể tải kết quả bài thi này" : "";
+
+  const scoreScale = getScoreScale(enhanced?.scoringMethod);
 
   const formatTime = (start?: string, end?: string) => {
     if (!start || !end) return "--:--";
@@ -108,8 +111,13 @@ const TestResult = () => {
                   <>
                     <span className={cx("label")}>Điểm số</span>
                     <div className={cx("points")}>
-                      {result?.totalScore?.toFixed(2) || "0.00"}
+                      {Math.round(Number(result?.totalScore ?? 0))}
                     </div>
+                    {scoreScale.scaled && (
+                      <span className={cx("scale-hint")}>
+                        thang {scoreScale.min}–{scoreScale.max}
+                      </span>
+                    )}
                   </>
                 )}
               </div>

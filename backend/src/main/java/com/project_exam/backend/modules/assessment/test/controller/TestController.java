@@ -73,10 +73,6 @@ public class TestController {
         return ResponseEntity.ok(testService.getPartsSummary(testId));
     }
 
-    /**
-     * Trả cả đáp án đúng + giải thích nên chỉ dành cho người soạn đề. Người làm bài muốn xem lại
-     * đáp án thì đi qua GET /api/user-tests/{userTestId}/review-test (có kiểm tra đã nộp bài).
-     */
     @GetMapping("/admintest/{testId}")
     public ResponseEntity<TestAdminResponse> getTestByIdAdmin(
             @PathVariable String testId,

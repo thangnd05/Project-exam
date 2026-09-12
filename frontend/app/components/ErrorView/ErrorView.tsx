@@ -18,7 +18,7 @@ function ErrorView({ error, reset }: ErrorViewProps) {
     <div className={styles.wrapper}>
       <h2 className={styles.title}>Trang gặp sự cố</h2>
       <p className={styles.message}>
-        Đã có lỗi xảy ra khi tải nội dung. Bạn thử lại giúp mình nhé — nếu vẫn lỗi thì tải lại trang.
+        Đã có lỗi xảy ra khi tải nội dung. Bạn thử lại giúp mình nhé - nếu vẫn lỗi thì tải lại trang.
       </p>
       <div className={styles.actions}>
         <ButtonPrime variant="primary" size="lg" onClick={reset}>

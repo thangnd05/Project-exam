@@ -19,6 +19,8 @@ import com.project_exam.backend.modules.assessment.exam.dto.PassageRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCreateRequest;
+import com.project_exam.backend.modules.assessment.exam.dto.QuestionJsonImportPreviewResponse;
+import com.project_exam.backend.modules.assessment.exam.dto.QuestionJsonImportRequest;
 import com.project_exam.backend.modules.assessment.test.dto.AnswerResponse;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.assessment.exam.mapper.PassageMapper;
@@ -76,6 +78,7 @@ public class QuestionService {
     private final ClassMemberRepository classMemberRepository;
     private final ClassRepository classRepository;
     private final QuestionDocumentImportService questionDocumentImportService;
+    private final QuestionJsonImportService questionJsonImportService;
     private final AdminUserProvider adminUserProvider;
     private final ClassAccessGuard classAccessGuard;
     private final UserAnswerRepository userAnswerRepository;
@@ -340,6 +343,84 @@ public class QuestionService {
         return questionDocumentImportService.parsePassageQuestionsFromDocument(file);
     }
 
+    /** Dry-run: kiểm tra file JSON và trả về dữ liệu đã chuẩn hoá, không ghi database. */
+    public QuestionJsonImportPreviewResponse previewQuestionsFromJson(QuestionJsonImportRequest payload) {
+        QuestionJsonImportService.NormalizedImport normalized =
+                questionJsonImportService.normalize(payload);
+        return new QuestionJsonImportPreviewResponse(
+                normalized.isValid(),
+                normalized.totalQuestions(),
+                normalized.getGroups().size(),
+                normalized.getErrors(),
+                normalized.getWarnings(),
+                normalized.getQuestions(),
+                normalized.getGroups()
+        );
+    }
+
+    /**
+     * Import câu hỏi từ payload JSON. Tham số trên URL (nếu có) được ưu tiên hơn giá trị
+     * khai báo trong file, để một file JSON dùng lại được cho nhiều part / lớp.
+     */
+    @Transactional
+    public List<QuestionAdminResponse> importQuestionsFromJson(
+            QuestionJsonImportRequest payload,
+            String examPartId,
+            String classId,
+            String chapterId,
+            Question.UsageScope usageScope,
+            String currentUserId
+    ) throws IOException {
+        String resolvedExamPartId = firstNonBlank(examPartId, payload.getExamPartId());
+        if (resolvedExamPartId == null) {
+            throw new BadRequestException("Thiếu examPartId.");
+        }
+        String resolvedClassId = firstNonBlank(classId, payload.getClassId());
+        String resolvedChapterId = firstNonBlank(chapterId, payload.getChapterId());
+
+        QuestionJsonImportService.NormalizedImport normalized =
+                questionJsonImportService.normalize(payload);
+        normalized.throwIfInvalid();
+
+        Question.UsageScope resolvedScope =
+                usageScope != null ? usageScope : normalized.getUsageScope();
+
+        List<QuestionAdminResponse> responses = new ArrayList<>();
+
+        if (!normalized.getQuestions().isEmpty()) {
+            responses.addAll(createBulkQuestionsToBankNoPassage(
+                    new BulkCreateQuestionsToBankRequest(
+                            resolvedExamPartId,
+                            resolvedClassId,
+                            resolvedChapterId,
+                            normalized.getQuestions(),
+                            resolvedScope
+                    ),
+                    currentUserId,
+                    Collections.emptyMap()
+            ));
+        }
+
+        if (!normalized.getGroups().isEmpty()) {
+            BulkPassageGroupRequest groupRequest = new BulkPassageGroupRequest();
+            groupRequest.setExamPartId(resolvedExamPartId);
+            groupRequest.setClassId(resolvedClassId);
+            groupRequest.setChapterId(resolvedChapterId);
+            groupRequest.setGroups(normalized.getGroups());
+            groupRequest.setUsageScope(resolvedScope);
+            responses.addAll(createBulkGroups(groupRequest, currentUserId, Collections.emptyMap()));
+        }
+
+        return responses;
+    }
+
+    private String firstNonBlank(String preferred, String fallback) {
+        if (preferred != null && !preferred.isBlank()) {
+            return preferred;
+        }
+        return fallback != null && !fallback.isBlank() ? fallback : null;
+    }
+
     @Transactional
     public List<QuestionAdminResponse> importQuestionsFromDocument(
             MultipartFile file,
@@ -414,7 +495,7 @@ public class QuestionService {
             question.setExplanation(parsedQuestion.getExplanation());
             question.setCreatedBy(currentUserId);
             question.setIsBank(Boolean.FALSE);
-            // Import gắn thẳng vào đề: câu thi.
+
             question.setUsageScope(Question.UsageScope.EXAM);
             if (classId != null) {
                 question.setClassId(classId);
@@ -751,7 +832,7 @@ public class QuestionService {
         question.setExplanation(request.getExplanation());
         question.setCreatedBy(currentUserId);
         question.setIsBank(Boolean.FALSE);
-        // Câu viết thẳng vào một đề cụ thể thì đương nhiên là câu thi.
+
         question.setUsageScope(Question.UsageScope.EXAM);
 
         if (request.getClassId() != null) question.setClassId(request.getClassId());
@@ -993,11 +1074,6 @@ public class QuestionService {
         return buildQuestionAdminResponse(question, passage, updatedAnswers);
     }
 
-    /**
-     * Lô cũ (client chưa gửi usageScope) mặc định là câu thi — giữ nguyên hành vi
-     * trước khi tách EXAM/PRACTICE, đừng đổi thành PRACTICE nếu không muốn câu cũ
-     * tự chui vào lộ trình.
-     */
     private Question.UsageScope resolveUsageScope(Question.UsageScope requested) {
         return requested != null ? requested : Question.UsageScope.EXAM;
     }

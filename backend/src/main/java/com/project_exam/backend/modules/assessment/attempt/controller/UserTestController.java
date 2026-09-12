@@ -57,7 +57,6 @@ public class UserTestController {
         return ResponseEntity.ok(userTestService.getMeta(userTestId, userId));
     }
 
-    /** Đáp án + giải thích của đề, chỉ mở cho chủ bài làm và chỉ khi bài đã nộp. */
     @GetMapping("/{userTestId}/review-test")
     public ResponseEntity<TestAdminResponse> getReviewTest(
             @PathVariable String userTestId,

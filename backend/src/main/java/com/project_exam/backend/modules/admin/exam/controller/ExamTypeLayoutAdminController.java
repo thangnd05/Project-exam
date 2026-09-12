@@ -9,12 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * Mặt quản trị của exam-types, tách khỏi controller dùng chung theo khuôn
- * QuestAdminController/CoinAdminController: cùng module, cùng service và
- * repository, chỉ tách controller theo đối tượng dùng. Mọi method ở đây đều
- * cần quyền nên khó sót requirePermission hơn là trộn với endpoint người dùng.
- */
 @RestController
 @RequestMapping("/api/admin/exam-types")
 @RequiredArgsConstructor

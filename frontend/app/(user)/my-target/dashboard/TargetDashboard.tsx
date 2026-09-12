@@ -94,10 +94,11 @@ function TargetDashboard() {
   }, [target, examParts]);
 
   const readinessLevel = enhancedMatchesType ? latestEnhanced?.readinessLevel : null;
-  const examTypeName = useMemo(
-    () => examTypes.find((et) => et.examTypeId === examTypeId)?.name || '',
+  const selectedExamType = useMemo(
+    () => examTypes.find((et) => et.examTypeId === examTypeId),
     [examTypes, examTypeId],
   );
+  const examTypeName = selectedExamType?.name || '';
 
   return (
     <div className={cx('wrapper')}>
@@ -195,7 +196,7 @@ function TargetDashboard() {
             <div className={cx('statTile')}>
               <div className={cx('statLabel')}>Độ sẵn sàng bài gần nhất</div>
               <div className={cx('statValue')}>
-                {enhancedMatchesType ? `${latestEnhanced?.readinessScore ?? '—'}%` : '—'}
+                {enhancedMatchesType ? `${latestEnhanced?.readinessScore ?? '-'}%` : '-'}
               </div>
               {readinessLevel ? (
                 <span
@@ -219,7 +220,7 @@ function TargetDashboard() {
                 <>
                   <div className={cx('statValue')}>Lộ trình #{activePlan.planSequence ?? '?'}</div>
                   <div className={cx('statHint')}>
-                    Ban đầu {activePlan.baselineReadiness ?? '—'}% ·{' '}
+                    Ban đầu {activePlan.baselineReadiness ?? '-'}% ·{' '}
                     {activePlan.passedTasks ?? 0}/{activePlan.totalTasks ?? 0} ải đã pass
                   </div>
                   <div className={pageCx('statTileFooter')}>
@@ -264,7 +265,11 @@ function TargetDashboard() {
       )}
 
       {!loading && (
-        <MockHistoryPanel examTypeId={examTypeId} examTypeName={examTypeName} />
+        <MockHistoryPanel
+          examTypeId={examTypeId}
+          examTypeName={examTypeName}
+          scoringMethod={selectedExamType?.scoringMethod}
+        />
       )}
 
       {!loading && (

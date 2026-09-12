@@ -9,7 +9,10 @@ import com.project_exam.backend.modules.assessment.exam.dto.PassageQuestionGroup
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCreateRequest;
+import com.project_exam.backend.modules.assessment.exam.dto.QuestionJsonImportPreviewResponse;
+import com.project_exam.backend.modules.assessment.exam.dto.QuestionJsonImportRequest;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
+import com.project_exam.backend.modules.assessment.exam.service.QuestionJsonImportService;
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
@@ -33,11 +36,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class QuestionController {
     private final QuestionService questionService;
+    private final QuestionJsonImportService questionJsonImportService;
     private final ObjectMapper objectMapper;
     private final AuthUtils authUtils;
-
-    // Các endpoint quản trị (duyệt toàn bộ ngân hàng, sửa hàng loạt) nằm ở
-    // QuestionAdminController — /api/admin/questions.
 
     @GetMapping("/{id}")
     public ResponseEntity<QuestionAdminResponse> getQuestionById(
@@ -212,6 +213,68 @@ public class QuestionController {
     ) throws IOException {
         List<PassageQuestionGroupRequest> responses = questionService.previewPassageQuestionsFromDocument(file);
         return ResponseEntity.ok(responses);
+    }
+
+    @PostMapping(
+            value = "/preview/json",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<QuestionJsonImportPreviewResponse> previewQuestionsFromJsonBody(
+            @RequestBody String rawJson
+    ) {
+        QuestionJsonImportRequest payload = questionJsonImportService.parse(rawJson);
+        return ResponseEntity.ok(questionService.previewQuestionsFromJson(payload));
+    }
+
+    @PostMapping(
+            value = "/preview/json",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<QuestionJsonImportPreviewResponse> previewQuestionsFromJsonFile(
+            @RequestPart("file") MultipartFile file
+    ) throws IOException {
+        QuestionJsonImportRequest payload = questionJsonImportService.parse(file);
+        return ResponseEntity.ok(questionService.previewQuestionsFromJson(payload));
+    }
+
+    @PostMapping(
+            value = "/import/json",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<List<QuestionAdminResponse>> importQuestionsFromJsonBody(
+            @RequestBody String rawJson,
+            @RequestParam(required = false) String examPartId,
+            @RequestParam(required = false) String classId,
+            @RequestParam(required = false) String chapterId,
+            @RequestParam(required = false) Question.UsageScope usageScope,
+            HttpServletRequest httpRequest
+    ) throws IOException {
+        QuestionJsonImportRequest payload = questionJsonImportService.parse(rawJson);
+        List<QuestionAdminResponse> responses = questionService.importQuestionsFromJson(
+                payload, examPartId, classId, chapterId, usageScope, authUtils.getUserId(httpRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+    }
+
+    @PostMapping(
+            value = "/import/json",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<List<QuestionAdminResponse>> importQuestionsFromJsonFile(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(required = false) String examPartId,
+            @RequestParam(required = false) String classId,
+            @RequestParam(required = false) String chapterId,
+            @RequestParam(required = false) Question.UsageScope usageScope,
+            HttpServletRequest httpRequest
+    ) throws IOException {
+        QuestionJsonImportRequest payload = questionJsonImportService.parse(file);
+        List<QuestionAdminResponse> responses = questionService.importQuestionsFromJson(
+                payload, examPartId, classId, chapterId, usageScope, authUtils.getUserId(httpRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)

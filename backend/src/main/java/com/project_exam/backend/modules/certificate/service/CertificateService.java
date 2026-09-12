@@ -40,27 +40,16 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Cấp và tra cứu chứng chỉ.
- *
- * Điều kiện cấp (kiểu AWS, chỉ Đạt/Chưa đạt):
- *   - lượt làm bài là FULL_TEST đã COMPLETED của người dùng đã đăng nhập (khách không cấp)
- *   - đề thuộc nhóm đề có cờ exam_categories.certificate_eligible
- *   - loại đề có mẫu chứng chỉ đang bật
- *   - tổng điểm >= passScore của mẫu
- *   - người đó chưa có chứng chỉ còn hiệu lực cho loại đề này
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CertificateService {
 
-    /** Bỏ I, O, 0, 1 để đọc/đánh máy lại mã không nhầm. */
     private static final String CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
     private static final int CODE_LENGTH = 6;
     private static final int CODE_MAX_ATTEMPTS = 5;
     private static final SecureRandom RANDOM = new SecureRandom();
-    /** Trần trang cho bảng vinh danh: khách không kéo được cả bảng bằng một request. */
+
     private static final int PUBLIC_MAX_PAGE_SIZE = 24;
 
     private final UserCertificateRepository userCertificateRepository;
@@ -72,12 +61,6 @@ public class CertificateService {
     private final UserRepository userRepository;
     private final CertificateMapper certificateMapper;
 
-    // ------------------------------------------------------------------ cấp phát
-
-    /**
-     * Cấp chứng chỉ nếu lượt làm bài vừa chốt đủ điều kiện. Gọi sau khi commit lượt làm bài
-     * nên chạy trong transaction riêng: chứng chỉ hỏng thì bài thi vẫn phải nộp được.
-     */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Optional<UserCertificate> issueIfEligible(String userTestId) {
         UserTest userTest = userTestRepository.findById(userTestId).orElse(null);
@@ -95,7 +78,6 @@ public class CertificateService {
             return Optional.empty();
         }
 
-        // Đã có chứng chỉ còn hiệu lực thì thi lại bao nhiêu lần cũng không cấp thêm.
         Optional<UserCertificate> existing = userCertificateRepository
                 .findByUserIdAndExamTypeIdAndStatus(
                         userTest.getUserId(), test.getExamTypeId(), UserCertificate.Status.ACTIVE);
@@ -106,7 +88,7 @@ public class CertificateService {
         try {
             return Optional.of(create(userTest, test, template));
         } catch (DataIntegrityViolationException e) {
-            // Hai lượt nộp gần như cùng lúc: unique index đã chặn, coi như đã có chứng chỉ.
+
             log.debug("Chứng chỉ đã tồn tại cho user {} loại đề {}", userTest.getUserId(), test.getExamTypeId());
             return Optional.empty();
         }
@@ -152,10 +134,6 @@ public class CertificateService {
                 && userTest.getTotalScore() != null;
     }
 
-    /**
-     * Đề có được cấp chứng chỉ hay không do cờ trên nhóm đề quyết định, không hardcode
-     * code 'FULL_MOCK': admin đổi tên nhóm hay thêm nhóm mới không phải sửa code.
-     */
     private boolean isCertificateEligibleTest(Test test) {
         if (test.getExamCategoryId() == null) {
             return false;
@@ -194,11 +172,9 @@ public class CertificateService {
                 return code;
             }
         }
-        // Hết lượt bốc trùng thì rơi về mã theo thời gian, vẫn duy nhất.
+
         return "EXAM-" + year + "-" + Long.toString(issuedAt.toEpochMilli(), 36).toUpperCase();
     }
-
-    // ------------------------------------------------------------------ đọc
 
     @Transactional(readOnly = true)
     public List<CertificateResponse> findMine(String userId) {
@@ -227,9 +203,6 @@ public class CertificateService {
                 .orElseGet(() -> certificateMapper.notFound(code));
     }
 
-    // ------------------------------------------------------------------ công khai
-
-    /** Danh sách chứng chỉ đã cấp, công khai. Mới cấp trước, lọc được theo loại đề. */
     @Transactional(readOnly = true)
     public PageResponse<PublicCertificateResponse> findPublicFeed(String examTypeId, int page, int size) {
         int safePage = Math.max(0, page);
@@ -248,10 +221,6 @@ public class CertificateService {
         return "VALID";
     }
 
-    /**
-     * Trạng thái chứng chỉ của một lượt làm bài, để trang kết quả biết hiện băng chúc mừng,
-     * hiện "bạn đã có chứng chỉ" hay hiện còn thiếu bao nhiêu điểm.
-     */
     @Transactional(readOnly = true)
     public AttemptCertificateResponse getForAttempt(String userTestId, String userId) {
         UserTest userTest = userTestRepository.findById(userTestId)

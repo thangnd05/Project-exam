@@ -257,7 +257,7 @@ function PlanStudy() {
             Đã hoàn thành ải theo từng Part. Làm Full Mock để kiểm tra readiness.
             <br />
             <small>
-              Làm một bài <strong>thi thử trọn đề</strong>, sau đó quay lại trang kế hoạch 
+              Làm một bài <strong>thi thử trọn đề</strong>, sau đó quay lại trang kế hoạch
               hệ thống sẽ gợi ý sinh lộ trình mới từ chính bài vừa làm.
             </small>
           </span>

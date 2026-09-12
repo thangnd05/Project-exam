@@ -14,7 +14,6 @@ import styles from '../QuestionsManagement.module.scss';
 
 const cx = classNames.bind(styles);
 
-/** Giá trị select "để nguyên" — phân biệt với chuỗi rỗng của option thật. */
 const KEEP = '';
 const CLEAR_COLLECTION = '__CLEAR__';
 
@@ -41,8 +40,6 @@ function BulkEditQuestionsModal({
   const [collectionChoice, setCollectionChoice] = useState<string>(KEEP);
   const [bankChoice, setBankChoice] = useState<string>(KEEP);
 
-  // Mỗi lần mở lại phải về "để nguyên", nếu không lần sửa trước còn dính lại
-  // và admin bấm Lưu là ghi đè nhầm cả lô mới.
   useEffect(() => {
     if (show) {
       setUsageScope(KEEP);
@@ -129,8 +126,8 @@ function BulkEditQuestionsModal({
             onChange={(e) => setBankChoice(e.target.value)}
           >
             <option value={KEEP}>-- Giữ nguyên --</option>
-            <option value="true">Có — dùng lại được khi ra đề</option>
-            <option value="false">Không — chỉ thuộc đề đã gắn</option>
+            <option value="true">Có - dùng lại được khi ra đề</option>
+            <option value="false">Không - chỉ thuộc đề đã gắn</option>
           </select>
         </div>
 

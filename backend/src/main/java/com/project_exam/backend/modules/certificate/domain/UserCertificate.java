@@ -6,10 +6,6 @@ import lombok.*;
 
 import java.time.Instant;
 
-/**
- * Chứng chỉ đã cấp. Tên người nhận, tên đề và toàn bộ phần trình bày của mẫu được
- * chụp lại lúc cấp, nên sửa mẫu hay đổi tên về sau không làm biến dạng chứng chỉ cũ.
- */
 @Entity
 @Table(name = "user_certificates", indexes = {
         @Index(name = "idx_user_certificates_user_id", columnList = "user_id"),
@@ -36,14 +32,12 @@ public class UserCertificate {
     @Column(name = "template_id")
     private String templateId;
 
-    /** Lượt làm bài đã sinh ra chứng chỉ này, giữ để truy vết. */
     @Column(name = "user_test_id")
     private String userTestId;
 
     @Column(name = "test_id")
     private String testId;
 
-    /** Mã tra cứu công khai in trên chứng chỉ: EXAM-2026-XXXXXX */
     @Column(name = "certificate_code", nullable = false, unique = true, length = 40)
     private String certificateCode;
 

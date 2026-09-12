@@ -203,10 +203,6 @@ public class UserService {
         return saved;
     }
 
-    /**
-     * Cảnh báo bảo mật khi đổi email. Gửi tới CẢ địa chỉ cũ lẫn mới: địa chỉ cũ mới là nơi
-     * chủ tài khoản thật đọc được nếu ai đó chiếm tài khoản rồi đổi email.
-     */
     private void notifyEmailChanged(User user, String oldEmail, String newEmail) {
         java.util.Map<String, String> vars = java.util.Map.of(
                 "fullName", user.getFullName() != null ? user.getFullName() : user.getUserName(),
@@ -414,7 +410,6 @@ public class UserService {
             return true;
         }).orElse(false);
     }
-
 
     public void requireSelfOrAdminForUser(String targetUserId, String currentUserId) {
         boolean isSelf = currentUserId != null && currentUserId.equals(targetUserId);

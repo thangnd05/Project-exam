@@ -21,12 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * Mặt quản trị của users, tách khỏi controller dùng chung theo khuôn
- * QuestAdminController/CoinAdminController: cùng module, cùng service và
- * repository, chỉ tách controller theo đối tượng dùng. Mọi method ở đây đều
- * cần quyền nên khó sót requirePermission hơn là trộn với endpoint người dùng.
- */
 @RestController
 @RequestMapping("/api/admin/users")
 @RequiredArgsConstructor

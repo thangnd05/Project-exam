@@ -19,12 +19,10 @@ public interface EmailRecipientRepository extends JpaRepository<EmailRecipient, 
 
     List<EmailRecipient> findByEmailIdAndStatus(String emailId, EmailStatus status);
 
-    /** Đếm gộp theo (emailId, status) cho danh sách  tránh N+1 khi dựng bảng. */
     @Query("SELECT r.emailId, r.status, COUNT(r) FROM EmailRecipient r "
             + "WHERE r.emailId IN :emailIds GROUP BY r.emailId, r.status")
     List<Object[]> countGroupedByEmailIds(Collection<String> emailIds);
 
-    /** Đưa các mail lỗi của một email về hàng chờ để worker gửi lại. */
     @Modifying
     @Query("UPDATE EmailRecipient r SET r.status = com.project_exam.backend.modules.system.mail.domain.EmailStatus.PENDING, "
             + "r.errorMessage = NULL WHERE r.emailId = :emailId "

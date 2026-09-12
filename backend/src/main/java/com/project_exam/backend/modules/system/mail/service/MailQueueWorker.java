@@ -18,12 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Gửi lần lượt các người nhận còn PENDING của một email.
- *
- * Chạy trên một luồng nền duy nhất cho cả đợt gửi thay vì bắn mỗi mail một task: SMTP
- * (nhất là Gmail) chặn khi bị dội quá nhanh, nên giữa mỗi lô có quãng nghỉ.
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -80,7 +74,6 @@ public class MailQueueWorker {
         log.info("Gửi xong email {}: {}/{} thành công", emailId, sent, pending.size());
     }
 
-    /** Mỗi người nhận có {{fullName}} của riêng mình nên nội dung render lại theo từng người. */
     private Map<String, String> userVars(User user, EmailRecipient recipient) {
         Map<String, String> vars = new HashMap<>();
         vars.put("email", recipient.getToEmail());

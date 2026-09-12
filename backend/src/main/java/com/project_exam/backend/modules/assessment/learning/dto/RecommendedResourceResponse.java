@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/** Tài liệu phương pháp gợi ý đọc trước khi luyện (lấy từ RecoveryResource theo tag hoặc theo Part). */
 @Getter
 @Setter
 @Builder

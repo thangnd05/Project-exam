@@ -36,8 +36,6 @@ export function useAdminQuestionList(params: AdminQuestionSearchParams) {
     queryFn: () => searchAdminQuestions(params),
   });
 
-  // Sửa hàng loạt đổi nhiều dòng cùng lúc nên làm mới cả nhánh list thay vì
-  // vá từng dòng trong cache.
   const invalidateList = () =>
     queryClient.invalidateQueries({ queryKey: adminQuestionKeys.root });
 

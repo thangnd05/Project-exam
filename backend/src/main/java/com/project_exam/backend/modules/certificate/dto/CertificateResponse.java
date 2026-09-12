@@ -24,10 +24,8 @@ public class CertificateResponse {
     private Instant expiresAt;
     private boolean expired;
 
-    /** Bản chụp phần trình bày lúc cấp, frontend dùng để vẽ chứng chỉ. */
     private CertificateDesign design;
 
-    /** Chỉ có ở màn quản trị. */
     private String userId;
     private String userTestId;
     private String revokedReason;

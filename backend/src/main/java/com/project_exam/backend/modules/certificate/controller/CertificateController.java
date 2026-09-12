@@ -28,13 +28,11 @@ public class CertificateController {
         return ResponseEntity.ok(certificateService.findMine(userId));
     }
 
-    /** Tra cứu công khai, không cần đăng nhập. */
     @GetMapping("/verify/{code}")
     public ResponseEntity<CertificateVerifyResponse> verify(@PathVariable String code) {
         return ResponseEntity.ok(certificateService.verify(code));
     }
 
-    /** Danh sách chứng chỉ đã cấp, công khai cho cả khách chưa đăng nhập. */
     @GetMapping("/public")
     public ResponseEntity<PageResponse<PublicCertificateResponse>> findPublicFeed(
             @RequestParam(required = false) String examTypeId,

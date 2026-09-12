@@ -36,22 +36,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * Màn quản lý câu hỏi của admin: duyệt toàn bộ ngân hàng có phân trang + lọc,
- * và sửa hàng loạt các thuộc tính chung.
- *
- * Tách khỏi {@link QuestionService} vì đây là góc nhìn quản trị: KHÔNG áp
- * usage_scope theo luồng như hai nhánh ra đề / ôn tập — admin phải nhìn thấy
- * mọi câu thì mới gắn nhãn lại được.
- */
 @Service
 @RequiredArgsConstructor
 public class AdminQuestionService {
 
-    /** Chặn client gửi size quá lớn kéo sập bảng. */
     private static final int MAX_PAGE_SIZE = 100;
 
-    /** Giá trị collectionId đặc biệt để lọc riêng nhóm câu chưa xếp bộ sưu tập. */
     public static final String UNCLASSIFIED = "__NONE__";
 
     private final QuestionRepository questionRepository;
@@ -60,8 +50,6 @@ public class AdminQuestionService {
     private final QuestionCollectionRepository questionCollectionRepository;
     private final QuestionTagRepository questionTagRepository;
     private final TagRepository tagRepository;
-
-    // ------------------------------------------------------------------ tra cứu
 
     public PageResponse<AdminQuestionListItemResponse> search(
             String examTypeId,
@@ -79,7 +67,7 @@ public class AdminQuestionService {
 
         Set<String> partIdScope = resolvePartIdScope(examTypeId, examPartId);
         if (partIdScope != null && partIdScope.isEmpty()) {
-            // Loại đề được chọn chưa có Part nào -> chắc chắn không có câu nào.
+
             return PageResponse.empty(safePage, safeSize);
         }
 
@@ -93,9 +81,6 @@ public class AdminQuestionService {
         return PageResponse.from(pageResult, toListItems(pageResult.getContent()));
     }
 
-    /**
-     * null = không lọc theo Part. Tập rỗng = có lọc nhưng không Part nào khớp.
-     */
     private Set<String> resolvePartIdScope(String examTypeId, String examPartId) {
         if (isBlank(examTypeId) && isBlank(examPartId)) {
             return null;
@@ -124,8 +109,7 @@ public class AdminQuestionService {
         if (UNCLASSIFIED.equals(collectionId)) {
             spec = spec.and((root, query, cb) -> cb.isNull(root.get("collectionId")));
         } else if (!isBlank(collectionId)) {
-            // Chọn bộ sưu tập cha thì lấy luôn câu của các bộ con, khớp cách
-            // TestService/TestQuestionAssignmentService đang gom collection.
+
             Set<String> scope = collectionWithChildrenIds(collectionId);
             spec = spec.and((root, query, cb) -> root.get("collectionId").in(scope));
         }
@@ -138,7 +122,7 @@ public class AdminQuestionService {
         if (isBank != null) {
             spec = isBank
                     ? spec.and((root, query, cb) -> cb.isTrue(root.get("isBank")))
-                    // is_bank nullable: "không thuộc kho" gồm cả FALSE lẫn NULL.
+
                     : spec.and((root, query, cb) -> cb.or(
                             cb.isFalse(root.get("isBank")),
                             cb.isNull(root.get("isBank"))));
@@ -159,12 +143,6 @@ public class AdminQuestionService {
         return ids;
     }
 
-    // ------------------------------------------------------- dựng dòng cho bảng
-
-    /**
-     * Nạp tên Part / loại đề / bộ sưu tập / tag theo lô. Bảng 20 dòng mà tra từng
-     * dòng thì thành 80 query, nên tất cả đều gom bằng findAllById / findByIn.
-     */
     private List<AdminQuestionListItemResponse> toListItems(List<Question> questions) {
         if (questions.isEmpty()) {
             return List.of();
@@ -244,8 +222,6 @@ public class AdminQuestionService {
         return map;
     }
 
-    // --------------------------------------------------------- sửa hàng loạt
-
     @Transactional
     public BulkUpdateQuestionsResponse bulkUpdate(BulkUpdateQuestionsRequest request) {
         Set<String> requestedIds = new LinkedHashSet<>(
@@ -301,7 +277,6 @@ public class AdminQuestionService {
         return value == null || value.trim().isEmpty();
     }
 
-    /** Dùng cho thanh thống kê phía trên bảng. */
     public Map<String, Long> countByUsageScope(Collection<Question.UsageScope> scopes) {
         return scopes.stream().collect(Collectors.toMap(
                 Enum::name,

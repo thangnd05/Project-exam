@@ -6,10 +6,6 @@ import lombok.*;
 
 import java.time.Instant;
 
-/**
- * Một lần gửi tới một người: vừa là hàng chờ của worker, vừa là nhật ký đã gửi.
- * Chỉ giữ "gửi email nào, cho ai, kết quả ra sao"  nội dung nằm ở {@link Email}.
- */
 @Entity
 @Table(name = "email_recipients", indexes = {
         @Index(name = "idx_email_recipients_email_id", columnList = "email_id"),
@@ -28,14 +24,9 @@ public class EmailRecipient {
     @Column(name = "email_id", nullable = false)
     private String emailId;
 
-    /** Null khi tài khoản đã bị xoá  dòng nhật ký vẫn giữ lại địa chỉ đã gửi. */
     @Column(name = "user_id")
     private String userId;
 
-    /**
-     * Lưu riêng chứ không suy từ users.email: mail cảnh báo đổi email phải gửi về địa chỉ
-     * CŨ, lúc đó users.email đã là địa chỉ mới.
-     */
     @Column(name = "to_email", nullable = false)
     private String toEmail;
 

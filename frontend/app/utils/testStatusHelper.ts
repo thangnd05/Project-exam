@@ -23,7 +23,7 @@ export const formatCountdown = (ms: number): string => {
 };
 
 export const formatDateTime = (dateStr: string | null | undefined): string => {
-    if (!dateStr) return '—';
+    if (!dateStr) return '-';
     return new Date(dateStr).toLocaleString('vi-VN', {
         month: '2-digit',
         day: '2-digit',
@@ -33,7 +33,7 @@ export const formatDateTime = (dateStr: string | null | undefined): string => {
 };
 
 export const formatFullDateTime = (dateStr: string | null | undefined): string => {
-    if (!dateStr) return '—';
+    if (!dateStr) return '-';
     return new Date(dateStr).toLocaleString('vi-VN', {
         day: '2-digit',
         month: '2-digit',

@@ -4,7 +4,6 @@ import type { VocabularyRequest, VocabularyResponse } from '@/app/types';
 const BASE_URL = '/api/vocabularies';
 const ADMIN_BASE_URL = '/api/admin/vocabularies';
 
-/** Khoá cache danh sách từ trong một album — dùng chung bởi albums/[albumId] và practice/[albumId]. */
 export const albumDeltaKeys = {
   vocabularies: (albumId?: string) => ['album-vocabularies', albumId],
 };

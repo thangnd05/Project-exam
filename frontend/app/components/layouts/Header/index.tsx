@@ -23,7 +23,6 @@ import {useCosmetics} from '@/app/hooks/useCosmetics';
 
 const cx = classNames.bind(style);
 
-// Trễ đóng khi rê chuột qua khe hở giữa nút và menu
 const CLASS_MENU_CLOSE_DELAY = 160;
 
 function Header() {
@@ -47,7 +46,6 @@ function Header() {
 
   useEffect(() => clearClassMenuTimer, [clearClassMenuTimer]);
 
-  // Chỉ mở bằng hover trên thiết bị có chuột, thiết bị cảm ứng vẫn dùng tap
   const canHover = () => window.matchMedia?.('(hover: hover)').matches ?? false;
 
   const handleClassMenuEnter = () => {

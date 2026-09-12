@@ -11,7 +11,6 @@ import type { EnhancedResultResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
-
 type GaugeColor = { color: string; bg: string };
 
 const COLOR_MAP: Record<string, GaugeColor> = {

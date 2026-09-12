@@ -32,9 +32,19 @@ import java.util.regex.Pattern;
 public class QuestionDocumentImportService {
     private static final Logger log = LoggerFactory.getLogger(QuestionDocumentImportService.class);
 
-    private static final List<String> ALLOWED_LABELS = List.of("A", "B", "C", "D");
+    private static final List<String> ALLOWED_LABELS =
+            List.of("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
 
-    private static final String ALLOWED_LABEL_CLASS = "[A-D]";
+    private static final String ALLOWED_LABEL_CLASS =
+            "[" + ALLOWED_LABELS.get(0) + "-" + ALLOWED_LABELS.get(ALLOWED_LABELS.size() - 1) + "]";
+
+    private static final String AMBIGUOUS_BARE_LABEL = "I";
+
+    private static final String BARE_LABEL_CLASS =
+            "[" + ALLOWED_LABELS.get(0) + "-" + ALLOWED_LABELS.get(ALLOWED_LABELS.size() - 1)
+                    + "&&[^" + AMBIGUOUS_BARE_LABEL + "]]";
+
+    private static final int FULL_OPTION_SET_SIZE = 4;
 
     private static final String QUESTION_KEYWORDS = "Câu|Question|Bài";
 
@@ -52,9 +62,10 @@ public class QuestionDocumentImportService {
     private static final List<String> SKIPPABLE_PREFIXES = List.of(
             "part ",
             "choose the correct answer",
-            "choose a, b, c, or d",
-            "i."
+            "choose a, b, c, or d"
     );
+
+    private static final String ROMAN_SECTION_PREFIX = "i.";
 
     private static final List<String> SKIPPABLE_CONTAINS = List.of(
             "reading & writing",
@@ -72,14 +83,20 @@ public class QuestionDocumentImportService {
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
 
+    private static final String OPTION_DELIMITER = "(?:[\\.\\):]|-(?!\\p{L}))(?![-_]{2,})";
+
+    private static final String NOT_ABBREVIATION = "(?![MmGgEe]\\.)";
+
     private static final Pattern OPTION_PATTERN = Pattern.compile(
-            "^\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?(?:\\s*[\\.\\):\\-](?![-_]{2,})|\\s+(?![-_]{2,}))\\s*(.*)$",
+            "^\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?"
+                    + "(?:\\s*" + OPTION_DELIMITER + NOT_ABBREVIATION
+                    + "|(?<!" + AMBIGUOUS_BARE_LABEL + ")\\s+(?![-_]{2,}))\\s*(.*)$",
             Pattern.CASE_INSENSITIVE
     );
 
     private static final Pattern OPTION_LABEL_START = Pattern.compile(
-            "(?:^|\\s)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s*[\\.\\):\\-](?![-_]{2,})(?![Mm]\\.)"
-                    + "|(?:^|\\s{2,}|\\t)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s+(?![-_]{2,})",
+            "(?:^|\\s)\\s*\\(?(" + ALLOWED_LABEL_CLASS + ")\\)?\\s*" + OPTION_DELIMITER + NOT_ABBREVIATION
+                    + "|(?:^|\\s{2,}|\\t)\\s*\\(?(" + BARE_LABEL_CLASS + ")\\)?\\s+(?![-_]{2,})",
             Pattern.CASE_INSENSITIVE
     );
 
@@ -112,6 +129,10 @@ public class QuestionDocumentImportService {
             "^\\s*(?:Tags?|Thẻ|Nhãn)\\s*[:\\-]\\s*(.*)$",
             Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
     );
+
+    private static final int MAX_INLINE_TAG_SPEC_LENGTH = 200;
+
+    private static final Pattern SENTENCE_BREAK_PATTERN = Pattern.compile("[.?!]\\s");
 
     private static final Pattern TRANSLATION_START_PATTERN = Pattern.compile(
             "^\\s*(?:Dịch(?:\\s*nghĩa)?|Bản\\s*dịch|Translation)\\s*[:\\.\\-]?\\s*(.*)$",
@@ -493,7 +514,8 @@ public class QuestionDocumentImportService {
             }
 
             String text = pl.text;
-            if (isSkippableLine(text)) {
+            boolean insideQuestionOptions = currentQuestion != null && !currentQuestion.options.isEmpty();
+            if (isSkippableLine(text, insideQuestionOptions)) {
                 return;
             }
 
@@ -539,7 +561,9 @@ public class QuestionDocumentImportService {
                 pendingText.setLength(0);
                 pendingTranslation.setLength(0);
                 pendingPassageBlank = false;
-                currentQuestion = new ParsedQuestion(qm.group(1), extractQuestionText(qm));
+                currentQuestion = new ParsedQuestion(qm.group(1), "");
+
+                currentQuestion.questionText = consumeInlineTags(extractQuestionText(qm));
                 lastLabel = null;
                 return;
             }
@@ -582,14 +606,7 @@ public class QuestionDocumentImportService {
             if (currentQuestion != null && !inPassageHeader) {
                 Matcher tagm = TAGS_START_PATTERN.matcher(text);
                 if (tagm.matches()) {
-                    String body = tagm.group(1) == null ? "" : tagm.group(1).trim();
-
-                    for (String name : body.split(";")) {
-                        String n = name.trim();
-                        if (!n.isEmpty() && !currentQuestion.tagNames.contains(n)) {
-                            currentQuestion.tagNames.add(n);
-                        }
-                    }
+                    addTagNames(tagm.group(1));
                     return;
                 }
             }
@@ -611,7 +628,8 @@ public class QuestionDocumentImportService {
             Matcher om = OPTION_PATTERN.matcher(text);
             if (om.matches() && currentQuestion != null && !inPassageHeader && !isSectionHeadingOptionLike(text)) {
                 ParsedOption parsedOption = parseOptionText(om.group(2));
-                if (isLikelyOptionLine(text, parsedOption.optionText)) {
+                if (isLikelyOptionLine(text, parsedOption.optionText)
+                        && !isQuestionStemStart(text)) {
                     handleOptionLine(om.group(1), parsedOption, pl.isStyled);
                     return;
                 }
@@ -631,6 +649,39 @@ public class QuestionDocumentImportService {
             }
 
             handleContinuationLine(text);
+        }
+
+        private void addTagNames(String body) {
+            String raw = body == null ? "" : body.trim();
+            for (String name : raw.split(";")) {
+                String n = name.trim();
+                if (!n.isEmpty() && !currentQuestion.tagNames.contains(n)) {
+                    currentQuestion.tagNames.add(n);
+                }
+            }
+        }
+
+        private String consumeInlineTags(String stem) {
+            if (stem == null || stem.isBlank()) {
+                return "";
+            }
+            Matcher tagm = TAGS_START_PATTERN.matcher(stem);
+            if (!tagm.matches()) {
+                return stem;
+            }
+            String body = tagm.group(1) == null ? "" : tagm.group(1).trim();
+            if (!looksLikeTagSpecOnly(body)) {
+
+                return stem;
+            }
+            addTagNames(body);
+            return "";
+        }
+
+        private boolean looksLikeTagSpecOnly(String body) {
+            return !body.isEmpty()
+                    && body.length() <= MAX_INLINE_TAG_SPEC_LENGTH
+                    && !SENTENCE_BREAK_PATTERN.matcher(body).find();
         }
 
         private void appendExplanation(String addition) {
@@ -653,11 +704,26 @@ public class QuestionDocumentImportService {
             passageSegments.clear();
         }
 
+        /**
+         * "A company must..." / "A CFO mixes three S3 tools." is a stem, not an
+         * option: a bare label with no delimiter, arriving before any option and
+         * before any stem text, can only be the beginning of the question.
+         */
+        private boolean isQuestionStemStart(String text) {
+            if (currentQuestion == null || !currentQuestion.options.isEmpty()) {
+                return false;
+            }
+            if (currentQuestion.questionText != null && !currentQuestion.questionText.isBlank()) {
+                return false;
+            }
+            return !hasOptionDelimiter(text);
+        }
+
         private void handleOptionLine(String rawLabel, ParsedOption parsedOption, boolean isStyled) {
             String label = rawLabel.toUpperCase(Locale.ROOT);
 
             if (currentQuestion.options.containsKey(label)) {
-                boolean nearlyComplete = currentQuestion.options.size() >= ALLOWED_LABELS.size() - 1;
+                boolean nearlyComplete = currentQuestion.options.size() >= FULL_OPTION_SET_SIZE - 1;
                 if (nearlyComplete) {
                     log.warn(
                             "Question no='{}' option '{}' duplicated -> treat as next question (missing number)",
@@ -715,7 +781,7 @@ public class QuestionDocumentImportService {
             if (currentQuestion.options.isEmpty()) {
 
                 currentQuestion.questionText = appendLine(currentQuestion.questionText, text, "\n");
-            } else if (currentQuestion.options.size() >= ALLOWED_LABELS.size()) {
+            } else if (currentQuestion.options.size() >= FULL_OPTION_SET_SIZE) {
 
                 if (pendingText.length() > 0) {
                     pendingText.append("\n");
@@ -858,7 +924,24 @@ public class QuestionDocumentImportService {
         if (trimmed.length() < 2) {
             return false;
         }
+        if (hasOptionDelimiter(trimmed)) {
+            return true;
+        }
 
+        String t = optionText == null ? "" : optionText.trim();
+        if (t.isEmpty()) {
+            return false;
+        }
+        int wordCount = t.split("\\s+").length;
+        return t.length() <= MAX_INLINE_OPTION_CHARS && wordCount <= MAX_INLINE_OPTION_WORDS;
+    }
+
+    /**
+     * True when the line reads "A." / "(A)" / "A:" / "A-", i.e. the label is
+     * followed by a real delimiter instead of just a space.
+     */
+    private boolean hasOptionDelimiter(String line) {
+        String trimmed = cleanWhitespace(line);
         int i = 0;
         while (i < trimmed.length() && Character.isWhitespace(trimmed.charAt(i))) {
             i++;
@@ -876,19 +959,11 @@ public class QuestionDocumentImportService {
         while (i < trimmed.length() && Character.isWhitespace(trimmed.charAt(i))) {
             i++;
         }
-        if (i < trimmed.length()) {
-            char c = trimmed.charAt(i);
-            if (c == '.' || c == ')' || c == ':' || c == '-') {
-                return true;
-            }
-        }
-
-        String t = optionText == null ? "" : optionText.trim();
-        if (t.isEmpty()) {
+        if (i >= trimmed.length()) {
             return false;
         }
-        int wordCount = t.split("\\s+").length;
-        return t.length() <= MAX_INLINE_OPTION_CHARS && wordCount <= MAX_INLINE_OPTION_WORDS;
+        char c = trimmed.charAt(i);
+        return c == '.' || c == ')' || c == ':' || c == '-';
     }
 
     private List<String> splitLineByOptionLabels(String line) {
@@ -897,13 +972,29 @@ public class QuestionDocumentImportService {
         }
         Matcher m = OPTION_LABEL_START.matcher(line);
         List<Integer> starts = new ArrayList<>();
+        char expectedLabel = 0;
         while (m.find()) {
 
             int s = m.group(1) != null ? m.start(1) : m.start(2);
+            String rawLabel = m.group(1) != null ? m.group(1) : m.group(2);
+            char label = Character.toUpperCase(rawLabel.charAt(0));
 
             if (s > 0 && line.charAt(s - 1) == '(') {
                 s--;
             }
+
+            if (!acceptsLabelInSequence(label, expectedLabel, s)) {
+
+                log.debug(
+                        "Ignore mid-line label '{}' at {} (expected '{}') in line: {}",
+                        label,
+                        s,
+                        expectedLabel == 0 ? "A" : expectedLabel,
+                        line
+                );
+                continue;
+            }
+            expectedLabel = (char) (label + 1);
             starts.add(s);
         }
         if (starts.isEmpty()) {
@@ -927,6 +1018,21 @@ public class QuestionDocumentImportService {
             }
         }
         return out;
+    }
+
+    /**
+     * A label only opens a new option when it continues the A, B, C... run.
+     * The first label of a line may be anything when the line starts with it
+     * (that is a normal one-option-per-paragraph document); a label found in
+     * the middle of a line must be "A" or the successor of the previous one,
+     * otherwise sentences ending in a bare letter ("...in account B.",
+     * "...into VPC A.") would be cut into phantom options.
+     */
+    private boolean acceptsLabelInSequence(char label, char expectedLabel, int start) {
+        if (expectedLabel == 0) {
+            return start == 0 || label == ALLOWED_LABELS.get(0).charAt(0);
+        }
+        return label == expectedLabel;
     }
 
     private boolean isOptionSegmentStyled(XWPFParagraph para, String segmentText) {
@@ -1059,7 +1165,7 @@ public class QuestionDocumentImportService {
         return SECTION_HEADING_OPTION_LIKE_PATTERN.matcher(text).matches();
     }
 
-    private boolean isSkippableLine(String text) {
+    private boolean isSkippableLine(String text, boolean insideQuestionOptions) {
         String trimmed = text == null ? "" : text.trim();
         if (trimmed.isEmpty()) {
             return true;
@@ -1078,7 +1184,7 @@ public class QuestionDocumentImportService {
                 return true;
             }
         }
-        return false;
+        return !insideQuestionOptions && lower.startsWith(ROMAN_SECTION_PREFIX);
     }
 
     private String getOptionLabel(String text) {

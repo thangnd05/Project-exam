@@ -99,7 +99,7 @@ function EmailsManagement() {
     }
   };
 
-  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString('vi-VN') : '—');
+  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString('vi-VN') : '-');
 
   const statusColumn: AdminTableColumn = {
     key: 'active',

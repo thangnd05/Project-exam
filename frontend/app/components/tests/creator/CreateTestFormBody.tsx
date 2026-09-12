@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { Row, Col, Alert } from 'react-bootstrap';
 import { getClassById } from '@/app/apis/classApi';
 import { getChapterById } from '@/app/apis/chapterApi';
-import { previewDocument, previewPassageDocument } from '@/app/apis/questionApi';
+import { previewDocument, previewJsonFile, previewPassageDocument } from '@/app/apis/questionApi';
 import {
   IoCalendarOutline,
   IoTimeOutline,
@@ -281,6 +281,20 @@ const CreateTestFormBody = ({
     })
   );
 
+  const normalizeParsedGroups = (parsedGroups: any[] = []): DraftGroup[] => (
+    parsedGroups.map((group: any) => ({
+      passage: {
+        content: group.passage?.content || '',
+        contentTranslation: group.passage?.contentTranslation || '',
+        passageType: group.passage?.passageType || 'READING',
+        mediaFiles: [],
+        extraContents: Array.isArray(group.passage?.extraContents) ? group.passage.extraContents : [],
+        inputMode: 'TEXT',
+      },
+      questions: normalizeParsedQuestions(group.questions),
+    }))
+  );
+
   const handlePreviewQuestionsFromDocument = async (fileInput: File | null = documentFile) => {
     if (!fileInput) {
       toast.warning('Vui lòng chọn file Word trước khi nạp câu hỏi.');
@@ -310,6 +324,83 @@ const CreateTestFormBody = ({
         error.response?.data?.message ||
         'Không thể nạp câu hỏi từ Word.';
       toast.error(message);
+    }
+  };
+
+  const showJsonIssues = (issues: string[] = [], label: string, isError: boolean) => {
+    if (issues.length === 0) return;
+    const shown = issues.slice(0, 3).join(' | ');
+    const rest = issues.length > 3 ? ` (và ${issues.length - 3} mục khác)` : '';
+    const message = `${label}: ${shown}${rest}`;
+    if (isError) {
+      toast.error(message, { autoClose: 20000 });
+    } else {
+      toast.info(message, { autoClose: 10000 });
+    }
+  };
+
+  /** Nạp file JSON vào form nháp. Mục tiêu 'questions' cho câu lẻ, 'groups' cho nhóm theo passage. */
+  const handlePreviewFromJson = async (fileInput: File, target: 'questions' | 'groups') => {
+    try {
+      const formData = new FormData();
+      formData.append('file', fileInput);
+
+      const data = await previewJsonFile(formData);
+
+      if (!data.valid) {
+        showJsonIssues(data.errors, `File JSON có ${data.errors.length} lỗi`, true);
+        return;
+      }
+      showJsonIssues(data.warnings, 'Cảnh báo', false);
+
+      const parsedQuestions = data.questions ?? [];
+      const parsedGroups = data.groups ?? [];
+
+      if (target === 'groups') {
+        if (parsedGroups.length === 0) {
+          toast.warning('File JSON không có nhóm nào trong "groups".');
+          return;
+        }
+        if (parsedQuestions.length > 0) {
+          toast.info(`Bỏ qua ${parsedQuestions.length} câu trong "questions" - ở đây chỉ nạp "groups".`);
+        }
+        setGroups(normalizeParsedGroups(parsedGroups));
+        toast.success(`Đã nạp ${parsedGroups.length} nhóm passage từ JSON.`);
+        return;
+      }
+
+      if (parsedQuestions.length === 0) {
+        toast.warning(
+          parsedGroups.length > 0
+            ? 'File JSON chỉ có "groups". Dùng tab Passage để nạp nhóm câu hỏi.'
+            : 'File JSON không có câu hỏi nào trong "questions".',
+        );
+        return;
+      }
+      if (parsedGroups.length > 0) {
+        toast.info(`Bỏ qua ${parsedGroups.length} nhóm trong "groups" - dùng tab Passage để nạp nhóm.`);
+      }
+
+      const normalizedQuestions = normalizeParsedQuestions(parsedQuestions);
+      setQuestions(normalizedQuestions);
+      toast.success(`Đã nạp ${normalizedQuestions.length} câu hỏi từ JSON.`);
+    } catch (error: any) {
+      const message =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        'Không thể nạp câu hỏi từ file JSON.';
+      toast.error(message, { autoClose: 20000 });
+    }
+  };
+
+  const handleJsonFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    target: 'questions' | 'groups',
+  ) => {
+    const selectedFile = event.target.files?.[0] || null;
+    event.target.value = '';
+    if (selectedFile) {
+      handlePreviewFromJson(selectedFile, target);
     }
   };
 
@@ -381,17 +472,7 @@ const CreateTestFormBody = ({
         return;
       }
 
-      const normalizedGroups: DraftGroup[] = parsedGroups.map((group: any) => ({
-        passage: {
-          content: group.passage?.content || '',
-          contentTranslation: group.passage?.contentTranslation || '',
-          passageType: group.passage?.passageType || 'READING',
-          mediaFiles: [],
-          extraContents: Array.isArray(group.passage?.extraContents) ? group.passage.extraContents : [],
-          inputMode: 'TEXT',
-        },
-        questions: normalizeParsedQuestions(group.questions),
-      }));
+      const normalizedGroups = normalizeParsedGroups(parsedGroups);
 
       setGroups(normalizedGroups);
       setBulkPassageFile(null);
@@ -623,6 +704,22 @@ const CreateTestFormBody = ({
                     )}
                   </div>
                 </Col>
+                <Col md={12}>
+                  <div className={cx('formGroupModern')}>
+                    <label>Hoặc upload file JSON (chính xác hơn, không cần đoán cấu trúc)</label>
+                    <input
+                      type="file"
+                      accept=".json,application/json"
+                      className={cx('inputModern')}
+                      onChange={(e) => handleJsonFileChange(e, 'questions')}
+                    />
+                    <small className="text-muted d-block mt-2">
+                      Nạp các câu trong <code>questions</code> của file JSON. Sai định dạng sẽ được
+                      báo chính xác vị trí thay vì đọc sai âm thầm. Xem file mẫu tại{' '}
+                      <code>docs/question-import-sample.json</code>.
+                    </small>
+                  </div>
+                </Col>
               </>
             )}
           </Row>
@@ -679,6 +776,23 @@ const CreateTestFormBody = ({
               <small className="text-muted d-block mt-2">
                 File của bạn cần có dòng phân cách Passage (ví dụ: "Passage 1:", "Bài đọc 2:"). Các câu hỏi bên dưới sẽ tự động được xếp vào đúng Passage.
                 Nếu 1 passage có NHIỀU đoạn văn, ngăn các đoạn bằng dòng "Đoạn 2:", "Đoạn 3:"… (đoạn đầu không cần đánh dấu); đặt trước dòng "Dịch:" nếu có.
+              </small>
+            </div>
+
+            <div className={cx('formGroupModern', 'mb-0')} style={{ marginTop: '16px' }}>
+              <label className="mb-2 d-block fw-bold text-primary">
+                Hoặc upload file JSON nạp NHIỀU Passage (chính xác hơn)
+              </label>
+              <input
+                type="file"
+                accept=".json,application/json"
+                className={cx('inputModern')}
+                onChange={(e) => handleJsonFileChange(e, 'groups')}
+              />
+              <small className="text-muted d-block mt-2">
+                Nạp các nhóm trong <code>groups</code> của file JSON, không cần dòng phân cách nào.
+                File mẫu: <code>docs/question-import-sample.json</code>. Lưu ý: JSON không mang theo
+                file audio/ảnh - dùng <code>mediaUrl</code> của file đã upload, hoặc thêm media bên dưới sau khi nạp.
               </small>
             </div>
           </div>

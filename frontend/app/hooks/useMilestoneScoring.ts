@@ -2,10 +2,15 @@
 
 import { useCallback, useMemo } from 'react';
 
-const SCALE_MIN = 100;
-const SCALE_SPAN = 900;
-const SCALE_MAX = SCALE_MIN + SCALE_SPAN;
-const DEFAULT_MAX_SCORE = 990;
+import {
+  AWS_SCORE_SCALE,
+  getScoreScale,
+  scoreToPercent,
+} from '@/app/utils/scoreScale';
+
+const SCALE_MIN = AWS_SCORE_SCALE.min;
+const SCALE_MAX = AWS_SCORE_SCALE.max;
+const SCALE_SPAN = SCALE_MAX - SCALE_MIN;
 
 type ExamTypeLike = { examTypeId: string | number; scoringMethod?: string | null; [key: string]: any };
 type ExamPartLike = {
@@ -56,8 +61,9 @@ export default function useMilestoneScoring({
     [examTypes, selectedExamTypeId],
   );
   const scoringMethod = (selectedExamType?.scoringMethod || 'DEFAULT').toUpperCase();
-  const isScaled = scoringMethod === 'AWS_SCALE';
-  const maxScore = isScaled ? SCALE_MAX : DEFAULT_MAX_SCORE;
+  const scale = getScoreScale(scoringMethod);
+  const isScaled = scale.scaled;
+  const maxScore = scale.max;
 
   const getPartTotal = useCallback(
     (examPartId: string) =>
@@ -70,11 +76,8 @@ export default function useMilestoneScoring({
   );
 
   const evenPctForScore = useCallback(
-    (score: number | string) =>
-      isScaled
-        ? Math.max(0, Math.min(100, Math.round(((Number(score) - SCALE_MIN) / SCALE_SPAN) * 100)))
-        : Math.min(100, Math.round((Number(score) / DEFAULT_MAX_SCORE) * 100)),
-    [isScaled],
+    (score: number | string) => scoreToPercent(score, scale),
+    [scale],
   );
 
   const estimateScore = useCallback(
@@ -150,6 +153,7 @@ export default function useMilestoneScoring({
   return {
     selectedExamType,
     scoringMethod,
+    scale,
     isScaled,
     maxScore,
     SCALE_MIN,

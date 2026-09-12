@@ -1,4 +1,4 @@
-> **TÀI LIỆU ĐÃ HẾT HIỆU LỰC — giữ lại để tra lịch sử.**
+> **TÀI LIỆU ĐÃ HẾT HIỆU LỰC - giữ lại để tra lịch sử.**
 >
 > Kế hoạch dưới đây (chia `features/` + `shared/`, co-locate API theo feature) đã được thực hiện
 > rồi **bị thay thế hoàn toàn** bằng cấu trúc route-colocated theo chuẩn `edusoft-lms`: không còn

@@ -296,7 +296,7 @@ function UsersManagement() {
         user.is_premium ? (
           <span className={cx('premiumBadge')}>Premium</span>
         ) : (
-          <span className={cx('premiumNone')}>—</span>
+          <span className={cx('premiumNone')}>-</span>
         ),
     },
     {

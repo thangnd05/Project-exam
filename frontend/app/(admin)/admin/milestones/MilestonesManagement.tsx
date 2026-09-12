@@ -301,7 +301,7 @@ function MilestonesManagement() {
                 <h5>
                   {m.milestoneScore} điểm
                   {m.description && (
-                    <span style={{marginLeft: 8}}>— {m.description}</span>
+                    <span style={{marginLeft: 8}}>- {m.description}</span>
                   )}
                 </h5>
               </div>

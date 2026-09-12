@@ -40,16 +40,6 @@ public class TestCommandService {
         return testRepository.save(test);
     }
 
-    /**
-     * Lọc nhóm đề trước khi gán cho bài kiểm tra.
-     *
-     * Nhóm đề có cờ certificate_eligible sinh ra chứng chỉ khi người học đạt điểm, nên người
-     * dùng thường không được tự gắn: nếu không chặn thì ai cũng tạo được một đề 5 câu tự soạn,
-     * gắn nhóm "Full Mock" rồi tự cấp chứng chỉ cho mình. Cùng cách costCoins chỉ nhận khi có
-     * quyền TEST:MANAGE_PRICING.
-     *
-     * Trả về null (không gán nhóm) thay vì ném lỗi để luồng tạo đề cá nhân vẫn chạy bình thường.
-     */
     public String sanitizeExamCategoryId(String examCategoryId) {
         if (examCategoryId == null || examCategoryId.isBlank()) {
             return null;

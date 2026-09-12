@@ -42,7 +42,7 @@ export const formatDateTime = (value: DateInput): string => {
 
 export const formatDateTime24 = (value: DateInput): string => {
   if (!value) {
-    return '—';
+    return '-';
   }
 
   const date = new Date(value);
@@ -55,7 +55,7 @@ export const formatDateTime24 = (value: DateInput): string => {
 
 export const formatDayMonth = (value: DateInput): string => {
   if (!value) {
-    return '—';
+    return '-';
   }
 
   const date = new Date(value);
