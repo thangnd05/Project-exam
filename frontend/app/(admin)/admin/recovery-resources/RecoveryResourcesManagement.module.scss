@@ -91,6 +91,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
+
+  :global(.badge) {
+    max-width: 100%;
+    white-space: normal;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
 }
 
 .cardFileName {

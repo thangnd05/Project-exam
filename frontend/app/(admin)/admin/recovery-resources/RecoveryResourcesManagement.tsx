@@ -77,14 +77,9 @@ function ResourceCard({
         <p className={cx('cardDescription')}>{resource.description}</p>
       )}
 
-      {(resource.examPartName || (resource.tags && resource.tags.length > 0)) && (
+      {resource.tags && resource.tags.length > 0 && (
         <div className={cx('cardTags')}>
-          {resource.examPartName && (
-            <Badge bg="primary">
-              {resource.examTypeName ? `${resource.examTypeName} · ` : ''}{resource.examPartName}
-            </Badge>
-          )}
-          {(resource.tags || []).map((tag) => (
+          {resource.tags.map((tag) => (
             <Badge key={tag.tagId} bg="light" text="dark" className="border">
               {tag.name}
             </Badge>
