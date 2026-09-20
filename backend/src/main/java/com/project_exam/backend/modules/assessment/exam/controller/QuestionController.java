@@ -56,14 +56,16 @@ public class QuestionController {
             @RequestParam(required = false) String classId,
             @RequestParam(required = false) String chapterId,
             @RequestParam(required = false) String bank,
+            @RequestParam(required = false) String usageScope,
             HttpServletRequest request
     ) {
+        List<Question.UsageScope> scopes = Question.UsageScope.scopesOf(usageScope);
         if ("admin".equalsIgnoreCase(bank)) {
             authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
-            return ResponseEntity.ok(questionService.getAdminBankQuestionsByPart(examPartId));
+            return ResponseEntity.ok(questionService.getAdminBankQuestionsByPart(examPartId, scopes));
         }
         String userId = authUtils.getUserId(request);
-        List<QuestionResponse> questions = questionService.getQuestionsByPart(examPartId, classId, chapterId, userId);
+        List<QuestionResponse> questions = questionService.getQuestionsByPart(examPartId, classId, chapterId, userId, scopes);
         return ResponseEntity.ok(questions);
     }
 
@@ -73,14 +75,16 @@ public class QuestionController {
             @RequestParam(required = false) String classId,
             @RequestParam(required = false) String chapterId,
             @RequestParam(required = false) String bank,
+            @RequestParam(required = false) String usageScope,
             HttpServletRequest request
     ) {
+        List<Question.UsageScope> scopes = Question.UsageScope.scopesOf(usageScope);
         if ("admin".equalsIgnoreCase(bank)) {
             authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
-            return ResponseEntity.ok(questionService.countAdminBankQuestionsByPart(examPartId));
+            return ResponseEntity.ok(questionService.countAdminBankQuestionsByPart(examPartId, scopes));
         }
         String userId = authUtils.getUserId(request);
-        long count = questionService.countByExamPartId(examPartId, classId, chapterId, userId);
+        long count = questionService.countByExamPartId(examPartId, classId, chapterId, userId, scopes);
         return ResponseEntity.ok(count);
     }
 

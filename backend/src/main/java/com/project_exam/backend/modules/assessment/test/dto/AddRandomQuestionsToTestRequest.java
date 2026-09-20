@@ -22,4 +22,7 @@ public class AddRandomQuestionsToTestRequest {
     private String bank;
 
     private String collectionId;
+
+    /** Phạm vi kho câu hỏi: EXAM (mặc định), PRACTICE hoặc ALL. */
+    private String usageScope;
 }

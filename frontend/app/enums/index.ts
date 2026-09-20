@@ -10,6 +10,13 @@ export enum QuestionUsageScope {
   PRACTICE = 'PRACTICE',
 }
 
+// Phạm vi kho câu hỏi khi tạo đề: chỉ câu thi, chỉ câu ôn tập, hoặc cả hai.
+export enum QuestionBankScope {
+  EXAM = 'EXAM',
+  PRACTICE = 'PRACTICE',
+  ALL = 'ALL',
+}
+
 export enum PassageType {
   READING = 'READING',
   LISTENING = 'LISTENING',

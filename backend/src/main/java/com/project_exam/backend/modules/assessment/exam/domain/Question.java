@@ -82,9 +82,23 @@ public class Question {
 
         public static final List<UsageScope> FOR_EXAM = List.of(EXAM);
         public static final List<UsageScope> FOR_PRACTICE = List.of(PRACTICE);
+        public static final List<UsageScope> FOR_ALL = List.of(EXAM, PRACTICE);
 
         public static final List<String> FOR_EXAM_NAMES = List.of(EXAM.name());
         public static final List<String> FOR_PRACTICE_NAMES = List.of(PRACTICE.name());
+
+        /**
+         * Chuyển tham số phạm vi kho câu hỏi (EXAM / PRACTICE / ALL) thành danh sách usage scope.
+         * Rỗng hoặc không hợp lệ thì mặc định chỉ lấy câu thi.
+         */
+        public static List<UsageScope> scopesOf(String param) {
+            if (param == null || param.isBlank()) return FOR_EXAM;
+            return switch (param.trim().toUpperCase()) {
+                case "PRACTICE" -> FOR_PRACTICE;
+                case "ALL", "BOTH" -> FOR_ALL;
+                default -> FOR_EXAM;
+            };
+        }
     }
 
 }

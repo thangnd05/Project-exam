@@ -124,24 +124,25 @@ public class QuestionService {
             String examPartId,
             String classId,
             String chapterId,
-            String currentUserId
+            String currentUserId,
+            List<Question.UsageScope> scopes
     ) {
 
         if (classId == null) {
             return questionRepository
                     .findByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
-                            examPartId, currentUserId, Question.UsageScope.FOR_EXAM);
+                            examPartId, currentUserId, scopes);
         }
 
         if (chapterId != null) {
             return questionRepository
                     .findByExamPartIdAndClassIdAndChapterId(
-                            examPartId, classId, chapterId, Question.UsageScope.FOR_EXAM);
+                            examPartId, classId, chapterId, scopes);
         }
 
         return questionRepository
                 .findByExamPartIdAndClassId(
-                        examPartId, classId, Question.UsageScope.FOR_EXAM);
+                        examPartId, classId, scopes);
     }
 
     private Map<String, Passage> loadPassagesById(List<Question> questions) {
@@ -220,7 +221,8 @@ public class QuestionService {
             String examPartId,
             String classId,
             String chapterId,
-            String currentUserId
+            String currentUserId,
+            List<Question.UsageScope> scopes
     ) {
 
         if (classId != null) {
@@ -234,7 +236,8 @@ public class QuestionService {
                 examPartId,
                 classId,
                 chapterId,
-                currentUserId
+                currentUserId,
+                scopes
         );
 
         if (questions.isEmpty()) {
@@ -244,26 +247,26 @@ public class QuestionService {
         return buildUserQuestionResponses(questions);
     }
 
-    public List<QuestionResponse> getAdminBankQuestionsByPart(String examPartId) {
+    public List<QuestionResponse> getAdminBankQuestionsByPart(String examPartId, List<Question.UsageScope> scopes) {
         Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) {
             return Collections.emptyList();
         }
         List<Question> questions = questionRepository.findAdminBankByExamPart(
-                examPartId, adminIds, Question.UsageScope.FOR_EXAM);
+                examPartId, adminIds, scopes);
         if (questions.isEmpty()) {
             return Collections.emptyList();
         }
         return buildUserQuestionResponses(questions);
     }
 
-    public long countAdminBankQuestionsByPart(String examPartId) {
+    public long countAdminBankQuestionsByPart(String examPartId, List<Question.UsageScope> scopes) {
         Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) {
             return 0L;
         }
         return questionRepository.countAdminBankByExamPart(
-                examPartId, adminIds, Question.UsageScope.FOR_EXAM);
+                examPartId, adminIds, scopes);
     }
 
     private Set<String> getAccessibleClassIds(String currentUserId) {
@@ -587,23 +590,24 @@ public class QuestionService {
         }
     }
 
-    public long countByExamPartId(String examPartId, String classId, String chapterId, String currentUserId) {
+    public long countByExamPartId(String examPartId, String classId, String chapterId, String currentUserId,
+                                  List<Question.UsageScope> scopes) {
         if (classId != null) {
 
             classAccessGuard.requireMemberOrTeacher(classId, currentUserId);
             classAccessGuard.requireChapterInClass(chapterId, classId);
             if (chapterId != null) {
                 return questionRepository.countByExamPartIdAndClassIdAndChapterId(
-                        examPartId, classId, chapterId, Question.UsageScope.FOR_EXAM);
+                        examPartId, classId, chapterId, scopes);
             }
             return questionRepository.countByExamPartIdAndClassId(
-                    examPartId, classId, Question.UsageScope.FOR_EXAM);
+                    examPartId, classId, scopes);
         }
         if (chapterId != null) {
             throw new BadRequestException("Khi có chapterId thì phải có classId.");
         }
         return questionRepository.countByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
-                examPartId, currentUserId, Question.UsageScope.FOR_EXAM);
+                examPartId, currentUserId, scopes);
     }
 
     @Transactional

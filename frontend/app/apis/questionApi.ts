@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from 'axios';
 import axios from './axiosClient';
-import type { QuestionUsageScope } from '@/app/enums';
+import type { QuestionBankScope, QuestionUsageScope } from '@/app/enums';
 import type {
   AdminQuestionListItem,
   AdminQuestionSearchParams,
@@ -26,6 +26,7 @@ interface QuestionBankFilterParams {
   classId?: string;
   chapterId?: string;
   bank?: string;
+  usageScope?: QuestionBankScope;
 }
 
 export interface QuestionJsonImportParams {

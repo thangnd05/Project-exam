@@ -23,6 +23,7 @@ import {
   IoCreateOutline,
   IoServerOutline,
   IoSchoolOutline,
+  IoFilterOutline,
 } from 'react-icons/io5';
 import { useBaseMetaData } from '@/app/hooks/useBaseMetaData';
 import { durationMinutesFromExamType } from '@/app/hooks/useExamTypes';
@@ -40,7 +41,7 @@ import {
   groupQuestionsByPassage,
 } from '@/app/hooks/useBankTestBuilder';
 import type { BankLoadParams, BankQuestion, PartConfig } from '@/app/hooks/useBankTestBuilder';
-import { PermissionCode } from '@/app/enums';
+import { PermissionCode, QuestionBankScope, QuestionUsageScope } from '@/app/enums';
 import type { CreateTestRequest } from '@/app/types';
 import type { CreateTestMode } from './CreateTestFormBody';
 import styles from '../CreateTestModal.module.scss';
@@ -62,6 +63,24 @@ const BANK_SOURCES = {
 type BankSource = (typeof BANK_SOURCES)[keyof typeof BANK_SOURCES];
 
 const ALL_CHAPTERS = '__ALL__';
+
+const BANK_SCOPE_OPTIONS: { value: QuestionBankScope; label: string; hint: string }[] = [
+  {
+    value: QuestionBankScope.EXAM,
+    label: 'Câu thi',
+    hint: 'Chỉ lấy câu hỏi dành cho thi — đây là mặc định.',
+  },
+  {
+    value: QuestionBankScope.PRACTICE,
+    label: 'Câu ôn tập',
+    hint: 'Chỉ lấy câu hỏi ôn tập (lộ trình). Câu vẫn giữ nguyên trạng thái ôn tập sau khi đưa vào đề.',
+  },
+  {
+    value: QuestionBankScope.ALL,
+    label: 'Cả hai',
+    hint: 'Lấy cả câu thi lẫn câu ôn tập trong cùng một kho.',
+  },
+];
 
 type BankTestInfo = {
   title: string;
@@ -110,6 +129,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [editingPartId, setEditingPartId] = useState<string | null>(null);
   const [bankSource, setBankSource] = useState<BankSource>(isClassMode ? BANK_SOURCES.CLASS : BANK_SOURCES.PERSONAL);
+  const [bankScope, setBankScope] = useState<QuestionBankScope>(QuestionBankScope.EXAM);
   const [chapters, setChapters] = useState<any[]>([]);
   const [selectedChapterId, setSelectedChapterId] = useState<string>(chapterId || ALL_CHAPTERS);
 
@@ -138,14 +158,19 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     hasPartWithQuestions,
   } = useBankTestBuilder({ getScopedQuestions });
 
-  const buildLoadParams = (source: BankSource = bankSource, chapterFilter = selectedChapterId): BankLoadParams => {
-    if (source === BANK_SOURCES.ADMIN) return { bank: 'admin' };
+  const buildLoadParams = (
+    source: BankSource = bankSource,
+    chapterFilter = selectedChapterId,
+    scope: QuestionBankScope = bankScope,
+  ): BankLoadParams => {
+    const params: BankLoadParams = { usageScope: scope };
+    if (source === BANK_SOURCES.ADMIN) return { ...params, bank: 'admin' };
     if (source === BANK_SOURCES.CLASS && classId) {
-      const params: BankLoadParams = { classId };
+      params.classId = classId;
       if (chapterFilter && chapterFilter !== ALL_CHAPTERS) params.chapterId = chapterFilter;
       return params;
     }
-    return {};
+    return params;
   };
 
   useEffect(() => {
@@ -172,15 +197,15 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     });
     setPartConfigs(initial);
     examParts.forEach((part: any) => {
-      loadQuestionsForPart(part.examPartId, buildLoadParams(bankSource, selectedChapterId));
+      loadQuestionsForPart(part.examPartId, buildLoadParams(bankSource, selectedChapterId, bankScope));
     });
 
-  }, [testInfo.examTypeId, examParts, bankSource, selectedChapterId]);
+  }, [testInfo.examTypeId, examParts, bankSource, selectedChapterId, bankScope]);
 
   const handleEditQuestionSuccess = () => {
     setEditingQuestionId(null);
     if (editingPartId) {
-      loadQuestionsForPart(editingPartId, buildLoadParams(bankSource, selectedChapterId));
+      loadQuestionsForPart(editingPartId, buildLoadParams(bankSource, selectedChapterId, bankScope));
     }
   };
 
@@ -257,6 +282,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             classId: useClassSource ? classId : undefined,
             chapterId: useClassSource && selectedChapterId && selectedChapterId !== ALL_CHAPTERS ? selectedChapterId : undefined,
             collectionId: scopeByCollection ? String(testInfo.collectionId) : undefined,
+            usageScope: bankScope,
           });
         }
       }
@@ -479,6 +505,29 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             )}
           </div>
 
+          <div className={cx('bankScopeRow')} style={{ marginTop: 16 }}>
+            <div className={cx('bankScopeLabel')}>
+              <IoFilterOutline size={16} /> Phạm vi câu hỏi
+            </div>
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {BANK_SCOPE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  type="button"
+                  className={cx('bankModeTab', { active: bankScope === opt.value })}
+                  onClick={() => setBankScope(opt.value)}
+                  aria-pressed={bankScope === opt.value}
+                  title={opt.hint}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <p className={cx('bankHint')} style={{ marginTop: 8, marginBottom: 0 }}>
+              {BANK_SCOPE_OPTIONS.find((o) => o.value === bankScope)?.hint}
+            </p>
+          </div>
+
           {isClassMode && bankSource === BANK_SOURCES.CLASS && (
             <div className={cx('formGroupModern')} style={{ marginTop: 14, maxWidth: 480 }}>
               <label><IoBookOutline /> Lọc theo chapter</label>
@@ -525,6 +574,19 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                       ? ` · ${chapters.find((c: any) => c.chapterId === selectedChapterId)?.title || 'Chapter'}`
                       : ' · Tất cả chapter'}`
                     : 'Kho cá nhân'}
+              </span>
+              <span
+                style={{
+                  marginLeft: 8,
+                  fontSize: '1.15rem',
+                  fontWeight: 600,
+                  color: bankScope === QuestionBankScope.EXAM ? '#475569' : '#6d28d9',
+                  background: bankScope === QuestionBankScope.EXAM ? '#f1f5f9' : '#ede9fe',
+                  padding: '2px 10px',
+                  borderRadius: 999,
+                }}
+              >
+                {BANK_SCOPE_OPTIONS.find((o) => o.value === bankScope)?.label}
               </span>
             </div>
             <p className={cx('bankHint')}>
@@ -689,6 +751,9 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                                     ? 'Kho lớp học (chapter đã chọn) chưa có câu hỏi cho part này.'
                                     : 'Kho lớp học chưa có câu hỏi cho part này.')
                                 : 'Chưa có câu hỏi trong kho cá nhân cho part này.'}
+                          {bankScope !== QuestionBankScope.ALL && (
+                            <> Đang lọc theo <strong>{BANK_SCOPE_OPTIONS.find((o) => o.value === bankScope)?.label}</strong> — thử đổi phạm vi ở mục 2.</>
+                          )}
                         </Alert>
                       )}
 
@@ -738,6 +803,11 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                                           <li key={id} className={cx('bankQuestionItem', { selected: checked })}>
                                             <span className={cx('bankQuestionIndex')}>{displayNo}.</span>
                                             <span className={cx('bankQuestionText')}>{q.questionText || '(Không có nội dung)'}</span>
+                                            {q.usageScope === QuestionUsageScope.PRACTICE && (
+                                              <span className={cx('bankScopeBadge')} title="Câu ôn tập — vẫn giữ nguyên trạng thái ôn tập sau khi đưa vào đề">
+                                                Ôn tập
+                                              </span>
+                                            )}
                                             {bankSource === BANK_SOURCES.PERSONAL && (
                                               <button
                                                 type="button"

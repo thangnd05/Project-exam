@@ -1,4 +1,4 @@
-import { QuestionType, QuestionUsageScope, TestStatus } from '@/app/enums';
+import { QuestionBankScope, QuestionType, QuestionUsageScope, TestStatus } from '@/app/enums';
 import type { PassageMediaResponse, PassageResponse, QuestionGroupAdminResponse } from './question';
 
 export interface AnswerResponse {
@@ -154,6 +154,7 @@ export interface AddRandomQuestionsToTestRequest {
   toIndex?: number;
   bank?: string;
   collectionId?: string;
+  usageScope?: QuestionBankScope;
 }
 
 export interface TestCollectionResponse {

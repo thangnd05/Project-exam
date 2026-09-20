@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { getQuestionsByPart } from '@/app/apis/questionApi';
+import type { QuestionBankScope } from '@/app/enums';
 import type { QuestionResponse } from '@/app/types';
 
 export const SELECTION_MODES = {
@@ -35,6 +36,7 @@ export interface BankLoadParams {
   classId?: string;
   chapterId?: string;
   bank?: string;
+  usageScope?: QuestionBankScope;
 }
 
 export interface PassageGroup {

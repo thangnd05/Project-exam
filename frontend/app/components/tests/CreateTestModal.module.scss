@@ -726,3 +726,29 @@
         }
     }
 }
+
+.bankScopeRow {
+    padding-top: 16px;
+    border-top: 1px dashed var(--slate-200);
+}
+
+.bankScopeLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+    font-size: var(--font-size-smd);
+    font-weight: 700;
+    color: var(--slate-700);
+}
+
+.bankScopeBadge {
+    flex-shrink: 0;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #ede9fe;
+    color: #6d28d9;
+    font-size: 1.1rem;
+    font-weight: 700;
+    white-space: nowrap;
+}

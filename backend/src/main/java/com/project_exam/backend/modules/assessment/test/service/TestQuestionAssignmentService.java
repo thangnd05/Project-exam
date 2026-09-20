@@ -149,23 +149,24 @@ public class TestQuestionAssignmentService {
                 .max(Integer::compareTo)
                 .orElse(0) + 1;
 
+        List<Question.UsageScope> scopes = Question.UsageScope.scopesOf(request.getUsageScope());
+
         List<Question> candidates;
         if (useAdminBank) {
             Set<String> adminIds = adminUserProvider.adminUserIds();
             candidates = adminIds.isEmpty()
                     ? new ArrayList<>()
                     : new ArrayList<>(questionRepository.findAdminBankByExamPart(
-                            examPartId, adminIds, Question.UsageScope.FOR_EXAM));
+                            examPartId, adminIds, scopes));
         } else if (request.getClassId() != null && request.getChapterId() != null) {
             candidates = new ArrayList<>(questionRepository.findByExamPartIdAndClassIdAndChapterId(
-                    examPartId, request.getClassId(), request.getChapterId(),
-                    Question.UsageScope.FOR_EXAM));
+                    examPartId, request.getClassId(), request.getChapterId(), scopes));
         } else if (request.getClassId() != null) {
             candidates = new ArrayList<>(questionRepository.findByExamPartIdAndClassId(
-                    examPartId, request.getClassId(), Question.UsageScope.FOR_EXAM));
+                    examPartId, request.getClassId(), scopes));
         } else {
             candidates = new ArrayList<>(questionRepository.findByExamPartIdAndCreatedByAndClassIdIsNullAndChapterIdIsNullAndIsBankTrue(
-                    examPartId, currentUserId, Question.UsageScope.FOR_EXAM));
+                    examPartId, currentUserId, scopes));
         }
 
         if (request.getCollectionId() != null && !request.getCollectionId().isBlank()) {
