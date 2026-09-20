@@ -16,23 +16,24 @@
   overflow: hidden;
   width: 1000px;
   max-width: 95%;
-  min-height: 700px;
-  display: block;
+  /* Chỉ cần đủ chỗ cho panel giới thiệu bên phải; phần còn lại do form quyết định. */
+  min-height: 560px;
+  /* Hai form nằm chung một ô grid nên card tự cao bằng form cao nhất thay vì
+     bị ép cứng 700px. Nhờ vậy form đăng ký không còn thanh cuộn riêng bên trong. */
+  display: grid;
+  grid-template-columns: 1fr;
 }
 
 .formContainer {
-  position: absolute;
-  top: 0;
-  height: 100%;
+  grid-area: 1 / 1;
   transition: all 0.6s cubic-bezier(0.645, 0.045, 0.355, 1.000);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 30px 50px;
+  padding: 40px 50px;
   text-align: center;
   width: 50%;
-  overflow-y: auto;
 
   form {
     width: 100%;
@@ -42,9 +43,9 @@
   }
 
   h1 {
-    font-size: 3.2rem;
+    font-size: 3rem;
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     color: var(--text-color);
   }
 
@@ -56,16 +57,32 @@
 }
 
 .signInContainer {
-  left: 0;
   z-index: 2;
   opacity: 1;
 }
 
 .signUpContainer {
-  left: 0;
   width: 50%;
   opacity: 0;
   z-index: 1;
+  /* Form đang ẩn không được nhận focus khi bấm Tab. */
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.mainCard.signUpMode .signUpContainer {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mainCard:not(.signUpMode) .signInContainer {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.mainCard.signUpMode .signInContainer {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .mainCard.signUpMode {
@@ -181,14 +198,15 @@
 
 .input-box {
   width: 100%;
-  margin-bottom: 15px;
+  margin-bottom: 12px;
+  text-align: left;
 
-  &.has-toggle {
+  .control {
     position: relative;
     display: flex;
     align-items: center;
 
-    input {
+    &.has-toggle input {
       padding-right: 46px;
     }
   }
@@ -217,22 +235,28 @@
   input {
     width: 100%;
     background-color: var(--bg-white);
-    border: 1px solid transparent;
-    padding: 14px 18px;
+    /* Trước đây viền trong suốt khiến ô nhập gần như tàng hình trên card trắng. */
+    border: 1px solid var(--border-color);
+    padding: 13px 16px;
     border-radius: var(--radius-md);
     font-size: 1.4rem;
     color: var(--text-color);
     font-weight: 500;
-    transition: all 0.2s ease;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 
     &::placeholder {
       color: var(--slate-400);
     }
 
     &:focus {
-      background-color: var(--bg-white);
-      border-color: var(--border-color);
+      outline: none;
+      border-color: var(--accent-color);
       box-shadow: 0 0 0 3px var(--primary-alpha-10);
+    }
+
+    &:disabled {
+      background-color: var(--gray-50);
+      cursor: not-allowed;
     }
   }
 }
@@ -299,9 +323,11 @@
 
 .forgot-link {
   display: block;
-  font-size: var(--font-size-base);
+  width: 100%;
+  text-align: right;
+  font-size: var(--font-size-smd);
   color: var(--text-secondary);
-  margin: 10px 0 25px;
+  margin: 2px 0 20px;
   font-weight: 500;
 
   &:hover {
@@ -311,6 +337,7 @@
 }
 
 .login-btn {
+  width: 100%;
   border-radius: 30px;
   border: none;
   background: var(--accent-color);
@@ -321,13 +348,23 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 15px var(--primary-alpha-20);
+  /* Spinner nằm cạnh chữ thay vì thay thế chữ, nút không co lại giữa chừng. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: var(--accent-act-color);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgb(var(--teal-600-rgb) / 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
   }
 }
 
@@ -371,10 +408,11 @@
 }
 
 .loading-spinner {
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border: 2px solid rgb(255 255 255 / 0.35);
+  border-top-color: var(--white);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -411,59 +449,29 @@
     box-shadow: none;
   }
 
-  .formContainer {
-    position: relative;
-    width: 100%;
-    padding: 40px 20px;
-  }
-
   .overlayContainer {
     display: none;
   }
 
-  .signInContainer,
-  .signUpContainer {
+  /* Trên mobile chỉ hiện đúng một form, không còn hiệu ứng trượt. */
+  .formContainer {
+    display: none;
     position: relative;
-    left: 0 !important;
+    width: 100% !important;
+    padding: 32px 20px;
     transform: none !important;
     opacity: 1 !important;
-    visibility: visible;
+    visibility: visible !important;
+    pointer-events: auto !important;
   }
 
-  .mainCard.signUpMode {
-    .signInContainer {
-      display: none;
-    }
-
-    .signUpContainer {
-      display: flex;
-      animation: none;
-    }
+  .mainCard:not(.signUpMode) .signInContainer,
+  .mainCard.signUpMode .signUpContainer {
+    display: flex;
+    animation: none;
   }
 
   .mobile-switch {
     display: block;
-
-  }
-
-  .overlayContainer {
-    display: none;
-  }
-
-  .formContainer {
-    width: 100% !important;
-    padding: 20px !important;
-    position: relative !important;
-    opacity: 1 !important;
-    transform: none !important;
-    display: none;
-  }
-
-  .mainCard:not(.signUpMode) .signInContainer {
-    display: flex;
-  }
-
-  .mainCard.signUpMode .signUpContainer {
-    display: flex;
   }
 }

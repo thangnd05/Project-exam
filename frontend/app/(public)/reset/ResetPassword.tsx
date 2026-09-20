@@ -206,7 +206,9 @@ function ResetPassword() {
           </div>
 
           <p className={cx('footer')}>
-            <Link href={routes.login}>Quay lại đăng nhập</Link>
+            <Link href={routes.login} className={cx('back-link')}>
+              Quay lại đăng nhập
+            </Link>
           </p>
         </div>
       </div>
@@ -268,19 +270,17 @@ function ResetPassword() {
 
         <form className={cx('form')} onSubmit={handleSubmit} noValidate>
           <div className={cx('field')}>
-            <label className={cx('label')} htmlFor="new-password">
-              Mật khẩu mới
-            </label>
             <div className={cx('control')}>
               <input
                 id="new-password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="new-password"
                 autoFocus
+                aria-label="Mật khẩu mới"
                 className={cx('input', 'hasToggle', {
                   invalid: touched.password && newPassword.length > 0 && !passwordOk,
                 })}
-                placeholder="Nhập mật khẩu mới"
+                placeholder="Mật khẩu mới"
                 value={newPassword}
                 disabled={isSubmitting || expired}
                 onChange={(e) => {
@@ -303,18 +303,16 @@ function ResetPassword() {
           </div>
 
           <div className={cx('field')}>
-            <label className={cx('label')} htmlFor="confirm-password">
-              Xác nhận mật khẩu mới
-            </label>
             <div className={cx('control')}>
               <input
                 id="confirm-password"
                 type={showConfirm ? 'text' : 'password'}
                 autoComplete="new-password"
+                aria-label="Xác nhận mật khẩu mới"
                 className={cx('input', 'hasToggle', {
                   invalid: touched.confirm && confirmPassword.length > 0 && !confirmOk,
                 })}
-                placeholder="Nhập lại mật khẩu mới"
+                placeholder="Xác nhận mật khẩu mới"
                 value={confirmPassword}
                 disabled={isSubmitting || expired}
                 onChange={(e) => {
@@ -339,15 +337,15 @@ function ResetPassword() {
 
           {formError && <div className={cx('alert', 'alertError')}>{formError}</div>}
 
+          <Link href={routes.login} className={cx('back-link')}>
+            Quay lại đăng nhập
+          </Link>
+
           <button type="submit" className={cx('submitBtn')} disabled={!canSubmit || expired}>
             {isSubmitting && <span className={cx('spinner')} />}
             {isSubmitting ? 'Đang cập nhật...' : 'Đặt lại mật khẩu'}
           </button>
         </form>
-
-        <p className={cx('footer')}>
-          <Link href={routes.login}>Quay lại đăng nhập</Link>
-        </p>
       </div>
     </div>
   );

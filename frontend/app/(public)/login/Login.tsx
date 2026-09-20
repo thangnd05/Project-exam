@@ -158,30 +158,75 @@ function Login() {
             </div>
 
             <div className={cx('input-box')}>
-              <input type="text" placeholder="Họ và tên" required value={regFullName} onChange={(e) => setRegFullName(e.target.value)} />
+              <div className={cx('control')}>
+                <input
+                  id="reg-fullname"
+                  type="text"
+                  autoComplete="name"
+                  aria-label="Họ và tên"
+                  placeholder="Họ và tên"
+                  required
+                  value={regFullName}
+                  onChange={(e) => setRegFullName(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
             </div>
+
             <div className={cx('input-box')}>
-              <input type="email" placeholder="Email" required value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
+              <div className={cx('control')}>
+                <input
+                  id="reg-email"
+                  type="email"
+                  autoComplete="email"
+                  aria-label="Email"
+                  placeholder="Email"
+                  required
+                  value={regEmail}
+                  onChange={(e) => setRegEmail(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
             </div>
+
             <div className={cx('input-box')}>
-              <input type="text" placeholder="Tên đăng nhập" required value={regUserName} onChange={(e) => setRegUserName(e.target.value)} />
+              <div className={cx('control')}>
+                <input
+                  id="reg-username"
+                  type="text"
+                  autoComplete="username"
+                  aria-label="Tên đăng nhập"
+                  placeholder="Tên đăng nhập"
+                  required
+                  value={regUserName}
+                  onChange={(e) => setRegUserName(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
             </div>
-            <div className={cx('input-box', 'has-toggle')}>
-              <input
-                type={showRegPassword ? 'text' : 'password'}
-                placeholder="Mật khẩu"
-                required
-                value={regPassword}
-                onChange={(e) => setRegPassword(e.target.value)}
-              />
-              <button
-                type="button"
-                className={cx('password-toggle')}
-                onClick={() => setShowRegPassword((prev) => !prev)}
-                aria-label={showRegPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-              >
-                {showRegPassword ? <FiEyeOff /> : <FiEye />}
-              </button>
+
+            <div className={cx('input-box')}>
+              <div className={cx('control', 'has-toggle')}>
+                <input
+                  id="reg-password"
+                  type={showRegPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
+                  aria-label="Mật khẩu"
+                  placeholder="Mật khẩu"
+                  required
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className={cx('password-toggle')}
+                  onClick={() => setShowRegPassword((prev) => !prev)}
+                  aria-label={showRegPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                >
+                  {showRegPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
             </div>
 
             <div className={cx('agreement')}>
@@ -194,7 +239,10 @@ function Login() {
             </div>
 
             {isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}
-            <button type="submit" className={cx('login-btn')} disabled={loading}>Đăng ký ngay</button>
+            <button type="submit" className={cx('login-btn')} disabled={loading}>
+              {loading && <span className={cx('loading-spinner')} />}
+              <span>{loading ? 'Đang xử lý...' : 'Đăng ký ngay'}</span>
+            </button>
             <div className={cx('mobile-switch')}>
               <span>Đã có tài khoản? </span>
               <button type="button" style={{ textDecoration: 'none' }} onClick={() => { setIsSignUp(false); setMessage(''); }}>
@@ -213,32 +261,51 @@ function Login() {
               </div>
             </div>
             <div className={cx('input-box')}>
-              <input type="text" placeholder="Email hoặc Tên đăng nhập" required value={loginIdentifier} onChange={(e) => setLoginIdentifier(e.target.value)} disabled={loading} />
+              <div className={cx('control')}>
+                <input
+                  id="login-identifier"
+                  type="text"
+                  autoComplete="username"
+                  aria-label="Email hoặc tên đăng nhập"
+                  placeholder="Email hoặc tên đăng nhập"
+                  required
+                  value={loginIdentifier}
+                  onChange={(e) => setLoginIdentifier(e.target.value)}
+                  disabled={loading}
+                />
+              </div>
             </div>
-            <div className={cx('input-box', 'has-toggle')}>
-              <input
-                type={showLoginPassword ? 'text' : 'password'}
-                placeholder="Mật khẩu"
-                required
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                disabled={loading}
-              />
-              <button
-                type="button"
-                className={cx('password-toggle')}
-                onClick={() => setShowLoginPassword((prev) => !prev)}
-                aria-label={showLoginPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-              >
-                {showLoginPassword ? <FiEyeOff /> : <FiEye />}
-              </button>
+
+            <div className={cx('input-box')}>
+              <div className={cx('control', 'has-toggle')}>
+                <input
+                  id="login-password"
+                  type={showLoginPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  aria-label="Mật khẩu"
+                  placeholder="Mật khẩu"
+                  required
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className={cx('password-toggle')}
+                  onClick={() => setShowLoginPassword((prev) => !prev)}
+                  aria-label={showLoginPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                >
+                  {showLoginPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
             </div>
 
             <Link href={routes.forgot} className={cx('forgot-link')}>Bạn quên mật khẩu?</Link>
             {!isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}
 
             <button type="submit" className={cx('login-btn')} disabled={loading}>
-              {loading ? <div className={cx('loading-spinner')}></div> : 'Đăng nhập ngay'}
+              {loading && <span className={cx('loading-spinner')} />}
+              <span>{loading ? 'Đang đăng nhập...' : 'Đăng nhập ngay'}</span>
             </button>
 
             <div className={cx('mobile-switch')}>

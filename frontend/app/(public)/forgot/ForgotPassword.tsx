@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import classNames from 'classnames/bind';
-import { FiArrowLeft, FiMail } from 'react-icons/fi';
-import { MdMarkEmailRead } from 'react-icons/md';
+import {FiMail} from 'react-icons/fi';
+import {MdMarkEmailRead} from 'react-icons/md';
 import routes from '@/app/configs/Routes';
-import { useForgotPasswordMutation } from '@/app/hooks/useAuthActions';
+import {useForgotPasswordMutation} from '@/app/hooks/useAuthActions';
 import style from '../_components/auth/AuthRecovery.module.scss';
 
 const cx = classNames.bind(style);
@@ -14,12 +14,16 @@ const cx = classNames.bind(style);
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const RESEND_COOLDOWN_SECONDS = 60;
 
+function isEmailValid(value: string) {
+  return EMAIL_PATTERN.test(value.trim());
+}
+
 function ForgotPassword() {
   const [email, setEmail] = useState('');
-  const [emailError, setEmailError] = useState('');
   const [formError, setFormError] = useState('');
   const [sentTo, setSentTo] = useState('');
   const [cooldown, setCooldown] = useState(0);
+  const canSubmit = isEmailValid(email);
 
   const forgotPasswordMutation = useForgotPasswordMutation();
   const isSubmitting = forgotPasswordMutation.isPending;
@@ -46,13 +50,6 @@ function ForgotPassword() {
     };
   }, []);
 
-  const validate = (value: string) => {
-    const trimmed = value.trim();
-    if (!trimmed) return 'Vui lòng nhập email.';
-    if (!EMAIL_PATTERN.test(trimmed)) return 'Email không đúng định dạng.';
-    return '';
-  };
-
   const sendRequest = async (value: string) => {
     setFormError('');
     try {
@@ -63,9 +60,14 @@ function ForgotPassword() {
       const status = err?.response?.status;
       if (status === 429) {
         const retryAfter = Number(err?.response?.headers?.['retry-after']);
-        const waitFor = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : RESEND_COOLDOWN_SECONDS;
+        const waitFor =
+          Number.isFinite(retryAfter) && retryAfter > 0
+            ? retryAfter
+            : RESEND_COOLDOWN_SECONDS;
         startCooldown(waitFor);
-        setFormError(`Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau ${waitFor} giây.`);
+        setFormError(
+          `Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau ${waitFor} giây.`,
+        );
         return;
       }
       setFormError(
@@ -79,9 +81,7 @@ function ForgotPassword() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const message = validate(email);
-    setEmailError(message);
-    if (message) return;
+    if (!isEmailValid(email)) return;
     await sendRequest(email.trim());
   };
 
@@ -99,12 +99,14 @@ function ForgotPassword() {
           </div>
           <h1 className={cx('title')}>Kiểm tra hộp thư của bạn</h1>
           <p className={cx('subtitle')}>
-            Nếu <strong>{sentTo}</strong> đang được dùng cho một tài khoản, chúng tôi đã gửi một liên
-            kết đặt lại mật khẩu đến email đó. Liên kết có hiệu lực trong 30 phút và chỉ dùng được
-            một lần.
+            Nếu <strong>{sentTo}</strong> đang được dùng cho một tài khoản,
+            chúng tôi đã gửi một liên kết đặt lại mật khẩu đến email đó. Liên
+            kết có hiệu lực trong 30 phút và chỉ dùng được một lần.
           </p>
 
-          {formError && <div className={cx('alert', 'alertError')}>{formError}</div>}
+          {formError && (
+            <div className={cx('alert', 'alertError')}>{formError}</div>
+          )}
 
           <div className={cx('actions')}>
             <button
@@ -133,8 +135,9 @@ function ForgotPassword() {
 
           <p className={cx('footer')}>
             Không thấy email? Hãy kiểm tra cả mục Spam / Quảng cáo.
-            <br />
-            <Link href={routes.login}>Quay lại đăng nhập</Link>
+            <Link href={routes.login} className={cx('back-link')}>
+              Quay lại đăng nhập
+            </Link>
           </p>
         </div>
       </div>
@@ -147,41 +150,46 @@ function ForgotPassword() {
         <div className={cx('badge')}>
           <FiMail />
         </div>
-        <h1 className={cx('title')}>Quên mật khẩu?</h1>
+        <h1 className={cx('title')}>Quên mật khẩu</h1>
         <p className={cx('subtitle')}>
-          Nhập email bạn đã đăng ký. Chúng tôi sẽ gửi cho bạn một liên kết để đặt lại mật khẩu.
+          Nhập email bạn đã đăng ký. Chúng tôi sẽ gửi cho bạn một liên kết để
+          đặt lại mật khẩu.
         </p>
 
         <form className={cx('form')} onSubmit={handleSubmit} noValidate>
           <div className={cx('field')}>
-            <label className={cx('label')} htmlFor="forgot-email">
-              Email
-            </label>
             <div className={cx('control')}>
               <input
                 id="forgot-email"
                 type="email"
                 autoComplete="email"
                 autoFocus
-                className={cx('input', { invalid: Boolean(emailError) })}
-                placeholder="ban@example.com"
+                aria-label="Email"
+                className={cx('input')}
+                placeholder="Email"
                 value={email}
                 disabled={isSubmitting}
-                aria-invalid={Boolean(emailError)}
                 onChange={(e) => {
                   setEmail(e.target.value);
-                  if (emailError) setEmailError('');
                   if (formError) setFormError('');
                 }}
-                onBlur={(e) => setEmailError(validate(e.target.value))}
               />
             </div>
-            {emailError && <span className={cx('fieldError')}>{emailError}</span>}
           </div>
 
-          {formError && <div className={cx('alert', 'alertError')}>{formError}</div>}
+          {formError && (
+            <div className={cx('alert', 'alertError')}>{formError}</div>
+          )}
 
-          <button type="submit" className={cx('submitBtn')} disabled={isSubmitting || cooldown > 0}>
+          <Link href={routes.login} className={cx('back-link')}>
+            Quay lại đăng nhập
+          </Link>
+
+          <button
+            type="submit"
+            className={cx('submitBtn')}
+            disabled={!canSubmit || isSubmitting || cooldown > 0}
+          >
             {isSubmitting && <span className={cx('spinner')} />}
             {isSubmitting
               ? 'Đang gửi...'
@@ -190,13 +198,6 @@ function ForgotPassword() {
                 : 'Gửi liên kết đặt lại'}
           </button>
         </form>
-
-        <p className={cx('footer')}>
-          <Link href={routes.login}>
-            <FiArrowLeft style={{ verticalAlign: 'middle', marginRight: 4 }} />
-            Quay lại đăng nhập
-          </Link>
-        </p>
       </div>
     </div>
   );
