@@ -1,0 +1,230 @@
+{
+  "version": 1,
+  "usageScope": "EXAM",
+  "examPartId": "01a09629-a88c-7b07-aa6c-7060778ca6df",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "A company stores the source code for 40 microservices in AWS CodeCommit repositories within a single AWS account. A new compliance requirement states that every change merged into the main branch of any repository must be reviewed and approved by at least two members of the senior-engineers IAM group, and developers must not be able to bypass this requirement. The company wants the requirement applied to all current and future repositories with the LEAST ongoing operational effort. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Yêu cầu là bắt buộc hai lượt phê duyệt từ một nhóm cụ thể, áp cho cả kho hiện có lẫn kho tạo sau này, với công sức duy trì thấp nhất.\n(A) SAI: Tạo approval rule riêng trên từng pull request là thao tác thủ công lặp lại cho mỗi lần tạo pull request, và người tạo có thể không thêm rule.\n(B) ĐÚNG: Approval rule template được định nghĩa một lần ở cấp tài khoản rồi liên kết với nhiều kho; mọi pull request trong các kho đã liên kết tự động thừa hưởng yêu cầu phê duyệt, và kho mới chỉ cần liên kết template thay vì cấu hình lại từ đầu. Kết hợp chính sách IAM từ chối các hành động ghi đè để developer không tự gỡ được.\n(C) SAI: Dùng Lambda kiểm tra sau khi merge là kiểm soát phát hiện, không ngăn được việc merge thiếu phê duyệt.\n(D) SAI: Chuyển sang nhánh bảo vệ của một nền tảng khác là thay đổi hạ tầng lớn, không phải phương án ít công sức nhất.\nĐáp án đúng: B\nĐiểm cần nhớ: Approval rule template áp quy tắc phê duyệt cho nhiều kho CodeCommit một cách tập trung; đây là kiểm soát phòng ngừa chứ không phải phát hiện.",
+      "tagNames": ["SDLC Automation > AWS CodeCommit"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Instruct developers to add an approval rule requiring two approvals to each pull request they open, and audit compliance monthly.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Create an approval rule template that requires two approvals from the senior-engineers group, associate it with all repositories, and use an IAM policy that denies developers the ability to override or delete approval rules.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Configure an Amazon EventBridge rule for merge events that invokes an AWS Lambda function to verify the number of approvals and notify the security team when fewer than two approvals were recorded.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Migrate all repositories to a third-party Git provider and enable protected branches that require two reviewers.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer must allow a build pipeline that runs in a dedicated tooling AWS account to clone a CodeCommit repository that lives in a separate development AWS account. The solution must not use long-lived credentials and must restrict access to that single repository. Which combination of actions meets these requirements?",
+      "explanation": "Phân tích đề: Cần truy cập kho CodeCommit giữa hai tài khoản, không dùng thông tin xác thực dài hạn, giới hạn đúng một kho.\n(A) SAI: Tạo Git credentials cho một IAM user và lưu trong Secrets Manager vẫn là thông tin xác thực tĩnh phải xoay vòng, trái yêu cầu.\n(B) ĐÚNG: Tạo một IAM role trong tài khoản development với chính sách chỉ cho phép các hành động đọc trên đúng ARN của kho đó, chính sách tin cậy chỉ cho phép vai trò build ở tài khoản tooling đảm nhận; build assume role và nhận thông tin xác thực tạm thời.\n(C) SAI: Đặt kho ở chế độ công khai là điều không tồn tại với CodeCommit và vi phạm bảo mật.\n(D) SAI: Sao chép kho sang tài khoản tooling tạo ra bản sao phải đồng bộ và làm mất nguồn sự thật duy nhất.\nĐáp án đúng: B\nĐiểm cần nhớ: Truy cập CodeCommit giữa các tài khoản nên dùng cross-account role với chính sách giới hạn theo ARN kho, không dùng Git credentials tĩnh.",
+      "tagNames": ["SDLC Automation > AWS CodeCommit"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create an IAM user in the development account, generate Git credentials, and store them in AWS Secrets Manager for the build to retrieve at runtime.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Create an IAM role in the development account that grants read access scoped to that repository ARN, with a trust policy allowing only the build role in the tooling account to assume it, and have the build assume the role before cloning.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Make the repository publicly readable and restrict access using a network ACL on the tooling account VPC.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Configure a scheduled job that mirrors the repository into a CodeCommit repository in the tooling account, and build from the mirror.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "A company hosts its application source code in GitHub. The company wants AWS CodePipeline to start automatically when a commit is pushed to the release branch. The security team requires that no long-lived AWS access keys are stored in GitHub and that the connection between AWS and GitHub is managed centrally so it can be reused by multiple pipelines. Which solution meets these requirements with the LEAST operational overhead?",
+      "explanation": "Phân tích đề: Cần kích hoạt pipeline từ GitHub, không lưu khóa AWS dài hạn trong GitHub, kết nối quản lý tập trung và tái sử dụng được.\n(A) ĐÚNG: AWS CodeConnections tạo một kết nối được quản lý tới GitHub, dùng chung cho nhiều pipeline; CodePipeline dùng kết nối này làm nguồn và nhận sự kiện khi có commit, nên không cần lưu bất kỳ thông tin xác thực AWS nào phía GitHub.\n(B) SAI: Lưu access key trong GitHub Secrets để GitHub Actions gọi ngược vào AWS vi phạm yêu cầu không dùng khóa dài hạn.\n(C) SAI: Cho CodePipeline định kỳ thăm dò kho tạo độ trễ và tăng số lời gọi không cần thiết, đồng thời vẫn cần cơ chế xác thực riêng.\n(D) SAI: Đẩy gương sang CodeCommit rồi kích hoạt từ đó là thêm một bước đồng bộ phải bảo trì, không phải phương án ít công sức nhất.\nĐáp án đúng: A\nĐiểm cần nhớ: CodeConnections là cách chuẩn để tích hợp GitHub/GitLab/Bitbucket với CodePipeline mà không lưu thông tin xác thực tĩnh.",
+      "tagNames": ["SDLC Automation > GitHub / GitLab / Bitbucket Integration"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create an AWS CodeConnections connection to the GitHub organization, and configure the pipeline source action to use that connection with the release branch as the trigger.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create an IAM user with pipeline start permissions, store its access keys as GitHub repository secrets, and add a GitHub Actions workflow that calls StartPipelineExecution.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Configure the CodePipeline source action to poll the GitHub repository every minute for new commits on the release branch.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Configure a GitHub Actions workflow that mirrors the release branch into AWS CodeCommit, and trigger the pipeline from the CodeCommit repository.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "A development team runs its CI jobs in GitHub Actions. The jobs must deploy AWS CloudFormation stacks into a production AWS account. A security review requires that the workflow can assume an AWS role only when it runs from the main branch of one specific repository, and that no static credentials exist anywhere in the workflow. Which configuration enforces this?",
+      "explanation": "Phân tích đề: Cần liên kết danh tính giữa GitHub Actions và AWS, giới hạn theo kho và theo nhánh.\n(A) SAI: Giới hạn theo địa chỉ IP của runner là không khả thi vì runner được cấp phát động và dải địa chỉ thay đổi.\n(B) SAI: Dùng OIDC nhưng chính sách tin cậy chỉ kiểm tra nhà cung cấp cho phép bất kỳ kho nào trong tổ chức đảm nhận vai trò, không đáp ứng yêu cầu giới hạn theo kho và nhánh.\n(C) ĐÚNG: Tạo OIDC identity provider cho GitHub trong tài khoản AWS, rồi tạo role có chính sách tin cậy kiểm tra điều kiện trên claim sub để chỉ khớp đúng kho và đúng nhánh main; workflow nhận thông tin xác thực tạm thời cho mỗi lần chạy.\n(D) SAI: Lưu access key trong GitHub Secrets vi phạm yêu cầu không có thông tin xác thực tĩnh.\nĐáp án đúng: C\nĐiểm cần nhớ: Với GitHub Actions, dùng OIDC và đặt điều kiện trên claim sub theo repo và ref để giới hạn chính xác ai được đảm nhận vai trò.",
+      "tagNames": ["SDLC Automation > GitHub / GitLab / Bitbucket Integration"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create an IAM role whose trust policy restricts access by the source IP addresses of the GitHub Actions runners.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Create an OIDC identity provider for GitHub and a role whose trust policy allows any principal federated through that provider.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an OIDC identity provider for GitHub and a role whose trust policy contains a condition on the token subject claim matching the specific repository and the main branch reference.", "isCorrect": true },
+        { "answerLabel": "D", "answerText": "Create an IAM user with deployment permissions and store its access key and secret key as encrypted GitHub repository secrets.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "An AWS CodeBuild project compiles a large Java application. Each build downloads roughly 800 MB of Maven dependencies from the internet, and builds now take 14 minutes, of which about 9 minutes is dependency download. The team wants to reduce build duration with minimal changes to the build specification. Which solution is MOST effective?",
+      "explanation": "Phân tích đề: Phần lớn thời gian build là tải phụ thuộc lặp lại ở mỗi lần chạy.\n(A) SAI: Tăng kích thước compute làm phần biên dịch nhanh hơn nhưng không giảm thời gian tải phụ thuộc qua mạng.\n(B) ĐÚNG: Bật cache cho CodeBuild và khai báo đường dẫn thư mục phụ thuộc trong phần cache của buildspec; các lần build sau khôi phục cache thay vì tải lại toàn bộ, đây là thay đổi nhỏ và tác động trực tiếp tới đúng phần chiếm thời gian.\n(C) SAI: Chia build thành nhiều project song song không loại bỏ việc mỗi project vẫn phải tải phụ thuộc.\n(D) SAI: Tăng thời gian chờ của build chỉ nới giới hạn chứ không làm build nhanh hơn.\nĐáp án đúng: B\nĐiểm cần nhớ: Cache của CodeBuild áp dụng cho thư mục phụ thuộc là cách trực tiếp nhất để cắt thời gian tải lặp lại.",
+      "tagNames": ["SDLC Automation > AWS CodeBuild"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Change the build environment to a larger compute type with more vCPUs and memory.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Enable CodeBuild caching and declare the local Maven repository directory in the cache paths section of the buildspec file.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Split the build into several CodeBuild projects that run in parallel within the pipeline stage.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Increase the build timeout value for the CodeBuild project.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MCQ",
+      "questionText": "A CodeBuild project must run integration tests against an Amazon RDS for PostgreSQL database that has no public endpoint and resides in private subnets. The build also needs to download packages from the public internet and read a database password that must not appear in build logs or in the buildspec file. Which combination of configurations meets these requirements?",
+      "explanation": "Phân tích đề: Build cần vào được mạng riêng, vẫn ra được Internet, và đọc bí mật an toàn.\n(A) SAI: Đặt build trong VPC nhưng không có NAT gateway thì build mất đường ra Internet và không tải được gói.\n(B) ĐÚNG: Cấu hình CodeBuild chạy trong VPC ở các subnet riêng với security group được RDS cho phép, thêm NAT gateway để có đường ra Internet, và khai báo mật khẩu trong phần env/secrets-manager của buildspec để CodeBuild nạp giá trị lúc chạy và tự che trong nhật ký.\n(C) SAI: Mở RDS ra Internet để build kết nối là vi phạm bảo mật nghiêm trọng.\n(D) SAI: Ghi mật khẩu vào biến môi trường dạng plaintext của project làm lộ giá trị cho bất kỳ ai xem được cấu hình.\nĐáp án đúng: B\nĐiểm cần nhớ: CodeBuild trong VPC cần NAT để ra Internet; bí mật nên tham chiếu từ Secrets Manager qua khai báo secrets trong buildspec.",
+      "tagNames": ["SDLC Automation > AWS CodeBuild"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Configure the project to run in the private subnets with no additional routing, and pass the password as a plaintext environment variable.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Configure the project to run in the VPC private subnets with a security group allowed by the database, add a NAT gateway for outbound internet access, and reference the password from AWS Secrets Manager in the buildspec secrets section.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Make the RDS instance publicly accessible, restrict it with a security group that allows the CodeBuild managed IP ranges, and store the password in Parameter Store as a String parameter.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Run the project outside the VPC, open the database security group to 0.0.0.0/0 on the PostgreSQL port, and define the password as a project environment variable.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MSQ",
+      "questionText": "A DevOps engineer must harden an AWS CodeBuild project that builds container images and pushes them to Amazon ECR. A security audit requires that the build cannot be used to access unrelated AWS resources, and that a compromised build cannot overwrite an image tag that has already been deployed to production. Which TWO actions should the engineer take? (Choose TWO.)",
+      "explanation": "Phân tích đề: Cần thu hẹp quyền của build và ngăn việc ghi đè thẻ image đã phát hành.\n(A) ĐÚNG: Gán cho build service role một chính sách chỉ cho phép đúng các hành động cần thiết trên đúng ARN của repository ECR, thay vì chính sách quản lý rộng; như vậy build bị chiếm quyền cũng không chạm được tài nguyên khác.\n(B) ĐÚNG: Bật image tag immutability trên repository ECR, khiến một thẻ đã tồn tại không thể bị ghi đè; mọi lần đẩy phải dùng thẻ mới, nên image đang chạy ở sản xuất không bị thay thế ngầm.\n(C) SAI: Tăng thời gian chờ của build không liên quan tới bảo mật.\n(D) SAI: Bật quét image khi đẩy giúp phát hiện lỗ hổng nhưng không ngăn việc ghi đè thẻ.\n(E) SAI: Dùng chung một service role cho mọi project làm quyền tích lũy và mở rộng phạm vi ảnh hưởng.\nĐáp án đúng: A, B\nĐiểm cần nhớ: Thu hẹp service role theo ARN tài nguyên, và bật tag immutability để thẻ image không bị ghi đè.",
+      "tagNames": ["SDLC Automation > AWS CodeBuild"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Replace the broad managed policy on the CodeBuild service role with a policy scoped to the specific ECR repository ARN and only the required actions.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable image tag immutability on the Amazon ECR repository.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Reduce the build timeout so a compromised build has less time to run.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable scan on push for the Amazon ECR repository.", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Share a single CodeBuild service role across all build projects so permissions are managed in one place.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "A company deploys an Amazon ECS service that runs on AWS Fargate behind an Application Load Balancer. The company wants new releases to be exposed to 10 percent of production traffic for 15 minutes while error metrics are evaluated. If the error rate exceeds a threshold during that window, traffic must return to the previous version automatically without human action. Which deployment configuration meets these requirements?",
+      "explanation": "Phân tích đề: Cần dịch chuyển lưu lượng theo tỉ lệ, có cửa sổ quan sát, và tự quay lại theo chỉ số.\n(A) SAI: Rolling update của ECS thay thế task tại chỗ nên không giữ đồng thời hai phiên bản sau một thời điểm, và không có cơ chế chia lưu lượng theo tỉ lệ.\n(B) ĐÚNG: Dùng AWS CodeDeploy với deployment type blue/green cho ECS, cấu hình canary chuyển 10 phần trăm lưu lượng rồi chờ, và gắn CloudWatch alarm vào deployment group để tự động rollback khi alarm chuyển sang trạng thái báo động.\n(C) SAI: Tăng số task của phiên bản mới dần không tạo ra ranh giới phiên bản rõ ràng và không có cơ chế quay lại tự động.\n(D) SAI: Dùng bản ghi DNS có trọng số chịu ảnh hưởng của bộ nhớ đệm phân giải nên tỉ lệ không chính xác và việc quay lại không tức thì.\nĐáp án đúng: B\nĐiểm cần nhớ: Blue/green của CodeDeploy cho ECS hỗ trợ canary theo tỉ lệ và tự rollback khi alarm kích hoạt.",
+      "tagNames": ["SDLC Automation > AWS CodeDeploy"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use the ECS rolling update deployment type with a minimum healthy percent of 100 and enable the deployment circuit breaker.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Use AWS CodeDeploy with the ECS blue/green deployment type, select a canary traffic-shifting configuration that routes 10 percent of traffic for 15 minutes, and associate a CloudWatch alarm on the error metric with the deployment group to trigger automatic rollback.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Deploy the new task definition as a second ECS service and gradually increase its desired task count while decreasing the old service.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create two target groups and use Amazon Route 53 weighted records to send 10 percent of traffic to the new version.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer uses AWS CodeDeploy to deploy an application to an Amazon EC2 Auto Scaling group using the in-place deployment type. Occasionally, a deployment succeeds even though the application on some instances is not actually able to serve traffic, because the application takes up to 90 seconds to warm up after the process starts. The engineer must ensure CodeDeploy marks the deployment as failed when the application is not genuinely ready. What should the engineer do?",
+      "explanation": "Phân tích đề: CodeDeploy đang coi việc tiến trình khởi động là thành công, trong khi ứng dụng chưa thực sự sẵn sàng.\n(A) SAI: Tăng thời gian chờ của sự kiện ApplicationStart chỉ kéo dài giai đoạn chờ mà không kiểm chứng ứng dụng có phục vụ được hay không.\n(B) ĐÚNG: Viết script cho hook ValidateService trong appspec, thực hiện kiểm tra thật đối với endpoint sức khỏe của ứng dụng và thử lại trong khoảng thời gian khởi động, trả mã khác không khi kiểm tra thất bại; CodeDeploy sẽ đánh dấu deployment thất bại và kích hoạt rollback nếu được cấu hình.\n(C) SAI: Chuyển sang deployment type blue/green giải quyết vấn đề khác và không tự nó kiểm chứng tình trạng sẵn sàng của ứng dụng.\n(D) SAI: Thêm một bước chờ cố định trong BeforeAllowTraffic là phỏng đoán theo thời gian chứ không phải kiểm chứng trạng thái.\nĐáp án đúng: B\nĐiểm cần nhớ: Hook ValidateService là nơi kiểm chứng ứng dụng thực sự phục vụ được; mã thoát khác không làm deployment thất bại.",
+      "tagNames": ["SDLC Automation > AWS CodeDeploy"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Increase the timeout value of the ApplicationStart lifecycle event in the appspec file.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Add a ValidateService lifecycle hook script that polls the application health endpoint with retries and exits with a non-zero status if the application does not become healthy.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Change the deployment type to blue/green so that new instances are created for each deployment.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Add a script to the BeforeAllowTraffic hook that sleeps for 90 seconds before returning success.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MCQ",
+      "questionText": "A serverless application consists of an AWS Lambda function exposed through Amazon API Gateway. The DevOps team must release new function versions so that 10 percent of invocations use the new version for 5 minutes, then the remaining traffic shifts automatically. If the function error metric breaches an alarm during the shift, the release must roll back. Which approach meets these requirements?",
+      "explanation": "Phân tích đề: Cần dịch chuyển lưu lượng theo tỉ lệ cho Lambda, có cửa sổ quan sát và tự rollback.\n(A) ĐÚNG: Dùng CodeDeploy với compute platform Lambda, cấu hình deployment configuration kiểu canary 10 phần trăm trong 5 phút; CodeDeploy điều chỉnh trọng số của alias giữa hai phiên bản và tự rollback khi CloudWatch alarm gắn với deployment group chuyển sang báo động.\n(B) SAI: Cập nhật mã hàm trực tiếp làm toàn bộ lưu lượng chuyển sang mã mới cùng lúc, không có giai đoạn canary.\n(C) SAI: Tạo hàm thứ hai và đổi tích hợp API Gateway đòi hỏi thay đổi thủ công và không có cơ chế chia tỉ lệ tự động.\n(D) SAI: Dùng stage variable của API Gateway để chia lưu lượng là cách thủ công, không tích hợp với alarm để rollback.\nĐáp án đúng: A\nĐiểm cần nhớ: CodeDeploy trên compute platform Lambda dịch chuyển trọng số alias theo canary hoặc linear và tự rollback theo alarm.",
+      "tagNames": ["SDLC Automation > AWS CodeDeploy"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use AWS CodeDeploy with the Lambda compute platform and a canary deployment configuration of 10 percent for 5 minutes, with a CloudWatch alarm associated with the deployment group.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Use the UpdateFunctionCode API in the pipeline and monitor the error metric after the deployment completes.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Publish the new code as a separate Lambda function and update the API Gateway integration to point to it after validation.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Use API Gateway stage variables to route a portion of requests to a second Lambda alias and change the variable manually.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MCQ",
+      "questionText": "A company uses a single AWS CodePipeline in a shared tooling account to deploy AWS CloudFormation stacks into separate development, staging, and production accounts. Artifacts are stored in an Amazon S3 bucket in the tooling account and encrypted with an AWS KMS key. Deployments into the production account fail with an access denied error when CodePipeline attempts to read the artifact. Which combination of configurations resolves the failure?",
+      "explanation": "Phân tích đề: Triển khai giữa các tài khoản cần quyền trên cả bucket artifact lẫn khóa KMS.\n(A) SAI: Chỉ thêm quyền vào vai trò trong tài khoản production là chưa đủ nếu bucket policy và key policy ở tài khoản tooling không cho phép principal đó.\n(B) ĐÚNG: Bucket policy của S3 và key policy của KMS ở tài khoản tooling phải cho phép vai trò triển khai ở tài khoản production, đồng thời vai trò đó phải có chính sách danh tính cho phép đọc artifact và giải mã; thiếu bất kỳ vế nào cũng gây từ chối truy cập.\n(C) SAI: Dùng khóa mặc định do dịch vụ quản lý không chia sẻ được giữa các tài khoản theo cách cần thiết.\n(D) SAI: Sao chép artifact sang bucket của từng tài khoản làm mất tính toàn vẹn của artifact được thăng cấp và thêm bước phải bảo trì.\nĐáp án đúng: B\nĐiểm cần nhớ: Pipeline đa tài khoản cần quyền ở ba nơi: bucket policy, key policy và chính sách của vai trò được đảm nhận.",
+      "tagNames": ["SDLC Automation > AWS CodePipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Attach an IAM policy to the deployment role in the production account that allows s3:GetObject and kms:Decrypt on all resources.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Update the S3 bucket policy and the KMS key policy in the tooling account to allow the production deployment role, and ensure that role's identity policy permits reading the artifact and decrypting with the key.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Replace the customer managed KMS key with the default AWS managed key for Amazon S3 so cross-account access works automatically.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Add a pipeline stage that copies the artifact into an S3 bucket owned by the production account before the deploy action runs.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 12,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer is designing an AWS CodePipeline for a regulated workload. The pipeline must run unit tests and security scanning at the same time to reduce total pipeline duration, and a designated release manager must explicitly authorize the deployment to production. Which pipeline structure meets these requirements?",
+      "explanation": "Phân tích đề: Cần hai hành động chạy song song và một cổng phê duyệt thủ công trước sản xuất.\n(A) SAI: Đặt hai hành động ở hai stage liên tiếp khiến chúng chạy tuần tự, không giảm được tổng thời gian.\n(B) ĐÚNG: Đặt hành động unit test và hành động quét bảo mật trong cùng một stage với cùng giá trị runOrder để chúng chạy song song, rồi thêm một stage chứa manual approval action trước stage triển khai sản xuất, giới hạn quyền phê duyệt cho release manager bằng IAM.\n(C) SAI: Dùng hai pipeline riêng làm mất khả năng điều phối và khó bảo đảm cả hai cùng đạt trước khi triển khai.\n(D) SAI: Gộp cả hai bước vào một CodeBuild project vẫn chạy tuần tự bên trong build và làm mất khả năng báo cáo kết quả riêng biệt.\nĐáp án đúng: B\nĐiểm cần nhớ: Trong CodePipeline, các action cùng stage có cùng runOrder sẽ chạy song song; manual approval action là cổng phê duyệt của con người.",
+      "tagNames": ["SDLC Automation > AWS CodePipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Place the unit test action in one stage and the security scan action in the following stage, then add an approval action to the production stage.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Place the unit test action and the security scan action in the same stage with the same runOrder value, and add a manual approval action in a stage before the production deployment stage, restricted to the release manager by IAM.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Create two separate pipelines, one for testing and one for deployment, and start the deployment pipeline manually.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Combine the unit tests and the security scan into a single CodeBuild project, and require a comment on the pull request before deploying.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 13,
+      "questionType": "MCQ",
+      "questionText": "A company runs an AWS CodePipeline that deploys to production several times a day. The team discovers that when a deployment introduces a defect, engineers must manually identify the last good commit and re-run the pipeline with it, which takes 20 to 30 minutes. The company wants the pipeline to return production to the previously deployed revision as quickly as possible when a deployment stage fails. What should a DevOps engineer implement?",
+      "explanation": "Phân tích đề: Cần khôi phục nhanh về bản phát hành tốt trước đó khi stage thất bại.\n(A) ĐÚNG: Bật cấu hình rollback tự động ở mức stage của CodePipeline, để khi stage triển khai thất bại thì pipeline tự chạy lại stage đó với revision đã thành công trước đó mà không cần ai xác định commit thủ công.\n(B) SAI: Tăng số lần thử lại của stage sẽ chạy lại cùng một revision lỗi và nhiều khả năng thất bại lặp lại.\n(C) SAI: Lưu lịch sử commit vào một bảng tham chiếu vẫn để việc xác định và kích hoạt lại cho con người.\n(D) SAI: Thêm một manual approval trước sản xuất làm chậm mọi lần phát hành mà không rút ngắn thời gian khôi phục khi đã xảy ra sự cố.\nĐáp án đúng: A\nĐiểm cần nhớ: CodePipeline hỗ trợ rollback ở mức stage về revision thành công gần nhất, loại bỏ bước tìm commit thủ công.",
+      "tagNames": ["SDLC Automation > AWS CodePipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable automatic stage rollback on the production deployment stage so the pipeline redeploys the last successful revision when the stage fails.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Configure the deployment stage to retry three times before reporting failure.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Write each successful commit identifier to an Amazon DynamoDB table so engineers can look up the last good revision quickly.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Add a manual approval action before the production deployment stage.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 14,
+      "questionType": "MSQ",
+      "questionText": "A platform team maintains one AWS CodePipeline definition that must be reproduced for 25 application teams. Each pipeline differs only in the source repository name and the target ECS cluster. The team wants to avoid maintaining 25 hand-edited pipeline definitions. Which TWO approaches address this requirement? (Choose TWO.)",
+      "explanation": "Phân tích đề: Cần tạo nhiều pipeline gần giống nhau từ một định nghĩa duy nhất.\n(A) ĐÚNG: Định nghĩa pipeline bằng CloudFormation với parameter cho tên kho nguồn và cụm ECS, rồi triển khai một stack cho mỗi đội; chỉ có một mẫu phải bảo trì và mọi thay đổi chung được áp lại bằng cách cập nhật stack.\n(B) ĐÚNG: Dùng bộ triển khai theo tổ chức hoặc một pipeline tạo pipeline, sinh ra các stack từ danh sách cấu hình theo đội; cách này giữ định nghĩa tập trung và tự động hóa việc thêm đội mới.\n(C) SAI: Sao chép pipeline qua bảng điều khiển rồi sửa tay là chính vấn đề cần loại bỏ.\n(D) SAI: Dùng một pipeline duy nhất cho 25 ứng dụng làm mọi đội bị ràng buộc vào cùng một nhịp phát hành và phạm vi ảnh hưởng chung.\n(E) SAI: Viết tài liệu hướng dẫn từng đội tự tạo pipeline dẫn tới 25 biến thể khác nhau.\nĐáp án đúng: A, B\nĐiểm cần nhớ: Pipeline nên là hạ tầng dưới dạng mã có tham số, nhân bản bằng stack hoặc stack set thay vì sao chép thủ công.",
+      "tagNames": ["SDLC Automation > AWS CodePipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Define the pipeline in an AWS CloudFormation template with parameters for the repository name and ECS cluster, and deploy one stack per team.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Use a CloudFormation StackSet or a generator pipeline that creates the per-team pipeline stacks from a central configuration list.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Clone the pipeline in the console 25 times and edit the source and deploy actions for each team.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create a single pipeline that builds and deploys all 25 applications in sequential stages.", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Publish a runbook that instructs each team to create its own pipeline following the documented steps.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 15,
+      "questionType": "MCQ",
+      "questionText": "A company wants developers to consume open source npm packages through AWS CodeArtifact so that every package the company uses is retained even if it is later removed from the public registry. Developers must also be able to publish internal packages that are never forwarded to the public registry. Which CodeArtifact configuration meets these requirements?",
+      "explanation": "Phân tích đề: Cần vừa lấy gói công khai và giữ lại bản sao, vừa có nơi xuất bản gói nội bộ không rò ra ngoài.\n(A) ĐÚNG: Tạo một repository có external connection tới registry công khai để tự động lấy và lưu lại các gói đã dùng, rồi tạo một repository nội bộ dùng repository kia làm upstream; developer trỏ tới repository nội bộ, xuất bản gói riêng ở đó và gói nội bộ không bao giờ được đẩy ngược ra ngoài.\n(B) SAI: Cho mọi repository đều có external connection làm cấu trúc rối và không tách được gói nội bộ khỏi luồng lấy gói công khai.\n(C) SAI: Tắt external connection hoàn toàn khiến developer không lấy được gói công khai qua CodeArtifact.\n(D) SAI: Tải gói công khai về S3 rồi tự phục vụ là giải pháp tự chế bỏ qua chính chức năng của CodeArtifact.\nĐáp án đúng: A\nĐiểm cần nhớ: External connection lấy và giữ lại gói công khai; upstream repository cho phép xếp lớp giữa repository nội bộ và repository có kết nối ngoài.",
+      "tagNames": ["SDLC Automation > AWS CodeArtifact"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a repository with an external connection to the public npm registry, create a second repository for internal packages that lists the first as an upstream, and point developers at the second repository.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create one repository per team, each with its own external connection to the public npm registry.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create a single repository with no external connection and require developers to upload any public package they need manually.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Mirror the public npm registry into an Amazon S3 bucket on a schedule and configure developers to install from the bucket.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 16,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer must allow build jobs running in 12 different AWS accounts to download packages from a CodeArtifact repository that lives in a shared services account. Access must be granted to all accounts in the organization without listing each account individually, and the engineer must not distribute static credentials. What should the engineer do?",
+      "explanation": "Phân tích đề: Cần cấp quyền đọc cho nhiều tài khoản trong tổ chức mà không liệt kê từng tài khoản.\n(A) ĐÚNG: Gắn resource policy cho CodeArtifact domain hoặc repository, cho phép các hành động đọc với điều kiện dựa trên định danh tổ chức; mọi tài khoản thuộc tổ chức đều được phép, kể cả tài khoản thêm sau này, và build dùng token tạm thời lấy qua lời gọi API chứ không dùng khóa tĩnh.\n(B) SAI: Liệt kê 12 ARN tài khoản trong chính sách phải cập nhật mỗi khi có tài khoản mới, trái yêu cầu.\n(C) SAI: Tạo IAM user và chia sẻ khóa cho từng tài khoản là mô hình khóa tĩnh cần tránh.\n(D) SAI: Sao chép repository sang từng tài khoản làm mất nguồn gói duy nhất và tăng chi phí bảo trì.\nĐáp án đúng: A\nĐiểm cần nhớ: Dùng resource policy trên domain hoặc repository với điều kiện theo tổ chức để cấp quyền diện rộng mà không liệt kê tài khoản.",
+      "tagNames": ["SDLC Automation > AWS CodeArtifact"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Attach a resource policy to the CodeArtifact domain that allows the read actions with a condition on the organization identifier, and have builds obtain a temporary authorization token.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Attach a resource policy that explicitly lists the 12 account ARNs as principals, and update it whenever a new account is added.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an IAM user with CodeArtifact read permissions in the shared services account and distribute its access keys to each build environment.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Replicate the CodeArtifact repository into each of the 12 accounts on a nightly schedule.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 17,
+      "questionType": "MCQ",
+      "questionText": "A company stores container images in Amazon ECR. Storage costs are rising because every build pushes a uniquely tagged image and nothing is ever removed, and the security team requires that images with critical vulnerabilities are identified even after they have been pushed. Which combination of ECR features addresses both concerns with the LEAST operational overhead?",
+      "explanation": "Phân tích đề: Cần vừa kiểm soát chi phí lưu trữ vừa phát hiện lỗ hổng phát sinh sau khi đẩy image.\n(A) ĐÚNG: Tạo lifecycle policy để tự động xóa các image cũ hoặc chưa được gắn thẻ theo quy tắc đã định, và bật enhanced scanning để image đã lưu được đánh giá lại liên tục khi có thông tin lỗ hổng mới; cả hai đều là tính năng tích hợp, không cần mã tự viết.\n(B) SAI: Viết Lambda theo lịch để tự xóa image và tự quét là làm lại các tính năng đã có và phải tự bảo trì.\n(C) SAI: Chỉ bật quét khi đẩy image bỏ sót các lỗ hổng được công bố sau thời điểm đẩy.\n(D) SAI: Xóa thủ công định kỳ không mở rộng được và dễ xóa nhầm image đang chạy.\nĐáp án đúng: A\nĐiểm cần nhớ: Lifecycle policy xử lý chi phí lưu trữ; enhanced scanning đánh giá lại image đã lưu khi có lỗ hổng mới.",
+      "tagNames": ["SDLC Automation > Amazon ECR"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Configure an ECR lifecycle policy to expire untagged and aged images automatically, and enable enhanced scanning so stored images are continuously rescanned as new vulnerabilities are published.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Schedule an AWS Lambda function to list images, delete those older than 30 days, and invoke a third-party scanner against the remaining images.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Enable basic scan on push only, and ask teams to delete images they no longer need.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Export the repository inventory monthly and have an engineer delete unused images manually after verifying them.", "isCorrect": false }
+      ]
+    }
+  ]
+}

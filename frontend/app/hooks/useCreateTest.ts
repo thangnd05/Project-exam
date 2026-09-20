@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useBaseMetaData } from '@/app/hooks/useBaseMetaData';
+import { durationMinutesFromExamType } from '@/app/hooks/useExamTypes';
 import { useTestSubmission } from '@/app/hooks/useTestSubmission';
 import { QuestionUsageScope } from '@/app/enums';
 
@@ -163,7 +164,12 @@ export const useCreateTest = ({
   });
 
   const handleExamTypeChange = async (value: string) => {
-    setTestInfo((prev) => ({ ...prev, examTypeId: value, examPartId: '' }));
+    setTestInfo((prev) => ({
+      ...prev,
+      examTypeId: value,
+      examPartId: '',
+      durationMinutes: durationMinutesFromExamType(examTypes, value),
+    }));
   };
 
   const addQuestion = () => {

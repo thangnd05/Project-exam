@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "usageScope": "EXAM",
+  "examPartId": "01a0962a-564c-7ca2-8a18-261270162705",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "An application has a strong daily and weekly traffic pattern: request volume is ten times higher at midday than overnight, and much lower at weekends. A static CloudWatch alarm on request count produces false alarms overnight and misses real drops during peak hours. Which solution reduces both problems?",
+      "explanation": "Phân tích đề: Ngưỡng tĩnh không phù hợp với chỉ số có chu kỳ rõ rệt.\n(A) ĐÚNG: Dùng anomaly detection; CloudWatch học mẫu theo giờ và theo ngày trong tuần rồi tạo dải giá trị kỳ vọng, và alarm kích hoạt khi giá trị nằm ngoài dải đó. Nhờ vậy ngưỡng tự điều chỉnh theo thời điểm thay vì cố định.\n(B) SAI: Nâng ngưỡng tĩnh lên làm giảm cảnh báo sai ban đêm nhưng càng dễ bỏ sót sụt giảm trong giờ cao điểm.\n(C) SAI: Tạo nhiều alarm với ngưỡng khác nhau theo khung giờ là cách thủ công, khó bảo trì và không xử lý được khác biệt giữa ngày thường và cuối tuần.\n(D) SAI: Tăng số chu kỳ đánh giá chỉ làm alarm chậm hơn chứ không giải quyết việc ngưỡng không phù hợp theo thời điểm.\nĐáp án đúng: A\nĐiểm cần nhớ: Anomaly detection tạo dải kỳ vọng theo mẫu chu kỳ, phù hợp với chỉ số biến thiên theo giờ và theo ngày.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a CloudWatch anomaly detection alarm that triggers when the metric falls outside the expected band.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Raise the static threshold so the alarm does not fire overnight.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create several alarms with different static thresholds and enable each one during a different time window.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Increase the number of evaluation periods on the existing alarm.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MCQ",
+      "questionText": "A company must detect within two minutes when its public checkout page stops working correctly, including cases where the page returns HTTP 200 but renders an error message. Server-side metrics show healthy targets during these events. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần phát hiện lỗi mà chỉ số phía máy chủ không thấy, dựa trên trải nghiệm thật từ bên ngoài.\n(A) ĐÚNG: Tạo CloudWatch Synthetics canary chạy theo chu kỳ ngắn, gọi trang checkout từ bên ngoài và kiểm tra cả mã trạng thái lẫn nội dung trả về, rồi gắn alarm vào kết quả canary; cách này phát hiện được trường hợp trả về mã thành công nhưng nội dung là lỗi.\n(B) SAI: Cảnh báo trên số target khỏe mạnh của bộ cân bằng tải chỉ phản ánh tình trạng ở mức hạ tầng, đúng như đề bài đã nêu là vẫn bình thường.\n(C) SAI: Cảnh báo trên tỉ lệ lỗi 5xx bỏ sót trường hợp máy chủ trả về mã 200 kèm nội dung lỗi.\n(D) SAI: Dựa vào báo cáo của người dùng là cách phát hiện chậm và không đáp ứng yêu cầu hai phút.\nĐáp án đúng: A\nĐiểm cần nhớ: Synthetics canary kiểm tra cả mã trạng thái lẫn nội dung từ góc nhìn bên ngoài, phát hiện lỗi mà chỉ số máy chủ bỏ sót.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a CloudWatch Synthetics canary that loads the checkout page on a short interval, validates the response content, and alarm on the canary success metric.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create an alarm on the load balancer healthy host count metric.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an alarm on the load balancer HTTP 5xx error count metric.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Rely on customer support tickets to identify checkout failures.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "A team publishes a custom CloudWatch metric that includes the customer identifier as a dimension. The company has 400,000 customers, and the monthly CloudWatch bill has increased sharply. The team still needs to investigate latency for individual customers when a complaint arrives. Which change reduces cost while preserving that ability?",
+      "explanation": "Phân tích đề: Số chiều có lực lượng lớn tạo ra rất nhiều chỉ số tùy chỉnh riêng biệt.\n(A) ĐÚNG: Ngừng dùng định danh khách hàng làm dimension của chỉ số, chỉ phát chỉ số tổng hợp theo các chiều có lực lượng nhỏ như vùng hoặc loại gói; đồng thời ghi định danh khách hàng vào nhật ký có cấu trúc để khi có khiếu nại thì truy vấn bằng Logs Insights cho đúng khách hàng đó.\n(B) SAI: Giảm độ chi tiết của chỉ số không loại bỏ chi phí do số lượng chỉ số riêng biệt quá lớn.\n(C) SAI: Giữ nguyên dimension nhưng giảm tần suất phát vẫn tạo ra hàng trăm nghìn chỉ số riêng biệt.\n(D) SAI: Chuyển toàn bộ sang chỉ số tùy chỉnh ở độ phân giải cao làm chi phí tăng thêm.\nĐáp án đúng: A\nĐiểm cần nhớ: Không đặt trường có lực lượng lớn làm dimension của chỉ số; hãy để chúng trong nhật ký có cấu trúc và truy vấn khi cần.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Remove the customer identifier from the metric dimensions, publish aggregated metrics only, and record the identifier in structured logs for per-customer investigation with Logs Insights.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Keep the dimension but reduce the metric resolution to five minutes.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Keep the dimension but publish the metric only once per hour per customer.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Convert the metric to a high-resolution custom metric for faster investigation.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "During an incident, a DevOps engineer must find which API endpoints produced the most HTTP 500 responses in the last hour, using JSON-formatted application logs stored in a CloudWatch log group. Which approach returns the answer fastest?",
+      "explanation": "Phân tích đề: Cần tổng hợp và xếp hạng theo trường trong nhật ký có cấu trúc.\n(A) ĐÚNG: Chạy truy vấn CloudWatch Logs Insights lọc theo trường mã trạng thái bằng 500, rồi dùng stats count theo trường endpoint và sắp xếp giảm dần; truy vấn chạy trực tiếp trên log group và trả về bảng xếp hạng ngay.\n(B) SAI: Tạo metric filter và alarm phục vụ cảnh báo về sau chứ không trả lời nhanh câu hỏi tổng hợp ngay lúc này.\n(C) SAI: Xuất nhật ký sang S3 rồi truy vấn bằng Athena tốn thời gian xuất và chuẩn bị bảng, chậm hơn nhiều trong lúc xử lý sự cố.\n(D) SAI: Cuộn xem thủ công log stream không khả thi với khối lượng nhật ký của một giờ.\nĐáp án đúng: A\nĐiểm cần nhớ: Logs Insights với lệnh stats và sort trả lời nhanh các câu hỏi tổng hợp trên nhật ký có cấu trúc.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Run a CloudWatch Logs Insights query that filters on the status field and aggregates a count by endpoint sorted in descending order.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create a metric filter for HTTP 500 responses and view the resulting metric graph.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Export the log group to Amazon S3 and query it with Amazon Athena.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Open the log streams in the console and scroll through the entries from the last hour.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "An application on EC2 writes logs to a file at /var/log/app/application.log. The operations team must be able to search these entries in CloudWatch Logs alongside logs from other services. Which solution meets this requirement?",
+      "explanation": "Phân tích đề: Cần đưa nhật ký dạng tệp trên instance vào CloudWatch Logs.\n(A) ĐÚNG: Cài CloudWatch agent và khai báo phần logs trong tệp cấu hình agent, chỉ định đường dẫn tệp, log group và log stream; agent theo dõi tệp và gửi các dòng mới lên CloudWatch Logs liên tục.\n(B) SAI: Chỉ số của EC2 không bao gồm nội dung tệp nhật ký bên trong hệ điều hành.\n(C) SAI: Viết script định kỳ tải tệp lên S3 tạo độ trễ và không cho phép tìm kiếm cùng nơi với nhật ký của dịch vụ khác.\n(D) SAI: Bật detailed monitoring chỉ tăng tần suất của các chỉ số hạ tầng, không liên quan tới nhật ký.\nĐáp án đúng: A\nĐiểm cần nhớ: Phần logs trong cấu hình CloudWatch agent đưa tệp nhật ký trên instance vào CloudWatch Logs.",
+      "tagNames": ["Monitoring and Logging > CloudWatch Agent"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Install the CloudWatch agent and configure a logs collection section that specifies the file path, log group, and log stream.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable the EC2 log metrics in the CloudWatch console for the instances.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Write a cron job that uploads the log file to Amazon S3 every five minutes.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable detailed monitoring on the instances.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MCQ",
+      "questionText": "A company must collect metrics and logs from 120 physical servers in its own data center into the same CloudWatch account used for its AWS workloads. The servers have outbound internet access but are not EC2 instances. Which approach meets these requirements?",
+      "explanation": "Phân tích đề: Máy chủ tại chỗ cần danh tính để gửi dữ liệu vào AWS.\n(A) ĐÚNG: Đăng ký máy chủ làm managed node bằng hybrid activation của Systems Manager, nhờ đó mỗi máy nhận danh tính và thông tin xác thực tạm thời; sau đó cài CloudWatch agent và cấu hình nó gửi chỉ số cùng nhật ký tới tài khoản đích.\n(B) SAI: Tạo một IAM user và chia sẻ khóa truy cập cho 120 máy chủ là mô hình khóa tĩnh cần tránh và khó xoay vòng.\n(C) SAI: Cài agent mà không cấp thông tin xác thực nào thì agent không xác thực được với dịch vụ.\n(D) SAI: Chuyển toàn bộ máy chủ lên EC2 là thay đổi hạ tầng lớn chứ không phải yêu cầu để thu thập dữ liệu.\nĐáp án đúng: A\nĐiểm cần nhớ: Hybrid activation cấp danh tính cho máy chủ tại chỗ, từ đó CloudWatch agent gửi được chỉ số và nhật ký.",
+      "tagNames": ["Monitoring and Logging > CloudWatch Agent"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Register the servers as managed nodes using a Systems Manager hybrid activation, then install and configure the CloudWatch agent on each server.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create an IAM user with CloudWatch permissions and distribute its access keys to all 120 servers.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Install the CloudWatch agent on each server; it discovers the target account automatically.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Migrate the servers to Amazon EC2 so the agent can use an instance profile.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MCQ",
+      "questionText": "A compliance team must run ad hoc SQL-style queries against seven years of AWS API activity across all accounts in the organization, without building and maintaining a data pipeline or an external query engine. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần truy vấn lịch sử hoạt động API dài hạn bằng SQL mà không tự dựng hạ tầng.\n(A) ĐÚNG: Tạo CloudTrail Lake event data store ở mức tổ chức với thời gian lưu giữ phù hợp; dịch vụ lưu sự kiện ở dạng có thể truy vấn và hỗ trợ truy vấn kiểu SQL ngay trong dịch vụ, nên không cần xây dựng pipeline hay cụm truy vấn riêng.\n(B) SAI: Ghi trail vào S3 rồi dùng Athena là phương án khả thi nhưng phải tự tạo bảng, phân vùng và bảo trì, trái yêu cầu không duy trì pipeline.\n(C) SAI: Event history trong bảng điều khiển chỉ giữ lịch sử ngắn hạn và không hỗ trợ truy vấn SQL trên bảy năm.\n(D) SAI: Đẩy nhật ký vào một cụm tìm kiếm tự quản lý chính là việc xây dựng và bảo trì hạ tầng mà đề bài muốn tránh.\nĐáp án đúng: A\nĐiểm cần nhớ: CloudTrail Lake lưu trữ và truy vấn sự kiện dài hạn bằng SQL mà không cần dựng pipeline riêng.",
+      "tagNames": ["Monitoring and Logging > AWS CloudTrail"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create an organization-level CloudTrail Lake event data store with a seven-year retention period and run queries directly against it.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Deliver the organization trail to Amazon S3 and build Athena tables with partitions over the log prefixes.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Use CloudTrail event history in each account and export the results when needed.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Stream CloudTrail logs into a self-managed Elasticsearch cluster and query it.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "A security team wants to be notified when an account suddenly generates an unusual volume of write API calls compared with its normal baseline, without defining specific thresholds for each API. Which CloudTrail feature provides this?",
+      "explanation": "Phân tích đề: Cần phát hiện bất thường về khối lượng lời gọi API mà không tự đặt ngưỡng.\n(A) ĐÚNG: Bật CloudTrail Insights; dịch vụ học mức cơ sở về tần suất lời gọi API ghi và sinh ra sự kiện Insights khi khối lượng lệch đáng kể so với mức thường, nên không cần định nghĩa ngưỡng cho từng API.\n(B) SAI: Bật data event ghi lại thao tác ở mức đối tượng, làm tăng khối lượng nhật ký chứ không phát hiện bất thường về tần suất.\n(C) SAI: Bật log file validation bảo đảm tính toàn vẹn của tệp nhật ký, không liên quan tới phát hiện bất thường.\n(D) SAI: Tạo metric filter cho từng API chính là việc định nghĩa ngưỡng thủ công mà đề bài muốn tránh.\nĐáp án đúng: A\nĐiểm cần nhớ: CloudTrail Insights phát hiện bất thường về khối lượng lời gọi API so với mức cơ sở đã học.",
+      "tagNames": ["Monitoring and Logging > AWS CloudTrail"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable CloudTrail Insights on the trail to detect unusual API call rates against the learned baseline.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable data events on the trail for all supported resource types.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Enable log file integrity validation on the trail.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create a metric filter and alarm for each write API that the account uses.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer needs to filter AWS X-Ray traces to show only requests from a specific tenant while investigating a performance complaint. The tenant identifier is available in the application code. What should the engineer add to the instrumentation?",
+      "explanation": "Phân tích đề: Cần lọc dấu vết theo một giá trị nghiệp vụ.\n(A) ĐÚNG: Ghi định danh bên thuê dưới dạng annotation; annotation được lập chỉ mục nên có thể dùng trong biểu thức lọc để truy vấn dấu vết theo giá trị đó.\n(B) SAI: Ghi giá trị vào metadata thì dữ liệu được lưu kèm dấu vết nhưng không được lập chỉ mục nên không dùng để lọc.\n(C) SAI: Ghi định danh vào nhật ký ứng dụng cho phép tìm trong nhật ký nhưng không lọc được dấu vết trong X-Ray.\n(D) SAI: Tăng tỉ lệ lấy mẫu thu thập nhiều dấu vết hơn nhưng vẫn không có cách lọc theo bên thuê.\nĐáp án đúng: A\nĐiểm cần nhớ: Annotation được lập chỉ mục và dùng để lọc dấu vết; metadata thì không.",
+      "tagNames": ["Monitoring and Logging > AWS X-Ray"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Record the tenant identifier as an X-Ray annotation so it is indexed and usable in filter expressions.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Record the tenant identifier as X-Ray metadata attached to the segment.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Write the tenant identifier into the application log entries.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Increase the sampling rate so more tenant requests are captured.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MSQ",
+      "questionText": "An X-Ray service map shows a Lambda function calling an Amazon DynamoDB table, but the map does not show a downstream third-party HTTP API that the function also calls, so the team cannot see how much latency that call contributes. Which TWO actions would make the external call visible in the traces? (Choose TWO.)",
+      "explanation": "Phân tích đề: Lời gọi ra ngoài không xuất hiện vì chưa được thiết bị hóa.\n(A) ĐÚNG: Dùng X-Ray SDK hoặc bộ thiết bị hóa tương thích để bọc client HTTP trong mã hàm, nhờ đó lời gọi ra ngoài được ghi thành subsegment với thời gian riêng.\n(B) ĐÚNG: Bật active tracing cho hàm Lambda để dịch vụ tạo segment cho mỗi lần gọi; nếu tracing chưa được bật thì ngay cả phần đã thiết bị hóa cũng không được thu thập.\n(C) SAI: Tăng bộ nhớ của hàm ảnh hưởng tới hiệu năng chứ không làm xuất hiện subsegment.\n(D) SAI: Thêm annotation giúp lọc dấu vết nhưng không tạo ra subsegment cho lời gọi ra ngoài.\n(E) SAI: Tăng thời gian lưu giữ dấu vết không làm xuất hiện dữ liệu chưa từng được thu thập.\nĐáp án đúng: A, B\nĐiểm cần nhớ: Lời gọi ra ngoài chỉ hiện trong dấu vết khi client được thiết bị hóa và tracing đã được bật cho hàm.",
+      "tagNames": ["Monitoring and Logging > AWS X-Ray"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Instrument the outbound HTTP client in the function code with the X-Ray SDK so the call is captured as a subsegment.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable active tracing on the Lambda function.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Increase the memory allocated to the Lambda function.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Add an annotation containing the external API hostname.", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Increase the X-Ray trace retention period.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MCQ",
+      "questionText": "A company streams application logs through Amazon Data Firehose into Amazon S3 and queries them with Amazon Athena. Queries are slow and expensive because Athena scans the entire bucket for every query, even when the analyst filters on a single day. Which change improves query performance and cost the MOST?",
+      "explanation": "Phân tích đề: Athena đang quét toàn bộ dữ liệu vì bố cục lưu trữ không hỗ trợ cắt bớt.\n(A) ĐÚNG: Cấu hình Firehose ghi theo tiền tố phân vùng động theo ngày và chuyển bản ghi sang định dạng cột như Parquet; Athena chỉ đọc các phân vùng khớp bộ lọc và chỉ đọc các cột cần thiết, nên lượng dữ liệu quét giảm mạnh.\n(B) SAI: Tăng kích thước bộ đệm của Firehose tạo tệp lớn hơn, có ích phần nào nhưng không giải quyết việc thiếu phân vùng.\n(C) SAI: Chuyển dữ liệu sang lớp lưu trữ rẻ hơn giảm chi phí lưu trữ nhưng không giảm lượng dữ liệu Athena phải quét.\n(D) SAI: Tăng thời gian lưu giữ không cải thiện hiệu năng truy vấn mà còn làm lượng dữ liệu quét lớn hơn.\nĐáp án đúng: A\nĐiểm cần nhớ: Phân vùng theo thời gian cộng với định dạng cột là cách giảm mạnh lượng dữ liệu Athena phải quét.",
+      "tagNames": ["Monitoring and Logging > Log Aggregation (Kinesis Firehose / OpenSearch)"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Configure Firehose dynamic partitioning to write date-based prefixes and convert the records to a columnar format such as Parquet.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Increase the Firehose buffer size so fewer, larger objects are written.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Apply an S3 lifecycle rule that moves older objects to a cheaper storage class.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Increase the retention period of the source CloudWatch log groups.", "isCorrect": false }
+      ]
+    }
+  ]
+}

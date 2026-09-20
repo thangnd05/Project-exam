@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "usageScope": "EXAM",
+  "examPartId": "01a0962a-ad0d-7882-a218-c196703c2087",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer must invoke a remediation workflow whenever an Amazon RDS event indicates that a database instance has failed over, but not for any other RDS event. The solution must not poll any API and must not run continuously. Which approach meets these requirements?",
+      "explanation": "Phân tích đề: Cần phản ứng theo sự kiện cụ thể mà không thăm dò.\n(A) ĐÚNG: Tạo EventBridge rule với event pattern khớp nguồn RDS và đúng mã danh mục sự kiện chuyển đổi dự phòng, rồi đặt luồng công việc khắc phục làm target; quy tắc chỉ kích hoạt khi sự kiện khớp, không có thành phần nào chạy liên tục.\n(B) SAI: Dùng hàm chạy theo lịch để gọi API kiểm tra trạng thái là thăm dò, trái yêu cầu và tạo độ trễ.\n(C) SAI: Tạo rule khớp mọi sự kiện RDS rồi lọc trong mã của hàm làm hàm được gọi cho các sự kiện không liên quan, tăng chi phí và độ phức tạp.\n(D) SAI: Dựa vào cảnh báo CloudWatch trên chỉ số không phát hiện được chính sự kiện chuyển đổi dự phòng một cách trực tiếp.\nĐáp án đúng: A\nĐiểm cần nhớ: Lọc ngay trong event pattern của EventBridge thay vì lọc trong mã của target.",
+      "tagNames": ["Incident and Event Response > Amazon EventBridge"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create an EventBridge rule with an event pattern matching the RDS source and the failover event category, and set the remediation workflow as the target.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Schedule an AWS Lambda function every minute to call the RDS API and check the instance state.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an EventBridge rule that matches all RDS events and filter for failover inside the target Lambda function.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create a CloudWatch alarm on the database connection count metric and trigger the workflow from the alarm.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer discovers that events sent to an EventBridge rule target failed for two hours because the target Lambda function was misconfigured. The events were lost. The engineer must ensure that future delivery failures do not lose events and that the failed events can be reprocessed after the target is fixed. Which combination of settings achieves this?",
+      "explanation": "Phân tích đề: Cần giữ lại sự kiện khi giao tới target thất bại và xử lý lại sau.\n(A) ĐÚNG: Cấu hình dead-letter queue cho target của rule để sự kiện giao thất bại sau các lần thử lại được giữ trong hàng đợi; sau khi sửa target, đọc lại từ hàng đợi để xử lý. Bổ sung chính sách thử lại phù hợp để các lỗi tạm thời tự khắc phục.\n(B) SAI: Bật archive và replay giúp phát lại sự kiện đã đi qua bus theo khoảng thời gian, nhưng không phải cơ chế bắt riêng các sự kiện giao thất bại và phát lại sẽ đưa lại toàn bộ sự kiện khớp chứ không chỉ phần bị lỗi.\n(C) SAI: Tăng thời gian chờ của hàm không liên quan tới việc sự kiện bị mất do cấu hình target sai.\n(D) SAI: Thêm rule thứ hai cùng pattern chỉ nhân đôi lượng sự kiện chứ không giải quyết việc giao thất bại.\nĐáp án đúng: A\nĐiểm cần nhớ: Dead-letter queue trên target của EventBridge giữ lại sự kiện giao thất bại để xử lý lại.",
+      "tagNames": ["Incident and Event Response > Amazon EventBridge"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Configure a dead-letter queue and a retry policy on the rule target so undelivered events are captured for later reprocessing.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable an archive on the event bus and rely on replay to recover the failed deliveries.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Increase the timeout and memory of the target Lambda function.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create a second rule with the same event pattern pointing at a different target.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "A company must ensure that when a high-severity alarm fires at 03:00, an on-call engineer is engaged through multiple contact channels, that the engagement escalates to a second engineer if nobody acknowledges within 10 minutes, and that an incident record with a timeline is created automatically. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần huy động người có cấu trúc, có leo thang và có bản ghi sự cố.\n(A) ĐÚNG: Dùng AWS Systems Manager Incident Manager với response plan gắn vào CloudWatch alarm; response plan định nghĩa contact với nhiều kênh liên lạc theo thứ tự, escalation plan chuyển sang người tiếp theo khi không có xác nhận, và sự cố được tạo tự động kèm trang cộng tác cùng dòng thời gian.\n(B) SAI: Gửi thông báo qua SNS tới một danh sách thư điện tử không bảo đảm có người nhận và không có cơ chế leo thang.\n(C) SAI: Đăng thông báo vào kênh trò chuyện phụ thuộc vào việc có ai đang theo dõi kênh lúc 3 giờ sáng.\n(D) SAI: Tự viết hàm gửi tin nhắn và theo dõi xác nhận là làm lại thứ dịch vụ đã cung cấp và phải tự bảo trì.\nĐáp án đúng: A\nĐiểm cần nhớ: Incident Manager cung cấp response plan, nhiều kênh liên lạc, leo thang khi không xác nhận và bản ghi sự cố tự động.",
+      "tagNames": ["Incident and Event Response > Incident Response Tooling (Security Hub / AWS Health / Incident Manager)"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Configure an AWS Systems Manager Incident Manager response plan with contacts, engagement channels, and an escalation plan, and associate it with the CloudWatch alarm.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Configure the alarm to publish to an Amazon SNS topic subscribed by the on-call team email distribution list.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Configure the alarm to post a message into the team chat channel through a webhook.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Write a Lambda function that sends SMS messages and tracks acknowledgements in a DynamoDB table.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "An AWS Lambda function processes messages from an Amazon SQS queue. A malformed message causes the function to fail repeatedly, and because the message returns to the queue after each failure, it blocks processing of subsequent messages. Which solution resolves this?",
+      "explanation": "Phân tích đề: Thông điệp lỗi vĩnh viễn đang chặn luồng xử lý.\n(A) ĐÚNG: Cấu hình dead-letter queue trên chính hàng đợi nguồn với maxReceiveCount phù hợp; sau số lần nhận đã định, thông điệp được chuyển sang hàng đợi thư chết và luồng chính tiếp tục với các thông điệp khác, đồng thời thông điệp lỗi được giữ lại để phân tích.\n(B) SAI: Tăng thời gian chờ của hàm không giúp khi thông điệp không thể xử lý thành công.\n(C) SAI: Tăng visibility timeout chỉ kéo dài thời gian thông điệp bị ẩn chứ không loại nó khỏi luồng.\n(D) SAI: Tăng mức đồng thời của hàm làm nhiều thông điệp được xử lý song song nhưng thông điệp lỗi vẫn quay lại vô hạn.\nĐáp án đúng: A\nĐiểm cần nhớ: Dead-letter queue với maxReceiveCount tách thông điệp lỗi vĩnh viễn ra khỏi luồng xử lý chính.",
+      "tagNames": ["Incident and Event Response > AWS Lambda"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Configure a dead-letter queue on the source SQS queue with an appropriate maxReceiveCount.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Increase the Lambda function timeout so processing has more time to complete.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Increase the visibility timeout on the SQS queue.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Increase the reserved concurrency of the Lambda function.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "During a flash sale, one AWS Lambda function scaled up sharply and consumed the entire account concurrency limit. Other critical Lambda functions in the same account were throttled and failed. A DevOps engineer must prevent one function from starving the others while guaranteeing a minimum level of capacity for the critical functions. What should the engineer configure?",
+      "explanation": "Phân tích đề: Một hàm đang chiếm hết năng lực đồng thời của tài khoản.\n(A) ĐÚNG: Đặt reserved concurrency cho hàm gây ra vấn đề để giới hạn trần của nó, và đặt reserved concurrency cho các hàm thiết yếu để bảo đảm chúng luôn có phần tối thiểu; reserved concurrency vừa là trần cho hàm được đặt vừa là phần dành riêng không bị hàm khác chiếm.\n(B) SAI: Tăng hạn mức đồng thời của tài khoản làm tăng trần chung nhưng không ngăn một hàm chiếm hết phần đó.\n(C) SAI: Giảm thời gian chờ của hàm gây tải không giới hạn được số lời gọi đồng thời.\n(D) SAI: Chuyển các hàm thiết yếu sang tài khoản khác giải quyết được triệu chứng nhưng là thay đổi kiến trúc lớn và không phải biện pháp trực tiếp.\nĐáp án đúng: A\nĐiểm cần nhớ: Reserved concurrency vừa đặt trần cho một hàm vừa dành riêng năng lực cho hàm thiết yếu.",
+      "tagNames": ["Incident and Event Response > AWS Lambda"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Set reserved concurrency on the high-volume function to cap it, and set reserved concurrency on the critical functions to guarantee their capacity.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Request an increase to the account concurrent execution quota.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Reduce the timeout of the high-volume function so invocations finish faster.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Move the critical functions into a separate AWS account.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer must build an incident response workflow that collects diagnostic data, then waits for a security analyst to approve a containment action that may take several hours, and finally performs the containment. The workflow must record every step for audit. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần luồng công việc có bước chờ phê duyệt dài và lịch sử đầy đủ.\n(A) ĐÚNG: Dùng AWS Step Functions với standard workflow; bước phê duyệt dùng mẫu chờ mã thông báo tác vụ nên luồng dừng chờ tín hiệu bên ngoài trong nhiều giờ mà không tiêu tốn tài nguyên tính toán, và lịch sử thực thi ghi lại từng lần chuyển trạng thái kèm đầu vào, đầu ra phục vụ kiểm toán.\n(B) SAI: Dùng một hàm Lambda duy nhất không thể chờ nhiều giờ vì vượt giới hạn thời gian thực thi tối đa.\n(C) SAI: Dùng express workflow không phù hợp vì thời lượng tối đa ngắn và lịch sử không được lưu trong dịch vụ theo cách của standard workflow.\n(D) SAI: Chuỗi các hàm gọi lẫn nhau kèm thăm dò trạng thái phê duyệt làm logic điều phối phân tán và khó kiểm toán.\nĐáp án đúng: A\nĐiểm cần nhớ: Standard workflow với mẫu chờ mã thông báo tác vụ cho phép dừng chờ phê duyệt dài và giữ lịch sử đầy đủ.",
+      "tagNames": ["Incident and Event Response > AWS Step Functions"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use an AWS Step Functions standard workflow with a task token callback for the approval step, and rely on the execution history for the audit record.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Use a single AWS Lambda function that collects data, waits for approval, and performs containment.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Use an AWS Step Functions express workflow so the steps run with lower cost.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Chain several Lambda functions together and have the last one poll a DynamoDB table for the approval status.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MCQ",
+      "questionText": "A Step Functions workflow calls a third-party API that occasionally returns transient errors. When this happens the entire execution fails and the business process must be restarted manually. A DevOps engineer must make the workflow tolerate transient failures and route persistent failures to a compensation branch. What should the engineer configure?",
+      "explanation": "Phân tích đề: Cần xử lý lỗi ngay trong định nghĩa luồng công việc.\n(A) ĐÚNG: Khai báo Retry trên bước gọi API với số lần thử, khoảng chờ ban đầu và hệ số tăng dần để lỗi tạm thời tự khắc phục, và khai báo Catch để khi việc thử lại cạn thì chuyển sang nhánh bù trừ thay vì làm cả lần thực thi thất bại.\n(B) SAI: Viết logic thử lại trong mã của bước làm trách nhiệm phân tán và không hiển thị trong lịch sử thực thi.\n(C) SAI: Tăng thời gian chờ của bước không xử lý được lỗi mà API trả về.\n(D) SAI: Khởi động lại toàn bộ luồng công việc từ đầu lặp lại các bước đã thành công và có thể gây tác dụng phụ trùng lặp.\nĐáp án đúng: A\nĐiểm cần nhớ: Retry và Catch khai báo ngay trong định nghĩa state machine là cách xử lý lỗi chuẩn của Step Functions.",
+      "tagNames": ["Incident and Event Response > AWS Step Functions"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Add a Retry block with exponential backoff and a Catch block that routes to a compensation state on the API task.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Implement retry logic inside the Lambda function that calls the API.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Increase the timeout of the task state that calls the API.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Configure the workflow to restart from the beginning whenever any state fails.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "A company requires that any Amazon S3 bucket created without default encryption is corrected automatically within minutes, in all accounts of the organization, with no human involvement. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần khắc phục tự động, nhanh, và phủ toàn tổ chức.\n(A) ĐÚNG: Triển khai AWS Config rule ở mức tổ chức được kích hoạt theo thay đổi cấu hình, gắn remediation action tự động chạy tài liệu tự động hóa của Systems Manager để bật mã hóa mặc định; vai trò thực thi được triển khai vào từng tài khoản thành viên để tự động hóa hành động trong ngữ cảnh của tài khoản đó.\n(B) SAI: Quy tắc đánh giá theo chu kỳ hằng ngày để bucket chưa mã hóa tồn tại tới một ngày.\n(C) SAI: Gửi thông báo cho chủ sở hữu bucket phụ thuộc vào thời gian phản ứng của con người, trái yêu cầu.\n(D) SAI: Áp SCP từ chối hành động tạo bucket ngăn được cấu hình sai nhưng cũng chặn luôn các bucket hợp lệ, và không sửa các bucket đã tồn tại.\nĐáp án đúng: A\nĐiểm cần nhớ: Config rule theo thay đổi ở mức tổ chức kèm remediation tự động cho thời gian phản ứng ngắn nhất trên nhiều tài khoản.",
+      "tagNames": ["Incident and Event Response > Event-Driven Remediation (Config Remediation / SSM Automation)"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Deploy an organization-wide change-triggered AWS Config rule with an automatic remediation action that runs a Systems Manager Automation document, with the execution role deployed to each member account.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Deploy a periodic AWS Config rule that evaluates daily and remediates non-compliant buckets.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Send AWS Config non-compliance notifications to the bucket owner so they can enable encryption.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Apply a service control policy that denies the s3:CreateBucket action in all member accounts.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MSQ",
+      "questionText": "A DevOps engineer is enabling automatic remediation for a rule that currently reports 4,000 non-compliant resources across production accounts. The engineer must avoid causing a large-scale outage if the remediation document contains a defect. Which TWO precautions should the engineer take? (Choose TWO.)",
+      "explanation": "Phân tích đề: Bật khắc phục hàng loạt trên tồn đọng lớn là rủi ro cao.\n(A) ĐÚNG: Kiểm chứng tài liệu tự động hóa trong tài khoản không phải sản xuất với các trường hợp biên thực tế, gồm tài nguyên ở trạng thái chuyển tiếp và tài nguyên thiếu quyền, để biết tài liệu hành xử ra sao khi gặp bất thường.\n(B) ĐÚNG: Giới hạn tốc độ và số tài nguyên bị tác động trong một lần chạy, kèm điều kiện dừng khi tỉ lệ thất bại vượt ngưỡng, để một tài liệu có lỗi dừng lại sau vài tài nguyên thay vì tác động tới toàn bộ.\n(C) SAI: Bật khắc phục cho toàn bộ 4.000 tài nguyên cùng lúc chính là kịch bản cần tránh.\n(D) SAI: Cấp quyền quản trị cho vai trò khắc phục để tránh lỗi thiếu quyền làm phạm vi thiệt hại của một lỗi trở nên rất lớn.\n(E) SAI: Tăng số lần thử lại khi khắc phục thất bại có thể lặp lại chính hành động gây hại.\nĐáp án đúng: A, B\nĐiểm cần nhớ: Kiểm chứng trước ở môi trường không phải sản xuất, và giới hạn tốc độ cùng điều kiện dừng khi bật khắc phục diện rộng.",
+      "tagNames": ["Incident and Event Response > Event-Driven Remediation (Config Remediation / SSM Automation)"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Validate the automation document in a non-production account against realistic edge cases before enabling it.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Apply rate and concurrency limits per run with a stop condition based on the failure rate.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Enable remediation for all 4,000 resources at once so the backlog is cleared quickly.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Grant the remediation role administrator permissions to avoid permission errors during execution.", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Configure the remediation to retry indefinitely until each resource becomes compliant.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MCQ",
+      "questionText": "Users report elevated error rates beginning at 14:05. A DevOps engineer sees that overall CPU and memory utilization on the application fleet are normal, and average latency looks unchanged. What is the MOST efficient next step to narrow down the cause?",
+      "explanation": "Phân tích đề: Chỉ số tổng hợp bình thường nhưng người dùng vẫn gặp lỗi, nên cần thu hẹp phạm vi theo các chiều khác.\n(A) ĐÚNG: Đối chiếu thời điểm bắt đầu với lịch sử triển khai và thay đổi cấu hình, đồng thời phân nhóm lỗi theo vùng sẵn sàng, theo instance, theo phiên bản đang phục vụ và theo endpoint; phần lớn sự cố có nguyên nhân là một thay đổi, và việc phân nhóm cho thấy lỗi có tập trung ở một nhóm nhỏ hay không.\n(B) SAI: Khởi động lại toàn bộ đội hình xóa mất chính mẫu phân bố cần để chẩn đoán và có thể che giấu nguyên nhân.\n(C) SAI: Tăng năng lực là biện pháp giảm nhẹ cho vấn đề quá tải, nhưng các chỉ số tài nguyên đang bình thường nên nhiều khả năng không liên quan.\n(D) SAI: Nhìn giá trị trung bình của độ trễ chính là thứ đang che giấu vấn đề; cần xem các phân vị cao thay vì trung bình.\nĐáp án đúng: A\nĐiểm cần nhớ: Bắt đầu chẩn đoán bằng câu hỏi điều gì đã thay đổi, rồi phân nhóm lỗi theo AZ, instance, phiên bản và endpoint.",
+      "tagNames": ["Incident and Event Response > Troubleshooting & Root Cause Analysis"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Correlate the start time with recent deployments and configuration changes, and break the errors down by Availability Zone, host, application version and endpoint.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Restart every instance in the fleet to clear any transient condition.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Scale the fleet out to add capacity and observe whether the errors decrease.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Continue monitoring the average latency metric until a clear trend appears.", "isCorrect": false }
+      ]
+    }
+  ]
+}

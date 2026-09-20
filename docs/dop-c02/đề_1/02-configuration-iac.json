@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "usageScope": "EXAM",
+  "examPartId": "01a09629-c49c-76ed-84dd-e2ac40d36b4b",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer must deploy a standard set of security controls, consisting of an IAM role, an AWS Config recorder, and a CloudWatch log group, into every account in an AWS Organization. The controls must also be applied automatically to accounts that are created in the future, and the engineer wants to manage the definition in one place. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần triển khai cùng một bộ tài nguyên cho mọi tài khoản hiện có và tài khoản tạo sau này, quản lý tập trung.\n(A) SAI: Chạy stack riêng trong từng tài khoản đòi hỏi thao tác thủ công và bỏ sót tài khoản mới.\n(B) ĐÚNG: Dùng CloudFormation StackSet với service-managed permissions nhắm tới các đơn vị tổ chức và bật automatic deployment; tài khoản được thêm vào đơn vị tổ chức sau này tự nhận stack instance mà không cần thao tác bổ sung.\n(C) SAI: Viết script lặp qua danh sách tài khoản là giải pháp tự chế phải tự xử lý lỗi, thử lại và theo dõi trạng thái.\n(D) SAI: Yêu cầu mỗi đội tự triển khai mẫu dẫn tới sự không nhất quán và không kiểm chứng được độ bao phủ.\nĐáp án đúng: B\nĐiểm cần nhớ: StackSet với service-managed permissions và automatic deployment phủ cả tài khoản được thêm vào đơn vị tổ chức sau này.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a CloudFormation stack in each account and repeat the process manually whenever a new account is created.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Create a CloudFormation StackSet with service-managed permissions, target the organizational units, and enable automatic deployment to new accounts.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Write a script that assumes a role in each account from a list and runs the CreateStack API, and schedule it to run nightly.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Publish the template to an Amazon S3 bucket and ask each account owner to deploy it.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MCQ",
+      "questionText": "A CloudFormation template launches Amazon EC2 instances that must run a configuration script at boot. The stack frequently reports CREATE_COMPLETE while the configuration script is still running or has failed, so downstream stacks consume a half-configured environment. Which solution ensures the stack only reports success after the instance configuration completes successfully?",
+      "explanation": "Phân tích đề: CloudFormation đang coi việc khởi chạy instance là hoàn tất, trong khi cấu hình bên trong chưa xong.\n(A) ĐÚNG: Thêm CreationPolicy cho tài nguyên instance kèm thời gian chờ, và cho script gọi cfn-signal với mã trạng thái sau khi cấu hình xong; CloudFormation chỉ chuyển sang CREATE_COMPLETE khi nhận được tín hiệu thành công, và thất bại nếu hết thời gian chờ.\n(B) SAI: Thêm DependsOn chỉ điều khiển thứ tự tạo tài nguyên chứ không biết trạng thái bên trong instance.\n(C) SAI: Tăng thời gian chờ của stack không thay đổi tiêu chí xác định hoàn tất.\n(D) SAI: Thêm bước chờ cố định trong script là phỏng đoán theo thời gian và không báo lỗi khi cấu hình thất bại.\nĐáp án đúng: A\nĐiểm cần nhớ: CreationPolicy kết hợp cfn-signal để CloudFormation chờ tín hiệu thật từ bên trong instance.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Add a CreationPolicy with a timeout to the instance resource and call cfn-signal from the configuration script with the resulting exit status.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Add a DependsOn attribute so that downstream resources are created after the instance.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Increase the stack creation timeout in the CloudFormation console.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Add a sleep command at the end of the user data script to allow configuration to finish.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer must update a production CloudFormation stack that manages an Amazon RDS database and an Auto Scaling group. Before applying the update, the engineer must know exactly which resources will be modified, replaced, or deleted, because replacing the database is unacceptable. Which approach provides this information before any change is made?",
+      "explanation": "Phân tích đề: Cần biết trước tác động của thay đổi, đặc biệt là khả năng thay thế cơ sở dữ liệu.\n(A) ĐÚNG: Tạo change set từ template mới; CloudFormation liệt kê từng tài nguyên kèm hành động dự kiến và cột Replacement cho biết tài nguyên nào sẽ bị thay thế, nên có thể kiểm tra rồi mới quyết định thực thi hay hủy.\n(B) SAI: Chạy cập nhật rồi theo dõi sự kiện là biết tác động sau khi thay đổi đã bắt đầu, quá muộn với tài nguyên bị thay thế.\n(C) SAI: Drift detection so sánh trạng thái thực tế với template hiện tại, không dự đoán tác động của template mới.\n(D) SAI: Triển khai vào tài khoản thử nghiệm cho thông tin tham khảo nhưng không phản ánh chính xác trạng thái của stack sản xuất.\nĐáp án đúng: A\nĐiểm cần nhớ: Change set cho biết tài nguyên nào bị sửa, thay thế hay xóa trước khi thực thi cập nhật.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a change set from the updated template and review the action and replacement columns for each resource before executing it.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Run the stack update and monitor the stack events, cancelling the update if a database replacement begins.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Run drift detection on the stack and review the differences that are reported.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Deploy the updated template into a test account and compare the resulting resources.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MSQ",
+      "questionText": "A company must ensure that an Amazon S3 bucket and an Amazon DynamoDB table created by a CloudFormation stack are retained if the stack is accidentally deleted, and that no one can delete the DynamoDB table through a stack update. Which TWO actions should a DevOps engineer take? (Choose TWO.)",
+      "explanation": "Phân tích đề: Cần giữ tài nguyên khi xóa stack và ngăn việc xóa qua cập nhật stack.\n(A) ĐÚNG: Đặt DeletionPolicy là Retain cho hai tài nguyên, để khi stack bị xóa thì CloudFormation bỏ chúng ra khỏi quản lý thay vì xóa dữ liệu.\n(B) ĐÚNG: Áp stack policy từ chối hành động Update:Delete và Update:Replace trên tài nguyên DynamoDB, để một lần cập nhật stack không thể xóa hoặc thay thế bảng đó.\n(C) SAI: Bật termination protection ngăn việc xóa stack nhưng không bảo vệ tài nguyên khi cập nhật stack, và câu hỏi yêu cầu cả hai vế.\n(D) SAI: Gỡ tài nguyên khỏi template làm chúng bị xóa khỏi stack và mất khả năng quản lý bằng mã.\n(E) SAI: Sao lưu định kỳ là biện pháp phục hồi, không ngăn được việc xóa.\nĐáp án đúng: A, B\nĐiểm cần nhớ: DeletionPolicy Retain bảo vệ khi xóa stack; stack policy bảo vệ tài nguyên khỏi các hành động trong lúc cập nhật stack.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Set the DeletionPolicy attribute to Retain on the S3 bucket and DynamoDB table resources.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Apply a stack policy that denies Update:Delete and Update:Replace actions on the DynamoDB table resource.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Enable termination protection on the stack and rely on it to prevent all resource deletion.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Remove the two resources from the template and create them manually outside CloudFormation.", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Configure AWS Backup to take daily backups of both resources.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "A company operates 2,000 Amazon EC2 instances across development and production. The security team requires that operating system patches classified as critical are installed on production instances during a defined weekly window, and that a compliance report showing which instances are missing patches is available at any time. Which solution meets these requirements with the LEAST custom code?",
+      "explanation": "Phân tích đề: Cần vá theo lịch có kiểm soát và báo cáo mức tuân thủ bản vá.\n(A) ĐÚNG: Dùng AWS Systems Manager Patch Manager với patch baseline định nghĩa mức phân loại cần vá, gán instance theo patch group bằng thẻ, chạy trong maintenance window đã định; Patch Manager ghi nhận trạng thái tuân thủ bản vá cho từng instance và báo cáo được ngay.\n(B) SAI: Viết script gọi trình quản lý gói qua Run Command theo lịch phải tự xử lý phân loại bản vá, tự tổng hợp báo cáo và tự kiểm soát tốc độ.\n(C) SAI: Dựa vào cơ chế cập nhật tự động của hệ điều hành làm mất khả năng kiểm soát thời điểm và không cung cấp báo cáo tập trung.\n(D) SAI: Dựng lại AMI và thay thế toàn bộ instance mỗi tuần là hợp lệ với hạ tầng bất biến nhưng không phải phương án ít mã nhất cho yêu cầu đã nêu.\nĐáp án đúng: A\nĐiểm cần nhớ: Patch Manager kết hợp patch baseline, patch group theo thẻ và maintenance window, kèm báo cáo tuân thủ bản vá sẵn có.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Systems Manager"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use Systems Manager Patch Manager with a custom patch baseline for critical patches, tag-based patch groups, and a weekly maintenance window, then review patch compliance reporting.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Use Systems Manager Run Command on a schedule to execute a package manager update script, and write results to an Amazon S3 bucket for reporting.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Enable unattended upgrades inside the operating system on each instance and collect logs centrally.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Rebuild the AMI weekly with the latest patches and replace every instance in all environments.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MCQ",
+      "questionText": "A security policy states that engineers must not use SSH key pairs or open inbound port 22 to access EC2 instances, yet they still need interactive shell access for troubleshooting, and every session must be recorded for audit. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần truy cập shell mà không mở cổng vào và không dùng khóa SSH, đồng thời ghi lại phiên.\n(A) ĐÚNG: Dùng Systems Manager Session Manager; tác nhân trên instance khởi tạo kết nối ra ngoài nên không cần mở cổng 22 và không cần key pair, quyền được kiểm soát bằng IAM, và có thể bật ghi nhật ký phiên vào S3 hoặc CloudWatch Logs để phục vụ kiểm toán.\n(B) SAI: Mở cổng 22 giới hạn theo dải địa chỉ văn phòng vẫn vi phạm yêu cầu không mở cổng vào.\n(C) SAI: Dùng bastion host vẫn cần khóa SSH và cổng vào, đồng thời thêm hạ tầng phải bảo trì.\n(D) SAI: Cài phần mềm truy cập từ xa của bên thứ ba thêm thành phần ngoài luồng kiểm soát và không tích hợp sẵn với IAM.\nĐáp án đúng: A\nĐiểm cần nhớ: Session Manager cho truy cập shell không cần cổng vào, không cần khóa SSH, có kiểm soát bằng IAM và ghi nhật ký phiên.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Systems Manager"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use Systems Manager Session Manager with IAM-based access control and enable session logging to Amazon S3 and CloudWatch Logs.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Allow inbound port 22 only from the corporate IP range and distribute a shared SSH key to engineers.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Deploy a bastion host in a public subnet and require engineers to connect through it with individual SSH keys.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Install a third-party remote desktop agent on each instance and manage access through its own console.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer must guarantee that a specific CloudWatch agent configuration remains applied to a fleet of EC2 instances. Engineers occasionally modify the configuration by hand during troubleshooting and forget to revert it. The engineer wants the configuration to be reapplied automatically and to see which instances were out of compliance. Which Systems Manager capability should be used?",
+      "explanation": "Phân tích đề: Cần duy trì trạng thái mong muốn và tự khôi phục khi bị thay đổi thủ công.\n(A) ĐÚNG: State Manager association áp một document cấu hình theo lịch định kỳ lên các instance mục tiêu; nếu ai đó sửa tay, lần chạy kế tiếp đưa cấu hình trở lại trạng thái khai báo, và association ghi nhận trạng thái tuân thủ cho từng instance.\n(B) SAI: Run Command chạy một lần theo yêu cầu, không tự lặp lại để duy trì trạng thái.\n(C) SAI: Inventory thu thập thông tin về phần mềm và cấu hình nhưng không áp đặt trạng thái mong muốn.\n(D) SAI: Maintenance window định nghĩa khung thời gian thực hiện tác vụ chứ tự nó không phải cơ chế duy trì cấu hình.\nĐáp án đúng: A\nĐiểm cần nhớ: State Manager duy trì trạng thái cấu hình mong muốn theo lịch và báo cáo mức tuân thủ.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Systems Manager"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a State Manager association that applies the configuration document to the tagged instances on a schedule.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Use Run Command to push the configuration whenever an engineer reports a problem.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Enable Systems Manager Inventory to collect the agent configuration from each instance.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Define a maintenance window that runs the configuration document once per month.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "A company must produce hardened Amazon Machine Images monthly. Each image must be built from the latest Amazon Linux base image, have the company security agent installed, pass an automated CIS benchmark test before release, and be shared automatically with 15 member accounts in three AWS Regions. Which solution meets these requirements with the LEAST operational overhead?",
+      "explanation": "Phân tích đề: Cần pipeline dựng image có bước kiểm thử bắt buộc và phân phối đa tài khoản, đa Region.\n(A) ĐÚNG: EC2 Image Builder cung cấp pipeline với recipe gồm các component cài đặt và các component kiểm thử; image chỉ được phát hành khi bước kiểm thử đạt, và distribution configuration tự sao chép cùng chia sẻ image tới các tài khoản và Region đã khai báo, chạy theo lịch hằng tháng.\n(B) SAI: Dựng image thủ công rồi chạy script sao chép là quy trình lặp lại tốn công và dễ sai sót.\n(C) SAI: Dùng CodeBuild để chạy công cụ dựng image của bên thứ ba là khả thi nhưng phải tự hiện thực phần kiểm thử, phân phối và chia sẻ.\n(D) SAI: Chia sẻ snapshot thay vì AMI không cho ra image khởi chạy được trực tiếp và làm quy trình phức tạp hơn.\nĐáp án đúng: A\nĐiểm cần nhớ: EC2 Image Builder gom việc dựng, kiểm thử và phân phối AMI vào một pipeline được quản lý.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AMI Pipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create an EC2 Image Builder pipeline with a recipe containing build and test components, a schedule for monthly runs, and a distribution configuration that copies and shares the image with the member accounts in each Region.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Launch an instance monthly, apply hardening manually, create an AMI, and run a script that copies and shares it with each account and Region.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Use AWS CodeBuild to run a third-party image build tool and write custom code to test, copy, and share the resulting AMI.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create an EBS snapshot of a hardened instance and share the snapshot with the member accounts.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MCQ",
+      "questionText": "A web application runs on AWS Elastic Beanstalk. During deployments, users occasionally receive errors because instances are taken out of service while the new version starts. The company requires that deployments never reduce the capacity available to serve traffic and that a failed deployment does not leave a mix of old and new versions running. Which deployment policy should be used?",
+      "explanation": "Phân tích đề: Yêu cầu không giảm năng lực phục vụ và không để lại trạng thái lẫn lộn khi thất bại.\n(A) SAI: Rolling thay thế từng nhóm instance tại chỗ nên năng lực giảm trong quá trình triển khai.\n(B) SAI: All at once thay toàn bộ cùng lúc, gây gián đoạn rõ rệt.\n(C) ĐÚNG: Immutable khởi chạy một nhóm instance mới song song với nhóm hiện có trong cùng môi trường; chỉ khi nhóm mới đạt kiểm tra sức khỏe thì lưu lượng mới chuyển sang và nhóm cũ bị gỡ, còn nếu thất bại thì nhóm mới bị hủy và môi trường giữ nguyên phiên bản cũ.\n(D) SAI: Rolling with additional batch giữ được năng lực nhưng vẫn có giai đoạn tồn tại đồng thời hai phiên bản phục vụ, và việc khôi phục khi thất bại phức tạp hơn.\nĐáp án đúng: C\nĐiểm cần nhớ: Immutable tạo đội hình mới song song, giữ nguyên năng lực và cho phép hủy sạch khi thất bại.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS OpsWorks / Elastic Beanstalk"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Rolling", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "All at once", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Immutable", "isCorrect": true },
+        { "answerLabel": "D", "answerText": "Rolling with additional batch", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MCQ",
+      "questionText": "A company manages AWS infrastructure with Terraform. Several engineers run terraform apply from their laptops, and on two occasions simultaneous runs corrupted the state file and produced duplicated resources. The company wants to prevent concurrent modifications and keep an auditable history of state changes. Which solution addresses this?",
+      "explanation": "Phân tích đề: Nguyên nhân là nhiều người cùng ghi vào state mà không có cơ chế khóa.\n(A) ĐÚNG: Chuyển state sang backend từ xa dùng S3 với versioning bật, kèm khóa trạng thái để chỉ một lần chạy được ghi tại một thời điểm; lần chạy thứ hai bị chặn cho tới khi lần đầu kết thúc, và versioning giữ lịch sử để khôi phục khi cần.\n(B) SAI: Lưu state trong kho nguồn không ngăn được việc chạy đồng thời và dễ gây xung đột hợp nhất, đồng thời làm lộ dữ liệu nhạy cảm trong state.\n(C) SAI: Quy ước rằng mỗi lần chỉ một người chạy là thỏa thuận chứ không phải kiểm soát kỹ thuật.\n(D) SAI: Chia hạ tầng thành nhiều state nhỏ giảm xác suất xung đột nhưng không loại bỏ nó và không giải quyết yêu cầu về khóa.\nĐáp án đúng: A\nĐiểm cần nhớ: Remote state với versioning và cơ chế khóa là điều kiện bắt buộc khi nhiều người cùng vận hành Terraform.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > Terraform / Ansible"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Move the Terraform state to a remote backend backed by Amazon S3 with versioning enabled and state locking so concurrent runs are blocked.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Commit the state file to the Git repository so that changes are versioned and conflicts are detected during merge.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Agree on a team convention that only one engineer runs terraform apply at a time.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Split the infrastructure into many small configurations so that collisions are less likely.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer must run a configuration change with Ansible across 500 EC2 instances. The playbook must target only instances tagged Environment=production, and the inventory must reflect instances that were added by Auto Scaling minutes earlier without manual updates. Which approach meets these requirements?",
+      "explanation": "Phân tích đề: Danh sách máy chủ thay đổi liên tục do mở rộng tự động.\n(A) ĐÚNG: Dùng dynamic inventory plugin cho EC2, lọc theo thẻ Environment=production; danh sách mục tiêu được truy vấn từ API tại thời điểm chạy nên luôn phản ánh các instance hiện có, kể cả instance vừa được tạo.\n(B) SAI: Duy trì tệp inventory tĩnh phải cập nhật thủ công và luôn lạc hậu trong môi trường mở rộng tự động.\n(C) SAI: Sinh lại tệp inventory hằng đêm vẫn bỏ sót các instance được tạo trong ngày.\n(D) SAI: Chạy playbook trên mọi instance rồi để tác vụ tự bỏ qua máy không phù hợp là lãng phí và rủi ro nếu điều kiện lọc sai.\nĐáp án đúng: A\nĐiểm cần nhớ: Dynamic inventory truy vấn danh sách mục tiêu theo thẻ tại thời điểm chạy, phù hợp với môi trường mở rộng tự động.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > Terraform / Ansible"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use the Ansible dynamic inventory plugin for EC2 with a filter on the Environment tag so targets are resolved at run time.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Maintain a static inventory file listing the instance IP addresses and update it before each run.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Generate a static inventory file from a nightly script that queries the EC2 API.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Run the playbook against all instances and use a conditional task to skip instances that are not production.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 12,
+      "questionType": "MCQ",
+      "questionText": "A company wants to enable a new checkout feature for 5 percent of users, monitor an error-rate alarm, and automatically revert the feature for all users if the alarm triggers, without redeploying the application. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần bật tính năng theo tỉ lệ và tự quay lại mà không phát hành lại mã.\n(A) ĐÚNG: Dùng AWS AppConfig với feature flag, cấu hình deployment strategy tăng dần và gắn CloudWatch alarm vào môi trường AppConfig; khi alarm chuyển sang báo động trong lúc triển khai cấu hình, AppConfig tự động quay lại giá trị trước đó, và ứng dụng chỉ đọc cấu hình chứ không cần triển khai lại.\n(B) SAI: Đặt cờ trong biến môi trường của ứng dụng đòi hỏi triển khai lại cho mỗi lần thay đổi.\n(C) SAI: Lưu cờ trong Parameter Store và tự viết logic thăm dò là khả thi nhưng phải tự hiện thực việc triển khai theo tỉ lệ và việc tự quay lại theo alarm.\n(D) SAI: Dùng bản ghi DNS có trọng số chia lưu lượng ở tầng hạ tầng chứ không bật tắt tính năng theo người dùng.\nĐáp án đúng: A\nĐiểm cần nhớ: AppConfig triển khai cấu hình theo chiến lược tăng dần và tự quay lại khi alarm kích hoạt, không cần phát hành lại ứng dụng.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS AppConfig"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use AWS AppConfig feature flags with a gradual deployment strategy and an associated CloudWatch alarm that triggers automatic rollback of the configuration.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Store the feature flag as an application environment variable and redeploy to change its value.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Store the flag in Parameter Store and write a custom poller in the application that also watches the alarm state.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Use Route 53 weighted records to send 5 percent of traffic to a separate deployment that has the feature enabled.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 13,
+      "questionType": "MCQ",
+      "questionText": "A platform team publishes an approved Amazon RDS configuration as an AWS Service Catalog product. Application teams must be able to provision the database themselves, but they must not hold IAM permissions to create RDS instances directly, and they must only be able to choose from an approved list of instance classes. Which combination of Service Catalog configurations meets these requirements?",
+      "explanation": "Phân tích đề: Cần tự phục vụ mà người dùng không nắm quyền tạo RDS, và giới hạn lựa chọn tham số.\n(A) ĐÚNG: Dùng launch constraint gắn một IAM role nắm các quyền tạo RDS, để sản phẩm được cấp phát bằng quyền của role đó chứ không bằng quyền của người dùng; kết hợp template constraint giới hạn giá trị hợp lệ của tham số instance class.\n(B) SAI: Cấp cho các đội quyền tạo RDS trực tiếp làm mất mục đích của mô hình danh mục.\n(C) SAI: Chỉ ghi danh sách instance class được phép trong phần mô tả sản phẩm là hướng dẫn chứ không được thực thi.\n(D) SAI: Yêu cầu đội nền tảng cấp phát hộ mỗi lần tạo nút thắt cổ chai và không phải tự phục vụ.\nĐáp án đúng: A\nĐiểm cần nhớ: Launch constraint cấp quyền cấp phát qua role; template constraint giới hạn giá trị tham số người dùng chọn được.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Service Catalog"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Add a launch constraint that specifies an IAM role with the required RDS permissions, and add a template constraint that restricts the instance class parameter to the approved values.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Grant each application team an IAM policy allowing rds:CreateDBInstance and share the product with them.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Document the approved instance classes in the product description and review provisioned databases weekly.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Require application teams to raise a request so the platform team can provision the database on their behalf.", "isCorrect": false }
+      ]
+    }
+  ]
+}

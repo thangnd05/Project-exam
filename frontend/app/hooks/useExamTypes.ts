@@ -17,6 +17,16 @@ import type {ExamTypeLayoutResponse, ExamTypeRequest, ExamTypeResponse} from '@/
 
 export {examTypeKeys};
 
+export function durationMinutesFromExamType(
+  examTypes: Pick<ExamTypeResponse, 'examTypeId' | 'durationMinutes'>[],
+  examTypeId: string,
+): string {
+  if (!examTypeId) return '';
+  const selected = examTypes.find((item) => String(item.examTypeId) === String(examTypeId));
+  const minutes = selected?.durationMinutes;
+  return minutes != null && Number(minutes) > 0 ? String(minutes) : '';
+}
+
 export function useExamTypes() {
   const crud = useAdminCrud({
     queryKey: examTypeKeys.all,

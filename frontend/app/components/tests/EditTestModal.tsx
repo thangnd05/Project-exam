@@ -8,6 +8,7 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import { getAdminTestById, updateTest } from '@/app/apis/testApi';
 import { getExamTypes } from '@/app/apis/examTypeApi';
+import { durationMinutesFromExamType } from '@/app/hooks/useExamTypes';
 import { getExamCategories } from '@/app/apis/examCategoryApi';
 import { getQuestionCollections } from '@/app/apis/questionCollectionApi';
 import { buildCollectionTree } from '@/app/utils/collectionTree';
@@ -318,9 +319,14 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                 <select
                   className={cxCreate('inputModern')}
                   value={formData.examTypeId}
-                  onChange={(e) =>
-                    setFormData({ ...formData, examTypeId: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const examTypeId = e.target.value;
+                    setFormData({
+                      ...formData,
+                      examTypeId,
+                      durationMinutes: durationMinutesFromExamType(examTypes, examTypeId),
+                    });
+                  }}
                 >
                   <option value="">-- Chọn loại --</option>
 

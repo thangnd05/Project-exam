@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "usageScope": "EXAM",
+  "examPartId": "01a0962a-564c-7ca2-8a18-261270162705",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "An application writes its logs to Amazon CloudWatch Logs. The operations team must be alerted when the phrase OutOfMemoryError appears more than five times within 5 minutes in a log group. The solution must not require running any additional compute. Which approach meets these requirements?",
+      "explanation": "Phân tích đề: Cần cảnh báo dựa trên nội dung nhật ký, không chạy thêm tài nguyên tính toán.\n(A) ĐÚNG: Tạo metric filter trên log group khớp chuỗi cần tìm, filter phát ra một chỉ số tùy chỉnh; sau đó tạo CloudWatch alarm trên chỉ số đó với ngưỡng lớn hơn năm trong khoảng 5 phút. Toàn bộ do dịch vụ thực hiện, không cần hàm hay instance nào.\n(B) SAI: Dùng Lambda đăng ký subscription filter để đếm là chạy thêm tài nguyên tính toán, trái yêu cầu.\n(C) SAI: Chạy truy vấn Logs Insights theo lịch vẫn cần một cơ chế kích hoạt và xử lý kết quả, đồng thời không phải cách gắn alarm trực tiếp.\n(D) SAI: Xuất nhật ký sang S3 rồi phân tích định kỳ tạo độ trễ lớn và không đáp ứng yêu cầu cảnh báo theo cửa sổ 5 phút.\nĐáp án đúng: A\nĐiểm cần nhớ: Metric filter biến mẫu văn bản trong nhật ký thành chỉ số, rồi gắn alarm lên chỉ số đó.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a metric filter on the log group that matches the phrase, publish it as a custom metric, and create an alarm with a threshold of five over a 5-minute period.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create a subscription filter that invokes an AWS Lambda function which counts matches and publishes an alarm state.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Schedule a CloudWatch Logs Insights query every 5 minutes and send the result to Amazon SNS.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Export the log group to Amazon S3 and run an Amazon Athena query every 5 minutes.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer configured a CloudWatch alarm on a custom metric that an application publishes only when it processes an order. During a recent outage the application stopped completely, no metric data was published, and the alarm never entered the ALARM state. Which configuration change ensures the alarm detects this situation?",
+      "explanation": "Phân tích đề: Khi ứng dụng dừng hẳn, chỉ số không được phát nên alarm không có dữ liệu để đánh giá.\n(A) ĐÚNG: Đặt cách xử lý khi thiếu dữ liệu thành treat missing data as breaching, để khoảng thời gian không có điểm dữ liệu được coi là vi phạm ngưỡng và alarm chuyển sang báo động; đây chính là trường hợp ứng dụng ngừng hoạt động hoàn toàn.\n(B) SAI: Giữ mặc định coi thiếu dữ liệu là missing khiến alarm giữ nguyên trạng thái trước đó và im lặng.\n(C) SAI: Giảm ngưỡng không giúp khi hoàn toàn không có điểm dữ liệu nào để so sánh.\n(D) SAI: Tăng số chu kỳ đánh giá làm alarm càng chậm phản ứng và vẫn không xử lý được việc thiếu dữ liệu.\nĐáp án đúng: A\nĐiểm cần nhớ: Với chỉ số chỉ phát khi có hoạt động, hãy đặt treat missing data as breaching để phát hiện việc ngừng hẳn.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Configure the alarm to treat missing data as breaching.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Configure the alarm to treat missing data as missing so the previous state is retained.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Lower the alarm threshold so that fewer orders trigger the alarm.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Increase the number of evaluation periods before the alarm changes state.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "An on-call team receives dozens of pages during a single incident because 15 separate alarms on related components all enter the ALARM state. The team wants to be paged once, only when both the customer-facing error rate alarm and at least one infrastructure alarm are in ALARM, while keeping all individual alarms for diagnosis. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần giảm số lần gọi mà vẫn giữ các alarm riêng lẻ để chẩn đoán.\n(A) ĐÚNG: Tạo composite alarm với biểu thức kết hợp trạng thái của các alarm con theo logic AND và OR, và chỉ gắn hành động gọi trực vào composite alarm; các alarm con vẫn tồn tại và hiển thị trên bảng điều khiển nhưng không tự gọi người.\n(B) SAI: Xóa bớt alarm làm mất khả năng chẩn đoán chi tiết.\n(C) SAI: Tăng ngưỡng của mọi alarm có thể làm bỏ sót vấn đề thật.\n(D) SAI: Gửi mọi alarm vào một hàng đợi rồi tự viết logic gom nhóm là làm lại thứ composite alarm đã cung cấp sẵn.\nĐáp án đúng: A\nĐiểm cần nhớ: Composite alarm kết hợp trạng thái nhiều alarm con thành một tín hiệu gọi trực duy nhất.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a composite alarm whose rule combines the error rate alarm with the infrastructure alarms, and attach the paging action only to the composite alarm.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Delete the component alarms and keep only the customer-facing error rate alarm.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Raise the threshold on every component alarm so they trigger less often.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Send all alarm notifications to an Amazon SQS queue and write a Lambda function that deduplicates them before paging.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "A company operates 60 AWS accounts. The central operations team must build dashboards and investigate CloudWatch metrics and logs from all accounts without signing in to each one, and without copying log data into a central account. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần quan sát chỉ số và nhật ký nhiều tài khoản từ một nơi, không sao chép dữ liệu.\n(A) ĐÚNG: Bật CloudWatch cross-account observability, chỉ định tài khoản giám sát trung tâm và liên kết các tài khoản nguồn; đội vận hành truy vấn chỉ số, nhật ký và dấu vết của mọi tài khoản liên kết ngay trong tài khoản giám sát mà dữ liệu vẫn nằm ở tài khoản nguồn.\n(B) SAI: Dùng subscription filter đẩy toàn bộ nhật ký sang tài khoản trung tâm là sao chép dữ liệu, trái yêu cầu, và tốn chi phí truyền cùng lưu trữ.\n(C) SAI: Cấp vai trò chỉ đọc rồi chuyển đổi vai trò từng tài khoản vẫn buộc phải mở từng tài khoản để xem.\n(D) SAI: Xuất chỉ số ra S3 rồi dựng bảng điều khiển riêng là giải pháp tự chế với độ trễ cao.\nĐáp án đúng: A\nĐiểm cần nhớ: Cross-account observability cho phép xem chỉ số, nhật ký và dấu vết của nhiều tài khoản từ một tài khoản giám sát mà không sao chép dữ liệu.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable CloudWatch cross-account observability with a central monitoring account and link the source accounts to it.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create subscription filters in every account that stream all log groups into a central account log group.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create a read-only IAM role in each account and have operators switch roles to view each account's console.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Export metrics from each account to Amazon S3 every hour and visualize them with Amazon QuickSight.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer must alarm on memory utilization and disk space used on a fleet of Amazon EC2 instances running Amazon Linux. The engineer checks the EC2 namespace in CloudWatch and cannot find these metrics. What is the reason, and what should the engineer do?",
+      "explanation": "Phân tích đề: Chỉ số bộ nhớ và dung lượng đĩa không có sẵn trong không gian tên EC2.\n(A) ĐÚNG: Hypervisor chỉ nhìn thấy các chỉ số ở mức hạ tầng như CPU, mạng và đĩa ở mức khối; mức sử dụng bộ nhớ và dung lượng hệ thống tệp là trạng thái bên trong hệ điều hành nên phải cài CloudWatch agent để thu thập và phát ra dưới dạng chỉ số tùy chỉnh.\n(B) SAI: Cho rằng cần bật detailed monitoring là hiểu sai; detailed monitoring chỉ tăng tần suất của các chỉ số sẵn có lên một phút.\n(C) SAI: Cho rằng các chỉ số này nằm trong một không gian tên khác được bật sẵn là không đúng.\n(D) SAI: Cho rằng phải nâng cấp loại instance không liên quan tới việc chỉ số có sẵn hay không.\nĐáp án đúng: A\nĐiểm cần nhớ: Bộ nhớ và dung lượng đĩa là chỉ số bên trong hệ điều hành; cần CloudWatch agent mới thu thập được.",
+      "tagNames": ["Monitoring and Logging > CloudWatch Agent"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "These are guest operating system metrics that the hypervisor cannot see; install and configure the CloudWatch agent to publish them as custom metrics.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Detailed monitoring is disabled; enable detailed monitoring on the instances to expose memory and disk metrics.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "The metrics are published to a different namespace that is enabled by default; change the namespace in the alarm definition.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "The instance type does not support these metrics; change to a larger instance type.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer must roll out an identical CloudWatch agent configuration to 300 EC2 instances and be able to update that configuration later without connecting to each instance. Which approach meets these requirements with the LEAST operational overhead?",
+      "explanation": "Phân tích đề: Cần phân phối và cập nhật cấu hình agent tập trung.\n(A) ĐÚNG: Lưu tệp cấu hình agent trong Parameter Store, rồi dùng Systems Manager để cài và khởi động agent với tham chiếu tới tham số đó; khi cần đổi cấu hình, chỉ cập nhật giá trị tham số rồi chạy lại document trên các instance mục tiêu, không cần đăng nhập vào máy nào.\n(B) SAI: Nhúng cấu hình vào AMI buộc phải dựng lại image và thay thế instance cho mỗi thay đổi nhỏ.\n(C) SAI: Chép tệp cấu hình thủ công qua SSH tới 300 máy là cách tốn công nhất và trái với yêu cầu.\n(D) SAI: Đặt cấu hình trong user data chỉ áp dụng lúc khởi chạy lần đầu nên không cập nhật được cho instance đang chạy.\nĐáp án đúng: A\nĐiểm cần nhớ: Lưu cấu hình CloudWatch agent trong Parameter Store và triển khai qua Systems Manager để cập nhật tập trung.",
+      "tagNames": ["Monitoring and Logging > CloudWatch Agent"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Store the agent configuration in AWS Systems Manager Parameter Store and use a Systems Manager document to install the agent and apply the configuration from the parameter.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Bake the agent configuration into a new AMI and replace all instances whenever the configuration changes.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Copy the configuration file to each instance over SSH and restart the agent.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Place the agent configuration in the instance user data script.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MCQ",
+      "questionText": "A security team must retain a single, tamper-evident record of all management API activity across every account in an AWS Organization, including accounts created in the future. Member account administrators must not be able to stop or delete the trail. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần một trail duy nhất phủ toàn tổ chức, chống bị tắt bởi tài khoản thành viên, và chống sửa đổi bằng chứng.\n(A) ĐÚNG: Tạo organization trail từ tài khoản quản lý hoặc tài khoản quản trị được ủy quyền, ghi vào bucket ở tài khoản kiểm toán; trail tự áp dụng cho tài khoản mới, quản trị viên tài khoản thành viên không sửa được, và bật log file validation cho bằng chứng chống giả mạo.\n(B) SAI: Tạo trail riêng trong từng tài khoản khiến quản trị viên ở đó có thể tắt và bỏ sót tài khoản mới.\n(C) SAI: Chỉ bật event history không cung cấp lưu giữ dài hạn và không tập trung được.\n(D) SAI: Sao chép nhật ký định kỳ sang tài khoản kiểm toán để lại khoảng thời gian dữ liệu chỉ nằm ở tài khoản nguồn và có thể bị xóa.\nĐáp án đúng: A\nĐiểm cần nhớ: Organization trail phủ mọi tài khoản kể cả tài khoản mới; bật log file validation để phát hiện giả mạo.",
+      "tagNames": ["Monitoring and Logging > AWS CloudTrail"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create an organization trail from the management account that delivers to an S3 bucket in a dedicated audit account, and enable log file validation.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create a separate trail in each member account that delivers to a local S3 bucket.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Rely on CloudTrail event history in each account and review it during audits.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Configure a nightly job that copies CloudTrail logs from each account into the audit account.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "After a data exposure incident, a company must determine exactly which objects were read from a specific Amazon S3 bucket and by which principal. The existing CloudTrail trail records management events only, and the required object-level activity is missing. What should a DevOps engineer configure?",
+      "explanation": "Phân tích đề: Hành động đọc đối tượng trong S3 là data event, không phải management event.\n(A) ĐÚNG: Bật data event cho S3 trên trail, giới hạn phạm vi tới bucket cần theo dõi để kiểm soát chi phí; từ đó các thao tác ở mức đối tượng như GetObject được ghi lại kèm danh tính người gọi.\n(B) SAI: Bật CloudTrail Insights phát hiện bất thường về tần suất gọi API chứ không ghi lại từng thao tác đối tượng.\n(C) SAI: Bật server access logging của S3 cho một dạng nhật ký khác, ít cấu trúc hơn và không tích hợp cùng nơi với CloudTrail; đề bài đang hỏi cấu hình CloudTrail còn thiếu.\n(D) SAI: Tăng thời gian lưu giữ nhật ký không tạo ra dữ liệu chưa từng được ghi.\nĐáp án đúng: A\nĐiểm cần nhớ: Thao tác ở mức đối tượng của S3 chỉ xuất hiện khi bật data event; hãy giới hạn phạm vi để kiểm soát chi phí.",
+      "tagNames": ["Monitoring and Logging > AWS CloudTrail"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable S3 data events on the trail, scoped to the specific bucket.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable CloudTrail Insights on the existing trail.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Increase the CloudTrail log retention period in the destination bucket.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable AWS Config recording for S3 bucket resources.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MCQ",
+      "questionText": "A microservices application shows intermittent latency spikes. The team has enabled AWS X-Ray but the default sampling rate captures only a small percentage of requests, and the slow requests are rarely present in the traces. The team must capture traces for the slow requests without tracing every request in production. What should a DevOps engineer do?",
+      "explanation": "Phân tích đề: Lấy mẫu mặc định bỏ sót đúng các yêu cầu cần điều tra.\n(A) ĐÚNG: Tạo sampling rule tùy chỉnh trong X-Ray nhắm tới nhóm yêu cầu cần quan tâm, ví dụ theo service, theo đường dẫn hoặc theo phương thức, với tỉ lệ lấy mẫu cao hơn; như vậy vẫn giữ chi phí ở mức chấp nhận được nhưng tăng xác suất bắt được yêu cầu chậm.\n(B) SAI: Tắt lấy mẫu để ghi lại mọi yêu cầu trong sản xuất làm chi phí và tải tăng mạnh.\n(C) SAI: Tăng thời gian lưu giữ dấu vết không làm xuất hiện các dấu vết chưa từng được ghi.\n(D) SAI: Chuyển sang ghi nhật ký chi tiết thay cho dấu vết làm mất khả năng thấy thời gian tiêu tốn giữa các dịch vụ.\nĐáp án đúng: A\nĐiểm cần nhớ: Sampling rule tùy chỉnh cho phép tăng tỉ lệ lấy mẫu có chọn lọc thay vì ghi lại toàn bộ.",
+      "tagNames": ["Monitoring and Logging > AWS X-Ray"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a custom X-Ray sampling rule that increases the sampling rate for the affected service and request path.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Disable sampling so that every request in production is traced.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Increase the trace retention period in X-Ray.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Replace tracing with verbose application logging on every request.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MCQ",
+      "questionText": "A request passes through an Application Load Balancer, an Amazon API Gateway REST API, three AWS Lambda functions, and an Amazon DynamoDB table. Users report that some requests take several seconds. A DevOps engineer must determine which component contributes most of the latency for those specific slow requests. Which approach provides this most directly?",
+      "explanation": "Phân tích đề: Cần thấy thời gian phân bổ giữa các thành phần trong cùng một yêu cầu.\n(A) ĐÚNG: Bật X-Ray trên các thành phần trong đường đi và xem service map cùng các dấu vết của yêu cầu chậm; mỗi subsegment hiển thị thời gian tiêu tốn ở từng chặng, gồm cả lời gọi tới DynamoDB, nên thành phần chiếm phần lớn thời gian lộ ra ngay.\n(B) SAI: So sánh chỉ số độ trễ trung bình của từng dịch vụ khó ghép lại thành một yêu cầu cụ thể và bị trung bình hóa che giấu.\n(C) SAI: Đọc nhật ký của từng hàm riêng lẻ cho thông tin rời rạc và tốn công ghép thủ công.\n(D) SAI: Bật detailed monitoring cho ALB chỉ cho chỉ số ở mức bộ cân bằng tải chứ không phân tách theo thành phần phía sau.\nĐáp án đúng: A\nĐiểm cần nhớ: Service map và dấu vết của X-Ray cho thấy thời gian tiêu tốn ở từng chặng của một yêu cầu cụ thể.",
+      "tagNames": ["Monitoring and Logging > AWS X-Ray"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable AWS X-Ray tracing across the components and analyze the service map and individual traces for the slow requests.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Compare the average latency metrics published by each service in CloudWatch.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Enable verbose logging in each Lambda function and correlate the log entries by timestamp.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable detailed monitoring on the Application Load Balancer.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MCQ",
+      "questionText": "A company must centralize application logs from 200 CloudWatch log groups across many accounts into Amazon OpenSearch Service for near real-time search, and must also retain a low-cost copy of the raw logs for seven years to satisfy an audit requirement. Which architecture meets both requirements?",
+      "explanation": "Phân tích đề: Cần vừa tìm kiếm gần thời gian thực vừa lưu trữ dài hạn chi phí thấp.\n(A) ĐÚNG: Dùng subscription filter trên các log group đẩy dữ liệu tới Amazon Data Firehose; Firehose ghi song song vào OpenSearch cho việc tìm kiếm và vào S3 cho bản lưu thô, kết hợp lifecycle policy chuyển dữ liệu S3 sang lớp lưu trữ chi phí thấp theo thời gian.\n(B) SAI: Chỉ đẩy vào OpenSearch rồi giữ dữ liệu bảy năm trong cụm là phương án rất tốn kém.\n(C) SAI: Chỉ xuất sang S3 theo lịch không đáp ứng yêu cầu tìm kiếm gần thời gian thực.\n(D) SAI: Tăng thời gian lưu giữ của chính log group trong CloudWatch Logs đáp ứng phần lưu trữ nhưng không cung cấp khả năng tìm kiếm của OpenSearch và đắt hơn S3 cho bảy năm.\nĐáp án đúng: A\nĐiểm cần nhớ: Firehose có thể phân phối đồng thời tới OpenSearch cho tìm kiếm và tới S3 cho lưu trữ dài hạn giá rẻ.",
+      "tagNames": ["Monitoring and Logging > Log Aggregation (Kinesis Firehose / OpenSearch)"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create subscription filters that stream the log groups to Amazon Data Firehose, and configure Firehose to deliver to both OpenSearch Service and an S3 bucket with lifecycle rules to a low-cost storage class.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Stream the logs to OpenSearch Service only and retain the indices for seven years.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Use scheduled CloudWatch Logs export tasks to Amazon S3 and query the data with Amazon Athena when needed.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Set the retention of each CloudWatch log group to seven years and search the log groups with Logs Insights.", "isCorrect": false }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,177 @@
+{
+  "version": 1,
+  "usageScope": "EXAM",
+  "examPartId": "01a0962a-d4e1-7989-b254-e700428546de",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "A company has 60 project teams. Each team must be able to manage only the EC2 instances and EBS volumes that belong to its own project. The security team does not want to create and maintain 60 separate IAM policies, and new projects are onboarded every month. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần mô hình quyền không tăng theo số đội và tự phục vụ được cho đội mới.\n(A) ĐÚNG: Dùng kiểm soát truy cập dựa trên thuộc tính: gắn thẻ project cho cả principal lẫn tài nguyên, rồi viết một chính sách duy nhất dùng điều kiện so khớp thẻ của principal với thẻ của tài nguyên; thêm đội mới chỉ là gán thẻ chứ không phải viết chính sách mới.\n(B) SAI: Tạo một chính sách quản lý cho mỗi đội chính là điều đề bài muốn tránh và số lượng tăng theo thời gian.\n(C) SAI: Cấp quyền rộng rồi dựa vào quy ước đặt tên không được hệ thống thực thi.\n(D) SAI: Tách mỗi đội sang một tài khoản riêng là mô hình cô lập hợp lệ nhưng nặng nề hơn nhiều so với yêu cầu và không phải điều câu hỏi hướng tới.\nĐáp án đúng: A\nĐiểm cần nhớ: Kiểm soát truy cập theo thuộc tính so khớp thẻ principal với thẻ tài nguyên, giúp chính sách không tăng theo số đội.",
+      "tagNames": ["Security and Compliance > AWS IAM"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use attribute-based access control with a single policy that compares the principal project tag against the resource project tag.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create one managed policy per project team and attach it to that team's role.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Grant broad EC2 permissions and enforce a resource naming convention per project.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create a separate AWS account for each project team.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MCQ",
+      "questionText": "A third-party monitoring vendor requires read access to a company AWS account. The vendor serves many customers from the same AWS account. The security team must ensure the vendor cannot be tricked by another of its customers into accessing this company's resources. Which configuration addresses this risk?",
+      "explanation": "Phân tích đề: Đây là rủi ro bị lợi dụng làm trung gian khi nhà cung cấp phục vụ nhiều khách hàng.\n(A) ĐÚNG: Yêu cầu một external ID duy nhất trong chính sách tin cậy của vai trò; nhà cung cấp phải truyền đúng giá trị đó khi đảm nhận vai trò, nên một khách hàng khác của nhà cung cấp không thể khiến nhà cung cấp truy cập tài nguyên của công ty này.\n(B) SAI: Giới hạn theo dải địa chỉ của nhà cung cấp không phân biệt được nhà cung cấp đang hành động thay mặt khách hàng nào.\n(C) SAI: Cấp khóa truy cập dài hạn cho nhà cung cấp là mô hình kém an toàn hơn nhiều so với vai trò và không giải quyết rủi ro đã nêu.\n(D) SAI: Thu hẹp quyền của vai trò là việc nên làm nhưng không ngăn được kịch bản bị lợi dụng làm trung gian.\nĐáp án đúng: A\nĐiểm cần nhớ: External ID trong chính sách tin cậy là biện pháp chuẩn chống rủi ro bị lợi dụng làm trung gian với bên thứ ba.",
+      "tagNames": ["Security and Compliance > AWS IAM"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Require a unique external ID in the role trust policy that the vendor must supply when assuming the role.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Restrict the role trust policy to the vendor's published IP address ranges.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an IAM user for the vendor and provide long-lived access keys.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Limit the role to read-only actions on the required services.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "A developer reports that an action fails with an access denied error in a member account, even though the role's identity policy explicitly allows the action and there is no explicit deny in any policy attached to the role. What is the MOST likely cause?",
+      "explanation": "Phân tích đề: Quyền hiệu dụng là giao của nhiều lớp chính sách, không chỉ chính sách danh tính.\n(A) ĐÚNG: Một service control policy áp cho tài khoản hoặc cho đơn vị tổ chức cha đang không đưa hành động đó vào tập được phép, nên nó bị loại khỏi quyền hiệu dụng dù chính sách danh tính cho phép; SCP đặt trần quyền và không cấp quyền.\n(B) SAI: Thêm quyền vào chính sách danh tính không vượt qua được trần của tổ chức.\n(C) SAI: Cho rằng vai trò cần được tạo lại là hiểu sai cơ chế đánh giá chính sách.\n(D) SAI: Cho rằng thiếu permissions boundary gây từ chối là không đúng; boundary chỉ giới hạn khi được gắn, và việc không có boundary không làm hành động bị từ chối.\nĐáp án đúng: A\nĐiểm cần nhớ: Khi chính sách danh tính đã cho phép mà vẫn bị từ chối, hãy kiểm tra SCP ở tài khoản và các đơn vị tổ chức cha.",
+      "tagNames": ["Security and Compliance > AWS IAM"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "A service control policy applied to the account or a parent organizational unit does not permit the action.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "The identity policy needs additional permissions for the same action.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "The role must be deleted and recreated to refresh its permissions.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "The role is missing a permissions boundary, which causes all actions to be denied.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "A workload runs in us-east-1 and has a warm standby environment in eu-west-1. The application in both Regions reads a database credential from AWS Secrets Manager. During a disaster recovery rehearsal, the standby environment could not start because the secret did not exist in eu-west-1. Which solution prevents this?",
+      "explanation": "Phân tích đề: Bí mật là tài nguyên theo Region nên phải có mặt ở Region dự phòng.\n(A) ĐÚNG: Bật replication cho secret sang eu-west-1; Secrets Manager duy trì bản sao ở Region đó, việc xoay vòng ở bản gốc lan sang bản sao, và cần bảo đảm khóa mã hóa cùng quyền đọc phù hợp tồn tại ở Region dự phòng.\n(B) SAI: Cho ứng dụng ở Region dự phòng đọc bí mật từ Region chính tạo phụ thuộc vào chính Region đang gặp sự cố.\n(C) SAI: Tạo một bí mật riêng ở Region dự phòng và cập nhật thủ công dễ lệch giá trị sau mỗi lần xoay vòng.\n(D) SAI: Lưu bản sao bí mật trong tham số cấu hình của môi trường dự phòng làm lộ giá trị và mất khả năng xoay vòng tập trung.\nĐáp án đúng: A\nĐiểm cần nhớ: Nhân bản secret sang Region dự phòng kèm khóa và quyền phù hợp, rồi kiểm chứng trong diễn tập.",
+      "tagNames": ["Security and Compliance > AWS Secrets Manager & Parameter Store"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable Secrets Manager replication of the secret to eu-west-1 with an appropriate KMS key and read permissions in that Region.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Configure the standby application to read the secret from the us-east-1 endpoint.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create a separate secret in eu-west-1 and update it manually whenever the password changes.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Store a copy of the credential in the standby environment configuration files.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "During a large scale-out event, hundreds of application instances start at the same time and each reads twenty parameters from AWS Systems Manager Parameter Store during startup. Many instances fail to start because the requests are throttled. Which change resolves this with the LEAST application redesign?",
+      "explanation": "Phân tích đề: Số lời gọi tăng đột biến khi nhiều instance khởi động đồng thời.\n(A) ĐÚNG: Đọc các tham số theo lô thay vì gọi riêng lẻ từng tham số, lưu đệm giá trị trong tiến trình sau lần đọc đầu, và thêm cơ chế thử lại có thoái lui kèm yếu tố ngẫu nhiên; ba biện pháp này giảm mạnh số lời gọi và phân tán chúng theo thời gian.\n(B) SAI: Thử lại ngay lập tức không có thoái lui làm tình trạng bị điều tiết kéo dài hơn.\n(C) SAI: Chuyển toàn bộ tham số sang Secrets Manager làm tăng chi phí đáng kể cho dữ liệu không bí mật và vẫn có giới hạn tần suất riêng.\n(D) SAI: Giảm tốc độ mở rộng làm dịch vụ đáp ứng tải chậm hơn, đi ngược mục tiêu của việc mở rộng.\nĐáp án đúng: A\nĐiểm cần nhớ: Đọc theo lô, lưu đệm trong tiến trình và thử lại có thoái lui là cách giảm bị điều tiết khi khởi động hàng loạt.",
+      "tagNames": ["Security and Compliance > AWS Secrets Manager & Parameter Store"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Retrieve the parameters in a single batch call, cache them in process, and add retries with jittered exponential backoff.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Add an immediate retry loop around each parameter read.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Move all parameters into AWS Secrets Manager.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Reduce the Auto Scaling group scale-out rate so fewer instances start at once.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MCQ",
+      "questionText": "An organization must evaluate all accounts against a recognized security framework, report a single compliance score per account, and deploy the whole set of related rules as one unit that can be updated centrally. Which AWS Config capability should be used?",
+      "explanation": "Phân tích đề: Cần đóng gói nhiều quy tắc thành một đơn vị triển khai và báo cáo theo khung.\n(A) ĐÚNG: Dùng conformance pack, tập hợp nhiều Config rule và cấu hình khắc phục vào một mẫu duy nhất; gói có thể triển khai cho toàn tổ chức và cung cấp điểm tuân thủ theo gói cho từng tài khoản, đồng thời cập nhật tập trung bằng cách phát hành phiên bản mới của gói.\n(B) SAI: Tạo từng Config rule riêng lẻ vẫn đánh giá được nhưng không cho đơn vị triển khai và báo cáo theo nhóm.\n(C) SAI: Dùng aggregator gom kết quả từ nhiều tài khoản nhưng bản thân nó không định nghĩa tập quy tắc theo khung.\n(D) SAI: Bật recording cho mọi loại tài nguyên là điều kiện nền cho việc đánh giá chứ không phải cơ chế nhóm quy tắc.\nĐáp án đúng: A\nĐiểm cần nhớ: Conformance pack đóng gói nhiều quy tắc và hành động khắc phục thành một đơn vị triển khai và báo cáo.",
+      "tagNames": ["Security and Compliance > AWS Config"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Deploy a conformance pack containing the framework rules to the organization.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create each AWS Config rule individually in every account.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an AWS Config aggregator in the audit account.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable AWS Config recording for all supported resource types in every account.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MCQ",
+      "questionText": "A company requires that every EC2 instance must be launched from an AMI that appears on an internally maintained approved list, which changes as new images are released. No AWS managed Config rule expresses this requirement. Which solution meets it?",
+      "explanation": "Phân tích đề: Cần logic đánh giá tùy chỉnh dựa trên danh sách thay đổi theo thời gian.\n(A) ĐÚNG: Tạo custom Config rule với hàm đánh giá đọc danh sách AMI được duyệt từ một nguồn cập nhật được, ví dụ tham số trong Parameter Store, rồi so sánh AMI của từng instance; danh sách thay đổi mà không cần sửa mã của quy tắc.\n(B) SAI: Ghi cứng danh sách AMI trong mã của hàm đánh giá buộc phải phát hành lại quy tắc cho mỗi lần duyệt image mới.\n(C) SAI: Chấp nhận rằng yêu cầu không tự động hóa được là kết luận vội khi custom rule đã hỗ trợ đúng trường hợp này.\n(D) SAI: Rà soát thủ công danh sách instance hằng tháng phát hiện quá muộn và không mở rộng được.\nĐáp án đúng: A\nĐiểm cần nhớ: Custom Config rule nên đọc danh sách tham chiếu từ nguồn cập nhật được thay vì ghi cứng trong mã.",
+      "tagNames": ["Security and Compliance > AWS Config"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a custom AWS Config rule whose evaluation function reads the approved AMI list from an updatable source such as Parameter Store.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create a custom AWS Config rule with the approved AMI list hard-coded in the evaluation function.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Accept that this requirement cannot be automated and document it as a manual control.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Export the instance inventory monthly and review the AMI identifiers manually.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "A security team must ensure Amazon GuardDuty is enabled in all 120 accounts of an AWS Organization, that findings from every account are visible in one place, and that accounts created next year are protected without manual action. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần bao phủ toàn tổ chức, tập trung phát hiện và tự động cho tài khoản mới.\n(A) ĐÚNG: Chỉ định một tài khoản quản trị được ủy quyền cho GuardDuty ở mức tổ chức và bật tùy chọn tự động đưa tài khoản mới vào phạm vi; phát hiện từ mọi tài khoản hiển thị tập trung tại tài khoản quản trị, và tài khoản gia nhập sau được bật mà không cần thao tác.\n(B) SAI: Bật GuardDuty thủ công trong từng tài khoản không mở rộng được và bỏ sót tài khoản mới.\n(C) SAI: Chạy script hằng tuần để bật cho tài khoản mới để lại khoảng trống bao phủ giữa các lần chạy.\n(D) SAI: Chỉ bật ở tài khoản sản xuất bỏ qua các tài khoản khác vốn cũng có thể bị xâm nhập và dùng làm bàn đạp.\nĐáp án đúng: A\nĐiểm cần nhớ: Quản trị viên được ủy quyền kèm tùy chọn tự động bật cho tài khoản mới là cách phủ toàn tổ chức.",
+      "tagNames": ["Security and Compliance > Amazon GuardDuty & Amazon Inspector"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Designate a delegated administrator account for GuardDuty at the organization level and enable automatic enablement for new accounts.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable GuardDuty individually in each of the 120 accounts and invite them to a master account.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Run a weekly script that enables GuardDuty in any account where it is not yet active.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable GuardDuty only in the production accounts to control cost.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MSQ",
+      "questionText": "An approved internal penetration testing tool runs weekly from a fixed set of IP addresses and generates dozens of GuardDuty findings each time. The security team must stop these specific findings from reaching the on-call responder while keeping detection for genuinely malicious sources. Which TWO actions are appropriate? (Choose TWO.)",
+      "explanation": "Phân tích đề: Cần loại nhiễu đã biết mà không làm mù hệ thống phát hiện.\n(A) ĐÚNG: Thêm dải địa chỉ của công cụ vào danh sách địa chỉ tin cậy, để lưu lượng từ nguồn đó không sinh ra phát hiện dựa trên danh tiếng địa chỉ; cần rà soát danh sách định kỳ vì dải địa chỉ có thể thay đổi.\n(B) ĐÚNG: Tạo suppression rule có phạm vi hẹp, khớp đúng loại phát hiện và đúng địa chỉ nguồn của công cụ; phát hiện vẫn được ghi nhận nhưng không chuyển tới quy trình gọi người trực.\n(C) SAI: Tắt loại phát hiện đó hoàn toàn làm mất khả năng phát hiện khi một nguồn thật sự độc hại thực hiện cùng hành vi.\n(D) SAI: Tắt GuardDuty trong cửa sổ kiểm thử tạo vùng mù cho mọi hoạt động khác trong khoảng thời gian đó.\n(E) SAI: Bỏ qua thủ công từng phát hiện mỗi tuần là gánh nặng lặp lại và dễ bỏ sót cảnh báo thật lẫn trong đó.\nĐáp án đúng: A, B\nĐiểm cần nhớ: Dùng danh sách địa chỉ tin cậy và suppression rule phạm vi hẹp; đừng tắt cả loại phát hiện hay cả dịch vụ.",
+      "tagNames": ["Security and Compliance > Amazon GuardDuty & Amazon Inspector"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Add the scanner IP addresses to a GuardDuty trusted IP list and review the list periodically.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create a suppression rule scoped to the specific finding types and the scanner source addresses.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Disable those GuardDuty finding types for the account.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Suspend GuardDuty during the weekly testing window.", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Archive each generated finding manually after every test run.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MCQ",
+      "questionText": "A healthcare company is preparing to process protected health information on AWS. Legal counsel states that a specific agreement must be in place with AWS before the workload goes live, and the company has 30 member accounts that will handle this data. What should a DevOps engineer do?",
+      "explanation": "Phân tích đề: Cần hoàn tất nghĩa vụ hợp đồng trước khi đưa dữ liệu được quản lý vào môi trường.\n(A) ĐÚNG: Vào phần agreements của AWS Artifact từ tài khoản quản lý và chấp nhận thỏa thuận ở mức tổ chức bởi người có thẩm quyền ký kết; khi chấp nhận ở mức tổ chức, thỏa thuận áp cho các tài khoản thành viên thay vì phải chấp nhận riêng trong từng tài khoản.\n(B) SAI: Tải báo cáo tuân thủ từ AWS Artifact là bằng chứng về kiểm soát của nhà cung cấp chứ không phải việc chấp nhận thỏa thuận.\n(C) SAI: Bật mã hóa và ghi nhật ký là kiểm soát kỹ thuật cần thiết nhưng không thay thế được nghĩa vụ hợp đồng.\n(D) SAI: Mở phiếu hỗ trợ để yêu cầu ký bản giấy không phản ánh quy trình hiện tại, vốn được thực hiện trực tuyến.\nĐáp án đúng: A\nĐiểm cần nhớ: Thỏa thuận trong AWS Artifact được chấp nhận trực tuyến và có thể chấp nhận ở mức tổ chức cho các tài khoản thành viên.",
+      "tagNames": ["Security and Compliance > AWS Artifact"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use the agreements section of AWS Artifact in the management account to accept the agreement at the organization level with an authorized signatory.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Download the relevant compliance report from AWS Artifact and store it with the compliance records.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Enable encryption and logging on all resources that will hold the regulated data.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Open an AWS Support case to request a paper copy of the agreement for signature.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MCQ",
+      "questionText": "A company encrypts Amazon EBS snapshots with a customer managed KMS key in us-east-1 and copies them to eu-west-1 for disaster recovery. The team wants to avoid re-encrypting the data with a different key during the copy and wants the same key identity to be usable in both Regions. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần dùng cùng một chất liệu khóa ở hai Region.\n(A) ĐÚNG: Dùng multi-Region KMS key, gồm một khóa chính và một bản sao ở Region đích dùng chung chất liệu khóa và cùng key ID; dữ liệu mã hóa bằng khóa ở Region này giải mã được bằng bản sao ở Region kia mà không phải mã hóa lại.\n(B) SAI: Tạo một khóa độc lập ở Region đích buộc phải mã hóa lại trong quá trình sao chép và là hai danh tính khóa khác nhau.\n(C) SAI: Chuyển sang khóa do dịch vụ quản lý làm mất quyền kiểm soát chính sách khóa và không đáp ứng yêu cầu về cùng danh tính khóa.\n(D) SAI: Chia sẻ khóa của us-east-1 sang Region khác không phải cơ chế khả dụng, vì khóa thông thường bị ràng buộc theo Region.\nĐáp án đúng: A\nĐiểm cần nhớ: Multi-Region key có cùng key ID và chất liệu khóa ở nhiều Region, tránh phải mã hóa lại khi sao chép.",
+      "tagNames": ["Security and Compliance > AWS KMS & Encryption"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a multi-Region KMS key and a replica of it in eu-west-1, then use it for the snapshots in both Regions.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create an independent customer managed key in eu-west-1 and specify it during the snapshot copy.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Use the AWS managed key for Amazon EBS in both Regions.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Share the us-east-1 key with eu-west-1 through the key policy.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 12,
+      "questionType": "MCQ",
+      "questionText": "A company must prevent workloads from being created in any AWS Region other than us-east-1 and eu-west-1, across all member accounts. After applying a service control policy that denies all actions outside those Regions, engineers report that they can no longer manage IAM or create CloudFront distributions. What should a DevOps engineer do?",
+      "explanation": "Phân tích đề: Chính sách giới hạn Region đang chặn cả các dịch vụ toàn cầu.\n(A) ĐÚNG: Sửa SCP để loại trừ các dịch vụ toàn cầu khỏi điều kiện giới hạn Region, ví dụ bằng cách thêm điều kiện NotAction cho các tiền tố hành động của những dịch vụ này; các dịch vụ toàn cầu có endpoint gắn với một Region cụ thể nên bị chặn nhầm nếu điều kiện áp cho mọi hành động.\n(B) SAI: Gỡ bỏ SCP làm mất kiểm soát Region cho toàn bộ tổ chức.\n(C) SAI: Thêm us-east-1 vào danh sách Region được phép không giải quyết vấn đề vì Region này đã nằm trong danh sách.\n(D) SAI: Cấp quyền quản trị cho kỹ sư không vượt qua được trần do SCP đặt ra.\nĐáp án đúng: A\nĐiểm cần nhớ: Khi giới hạn Region bằng SCP, phải loại trừ các dịch vụ toàn cầu khỏi điều kiện để không chặn nhầm.",
+      "tagNames": ["Security and Compliance > AWS Organizations"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Modify the SCP so that global services such as IAM and CloudFront are excluded from the Region condition.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Detach the SCP and rely on a detective control that reports resources in unapproved Regions.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Add us-east-1 to the list of allowed Regions in the SCP condition.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Grant the engineers administrator permissions in the member accounts.", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 13,
+      "questionType": "MCQ",
+      "questionText": "A company uses AWS Control Tower Account Factory to create accounts. Every new account must automatically receive a standard VPC layout, a centralized logging configuration, and the company security agent, without any manual steps after the account is created. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần áp nền tảng riêng của công ty ngay sau khi tài khoản được cấp phát.\n(A) ĐÚNG: Dùng cơ chế tùy chỉnh được hỗ trợ của Control Tower, trong đó sự kiện hoàn tất cấp phát tài khoản kích hoạt việc triển khai các stack chứa mạng, cấu hình ghi nhật ký và phần mềm bảo mật; tài khoản sẵn sàng sử dụng mà không cần thao tác thủ công.\n(B) SAI: Cấu hình thủ công từng tài khoản sau khi bàn giao dễ bị bỏ sót và không nhất quán.\n(C) SAI: Sửa trực tiếp các tài nguyên do Control Tower quản lý gây lệch cấu hình và có thể bị ghi đè khi vùng hạ cánh được cập nhật.\n(D) SAI: Gửi tài liệu hướng dẫn cho đội sở hữu tài khoản là thỏa thuận chứ không phải tự động hóa.\nĐáp án đúng: A\nĐiểm cần nhớ: Mở rộng nền tảng của Control Tower bằng tùy chỉnh chạy tự động sau khi tài khoản được cấp phát.",
+      "tagNames": ["Security and Compliance > AWS Control Tower"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use a Control Tower customization pipeline triggered by the account provisioning event to deploy the baseline stacks into the new account.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Have the platform team apply the baseline manually after each account is handed over.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Modify the resources that Control Tower creates in each account to include the baseline.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Publish a baseline setup guide for the team that receives the account.", "isCorrect": false }
+      ]
+    }
+  ]
+}

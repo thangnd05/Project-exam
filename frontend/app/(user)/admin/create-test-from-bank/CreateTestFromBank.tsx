@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import CoinPriceField from '@/app/components/tests/CoinPriceField';
 import { useBaseMetaData } from '@/app/hooks/useBaseMetaData';
+import { durationMinutesFromExamType } from '@/app/hooks/useExamTypes';
 import { getQuestionDisplayNumber } from '@/app/utils/questionNumber';
 import EditQuestionModal from '@/app/components/tests/EditQuestionModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -91,7 +92,11 @@ const CreateTestFromBank = () => {
   };
 
   const handleExamTypeChange = (value: string) => {
-    setTestInfo((prev) => ({ ...prev, examTypeId: value }));
+    setTestInfo((prev) => ({
+      ...prev,
+      examTypeId: value,
+      durationMinutes: durationMinutesFromExamType(examTypes, value),
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {

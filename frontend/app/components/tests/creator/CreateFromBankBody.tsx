@@ -25,6 +25,7 @@ import {
   IoSchoolOutline,
 } from 'react-icons/io5';
 import { useBaseMetaData } from '@/app/hooks/useBaseMetaData';
+import { durationMinutesFromExamType } from '@/app/hooks/useExamTypes';
 import { useHasPermission } from '@/app/hooks/usePermission';
 import { brandColors } from '@/app/assets/styles/brandColors';
 import CoinPriceField from '@/app/components/tests/CoinPriceField';
@@ -184,7 +185,11 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
   };
 
   const handleExamTypeChange = (value: string) => {
-    setTestInfo((prev) => ({ ...prev, examTypeId: value }));
+    setTestInfo((prev) => ({
+      ...prev,
+      examTypeId: value,
+      durationMinutes: durationMinutesFromExamType(examTypes, value),
+    }));
   };
 
   const applyModeToAllParts = (modeValue: PartConfig['mode']) => {
