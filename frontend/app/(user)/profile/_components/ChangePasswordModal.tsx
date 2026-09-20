@@ -1,6 +1,7 @@
 'use client';
 
 import {useState} from 'react';
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useChangePassword } from '../_hooks/useChangePassword';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
@@ -17,6 +18,16 @@ type ChangePasswordModalProps = {
 
 function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
   const changePasswordMutation = useChangePassword();
+  const [visibleFields, setVisibleFields] = useState({
+    oldPassword: false,
+    newPassword: false,
+    confirmNewPassword: false,
+  });
+
+  const toggleVisibility = (fieldName: keyof typeof visibleFields) => {
+    setVisibleFields((prev) => ({...prev, [fieldName]: !prev[fieldName]}));
+  };
+
   const submitting = changePasswordMutation.isPending;
   const [formValues, setFormValues] = useState({
     oldPassword: '',
@@ -56,8 +67,8 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
       return;
     }
 
-    if (newPassword.length < 6) {
-      toast.warning('Mật khẩu mới phải có ít nhất 6 ký tự.');
+    if (newPassword.length < 8) {
+      toast.warning('Mật khẩu mới phải có ít nhất 8 ký tự.');
       return;
     }
 
@@ -110,48 +121,78 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
         <label className={cmx('label')} htmlFor="oldPasswordInput">
           Mật khẩu cũ
         </label>
-        <input
-          id="oldPasswordInput"
-          className={cmx('inputControl')}
-          type="password"
-          value={formValues.oldPassword}
-          onChange={(event) => updateField('oldPassword', event.target.value)}
-          disabled={submitting}
-          autoFocus
-          placeholder="Nhập mật khẩu hiện tại"
-        />
+        <div className={cmx('passwordField')}>
+          <input
+            id="oldPasswordInput"
+            className={cmx('inputControl')}
+            type={visibleFields.oldPassword ? 'text' : 'password'}
+            value={formValues.oldPassword}
+            onChange={(event) => updateField('oldPassword', event.target.value)}
+            disabled={submitting}
+            autoFocus
+            placeholder="Nhập mật khẩu hiện tại"
+          />
+          <button
+            type="button"
+            className={cmx('passwordToggle')}
+            onClick={() => toggleVisibility('oldPassword')}
+            aria-label={visibleFields.oldPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+          >
+            {visibleFields.oldPassword ? <FiEyeOff /> : <FiEye />}
+          </button>
+        </div>
       </div>
 
       <div className={cmx('formGroup')}>
         <label className={cmx('label')} htmlFor="newPasswordInput">
           Mật khẩu mới
         </label>
-        <input
-          id="newPasswordInput"
-          className={cmx('inputControl')}
-          type="password"
-          value={formValues.newPassword}
-          onChange={(event) => updateField('newPassword', event.target.value)}
-          disabled={submitting}
-          placeholder="Tối thiểu 6 ký tự"
-        />
+        <div className={cmx('passwordField')}>
+          <input
+            id="newPasswordInput"
+            className={cmx('inputControl')}
+            type={visibleFields.newPassword ? 'text' : 'password'}
+            value={formValues.newPassword}
+            onChange={(event) => updateField('newPassword', event.target.value)}
+            disabled={submitting}
+            placeholder="Tối thiểu 8 ký tự"
+          />
+          <button
+            type="button"
+            className={cmx('passwordToggle')}
+            onClick={() => toggleVisibility('newPassword')}
+            aria-label={visibleFields.newPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+          >
+            {visibleFields.newPassword ? <FiEyeOff /> : <FiEye />}
+          </button>
+        </div>
       </div>
 
       <div className={cmx('formGroup')}>
         <label className={cmx('label')} htmlFor="confirmNewPasswordInput">
           Xác nhận mật khẩu mới
         </label>
-        <input
-          id="confirmNewPasswordInput"
-          className={cmx('inputControl')}
-          type="password"
-          value={formValues.confirmNewPassword}
-          onChange={(event) =>
-            updateField('confirmNewPassword', event.target.value)
-          }
-          disabled={submitting}
-          placeholder="Nhập lại mật khẩu mới"
-        />
+        <div className={cmx('passwordField')}>
+          <input
+            id="confirmNewPasswordInput"
+            className={cmx('inputControl')}
+            type={visibleFields.confirmNewPassword ? 'text' : 'password'}
+            value={formValues.confirmNewPassword}
+            onChange={(event) =>
+              updateField('confirmNewPassword', event.target.value)
+            }
+            disabled={submitting}
+            placeholder="Nhập lại mật khẩu mới"
+          />
+          <button
+            type="button"
+            className={cmx('passwordToggle')}
+            onClick={() => toggleVisibility('confirmNewPassword')}
+            aria-label={visibleFields.confirmNewPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+          >
+            {visibleFields.confirmNewPassword ? <FiEyeOff /> : <FiEye />}
+          </button>
+        </div>
       </div>
     </CommonFormModal>
   );

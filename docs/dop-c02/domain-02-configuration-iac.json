@@ -1,0 +1,341 @@
+{
+  "version": 1,
+  "usageScope": "PRACTICE",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "A platform team must deploy an identical baseline VPC with flow logs and standard route tables into 40 accounts spread over two Regions, and must be able to push a change to all of them within one operation. New accounts are created roughly twice a month and must receive the baseline without anyone remembering to act. The team does not want to create IAM roles manually in each account. Which approach is MOST operationally efficient?",
+      "explanation": "Phân tích đề: 40 account, hai Region, cập nhật một lần cho tất cả, account mới tự nhận baseline, và không muốn tạo role thủ công ở từng account.\n(A) SAI: Chạy một pipeline lần lượt assume role vào từng account là tự viết lại chức năng của StackSets, phải tự xử lý song song, lỗi cục bộ và danh sách account mới.\n(B) ĐÚNG: CloudFormation StackSets với service-managed permissions nhắm tới OU: AWS tự tạo role thực thi cần thiết, và bật automatic deployment thì account mới thêm vào OU sẽ nhận stack instance mà không cần thao tác. Một lần update StackSet là lan ra toàn bộ account và Region.\n(C) SAI: Chia sẻ template qua S3 và để từng team tự deploy không đảm bảo tính nhất quán và không có cách buộc cập nhật.\n(D) SAI: Terraform với một workspace cho mỗi account là khả thi về kỹ thuật nhưng đề nhấn mạnh tính tự động cho account mới và không muốn tạo role thủ công; phương án này vẫn đòi hỏi bootstrap từng account.\nĐáp án đúng: B\nĐiểm cần nhớ: StackSets service-managed + automatic deployment theo OU là câu trả lời mặc định cho triển khai baseline đa account. Self-managed chỉ dùng khi chưa bật AWS Organizations hoặc cần triển khai ra account ngoài tổ chức.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Build a pipeline that assumes a deployment role in each account in turn and runs CreateStack or UpdateStack", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Use CloudFormation StackSets with service-managed permissions targeting the OU, with automatic deployment enabled so new accounts receive the baseline", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Publish the template to a shared S3 bucket and ask each account owner to deploy and update it", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Manage the baseline with Terraform using one workspace per account and Region", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MSQ",
+      "questionText": "A stack contains an Amazon RDS instance holding production data together with the application tier. A required change to a database property triggers replacement, and a previous attempt already caused an outage scare when a change set showed Replacement true. The team must be able to keep evolving the application tier quickly while making it structurally impossible for a template change to destroy or replace the database. Which TWO actions should the DevOps engineer take?",
+      "explanation": "Phân tích đề: Hai mục tiêu: tiếp tục thay đổi tầng ứng dụng nhanh, và không thể nào replace hay xóa database bằng một thay đổi template.\n(A) ĐÚNG: Tách RDS sang một stack riêng có vòng đời thay đổi rất chậm, rồi truyền endpoint/identifier sang stack ứng dụng qua Export/ImportValue hoặc SSM Parameter Store. Nhờ vậy các lần update thường xuyên của ứng dụng không bao giờ chạm tới resource database.\n(B) ĐÚNG: Áp stack policy deny Update:Replace và Update:Delete trên logical ID của RDS, kèm DeletionPolicy Retain và UpdateReplacePolicy Retain. Đây là lớp chặn ở mức dịch vụ ngay cả khi ai đó vô tình sửa thuộc tính gây replacement.\n(C) SAI: Dựa vào việc đọc kỹ change set trước khi execute là kiểm soát bằng quy trình con người, đúng thứ đã suýt gây sự cố.\n(D) SAI: Bật deletion protection trên RDS ngăn DeleteDBInstance nhưng không ngăn CloudFormation thực hiện thay thế theo kiểu tạo mới rồi chuyển đổi, và cũng không ngăn được mọi kịch bản update.\n(E) SAI: Tắt rollback tự động để update không bị hoàn tác làm tình hình tệ hơn: stack có thể dừng ở trạng thái nửa vời.\n(F) SAI: Snapshot thủ công trước mỗi lần update là biện pháp khôi phục, không phải biện pháp ngăn chặn, và vẫn kéo theo downtime cùng thay đổi endpoint.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Tách stack theo tốc độ thay đổi (stateful chậm, stateless nhanh) là nguyên tắc thiết kế; DeletionPolicy, UpdateReplacePolicy và stack policy là ba cơ chế bảo vệ resource ở các thời điểm khác nhau.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Move the RDS instance into its own stack and pass its endpoint to the application stack through exports or SSM Parameter Store", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Apply a stack policy that denies Update:Replace and Update:Delete on the database resource and set Retain policies on it", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Require engineers to review every change set for Replacement true before executing it", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable deletion protection on the RDS instance and keep everything in one stack", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Disable automatic rollback so a failed update does not revert the database resource", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Take a manual snapshot before every stack update and restore it if a replacement occurs", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "An operations team must patch EC2 fleets in several accounts on a fixed weekly window, prove to auditors which instances are compliant with the patch baseline, and additionally run a one-time shell command against only those instances that are missing a specific tag. They do not want to install any third-party agent or open inbound SSH. Which combination of AWS Systems Manager capabilities should be used?",
+      "explanation": "Phân tích đề: Ba nhu cầu khác nhau: vá theo cửa sổ thời gian, báo cáo tuân thủ, và chạy lệnh một lần trên tập instance chọn theo tag.\n(A) ĐÚNG: Patch Manager với patch baseline và patch group thực hiện việc vá, chạy bên trong Maintenance Window để tôn trọng khung giờ; Compliance của Systems Manager cung cấp báo cáo tuân thủ theo instance; Run Command nhắm mục tiêu bằng tag để thực hiện lệnh một lần. Không cần agent bên thứ ba, không cần inbound SSH.\n(B) SAI: State Manager duy trì trạng thái mong muốn liên tục, không phải công cụ tự nhiên cho một lệnh chạy một lần, và bản thân nó không cung cấp khung cửa sổ thời gian như Maintenance Window.\n(C) SAI: Dùng EC2 user data để vá chỉ chạy lúc khởi động instance, không có báo cáo tuân thủ và không nhắm được instance đang chạy.\n(D) SAI: Automation runbook có thể điều phối nhưng đề đang mô tả đúng ba chức năng chuyên biệt; ghép Automation cho mọi thứ làm phức tạp hóa và vẫn cần Patch Manager cho compliance.\nĐáp án đúng: A\nĐiểm cần nhớ: Ghi nhớ bản đồ chức năng của SSM: Patch Manager (vá theo baseline), Maintenance Window (khung thời gian và rate control), Run Command (một lần), State Manager (liên tục), Automation (runbook nhiều bước), Compliance và Inventory (báo cáo).",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Systems Manager"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Patch Manager running inside a maintenance window, Systems Manager compliance reporting, and Run Command targeted by tags", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "State Manager associations for patching and for the one-time command, with Inventory for reporting", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "EC2 user data scripts that patch at boot, with CloudWatch Logs used as the compliance evidence", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A single Automation runbook that patches, reports, and runs the command on every instance in the account", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "An EC2 instance in a private subnet with no public IP and no NAT gateway does not appear as a managed node. Session Manager and Run Command both report that the SSM Agent is not online. Interface VPC endpoints for ssm, ssmmessages, and ec2messages already exist in the same subnets, private DNS is enabled, and the agent is installed and running according to the local service status. What is the MOST likely remaining requirement?",
+      "explanation": "Phân tích đề: Endpoint đã có, DNS riêng đã bật, agent đang chạy. Vậy thứ còn thiếu nằm ở quyền hoặc đường vào endpoint.\n(A) ĐÚNG: Instance phải có instance profile với quyền của AmazonSSMManagedInstanceCore để agent đăng ký với dịch vụ; đồng thời security group của các interface endpoint phải cho phép HTTPS 443 từ security group của instance. Thiếu một trong hai thì agent vẫn chạy cục bộ nhưng không bao giờ online.\n(B) SAI: Public IP hoặc NAT không bắt buộc khi đã có đủ interface endpoint; đề cũng nêu rõ ràng buộc mạng riêng.\n(C) SAI: Advanced instance tier chỉ liên quan tới số lượng máy on-premises vượt hạn mức, không phải điều kiện để EC2 trở thành managed node.\n(D) SAI: Session Manager không dùng SSH nên mở port 22 inbound không giải quyết gì và làm giảm mức bảo mật.\nĐáp án đúng: A\nĐiểm cần nhớ: Ba điều kiện để node được quản lý: agent chạy, quyền IAM qua instance profile, và đường mạng tới ba endpoint ssm, ssmmessages, ec2messages (kèm security group cho phép 443). Kiểm tra theo đúng thứ tự này khi debug.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Systems Manager"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An instance profile granting the Systems Manager core permissions, and endpoint security groups that allow HTTPS from the instance", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A public IP address or NAT gateway so the agent can reach the public Systems Manager endpoints", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Registration of the instance in the advanced instance tier", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "An inbound security group rule allowing TCP 22 from the Systems Manager service", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "A company wants a repeatable monthly process that bakes OS patches, CIS hardening, and the current application runtime into an AMI, and then makes Auto Scaling groups adopt the new image with a controlled rollout rather than an abrupt replacement. Engineers must not edit AMI IDs by hand anywhere. Which design matches AWS best practice?",
+      "explanation": "Phân tích đề: Cần pipeline tạo AMI định kỳ, và cách đưa AMI mới vào ASG có kiểm soát, không sửa AMI ID thủ công.\n(A) SAI: Chạy script vá trên instance đang chạy là configuration drift kéo dài, không tạo ra image bất biến và không phục vụ mục tiêu golden AMI.\n(B) ĐÚNG: EC2 Image Builder (hoặc Packer chạy trong CodeBuild) tạo AMI có phiên bản; AMI ID mới được ghi vào SSM Parameter Store; launch template tham chiếu parameter đó nên sinh version mới tự động; cuối cùng khởi động instance refresh với minimum healthy percentage để thay thế dần.\n(C) SAI: Cập nhật thủ công launch template sau mỗi lần build vi phạm ràng buộc không sửa AMI ID bằng tay và dễ sai sót.\n(D) SAI: Đặt desired capacity về 0 rồi tăng lại là cách thay thế thô bạo, gây gián đoạn dịch vụ hoàn toàn.\nĐáp án đúng: B\nĐiểm cần nhớ: Chuỗi chuẩn của AMI pipeline: build AMI có phiên bản → ghi AMI ID vào SSM Parameter → launch template resolve parameter → instance refresh để triển khai dần. Không bao giờ dán AMI ID cứng vào cấu hình.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AMI Pipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Run a monthly Systems Manager document that patches and hardens the running instances in place", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Produce versioned AMIs with EC2 Image Builder, publish the AMI ID to an SSM parameter referenced by the launch template, and roll it out with an instance refresh", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Produce AMIs with Image Builder and have an engineer update the AMI ID in each launch template after every build", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Produce AMIs with Image Builder and set the Auto Scaling group desired capacity to zero and back to force new launches", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MSQ",
+      "questionText": "Before an Auto Scaling group is allowed to use a newly baked AMI, the security and operations teams require proof that the image boots, passes a CIS benchmark check, and serves the application health endpoint. A failed image must never become available to production accounts. Which TWO elements belong in the pipeline?",
+      "explanation": "Phân tích đề: Cần bước kiểm thử thực sự chạy image, và cơ chế đảm bảo image lỗi không tới được production.\n(A) ĐÚNG: Test component của Image Builder (hoặc một stage kiểm thử riêng) khởi chạy instance từ image vừa tạo, chạy CIS check và gọi health endpoint; kết quả quyết định image có đạt trạng thái khả dụng hay không.\n(B) ĐÚNG: Distribution configuration chỉ chia sẻ và sao chép image sang Region cùng account production sau khi bước test thành công; image lỗi không bao giờ được phân phối.\n(C) SAI: Quét lỗ hổng sau khi đã chia sẻ cho production tạo cửa sổ mà production có thể dùng image chưa kiểm chứng.\n(D) SAI: Kiểm tra thủ công bằng cách khởi chạy một instance rồi xem xét là quy trình con người, không lặp lại được và không gắn vào pipeline.\n(E) SAI: Đặt tag Approved bằng tay rồi lọc theo tag khi launch phụ thuộc vào kỷ luật của người vận hành và có thể bị bỏ qua.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Trong Image Builder, thứ tự là build component rồi test component; chỉ khi test đạt thì image mới AVAILABLE và mới được distribution configuration phân phối. Đây là gate tự nhiên để chặn image lỗi.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AMI Pipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Test components that launch the image and assert the CIS rules and the application health endpoint", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A distribution configuration that copies and shares the image to the production accounts only after the tests pass", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "A vulnerability scan that runs after the image has been shared with production accounts", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A manual verification step where an engineer launches the AMI and inspects the instance", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "A tagging convention where operators add an Approved tag and launch templates filter on it", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MCQ",
+      "questionText": "A legacy PHP web application is deployed today with AWS OpsWorks Stacks and Chef 11 recipes. The team spends most of its time maintaining the Chef infrastructure rather than the application, and wants a managed platform that still provides rolling deployments, environment level configuration, load balancing, and health reporting with minimal application rewriting. Which migration target is the MOST direct fit?",
+      "explanation": "Phân tích đề: Ứng dụng web truyền thống, muốn nền tảng quản lý sẵn với rolling deployment, cấu hình theo môi trường, load balancing và báo cáo sức khỏe, ít phải viết lại.\n(A) ĐÚNG: AWS Elastic Beanstalk cung cấp đúng các năng lực đó cho ứng dụng web chuẩn, hỗ trợ rolling, rolling with additional batch, immutable và blue/green, cùng enhanced health reporting; ứng dụng PHP thường chạy gần như nguyên trạng.\n(B) SAI: Chuyển sang EKS đem lại nhiều khả năng hơn nhưng đòi hỏi containerize, học Kubernetes và vận hành cluster — trái mục tiêu giảm gánh nặng hạ tầng.\n(C) SAI: Chuyển sang Lambda cần viết lại đáng kể theo mô hình sự kiện, không phải đường đi trực tiếp cho ứng dụng web truyền thống.\n(D) SAI: Tự dựng EC2 với ASG và CodeDeploy là hoàn toàn khả thi nhưng team phải tự lắp ghép các mảnh mà Beanstalk đã cung cấp sẵn.\nĐáp án đúng: A\nĐiểm cần nhớ: Beanstalk là nền tảng PaaS cho ứng dụng web: môi trường, cấu hình, deployment policy và health reporting đều có sẵn. Khi đề nhấn mạnh giảm công vận hành và không muốn viết lại ứng dụng thì đây thường là đáp án.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS OpsWorks / Elastic Beanstalk"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Migrate the application to AWS Elastic Beanstalk and use its managed deployment policies", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Containerize the application and run it on Amazon EKS with a GitOps controller", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Rewrite the application as AWS Lambda functions behind Amazon API Gateway", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Run the application on EC2 in an Auto Scaling group and build the deployment tooling with CodeDeploy", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "An Elastic Beanstalk web environment serves a steady 1,200 requests per second. A new release process must not reduce serving capacity at any moment, must allow the team to validate the new version on its own URL before customers reach it, and must allow reverting to the previous version in under one minute. The company accepts running double capacity during the release. Which deployment approach fits?",
+      "explanation": "Phân tích đề: Không giảm capacity, validate trên URL riêng trước khi khách hàng vào, revert dưới một phút, chấp nhận gấp đôi capacity.\n(A) SAI: Rolling lấy bớt instance ra khỏi vòng phục vụ để cập nhật nên capacity giảm trong quá trình deploy.\n(B) ĐÚNG: Tạo một environment mới song song (clone), deploy version mới vào đó, kiểm thử bằng chính URL của environment đó, rồi swap CNAME để chuyển khách hàng sang. Revert là swap ngược lại, chỉ mất thời gian lan truyền DNS ngắn.\n(C) SAI: Immutable deployment giữ capacity và an toàn, nhưng không cung cấp một URL riêng để validate trước, và rollback là loại bỏ nhóm instance mới chứ không nhanh bằng swap.\n(D) SAI: All at once gây gián đoạn và không thỏa mãn bất kỳ ràng buộc nào ở đây.\nĐáp án đúng: B\nĐiểm cần nhớ: Chỉ có blue/green bằng swap CNAME mới cho cả ba thứ: không giảm capacity, kiểm thử trên URL riêng, và revert gần như tức thì. Đổi lại là chi phí gấp đôi trong thời gian chuyển đổi.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS OpsWorks / Elastic Beanstalk"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Rolling deployment with a batch size of 25 percent", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Deploy to a cloned environment, validate it on its own environment URL, then swap the environment CNAMEs", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Immutable deployment with enhanced health reporting", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "All at once deployment during a low traffic window", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MCQ",
+      "questionText": "A platform team runs Terraform from a CI system to provision account baselines. After an incident in which two concurrent runs corrupted the state file and nobody could determine who had applied the change, the team must redesign the backend so that concurrent applies are impossible, previous state versions can be recovered, the state is encrypted, and every state access is attributable. Which backend design meets all four requirements?",
+      "explanation": "Phân tích đề: Bốn yêu cầu: chặn apply đồng thời, khôi phục state cũ, mã hóa, và truy vết được ai truy cập state.\n(A) ĐÚNG: Backend S3 với state locking để chỉ một apply được ghi tại một thời điểm, versioning trên bucket để khôi phục bản trước, mã hóa bằng KMS, và bật CloudTrail data events cho bucket để biết ai đọc/ghi state.\n(B) SAI: Lưu state trong Git cho lịch sử nhưng không có khóa nguyên tử, và state chứa dữ liệu nhạy cảm không nên nằm trong repository.\n(C) SAI: Chỉ dùng quy ước lịch chạy để tránh trùng là kiểm soát bằng con người, đúng thứ đã thất bại.\n(D) SAI: Lưu state trên EFS chia sẻ giữa các runner không cung cấp cơ chế khóa của Terraform, cũng không có versioning theo object như S3.\nĐáp án đúng: A\nĐiểm cần nhớ: Bộ tứ cho state của Terraform trên AWS: S3 backend, state locking, bucket versioning, mã hóa KMS; thêm CloudTrail data events nếu cần truy vết truy cập.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > Terraform / Ansible"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An S3 backend with state locking, bucket versioning, KMS encryption, and CloudTrail data events on the bucket", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Commit the state file to the Git repository after every apply and rely on pull request history", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Keep the current S3 backend and schedule the pipelines so two applies never overlap", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Store the state on a shared Amazon EFS file system mounted by all CI runners", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MSQ",
+      "questionText": "Ansible configures EC2 instances that Terraform creates. All instances are in private subnets, Systems Manager is already fully working, and the security team wants the bastion host and its SSH key pair decommissioned. Instances are created and destroyed frequently, so a static inventory file quickly becomes wrong. Which TWO changes let the team keep their playbooks while removing the bastion?",
+      "explanation": "Phân tích đề: Giữ playbook hiện có, bỏ bastion và khóa SSH, và inventory phải tự cập nhật theo fleet luôn thay đổi.\n(A) ĐÚNG: Dùng connection plugin aws_ssm (hoặc chạy playbook qua document AWS-ApplyAnsiblePlaybooks) để Systems Manager làm kênh truyền lệnh. Xác thực bằng IAM, không cần inbound SSH và không cần bastion.\n(B) ĐÚNG: Dùng dynamic inventory plugin aws_ec2 để Ansible tự khám phá instance theo tag tại thời điểm chạy, thay cho file inventory tĩnh luôn lạc hậu.\n(C) SAI: Đặt bastion trong private subnet và truy cập qua VPN vẫn giữ nguyên mô hình SSH và khóa đặc quyền mà đề muốn loại bỏ.\n(D) SAI: Phát khóa SSH riêng cho từng instance làm tăng số lượng credential phải quản lý, ngược hướng yêu cầu.\n(E) SAI: Chuyển toàn bộ cấu hình vào user data làm mất khả năng áp dụng lại và hội tụ trạng thái mà Ansible cung cấp, đồng thời phải viết lại toàn bộ playbook.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Ansible trên AWS không cần SSH: dùng kênh SSM cho kết nối và aws_ec2 dynamic inventory cho danh sách máy. Hai thay đổi này giữ nguyên playbook nhưng loại bỏ bastion.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > Terraform / Ansible"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use the Systems Manager based connection channel so playbooks reach the instances without inbound SSH", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Use the aws_ec2 dynamic inventory plugin so hosts are discovered by tag at run time", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Move the bastion host into a private subnet reachable only over the corporate VPN", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Generate a unique SSH key pair per instance at launch and distribute it to the control node", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Move all configuration logic into EC2 user data so Ansible is no longer needed", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MCQ",
+      "questionText": "A CloudFormation stack is stuck in UPDATE_ROLLBACK_FAILED because a resource could not be restored to its previous state during rollback. The stack also contains an Amazon RDS instance and an Auto Scaling group that are currently healthy and serving traffic. The team needs the stack back in a state where new updates are possible, with no impact on the healthy resources. What should the DevOps engineer do?",
+      "explanation": "Phân tích đề: Stack kẹt ở UPDATE_ROLLBACK_FAILED, các resource khác đang khỏe mạnh và phục vụ traffic, cần trở lại trạng thái update được mà không ảnh hưởng chúng.\n(A) ĐÚNG: Gọi ContinueUpdateRollback và liệt kê logical ID của resource hỏng trong ResourcesToSkip. CloudFormation hoàn tất rollback và chuyển sang UPDATE_ROLLBACK_COMPLETE, các resource khác không bị đụng tới. Sau đó phải đồng bộ lại resource đã skip vì nó sẽ drift so với template.\n(B) SAI: Xóa stack rồi tạo lại ảnh hưởng toàn bộ resource, gồm cả RDS đang chạy production.\n(C) SAI: Sửa template rồi chạy update mới không được chấp nhận khi stack đang ở trạng thái UPDATE_ROLLBACK_FAILED; phải thoát khỏi trạng thái đó trước.\n(D) SAI: Import resource dùng để đưa resource có sẵn vào quản lý của stack, không phải cơ chế gỡ trạng thái rollback thất bại.\nĐáp án đúng: A\nĐiểm cần nhớ: UPDATE_ROLLBACK_FAILED chỉ có một lối ra chính: ContinueUpdateRollback, có thể kèm ResourcesToSkip. Luôn nhớ bước hậu kiểm là đồng bộ lại resource bị skip để loại bỏ drift.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Call ContinueUpdateRollback listing the failed resource in ResourcesToSkip, then reconcile that resource with the template", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Delete the stack and recreate it from the last known good template", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Fix the template and submit a new stack update to overwrite the failed state", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Use resource import to bring the broken resource back under stack management", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 12,
+      "questionType": "MCQ",
+      "questionText": "A networking stack creates a VPC that dozens of application stacks in the same account and Region must reference. The platform team also needs to be able to change the VPC stack occasionally, for example to add subnets, without a change being blocked by unrelated consumers. Which mechanism should be used to share the VPC ID, and what limitation must the team plan for?",
+      "explanation": "Phân tích đề: Chia sẻ VPC ID trong cùng account và Region cho nhiều stack tiêu thụ, đồng thời muốn vẫn sửa được stack mạng.\n(A) ĐÚNG: Export giá trị từ stack mạng và dùng Fn::ImportValue ở các stack tiêu thụ là cơ chế đúng trong cùng account và Region. Hạn chế phải lường trước: một giá trị đang được import thì không thể xóa hoặc đổi tên export, nên các thay đổi khác vẫn thực hiện được nhưng phải tránh thay đổi chính export đó.\n(B) SAI: Truyền VPC ID bằng parameter thủ công cho từng stack tạo gánh nặng cập nhật và dễ sai lệch khi có thay đổi.\n(C) SAI: Custom resource gọi Lambda để tra cứu VPC là phức tạp không cần thiết khi đã có export/import hoặc SSM Parameter.\n(D) SAI: Gán cứng VPC ID vào từng template phá vỡ khả năng tái sử dụng template giữa các môi trường.\nĐáp án đúng: A\nĐiểm cần nhớ: Export/ImportValue chỉ hoạt động trong cùng account và Region, và export đang được dùng thì bị khóa. Khi cần linh hoạt hơn, nhiều nhóm dùng SSM Parameter Store làm nơi công bố giá trị chung vì không tạo ràng buộc cứng như export.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Export the VPC ID from the networking stack and consume it with Fn::ImportValue, accepting that an export in use cannot be changed or removed", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Pass the VPC ID as a parameter that operators enter when creating each application stack", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create a custom resource in each application stack that calls a Lambda function to look up the VPC", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Hardcode the VPC ID in each application template and update them when the VPC changes", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 13,
+      "questionType": "MSQ",
+      "questionText": "A DevOps engineer must configure service-managed CloudFormation StackSets so that a security baseline reaches every account under a given organizational unit, including accounts that are created weeks later, without anyone provisioning administration or execution roles in the member accounts. Which TWO prerequisites or settings are required?",
+      "explanation": "Phân tích đề: Service-managed StackSets nhắm OU, phủ cả account tương lai, và không tạo role thủ công.\n(A) ĐÚNG: Phải bật trusted access giữa CloudFormation StackSets và AWS Organizations từ management account; đây là điều kiện tiên quyết để chế độ service-managed hoạt động và để AWS tự lo phần role.\n(B) ĐÚNG: Bật automatic deployment cho StackSet với target là OU, nhờ đó account mới thêm vào OU tự nhận stack instance, và account bị chuyển ra ngoài sẽ được xử lý theo cấu hình retain hoặc xóa.\n(C) SAI: Tạo AWSCloudFormationStackSetExecutionRole trong từng account là yêu cầu của chế độ self-managed, đúng thứ đề bài muốn tránh.\n(D) SAI: Bật CloudTrail ở mọi account là thực hành tốt nhưng không phải điều kiện của StackSets.\n(E) SAI: Chia sẻ template qua bucket public không liên quan và còn tạo rủi ro bảo mật.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Service-managed StackSets = trusted access với Organizations + target theo OU + automatic deployment. Self-managed = tự tạo administration role ở account quản trị và execution role ở từng account đích.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable trusted access between CloudFormation StackSets and AWS Organizations", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable automatic deployment on the StackSet with the OU as the deployment target", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Create the StackSet execution role in every member account before deploying", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable AWS CloudTrail in every member account so StackSets can record its operations", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Host the template in a publicly readable S3 bucket so member accounts can retrieve it", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 14,
+      "questionType": "MCQ",
+      "questionText": "An operations team must ensure that hundreds of EC2 instances continuously match a desired configuration defined in existing Systems Manager documents: specific agents installed, a configuration file present with exact content, and a service running. Instances launched later must converge automatically, manual changes must be corrected without human action, and no inbound SSH may be opened. Which capability should be scheduled?",
+      "explanation": "Phân tích đề: Trạng thái mong muốn duy trì liên tục, tự áp dụng cho instance mới, tự sửa khi bị thay đổi, không mở SSH.\n(A) SAI: Run Command thực thi một lần; instance mới và những thay đổi sau đó sẽ không được xử lý.\n(B) ĐÚNG: State Manager association nhắm theo tag, chạy theo rate hoặc cron (có thể đặt trong maintenance window). Instance mới khớp tag tự nhận association, và mỗi lần chạy sẽ đưa cấu hình về trạng thái mong muốn.\n(C) SAI: Automation runbook phù hợp cho quy trình vận hành nhiều bước, không phải cơ chế hội tụ trạng thái định kỳ trên fleet.\n(D) SAI: Inventory chỉ thu thập thông tin để báo cáo, hoàn toàn không thay đổi cấu hình.\nĐáp án đúng: B\nĐiểm cần nhớ: Từ khóa liên tục, tự hội tụ, instance tương lai luôn dẫn tới State Manager. Từ khóa một lần, ngay bây giờ dẫn tới Run Command. Từ khóa quy trình nhiều bước có điều kiện dẫn tới Automation.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Systems Manager"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Run Command executed against all instances after each configuration change", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "State Manager associations targeting instance tags on a recurring schedule", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "An Automation runbook started by an EventBridge rule on instance launch", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Systems Manager Inventory collecting the configuration state every hour", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 15,
+      "questionType": "MSQ",
+      "questionText": "A factory runs on-premises Linux servers with the SSM Agent installed, but none of them appear as managed nodes. The site has outbound HTTPS to AWS only, with no VPN and no Direct Connect, and the servers cannot be given AWS credentials on disk by policy. Which TWO steps are required to bring them under Systems Manager management?",
+      "explanation": "Phân tích đề: Máy chủ on-premises, chỉ có outbound HTTPS, không được đặt credential tĩnh trên máy.\n(A) ĐÚNG: Tạo hybrid activation trong Systems Manager và đăng ký máy chủ bằng activation code và activation ID; máy nhận credential tạm thời do dịch vụ cấp, không cần lưu access key trên đĩa.\n(B) ĐÚNG: Mở outbound HTTPS tới các endpoint của Systems Manager (ssm, ssmmessages, ec2messages) để agent check in; đây là điều kiện mạng tối thiểu.\n(C) SAI: Tạo IAM user và đặt access key trên từng máy vi phạm chính sách và là mô hình credential dài hạn không nên dùng.\n(D) SAI: Cài CloudWatch Agent phục vụ metric và log, không liên quan tới việc đăng ký managed node.\n(E) SAI: Dựng VPN site-to-site có thể hữu ích nhưng đề nói rõ không có VPN, và hybrid activation không yêu cầu VPN.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Managed node on-premises = hybrid activation (code và ID) + đường ra HTTPS tới các endpoint SSM. Lưu ý giới hạn của standard tier và khi nào cần advanced instance tier.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Systems Manager"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Register each server with a Systems Manager hybrid activation using the activation code and ID", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Allow outbound HTTPS from the servers to the Systems Manager service endpoints", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Create an IAM user per server and place its access keys in the agent configuration file", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Install the CloudWatch Agent so the servers report their presence to Systems Manager", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Establish a site-to-site VPN so the servers can reach the private Systems Manager endpoints", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 16,
+      "questionType": "MCQ",
+      "questionText": "During an incident, an engineer overwrote a production SSM parameter that holds a feature configuration value. The application immediately picked up the wrong value. The team needs the previous value restored with the least effort and wants a mechanism that prevents the same mistake from silently happening again. What should the DevOps engineer do?",
+      "explanation": "Phân tích đề: Cần khôi phục giá trị trước đó nhanh nhất, và có cơ chế phát hiện thay đổi trong tương lai.\n(A) ĐÚNG: Parameter Store giữ lịch sử phiên bản của mỗi parameter; lấy giá trị ở version trước và ghi lại là xong. Để phòng ngừa, tạo EventBridge rule bắt sự kiện Parameter Store Change để cảnh báo khi parameter production thay đổi, và giới hạn quyền ssm:PutParameter cho đúng vai trò cần thiết.\n(B) SAI: Khôi phục từ backup của hệ thống khác là đường vòng, chậm và có thể không tồn tại.\n(C) SAI: Hỏi engineer nhớ lại giá trị cũ là không đáng tin cậy, nhất là trong lúc xử lý sự cố.\n(D) SAI: Chuyển parameter sang Secrets Manager để có versioning là thay đổi kiến trúc không cần thiết vì Parameter Store đã có version history.\nĐáp án đúng: A\nĐiểm cần nhớ: Parameter Store có version history cho mọi parameter (standard và advanced), phát sự kiện thay đổi qua EventBridge, và hỗ trợ policy như expiration cho advanced tier. Đây là công cụ khôi phục và giám sát sẵn có.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Systems Manager"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Restore the value from the parameter version history and add an EventBridge rule that alerts on changes to production parameters", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Restore the value from the most recent backup of the configuration repository", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Ask the engineer to recall the previous value and write it back manually", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Migrate the parameter to Secrets Manager so previous versions can be recovered", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 17,
+      "questionType": "MCQ",
+      "questionText": "An EC2 Image Builder pipeline produces a hardened AMI in the build account. The image must automatically be copied to three Regions and made usable by the production account, whose Auto Scaling groups launch instances from it. Nobody should have to copy AMIs or adjust permissions after each build. Which configuration accomplishes this?",
+      "explanation": "Phân tích đề: Tự động sao chép AMI sang ba Region và cho phép account production dùng, không thao tác sau mỗi lần build.\n(A) ĐÚNG: Distribution configuration của Image Builder khai báo danh sách Region đích và danh sách account được chia sẻ (launch permission); mỗi build thành công sẽ tự sao chép và chia sẻ theo cấu hình. Lưu ý chia sẻ cả snapshot/KMS key nếu image được mã hóa bằng CMK.\n(B) SAI: Lambda theo lịch tự copy AMI là viết lại chức năng đã có, thêm code phải bảo trì và có độ trễ.\n(C) SAI: Tạo pipeline riêng ở mỗi Region sẽ build lại image ở từng nơi, dẫn tới các image không giống hệt nhau.\n(D) SAI: Chia sẻ thủ công qua ModifyImageAttribute sau mỗi build vi phạm yêu cầu tự động.\nĐáp án đúng: A\nĐiểm cần nhớ: Distribution configuration là nơi khai báo Region đích, account được chia sẻ, tên AMI và license configuration. Nếu AMI mã hóa bằng CMK thì key phải được chia sẻ cho account đích, nếu không launch sẽ thất bại.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AMI Pipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Define a distribution configuration listing the target Regions and granting launch permission to the production account", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Schedule a Lambda function that copies the newest AMI to the other Regions and shares it", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create a separate Image Builder pipeline in each Region that builds the same recipe", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Have an operator share the AMI with the production account after each successful build", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 18,
+      "questionType": "MSQ",
+      "questionText": "A security review of golden AMIs found that images contained the build instance SSH host keys, a leftover cloud-init log with an API token printed by a build script, and the bake-time application configuration. The team must ensure future images cannot carry host identity or secrets, while keeping the build fully automated. Which TWO practices should be adopted?",
+      "explanation": "Phân tích đề: Image chứa host key, log có token và cấu hình lúc bake. Cần loại bỏ mà vẫn tự động hóa.\n(A) ĐÚNG: Thêm cleanup component chạy cuối cùng để xóa SSH host key, log của cloud-init, lịch sử shell, file tạm và cache; host key sẽ được sinh lại khi instance mới khởi động.\n(B) ĐÚNG: Không ghi bí mật vào image: lấy secret lúc instance khởi động từ Secrets Manager hoặc Parameter Store bằng instance profile. Build script cũng không được in giá trị secret ra log.\n(C) SAI: Mã hóa AMI bằng KMS bảo vệ dữ liệu khi lưu trữ nhưng bất kỳ ai launch được instance từ image vẫn đọc được secret bên trong.\n(D) SAI: Xoay vòng secret sau mỗi lần build giảm thiệt hại nhưng vẫn để bí mật nằm trong image, không phải cách xử lý gốc.\n(E) SAI: Giới hạn quyền launch AMI là kiểm soát bổ sung, không loại bỏ việc bí mật tồn tại trong image.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Nguyên tắc AMI sạch: không có danh tính máy (host key, machine-id), không có bí mật, không có log build. Bí mật luôn nạp lúc chạy qua vai trò IAM của instance.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AMI Pipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Run a cleanup component that removes SSH host keys, build logs, shell history and temporary files before the snapshot", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Fetch application secrets at instance launch through the instance role instead of writing them into the image", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Encrypt the AMI with a customer managed KMS key so the embedded secrets are protected", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Rotate the embedded secrets immediately after every image build", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Restrict launch permissions on the AMI to a small set of accounts", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 19,
+      "questionType": "MCQ",
+      "questionText": "An EC2 Image Builder pipeline fails at the step that installs operating system packages from the distribution repositories on the public internet. The build instance runs in a private subnet that has gateway endpoints for Amazon S3 and interface endpoints for ECR and Systems Manager. Security policy forbids assigning a public IP to the build instance, but allows outbound internet access through controlled infrastructure. What is the MOST complete fix?",
+      "explanation": "Phân tích đề: Cần lấy package từ repository công khai, không được gán public IP cho build instance, nhưng được phép có đường ra Internet qua hạ tầng kiểm soát.\n(A) ĐÚNG: Thêm NAT gateway (hoặc một HTTP proxy tập trung) cho subnet build để instance private truy cập được repository bên ngoài mà không cần public IP. Đây là giải pháp đầy đủ vì package repository nằm ngoài AWS nên không có VPC endpoint nào thay thế được.\n(B) SAI: Thêm interface endpoint cho EC2 và Image Builder không giúp gì vì nguồn package không phải dịch vụ AWS.\n(C) SAI: Gán public IP cho build instance vi phạm trực tiếp chính sách bảo mật đã nêu.\n(D) SAI: Tải sẵn toàn bộ package vào S3 rồi cài từ đó có thể làm được cho một số trường hợp nhưng phải tự xây và duy trì bản sao repository, không phải giải pháp trực tiếp và đầy đủ mà đề hỏi.\nĐáp án đúng: A\nĐiểm cần nhớ: VPC endpoint chỉ áp dụng cho dịch vụ AWS và PrivateLink. Khi build cần tài nguyên ngoài AWS (apt, yum, npm, PyPI công khai) thì phải có NAT gateway, proxy, hoặc một repository nội bộ như CodeArtifact làm trung gian.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AMI Pipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Provide outbound access for the build subnet through a NAT gateway or a controlled HTTP proxy", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Add interface VPC endpoints for EC2 and EC2 Image Builder to the build subnet", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Assign a public IP address to the build instance only for the duration of the build", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Mirror the entire distribution repository into S3 and install packages from the gateway endpoint", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 20,
+      "questionType": "MCQ",
+      "questionText": "An Elastic Beanstalk environment currently uses all at once deployments. Twice this quarter a bad version took the whole environment down because every instance was updated simultaneously and the new version failed its health check. The team wants the smallest possible blast radius on a bad release, is willing to pay for extra instances during deployment, and wants existing instances untouched so a failure leaves the previous version intact. Which deployment policy should be configured?",
+      "explanation": "Phân tích đề: Muốn bán kính ảnh hưởng nhỏ nhất, chấp nhận thêm instance, và instance cũ phải nguyên vẹn để bản cũ vẫn chạy nếu bản mới hỏng.\n(A) SAI: Rolling cập nhật tại chỗ trên chính các instance hiện có, nên instance cũ bị thay đổi và khi lỗi phải deploy ngược lại.\n(B) ĐÚNG: Immutable deployment tạo một nhóm instance hoàn toàn mới trong cùng environment, chỉ chuyển sang dùng khi chúng vượt qua health check; nếu lỗi thì nhóm mới bị loại bỏ và instance cũ vẫn phục vụ nguyên vẹn. Đây đúng là mô tả của đề.\n(C) SAI: Rolling with additional batch giữ được capacity nhưng vẫn cập nhật trên instance hiện có theo lô.\n(D) SAI: All at once chính là chính sách đang gây sự cố.\nĐáp án đúng: B\nĐiểm cần nhớ: Immutable khác Rolling ở chỗ không đụng vào instance đang chạy: tạo nhóm mới, kiểm tra sức khỏe, rồi mới chuyển. Đây là lựa chọn an toàn nhất trong phạm vi một environment; blue/green là an toàn nhất ở phạm vi hai environment.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS OpsWorks / Elastic Beanstalk"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Rolling with a batch size of one instance", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Immutable deployment, which launches a new set of instances and keeps the existing ones untouched until health checks pass", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Rolling with an additional batch sized at 25 percent of capacity", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "All at once with enhanced health reporting and a longer grace period", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 21,
+      "questionType": "MSQ",
+      "questionText": "A team still runs OpsWorks Stacks with Chef 11 for a set of EC2-based web applications. With the service approaching end of support, they must plan a path that preserves automated application deployments and automatic replacement of unhealthy instances, while reducing the amount of configuration management code they maintain themselves. Which TWO directions are consistent with AWS guidance?",
+      "explanation": "Phân tích đề: Cần tiếp tục có deploy tự động và tự thay thế instance hỏng, đồng thời giảm lượng code cấu hình phải tự bảo trì.\n(A) ĐÚNG: Chuyển tầng web sang Elastic Beanstalk (hoặc sang container trên ECS/EKS) để nhận deployment policy có sẵn, health reporting và thay thế instance tự động mà không phải duy trì recipe.\n(B) ĐÚNG: Nếu vẫn ở EC2 thì dùng Auto Scaling health check để tự thay thế instance hỏng và Systems Manager (State Manager, Patch Manager, Run Command) thay cho Chef để quản lý cấu hình, giảm code tự viết.\n(C) SAI: Giữ nguyên OpsWorks Stacks và chờ đến sát thời điểm ngừng hỗ trợ là chấp nhận rủi ro vận hành không cần thiết.\n(D) SAI: Tự dựng một Chef server trên EC2 làm tăng đúng loại công việc mà đề muốn giảm.\n(E) SAI: Viết lại toàn bộ ứng dụng thành serverless là dự án hiện đại hóa lớn, vượt xa phạm vi bài toán ngừng hỗ trợ dịch vụ.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Khi một dịch vụ bị khai tử, hai hướng hợp lý là chuyển lên nền tảng quản lý cao hơn (Beanstalk, ECS) hoặc giữ EC2 nhưng thay lớp cấu hình bằng dịch vụ quản lý (Systems Manager) kèm ASG cho khả năng tự phục hồi.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS OpsWorks / Elastic Beanstalk"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Move the web tier to Elastic Beanstalk or to containers so deployments and instance replacement are handled by a managed platform", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "If staying on EC2, rely on Auto Scaling health checks for replacement and Systems Manager for configuration instead of Chef", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Keep the stacks as they are and revisit the topic when support officially ends", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Stand up a self-managed Chef server on EC2 and repoint the existing recipes at it", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Rewrite the applications as Lambda functions to remove servers from the picture", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 22,
+      "questionType": "MCQ",
+      "questionText": "An Elastic Beanstalk application stores its database user name and password as environment properties of the environment. A new policy requires the password to rotate every 7 days. The team must not create a new application version or update environment properties for each rotation, and the password must never be visible to anyone who can read the environment configuration. What should the DevOps engineer implement?",
+      "explanation": "Phân tích đề: Rotation 7 ngày, không tạo application version mới hay cập nhật environment property mỗi lần, và không ai đọc được giá trị từ cấu hình environment.\n(A) ĐÚNG: Lưu thông tin đăng nhập trong Secrets Manager có bật rotation, chỉ để lại tên secret (không phải giá trị) trong cấu hình; ứng dụng lấy giá trị lúc chạy bằng instance profile và cache ngắn hạn. Rotation diễn ra ở Secrets Manager nên environment không cần thay đổi.\n(B) SAI: Cập nhật environment property bằng một Lambda sau mỗi lần rotate sẽ kích hoạt cập nhật environment, gây gián đoạn và trái ràng buộc.\n(C) SAI: Lưu mật khẩu trong file cấu hình đi kèm application version yêu cầu tạo version mới mỗi lần rotate.\n(D) SAI: Dùng .ebextensions để ghi mật khẩu ra file trên instance vẫn đặt giá trị vào source bundle và lộ ra cho người đọc được cấu hình.\nĐáp án đúng: A\nĐiểm cần nhớ: Mẫu hình chuẩn là ứng dụng đọc bí mật lúc chạy bằng vai trò IAM, cấu hình chỉ chứa tên secret. Khi đó rotation trở nên trong suốt với quy trình triển khai.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > AWS OpsWorks / Elastic Beanstalk"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Store the credentials in Secrets Manager with rotation enabled and have the application retrieve them at run time using the instance role", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Keep the environment properties and update them from a Lambda function after every rotation", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Move the credentials into a configuration file inside the application source bundle", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Use an .ebextensions configuration file that writes the current password to a file on each instance", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 23,
+      "questionType": "MCQ",
+      "questionText": "Two GitHub Actions workflows triggered by different pull requests ran terraform apply against the same S3 backend within seconds of each other, and the resulting state no longer matched reality. The bucket already has encryption and versioning enabled, and both workflows used the same IAM role. What was MOST likely missing, and what is the immediate corrective action?",
+      "explanation": "Phân tích đề: Hai apply chạy đồng thời trên cùng backend, bucket đã có mã hóa và versioning nhưng state vẫn hỏng.\n(A) ĐÚNG: Không có state locking nên hai tiến trình cùng đọc, cùng ghi và ghi đè lẫn nhau. Khắc phục ngay là bật state locking cho backend; sau đó khôi phục state từ một object version trước đó nhờ versioning và chạy plan để kiểm chứng.\n(B) SAI: Versioning đã bật và không phải cơ chế ngăn ghi đồng thời; nó chỉ giúp khôi phục sau sự cố.\n(C) SAI: Dùng role riêng cho từng workflow không ngăn được việc ghi đồng thời vào cùng một object state.\n(D) SAI: Tăng quyền cho role không liên quan tới nguyên nhân; vấn đề là thiếu cơ chế loại trừ lẫn nhau.\nĐáp án đúng: A\nĐiểm cần nhớ: Versioning cho phép khôi phục, locking mới là thứ ngăn hỏng. Luôn bật cả hai và đừng bao giờ dùng cờ bỏ qua khóa trong CI.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > Terraform / Ansible"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "State locking was not enabled; enable it and restore the state from a previous object version, then verify with a plan", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Bucket versioning was not applied to the state key prefix; enable it so concurrent writes are serialized", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Both workflows shared one IAM role; give each workflow its own role so their writes do not collide", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "The role lacked permission to write the lock information; broaden the policy to allow all S3 actions", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 24,
+      "questionType": "MCQ",
+      "questionText": "Instances launched by an Auto Scaling group must be configured by Ansible within a few minutes of launch, including instances that did not exist when the last playbook run started. Capacity changes many times per day. The team wants no static inventory file and no polling loop that runs every minute. What is the MOST scalable approach?",
+      "explanation": "Phân tích đề: Cấu hình instance mới trong vài phút sau khi launch, fleet thay đổi liên tục, không inventory tĩnh và không polling.\n(A) ĐÚNG: Dùng dynamic inventory aws_ec2 lọc theo tag của Auto Scaling group, và kích hoạt lần chạy bằng sự kiện: EventBridge bắt EC2 Instance Launch Successful của ASG (hoặc dùng lifecycle hook) để khởi động playbook. Không có inventory tĩnh, không polling, và độ trễ tính bằng phút.\n(B) SAI: Cron chạy mỗi phút chính là polling mà đề loại trừ, lại tốn tài nguyên và vẫn có độ trễ.\n(C) SAI: Cập nhật file inventory thủ công là không khả thi khi capacity thay đổi nhiều lần mỗi ngày.\n(D) SAI: Nhúng toàn bộ cấu hình vào user data bỏ qua Ansible hoàn toàn, trái yêu cầu giữ playbook, và khó cập nhật cấu hình sau này.\nĐáp án đúng: A\nĐiểm cần nhớ: Kết hợp hai ý: dynamic inventory cho danh sách máy luôn đúng, và sự kiện launch (EventBridge hoặc lifecycle hook) cho thời điểm chạy. Lifecycle hook còn cho phép giữ instance ở trạng thái Pending:Wait cho tới khi cấu hình xong.",
+      "tagNames": ["Configuration Management and Infrastructure as Code > Terraform / Ansible"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use the aws_ec2 dynamic inventory filtered by the Auto Scaling group tags and start the playbook from an instance launch event or lifecycle hook", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Run the playbook from a cron job every minute against the dynamic inventory", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Maintain a static inventory file that the operations team updates when capacity changes", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Move the entire configuration into user data so no configuration management run is needed", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 25,
+      "questionType": "MSQ",
+      "questionText": "Terraform runs from a central CI account and must manage resources in 20 workload accounts. Security requires that a compromised CI job cannot provision arbitrary resources or escalate privileges in a workload account, and that no role in a workload account can be assumed by anything other than the intended CI identity. Which TWO controls should be implemented?",
+      "explanation": "Phân tích đề: Hạn chế thiệt hại khi CI bị chiếm quyền, và đảm bảo role ở workload account chỉ được assume bởi đúng danh tính CI.\n(A) ĐÚNG: Trust policy của role trong workload account chỉ tin đúng principal CI (role của CodeBuild hoặc role liên kết OIDC của GitHub), kèm điều kiện phù hợp như aws:PrincipalOrgID hoặc sts:ExternalId. Điều này chặn bất kỳ principal nào khác assume role đó.\n(B) ĐÚNG: Thu hẹp policy của role đích xuống đúng tập tài nguyên Terraform cần quản lý, và gắn permission boundary để ngay cả khi policy bị sửa rộng ra thì quyền hiệu dụng vẫn bị chặn trần — đây là phần chống leo thang đặc quyền.\n(C) SAI: Cấp AdministratorAccess cho role Terraform để tránh lỗi thiếu quyền là đúng thứ khiến một CI job bị chiếm quyền trở thành thảm họa.\n(D) SAI: Lưu access key dài hạn của workload account trong CI là mô hình credential tĩnh, dễ rò rỉ và khó xoay vòng.\n(E) SAI: Chạy Terraform bằng credential cá nhân của kỹ sư làm mất tính tự động và không truy vết được theo hệ thống.\n(F) SAI: Cho phép mọi role trong CI account assume role đích khiến bất kỳ workload nào trong CI account cũng có đường vào production.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Hai vế của an toàn cross-account: ai được assume (trust policy có điều kiện chặt) và assume xong làm được gì (policy tối thiểu cộng permission boundary).",
+      "tagNames": ["Configuration Management and Infrastructure as Code > Terraform / Ansible"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Make each workload account role trust only the specific CI identity, with a condition such as the organization ID or an external ID", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Scope the workload account roles to the resources Terraform must manage and attach a permissions boundary", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Attach AdministratorAccess to the Terraform role so applies never fail because of missing permissions", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Store long-lived access keys for each workload account in the CI credential store", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Run Terraform under the personal credentials of the engineer who opened the change request", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Allow any role in the CI account to assume the workload account roles so pipelines can be refactored freely", "isCorrect": false }
+      ]
+    }
+  ]
+}

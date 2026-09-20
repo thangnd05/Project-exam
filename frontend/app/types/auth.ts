@@ -36,3 +36,12 @@ export interface ResetPasswordRequest {
   newPassword: string;
   confirmNewPassword: string;
 }
+
+export type ResetTokenInvalidReason = 'MISSING' | 'INVALID' | 'USED' | 'EXPIRED';
+
+export interface ResetTokenStatus {
+  valid: boolean;
+  reason?: ResetTokenInvalidReason | null;
+  maskedEmail?: string | null;
+  expiresInSeconds?: number | null;
+}

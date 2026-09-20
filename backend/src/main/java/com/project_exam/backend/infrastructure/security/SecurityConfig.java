@@ -132,6 +132,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET,
+                                "/api/auth/reset-password/check",
                                 "/api/exam-types/**",
                                 "/api/exam-categories/**",
                                 "/api/evaluations/**",
@@ -143,9 +144,7 @@ public class SecurityConfig {
                                 "/api/recovery-resources/**",
                                 "/api/milestones/**",
                                 "/api/certificates/verify/**",
-                                "/api/certificates/public",
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**").permitAll()
+                                "/api/certificates/public").permitAll()
 
                         .requestMatchers(
                                 "/api/user-tests/guest",

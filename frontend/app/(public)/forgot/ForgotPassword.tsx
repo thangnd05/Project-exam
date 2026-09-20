@@ -1,99 +1,203 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import {useState} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import classNames from 'classnames/bind';
-import style from '../login/login.module.scss';
+import { FiArrowLeft, FiMail } from 'react-icons/fi';
+import { MdMarkEmailRead } from 'react-icons/md';
 import routes from '@/app/configs/Routes';
-import {Form, Button} from 'react-bootstrap';
 import { useForgotPasswordMutation } from '@/app/hooks/useAuthActions';
+import style from '../_components/auth/AuthRecovery.module.scss';
 
 const cx = classNames.bind(style);
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const RESEND_COOLDOWN_SECONDS = 60;
+
 function ForgotPassword() {
   const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState('');
+  const [formError, setFormError] = useState('');
+  const [sentTo, setSentTo] = useState('');
+  const [cooldown, setCooldown] = useState(0);
 
-  const router = useRouter();
   const forgotPasswordMutation = useForgotPasswordMutation();
+  const isSubmitting = forgotPasswordMutation.isPending;
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const handleReset = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setMessage('');
-    setError('');
+  const startCooldown = useCallback((seconds: number) => {
+    setCooldown(seconds);
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          timerRef.current = null;
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }, []);
 
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  const validate = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return 'Vui lòng nhập email.';
+    if (!EMAIL_PATTERN.test(trimmed)) return 'Email không đúng định dạng.';
+    return '';
+  };
+
+  const sendRequest = async (value: string) => {
+    setFormError('');
     try {
-      await forgotPasswordMutation.mutateAsync(email);
-
-      setMessage('Hãy vào email để lấy token để có thể đổi mật khẩu.');
-      setError('Token chỉ có thời lượng là 5 phút');
-
-      setTimeout(() => {
-        router.push(routes.reset);
-      }, 6000);
-    } catch (error: any) {
-      if (error.response) {
-        setError(error.response.data.message || 'Đã xảy ra lỗi!');
-      } else {
-        setError('Không thể kết nối đến server!');
+      await forgotPasswordMutation.mutateAsync(value);
+      setSentTo(value);
+      startCooldown(RESEND_COOLDOWN_SECONDS);
+    } catch (err: any) {
+      const status = err?.response?.status;
+      if (status === 429) {
+        const retryAfter = Number(err?.response?.headers?.['retry-after']);
+        const waitFor = Number.isFinite(retryAfter) && retryAfter > 0 ? retryAfter : RESEND_COOLDOWN_SECONDS;
+        startCooldown(waitFor);
+        setFormError(`Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau ${waitFor} giây.`);
+        return;
       }
-    } finally {
-      setIsLoading(false);
+      setFormError(
+        err?.response?.data?.message ||
+          (err?.response
+            ? 'Không gửi được yêu cầu. Vui lòng thử lại.'
+            : 'Không thể kết nối đến máy chủ. Kiểm tra kết nối mạng của bạn.'),
+      );
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const message = validate(email);
+    setEmailError(message);
+    if (message) return;
+    await sendRequest(email.trim());
+  };
+
+  const handleResend = async () => {
+    if (cooldown > 0 || isSubmitting) return;
+    await sendRequest(sentTo);
+  };
+
+  if (sentTo) {
+    return (
+      <div className={cx('page')}>
+        <div className={cx('card')}>
+          <div className={cx('badge', 'success')}>
+            <MdMarkEmailRead />
+          </div>
+          <h1 className={cx('title')}>Kiểm tra hộp thư của bạn</h1>
+          <p className={cx('subtitle')}>
+            Nếu <strong>{sentTo}</strong> đang được dùng cho một tài khoản, chúng tôi đã gửi một liên
+            kết đặt lại mật khẩu đến email đó. Liên kết có hiệu lực trong 30 phút và chỉ dùng được
+            một lần.
+          </p>
+
+          {formError && <div className={cx('alert', 'alertError')}>{formError}</div>}
+
+          <div className={cx('actions')}>
+            <button
+              type="button"
+              className={cx('ghostBtn')}
+              onClick={handleResend}
+              disabled={cooldown > 0 || isSubmitting}
+            >
+              {isSubmitting
+                ? 'Đang gửi lại...'
+                : cooldown > 0
+                  ? `Gửi lại sau ${cooldown}s`
+                  : 'Gửi lại email'}
+            </button>
+            <button
+              type="button"
+              className={cx('ghostBtn')}
+              onClick={() => {
+                setSentTo('');
+                setFormError('');
+              }}
+            >
+              Dùng email khác
+            </button>
+          </div>
+
+          <p className={cx('footer')}>
+            Không thấy email? Hãy kiểm tra cả mục Spam / Quảng cáo.
+            <br />
+            <Link href={routes.login}>Quay lại đăng nhập</Link>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={cx('bodic')}>
-      <Form className={cx('wrap')} id="login-form" onSubmit={handleReset}>
-        <h1>Quên mật khẩu</h1>
-        <Form.Group className={cx('input-box')}>
-          <Form.Control
-            type="text"
-            className={cx('wrap-username')}
-            id="username"
-            placeholder="Email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onInvalid={(e: React.FormEvent<HTMLInputElement>) => {
-              (e.target as HTMLInputElement).setCustomValidity('Vui lòng nhập email!');
-            }}
-            onInput={(e) => (e.target as HTMLInputElement).setCustomValidity('')}
-          />
-        </Form.Group>
-
-        <div className={cx('remember-forgot')}>
-          <label>
-            <input type="checkbox" />
-            <span>Ghi nhớ</span>
-          </label>
-          <Link href={routes.login}>Đăng Nhập</Link>
+    <div className={cx('page')}>
+      <div className={cx('card')}>
+        <div className={cx('badge')}>
+          <FiMail />
         </div>
+        <h1 className={cx('title')}>Quên mật khẩu?</h1>
+        <p className={cx('subtitle')}>
+          Nhập email bạn đã đăng ký. Chúng tôi sẽ gửi cho bạn một liên kết để đặt lại mật khẩu.
+        </p>
 
-        {message && (
-          <div className={cx('alert', 'alert-success')}>{message}</div>
-        )}
-        {error && <div className={cx('alert', 'alert-danger')}>{error}</div>}
+        <form className={cx('form')} onSubmit={handleSubmit} noValidate>
+          <div className={cx('field')}>
+            <label className={cx('label')} htmlFor="forgot-email">
+              Email
+            </label>
+            <div className={cx('control')}>
+              <input
+                id="forgot-email"
+                type="email"
+                autoComplete="email"
+                autoFocus
+                className={cx('input', { invalid: Boolean(emailError) })}
+                placeholder="ban@example.com"
+                value={email}
+                disabled={isSubmitting}
+                aria-invalid={Boolean(emailError)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (emailError) setEmailError('');
+                  if (formError) setFormError('');
+                }}
+                onBlur={(e) => setEmailError(validate(e.target.value))}
+              />
+            </div>
+            {emailError && <span className={cx('fieldError')}>{emailError}</span>}
+          </div>
 
-        <div className={cx('login-link')}>
-          <Button
-            className={cx('login-btn')}
-            type="submit"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Đang thực hiện...' : 'Gửi yêu cầu'}
-          </Button>
-        </div>
+          {formError && <div className={cx('alert', 'alertError')}>{formError}</div>}
 
-        <div className={cx('register-link')}>
-          <span>Chưa có tài khoản? </span>
-          <Link href={`${routes.login}?mode=signup`}>Đăng ký</Link>
-        </div>
-      </Form>
+          <button type="submit" className={cx('submitBtn')} disabled={isSubmitting || cooldown > 0}>
+            {isSubmitting && <span className={cx('spinner')} />}
+            {isSubmitting
+              ? 'Đang gửi...'
+              : cooldown > 0
+                ? `Thử lại sau ${cooldown}s`
+                : 'Gửi liên kết đặt lại'}
+          </button>
+        </form>
+
+        <p className={cx('footer')}>
+          <Link href={routes.login}>
+            <FiArrowLeft style={{ verticalAlign: 'middle', marginRight: 4 }} />
+            Quay lại đăng nhập
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

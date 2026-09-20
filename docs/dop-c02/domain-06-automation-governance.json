@@ -1,0 +1,274 @@
+{
+  "version": 1,
+  "usageScope": "PRACTICE",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "A company operates 80 AWS accounts that are currently billed and governed independently. Leadership wants one consolidated bill, wants to make it impossible for a member account to detach itself from central governance, and wants a rule that forbids creating IAM users with access keys everywhere except in a small break-glass grouping. The control must apply to every principal in those accounts, including the account root user. Which service provides the foundation for all of this?",
+      "explanation": "Phân tích đề: Ba nhu cầu: hợp nhất hóa đơn, không cho account rời tổ chức, và cấm tạo IAM access key ở mọi nơi trừ một nhóm ngoại lệ, áp cho cả root user.\n(A) ĐÚNG: AWS Organizations cung cấp consolidated billing, cấu trúc OU để phân nhóm, và service control policy làm trần quyền áp cho mọi principal trong account thành viên kể cả root. SCP deny organizations:LeaveOrganization và deny iam:CreateAccessKey cho mọi OU trừ OU break-glass đáp ứng đúng yêu cầu.\n(B) SAI: IAM Identity Center giải quyết bài toán đăng nhập và gán quyền cho con người, không cung cấp trần quyền ở cấp account hay hợp nhất hóa đơn.\n(C) SAI: AWS Config phát hiện vi phạm sau khi tài nguyên đã tồn tại; đây là detective, không ngăn được hành vi.\n(D) SAI: Permissions boundary áp cho từng IAM entity, không áp cho root user và phải được gắn đúng vào từng entity nên không đảm bảo độ phủ.\nĐáp án đúng: A\nĐiểm cần nhớ: SCP là trần quyền cho account (áp cả root, trừ management account), không cấp quyền. Phân nhóm bằng OU để có thể tạo ngoại lệ hợp lệ như break-glass mà không làm yếu phần còn lại.",
+      "tagNames": ["Automation & Governance > AWS Organizations"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "AWS Organizations with organizational units and service control policies", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "AWS IAM Identity Center with permission sets assigned to every account", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "AWS Config rules deployed to every account with automatic remediation", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "IAM permissions boundaries attached to every role and user in every account", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MSQ",
+      "questionText": "An audit revealed resources running in Regions that the company has never approved, created by teams that were unaware of the policy. Leadership wants two things: new resources must be impossible to create outside the approved Regions, and the team must be able to produce a list of resources that already exist in unapproved Regions so they can be cleaned up. Which TWO measures should be implemented?",
+      "explanation": "Phân tích đề: Hai lớp khác nhau: ngăn chặn từ bây giờ, và kiểm kê những gì đã tồn tại.\n(A) ĐÚNG: SCP với điều kiện aws:RequestedRegion deny mọi action ngoài danh sách Region được duyệt, kèm NotAction để loại trừ các dịch vụ global như IAM, CloudFront, Route 53 và Organizations. Đây là lớp preventive.\n(B) ĐÚNG: Dùng AWS Config với organization aggregator (hoặc Resource Explorer) để kiểm kê tài nguyên hiện có trên mọi Region và account, tạo ra danh sách cần dọn dẹp. Đây là lớp detective.\n(C) SAI: Gửi email nhắc nhở các team về chính sách Region là biện pháp truyền thông, không phải kiểm soát.\n(D) SAI: Tắt Region ở cấp account chỉ áp dụng được cho các Region opt-in, không bao phủ các Region bật mặc định.\n(E) SAI: Xóa mọi tài nguyên tìm thấy ngoài Region được duyệt bằng automation là hành động phá hủy nguy hiểm khi chưa đánh giá tác động.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Câu hỏi có cả preventive lẫn detective thì đáp án thường là SCP cộng Config. Với SCP giới hạn Region, luôn nhớ loại trừ dịch vụ global vì chúng gọi endpoint ở us-east-1.",
+      "tagNames": ["Automation & Governance > AWS Organizations"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An SCP that denies actions outside the approved Regions, excluding global services with NotAction", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "An organization-wide inventory through AWS Config aggregation to list resources already running in other Regions", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "A reminder sent to all engineering teams describing the approved Region policy", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Disabling the unapproved Regions in the account settings of every member account", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "An automation that deletes any resource found outside the approved Regions", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "A security automation must react to GuardDuty findings of high severity by tagging the affected resource and posting a summary to a chat channel. The work takes under 30 seconds per finding, findings arrive irregularly with occasional bursts of a few dozen, and the team does not want to operate or patch any server. Which design is the default fit?",
+      "explanation": "Phân tích đề: Công việc ngắn, hướng sự kiện, tải không đều, không muốn vận hành server.\n(A) ĐÚNG: EventBridge rule khớp GuardDuty finding theo severity, target là một Lambda function thực hiện tagging và gọi API chat. Lambda tự co giãn theo burst, tính phí theo lần gọi và không có máy chủ phải vá.\n(B) SAI: Một EC2 instance chạy daemon polling là luôn bật, phải vá và tốn chi phí ngay cả khi không có finding.\n(C) SAI: ECS service chạy thường trực cũng có nhược điểm tương tự cho một tác vụ chỉ vài chục giây và thưa thớt.\n(D) SAI: AWS Batch phù hợp cho job tính toán lớn theo lô, quá nặng cho tác vụ vài chục giây hướng sự kiện.\nĐáp án đúng: A\nĐiểm cần nhớ: Tác vụ ngắn, hướng sự kiện, tải không đều thì Lambda là lựa chọn mặc định. Chỉ chuyển sang Fargate, Batch hoặc Step Functions khi vượt giới hạn của Lambda như thời gian chạy, bộ nhớ hoặc kích thước payload.",
+      "tagNames": ["Automation & Governance > AWS Lambda"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An EventBridge rule on the GuardDuty findings invoking an AWS Lambda function", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "An EC2 instance running a daemon that polls the GuardDuty API for new findings", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "A long-running ECS service that subscribes to an SQS queue fed by GuardDuty", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "An AWS Batch job triggered for each finding by an EventBridge rule", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "A Lambda function was attached to private subnets so it could query an Amazon RDS instance. Since then, the calls it makes to the Secrets Manager API time out, while the database queries succeed. The security groups allow outbound HTTPS, the execution role has the right permissions, and the VPC has no NAT gateway. What is the MOST likely missing piece?",
+      "explanation": "Phân tích đề: Truy cập tài nguyên trong VPC vẫn được nhưng gọi API dịch vụ AWS thì timeout, và không có NAT.\n(A) ĐÚNG: Cần interface VPC endpoint cho Secrets Manager với private DNS bật, và security group của endpoint phải cho phép HTTPS từ ENI của hàm. Không có endpoint và không có NAT thì mọi lời gọi tới endpoint công khai đều treo cho tới khi timeout.\n(B) SAI: Tăng timeout của hàm chỉ kéo dài thời gian chờ, không tạo ra đường mạng.\n(C) SAI: Cấp thêm quyền không giúp gì khi triệu chứng là timeout chứ không phải access denied.\n(D) SAI: Tháo hàm khỏi VPC khôi phục được Internet nhưng làm mất kết nối tới RDS private, tức là phá vỡ mục đích ban đầu.\nĐáp án đúng: A\nĐiểm cần nhớ: Phân biệt triệu chứng: timeout là vấn đề đường mạng (endpoint, route, security group), còn AccessDenied là vấn đề quyền. Trong VPC không NAT, mỗi dịch vụ AWS cần endpoint riêng.",
+      "tagNames": ["Automation & Governance > AWS Lambda"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An interface VPC endpoint for Secrets Manager with private DNS and a security group allowing HTTPS from the function", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A longer function timeout so the API call has time to complete", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Additional Secrets Manager permissions on the execution role", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Removal of the VPC configuration so the function regains internet access", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "A platform team must let application developers provision an approved three-tier stack consisting of a VPC, an ECS service, and an RDS instance. Developers must be able to choose only from a short list of approved sizes, must not be able to edit the underlying CloudFormation template, and must not hold the IAM permissions needed to create RDS or VPC resources directly. Which service provides this governed self-service?",
+      "explanation": "Phân tích đề: Self-service có kiểm soát: tham số bị giới hạn, template không sửa được, và người dùng không có quyền trực tiếp trên dịch vụ nền.\n(A) ĐÚNG: AWS Service Catalog với product được publish bởi platform team, launch constraint chỉ định IAM role thực thi (nhờ đó developer không cần quyền RDS hay VPC), và template constraint giới hạn giá trị tham số hợp lệ.\n(B) SAI: Chia sẻ template CloudFormation trong Git và cấp quyền deploy cho developer đồng nghĩa với việc họ sửa được template và phải có quyền trên dịch vụ nền.\n(C) SAI: Cấp quyền tạo VPC, ECS và RDS kèm hướng dẫn sử dụng là mô hình tin tưởng, không có kiểm soát kỹ thuật nào.\n(D) SAI: Terraform module dùng chung là cách tốt để tái sử dụng nhưng tự nó không cung cấp cơ chế launch constraint để người dùng chạy mà không cần quyền nền.\nĐáp án đúng: A\nĐiểm cần nhớ: Service Catalog gồm portfolio, product có version, và constraint: launch (role thực thi), template (giới hạn tham số), notification, tag update. Launch constraint là chìa khóa để người dùng không cần quyền dịch vụ bên dưới.",
+      "tagNames": ["Automation & Governance > AWS Service Catalog"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "AWS Service Catalog products with a launch constraint role and template parameter constraints", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A shared CloudFormation template in Git with deployment permissions for the developers", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Direct IAM permissions to create VPC, ECS and RDS resources plus a written standard", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A reusable Terraform module published to an internal registry", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MSQ",
+      "questionText": "Service Catalog products are launched by developers in member accounts. The platform team requires that CloudFormation always executes with a central infrastructure role rather than the developer identity, and that developers can never substitute their own template for the approved one. Which TWO configurations are required?",
+      "explanation": "Phân tích đề: Hai ràng buộc: thực thi bằng role trung tâm, và không cho thay template.\n(A) ĐÚNG: Launch constraint gắn một IAM role cụ thể vào product; khi provisioning, CloudFormation chạy với role đó chứ không phải quyền của người dùng, nên developer không cần và không dùng quyền của chính mình.\n(B) ĐÚNG: Publish product có version từ portfolio trung tâm và chỉ cấp cho người dùng quyền provision các version đã publish, không cấp quyền tạo hay cập nhật product. Nhờ vậy template luôn là bản đã duyệt.\n(C) SAI: Cho phép developer upload template riêng khi cần gấp mở ra đúng lỗ hổng mà đề muốn bịt.\n(D) SAI: Cấp quyền CloudFormation trực tiếp cho developer bỏ qua toàn bộ cơ chế kiểm soát của Service Catalog.\n(E) SAI: Rà soát thủ công template sau khi đã provisioning là detective và quá muộn.\n(F) SAI: Dựa vào quy ước đặt tên stack không phải kiểm soát kỹ thuật.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Launch constraint quyết định quyền thực thi; quản lý version và phân quyền provision quyết định nội dung được triển khai. Hai thứ này cùng tạo nên mô hình self-service có kiểm soát.",
+      "tagNames": ["Automation & Governance > AWS Service Catalog"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Apply a launch constraint so CloudFormation runs with a predetermined IAM role", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Publish versioned products centrally and grant users permission only to provision those versions", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Allow developers to upload their own template when the approved product does not fit", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Grant developers CloudFormation permissions so they can deploy the product template directly", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Review the deployed stacks weekly to confirm they match the approved template", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Enforce a stack naming convention that identifies approved deployments", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MCQ",
+      "questionText": "A company is building a brand new multi-account environment. They want a centralized log archive account, a separate security tooling account, preventive and detective baseline controls applied consistently, and a repeatable way to create accounts that already include a standard network layout. They want an opinionated, AWS-managed setup rather than assembling these pieces themselves. Which service should be used?",
+      "explanation": "Phân tích đề: Cần landing zone nhiều account với log archive, audit account, guardrail và cơ chế cấp phát account, theo cách có sẵn và được AWS quản lý.\n(A) ĐÚNG: AWS Control Tower dựng landing zone gồm log archive account, audit account, các control preventive và detective, cùng Account Factory để cấp phát account theo chuẩn. Đây đúng là sản phẩm dành cho bài toán này.\n(B) SAI: Chỉ dùng AWS Organizations cho ta cấu trúc và SCP nhưng phải tự xây toàn bộ landing zone, đi ngược yêu cầu có sẵn.\n(C) SAI: CloudFormation StackSets là công cụ triển khai, không phải một landing zone có sẵn với các account chuyên biệt.\n(D) SAI: IAM Identity Center giải quyết truy cập của con người, chỉ là một phần nhỏ của landing zone.\nĐáp án đúng: A\nĐiểm cần nhớ: Control Tower dựng trên nền Organizations, Config, CloudTrail, Service Catalog và IAM Identity Center. Chọn Control Tower khi đề nhấn mạnh landing zone có sẵn và account vending.",
+      "tagNames": ["Automation & Governance > AWS Control Tower"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "AWS Control Tower, which provides the landing zone, baseline controls and Account Factory", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "AWS Organizations with hand-built SCPs and manually created shared accounts", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "CloudFormation StackSets deploying a baseline template to each new account", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "AWS IAM Identity Center with permission sets for each account team", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "Data scientists working in a sandbox account need to run experiments that conflict with a Control Tower control applied to their organizational unit. They have asked the platform team to turn the control off. Production accounts must keep every control active, and the governance team requires that any exception be explicit and reviewable. What is the correct approach?",
+      "explanation": "Phân tích đề: Cần ngoại lệ cho môi trường thử nghiệm mà không làm yếu production, và ngoại lệ phải tường minh, kiểm tra được.\n(A) ĐÚNG: Đưa các account thử nghiệm vào một OU riêng được thiết kế với tập control phù hợp, giữ nguyên control đầy đủ cho OU production. Cấu trúc OU chính là cách biểu đạt ngoại lệ một cách tường minh và có thể rà soát.\n(B) SAI: Tắt control cho toàn bộ landing zone làm mất kiểm soát ở mọi nơi, kể cả production.\n(C) SAI: Sửa trực tiếp SCP do Control Tower quản lý sẽ tạo drift và có thể bị ghi đè khi landing zone cập nhật.\n(D) SAI: Cấp quyền cho data scientist để họ tự bỏ qua control là mở lỗ hổng leo thang đặc quyền và không để lại dấu vết thiết kế.\nĐáp án đúng: A\nĐiểm cần nhớ: Trong Control Tower, phạm vi áp dụng control là OU. Mọi ngoại lệ hợp lệ nên được thể hiện bằng một OU riêng, không bao giờ bằng cách sửa tay tài nguyên do dịch vụ quản lý.",
+      "tagNames": ["Automation & Governance > AWS Control Tower"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Move the sandbox accounts into a dedicated OU whose control set reflects the agreed exception, leaving production controls intact", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Disable the control across the landing zone and re-enable it after the experiments finish", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Edit the Control Tower managed policy in AWS Organizations to exclude the sandbox account", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Grant the data scientists permissions that let them bypass the control when needed", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MCQ",
+      "questionText": "Every account in an organization must be denied the ability to stop or delete CloudTrail trails and to create IAM access keys. A small number of accounts used for emergency access must retain both abilities, and moving an account into or out of that emergency grouping must be enough to change its effective permissions, with no policy edits required. How should this be expressed in AWS Organizations?",
+      "explanation": "Phân tích đề: Một bộ deny áp rộng, một nhóm ngoại lệ, và việc di chuyển account giữa các nhóm phải tự thay đổi quyền hiệu dụng mà không cần sửa policy.\n(A) ĐÚNG: Gắn SCP deny các action đó vào các OU thông thường, và không gắn SCP đó vào OU break-glass. Vì SCP kế thừa theo vị trí trong cây OU, chỉ cần chuyển account sang OU khác là quyền hiệu dụng thay đổi ngay, không cần sửa nội dung policy.\n(B) SAI: Một SCP duy nhất gắn ở root với danh sách account ngoại lệ trong điều kiện buộc phải sửa policy mỗi khi danh sách thay đổi.\n(C) SAI: Gắn SCP trực tiếp vào từng account làm việc quản lý nặng nề và không tận dụng được cơ chế kế thừa theo OU.\n(D) SAI: Dùng IAM policy trong từng account không áp cho root user và có thể bị gỡ bởi quản trị viên địa phương.\nĐáp án đúng: A\nĐiểm cần nhớ: SCP kế thừa từ root xuống OU rồi tới account; quyền hiệu dụng là giao của tất cả SCP trên đường đi. Thiết kế ngoại lệ bằng cấu trúc OU thay vì bằng danh sách trong policy.",
+      "tagNames": ["Automation & Governance > AWS Organizations"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Attach deny SCPs to the regular OUs and leave the break-glass OU without them, so moving an account changes its effective permissions", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Attach one deny SCP at the root with a condition listing the break-glass account IDs as exceptions", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Attach the deny SCP individually to each account that must be restricted", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Deploy an IAM policy with the same deny statements to every role in every account", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MCQ",
+      "questionText": "A review finds that the organization management account hosts production workloads, several developer roles, and the security tooling consoles. The security team is concerned because SCPs do not restrict the management account and its compromise would affect the entire organization. Which change is MOST aligned with AWS guidance?",
+      "explanation": "Phân tích đề: Management account đang bị dùng cho công việc hằng ngày; cần giảm rủi ro theo khuyến nghị của AWS.\n(A) ĐÚNG: Chuyển workload sang các account thành viên và chỉ định delegated administrator cho các dịch vụ bảo mật như GuardDuty, Security Hub, Config và CloudTrail. Management account chỉ giữ chức năng quản trị tổ chức, và số người truy cập được giảm tới mức tối thiểu.\n(B) SAI: Gắn SCP hạn chế cho chính management account không có tác dụng vì SCP không áp dụng cho management account.\n(C) SAI: Bật MFA cho mọi người dùng trong management account là cần thiết nhưng không giải quyết vấn đề gốc là workload và quyền truy cập rộng nằm ở đó.\n(D) SAI: Tạo thêm một tổ chức thứ hai làm phức tạp hóa việc quản trị và không phải khuyến nghị cho vấn đề này.\nĐáp án đúng: A\nĐiểm cần nhớ: Management account nên trống về workload, ít người truy cập, và ủy quyền quản trị dịch vụ bảo mật cho một account chuyên biệt. Ghi nhớ rằng SCP không hạn chế được management account.",
+      "tagNames": ["Automation & Governance > AWS Organizations"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Move the workloads to member accounts and delegate administration of the security services to a dedicated account", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Attach restrictive SCPs to the management account so its permissions match the member accounts", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Require multi-factor authentication for every principal in the management account and keep the workloads there", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create a second organization so production workloads are separated from governance", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MSQ",
+      "questionText": "Two governance requirements must be enforced: a member account must never be able to remove itself from the organization, and only the security engineering role in the management account may attach or detach service control policies. Which TWO configurations support these requirements?",
+      "explanation": "Phân tích đề: Một yêu cầu về hành vi của account thành viên, một yêu cầu về ai được thao tác SCP.\n(A) ĐÚNG: SCP deny organizations:LeaveOrganization áp cho các OU chứa account thành viên, chặn mọi principal trong đó kể cả root.\n(B) ĐÚNG: Trong management account, giới hạn các action như organizations:AttachPolicy, DetachPolicy, CreatePolicy và UpdatePolicy cho đúng role của nhóm security engineering bằng IAM policy, và deny cho các role khác.\n(C) SAI: Ghi vào tài liệu nội bộ rằng chỉ security team được sửa SCP là quy ước, không phải kiểm soát.\n(D) SAI: Bật CloudTrail để ghi lại thao tác SCP là detective hữu ích nhưng không ngăn được ai đó thực hiện.\n(E) SAI: Gỡ quyền quản trị của tất cả mọi người trong management account là không khả thi và vẫn không phân biệt được ai được phép thao tác SCP.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Ngăn account rời tổ chức thuộc về SCP; hạn chế ai thao tác trên chính Organizations thuộc về IAM trong management account, vì SCP không áp dụng cho account này.",
+      "tagNames": ["Automation & Governance > AWS Organizations"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An SCP that denies organizations:LeaveOrganization for the member account OUs", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "IAM policies in the management account that allow the policy attach and detach actions only for the security engineering role", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "An internal standard stating that only the security team may modify service control policies", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "CloudTrail logging of all Organizations API calls with a weekly review", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Removal of administrator permissions from everyone in the management account", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 12,
+      "questionType": "MCQ",
+      "questionText": "A pipeline uploads thousands of files to Amazon S3 in short bursts. Each object must be processed within a few seconds of arrival by code that takes about two seconds to run, the solution must scale automatically with the burst, and the team does not want to manage or patch any compute. Which trigger design is the default fit?",
+      "explanation": "Phân tích đề: Xử lý gần thời gian thực theo object, công việc rất ngắn, burst lớn, không quản lý compute.\n(A) ĐÚNG: S3 event notification (hoặc EventBridge với S3 event) gọi trực tiếp Lambda; Lambda mở rộng đồng thời theo burst và không có máy chủ phải vá. Có thể thêm SQS ở giữa nếu cần điều tiết tải xuống hệ thống phía sau.\n(B) SAI: Lambda chạy theo lịch mỗi phút để liệt kê bucket là polling, có độ trễ và trở nên đắt đỏ cùng chậm khi số object lớn.\n(C) SAI: Một EC2 instance chạy vòng lặp polling luôn bật và phải vá, trái yêu cầu.\n(D) SAI: Job AWS Glue theo lịch phù hợp với xử lý dữ liệu theo lô, không đáp ứng yêu cầu vài giây sau khi object xuất hiện.\nĐáp án đúng: A\nĐiểm cần nhớ: Với S3, hãy ưu tiên event notification hoặc EventBridge thay vì polling. Nếu hệ thống phía sau có giới hạn thông lượng, chèn SQS giữa S3 và Lambda để điều tiết và có DLQ.",
+      "tagNames": ["Automation & Governance > AWS Lambda"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "S3 event notifications or EventBridge events invoking a Lambda function", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A scheduled Lambda function that lists the bucket every minute and processes new keys", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "An EC2 instance running a loop that polls the bucket for new objects", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A scheduled AWS Glue job that processes objects that arrived since the last run", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 13,
+      "questionType": "MSQ",
+      "questionText": "During a flash sale, one Lambda function scaled up sharply. It exhausted the account concurrency so unrelated functions began to be throttled, and its write volume caused throttling on a DynamoDB table shared with another service. The team must protect unrelated workloads and keep the sale function working without losing events. Which TWO controls should be applied?",
+      "explanation": "Phân tích đề: Hai thiệt hại: hàm khác bị đói concurrency, và DynamoDB bị throttle. Cần bảo vệ workload không liên quan và không mất sự kiện.\n(A) ĐÚNG: Đặt reserved concurrency cho hàm flash sale để giới hạn phần concurrency nó được dùng, đồng thời đặt reserved concurrency cho các hàm quan trọng khác để chúng luôn có phần dành riêng. Đây là phần cô lập ảnh hưởng.\n(B) ĐÚNG: Điều chỉnh capacity của DynamoDB (chuyển sang on-demand hoặc bật auto scaling) và cấu hình retry cùng dead-letter queue cho luồng xử lý để sự kiện không bị mất khi gặp throttling tạm thời.\n(C) SAI: Tăng hạn mức concurrency của account chỉ nâng trần chung, không ngăn một hàm chiếm hết phần của hàm khác.\n(D) SAI: Tăng timeout của hàm làm mỗi lần gọi giữ tài nguyên lâu hơn, có thể khiến tình trạng đói concurrency nặng hơn.\n(E) SAI: Tắt retry để giảm tải lên DynamoDB đồng nghĩa với việc chấp nhận mất sự kiện, trái yêu cầu.\n(F) SAI: Chuyển hàm sang chạy trong VPC không liên quan tới concurrency hay throughput của DynamoDB.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Reserved concurrency vừa giới hạn một hàm vừa bảo lưu phần cho hàm khác. Khi downstream bị throttle, hãy giải quyết ở cả hai phía: nới capacity downstream và đảm bảo cơ chế retry cùng DLQ ở phía tiêu thụ.",
+      "tagNames": ["Automation & Governance > AWS Lambda"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Set reserved concurrency to cap the flash sale function and to guarantee capacity for the critical functions", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Adjust the DynamoDB capacity mode or auto scaling and configure retries with a dead-letter queue so events are not lost", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Request an increase of the account concurrency limit from AWS Support", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Increase the timeout of the flash sale function so retries have more time to succeed", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Disable retries on the flash sale function to reduce pressure on the table", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Move the flash sale function into a VPC so its traffic is isolated from other functions", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 14,
+      "questionType": "MCQ",
+      "questionText": "A media conversion job implemented as a Lambda function now needs about 20 minutes per large video and consistently hits the maximum function timeout. The team must process every video reliably, wants to keep paying only for what it uses, and does not want to manage a fleet of servers. What should the DevOps engineer do?",
+      "explanation": "Phân tích đề: Công việc vượt giới hạn cứng 15 phút của Lambda, cần chạy đáng tin cậy, chi phí theo mức dùng, không quản lý fleet.\n(A) SAI: Không thể tăng timeout của Lambda vượt 15 phút; đây là giới hạn cứng của dịch vụ.\n(B) ĐÚNG: Chuyển phần xử lý dài sang AWS Fargate hoặc AWS Batch, điều phối bằng Step Functions nếu cần nhiều bước. Cả hai đều không yêu cầu quản lý máy chủ và tính phí theo tài nguyên sử dụng trong thời gian chạy.\n(C) SAI: Chia video thành nhiều phần và gọi hàm đệ quy có thể khả thi với một số bài toán nhưng làm tăng đáng kể độ phức tạp, rủi ro vòng lặp và chi phí điều phối, và không phải hướng mà đề gợi ý.\n(D) SAI: Chạy trên một EC2 instance luôn bật vi phạm yêu cầu chi phí theo mức dùng và tạo thêm công vận hành.\nĐáp án đúng: B\nĐiểm cần nhớ: Ghi nhớ các giới hạn cứng của Lambda: 15 phút, 10 GB memory, 10 GB ephemeral storage, payload đồng bộ 6 MB. Vượt giới hạn thời gian là tín hiệu chuyển sang Fargate, Batch hoặc Step Functions.",
+      "tagNames": ["Automation & Governance > AWS Lambda"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Request a service quota increase so the function timeout can exceed 15 minutes", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Move the conversion to AWS Fargate or AWS Batch, orchestrated by Step Functions where multiple steps are needed", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Split each video into segments and have the function invoke itself recursively until the job finishes", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Run the conversion on a dedicated EC2 instance that stays available for incoming jobs", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 15,
+      "questionType": "MCQ",
+      "questionText": "A Service Catalog portfolio is shared to an organizational unit. A developer can see the product in the console, but provisioning fails with an access denied error referring to iam:PassRole. The launch constraint is configured correctly and the launch role has all the permissions needed to create the underlying resources. What is MOST likely missing?",
+      "explanation": "Phân tích đề: Product hiển thị được nên phần chia sẻ portfolio là ổn; lỗi nằm ở iam:PassRole khi provisioning.\n(A) ĐÚNG: Người dùng cần quyền iam:PassRole đối với launch constraint role (bên cạnh các quyền provision của Service Catalog như servicecatalog:ProvisionProduct). Nếu không, họ không được phép trao role đó cho dịch vụ để thực thi.\n(B) SAI: Thêm quyền cho launch role không giải quyết được vì lỗi nằm ở phía người dùng chứ không phải ở role thực thi.\n(C) SAI: Chia sẻ lại portfolio là không cần thiết vì product đã hiển thị cho người dùng.\n(D) SAI: Cấp quyền tạo tài nguyên trực tiếp cho developer đi ngược mô hình launch constraint và làm mất ý nghĩa của Service Catalog.\nĐáp án đúng: A\nĐiểm cần nhớ: Với launch constraint, người dùng cần hai nhóm quyền: quyền dùng Service Catalog và iam:PassRole cho đúng role được chỉ định. Lỗi PassRole gần như luôn thuộc về identity policy của người gọi.",
+      "tagNames": ["Automation & Governance > AWS Service Catalog"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "The developer identity lacks iam:PassRole for the launch constraint role alongside the Service Catalog provisioning permissions", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "The launch role is missing permissions for the resources in the template", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "The portfolio share with the organizational unit has not been accepted in the member account", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "The developer needs direct permissions to create the resources defined in the product", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 16,
+      "questionType": "MCQ",
+      "questionText": "A Service Catalog product exposes an instance type parameter. The platform team must ensure that users can select only three approved instance types and can never provision a very large type, even if they call the Service Catalog API directly with a handcrafted parameter value. Which mechanism enforces this?",
+      "explanation": "Phân tích đề: Giới hạn giá trị tham số một cách bắt buộc, kể cả khi gọi API trực tiếp chứ không qua giao diện.\n(A) ĐÚNG: Template constraint (rule trên tham số) hoặc AllowedValues khai báo trong template sẽ được đánh giá khi provisioning, bất kể người dùng gọi qua console hay API; giá trị ngoài danh sách bị từ chối.\n(B) SAI: Ghi chú trong phần mô tả product chỉ là hướng dẫn, không có hiệu lực kỹ thuật.\n(C) SAI: Config rule phát hiện instance sai sau khi đã tạo, là detective chứ không ngăn được lúc provisioning.\n(D) SAI: Dựa vào giao diện console chỉ hiển thị ba lựa chọn không ngăn được người dùng gọi API với giá trị khác.\nĐáp án đúng: A\nĐiểm cần nhớ: Template constraint của Service Catalog và AllowedValues trong template là kiểm soát ở thời điểm provisioning nên áp dụng cho cả console lẫn API. Kết hợp thêm SCP nếu cần chặn tuyệt đối ở tầng tài khoản.",
+      "tagNames": ["Automation & Governance > AWS Service Catalog"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "A template constraint or AllowedValues on the parameter, which is evaluated at provisioning time", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A note in the product description listing the approved instance types", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "An AWS Config rule that flags instances of unapproved types after they launch", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A console interface that presents only the three approved choices in the dropdown", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 17,
+      "questionType": "MSQ",
+      "questionText": "A central platform account maintains Service Catalog products. Every account in a specific organizational unit must be able to launch the same products, and accounts vended into that OU next month must receive the catalog without anyone performing a per-account setup step. Which TWO elements are required?",
+      "explanation": "Phân tích đề: Chia sẻ tới toàn bộ OU, account mới tự có catalog, không thao tác riêng từng account.\n(A) ĐÚNG: Chia sẻ portfolio tới organizational unit thông qua tích hợp với AWS Organizations; account mới thuộc OU sẽ nằm trong phạm vi chia sẻ mà không cần thao tác thủ công cho từng account.\n(B) ĐÚNG: Giữ product có version tại một hub account trung tâm để mọi account nhận cùng một bản; cập nhật version ở hub sẽ phản ánh cho tất cả account được chia sẻ, đảm bảo tính đồng nhất theo thời gian.\n(C) SAI: Sao chép product sang từng account là việc thủ công mà đề muốn loại bỏ và dẫn tới lệch phiên bản.\n(D) SAI: Gửi template qua kho Git cho từng team bỏ qua toàn bộ cơ chế kiểm soát của Service Catalog.\n(E) SAI: Cấp quyền quản trị Service Catalog ở hub cho mọi team không giúp họ launch trong account của mình và mở rộng quyền không cần thiết.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Chia sẻ theo OU là cách để account tương lai tự nhận catalog; hub account với product có version là nguồn sự thật duy nhất. Ở account nhận vẫn cần gán quyền cho người dùng trên portfolio đã nhận.",
+      "tagNames": ["Automation & Governance > AWS Service Catalog"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Share the portfolio with the organizational unit through the AWS Organizations integration", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Keep versioned products in a central hub account so every account receives the same catalog", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Copy the products into each account as part of the account vending process", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Distribute the product templates through a Git repository for each team to deploy", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Grant every team administrator access to Service Catalog in the hub account", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 18,
+      "questionType": "MCQ",
+      "questionText": "An account vended by Control Tower Account Factory shows as drifted, and the dashboard reports that a mandatory control related to CloudTrail is no longer in effect for that account. Investigation shows that someone modified the organization policy that Control Tower manages. What is the FIRST operational response?",
+      "explanation": "Phân tích đề: Drift do tài nguyên quản trị bị sửa bên ngoài Control Tower; cần đưa landing zone về trạng thái được quản trị.\n(A) ĐÚNG: Sửa nguyên nhân gốc (hoàn nguyên thay đổi thủ công) rồi dùng chính Control Tower để khắc phục drift, bằng cách re-register OU hoặc cập nhật landing zone để áp lại control. Đây là con đường được hỗ trợ và giữ nguyên tính nhất quán.\n(B) SAI: Bỏ qua và chờ Control Tower tự hội tụ là sai; drift tồn tại cho tới khi được xử lý.\n(C) SAI: Xóa và tạo lại account là hành động cực đoan, mất dữ liệu và không cần thiết.\n(D) SAI: Tự tạo lại policy bằng tay trong Organizations làm tăng nguy cơ lệch so với cấu hình chuẩn và có thể bị ghi đè ở lần cập nhật sau.\nĐáp án đúng: A\nĐiểm cần nhớ: Drift trong Control Tower là lệch cấu hình quản trị; xử lý bằng re-register OU hoặc update landing zone. Phân biệt với non-compliance, vốn là tài nguyên vi phạm detective control và được xử lý bằng remediation.",
+      "tagNames": ["Automation & Governance > AWS Control Tower"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Revert the manual change and use Control Tower to repair the drift by re-registering the OU or updating the landing zone", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Ignore the drift status because Control Tower reapplies its controls automatically over time", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Close the vended account and create a new one through Account Factory", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Recreate the missing policy manually in AWS Organizations with the same statements", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 19,
+      "questionType": "MSQ",
+      "questionText": "A company uses Control Tower and needs every vended account to also receive a standard VPC layout and a set of IAM roles, applied automatically as part of account creation rather than as a later cleanup task. The platform team wants to keep using Account Factory rather than replacing it. Which TWO approaches extend the vending process?",
+      "explanation": "Phân tích đề: Thêm baseline vào quy trình cấp phát account, áp dụng ngay khi tạo, vẫn giữ Account Factory.\n(A) ĐÚNG: Dùng Account Factory Customization hoặc Customizations for Control Tower, vốn dựa trên CloudFormation StackSets, để triển khai tài nguyên baseline ngay trong luồng cấp phát account.\n(B) ĐÚNG: Gắn thêm các Service Catalog product (blueprint) vào quy trình vending để tạo VPC chuẩn và các IAM role; đây là cách mở rộng chính thức của Account Factory.\n(C) SAI: Chạy StackSet thủ công sau khi account đã được bàn giao tạo cửa sổ thời gian account chưa có baseline và phụ thuộc vào việc ai đó nhớ thực hiện.\n(D) SAI: Gửi tài liệu hướng dẫn cho chủ account là quy trình thủ công, không đảm bảo nhất quán.\n(E) SAI: Thay Account Factory bằng script tự viết đi ngược yêu cầu giữ lại Account Factory và làm mất tích hợp với Control Tower.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Account Factory có thể mở rộng bằng Account Factory Customization, CfCT, hoặc bắt sự kiện CreateManagedAccount bằng EventBridge để chạy automation. Baseline nên được áp trong luồng cấp phát, không phải sau đó.",
+      "tagNames": ["Automation & Governance > AWS Control Tower"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use Account Factory Customization or Customizations for Control Tower with StackSets to deploy the baseline during vending", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Attach additional Service Catalog blueprints that create the standard VPC and IAM roles as part of the vending process", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Run a StackSet operation manually after the account has been handed over to the team", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Send the baseline templates to the account owner with deployment instructions", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Replace Account Factory with a custom account creation script that also deploys the baseline", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 20,
+      "questionType": "MCQ",
+      "questionText": "A Control Tower landing zone enables a group of detective controls that depend on AWS Config. A data science team needs accounts where those detective controls are not enabled, because their short-lived experiments generate large numbers of configuration items and cost. Production accounts must keep every detective control. What is the correct organizational design?",
+      "explanation": "Phân tích đề: Cần một nhóm account không bật một số detective control vì lý do chi phí, trong khi production giữ đầy đủ.\n(A) ĐÚNG: Đặt các account thử nghiệm vào một OU riêng và không bật nhóm control đó cho OU này, trong khi OU production giữ nguyên toàn bộ. Phạm vi áp dụng control trong Control Tower là OU, nên đây là cách thể hiện đúng và có thể rà soát.\n(B) SAI: Tắt nhóm control cho toàn bộ landing zone làm production mất khả năng phát hiện.\n(C) SAI: Tắt AWS Config trong từng account thử nghiệm tạo drift so với cấu hình do Control Tower quản lý và sẽ bị báo lỗi.\n(D) SAI: Giữ nguyên mọi thứ và chấp nhận chi phí là một lựa chọn kinh doanh, nhưng đề đang hỏi thiết kế tổ chức đúng cho yêu cầu đã nêu.\nĐáp án đúng: A\nĐiểm cần nhớ: Cấu trúc OU chính là đơn vị áp dụng control. Mọi khác biệt về mức độ kiểm soát giữa các môi trường nên được thể hiện bằng OU, không bằng cách can thiệp vào tài nguyên do Control Tower quản lý.",
+      "tagNames": ["Automation & Governance > AWS Control Tower"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Place the experimentation accounts in their own OU where those detective controls are not enabled, keeping them enabled on the production OU", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Disable that group of controls for the whole landing zone and re-enable them for audits", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Turn off AWS Config directly in each data science account to stop the configuration item charges", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Keep the controls everywhere and absorb the configuration item cost in the data science budget", "isCorrect": false }
+      ]
+    }
+  ]
+}

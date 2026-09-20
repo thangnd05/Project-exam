@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.auth.dto.LoginRequest;
 import com.project_exam.backend.modules.auth.dto.RegisterRequest;
 import com.project_exam.backend.modules.auth.dto.ResetPasswordRequest;
 import com.project_exam.backend.modules.auth.dto.AuthMessageResponse;
+import com.project_exam.backend.modules.auth.dto.ResetTokenStatusResponse;
 import com.project_exam.backend.modules.users.user.dto.UserResponse;
 import com.project_exam.backend.modules.auth.service.AuthService;
 import com.project_exam.backend.modules.users.user.service.EmailVerificationService;
@@ -43,6 +44,11 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<AuthMessageResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         return ResponseEntity.ok(authService.forgotPassword(request));
+    }
+
+    @GetMapping("/reset-password/check")
+    public ResponseEntity<ResetTokenStatusResponse> checkResetToken(@RequestParam(required = false) String token) {
+        return ResponseEntity.ok(authService.checkResetToken(token));
     }
 
     @PostMapping("/reset-password")

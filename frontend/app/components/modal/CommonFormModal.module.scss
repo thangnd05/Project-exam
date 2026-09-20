@@ -107,6 +107,38 @@
   background: var(--bg-white);
 }
 
+/* Ô mật khẩu có nút hiện/ẩn do app tự vẽ. */
+.passwordField {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordField .inputControl {
+  padding-right: 48px;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: var(--slate-400);
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.passwordToggle:hover {
+  background: var(--slate-100);
+  color: var(--slate-800);
+}
+
 .inputControl.textarea {
   padding-left: 16px;
   resize: none;

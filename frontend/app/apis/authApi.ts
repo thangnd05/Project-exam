@@ -4,11 +4,12 @@ import type {
   ChangePasswordRequest,
   LoginRequest,
   RegisterRequest,
+  ResetPasswordRequest,
+  ResetTokenStatus,
   UserResponse,
 } from '@/app/types';
 
 const BASE_URL = '/api/auth';
-const FORM_URLENCODED = { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } };
 
 export const getCurrentUser = (): Promise<UserResponse> => {
   return axios.get(`${BASE_URL}/me`).then((res) => res.data);
@@ -35,14 +36,15 @@ export const changePassword = (payload: ChangePasswordRequest): Promise<AuthMess
 };
 
 export const forgotPassword = (email: string): Promise<AuthMessageResponse> => {
-  const params = new URLSearchParams();
-  params.append('email', email);
-  return axios.post(`${BASE_URL}/forgot-password`, params, FORM_URLENCODED).then((res) => res.data);
+  return axios.post(`${BASE_URL}/forgot-password`, { email }).then((res) => res.data);
 };
 
-export const resetPassword = (token: string, newPassword: string): Promise<AuthMessageResponse> => {
-  const params = new URLSearchParams();
-  params.append('token', token);
-  params.append('newPassword', newPassword);
-  return axios.post(`${BASE_URL}/reset-password`, params, FORM_URLENCODED).then((res) => res.data);
+export const checkResetToken = (token: string): Promise<ResetTokenStatus> => {
+  return axios
+    .get(`${BASE_URL}/reset-password/check`, { params: { token } })
+    .then((res) => res.data);
+};
+
+export const resetPassword = (payload: ResetPasswordRequest): Promise<AuthMessageResponse> => {
+  return axios.post(`${BASE_URL}/reset-password`, payload).then((res) => res.data);
 };

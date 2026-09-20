@@ -16,6 +16,17 @@ const nextConfig = {
     ],
   },
 
+  async headers() {
+    return [
+      {
+        // Trang đặt lại mật khẩu nhận token qua URL: cấm gửi Referer đi bất cứ đâu
+        // để token không rò sang bên thứ ba, thay vì phó mặc cho mặc định của trình duyệt.
+        source: '/reset',
+        headers: [{ key: 'Referrer-Policy', value: 'no-referrer' }],
+      },
+    ];
+  },
+
   async rewrites() {
     return {
       beforeFiles: [

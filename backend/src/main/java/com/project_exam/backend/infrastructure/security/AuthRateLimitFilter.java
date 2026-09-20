@@ -23,6 +23,7 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
             "/api/auth/register", 5,
             "/api/auth/forgot-password", 3,
             "/api/auth/reset-password", 5,
+            "/api/auth/reset-password/check", 20,
             "/api/auth/change-password", 5,
             "/api/auth/refresh", 30
             // [TẮT XÁC THỰC EMAIL] , "/api/auth/verify", 10

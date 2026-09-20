@@ -183,6 +183,37 @@
   width: 100%;
   margin-bottom: 15px;
 
+  &.has-toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    input {
+      padding-right: 46px;
+    }
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 6px;
+    width: 34px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-size: 1.8rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--gray-50);
+      color: var(--text-color);
+    }
+  }
+
   input {
     width: 100%;
     background-color: var(--bg-white);

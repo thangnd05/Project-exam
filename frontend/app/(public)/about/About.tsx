@@ -69,10 +69,9 @@ function About() {
 
         <h2>Liên hệ & Góp ý</h2>
         <p>
-          Hệ thống vẫn đang trong quá trình phát triển và hoàn thiện. Nếu bạn có
-          bất kỳ góp ý hoặc mong muốn cải thiện tính năng nào, hãy liên hệ với
-          chúng tôi. Mỗi phản hồi của bạn đều là động lực để{' '}
-          <strong>{name}</strong> ngày càng tốt hơn!
+          Nếu bạn có góp ý hoặc mong muốn cải thiện tính năng nào, hãy liên hệ
+          với chúng tôi. Mỗi phản hồi đều giúp{' '}
+          <strong>{name}</strong> phục vụ bạn tốt hơn.
         </p>
 
         <p className={cx('thankyou')}>

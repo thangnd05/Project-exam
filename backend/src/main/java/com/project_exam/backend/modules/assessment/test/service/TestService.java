@@ -113,7 +113,11 @@ public class TestService {
     }
 
     public List<TestResponse> getAllTests() {
-        List<Test> tests = testRepository.findAll();
+        Set<String> adminIds = adminUserProvider.adminUserIds();
+        if (adminIds.isEmpty()) {
+            return List.of();
+        }
+        List<Test> tests = testRepository.findByClassIdIsNullAndCreatedByIn(adminIds);
         return buildUserTestSummariesBatch(tests, null);
     }
 

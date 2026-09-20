@@ -7,23 +7,27 @@ import {
   type UseQueryOptions,
 } from '@tanstack/react-query';
 import {
+  checkResetToken,
   forgotPassword,
   getCurrentUser,
   login,
   register,
   resetPassword,
 } from '@/app/apis/authApi';
-import type { AuthMessageResponse, LoginRequest, RegisterRequest, UserResponse } from '@/app/types';
+import type {
+  AuthMessageResponse,
+  LoginRequest,
+  RegisterRequest,
+  ResetPasswordRequest,
+  ResetTokenStatus,
+  UserResponse,
+} from '@/app/types';
 import { CURRENT_USER_QUERY_KEY } from '@/app/contexts/AuthContext';
 
 export const authKeys = {
   currentUser: CURRENT_USER_QUERY_KEY,
+  resetToken: (token: string) => ['auth', 'reset-token', token] as const,
 };
-
-interface ResetPasswordVariables {
-  token: string;
-  newPassword: string;
-}
 
 export function useLoginMutation(
   options: Omit<UseMutationOptions<UserResponse, any, LoginRequest>, 'mutationFn'> = {},
@@ -53,10 +57,26 @@ export function useForgotPasswordMutation(
 }
 
 export function useResetPasswordMutation(
-  options: Omit<UseMutationOptions<AuthMessageResponse, any, ResetPasswordVariables>, 'mutationFn'> = {},
+  options: Omit<UseMutationOptions<AuthMessageResponse, any, ResetPasswordRequest>, 'mutationFn'> = {},
 ) {
   return useMutation({
-    mutationFn: ({ token, newPassword }: ResetPasswordVariables) => resetPassword(token, newPassword),
+    mutationFn: resetPassword,
+    ...options,
+  });
+}
+
+/** Kiem tra token trong link email truoc khi cho nhap mat khau moi. */
+export function useResetTokenQuery(
+  token: string,
+  options: Omit<UseQueryOptions<ResetTokenStatus>, 'queryKey' | 'queryFn'> = {},
+) {
+  return useQuery({
+    queryKey: authKeys.resetToken(token),
+    queryFn: () => checkResetToken(token),
+    enabled: Boolean(token),
+    retry: false,
+    staleTime: 0,
+    refetchOnWindowFocus: false,
     ...options,
   });
 }

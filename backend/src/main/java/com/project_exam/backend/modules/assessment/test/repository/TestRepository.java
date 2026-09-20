@@ -30,6 +30,8 @@ public interface TestRepository extends JpaRepository<Test, String> {
 
     Page<Test> findByCreatedByAndClassIdIsNullAndChapterIdIsNull(String createdBy, Pageable pageable);
 
+    List<Test> findByClassIdIsNullAndCreatedByIn(Collection<String> createdByIds);
+
     Page<Test> findByExamTypeIdAndClassIdIsNullAndCreatedByIn(
             String examTypeId, Collection<String> createdByIds, Pageable pageable);
 

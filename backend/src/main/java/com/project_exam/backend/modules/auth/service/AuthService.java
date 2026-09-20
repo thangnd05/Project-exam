@@ -9,6 +9,7 @@ import com.project_exam.backend.modules.auth.dto.ChangePasswordRequest;
 import com.project_exam.backend.modules.auth.dto.ForgotPasswordRequest;
 import com.project_exam.backend.modules.auth.dto.RegisterRequest;
 import com.project_exam.backend.modules.auth.dto.ResetPasswordRequest;
+import com.project_exam.backend.modules.auth.dto.ResetTokenStatusResponse;
 import com.project_exam.backend.modules.auth.dto.AuthMessageResponse;
 import com.project_exam.backend.modules.users.user.dto.UserResponse;
 import com.project_exam.backend.modules.users.user.mapper.UserMapper;
@@ -41,12 +42,16 @@ import org.springframework.stereotype.Service;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Base64;
 import java.util.UUID;
 
 @Service
@@ -54,6 +59,7 @@ import java.util.UUID;
 public class AuthService {
 
     private static final long RESET_TOKEN_EXPIRE_MINUTES = 30;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
@@ -296,15 +302,20 @@ public class AuthService {
         }
     }
 
+    @Transactional
     public AuthMessageResponse forgotPassword(ForgotPasswordRequest request) {
-        Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
+        String email = request.getEmail() == null ? "" : request.getEmail().trim();
+        Optional<User> userOptional = userRepository.findByEmail(email)
+                .or(() -> userRepository.findByEmail(email.toLowerCase()));
         if (userOptional.isPresent()) {
             User user = userOptional.get();
+            // Moi user chi giu dung mot token con hieu luc -> gui lai se vo hieu hoa link cu.
             passwordResetTokenRepository.deleteByUserId(user.getUserId());
-            String token = UUID.randomUUID().toString();
+
+            String rawToken = generateResetToken();
             PasswordResetToken resetToken = new PasswordResetToken();
             resetToken.setUserId(user.getUserId());
-            resetToken.setToken(token);
+            resetToken.setToken(hashResetToken(rawToken));
             resetToken.setExpiresAt(Instant.now().plus(Duration.ofMinutes(RESET_TOKEN_EXPIRE_MINUTES)));
             resetToken.setUsed(false);
             passwordResetTokenRepository.save(resetToken);
@@ -312,26 +323,76 @@ public class AuthService {
             mailService.sendAuto(MailTemplateCode.RESET_PASSWORD, user.getEmail(), user.getUserId(),
                     Map.of(
                             "fullName", user.getFullName(),
-                            "actionUrl", frontendOrigin + "/reset?token=" + token,
+                            "actionUrl", frontendOrigin + "/reset?token=" + rawToken,
                             "expireMinutes", String.valueOf(RESET_TOKEN_EXPIRE_MINUTES)
                     ));
         }
-        return AuthMessageResponse.builder().message("Nếu email tồn tại, chúng tôi đã gửi liên kết đặt lại mật khẩu.").build();
+        // Luon tra cung mot thong diep de khong lo email nao dang ton tai trong he thong.
+        return AuthMessageResponse.builder()
+                .message("N\u1ebfu email t\u1ed3n t\u1ea1i, ch\u00fang t\u00f4i \u0111\u00e3 g\u1eedi li\u00ean k\u1ebft \u0111\u1eb7t l\u1ea1i m\u1eadt kh\u1ea9u.")
+                .build();
     }
 
+    /** Kiem tra token truoc khi hien thi form dat lai mat khau. */
+    public ResetTokenStatusResponse checkResetToken(String token) {
+        if (token == null || token.isBlank()) {
+            return ResetTokenStatusResponse.builder().valid(false).reason("MISSING").build();
+        }
+
+        Optional<PasswordResetToken> found = passwordResetTokenRepository.findByToken(hashResetToken(token));
+        if (found.isEmpty()) {
+            return ResetTokenStatusResponse.builder().valid(false).reason("INVALID").build();
+        }
+
+        PasswordResetToken resetToken = found.get();
+        if (Boolean.TRUE.equals(resetToken.getUsed())) {
+            return ResetTokenStatusResponse.builder().valid(false).reason("USED").build();
+        }
+        if (resetToken.getExpiresAt().isBefore(Instant.now())) {
+            return ResetTokenStatusResponse.builder().valid(false).reason("EXPIRED").build();
+        }
+
+        String maskedEmail = userRepository.findById(resetToken.getUserId())
+                .map(user -> maskEmail(user.getEmail()))
+                .orElse(null);
+
+        return ResetTokenStatusResponse.builder()
+                .valid(true)
+                .maskedEmail(maskedEmail)
+                .expiresInSeconds(Math.max(0, Duration.between(Instant.now(), resetToken.getExpiresAt()).getSeconds()))
+                .build();
+    }
+
+    @Transactional
     public AuthMessageResponse resetPassword(ResetPasswordRequest request) {
         validateNewPassword(request.getNewPassword(), request.getConfirmNewPassword());
-        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(request.getToken()).orElseThrow(() -> new BadRequestException("Token không hợp lệ"));
-        if (Boolean.TRUE.equals(resetToken.getUsed()) || resetToken.getExpiresAt().isBefore(Instant.now())) throw new BadRequestException("Token hết hạn hoặc đã dùng");
-        User user = userRepository.findById(resetToken.getUserId()).orElseThrow();
+
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(hashResetToken(request.getToken()))
+                .orElseThrow(() -> new BadRequestException("Li\u00ean k\u1ebft \u0111\u1eb7t l\u1ea1i m\u1eadt kh\u1ea9u kh\u00f4ng h\u1ee3p l\u1ec7"));
+        if (Boolean.TRUE.equals(resetToken.getUsed())) {
+            throw new BadRequestException("Li\u00ean k\u1ebft n\u00e0y \u0111\u00e3 \u0111\u01b0\u1ee3c s\u1eed d\u1ee5ng. Vui l\u00f2ng y\u00eau c\u1ea7u li\u00ean k\u1ebft m\u1edbi.");
+        }
+        if (resetToken.getExpiresAt().isBefore(Instant.now())) {
+            throw new BadRequestException("Li\u00ean k\u1ebft \u0111\u00e3 h\u1ebft h\u1ea1n. Vui l\u00f2ng y\u00eau c\u1ea7u li\u00ean k\u1ebft m\u1edbi.");
+        }
+
+        User user = userRepository.findById(resetToken.getUserId())
+                .orElseThrow(() -> new BadRequestException("Li\u00ean k\u1ebft \u0111\u1eb7t l\u1ea1i m\u1eadt kh\u1ea9u kh\u00f4ng h\u1ee3p l\u1ec7"));
+        if (user.getPassword() != null && passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new BadRequestException("M\u1eadt kh\u1ea9u m\u1edbi ph\u1ea3i kh\u00e1c m\u1eadt kh\u1ea9u hi\u1ec7n t\u1ea1i");
+        }
+
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+
         resetToken.setUsed(true);
         passwordResetTokenRepository.save(resetToken);
 
         refreshTokenStore.revokeAllForUser(user.getUserId());
         notifyPasswordChanged(user);
-        return AuthMessageResponse.builder().message("Đặt lại mật khẩu thành công").build();
+        return AuthMessageResponse.builder()
+                .message("\u0110\u1eb7t l\u1ea1i m\u1eadt kh\u1ea9u th\u00e0nh c\u00f4ng")
+                .build();
     }
 
     public AuthMessageResponse changePassword(ChangePasswordRequest request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
@@ -355,8 +416,44 @@ public class AuthService {
                 ));
     }
 
+    private String generateResetToken() {
+        byte[] bytes = new byte[32];
+        SECURE_RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    /** Token chi luu duoi dang bam, ro ri DB cung khong dung lai duoc. */
+    private String hashResetToken(String rawToken) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256")
+                    .digest(rawToken.trim().getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder(digest.length * 2);
+            for (byte b : digest) {
+                sb.append(Character.forDigit((b >> 4) & 0xF, 16)).append(Character.forDigit(b & 0xF, 16));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("Khong tim thay thuat toan SHA-256", e);
+        }
+    }
+
+    private String maskEmail(String email) {
+        if (email == null || !email.contains("@")) return null;
+        String[] parts = email.split("@", 2);
+        String name = parts[0];
+        String masked = name.length() <= 2
+                ? name.charAt(0) + "*"
+                : name.charAt(0) + "*".repeat(Math.min(name.length() - 2, 5)) + name.charAt(name.length() - 1);
+        return masked + "@" + parts[1];
+    }
+
     private void validateNewPassword(String newPassword, String confirmNewPassword) {
         if (!Objects.equals(newPassword, confirmNewPassword)) throw new BadRequestException("Mật khẩu xác nhận không khớp");
-        if (newPassword.length() < 6) throw new BadRequestException("Mật khẩu ít nhất 6 ký tự");
+        if (newPassword == null || newPassword.length() < 8) {
+            throw new BadRequestException("M\u1eadt kh\u1ea9u ph\u1ea3i c\u00f3 \u00edt nh\u1ea5t 8 k\u00fd t\u1ef1");
+        }
+        if (newPassword.length() > 72) {
+            throw new BadRequestException("M\u1eadt kh\u1ea9u kh\u00f4ng \u0111\u01b0\u1ee3c v\u01b0\u1ee3t qu\u00e1 72 k\u00fd t\u1ef1");
+        }
     }
 }

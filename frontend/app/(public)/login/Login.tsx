@@ -19,6 +19,7 @@ import routes from '@/app/configs/Routes';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import { FcGoogle } from "react-icons/fc";
+import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { name } from '@/app/assets/images';
 import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/components/Recaptcha/RecaptchaCheckbox';
 
@@ -36,6 +37,8 @@ function Login() {
   const [regUserName, setRegUserName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
   const [recaptchaToken, setRecaptchaToken] = useState('');
   const recaptchaRef = useRef<RecaptchaCheckboxHandle | null>(null);
 
@@ -163,8 +166,22 @@ function Login() {
             <div className={cx('input-box')}>
               <input type="text" placeholder="Tên đăng nhập" required value={regUserName} onChange={(e) => setRegUserName(e.target.value)} />
             </div>
-            <div className={cx('input-box')}>
-              <input type="password" placeholder="Mật khẩu" required value={regPassword} onChange={(e) => setRegPassword(e.target.value)} />
+            <div className={cx('input-box', 'has-toggle')}>
+              <input
+                type={showRegPassword ? 'text' : 'password'}
+                placeholder="Mật khẩu"
+                required
+                value={regPassword}
+                onChange={(e) => setRegPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                className={cx('password-toggle')}
+                onClick={() => setShowRegPassword((prev) => !prev)}
+                aria-label={showRegPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              >
+                {showRegPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
             </div>
 
             <div className={cx('agreement')}>
@@ -198,8 +215,23 @@ function Login() {
             <div className={cx('input-box')}>
               <input type="text" placeholder="Email hoặc Tên đăng nhập" required value={loginIdentifier} onChange={(e) => setLoginIdentifier(e.target.value)} disabled={loading} />
             </div>
-            <div className={cx('input-box')}>
-              <input type="password" placeholder="Mật khẩu" required value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} disabled={loading} />
+            <div className={cx('input-box', 'has-toggle')}>
+              <input
+                type={showLoginPassword ? 'text' : 'password'}
+                placeholder="Mật khẩu"
+                required
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                disabled={loading}
+              />
+              <button
+                type="button"
+                className={cx('password-toggle')}
+                onClick={() => setShowLoginPassword((prev) => !prev)}
+                aria-label={showLoginPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+              >
+                {showLoginPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
             </div>
 
             <Link href={routes.forgot} className={cx('forgot-link')}>Bạn quên mật khẩu?</Link>

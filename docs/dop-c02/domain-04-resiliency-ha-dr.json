@@ -1,0 +1,275 @@
+{
+  "version": 1,
+  "usageScope": "PRACTICE",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "A stateless API runs on EC2 instances in an Auto Scaling group behind an Application Load Balancer. During flash sales the ALB target 5xx rate rises sharply and customers see timeouts, yet average CPU across the fleet stays below 25 percent because the bottleneck is connection handling and an external dependency, not compute. The current policy is target tracking on CPU at 70 percent and it never scales out during these events. Which change makes the group react to the actual symptom?",
+      "explanation": "Phân tích đề: CPU thấp nhưng lỗi tăng, nghĩa là CPU không phải tín hiệu phản ánh tải. Cần chọn metric thể hiện đúng áp lực lên mỗi instance.\n(A) ĐÚNG: Target tracking trên ALBRequestCountPerTarget scale theo số request mỗi target, đúng với trường hợp nút thắt nằm ở connection hoặc I/O chứ không phải CPU. Có thể thêm alarm trên 5xx để cảnh báo, nhưng chính sách scale phải bám request count.\n(B) SAI: Hạ ngưỡng CPU xuống 40 phần trăm vẫn là bám vào metric sai; với CPU dưới 25 phần trăm thì chính sách vẫn không kích hoạt.\n(C) SAI: Đặt alarm trên 5xx để page on-call giúp con người biết chuyện, nhưng không tự động thêm capacity và không giải quyết sự cố trong lúc nó đang diễn ra.\n(D) SAI: Chuyển sang scheduled scaling cho các đợt flash sale có thể hữu ích khi biết trước lịch, nhưng đề mô tả nhu cầu phản ứng theo triệu chứng, và lịch cố định không xử lý được đợt tăng ngoài dự kiến.\nĐáp án đúng: A\nĐiểm cần nhớ: Chọn metric scale theo nút thắt thật: CPU cho workload tính toán, ALBRequestCountPerTarget cho workload theo request, độ sâu hàng đợi cho worker. Alarm để cảnh báo, policy để hành động.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Auto Scaling"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Replace the CPU policy with target tracking on ALBRequestCountPerTarget and keep a 5xx alarm for alerting", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Lower the CPU target tracking threshold from 70 percent to 40 percent", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create a CloudWatch alarm on the ALB 5xx metric that pages the on-call engineer during sales", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Replace dynamic scaling with scheduled scaling actions for each planned flash sale", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MSQ",
+      "questionText": "An Auto Scaling group serving long-lived HTTP connections must continue serving customers when one Availability Zone becomes impaired, and must never cut active connections when an instance is being replaced. During the last AZ event the service lost a third of its capacity and users saw connection resets. Which TWO configurations address both problems?",
+      "explanation": "Phân tích đề: Hai vấn đề riêng biệt: mất capacity khi một AZ hỏng, và cắt kết nối đang hoạt động khi thay thế instance.\n(A) ĐÚNG: Trải group trên ít nhất hai AZ (thực tế nên ba) và đặt capacity sao cho mất một AZ vẫn còn đủ phục vụ, tức là thiết kế theo nguyên tắc N cộng một hoặc chịu được mất một AZ.\n(B) ĐÚNG: Dùng deregistration delay trên target group để ALB ngừng gửi request mới nhưng cho phép request đang xử lý hoàn tất, kết hợp terminating lifecycle hook để instance chỉ bị hủy sau khi ứng dụng đã drain xong.\n(C) SAI: Đặt group trong một AZ để giảm chi phí truyền dữ liệu giữa các AZ chính là bỏ khả năng chịu lỗi.\n(D) SAI: Đặt health check grace period bằng 0 làm instance mới bị đánh giá sức khỏe trước khi ứng dụng kịp khởi động, gây vòng lặp thay thế.\n(E) SAI: Tăng max size không giúp gì nếu capacity hiện tại đã đủ và vấn đề nằm ở phân bố AZ cùng cách drain kết nối.\n(F) SAI: Tắt ELB health check để instance không bị thay thế sẽ giữ lại cả instance hỏng, làm giảm chất lượng dịch vụ.\nĐáp án đúng: A và B\nĐiểm cần nhớ: HA theo AZ là chuyện thiết kế capacity, còn không cắt kết nối là chuyện drain: deregistration delay trên target group cộng lifecycle hook trên ASG. Hai việc khác nhau, hai cơ chế khác nhau.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Auto Scaling"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Spread the group across at least two Availability Zones and size capacity so the service survives losing one of them", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Use target group deregistration delay together with a terminating lifecycle hook so connections drain before an instance is removed", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Keep the group in a single Availability Zone to eliminate cross-zone data transfer charges", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Set the health check grace period to zero so unhealthy instances are detected immediately", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Raise the maximum size of the group so replacements can be launched faster", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Switch the group health check type from ELB to EC2 so instances are not replaced during application errors", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "A company runs its primary application in us-east-1 and a warm standby with reduced capacity in ap-southeast-1. During normal operation every request must be served by the primary, and no traffic at all may reach the standby. If the primary becomes unhealthy, clients must reach the standby automatically without any change to client applications and without an operator editing DNS. Which Route 53 configuration meets these requirements?",
+      "explanation": "Phân tích đề: Không một request nào được tới standby khi primary khỏe, chuyển đổi tự động, không cần sửa client hay thao tác thủ công.\n(A) ĐÚNG: Failover routing policy với bản ghi PRIMARY gắn health check và bản ghi SECONDARY. Khi primary khỏe, Route 53 chỉ trả về bản ghi primary; khi health check fail, nó trả về secondary. Client không cần thay đổi vì tên miền giữ nguyên.\n(B) SAI: Weighted routing với trọng số rất nhỏ cho standby vẫn gửi một phần traffic sang standby trong điều kiện bình thường, vi phạm yêu cầu.\n(C) SAI: Latency-based routing gửi người dùng tới Region có độ trễ thấp nhất, nghĩa là standby sẽ phục vụ một phần người dùng ngay cả khi primary khỏe.\n(D) SAI: Multivalue answer trả về nhiều bản ghi khỏe mạnh cùng lúc, không phải mô hình active-passive.\nĐáp án đúng: A\nĐiểm cần nhớ: Failover là chính sách duy nhất đảm bảo passive không nhận traffic khi primary còn khỏe. Thời gian chuyển đổi phụ thuộc health check interval, failure threshold và TTL của bản ghi.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > Route 53 Routing Policies"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "A failover routing policy with a health check attached to the primary record", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A weighted routing policy with a weight of 99 on the primary and 1 on the standby", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "A latency-based routing policy with a record in each Region", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A multivalue answer routing policy returning both Regions with health checks", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "A globally distributed API is deployed in four Regions. Users must always be served by the Region that gives them the lowest network latency, but a Region whose application is failing must be removed from DNS answers automatically, even when its load balancer still accepts TCP connections. What is the correct Route 53 configuration?",
+      "explanation": "Phân tích đề: Định tuyến theo độ trễ, và loại Region hỏng khỏi kết quả DNS ngay cả khi load balancer vẫn chấp nhận kết nối TCP.\n(A) ĐÚNG: Tạo latency record cho từng Region và gắn health check kiểu HTTP hoặc HTTPS vào một đường dẫn ứng dụng thực sự (deep health check). Region nào ứng dụng hỏng sẽ bị đánh dấu unhealthy và Route 53 ngừng trả về bản ghi đó.\n(B) SAI: Latency record không gắn health check sẽ tiếp tục gửi người dùng tới Region hỏng vì Route 53 không biết trạng thái ứng dụng.\n(C) SAI: Health check kiểu TCP chỉ xác nhận cổng mở; load balancer vẫn mở cổng khi ứng dụng phía sau lỗi, nên không phát hiện được sự cố như đề mô tả.\n(D) SAI: Geolocation routing định tuyến theo vị trí địa lý chứ không theo độ trễ đo được, và không đáp ứng yêu cầu của đề.\nĐáp án đúng: A\nĐiểm cần nhớ: Latency routing cộng health check là cặp đi kèm bắt buộc. Health check phải là deep check trên đường dẫn ứng dụng, không phải TCP, nếu muốn phát hiện lỗi ở tầng ứng dụng.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > Route 53 Routing Policies"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Latency records per Region, each associated with an HTTP or HTTPS health check against an application path", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Latency records per Region without health checks, relying on the load balancer to stop responding", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Latency records per Region with TCP health checks on the load balancer listener port", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Geolocation records per continent with health checks on each Region", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "A compliance requirement states that Amazon EBS volumes, Amazon RDS databases, and Amazon EFS file systems in 25 accounts must be backed up daily, retained for 35 days, and restorable in a second Region. The security team must be able to see one report of backup coverage, and the DevOps team refuses to maintain per-service snapshot scripts. Which solution fits?",
+      "explanation": "Phân tích đề: Nhiều loại tài nguyên, nhiều account, retention 35 ngày, khôi phục ở Region thứ hai, báo cáo tập trung, không script riêng cho từng dịch vụ.\n(A) ĐÚNG: AWS Backup với backup plan (rule daily, retention 35 ngày, copy action sang Region thứ hai) được triển khai bằng backup policy ở cấp AWS Organizations, và Backup Audit Manager cho báo cáo độ phủ. Không cần script cho từng dịch vụ.\n(B) SAI: Amazon Data Lifecycle Manager chỉ quản lý EBS snapshot và AMI, không bao phủ RDS và EFS.\n(C) SAI: Viết Lambda cho từng dịch vụ là đúng thứ đề bài loại trừ và tạo gánh nặng bảo trì lớn.\n(D) SAI: Để từng team tự cấu hình backup theo dịch vụ của mình làm mất tính nhất quán và không có báo cáo độ phủ tập trung.\nĐáp án đúng: A\nĐiểm cần nhớ: AWS Backup là mặt phẳng sao lưu thống nhất: backup plan, backup vault, copy cross-Region và cross-account, backup policy ở Organizations, và Backup Audit Manager cho bằng chứng tuân thủ.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Backup"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "AWS Backup plans with cross-Region copy, deployed through organization backup policies, with Backup Audit Manager reporting", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Amazon Data Lifecycle Manager policies in every account covering all three services", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Scheduled Lambda functions per service that create and copy snapshots", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Native backup features configured independently by each application team", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MSQ",
+      "questionText": "Auditors reviewing a disaster recovery program found two gaps: restores were tested manually only once in the past year with no documented outcome, and an application role in a member account currently has permissions that would let a compromised workload delete recovery points. Which TWO controls should the DevOps engineer implement?",
+      "explanation": "Phân tích đề: Hai lỗ hổng: thiếu bằng chứng khôi phục hoạt động, và quyền xóa recovery point quá rộng ở account thành viên.\n(A) ĐÚNG: Lập lịch restore testing của AWS Backup để tự động khôi phục theo định kỳ và lưu lại báo cáo kết quả; đây chính là bằng chứng mà auditor yêu cầu, thay cho một lần thử thủ công.\n(B) ĐÚNG: Bật Backup Vault Lock và siết vault access policy cùng IAM/SCP để không principal ứng dụng nào xóa được recovery point; ở chế độ compliance thì kể cả quản trị viên cũng không thể.\n(C) SAI: Tăng tần suất backup không chứng minh được khả năng khôi phục và không ngăn việc xóa.\n(D) SAI: Sao chép recovery point sang một Region khác trong cùng account vẫn nằm trong phạm vi quyền của kẻ tấn công nếu account đó bị chiếm.\n(E) SAI: Ghi lại quy trình khôi phục vào tài liệu và rà soát hằng năm là giấy tờ, không phải bằng chứng kỹ thuật có thể kiểm chứng.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Backup chỉ có giá trị khi restore được chứng minh. Hai trụ cột: restore testing tự động có báo cáo, và bất biến bằng Vault Lock cộng quyền tối thiểu, tốt nhất là ở một account backup tách biệt.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Backup"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Schedule automated restore testing in AWS Backup and retain the resulting reports as audit evidence", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable Backup Vault Lock and restrict the delete actions with vault access policies and SCPs", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Increase the backup frequency from daily to hourly so more recovery points are available", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Copy recovery points to a second Region inside the same member account", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Document the manual restore procedure and review it once per year", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MCQ",
+      "questionText": "A team claims that its Auto Scaling group, ALB health checks, and Route 53 failover will all work correctly when instances become unhealthy, but this has never been verified outside of a design review. Leadership wants a controlled experiment against a real environment, with a documented outcome and a guarantee that the test stops automatically if customer impact exceeds an agreed level. Which approach should the team use?",
+      "explanation": "Phân tích đề: Cần thí nghiệm có kiểm soát trên môi trường thật, có bằng chứng, và tự dừng khi ảnh hưởng vượt ngưỡng.\n(A) ĐÚNG: AWS Fault Injection Service cho phép định nghĩa experiment template với action gây lỗi (ví dụ làm instance unhealthy hoặc dừng instance), target theo tag, và stop condition gắn CloudWatch alarm để tự dừng khi vượt ngưỡng; kết quả thí nghiệm được ghi lại làm bằng chứng.\n(B) SAI: Tắt instance thủ công bằng console không có stop condition, không có ghi nhận có cấu trúc và dễ vượt tầm kiểm soát.\n(C) SAI: Rà soát lại kiến trúc và tài liệu không phải kiểm chứng thực nghiệm, đúng thứ leadership đang muốn vượt qua.\n(D) SAI: Chạy load test tạo tải cao nhưng không mô phỏng được lỗi hạ tầng như instance hỏng hay mất AZ.\nĐáp án đúng: A\nĐiểm cần nhớ: FIS gồm action, target, stop condition (CloudWatch alarm) và IAM role. Stop condition là bắt buộc khi thí nghiệm chạm tới môi trường có người dùng thật.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Fault Injection Service (FIS)"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Run an AWS Fault Injection Service experiment with targeted fault actions and CloudWatch alarm stop conditions", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Terminate a few instances from the console during a low traffic window and watch the dashboards", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Perform an architecture review against the Well-Architected reliability pillar and document the findings", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Run a load test at three times peak traffic and observe whether failover occurs", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer is designing an AWS FIS experiment against a production ECS service. The experiment may only affect tasks that belong to a canary deployment, and it must stop by itself the moment p99 latency for the service exceeds 400 ms. Which experiment template design satisfies both constraints?",
+      "explanation": "Phân tích đề: Hai ràng buộc: giới hạn phạm vi đúng tập task canary, và tự dừng khi p99 vượt 400 ms.\n(A) ĐÚNG: Định nghĩa target bằng resource tag của các task canary (kèm selection mode nếu cần giới hạn số lượng hoặc phần trăm), và gắn stop condition là một CloudWatch alarm trên p99 latency với ngưỡng 400 ms. Hai phần này ánh xạ trực tiếp vào hai ràng buộc.\n(B) SAI: Nhắm toàn bộ service rồi dựa vào thời lượng action ngắn không giới hạn được phạm vi ảnh hưởng và không phản ứng theo trạng thái thực tế.\n(C) SAI: Để một kỹ sư theo dõi dashboard và bấm dừng là quy trình thủ công, không đáp ứng yêu cầu tự dừng.\n(D) SAI: Đặt CloudWatch alarm để page on-call là cảnh báo, không phải stop condition; thí nghiệm vẫn tiếp tục chạy.\nĐáp án đúng: A\nĐiểm cần nhớ: Trong FIS, phạm vi ảnh hưởng do target và selection mode quyết định, còn an toàn do stop condition quyết định. Alarm dùng để page không tương đương alarm dùng làm stop condition.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Fault Injection Service (FIS)"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Target only the tasks carrying the canary tag and attach a stop condition bound to a p99 latency alarm at 400 ms", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Target the whole service but keep the action duration under one minute", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Target the canary tasks and have an engineer watch the latency dashboard to stop the experiment", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Target the canary tasks and create a p99 latency alarm that notifies the on-call engineer", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MCQ",
+      "questionText": "A new hardened AMI has been published and referenced in a new version of the launch template used by a production Auto Scaling group of 40 instances. The team must move the fleet onto the new AMI while keeping at least 90 percent of capacity in service, without permanently changing desired capacity, and with the ability to abort and return to the previous launch template version if error rates rise. Which mechanism should be used?",
+      "explanation": "Phân tích đề: Thay AMI trên fleet đang chạy, giữ tối thiểu 90 phần trăm capacity, không đổi desired capacity vĩnh viễn, và có thể hủy để quay lại version trước.\n(A) ĐÚNG: Instance refresh chạy trên launch template version mới với minimum healthy percentage 90 và instance warmup phù hợp; có thể cancel giữa chừng và có tùy chọn rollback về version trước. Desired capacity không bị thay đổi vĩnh viễn.\n(B) SAI: Tăng desired capacity rồi giảm lại là thao tác thủ công, không đảm bảo instance mới dùng đúng version và không có cơ chế rollback.\n(C) SAI: Terminate instance theo lô để ASG tự launch lại không kiểm soát được ngưỡng capacity và không có checkpoint hay rollback.\n(D) SAI: Chờ instance được thay thế tự nhiên theo thời gian không có tiến độ xác định, và fleet sẽ chạy hỗn hợp hai AMI trong thời gian dài.\nĐáp án đúng: A\nĐiểm cần nhớ: Instance refresh là cơ chế chính thức để triển khai launch template version mới: minimum healthy percentage, instance warmup, checkpoint, cancel và rollback.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Auto Scaling"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Start an instance refresh against the new launch template version with a minimum healthy percentage of 90", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Double the desired capacity so new instances launch with the new template, then reduce it again", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Terminate instances in batches of four and let the group launch replacements", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Update the launch template and let normal instance churn replace the fleet over time", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MCQ",
+      "questionText": "Traffic to a web tier rises sharply every weekday at 09:00 and the pattern has been stable for months. CPU based target tracking eventually scales out, but capacity arrives about ten minutes late, and customers experience slow responses during that window every morning. The team wants the smallest amount of ongoing configuration work and does not want to keep peak capacity running overnight. What should the DevOps engineer do?",
+      "explanation": "Phân tích đề: Mẫu tải lặp lại và dự đoán được, phản ứng của target tracking trễ mười phút, không muốn giữ capacity đỉnh qua đêm, và muốn ít công cấu hình.\n(A) ĐÚNG: Thêm predictive scaling (hoặc scheduled scaling) để nâng capacity trước 09:00 dựa trên mẫu lịch sử, giữ nguyên target tracking cho phần biến động ngoài dự đoán. Ban đêm capacity vẫn hạ xuống nên chi phí không tăng thường trực.\n(B) SAI: Nâng min size lên mức đỉnh sẽ giữ capacity cao suốt 24 giờ, trái yêu cầu chi phí.\n(C) SAI: Giảm ngưỡng target tracking làm fleet chạy dư thừa cả ngày mà vẫn có độ trễ phản ứng vào buổi sáng.\n(D) SAI: Rút ngắn cooldown giúp phản ứng dày hơn nhưng không loại bỏ được độ trễ khởi động instance và warm-up ứng dụng.\nĐáp án đúng: A\nĐiểm cần nhớ: Với mẫu tải lặp lại, hãy chuẩn bị capacity trước bằng predictive hoặc scheduled scaling, và giữ chính sách phản ứng cho phần bất ngờ. Auto Scaling lấy giá trị capacity lớn nhất trong các chính sách đang áp dụng.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Auto Scaling"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Add predictive or scheduled scaling that raises capacity shortly before 09:00 while keeping the reactive policy", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Raise the minimum size of the group to the morning peak value", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Lower the CPU target tracking value to 30 percent so scale out starts earlier", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Shorten the scaling cooldown so the policy can act more frequently", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MSQ",
+      "questionText": "An Auto Scaling group runs an application that takes about four minutes to warm up before it can serve traffic at full speed, and that keeps client connections open for up to two minutes. Operators observe two problems: new instances receive traffic too early and return errors, and instances being scaled in drop active requests. Which TWO settings should be configured?",
+      "explanation": "Phân tích đề: Hai vấn đề đối xứng: lúc vào (instance mới nhận traffic quá sớm) và lúc ra (instance bị hủy khi còn request đang xử lý).\n(A) ĐÚNG: Đặt health check grace period và default instance warmup xấp xỉ thời gian khởi động ứng dụng, để instance mới không bị đánh giá sức khỏe sớm và metric của nó không làm nhiễu quyết định scaling; kết hợp slow start trên target group nếu cần tăng dần lưu lượng.\n(B) ĐÚNG: Dùng deregistration delay trên target group lớn hơn thời gian sống của request, và terminating lifecycle hook để ứng dụng có cơ hội hoàn tất công việc trước khi instance bị hủy.\n(C) SAI: Tăng desired capacity không liên quan tới hai vấn đề về thời điểm này.\n(D) SAI: Đổi health check type sang EC2 khiến ASG không còn nhận biết lỗi ở tầng ứng dụng, làm giảm chất lượng dịch vụ.\n(E) SAI: Tắt cross-zone load balancing không giải quyết vấn đề warm-up hay drain.\n(F) SAI: Dùng termination policy OldestInstance chỉ quyết định chọn instance nào để hủy, không ảnh hưởng tới việc drain kết nối.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Ghép đúng tham số với đúng giai đoạn: vào dùng health check grace period, instance warmup và slow start; ra dùng deregistration delay và lifecycle hook.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Auto Scaling"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Set the health check grace period and instance warmup to match the application start time", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Set a target group deregistration delay longer than the request lifetime and add a terminating lifecycle hook", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Increase the desired capacity so fewer instances are replaced at a time", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Change the group health check type from ELB to EC2", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Disable cross-zone load balancing on the target group", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Change the termination policy to OldestInstance", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 12,
+      "questionType": "MCQ",
+      "questionText": "A company is opening a new Region for its API. The rollout plan is to send 10 percent of global traffic there for a week, then 25 percent, then 50 percent, adjusting the share without redeploying anything, and to stop sending any traffic to the new Region automatically if its health check fails. Which Route 53 configuration supports this plan?",
+      "explanation": "Phân tích đề: Cần chia tỉ lệ traffic điều chỉnh được theo thời gian, và tự ngắt khi Region mới hỏng.\n(A) ĐÚNG: Weighted routing với health check gắn vào bản ghi của Region mới. Tỉ lệ được điều chỉnh bằng cách đổi weight, không cần triển khai lại gì; nếu health check fail, Route 53 ngừng trả bản ghi đó nên traffic tự dồn về Region cũ.\n(B) SAI: Failover routing chỉ có hai trạng thái primary và secondary, không biểu diễn được tỉ lệ canary.\n(C) SAI: Latency-based routing phân phối theo độ trễ, không cho phép kiểm soát tỉ lệ phần trăm theo kế hoạch.\n(D) SAI: Geolocation routing gán theo vị trí địa lý, cũng không phải cơ chế chia tỉ lệ.\nĐáp án đúng: A\nĐiểm cần nhớ: Weighted routing là công cụ cho canary và blue/green ở tầng DNS; luôn gắn health check để tự loại bỏ mục tiêu hỏng. Nhớ rằng độ chính xác của tỉ lệ phụ thuộc hành vi cache của resolver.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > Route 53 Routing Policies"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Weighted records for both Regions with health checks, starting with a small weight on the new Region", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Failover records with the new Region as secondary until it proves stable", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Latency-based records so the new Region naturally receives nearby traffic first", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Geolocation records that send one country at a time to the new Region", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 13,
+      "questionType": "MSQ",
+      "questionText": "Route 53 health checks for an HTTPS API behind an Application Load Balancer currently pass even when the application returns HTTP 500 for every request, because the load balancer still terminates the TLS connection. The team must make the health check reflect application health, including the state of a critical downstream dependency. Which TWO configuration choices are required?",
+      "explanation": "Phân tích đề: Health check hiện tại quá nông nên không phát hiện lỗi ứng dụng; cần phản ánh cả dependency quan trọng.\n(A) ĐÚNG: Chuyển sang health check kiểu HTTPS nhắm vào một đường dẫn ứng dụng cụ thể thay vì chỉ kiểm tra kết nối TCP; khi ứng dụng trả 500 thì health check thất bại.\n(B) ĐÚNG: Đường dẫn đó phải là deep health check: chỉ trả về mã thành công khi các dependency quan trọng còn hoạt động, và có thể dùng string matching để xác nhận nội dung mong đợi. Nhờ vậy trạng thái DNS phản ánh khả năng phục vụ thật.\n(C) SAI: Giảm TTL của bản ghi giúp client cập nhật nhanh hơn sau khi trạng thái đổi, nhưng không sửa được việc health check đánh giá sai.\n(D) SAI: Tăng request interval lên mức chậm hơn làm phát hiện muộn hơn.\n(E) SAI: Tăng failure threshold lên rất cao làm Route 53 chậm kết luận unhealthy, đi ngược mục tiêu.\n(F) SAI: Chuyển sang calculated health check chỉ hữu ích khi đã có các health check con đúng đắn; bản thân nó không sửa được health check nông.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Health check nông cho kết quả sai tích cực. Dùng HTTP/HTTPS trên đường dẫn ứng dụng, kiểm tra dependency, và có thể dùng string matching; calculated và CloudWatch alarm health check dùng để kết hợp nhiều tín hiệu.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > Route 53 Routing Policies"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use an HTTPS health check against a specific application path instead of a TCP check", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Make that path a deep check that returns a success code only when critical dependencies are healthy", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Reduce the record TTL so clients notice the change sooner", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Increase the health check request interval to reduce load on the application", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Increase the failure threshold so transient errors do not mark the endpoint unhealthy", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Replace the health check with a calculated health check over the existing TCP checks", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 14,
+      "questionType": "MCQ",
+      "questionText": "A data protection regulation requires that personal data of European users is processed only in eu-west-1 and data of United States users only in us-east-1. Traffic must never be served from the other Region even if it would respond faster, and requests from anywhere else must go to us-east-1. Which Route 53 routing policy enforces this?",
+      "explanation": "Phân tích đề: Ràng buộc pháp lý theo vị trí người dùng, tuyệt đối không phục vụ chéo Region, và cần một lựa chọn mặc định cho phần còn lại của thế giới.\n(A) SAI: Latency-based routing tối ưu độ trễ và sẽ phục vụ chéo Region khi điều đó nhanh hơn, vi phạm quy định.\n(B) ĐÚNG: Geolocation routing định tuyến theo châu lục hoặc quốc gia của truy vấn, cho phép gán châu Âu về eu-west-1, Hoa Kỳ về us-east-1, và một bản ghi default cho mọi vị trí khác.\n(C) SAI: Weighted routing chia tỉ lệ không liên quan tới vị trí người dùng.\n(D) SAI: Geoproximity định tuyến theo khoảng cách và bias, phù hợp để dịch chuyển tải chứ không phải để đảm bảo ranh giới pháp lý.\nĐáp án đúng: B\nĐiểm cần nhớ: Yêu cầu tuân thủ theo vị trí luôn dẫn tới geolocation, và luôn phải tạo bản ghi default để không bỏ sót truy vấn không xác định được vị trí.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > Route 53 Routing Policies"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Latency-based routing with health checks in both Regions", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Geolocation routing by continent and country with a default record pointing to us-east-1", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Weighted routing with all weight on the closest Region for each user group", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Geoproximity routing with a bias applied to each Region", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 15,
+      "questionType": "MCQ",
+      "questionText": "A security architect requires that backups of a production workload be copied into a vault in a separate, dedicated backup account, and that no principal in the production account, including one holding AdministratorAccess, can delete those copies during their retention period. Restores must still be possible during a disaster. Which design meets these requirements?",
+      "explanation": "Phân tích đề: Bản sao phải nằm ngoài tầm với của production account, không ai trong account đó xóa được, nhưng vẫn khôi phục được khi cần.\n(A) ĐÚNG: Dùng AWS Backup cross-account copy đưa recovery point sang vault ở account backup chuyên dụng, bật Vault Lock ở chế độ compliance và giới hạn quyền bằng vault access policy cùng SCP. Quyền của production account không áp dụng cho tài nguyên ở account khác, còn Vault Lock đảm bảo không xóa được trước hạn.\n(B) SAI: Vault trong chính production account có Vault Lock ở chế độ governance vẫn cho phép principal có quyền đặc biệt gỡ bỏ, và vẫn nằm trong phạm vi bị ảnh hưởng nếu account bị chiếm.\n(C) SAI: Sao chép sang Region khác trong cùng account không vượt qua được ranh giới quyền của account đó.\n(D) SAI: Xuất snapshot ra S3 rồi tự quản lý vòng đời là tự xây lại chức năng đã có và khó đảm bảo tính bất biến một cách nhất quán.\nĐáp án đúng: A\nĐiểm cần nhớ: Ranh giới account là ranh giới bảo vệ mạnh nhất. Mô hình chống ransomware chuẩn: cross-account copy vào account backup, Vault Lock chế độ compliance, quyền tối thiểu và tách biệt vai trò khôi phục.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Backup"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use AWS Backup cross-account copy into a vault in a dedicated backup account with Vault Lock in compliance mode", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Keep the vault in the production account and enable Vault Lock in governance mode", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Copy the recovery points to a second Region inside the production account", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Export snapshots to an S3 bucket in the backup account and manage retention with lifecycle rules", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 16,
+      "questionType": "MCQ",
+      "questionText": "A company wants Amazon RDS, Amazon EFS, and Amazon DynamoDB to share a single AWS Backup plan with one schedule and one retention setting. The RDS and EFS resources are already protected by the plan, but DynamoDB tables assigned to the same plan are not producing recovery points, and the tables currently rely on on-demand backups created in the DynamoDB console. What must be done so DynamoDB joins the plan?",
+      "explanation": "Phân tích đề: Cùng một backup plan nhưng DynamoDB không sinh recovery point trong khi các dịch vụ khác vẫn hoạt động.\n(A) ĐÚNG: Phải bật hỗ trợ của AWS Backup cho DynamoDB trong phần cài đặt dịch vụ (advanced features cho DynamoDB) ở Region và account tương ứng. Nếu chưa bật, tài nguyên được gán vào plan nhưng không được bảo vệ.\n(B) SAI: Bật point-in-time recovery của DynamoDB là một tính năng khác, hữu ích nhưng không làm cho backup plan tạo recovery point.\n(C) SAI: Tạo một plan riêng cho DynamoDB không giải quyết nguyên nhân và cũng trái yêu cầu dùng chung một lịch và một retention.\n(D) SAI: Gán resource bằng tag thay vì ARN chỉ đổi cách chọn tài nguyên, không khắc phục việc dịch vụ chưa được bật hỗ trợ.\nĐáp án đúng: A\nĐiểm cần nhớ: AWS Backup có công tắc bật hỗ trợ theo từng dịch vụ trong mỗi Region. Khi một loại tài nguyên không sinh recovery point dù đã gán vào plan, hãy kiểm tra mục opt-in này trước tiên.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Backup"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Opt DynamoDB into AWS Backup in the service settings for that account and Region", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable point-in-time recovery on each DynamoDB table", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create a separate backup plan dedicated to DynamoDB tables", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Assign the tables to the plan by tag instead of by resource ARN", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 17,
+      "questionType": "MSQ",
+      "questionText": "A regulator requires that backup data remain immutable for 30 days, and that this guarantee hold even if an attacker obtains administrative IAM credentials in the member account that owns the workload. The DevOps engineer must implement controls that do not depend on anyone noticing the attack in time. Which TWO controls should be used?",
+      "explanation": "Phân tích đề: Bất biến 30 ngày ngay cả khi kẻ tấn công có quyền quản trị trong account workload, và không dựa vào việc phát hiện kịp thời.\n(A) ĐÚNG: Bật AWS Backup Vault Lock ở chế độ compliance với retention tối thiểu 30 ngày. Sau khi qua giai đoạn cooling-off, cấu hình này không thể đảo ngược, kể cả bởi root, nên đáp ứng đúng yêu cầu.\n(B) ĐÚNG: Đặt vault ở một account chuyên dụng và hạn chế các API xóa bằng vault access policy cùng SCP ở cấp tổ chức, để quyền quản trị trong account workload không vươn tới được bản sao.\n(C) SAI: Cảnh báo khi có lệnh xóa recovery point là detective và phụ thuộc vào việc ai đó phản ứng kịp, trái yêu cầu.\n(D) SAI: Vault Lock ở chế độ governance cho phép principal có quyền phù hợp gỡ bỏ, nên không chống được kẻ tấn công có quyền quản trị.\n(E) SAI: Mã hóa vault bằng CMK bảo vệ tính bí mật, không ngăn được hành vi xóa.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Compliance mode là bất biến thật sự và không thể đảo ngược; governance mode chỉ là rào cản có thể gỡ. Kết hợp với cách ly theo account để không phụ thuộc vào một ranh giới quyền duy nhất.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Backup"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable Backup Vault Lock in compliance mode with a minimum retention of 30 days", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Keep the vault in a dedicated account and deny the delete APIs through vault policy and SCPs", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Create an EventBridge rule that alerts the security team when a recovery point is deleted", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable Backup Vault Lock in governance mode so only approved roles can delete recovery points", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Encrypt the vault with a customer managed KMS key held in the security account", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 18,
+      "questionType": "MCQ",
+      "questionText": "A resilience team must verify that a workload survives the loss of an entire Availability Zone, including the effect on EC2 instances and the EBS volumes attached to them, in a test VPC. The exercise must be reproducible, must be scoped to one Availability Zone only, and must terminate itself if a CloudWatch alarm on application availability breaches. Which approach should be used?",
+      "explanation": "Phân tích đề: Mô phỏng mất một AZ ảnh hưởng tới EC2 và EBS, phạm vi đúng một AZ, lặp lại được, và tự dừng theo alarm.\n(A) ĐÚNG: Tạo FIS experiment template dùng các action mô phỏng gián đoạn ở cấp Availability Zone, target giới hạn theo AZ và theo tag của môi trường test, kèm stop condition gắn CloudWatch alarm. Template lưu lại nên thí nghiệm lặp lại được.\n(B) SAI: Xóa subnet trong AZ đó là thao tác phá hủy, khó hoàn tác và không phải thí nghiệm có kiểm soát.\n(C) SAI: Tách network ACL để chặn toàn bộ lưu lượng của AZ có thể mô phỏng một phần nhưng thiếu cơ chế tự dừng và khó đảm bảo phạm vi chính xác.\n(D) SAI: Dừng thủ công từng instance trong AZ bỏ qua ảnh hưởng tới EBS và không có stop condition.\nĐáp án đúng: A\nĐiểm cần nhớ: FIS có sẵn các action ở nhiều tầng, gồm cả kịch bản gián đoạn theo Availability Zone. Luôn ghép target hẹp với stop condition để giữ thí nghiệm trong tầm kiểm soát.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Fault Injection Service (FIS)"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An FIS experiment template using Availability Zone impairment actions scoped to that AZ, with a CloudWatch alarm stop condition", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Delete the subnets in that Availability Zone and recreate them after the test", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Apply a network ACL that denies all traffic for the subnets in that Availability Zone", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Stop every EC2 instance in that Availability Zone from the console and observe the result", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 19,
+      "questionType": "MSQ",
+      "questionText": "Before allowing fault injection experiments in production, a security review demands two guarantees: only a designated chaos engineering role may start experiments, and an experiment must never be able to remove the safety net by disabling or deleting the CloudWatch alarms that serve as its stop conditions. Which TWO controls implement these guarantees?",
+      "explanation": "Phân tích đề: Giới hạn ai được bắt đầu thí nghiệm, và đảm bảo thí nghiệm không thể vô hiệu hóa chính cơ chế dừng của nó.\n(A) ĐÚNG: Dùng IAM để chỉ role chaos engineering mới được gọi fis:StartExperiment (và các action liên quan), mọi principal khác bị từ chối.\n(B) ĐÚNG: Bắt buộc mọi experiment template phải có stop condition, đồng thời deny cho role đó các action như cloudwatch:DeleteAlarms và cloudwatch:DisableAlarmActions trên các alarm được dùng làm stop condition. Nhờ vậy lưới an toàn không thể bị gỡ từ bên trong.\n(C) SAI: Chạy thí nghiệm bằng role quản trị để tránh lỗi thiếu quyền là đi ngược hoàn toàn với yêu cầu kiểm soát.\n(D) SAI: Giới hạn thời lượng thí nghiệm dưới năm phút giảm rủi ro phần nào nhưng không thay thế được stop condition và không kiểm soát ai được chạy.\n(E) SAI: Chỉ ghi log các lần chạy thí nghiệm là detective, không phải kiểm soát ngăn chặn.\nĐáp án đúng: A và B\nĐiểm cần nhớ: An toàn của chaos engineering đến từ IAM (ai được chạy), stop condition bắt buộc (khi nào dừng) và việc bảo vệ chính các alarm đó khỏi bị sửa bởi role thực thi thí nghiệm.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Fault Injection Service (FIS)"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Allow only the chaos engineering role to call the FIS experiment start actions", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Require stop conditions on every template and deny that role the ability to delete or disable those alarms", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Run experiments with an administrator role so no action is blocked by missing permissions", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Limit every experiment to a maximum duration of five minutes", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Log every experiment start in CloudTrail and review the log weekly", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 20,
+      "questionType": "MCQ",
+      "questionText": "An FIS experiment that should stop a percentage of ECS tasks fails immediately with an access denied error. The experiment template targets the correct cluster by tag, the stop condition alarm exists and is in OK state, and the engineer who started the experiment holds permissions for the FIS API. What is the MOST likely cause?",
+      "explanation": "Phân tích đề: Template đúng, người chạy có quyền gọi API FIS, alarm bình thường, nhưng thí nghiệm vẫn access denied ngay lập tức.\n(A) ĐÚNG: FIS thực hiện action bằng IAM role được gán trong experiment template, không phải bằng quyền của người khởi chạy. Nếu role đó thiếu quyền tương ứng trên ECS (ví dụ các action dừng hoặc cập nhật task trên cluster đích) thì thí nghiệm thất bại ngay với access denied.\n(B) SAI: Alarm ở trạng thái OK là điều kiện bình thường để bắt đầu; nếu alarm đang ở ALARM thì thí nghiệm sẽ bị chặn nhưng thông báo sẽ khác.\n(C) SAI: Thiếu tag trên cluster sẽ dẫn tới không tìm thấy target chứ không phải lỗi access denied.\n(D) SAI: Quyền của người khởi chạy đã được nêu là đầy đủ cho API FIS, nên đây không phải nguyên nhân.\nĐáp án đúng: A\nĐiểm cần nhớ: Phân biệt hai loại quyền trong FIS: quyền của người gọi API để bắt đầu thí nghiệm, và quyền của experiment role mà dịch vụ dùng để thực hiện action lên tài nguyên đích. Lỗi khi thực thi action hầu như luôn thuộc loại thứ hai.",
+      "tagNames": ["Resiliency, High Availability & Disaster Recovery > AWS Fault Injection Service (FIS)"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "The FIS experiment role does not have the required ECS permissions on the target cluster", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "The stop condition alarm must be in ALARM state before an experiment can act on targets", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "The target cluster is missing the tag used by the target selection, so no resources were resolved", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "The engineer who started the experiment lacks permission to stop ECS tasks directly", "isCorrect": false }
+      ]
+    }
+  ]
+}

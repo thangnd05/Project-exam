@@ -1,0 +1,343 @@
+{
+  "version": 1,
+  "usageScope": "PRACTICE",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "A pipeline that runs in a dedicated toolchain account must deploy an ECS service in the production account. Security requires that the deployment identity cannot create IAM users, cannot disable CloudTrail, and cannot be assumed by anything other than the pipeline itself, and that these limits hold even if someone later attaches a broader policy to the deployment role. Which design is MOST aligned with least privilege?",
+      "explanation": "Phân tích đề: Ba yêu cầu chồng lên nhau: quyền deploy hẹp, không thể tạo IAM user hay tắt CloudTrail kể cả khi policy bị nới rộng về sau, và chỉ pipeline mới assume được.\n(A) ĐÚNG: Tạo deploy role trong production với trust policy chỉ tin đúng role của pipeline, policy chỉ gồm các action ECS và CodeDeploy cần thiết, và đặt trần quyền bằng SCP ở OU production (hoặc permissions boundary trên chính role đó) để deny iam:CreateUser và các action tắt CloudTrail. Trần này tồn tại độc lập với policy được gắn sau này.\n(B) SAI: Gắn PowerUserAccess rồi dựa vào việc không ai lạm dụng là mô hình tin tưởng, không phải least privilege, và không có lớp chặn khi policy thay đổi.\n(C) SAI: Tạo IAM user trong production và chia sẻ access key cho pipeline là credential dài hạn, khó xoay vòng và khó truy vết.\n(D) SAI: Cho phép mọi principal trong toolchain account assume deploy role mở rộng bề mặt tấn công: bất kỳ workload nào ở account đó cũng có đường vào production.\nĐáp án đúng: A\nĐiểm cần nhớ: Least privilege cross-account gồm ba lớp: trust policy hẹp (ai assume được), identity policy hẹp (làm được gì), và trần quyền bằng SCP hoặc permissions boundary (không bao giờ vượt quá được, kể cả khi policy bị sửa).",
+      "tagNames": ["Security and Compliance > AWS IAM"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "A production deploy role trusted only by the pipeline role, with scoped ECS and CodeDeploy permissions, plus an SCP or permissions boundary denying IAM user creation and CloudTrail disabling", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A production deploy role with PowerUserAccess, trusted by the toolchain account, reviewed quarterly", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "An IAM user in the production account whose access keys are stored in the pipeline credential store", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A production deploy role whose trust policy allows the entire toolchain account as principal", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MSQ",
+      "questionText": "A CodeBuild project in a toolchain account must assume a role in the production account. The production security team requires short-lived credentials, forbids long-lived access keys, and requires that every AssumeRole call carry a shared secret string that production issues, so that the role cannot be assumed by a third party who merely learns its ARN. Which TWO IAM settings implement this?",
+      "explanation": "Phân tích đề: Credential ngắn hạn, không access key, và bắt buộc một chuỗi bí mật trong mỗi lần AssumeRole.\n(A) ĐÚNG: Trust policy của role production chỉ cho phép đúng service role của CodeBuild trong toolchain account gọi sts:AssumeRole. Đây là vế xác định ai được phép.\n(B) ĐÚNG: Thêm điều kiện sts:ExternalId trong trust policy và truyền giá trị đó từ pipeline khi gọi AssumeRole. Đây chính là chuỗi bí mật mà production cấp, và là biện pháp chống confused deputy.\n(C) SAI: Tạo IAM user trong production và lưu access key trong pipeline là credential dài hạn, vi phạm rõ ràng.\n(D) SAI: Cho phép toàn bộ toolchain account assume role làm mất tính xác định về danh tính gọi.\n(E) SAI: Kéo dài thời gian session lên tối đa đi ngược nguyên tắc credential ngắn hạn.\n(F) SAI: Lưu external id trong biến môi trường dạng plaintext của project làm lộ giá trị cho ai đọc được cấu hình; nó nên nằm trong Secrets Manager hoặc Parameter Store.\nĐáp án đúng: A và B\nĐiểm cần nhớ: sts:ExternalId dùng cho kịch bản bên thứ ba hoặc khi cần thêm một yếu tố xác thực ngữ cảnh; trong nội bộ một tổ chức có thể dùng aws:PrincipalOrgID. Trust policy luôn phải chỉ đích danh principal thay vì cả account khi có thể.",
+      "tagNames": ["Security and Compliance > AWS IAM"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Make the production role trust policy allow only the specific CodeBuild service role to call sts:AssumeRole", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Add an sts:ExternalId condition to the trust policy and have the pipeline pass that value on every AssumeRole call", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Create an IAM user in production and store its access keys in the pipeline credential store", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Allow the entire toolchain account as principal so future projects work without changes", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Set the maximum session duration of the production role to twelve hours", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Store the external ID as a plaintext environment variable on the CodeBuild project", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MSQ",
+      "questionText": "An application on EC2 reads a database password from a plaintext file that is baked into the AMI. The team must stop shipping the secret inside the image, must rotate the password automatically every 30 days, and must be able to prove who read the secret and when. Which TWO changes accomplish this?",
+      "explanation": "Phân tích đề: Bỏ secret khỏi AMI, rotation tự động 30 ngày, và truy vết ai đọc secret.\n(A) ĐÚNG: Lưu mật khẩu trong AWS Secrets Manager với rotation bật, cấp cho instance role quyền secretsmanager:GetSecretValue trên đúng ARN secret đó. Ứng dụng lấy giá trị lúc chạy nên AMI không còn chứa bí mật.\n(B) ĐÚNG: Mọi lời gọi GetSecretValue đều được ghi trong CloudTrail kèm principal và thời điểm, đáp ứng yêu cầu truy vết; kết hợp resource policy trên secret để giới hạn ai được đọc.\n(C) SAI: Mã hóa file mật khẩu trong AMI bằng KMS vẫn để bí mật nằm trong image, và bất kỳ ai launch được instance đều giải mã được.\n(D) SAI: Truyền mật khẩu qua user data khiến giá trị hiển thị trong metadata của instance và trong cấu hình launch template.\n(E) SAI: Xoay vòng mật khẩu thủ công mỗi 30 ngày không phải tự động và dễ bị bỏ sót.\n(F) SAI: Đặt mật khẩu trong tag của instance là nơi lưu trữ công khai với bất kỳ ai có quyền mô tả tài nguyên.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Ba lợi ích khi chuyển sang Secrets Manager: bí mật ra khỏi artifact, rotation quản lý sẵn, và mọi lần đọc đều xuất hiện trong CloudTrail. Parameter Store SecureString là lựa chọn rẻ hơn nhưng không có rotation quản lý sẵn cho cơ sở dữ liệu.",
+      "tagNames": ["Security and Compliance > AWS Secrets Manager & Parameter Store"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Store the password in Secrets Manager with automatic rotation and grant the instance role read access to that secret only", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Rely on CloudTrail records of the secret retrieval calls, combined with a resource policy that limits which principals may read it", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Keep the file in the AMI but encrypt it with a customer managed KMS key", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Pass the password to the instance through user data at launch time", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Have an operator change the password every 30 days and rebuild the AMI", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Store the password in an instance tag that the application reads at startup", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "A platform holds about 900 non-secret configuration values that must be organized hierarchically such as /prod/app/log_level, read very frequently by a large fleet, and kept as cheap as possible. It also holds 15 database credentials that must rotate every 7 days with a managed rotation mechanism. How should the DevOps engineer split these between Secrets Manager and Parameter Store?",
+      "explanation": "Phân tích đề: Một nhóm giá trị cấu hình lớn, không nhạy cảm, đọc nhiều, ưu tiên chi phí; một nhóm nhỏ là thông tin đăng nhập cần rotation quản lý sẵn.\n(A) ĐÚNG: Parameter Store cho cấu hình phân cấp và feature flag (standard parameter không tính phí lưu trữ, hỗ trợ đường dẫn phân cấp và GetParametersByPath), Secrets Manager cho thông tin đăng nhập cơ sở dữ liệu vì có rotation quản lý sẵn cùng tích hợp với RDS.\n(B) SAI: Đưa toàn bộ 915 giá trị vào Secrets Manager làm chi phí tăng mạnh mà không mang lại lợi ích cho các giá trị không nhạy cảm.\n(C) SAI: Đưa tất cả vào Parameter Store buộc phải tự xây rotation cho 15 thông tin đăng nhập, mất đi tính năng quản lý sẵn và tăng rủi ro.\n(D) SAI: Lưu cấu hình trong bảng DynamoDB tự quản lý là tự dựng lại một dịch vụ cấu hình, thêm code và mất tích hợp sẵn có với SDK và Lambda extension.\nĐáp án đúng: A\nĐiểm cần nhớ: Chọn theo bản chất dữ liệu: cấu hình phân cấp, đọc nhiều, không nhạy cảm thì Parameter Store; bí mật cần rotation, chia sẻ cross-account hoặc replica đa Region thì Secrets Manager.",
+      "tagNames": ["Security and Compliance > AWS Secrets Manager & Parameter Store"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Keep the hierarchical configuration in Parameter Store and the rotating database credentials in Secrets Manager", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Keep everything in Secrets Manager so there is one place to look for configuration", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Keep everything in Parameter Store, using SecureString for the database credentials", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Keep the configuration in a DynamoDB table and the credentials in Parameter Store", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "A security team needs a continuously updated inventory of resources in 90 accounts, the ability to see how a specific resource was configured on a past date, and automatic evaluation of rules such as S3 buckets must not be public. Results must be visible in one place, and accounts created later must be covered without extra work. Which solution should be deployed?",
+      "explanation": "Phân tích đề: Ba nhu cầu là kiểm kê liên tục, lịch sử cấu hình theo thời gian, và đánh giá quy tắc; cộng yêu cầu xem tập trung và tự phủ account mới.\n(A) ĐÚNG: Bật AWS Config trên toàn tổ chức, triển khai organization conformance pack chứa bộ rule để mọi account hiện tại và tương lai đều được đánh giá, và tạo Config aggregator ở account kiểm toán (delegated administrator) để xem tập trung.\n(B) SAI: AWS Security Hub tổng hợp finding rất tốt nhưng không cung cấp lịch sử cấu hình theo thời gian của từng tài nguyên như Config.\n(C) SAI: Truy vấn CloudTrail bằng Athena cho biết hành động API đã xảy ra, nhưng không dựng lại được trạng thái cấu hình của tài nguyên tại một thời điểm.\n(D) SAI: Viết script kiểm kê định kỳ là tự xây lại Config, tốn công và không có lịch sử chuẩn hóa.\nĐáp án đúng: A\nĐiểm cần nhớ: Config trả lời trạng thái cấu hình và lịch sử thay đổi; CloudTrail trả lời ai đã gọi API nào; Security Hub tổng hợp finding từ nhiều nguồn. Ba dịch vụ bổ sung nhau chứ không thay thế nhau.",
+      "tagNames": ["Security and Compliance > AWS Config"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "AWS Config enabled organization-wide with an organization conformance pack and an aggregator in a delegated administrator account", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "AWS Security Hub with the foundational security best practices standard enabled everywhere", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Amazon Athena queries over the organization CloudTrail logs on a daily schedule", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A scheduled inventory script in each account that writes resource descriptions to a central bucket", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MSQ",
+      "questionText": "An AWS Config rule reports NON_COMPLIANT for S3 buckets that allow public access. The team wants the condition corrected automatically within minutes, but the compliance officer insists that every corrective action be attributable to an identity and reviewable afterwards, and that the correction itself be visible in the compliance timeline. Which TWO components complete this design?",
+      "explanation": "Phân tích đề: Cần khắc phục tự động và đồng thời giữ được dấu vết kiểm toán của chính hành động khắc phục.\n(A) ĐÚNG: Gắn remediation action của Config vào một SSM Automation runbook (có sẵn hoặc tự viết) để tự sửa bucket vi phạm; remediation chạy bằng một IAM role xác định nên hành động có danh tính rõ ràng.\n(B) ĐÚNG: Giữ CloudTrail bật và Config recorder hoạt động để mọi lời gọi API do remediation thực hiện đều được ghi, và trạng thái tài nguyên chuyển từ NON_COMPLIANT sang COMPLIANT xuất hiện trên compliance timeline.\n(C) SAI: Cho phép người vận hành tự sửa khi nhận thông báo là quy trình thủ công, không đạt yêu cầu tự động trong vài phút.\n(D) SAI: Tắt Config recorder cho các bucket đã sửa để giảm chi phí sẽ xóa bỏ chính bằng chứng mà compliance officer cần.\n(E) SAI: Xóa bucket vi phạm là hành động phá hủy dữ liệu, không phải khắc phục.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Auto remediation của Config luôn đi qua SSM Automation; tính kiểm toán đến từ việc CloudTrail ghi lời gọi API và Config ghi lại chuyển trạng thái tuân thủ của tài nguyên.",
+      "tagNames": ["Security and Compliance > AWS Config"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Attach a Systems Manager Automation remediation action to the rule so the correction runs under a defined role", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Keep CloudTrail and the Config recorder enabled so the remediation calls and the compliance state change are recorded", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Notify the bucket owner and let them correct the configuration themselves", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Stop recording those buckets in AWS Config once they are compliant to reduce cost", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Have the remediation delete any bucket that is found to be public", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MCQ",
+      "questionText": "A security operations team must detect three different things: unusual API call patterns that suggest credential misuse, cryptocurrency mining behaviour on EC2 instances, and known CVEs present in the operating system packages and language libraries of EC2 instances and container images published by the build pipeline. Which combination of AWS services covers all three?",
+      "explanation": "Phân tích đề: Hai loại nhu cầu khác nhau: phát hiện mối đe dọa dựa trên hành vi và mạng, và đánh giá lỗ hổng phần mềm.\n(A) ĐÚNG: Amazon GuardDuty phân tích CloudTrail, DNS log, VPC Flow Logs và các nguồn khác để phát hiện hành vi bất thường như lạm dụng credential hay đào tiền mã hóa; Amazon Inspector quét lỗ hổng cho EC2 và image trong ECR, gồm cả package hệ điều hành lẫn thư viện ngôn ngữ.\n(B) SAI: AWS Config đánh giá cấu hình so với quy tắc, không phát hiện hành vi tấn công và không quét CVE.\n(C) SAI: CloudTrail cung cấp dữ liệu thô về lời gọi API nhưng không tự phân tích thành mối đe dọa, và hoàn toàn không xử lý CVE.\n(D) SAI: Macie chuyên phát hiện dữ liệu nhạy cảm trong S3, không phải công cụ cho hai nhu cầu còn lại.\nĐáp án đúng: A\nĐiểm cần nhớ: GuardDuty là phát hiện mối đe dọa dựa trên hành vi; Inspector là quét lỗ hổng phần mềm; Config là tuân thủ cấu hình; Macie là dữ liệu nhạy cảm; Security Hub là nơi tổng hợp.",
+      "tagNames": ["Security and Compliance > Amazon GuardDuty & Amazon Inspector"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Amazon GuardDuty for threat detection and Amazon Inspector for vulnerability assessment of EC2 and ECR images", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "AWS Config rules for the behaviours and Amazon Inspector for the CVEs", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "CloudTrail Insights for the behaviours and AWS Security Hub for the CVEs", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Amazon Macie for the behaviours and Amazon GuardDuty for the CVEs", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "GuardDuty reports that a production EC2 instance is repeatedly querying a domain associated with a known command and control server. The company's incident response policy requires that the instance stop communicating with the outside world immediately, that volatile and disk evidence be preserved for the forensics team, and that the response be automated rather than waiting for the on-call engineer. What should the automation do FIRST?",
+      "explanation": "Phân tích đề: Ba ràng buộc: cắt liên lạc ngay, giữ bằng chứng gồm cả dữ liệu dễ mất, và tự động.\n(A) ĐÚNG: Chạy một SSM Automation runbook do EventBridge kích hoạt để gắn security group cô lập (chỉ cho phép kênh điều tra), tách instance khỏi Auto Scaling group và target group, chụp snapshot các EBS volume, rồi thông báo cho đội an ninh. Instance vẫn ở trạng thái running nên bộ nhớ được bảo toàn cho forensics.\n(B) SAI: Terminate instance cắt được liên lạc nhưng phá hủy toàn bộ bằng chứng, đặc biệt là nội dung bộ nhớ.\n(C) SAI: Stop instance làm mất nội dung RAM, vốn là phần bằng chứng dễ mất nhất và thường quan trọng nhất trong điều tra mã độc.\n(D) SAI: Chỉ gửi thông báo cho đội an ninh không đáp ứng yêu cầu tự động cắt liên lạc ngay.\nĐáp án đúng: A\nĐiểm cần nhớ: Thứ tự chuẩn khi cô lập: thay security group, tách khỏi ASG và load balancer, snapshot volume, giữ máy chạy để bảo toàn RAM, ghi log mọi hành động. Terminate và stop đều phá hủy bằng chứng.",
+      "tagNames": ["Security and Compliance > Amazon GuardDuty & Amazon Inspector"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Apply an isolation security group, detach the instance from the Auto Scaling group and target group, snapshot its volumes, and notify the security team", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Terminate the instance so the Auto Scaling group replaces it with a clean one", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Stop the instance so that nothing further can be executed on it", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Send the finding to the security team through SNS and wait for their instructions", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MCQ",
+      "questionText": "During a customer due diligence review, an auditor requests the AWS SOC 2 Type II report and the ISO 27001 certificate covering Amazon RDS and AWS CodePipeline. The company's engineers must not produce or edit these documents themselves, and the documents must be obtained through an official channel with their confidentiality terms intact. Where should the compliance lead obtain them?",
+      "explanation": "Phân tích đề: Cần tài liệu kiểm toán chính thức của AWS, lấy qua kênh chính thống, không do kỹ sư tự tạo.\n(A) ĐÚNG: AWS Artifact là cổng tự phục vụ để tải báo cáo tuân thủ của AWS như SOC, ISO, PCI; khi tải, người dùng chấp nhận điều khoản bảo mật đi kèm nên tài liệu giữ nguyên tính pháp lý.\n(B) SAI: Security Hub báo cáo mức độ tuân thủ của chính tài nguyên khách hàng, không phải chứng nhận của AWS.\n(C) SAI: Config conformance pack đánh giá cấu hình của khách hàng, hoàn toàn không liên quan tới chứng chỉ của nhà cung cấp.\n(D) SAI: Trang web công khai có thể mô tả chương trình tuân thủ nhưng bản báo cáo chi tiết được phát hành qua Artifact với điều khoản bảo mật.\nĐáp án đúng: A\nĐiểm cần nhớ: Artifact phục vụ phía AWS trong mô hình trách nhiệm chung: Reports cho tài liệu kiểm toán, Agreements cho các thỏa thuận như BAA. Bằng chứng cho phía khách hàng đến từ Config, Security Hub và Audit Manager.",
+      "tagNames": ["Security and Compliance > AWS Artifact"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "From AWS Artifact, accepting the confidentiality terms presented at download time", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "From AWS Security Hub by exporting the compliance standard results", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "From AWS Config by generating a conformance pack report", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "From the public AWS compliance web pages by saving the relevant sections", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MCQ",
+      "questionText": "An external partner conducting a security assessment needs to review the AWS PCI DSS documentation. The partner must not have any access to production accounts, must not be able to view production resources, and the company wants to keep an auditable record of what the partner accessed. What is the appropriate access path?",
+      "explanation": "Phân tích đề: Cho phép đối tác xem tài liệu PCI của AWS, không được chạm tới production, và có bản ghi truy cập.\n(A) ĐÚNG: Cấp cho đối tác một IAM role trong một account không phải production (ví dụ account audit) với quyền chỉ đủ để dùng AWS Artifact, hoặc đơn giản là tải tài liệu rồi chia sẻ theo đúng điều khoản. Mọi truy cập được ghi trong CloudTrail của account đó và production hoàn toàn tách biệt.\n(B) SAI: Cấp quyền đọc trong production để họ tự vào Artifact vẫn mở cửa vào môi trường production, trái ràng buộc.\n(C) SAI: Tạo IAM user cho đối tác với access key dài hạn là mô hình credential kém an toàn và khó thu hồi.\n(D) SAI: Tắt kiểm soát truy cập Artifact cho mọi người trong tổ chức để tiện chia sẻ là nới lỏng không cần thiết và mất khả năng giới hạn theo vai trò.\nĐáp án đúng: A\nĐiểm cần nhớ: Quyền truy cập Artifact quản lý bằng IAM như mọi dịch vụ khác. Với bên ngoài, hãy tách account và dùng role tạm thời, đừng bao giờ mở đường vào account production chỉ để chia sẻ tài liệu.",
+      "tagNames": ["Security and Compliance > AWS Artifact"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Give the partner a role limited to AWS Artifact in a non-production audit account, or share the downloaded report under its terms", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Grant the partner read-only access to the production account so they can open Artifact there", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an IAM user for the partner with long-lived access keys limited to Artifact actions", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Remove Artifact access restrictions across the organization so the partner can be added quickly", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MCQ",
+      "questionText": "Developers must be able to pass an existing IAM role to AWS CodeBuild projects they create, but must never be able to create new IAM roles with broader permissions or attach AdministratorAccess to anything. The security team requires that this limit hold even if a developer later attaches a permissive managed policy to their own role. Which IAM feature enforces this?",
+      "explanation": "Phân tích đề: Cần trần quyền ở cấp danh tính, tồn tại độc lập với các policy được gắn sau này, cộng quyền PassRole có giới hạn.\n(A) ĐÚNG: Permissions boundary gắn vào role của developer đặt trần cho quyền hiệu dụng: dù có gắn thêm policy rộng đến đâu, quyền thực tế vẫn là giao của policy và boundary. Kết hợp policy cho phép iam:PassRole chỉ với các role được duyệt (và điều kiện iam:PassedToService là codebuild.amazonaws.com).\n(B) SAI: Chỉ dựa vào một IAM policy deny có thể bị bỏ qua nếu policy đó bị gỡ; nó không phải trần quyền cố định gắn với danh tính.\n(C) SAI: Cấp quyền tạo role nhưng yêu cầu quy ước đặt tên là kiểm soát bằng quy ước, dễ lách.\n(D) SAI: Rà soát định kỳ bằng IAM Access Analyzer là detective, không ngăn hành vi tại thời điểm xảy ra.\nĐáp án đúng: A\nĐiểm cần nhớ: Permissions boundary đặt trần cho một IAM entity; SCP đặt trần cho cả account; identity policy cấp quyền. Quyền hiệu dụng là giao của tất cả các lớp này.",
+      "tagNames": ["Security and Compliance > AWS IAM"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Attach a permissions boundary to the developer roles together with a scoped iam:PassRole policy", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Attach an IAM policy that explicitly denies iam:CreateRole and the administrator policy ARN", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Allow role creation but require a naming convention that the security team audits", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Run IAM Access Analyzer unused access findings monthly and revoke excessive permissions", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 12,
+      "questionType": "MCQ",
+      "questionText": "A shared S3 bucket must allow GetObject only for principals that belong to the company's AWS Organization. New accounts join the organization roughly every month, and the platform team refuses to update the bucket policy each time. Which condition key achieves this with the least ongoing effort?",
+      "explanation": "Phân tích đề: Giới hạn truy cập theo phạm vi tổ chức, tự động bao gồm account mới, không sửa bucket policy thường xuyên.\n(A) ĐÚNG: Điều kiện aws:PrincipalOrgID so khớp với ID của tổ chức; mọi principal thuộc bất kỳ account nào trong tổ chức, kể cả account thêm sau này, đều thỏa mãn mà không cần sửa policy.\n(B) SAI: Liệt kê từng account ID trong điều kiện aws:PrincipalAccount buộc phải cập nhật policy mỗi khi có account mới.\n(C) SAI: aws:SourceVpce giới hạn theo VPC endpoint cụ thể, giải quyết bài toán khác và không biểu diễn được ranh giới tổ chức.\n(D) SAI: aws:PrincipalArn với ký tự đại diện khó bao phủ chính xác và vẫn phải sửa khi cấu trúc tên thay đổi.\nĐáp án đúng: A\nĐiểm cần nhớ: aws:PrincipalOrgID cho toàn tổ chức; aws:PrincipalOrgPaths cho một OU cụ thể; aws:PrincipalAccount cho account đơn lẻ. Dùng khóa đúng phạm vi để tránh phải bảo trì danh sách.",
+      "tagNames": ["Security and Compliance > AWS IAM"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "A condition on aws:PrincipalOrgID matching the organization identifier", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A condition on aws:PrincipalAccount listing every member account", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "A condition on aws:SourceVpce for the endpoints used by the member accounts", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A condition on aws:PrincipalArn with a wildcard covering the standard role names", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 13,
+      "questionType": "MSQ",
+      "questionText": "An audit found that a pipeline role used to deploy an ECS service also carries iam:CreateUser and iam:AttachUserPolicy, which would allow it to create a privileged backdoor identity. The team must restore least privilege without interrupting deployments, and must make sure the same excess permission cannot be reintroduced by a future policy change in the production organizational unit. Which TWO changes should be made?",
+      "explanation": "Phân tích đề: Vừa sửa quyền hiện tại vừa ngăn tái diễn trong tương lai, đồng thời không được chặn việc deploy đang hoạt động.\n(A) ĐÚNG: Gỡ các action IAM thừa khỏi policy của pipeline role, giữ lại đúng nhóm quyền ECS và CodeDeploy mà quá trình deploy cần. Đây là phần khắc phục trực tiếp.\n(B) ĐÚNG: Thêm SCP (hoặc permissions boundary) ở OU production deny các action tạo và cấp quyền cho IAM user; kể cả khi ai đó gắn lại policy rộng trong tương lai thì quyền hiệu dụng vẫn bị chặn.\n(C) SAI: Thay bằng ReadOnlyAccess cộng ECS full access không giải quyết đúng vấn đề và ReadOnlyAccess còn mở rộng khả năng đọc dữ liệu không cần thiết.\n(D) SAI: Bật MFA cho pipeline role là không khả thi với principal tự động và không liên quan tới phạm vi quyền.\n(E) SAI: Tạo alarm khi có lệnh CreateUser là detective hữu ích nhưng không khôi phục least privilege.\n(F) SAI: Xoay vòng credential của pipeline không loại bỏ quyền thừa đang tồn tại trong policy.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Sửa quyền ở lớp identity policy, rồi khóa lại bằng lớp trần quyền (SCP hoặc permissions boundary). Chỉ sửa một lớp thì vấn đề dễ quay lại sau vài lần thay đổi.",
+      "tagNames": ["Security and Compliance > AWS IAM"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Remove the IAM user creation and policy attachment actions from the pipeline role, keeping only the deployment permissions", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Add an SCP or permissions boundary in the production OU that denies those IAM actions", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Replace the pipeline policy with ReadOnlyAccess plus full ECS access", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Require multi-factor authentication for the pipeline role session", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Create a CloudWatch alarm that fires when the pipeline role calls CreateUser", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Rotate the pipeline credentials so the excess permissions cannot be used", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 14,
+      "questionType": "MCQ",
+      "questionText": "A Lambda function attached to private subnets times out when reading a secret from Secrets Manager. The team already created an interface VPC endpoint for Secrets Manager with private DNS enabled, and the function role has the correct permissions. Debug logging shows that the AWS SDK also times out when the function refreshes credentials through AWS STS. There is no NAT gateway. What is MOST likely still missing?",
+      "explanation": "Phân tích đề: Endpoint Secrets Manager đã có, quyền đã đúng, nhưng vẫn timeout và STS cũng timeout, trong môi trường không có NAT.\n(A) ĐÚNG: Thiếu interface VPC endpoint cho AWS STS, và cần kiểm tra security group của endpoint cho phép HTTPS từ ENI của Lambda. Khi SDK không gọi được STS thì thao tác đọc secret cũng thất bại theo.\n(B) SAI: Tăng timeout của hàm chỉ kéo dài thời gian chờ trước khi vẫn thất bại vì không có đường mạng.\n(C) SAI: Tạo lại secret bằng key mặc định không liên quan tới hiện tượng timeout mạng.\n(D) SAI: Gán public IP cho ENI của Lambda là không thể; Lambda trong VPC không nhận public IP.\nĐáp án đúng: A\nĐiểm cần nhớ: Trong VPC không có NAT, mỗi dịch vụ AWS mà code gọi tới đều cần endpoint riêng. STS là endpoint hay bị bỏ quên nhất, sau đó tới logs, kms và secretsmanager.",
+      "tagNames": ["Security and Compliance > AWS Secrets Manager & Parameter Store"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An interface VPC endpoint for AWS STS, with security group rules allowing HTTPS from the function network interfaces", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A longer function timeout so the secret retrieval has time to complete", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Recreation of the secret with the AWS managed key instead of a customer managed key", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A public IP address on the function network interfaces", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 15,
+      "questionType": "MCQ",
+      "questionText": "During a large scale-out, hundreds of instances start simultaneously and each reads about twenty feature flags from Parameter Store. The application now receives throttling errors and instances fail to start. The values are non-secret feature flags that change at most a few times per week. Which change is MOST appropriate?",
+      "explanation": "Phân tích đề: Throttling do lượng đọc đồng thời rất lớn, dữ liệu là feature flag không nhạy cảm và ít thay đổi.\n(A) ĐÚNG: Bật higher throughput cho Parameter Store để nâng hạn mức lời gọi, đồng thời cache giá trị ở phía client với TTL vài phút; vì flag hiếm khi đổi nên cache là giải pháp tự nhiên và giảm mạnh số lời gọi.\n(B) SAI: Chuyển sang Secrets Manager không phù hợp cho dữ liệu không nhạy cảm, tăng chi phí đáng kể và vẫn có hạn mức lời gọi.\n(C) SAI: Nhúng flag vào AMI làm mọi thay đổi đều cần build image mới, mất tính linh hoạt của feature flag.\n(D) SAI: Làm lệch thời điểm khởi động instance để giảm đồng thời chỉ là cách né tạm thời và làm chậm quá trình scale-out khi cần capacity gấp.\nĐáp án đúng: A\nĐiểm cần nhớ: Với cấu hình đọc nhiều, hãy cache ở client (hoặc dùng AWS Parameters and Secrets Lambda extension) trước khi nghĩ tới việc đổi dịch vụ; Parameter Store có tùy chọn higher throughput khi thực sự cần.",
+      "tagNames": ["Security and Compliance > AWS Secrets Manager & Parameter Store"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable higher throughput for Parameter Store and cache the values on the client with a short TTL", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Migrate the feature flags to Secrets Manager, which has higher request limits", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Bake the current flag values into the AMI so instances do not need to read them at startup", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Stagger instance launches so fewer instances read parameters at the same time", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 16,
+      "questionType": "MSQ",
+      "questionText": "Secrets Manager rotation for an RDS password completes successfully every 30 days, but the application keeps using the old password until it is restarted, which currently happens only during the next deployment hours later. During that window every new database connection fails. The team must fix this in the application without disabling rotation. Which TWO changes should be made?",
+      "explanation": "Phân tích đề: Rotation thành công nhưng ứng dụng giữ giá trị cũ cho tới khi restart; cần sửa phía ứng dụng.\n(A) ĐÚNG: Dùng thư viện cache của Secrets Manager (hoặc cơ chế tương đương) với TTL ngắn để ứng dụng tự lấy giá trị mới sau vài phút thay vì giữ mãi giá trị đọc lúc khởi động.\n(B) ĐÚNG: Xử lý lỗi xác thực bằng cách tải lại secret và thiết lập kết nối mới ngay lập tức, thay vì để lỗi lan ra người dùng cho tới lần restart kế tiếp.\n(C) SAI: Tắt rotation giải quyết triệu chứng bằng cách bỏ đi biện pháp bảo mật, trái yêu cầu.\n(D) SAI: Restart ứng dụng theo lịch mỗi ngày là biện pháp thô, vẫn để lại cửa sổ lỗi và gây gián đoạn không cần thiết.\n(E) SAI: Kéo dài chu kỳ rotation lên 180 ngày chỉ làm sự cố hiếm hơn chứ không biến mất.\n(F) SAI: Lưu bản sao mật khẩu trong biến môi trường lúc deploy đưa bí mật ra ngoài Secrets Manager và vẫn cũ sau rotation.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Ứng dụng phải coi bí mật là giá trị có thể thay đổi bất cứ lúc nào: cache có TTL ngắn, và làm mới ngay khi gặp lỗi xác thực. Chiến lược alternating users ở phía rotation cũng giúp thu hẹp cửa sổ lỗi.",
+      "tagNames": ["Security and Compliance > AWS Secrets Manager & Parameter Store"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Read the secret through a caching client with a short TTL so new values are picked up automatically", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Reload the secret and reconnect immediately when an authentication error occurs", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Disable automatic rotation and rotate the password during deployments instead", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Restart the application on a daily schedule so it always picks up the newest value", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Extend the rotation interval to 180 days so the problem occurs less often", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Copy the current password into an environment variable during each deployment", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 17,
+      "questionType": "MCQ",
+      "questionText": "A Config aggregator in the audit account shows resources from 89 accounts but nothing from an account that was added to the organization yesterday, even though the aggregator is configured for the whole organization. Resources clearly exist in that account. What should the DevOps engineer check FIRST?",
+      "explanation": "Phân tích đề: Aggregator hoạt động cho các account khác, chỉ account mới là không có dữ liệu.\n(A) ĐÚNG: Kiểm tra xem AWS Config đã thực sự được bật trong account mới hay chưa, tức là configuration recorder và delivery channel đã tồn tại và đang ghi, đồng thời xác nhận account nằm trong phạm vi của aggregator. Aggregator chỉ tổng hợp dữ liệu mà Config ở account nguồn sinh ra; nếu recorder chưa bật thì không có gì để tổng hợp.\n(B) SAI: Tạo lại aggregator là hành động nặng tay khi 89 account khác vẫn hoạt động bình thường.\n(C) SAI: Thiếu quyền trên bucket lưu trữ sẽ ảnh hưởng việc lưu snapshot, nhưng nguyên nhân phổ biến và cần kiểm tra trước vẫn là Config chưa được bật ở account mới.\n(D) SAI: Thay đổi Region của aggregator không hợp lý khi nó đang tổng hợp đúng cho các account khác.\nĐáp án đúng: A\nĐiểm cần nhớ: Với account mới, hãy đảm bảo baseline tự động bật Config (qua Control Tower hoặc StackSets). Aggregator không tự bật Config ở account nguồn.",
+      "tagNames": ["Security and Compliance > AWS Config"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Whether AWS Config is enabled and recording in the new account and whether that account falls within the aggregator scope", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Whether the aggregator needs to be deleted and recreated to pick up new accounts", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Whether the audit account bucket policy allows the new account to write configuration snapshots", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Whether the aggregator is configured in the same Region as the new account resources", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 18,
+      "questionType": "MCQ",
+      "questionText": "A security team maintains a set of 30 Config rules covering encryption, public access, and IAM hygiene. The same set must be evaluated in every account of the organization, must stay identical everywhere, and must appear automatically in accounts created in the future. The team must not have to run anything per account. What should they use?",
+      "explanation": "Phân tích đề: Một bộ rule đồng nhất cho toàn tổ chức, tự có mặt ở account mới, không thao tác theo từng account.\n(A) ĐÚNG: Organization conformance pack đóng gói toàn bộ rule (và remediation nếu có) và triển khai từ management account hoặc delegated administrator tới toàn tổ chức hoặc một OU; account mới thuộc phạm vi sẽ tự nhận.\n(B) SAI: Tạo thủ công 30 rule ở từng account là chính việc đề bài muốn loại bỏ, và chắc chắn sẽ lệch nhau theo thời gian.\n(C) SAI: Chia sẻ một template và để mỗi team tự triển khai không đảm bảo tính đồng nhất và không tự phủ account mới.\n(D) SAI: Bật Security Hub với standard mặc định là bộ kiểm soát khác, không phải cách triển khai chính bộ 30 rule Config mà team đã xây dựng.\nĐáp án đúng: A\nĐiểm cần nhớ: Conformance pack là đơn vị đóng gói và triển khai rule của Config; bản organization giúp phủ toàn bộ account hiện tại và tương lai. Aggregator là để xem, conformance pack là để triển khai.",
+      "tagNames": ["Security and Compliance > AWS Config"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Deploy an organization conformance pack containing the rule set to the organization or the target OUs", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create the 30 rules individually in each account through the console", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Publish a CloudFormation template with the rules and ask each account team to deploy it", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable AWS Security Hub in every account and rely on its default standards", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 19,
+      "questionType": "MSQ",
+      "questionText": "A Config rule reports unencrypted EBS volumes attached to running production instances. Automatic remediation is required, but the compliance team insists that no volume may be deleted before its data is safely preserved, and that every step of the remediation be reconstructable afterwards. Which TWO elements should the design include?",
+      "explanation": "Phân tích đề: Khắc phục tự động nhưng không được xóa dữ liệu trước khi bảo toàn, và mọi bước phải tái dựng lại được.\n(A) ĐÚNG: Dùng SSM Automation runbook thực hiện tuần tự: tạo snapshot của volume, tạo volume mới đã mã hóa từ snapshot đó, rồi hoán đổi attachment trong một cửa sổ có kiểm soát. Dữ liệu luôn tồn tại ở ít nhất một bản sao trước khi có thay đổi phá hủy.\n(B) ĐÚNG: Giữ CloudTrail bật để mọi lời gọi API của quá trình remediation được ghi lại kèm principal và thời điểm, cùng với Config ghi nhận chuyển trạng thái tuân thủ; đây là phần tái dựng lại được.\n(C) SAI: Tách và xóa volume chưa mã hóa rồi tạo volume mới rỗng làm mất toàn bộ dữ liệu.\n(D) SAI: Chỉ gửi thông báo cho chủ sở hữu tài nguyên không đáp ứng yêu cầu tự động.\n(E) SAI: Bật mã hóa mặc định cho EBS ở cấp account là biện pháp phòng ngừa tốt cho volume tương lai, nhưng không khắc phục các volume hiện có đang vi phạm.\nĐáp án đúng: A và B\nĐiểm cần nhớ: EBS không thể mã hóa tại chỗ; quy trình chuẩn là snapshot, copy snapshot có mã hóa, tạo volume mới, rồi hoán đổi. Kết hợp CloudTrail và Config để có bằng chứng đầy đủ.",
+      "tagNames": ["Security and Compliance > AWS Config"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "A Systems Manager Automation remediation that snapshots the volume, creates an encrypted volume from it, and swaps the attachment", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "CloudTrail and Config recording left enabled so every remediation call and compliance change is reconstructable", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "A remediation that detaches and deletes the unencrypted volume and attaches a new encrypted one", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A notification to the resource owner asking them to re-create the volume with encryption", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Account level default EBS encryption, which converts the existing volumes automatically", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 20,
+      "questionType": "MCQ",
+      "questionText": "Container images pushed to Amazon ECR by the build pipeline must not reach production if they contain a critical CVE, and the pipeline must fail in that case. GuardDuty is already enabled for runtime threat detection, and the team does not want to introduce a third-party scanner or maintain scanning infrastructure. What should be added to the CI process?",
+      "explanation": "Phân tích đề: Chặn image có CVE nghiêm trọng ngay trong pipeline, không thêm công cụ bên thứ ba, không tự vận hành hạ tầng quét.\n(A) ĐÚNG: Bật Amazon Inspector enhanced scanning cho các repository ECR để image được quét khi push (bao gồm package hệ điều hành và thư viện ngôn ngữ), rồi thêm một bước trong pipeline đọc kết quả quét và fail build khi có finding mức critical.\n(B) SAI: GuardDuty phát hiện mối đe dọa lúc chạy, không quét lỗ hổng trong image và không dùng làm gate cho pipeline.\n(C) SAI: Chạy một scanner mã nguồn mở trong build là đưa thêm công cụ bên ngoài và phải tự bảo trì, trái ràng buộc.\n(D) SAI: Quét thủ công trước mỗi lần phát hành không mở rộng được và không phải là gate tự động.\nĐáp án đúng: A\nĐiểm cần nhớ: ECR basic scanning quét lúc push và chỉ package hệ điều hành; Inspector enhanced scanning quét cả thư viện ngôn ngữ và quét lại liên tục khi có CVE mới, đồng thời đẩy finding sang Security Hub và EventBridge để tự động hóa.",
+      "tagNames": ["Security and Compliance > Amazon GuardDuty & Amazon Inspector"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable Amazon Inspector scanning for the ECR repositories and fail the pipeline when a critical finding is present", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Configure GuardDuty to scan the images and block the deployment when it reports a critical finding", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Run an open source vulnerability scanner in the build stage and fail on critical results", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Have the security team scan each release candidate image manually before approval", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 21,
+      "questionType": "MSQ",
+      "questionText": "When GuardDuty reports that an IAM access key is being used from an unusual location in a way consistent with compromise, the company requires that the key be deactivated automatically within minutes and that the security team receive the finding details for follow-up. The response must not depend on an engineer being awake. Which TWO components implement this safely?",
+      "explanation": "Phân tích đề: Phản ứng tự động trong vài phút gồm hai việc: vô hiệu hóa key và thông báo kèm chi tiết finding.\n(A) ĐÚNG: EventBridge rule khớp loại finding tương ứng và gọi automation (Lambda hoặc SSM Automation runbook) để gọi UpdateAccessKey với trạng thái Inactive. Vô hiệu hóa thay vì xóa giúp giữ lại dấu vết cho điều tra và có thể khôi phục nếu là báo động giả.\n(B) ĐÚNG: Một target thông báo song song gửi tới SNS, AWS Chatbot hoặc hệ thống ticket, kèm finding ID và tài nguyên liên quan để đội an ninh tiếp tục xử lý.\n(C) SAI: Xóa vĩnh viễn IAM user ngay lập tức phá hủy bằng chứng và có thể làm gián đoạn dịch vụ hợp lệ nếu là báo động giả.\n(D) SAI: Chờ đội an ninh xác nhận trước khi hành động không đáp ứng yêu cầu vài phút và phụ thuộc vào con người.\n(E) SAI: Xoay vòng toàn bộ access key trong account là phản ứng quá rộng, gây gián đoạn lớn cho các workload không liên quan.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Mẫu hình phản ứng tự động: GuardDuty finding tới EventBridge, rồi tới hành động khắc phục có phạm vi hẹp cộng kênh thông báo. Ưu tiên hành động đảo ngược được (deactivate) hơn hành động phá hủy (delete).",
+      "tagNames": ["Security and Compliance > Amazon GuardDuty & Amazon Inspector"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An EventBridge rule on the finding that invokes automation to set the access key to inactive", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A parallel notification target that sends the finding identifier and affected resource to the security team", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Automation that deletes the IAM user owning the key as soon as the finding arrives", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A workflow that waits for security team confirmation before touching the credential", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Automation that rotates every access key in the account when any such finding appears", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 22,
+      "questionType": "MCQ",
+      "questionText": "Amazon Inspector reports a critical CVE on a group of EC2 instances. The fix requires a kernel update that can only be applied during next week's maintenance window, and the security team has accepted that risk in writing. Until then, the finding floods the dashboard and hides other issues, but the team must not lose visibility of it permanently. What should the DevOps engineer do?",
+      "explanation": "Phân tích đề: Rủi ro đã được chấp nhận có thời hạn, cần giảm nhiễu trên dashboard nhưng không được đánh mất finding vĩnh viễn.\n(A) ĐÚNG: Tạo suppression rule của Inspector giới hạn đúng finding và tập tài nguyên đó, với thời hạn tới cửa sổ bảo trì; finding vẫn tồn tại và xuất hiện trở lại khi hết hạn. Nếu nguy cơ khai thác cao, kết hợp biện pháp bù đắp như thu hẹp security group hoặc cô lập.\n(B) SAI: Tắt Inspector cho các instance đó làm mất toàn bộ khả năng phát hiện, kể cả các lỗ hổng khác.\n(C) SAI: Đánh dấu finding là đã xử lý khi chưa vá là ghi nhận sai sự thật và làm hỏng dữ liệu kiểm toán.\n(D) SAI: Giảm mức độ nghiêm trọng của finding làm sai lệch đánh giá rủi ro và ảnh hưởng tới các quy trình dựa trên severity.\nĐáp án đúng: A\nĐiểm cần nhớ: Suppression rule là cách chính thức để tạm ẩn finding đã được chấp nhận rủi ro; luôn đặt thời hạn và phạm vi hẹp, đồng thời ghi lại lý do chấp nhận rủi ro.",
+      "tagNames": ["Security and Compliance > Amazon GuardDuty & Amazon Inspector"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a scoped Inspector suppression rule that expires at the maintenance window, and apply compensating controls if exploitation risk is high", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Disable Inspector scanning for those instances until the patch is applied", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Mark the finding as resolved so it disappears from the dashboard", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Lower the severity of the finding so it no longer appears in the critical view", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 23,
+      "questionType": "MCQ",
+      "questionText": "A prospective customer asks two things: whether AWS is certified against PCI DSS for the services the company uses, and where the responsibilities of AWS end and those of the company begin for those services. The compliance lead must answer with official documentation rather than a summary written internally. Where is this material obtained?",
+      "explanation": "Phân tích đề: Cần tài liệu chính thức về chứng nhận của AWS và phần phân chia trách nhiệm theo dịch vụ.\n(A) ĐÚNG: AWS Artifact cung cấp báo cáo kiểm toán như PCI DSS Attestation of Compliance cùng các tài liệu đi kèm mô tả phạm vi và phần trách nhiệm; đây là nguồn chính thức, có điều khoản bảo mật khi tải.\n(B) SAI: Security Hub đánh giá tuân thủ của tài nguyên khách hàng, không chứng minh chứng nhận của AWS.\n(C) SAI: Trusted Advisor đưa ra khuyến nghị vận hành và bảo mật, không phải tài liệu tuân thủ.\n(D) SAI: Audit Manager thu thập bằng chứng cho phần trách nhiệm của khách hàng, hữu ích nhưng không phải nơi cung cấp chứng nhận của AWS.\nĐáp án đúng: A\nĐiểm cần nhớ: Câu hỏi về chứng nhận của AWS luôn dẫn tới Artifact. Câu hỏi về việc cấu hình của chính công ty có tuân thủ hay không dẫn tới Config, Security Hub hoặc Audit Manager.",
+      "tagNames": ["Security and Compliance > AWS Artifact"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "From AWS Artifact, which provides the audit reports and the accompanying scope and responsibility documentation", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "From AWS Security Hub, by enabling the PCI DSS standard and exporting the results", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "From AWS Trusted Advisor, by exporting the security checks for the account", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "From AWS Audit Manager, by creating an assessment from the PCI framework", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 24,
+      "questionType": "MSQ",
+      "questionText": "Only members of the compliance team may download AWS Artifact reports. Developers working in the same account must not be able to open Artifact at all, and the restriction must survive someone attaching a broader policy to a developer role later. Which TWO controls implement this?",
+      "explanation": "Phân tích đề: Cho phép đúng một nhóm, chặn nhóm còn lại, và giữ được hiệu lực khi policy của developer bị nới rộng về sau.\n(A) ĐÚNG: Chỉ cấp các action của AWS Artifact cho role của nhóm compliance; không cấp cho bất kỳ role nào khác. Đây là vế cho phép.\n(B) ĐÚNG: Thêm deny tường minh cho các action Artifact trên role developer, hoặc tốt hơn là đặt deny ở SCP cho OU tương ứng, vì deny tường minh luôn thắng allow và SCP đặt trần quyền độc lập với policy được gắn sau này.\n(C) SAI: Dựa vào chính sách nội bộ yêu cầu developer không mở Artifact là kiểm soát bằng quy ước.\n(D) SAI: Tải sẵn báo cáo rồi bỏ hoàn toàn việc dùng Artifact không phải là kiểm soát truy cập và gây khó khăn khi cần bản mới nhất.\n(E) SAI: Bật MFA cho mọi người dùng là thực hành tốt chung nhưng không phân biệt được ai được dùng Artifact.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Mô hình chuẩn để giới hạn một dịch vụ cho một nhóm: allow hẹp cho nhóm được phép, deny tường minh hoặc SCP cho phần còn lại. Deny luôn thắng allow trong đánh giá policy.",
+      "tagNames": ["Security and Compliance > AWS Artifact"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Grant the Artifact actions only to the compliance team role", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Explicitly deny the Artifact actions for the developer roles, or deny them through an SCP on the OU", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Publish an internal policy stating that developers must not open AWS Artifact", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Download the reports once and stop using Artifact in that account", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Require multi-factor authentication for every principal in the account", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 25,
+      "questionType": "MCQ",
+      "questionText": "An auditor is not satisfied with evidence that someone downloaded a SOC report last year. They want proof that the company formally accepted the relevant AWS agreement for handling regulated data, including who accepted it and on what date, and whether that acceptance applies to the whole organization. What should the compliance lead present?",
+      "explanation": "Phân tích đề: Yêu cầu là bằng chứng về việc chấp nhận thỏa thuận, kèm người chấp nhận, ngày tháng và phạm vi tổ chức, chứ không phải một bản PDF đã tải.\n(A) ĐÚNG: Phần Agreements của AWS Artifact hiển thị thỏa thuận đã chấp nhận, thời điểm chấp nhận, và cho biết đó là thỏa thuận cho một account hay cho toàn tổ chức khi được quản lý ở cấp Organizations.\n(B) SAI: Bản PDF của báo cáo SOC là tài liệu kiểm toán về hạ tầng AWS, không phải bằng chứng chấp nhận thỏa thuận.\n(C) SAI: Ảnh chụp màn hình email nội bộ phê duyệt không phải bản ghi chính thức trong dịch vụ.\n(D) SAI: Báo cáo Config hoặc Security Hub nói về cấu hình tài nguyên, hoàn toàn không liên quan tới thỏa thuận pháp lý.\nĐáp án đúng: A\nĐiểm cần nhớ: Artifact có hai phần tách biệt: Reports (tài liệu kiểm toán của AWS) và Agreements (chấp nhận và quản lý thỏa thuận, có thể ở cấp tổ chức). Câu hỏi về việc đã ký hay chưa luôn thuộc phần Agreements.",
+      "tagNames": ["Security and Compliance > AWS Artifact"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "The AWS Artifact Agreements view showing the accepted agreement, the accepting identity, the date, and its organization scope", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "The downloaded SOC report PDF together with its download timestamp", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "A screenshot of the internal approval email chain for the agreement", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "An AWS Config conformance pack report covering the regulated workload", "isCorrect": false }
+      ]
+    }
+  ]
+}

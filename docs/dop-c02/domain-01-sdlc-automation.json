@@ -1,0 +1,344 @@
+{
+  "version": 1,
+  "usageScope": "PRACTICE",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "A software company keeps its product source in AWS CodeCommit. A partner engineering team, employed by a different company with its own AWS account, must be able to clone one specific repository for an integration project that lasts six months. Corporate policy forbids creating IAM users in the company account for anyone who is not an employee, forbids issuing long-lived Git credentials, and requires that access be removable in a single action when the project ends. Which approach satisfies all of these constraints?",
+      "explanation": "Phân tích đề: Ba ràng buộc cứng: không tạo IAM user cho người ngoài, không phát credential dài hạn, và thu hồi bằng một hành động duy nhất. Quyền cần cấp chỉ là clone (codecommit:GitPull) trên đúng một repository.\n(A) SAI: Git credentials cho HTTPS bắt buộc gắn với một IAM user trong chính account này. Phương án vi phạm cả hai ràng buộc đầu tiên, và khi kết thúc dự án phải xóa từng user một.\n(B) ĐÚNG: Tạo một IAM role với policy cho phép codecommit:GitPull trên ARN của đúng repository đó, trust policy cho phép account của đối tác assume (kèm sts:ExternalId để chống confused deputy). Đối tác dùng credential tạm thời của STS, không có IAM user nào được tạo bên mình, và khi kết thúc chỉ cần xóa role là toàn bộ quyền biến mất ngay lập tức.\n(C) SAI: Upload SSH public key cho một IAM user dùng chung nghe có vẻ gọn, nhưng vẫn là IAM user cho người ngoài, không truy vết được ai trong nhóm đối tác đã clone, và khóa SSH là credential dài hạn.\n(D) SAI: Mirror repository sang một S3 bucket rồi chia sẻ bucket giữ được ràng buộc IAM, nhưng phá vỡ luồng làm việc Git (không clone/pull được), tạo bản sao dữ liệu phải đồng bộ, và thu hồi phải xử lý cả bucket policy lẫn bản sao đã tồn tại.\nĐáp án đúng: B\nĐiểm cần nhớ: Truy cập Git cho bên thứ ba = cross-account IAM role + codecommit:GitPull + sts:ExternalId, ký SigV4. HTTPS Git credentials và SSH key luôn gắn với một IAM user trong chính account đó, nên không dùng cho người ngoài tổ chức.",
+      "tagNames": ["SDLC Automation > AWS CodeCommit"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create one IAM user per partner engineer and generate HTTPS Git credentials scoped to that repository", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Create an IAM role allowing codecommit:GitPull on that repository ARN, with a trust policy allowing the partner account to assume it under an external ID", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Create a shared IAM user for the partner team, upload their SSH public keys to it, and delete the user at the end of the project", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Mirror the repository into an S3 bucket and grant the partner account read access to the bucket through a bucket policy", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MSQ",
+      "questionText": "A regulated company uses AWS CodeCommit as its system of record. An internal audit requires that the main branch of every production repository can only change through a reviewed pull request, that nobody can rewrite history on that branch, and that the control is enforced by the service rather than by team convention. Developers must keep full freedom on feature branches. Which TWO actions should the DevOps engineer take?",
+      "explanation": "Phân tích đề: Yêu cầu là preventive control ở cấp dịch vụ (không phải quy ước), áp cho nhánh main: mọi thay đổi phải qua pull request đã review, và không được viết lại lịch sử. Feature branch vẫn tự do.\n(A) ĐÚNG: Approval rule template khai báo số approver tối thiểu và có thể giới hạn approver theo IAM ARN/nhóm; template được associate với nhiều repository nên áp dụng nhất quán. Pull request không đạt số approval sẽ không merge được — đây chính là phần bắt buộc review.\n(B) SAI: Notification rule gửi SNS khi có push là detective thuần túy. Nó thông báo sau khi lịch sử đã bị thay đổi, không ngăn được bất cứ điều gì.\n(C) SAI: Trigger gọi Lambda để tự revert là kiến trúc chữa cháy: force-push đã ghi đè lịch sử trước khi Lambda chạy, có cửa sổ mất commit, và việc tự động push ngược lại có thể tạo xung đột với người đang làm việc.\n(D) ĐÚNG: Branch-level permission trên main dùng IAM policy với condition codecommit:References để deny các hành động ghi trực tiếp (GitPush thường và force-push, DeleteBranch, PutFile, MergeBranchesBy*) cho nhóm developer, chỉ để lại đường merge qua pull request. Vì điều kiện gắn theo reference nên feature branch không bị ảnh hưởng.\n(E) SAI: Chuyển repository sang chế độ chỉ đọc cho toàn bộ developer chặn được viết lại lịch sử nhưng cũng chặn luôn merge pull request hợp lệ, làm quy trình phát triển ngừng hoạt động.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Bảo vệ nhánh trên CodeCommit gồm hai vế bổ sung nhau: approval rule template (bắt buộc review) và branch permission bằng IAM condition codecommit:References (chặn ghi trực tiếp/force-push). Trigger và notification chỉ là detective.",
+      "tagNames": ["SDLC Automation > AWS CodeCommit"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create an approval rule template that requires a minimum number of approvers from the reviewer group and associate it with the production repositories", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create a notification rule that publishes to an SNS topic whenever a push reaches the main branch", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Configure a repository trigger that invokes a Lambda function to revert any commit pushed directly to main", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Attach an IAM policy that denies the direct write actions on the main branch using a codecommit:References condition, leaving pull request merges as the only path", "isCorrect": true },
+        { "answerLabel": "E", "answerText": "Make the repository read-only for the developer group and have the release team apply approved changes", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer is migrating 15 pipelines whose source is GitHub.com. The existing pipelines use a source action configured with a personal access token belonging to an engineer who is leaving the company, and they poll the repository for changes, which adds up to several minutes of delay per release. The new design must start executions within seconds of a push, must not depend on any individual's credential, and must let AWS manage the webhook registration. Which source configuration should be used?",
+      "explanation": "Phân tích đề: Ba yêu cầu: khởi động gần như tức thì (loại polling), không phụ thuộc credential cá nhân, và webhook do AWS quản lý.\n(A) SAI: Giữ source action kiểu GitHub version 1 với OAuth token chỉ đổi chủ sở hữu token; vẫn là credential cá nhân, vẫn phải xoay vòng thủ công, và kiểu source này đã bị thay thế.\n(B) ĐÚNG: AWS CodeConnections (trước là CodeStar Connections) dùng GitHub App cài ở cấp tổ chức, không gắn với cá nhân; AWS tự đăng ký và quản lý webhook nên execution bắt đầu ngay sau push. Một connection dùng lại được cho cả 15 pipeline.\n(C) SAI: Lưu PAT trong Secrets Manager và cho pipeline đọc lúc chạy giải quyết chuyện lưu trữ, nhưng token vẫn thuộc về một con người, vẫn phải xoay vòng, và vẫn cần tự dựng webhook.\n(D) SAI: Để GitHub Actions build rồi đẩy artifact lên S3 làm source cho pipeline là một kiến trúc hợp lệ nhưng biến đổi toàn bộ quy trình, thêm một hệ thống CI thứ hai phải vận hành, và không phải điều đề bài hỏi.\nĐáp án đúng: B\nĐiểm cần nhớ: Nguồn GitHub/GitLab/Bitbucket cho CodePipeline ngày nay luôn là CodeConnections: xác thực ở cấp tổ chức, webhook do AWS quản lý, tái sử dụng cho nhiều pipeline. Thấy polling hoặc personal access token trong đáp án thì gần như chắc chắn là phương án cũ và sai.",
+      "tagNames": ["SDLC Automation > GitHub / GitLab / Bitbucket Integration"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Keep the existing GitHub source action type and replace the token with one created by a service account belonging to the platform team", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Use a source action backed by an AWS CodeConnections connection to the GitHub organization, which registers and manages the webhook automatically", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Store a personal access token in AWS Secrets Manager and have the source action read it at execution time", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Build in GitHub Actions and publish the artifact to Amazon S3, using S3 as the pipeline source with event notifications", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "A company runs GitLab self-managed on EC2 instances in a private subnet of a VPC in ap-southeast-1. There is no inbound path from the internet, and the security team will not open one. A new AWS CodePipeline in the same Region must start on every push to the release branch, with the least operational overhead and without any component that the platform team has to patch. What should the DevOps engineer configure?",
+      "explanation": "Phân tích đề: GitLab self-managed nằm trong private subnet, không có inbound từ Internet và không được mở. Pipeline phải khởi động theo push, ít vận hành nhất, không thêm thành phần phải vá.\n(A) ĐÚNG: Tạo một CodeConnections host cho GitLab self-managed với cấu hình VPC (VPC id, subnet, security group). Dịch vụ dựng elastic network interface trong VPC để tiếp cận GitLab private, sau đó tạo connection từ host đó và dùng làm source. Không có máy chủ trung gian nào do khách hàng vận hành.\n(B) SAI: Dựng một EC2 relay nhận webhook rồi gọi StartPipelineExecution hoạt động được nhưng thêm đúng thứ đề bài muốn tránh: một thành phần phải vá, phải giám sát và phải làm HA.\n(C) SAI: Mở inbound qua NLB public cho GitLab vi phạm trực tiếp ràng buộc của security team.\n(D) SAI: Cho pipeline polling repository qua Direct Connect không giải quyết được việc endpoint nằm trong private subnet, và polling vốn đã chậm cùng tốn kém.\nĐáp án đúng: A\nĐiểm cần nhớ: GitHub Enterprise Server và GitLab self-managed dùng khái niệm Host trong CodeConnections; Host có VPC configuration để tiếp cận hệ thống trong mạng riêng mà không cần mở inbound. Sau khi tạo host, mỗi connection dẫn xuất từ nó dùng như connection thường.",
+      "tagNames": ["SDLC Automation > GitHub / GitLab / Bitbucket Integration"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a CodeConnections host for GitLab self-managed with a VPC configuration, then create a connection from that host and use it as the pipeline source", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Run a small EC2 relay in a public subnet that receives GitLab webhooks and calls StartPipelineExecution", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Publish GitLab through an internet-facing Network Load Balancer restricted to the AWS webhook IP ranges", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Configure the source action to poll the repository over the existing Direct Connect link", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "A Java service is built by AWS CodeBuild. The project was recently attached to a VPC so integration tests can reach a private Amazon RDS instance. Since then, build duration has doubled and builds intermittently fail while Maven resolves dependencies. The VPC has no NAT gateway, and the company does not want to add one. Dependencies are published both on Maven Central and in an internal repository. Which change gives the largest and most durable improvement?",
+      "explanation": "Phân tích đề: Build trong VPC không có NAT nên không ra được Internet; Maven tải dependency mỗi lần build là nguyên nhân vừa chậm vừa không ổn định. Cần cải thiện lớn và bền vững mà không thêm NAT.\n(A) SAI: Tăng compute type làm build CPU nhanh hơn nhưng nút thắt ở đây là tải dependency qua mạng, nên cải thiện rất hạn chế và tốn thêm tiền.\n(B) ĐÚNG: Dùng AWS CodeArtifact làm repository (có upstream tới Maven Central) truy cập qua interface VPC endpoint, đồng thời bật cache của CodeBuild cho thư mục ~/.m2. Dependency được phục vụ trong mạng AWS và phần lớn lần build không phải tải lại, giải quyết cả tốc độ lẫn tính ổn định mà không cần NAT.\n(C) SAI: Commit toàn bộ JAR dependency vào Git làm repository phình to, clone chậm, và tạo ra vấn đề quản lý phiên bản/bản quyền — đây là anti-pattern.\n(D) SAI: Tách integration test ra khỏi VPC để build lại có Internet sẽ làm mất chính lý do đưa project vào VPC, và test không còn kiểm chứng được kết nối tới RDS private.\nĐáp án đúng: B\nĐiểm cần nhớ: CodeBuild trong VPC private mất Internet, mọi phụ thuộc bên ngoài phải đi qua VPC endpoint hoặc một dịch vụ trong AWS. CodeArtifact (với upstream repository) + cache dependency là cách chuẩn; nhớ endpoint cho codeartifact.api, codeartifact.repositories và gateway endpoint S3.",
+      "tagNames": ["SDLC Automation > AWS CodeBuild"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Move the project to a larger compute type so dependency resolution finishes before the intermittent failures occur", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Resolve dependencies from AWS CodeArtifact through interface VPC endpoints and enable CodeBuild caching of the local dependency directory", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Commit the dependency JAR files to the repository so the build no longer needs network access", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Remove the VPC configuration and run the integration tests against a publicly accessible copy of the database", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MSQ",
+      "questionText": "A CodeBuild project must run unit tests, build a container image with docker build, and push it to a private Amazon ECR repository in the same account. The first pipeline run fails during the build phase with an error stating that it cannot connect to the Docker daemon, and after that is corrected a later run fails on docker push with an authorization error. Which TWO configuration items resolve these two failures?",
+      "explanation": "Phân tích đề: Hai lỗi riêng biệt, cần hai hành động khác nhau: không kết nối được Docker daemon, và không có quyền đẩy image lên ECR.\n(A) ĐÚNG: Bật privileged mode cho project (hoặc dùng môi trường build hỗ trợ Docker) để container build có thể chạy Docker daemon. Đây chính xác là nguyên nhân của lỗi cannot connect to the Docker daemon.\n(B) ĐÚNG: Service role của project phải có quyền ECR: ecr:GetAuthorizationToken (cấp account, resource là *), cùng BatchCheckLayerAvailability, InitiateLayerUpload, UploadLayerPart, CompleteLayerUpload và PutImage trên repository đích. Thiếu nhóm quyền này gây lỗi authorization khi push.\n(C) SAI: Tăng timeout của build không liên quan tới hai lỗi này; chúng thất bại ngay lập tức chứ không phải hết thời gian.\n(D) SAI: Đặt project vào VPC private không cấp quyền và không bật Docker daemon; nếu không có VPC endpoint thì còn làm hỏng thêm kết nối tới ECR.\n(E) SAI: Gắn một instance profile như với EC2 không áp dụng cho CodEBuild; CodeBuild dùng service role của project.\n(F) SAI: Đổi image build sang bản Ubuntu mới hơn không tự cho phép chạy Docker nếu privileged mode chưa bật.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Build Docker trong CodeBuild luôn cần hai thứ: privileged mode và quyền ECR đầy đủ (chú ý ecr:GetAuthorizationToken phải để resource *). Hai triệu chứng khác nhau dẫn tới hai nguyên nhân khác nhau — đừng gộp chung.",
+      "tagNames": ["SDLC Automation > AWS CodeBuild"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable privileged mode on the build project so the build container can run a Docker daemon", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Grant the CodeBuild service role ecr:GetAuthorizationToken plus the layer upload and PutImage permissions on the target repository", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Increase the build timeout so the image build and push can complete", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Attach the project to a private subnet so it can reach ECR over the AWS network", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Attach an EC2 instance profile with ECR permissions to the build environment", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Switch the build environment to the newest managed Ubuntu image so Docker is available by default", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MCQ",
+      "questionText": "A customer-facing application runs on EC2 instances in an Auto Scaling group behind an Application Load Balancer. Releases currently use CodeDeploy in-place deployments and occasionally leave the fleet with a mix of old and new revisions when a deployment fails. The business now requires that a failed release never leaves the fleet in a mixed state, that recovery from a bad release takes less than two minutes, and accepts paying for double capacity during a deployment. Which CodeDeploy configuration should the team adopt?",
+      "explanation": "Phân tích đề: Yêu cầu là không bao giờ để fleet ở trạng thái hỗn hợp, phục hồi dưới hai phút, và chấp nhận chi phí gấp đôi trong lúc deploy.\n(A) SAI: In-place với OneAtATime giảm rủi ro nhưng bản chất vẫn thay thế tại chỗ, nên lúc deploy dở vẫn tồn tại đồng thời hai revision trên fleet — đúng vấn đề cần loại bỏ.\n(B) ĐÚNG: Blue/green deployment tạo một fleet mới hoàn toàn với revision mới, kiểm tra health, rồi chuyển target group của ALB sang fleet xanh. Fleet cũ được giữ lại trong khoảng thời gian cấu hình nên rollback chỉ là chuyển traffic ngược lại, đáp ứng mốc dưới hai phút; trong lúc deploy tồn tại hai môi trường riêng biệt nên không có trạng thái hỗn hợp trên cùng một fleet.\n(C) SAI: In-place AllAtOnce kèm rollback tự động có thể khôi phục nhanh về mặt ý định, nhưng nó gây gián đoạn toàn bộ và bản thân quá trình rollback cũng là một lần deploy nữa, không đảm bảo mốc hai phút.\n(D) SAI: Tăng minimum healthy hosts chỉ ảnh hưởng số instance được phép ngừng phục vụ cùng lúc; nó không loại bỏ trạng thái hỗn hợp và không cho rollback tức thì.\nĐáp án đúng: B\nĐiểm cần nhớ: Yêu cầu rollback trong vài phút và không có trạng thái hỗn hợp, kèm chấp nhận gấp đôi capacity, luôn dẫn tới blue/green. In-place chỉ phù hợp khi chi phí capacity là ràng buộc chính và chấp nhận rollback chậm hơn.",
+      "tagNames": ["SDLC Automation > AWS CodeDeploy"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Keep in-place deployments but switch the deployment configuration to CodeDeployDefault.OneAtATime", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Use a blue/green deployment that provisions a replacement Auto Scaling group, shifts the ALB target group after health checks pass, and keeps the original instances for a rollback window", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Keep in-place deployments with CodeDeployDefault.AllAtOnce and enable automatic rollback on failure", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Keep in-place deployments and raise the minimum healthy hosts value to 90 percent", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "An AWS Lambda function behind Amazon API Gateway is released with AWS CodeDeploy. The team requires that the new version serves 10 percent of invocations for 10 minutes, that a validation function runs against the new version before any production traffic reaches it, and that CodeDeploy automatically reverts the alias if a CloudWatch alarm on function errors breaches at any point. Which combination implements this?",
+      "explanation": "Phân tích đề: Ba thành phần: canary 10% trong 10 phút, validation chạy TRƯỚC khi có traffic production, và rollback tự động theo alarm.\n(A) SAI: LambdaLinear10PercentEvery1Minute tăng dần mỗi phút, không giữ ở 10% suốt 10 phút như yêu cầu.\n(B) ĐÚNG: Deployment configuration CodeDeployDefault.LambdaCanary10Percent10Minutes cho phần chia traffic; hook BeforeAllowTraffic trong AppSpec chạy hàm validation trước khi alias bắt đầu trỏ sang version mới; alarm configuration cùng automatic rollback on alarm trong deployment group lo phần quay lui.\n(C) SAI: LambdaAllAtOnce chuyển 100% ngay lập tức, không có giai đoạn canary nào để quan sát.\n(D) SAI: Hook AfterAllowTraffic chạy sau khi traffic đã chuyển, nên không thỏa mãn yêu cầu validate trước khi có traffic production; đây là bẫy phổ biến vì cả hai hook đều tồn tại cho Lambda.\nĐáp án đúng: B\nĐiểm cần nhớ: Với Lambda, CodeDeploy chỉ có hai hook: BeforeAllowTraffic (trước khi alias dịch chuyển) và AfterAllowTraffic (sau khi hoàn tất). Canary giữ một tỉ lệ rồi nhảy sang 100%; Linear tăng đều theo chu kỳ. Rollback tự động cấu hình ở deployment group, không phải trong AppSpec.",
+      "tagNames": ["SDLC Automation > AWS CodeDeploy"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "CodeDeployDefault.LambdaLinear10PercentEvery1Minute with a BeforeAllowTraffic hook and alarm based rollback", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "CodeDeployDefault.LambdaCanary10Percent10Minutes with a BeforeAllowTraffic hook and automatic rollback on the CloudWatch alarm configured in the deployment group", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "CodeDeployDefault.LambdaAllAtOnce with a validation hook and manual rollback by the on-call engineer", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "CodeDeployDefault.LambdaCanary10Percent10Minutes with an AfterAllowTraffic hook that runs the validation and alarm based rollback", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MCQ",
+      "questionText": "A company is designing a release process for a containerized service on Amazon ECS. Requirements are: source lives in GitHub, the container image must be built once and the identical image must reach production, a named release manager must approve before production, and the production rollout must shift traffic gradually with the ability to abort. The design must also ensure that a rebuild cannot silently occur between approval and deployment. Which pipeline design meets all requirements?",
+      "explanation": "Phân tích đề: Build once deploy many, approval bởi vai trò được chỉ định, rollout theo tỉ lệ có thể hủy, và không được build lại giữa approval và deploy.\n(A) SAI: Build lại image ngay trước khi deploy production phá vỡ nguyên tắc build once và đúng là rủi ro mà đề yêu cầu loại trừ: thứ được duyệt và thứ được triển khai có thể khác nhau.\n(B) ĐÚNG: Một pipeline duy nhất: Source qua CodeConnections, Build bằng CodeBuild đẩy image có tag bất biến (immutable tag trên ECR) và xuất imageDetail.json làm artifact, Manual approval được giới hạn bằng IAM cho role release manager, rồi Deploy bằng CodeDeploy blue/green trên ECS với deployment configuration dạng canary/linear để chuyển traffic dần và có thể stop-and-rollback. Artifact đi xuyên suốt nên không thể chèn bản build khác.\n(C) SAI: Hai pipeline tách rời với source riêng cho production cho phép một artifact khác lọt vào giai đoạn production, đúng thứ cần ngăn.\n(D) SAI: Deploy kiểu rolling update mặc định của ECS không cung cấp khả năng chuyển traffic theo tỉ lệ có kiểm soát và abort như CodeDeploy blue/green, và cũng không đáp ứng yêu cầu chuyển dần.\nĐáp án đúng: B\nĐiểm cần nhớ: Ba ý thường đi cùng nhau trong đề: một artifact duy nhất chạy xuyên suốt các stage, manual approval cưỡng chế bằng IAM (codepipeline:PutApprovalResult), và ECS blue/green qua CodeDeploy khi cần canary/linear cùng khả năng rollback.",
+      "tagNames": ["SDLC Automation > AWS CodePipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Source, Build, Approval, then a second Build that rebuilds the image from the approved commit before the production deploy action", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "A single pipeline with Source through CodeConnections, one CodeBuild stage that publishes an immutable image tag, a manual approval action restricted by IAM to the release manager role, and a CodeDeploy blue/green deploy to ECS with gradual traffic shifting", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "One pipeline for non-production and a separate production pipeline with its own source and build stages, started manually after approval", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A single pipeline that uses the standard ECS rolling update deploy action after the manual approval", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MSQ",
+      "questionText": "A production pipeline fails intermittently in the Deploy stage because of a transient dependency in the target environment. Today the team restarts the whole pipeline, which rebuilds the artifact and takes 25 extra minutes, and auditors have complained that the artifact deployed after a retry is not always byte-identical to the one that passed testing. Which TWO changes address both the delay and the audit concern?",
+      "explanation": "Phân tích đề: Hai vấn đề: retry tốn 25 phút vì build lại, và artifact sau retry không giống artifact đã qua test.\n(A) ĐÚNG: Dùng chức năng retry đúng stage bị lỗi (retry failed actions / retry stage) để CodePipeline dùng lại artifact đầu vào đã có thay vì chạy lại từ source. Vừa nhanh vừa bảo toàn chính xác artifact đã được kiểm thử.\n(B) ĐÚNG: Giữ artifact store là S3 bucket bật versioning và mã hóa, các action tham chiếu tới object version cụ thể của execution đó; đây là nền tảng để chứng minh artifact bất biến giữa các stage.\n(C) SAI: Tăng số lần retry tự động của action deploy có thể hữu ích nhưng nếu mỗi lần retry vẫn khởi động lại từ source thì không giải quyết gì, và bản thân nó không đảm bảo tính bất biến.\n(D) SAI: Build lại artifact trong mỗi stage là chính xác nguyên nhân khiến auditor phàn nàn.\n(E) SAI: Tắt mã hóa artifact bucket để giảm thời gian không đáng kể và làm giảm mức bảo mật.\n(F) SAI: Chuyển deploy sang một pipeline riêng khởi động thủ công làm quy trình rời rạc hơn và vẫn phải tự đảm bảo artifact giống nhau.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Build once, deploy many: artifact sinh ra một lần, lưu trong S3 có versioning và mã hóa, rồi truyền qua các stage. Khi một stage lỗi vì nguyên nhân tạm thời, retry chính stage đó thay vì chạy lại toàn bộ pipeline.",
+      "tagNames": ["SDLC Automation > AWS CodePipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Retry only the failed Deploy stage so the pipeline reuses the artifact that already passed the earlier stages", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Keep a versioned and encrypted S3 artifact store so each stage consumes the exact object version produced by the build", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Increase the automatic retry count on the deploy action so transient failures resolve themselves", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Rebuild the artifact at the start of each stage so every stage validates the current source", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Disable encryption on the artifact bucket to shorten the artifact transfer time between stages", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Move the deploy actions into a separate pipeline that the on-call engineer starts manually after a failure", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MCQ",
+      "questionText": "A CodeCommit repository was re-encrypted with a customer managed AWS KMS key as part of a compliance project. Since the change, developers can still clone and push from their laptops, but every CodeBuild project that uses the repository fails at the source download step with an access denied message. The CodeBuild service role still has codecommit:GitPull on the repository, and nothing else in the build configuration changed. What is the MOST likely cause?",
+      "explanation": "Phân tích đề: Sự cố bắt đầu ngay sau khi đổi sang CMK; người dùng laptop vẫn làm việc bình thường còn CodeBuild thì không. Quyền CodeCommit vẫn còn nguyên.\n(A) ĐÚNG: Đọc dữ liệu trong repository được mã hóa bằng CMK đòi hỏi quyền KMS. Role của developer thường đã có quyền rộng hoặc nằm trong key policy nên không bị ảnh hưởng, còn service role của CodeBuild thì chưa được thêm vào key policy và chưa có kms:Decrypt/GenerateDataKey, dẫn tới access denied ở bước tải source.\n(B) SAI: Nếu branch permission chặn thì người dùng laptop cũng bị chặn theo cùng cách; hiện tượng không khớp.\n(C) SAI: Repository được mã hóa không làm thay đổi giao thức clone; CodeBuild vẫn dùng đúng cơ chế như trước.\n(D) SAI: Thiếu VPC endpoint gây timeout hoặc lỗi kết nối, không phải access denied, và cấu hình mạng không hề thay đổi trong tình huống này.\nĐáp án đúng: A\nĐiểm cần nhớ: Khi lỗi AccessDenied xuất hiện ngay sau một thay đổi về mã hóa, hãy soi key policy và quyền KMS của principal trước tiên. Phân biệt triệu chứng: thiếu quyền thì AccessDenied, thiếu đường mạng thì timeout.",
+      "tagNames": ["SDLC Automation > AWS CodeCommit"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "The CodeBuild service role is not allowed to use the customer managed key, so it cannot decrypt the repository data", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A branch-level permission created during the compliance project denies read access to automated principals", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Encrypted repositories require SSH based cloning, which CodeBuild does not use", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "The build subnets are missing a VPC endpoint for CodeCommit", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 12,
+      "questionType": "MCQ",
+      "questionText": "A security team must receive a durable record in an Amazon SQS queue, located in a separate security account, every time a pull request is merged in any of 30 CodeCommit repositories. Records must not be lost if the queue is temporarily unavailable, failures must be visible, and the solution must keep working when new repositories are created. Which implementation is MOST operationally efficient?",
+      "explanation": "Phân tích đề: Bắt sự kiện merge pull request từ 30 repository (và cả repository mới), gửi tới SQS cross-account, không mất bản ghi, có khả năng nhìn thấy lỗi.\n(A) ĐÚNG: EventBridge rule ở cấp account khớp sự kiện CodeCommit Pull Request State Change với trạng thái merged; target là SQS ở account security (queue policy cho phép event bus gửi), kèm retry policy và dead-letter queue để không mất bản ghi. Rule cấp account nên repository mới tự động được bao phủ.\n(B) SAI: Trigger của CodeCommit phải cấu hình cho từng repository và không có cơ chế retry/DLQ như EventBridge; repository mới sẽ bị bỏ sót.\n(C) SAI: Lambda chạy theo lịch gọi ListPullRequests trên 30 repository là polling, tốn kém, có độ trễ và dễ bỏ sót khi số repository tăng.\n(D) SAI: Notification rule gửi SNS rồi chuyển tiếp sang SQS thêm một tầng trung gian, vẫn phải cấu hình theo từng repository, và cấu hình lỗi khó quan sát hơn.\nĐáp án đúng: A\nĐiểm cần nhớ: Sự kiện của CodeCommit nên tiêu thụ qua EventBridge chứ không qua trigger: bắt được ở cấp account (bao phủ repository mới), có input transformer, retry policy và DLQ, và gửi cross-account được qua resource policy của target.",
+      "tagNames": ["SDLC Automation > AWS CodeCommit"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An EventBridge rule matching merged pull request events with the cross-account queue as target, plus a retry policy and a dead-letter queue", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A CodeCommit trigger on each repository that sends the event directly to the queue in the security account", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "A scheduled Lambda function that lists pull requests in all repositories and writes merged ones to the queue", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A notification rule per repository publishing to an SNS topic that forwards the message to the queue", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 13,
+      "questionType": "MSQ",
+      "questionText": "A company is moving 40 repositories from GitHub.com to AWS CodeCommit. During the cutover, developers must keep using plain git commands with no extra tooling on their laptops, CI must stop depending on any GitHub personal access token, and the git history of every repository must be preserved including all branches and tags. Which TWO actions are required?",
+      "explanation": "Phân tích đề: Ba ràng buộc: developer dùng git thuần, CI không dùng PAT nữa, và giữ toàn bộ lịch sử gồm branch và tag.\n(A) ĐÚNG: Chuyển remote sang CodeCommit và xác thực bằng credential helper của AWS CLI (ký SigV4 dựa trên credential IAM/SSO sẵn có). Developer vẫn gõ git clone/push như bình thường, không cần công cụ lạ và không có mật khẩu riêng.\n(B) SAI: Yêu cầu developer tạo HTTPS Git credentials thủ công cho từng người là thêm một loại credential dài hạn phải quản lý, trong khi credential helper đã giải quyết gọn hơn.\n(C) ĐÚNG: Đổi source action của pipeline sang CodeCommit, qua đó CI dùng IAM role thay vì PAT của GitHub. Đây chính là phần loại bỏ token khỏi CI.\n(D) SAI: Import bằng cách đẩy một snapshot của nhánh mặc định làm mất branch và tag, vi phạm yêu cầu bảo toàn lịch sử; cách đúng là git clone --mirror rồi git push --mirror.\n(E) SAI: Giữ GitHub làm nguồn chính và đồng bộ một chiều sang CodeCommit không phải là migration, và CI vẫn còn phụ thuộc GitHub.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Ba việc trong một cuộc di trú repository: chuyển toàn bộ lịch sử (mirror), chuyển cách xác thực của con người (credential helper của AWS CLI), và chuyển cách xác thực của hệ thống (IAM role thay cho token).",
+      "tagNames": ["SDLC Automation > AWS CodeCommit"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Repoint developer remotes to CodeCommit and authenticate with the AWS CLI credential helper so plain git commands keep working", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Have each developer generate HTTPS Git credentials in the IAM console and store them in their local credential manager", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Change the pipeline source action to CodeCommit so CI authenticates with an IAM role instead of a token", "isCorrect": true },
+        { "answerLabel": "D", "answerText": "Import each repository by pushing a snapshot of the default branch into the new CodeCommit repository", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Keep GitHub as the system of record and configure one-way replication into CodeCommit for the pipelines", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 14,
+      "questionType": "MCQ",
+      "questionText": "A company runs its CI in GitHub Actions on GitHub.com and deploys into three AWS accounts. Today each repository stores an IAM user access key as a GitHub secret. Security requires eliminating long-lived credentials, restricting each workflow to the exact account and environment it owns, and being able to prove in CloudTrail which repository and branch performed a deployment. Which implementation meets all three requirements?",
+      "explanation": "Phân tích đề: Bỏ credential dài hạn, giới hạn theo đúng repository/môi trường, và truy vết được repository/branch trong CloudTrail.\n(A) SAI: Xoay vòng access key tự động vẫn để lại credential dài hạn trong GitHub và không giúp truy vết repository/branch trong CloudTrail.\n(B) ĐÚNG: Tạo IAM OIDC identity provider cho token.actions.githubusercontent.com ở mỗi account, kèm IAM role có trust policy kiểm tra claim sub theo dạng repo:Org/Repo:environment:prod (hoặc ref:refs/heads/main) và aud là sts.amazonaws.com. Workflow nhận credential tạm thời; role session và sourceIdentity/claim cho phép xác định nguồn gọi trong CloudTrail.\n(C) SAI: Dùng một IAM role chung cho mọi workflow với trust policy chỉ kiểm tra nhà cung cấp OIDC bỏ mất phần giới hạn theo repository và môi trường; một repository bất kỳ trong tổ chức sẽ assume được role của account khác.\n(D) SAI: Chuyển toàn bộ CI sang CodeBuild là thay đổi lớn về công cụ, không phải điều đề bài yêu cầu, và không trả lời câu hỏi về xác thực từ GitHub Actions.\nĐáp án đúng: B\nĐiểm cần nhớ: OIDC federation cho GitHub Actions: điều kiện trên claim sub quyết định phạm vi (repo, branch, tag, environment, pull_request), aud phải là sts.amazonaws.com. Trust policy chỉ kiểm tra provider mà không kiểm tra sub là lỗi cấu hình nguy hiểm.",
+      "tagNames": ["SDLC Automation > GitHub / GitLab / Bitbucket Integration"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Keep the IAM users but rotate the access keys automatically every week and update the GitHub secrets with a Lambda function", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Create an IAM OIDC identity provider for GitHub Actions in each account and roles whose trust policy conditions on the sub claim for the specific repository and environment", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Create one shared IAM role per account whose trust policy allows the GitHub OIDC provider without conditions on the sub claim", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Replace GitHub Actions with AWS CodeBuild projects triggered by webhooks so no credentials leave AWS", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 15,
+      "questionType": "MSQ",
+      "questionText": "A team hosts its code in Bitbucket Cloud. A new AWS CodePipeline must start only when a commit lands on the main branch, and it must not start for commits on feature branches or for pull request updates, because each pipeline execution provisions a costly test environment. The team also wants AWS to manage the credentials and webhook. Which TWO configuration steps are required?",
+      "explanation": "Phân tích đề: Nguồn Bitbucket Cloud, pipeline chỉ chạy cho commit vào main, không chạy cho feature branch hay pull request, và AWS quản lý credential/webhook.\n(A) ĐÚNG: Tạo AWS CodeConnections connection tới Bitbucket Cloud và hoàn tất handshake OAuth; connection này quản lý xác thực và webhook thay cho token cá nhân.\n(B) ĐÚNG: Cấu hình source action bám đúng branch main (và với pipeline V2 có thể dùng trigger filter theo branch/file path) để chỉ push vào main mới khởi động execution.\n(C) SAI: Lọc bằng một Lambda ở đầu pipeline thì execution vẫn đã khởi động và môi trường test có thể đã được tạo trước khi bị dừng, không tiết kiệm được chi phí như mong muốn.\n(D) SAI: Bật polling cho nhiều branch đi ngược lại yêu cầu và còn làm tăng độ trễ.\n(E) SAI: Tạo webhook thủ công trong Bitbucket trỏ tới pipeline là đúng thứ mà connection đã làm thay, và vi phạm yêu cầu để AWS quản lý webhook.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Với nguồn Bitbucket/GitHub/GitLab: connection lo xác thực và webhook, còn phạm vi kích hoạt lo bằng branch trong source action hoặc trigger filter của pipeline V2. Lọc sau khi execution đã bắt đầu là quá muộn nếu chi phí nằm ở chính execution.",
+      "tagNames": ["SDLC Automation > GitHub / GitLab / Bitbucket Integration"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create an AWS CodeConnections connection to Bitbucket Cloud and complete the authorization handshake once", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Configure the source action to track only the main branch so other branches do not start an execution", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Add a Lambda invoke action as the first action that stops the execution when the commit is not on main", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable change detection by polling for every branch and filter the results in the build stage", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Create a webhook manually in Bitbucket that posts to the pipeline endpoint on every push", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 16,
+      "questionType": "MCQ",
+      "questionText": "After a GitHub organization owner performed a security cleanup, several CodePipeline pipelines that use a CodeConnections connection stopped starting on push. Manually releasing a change still works and deploys the newest commit. In the console the connection status is shown as AVAILABLE, and the pipeline definition has not changed. What should the DevOps engineer investigate FIRST?",
+      "explanation": "Phân tích đề: Manual release vẫn lấy được commit mới nhất, nghĩa là connection vẫn đọc được repository; chỉ cơ chế kích hoạt theo push là hỏng. Status AVAILABLE chỉ nói rằng handshake còn hiệu lực.\n(A) ĐÚNG: Kiểm tra GitHub App của connection: app có còn được cài trên tổ chức không, phạm vi repository đã chọn còn bao gồm các repository này không, và webhook có gửi thành công không (xem delivery log ở phía GitHub). Đợt dọn dẹp bảo mật thường gỡ quyền repository hoặc gỡ cài đặt app, làm mất webhook trong khi connection vẫn AVAILABLE.\n(B) SAI: Tạo lại pipeline không xử lý nguyên nhân gốc và sự cố sẽ lặp lại ngay sau khi tạo xong.\n(C) SAI: Chuyển sang polling che được triệu chứng nhưng làm chậm release và bỏ qua vấn đề thực sự.\n(D) SAI: Quyền của service role pipeline ảnh hưởng tới việc chạy action, không phải việc nhận sự kiện push; hơn nữa manual release đang chạy tốt nên role không phải vấn đề.\nĐáp án đúng: A\nĐiểm cần nhớ: Connection AVAILABLE không đồng nghĩa với việc webhook đang hoạt động. Khi pipeline không tự khởi động nhưng manual release vẫn đúng, hãy soi phần cài đặt GitHub App, phạm vi repository và lịch sử gửi webhook.",
+      "tagNames": ["SDLC Automation > GitHub / GitLab / Bitbucket Integration"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Whether the GitHub App for the connection is still installed with access to those repositories and whether webhook deliveries are succeeding", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Whether the pipeline needs to be recreated so a new webhook is registered", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Whether change detection should be switched to periodic polling to avoid webhook dependencies", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Whether the pipeline service role still has permission to read the source artifact", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 17,
+      "questionType": "MCQ",
+      "questionText": "A DevOps engineer must make unit test results a hard quality gate in a pipeline: a failing test must stop the pipeline before the deploy stage, developers must be able to open a failing test case and see its error message in the AWS console, and the pass rate must be visible as a trend over the last months. The build already produces a JUnit XML file. Which configuration meets all three needs?",
+      "explanation": "Phân tích đề: Ba nhu cầu: chặn pipeline khi test fail, xem chi tiết từng test case trong console AWS, và xem xu hướng pass rate theo thời gian.\n(A) ĐÚNG: Khai báo mục reports trong buildspec trỏ tới file JUnit XML và một report group. CodeBuild phân tích file, hiển thị từng test case kèm thông báo lỗi và vẽ xu hướng pass rate theo lịch sử; đồng thời lệnh test trả exit code khác 0 khi fail nên build fail và pipeline dừng trước stage deploy.\n(B) SAI: Đẩy file XML lên S3 dưới dạng artifact lưu được dữ liệu nhưng console không hiển thị chi tiết test case và không có biểu đồ xu hướng.\n(C) SAI: Parse kết quả rồi publish một custom metric cho biết số test fail có thể dùng để cảnh báo, nhưng không cho xem chi tiết từng case và cần viết thêm code.\n(D) SAI: Dùng bảng điều khiển của công cụ CI bên thứ ba không thỏa mãn yêu cầu xem trong console AWS.\nĐáp án đúng: A\nĐiểm cần nhớ: CodeBuild test reporting hỗ trợ JUNITXML, NUNITXML, TESTNGXML, VISUALSTUDIOTRX, CUCUMBERJSON và các định dạng coverage như JACOCOXML, COBERTURAXML. Report group cho cả chi tiết test case lẫn xu hướng theo thời gian.",
+      "tagNames": ["SDLC Automation > AWS CodeBuild"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Add a reports section to the buildspec that publishes the JUnit XML to a CodeBuild report group, and let the test command exit non-zero on failure", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Upload the JUnit XML as a secondary build artifact to S3 and link to it from the pipeline notification", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Parse the JUnit XML in the build and publish a custom CloudWatch metric for the number of failed tests", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Send the results to a third-party test dashboard and gate the pipeline on its API response", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 18,
+      "questionType": "MCQ",
+      "questionText": "A CodeBuild project was moved into private subnets with no NAT gateway. Gateway endpoints for Amazon S3 and interface endpoints for ECR are already in place, and the build can pull images and read the dependency cache. However, builds now finish without any log output in CloudWatch, and some phases fail with credential related errors when the build calls AWS APIs. Which additional endpoints should the DevOps engineer create?",
+      "explanation": "Phân tích đề: Đã có endpoint S3 và ECR; triệu chứng còn lại là không có log trong CloudWatch và lỗi liên quan tới credential khi gọi API.\n(A) ĐÚNG: Thiếu interface endpoint cho CloudWatch Logs nên agent không đẩy được log, và thiếu endpoint cho STS nên các lời gọi cần lấy credential tạm thời (ví dụ AssumeRole) thất bại. Đây đúng là hai endpoint hay bị bỏ quên sau S3 và ECR.\n(B) SAI: Endpoint cho CodeCommit chỉ cần khi source nằm ở CodeCommit và không liên quan tới việc ghi log.\n(C) SAI: Endpoint cho CodePipeline không phải thứ build gọi tới; pipeline gọi vào CodeBuild chứ không ngược lại theo cách này.\n(D) SAI: Thêm NAT gateway giải quyết được về mặt kỹ thuật nhưng đề đang đi theo hướng endpoint, và NAT làm mất lợi ích chi phí cùng ràng buộc mạng riêng.\nĐáp án đúng: A\nĐiểm cần nhớ: Bộ endpoint thường dùng cho CodeBuild trong VPC private: s3 (gateway), ecr.api, ecr.dkr, logs, sts, secretsmanager, ssm và codeartifact nếu dùng. Không có log xuất hiện là dấu hiệu kinh điển của việc thiếu endpoint logs.",
+      "tagNames": ["SDLC Automation > AWS CodeBuild"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Interface endpoints for CloudWatch Logs and AWS STS", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "An interface endpoint for AWS CodeCommit", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "An interface endpoint for AWS CodePipeline", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "No additional endpoints; add a NAT gateway to the build subnets instead", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 19,
+      "questionType": "MSQ",
+      "questionText": "Integration tests in AWS CodeBuild need a database password. Security requires that the value never appears in the buildspec file, never appears as a plaintext project environment variable, never appears in the build log, and that the build role can read only that one secret. The password is rotated every 30 days and the buildspec must not change when it rotates. Which TWO configurations are required?",
+      "explanation": "Phân tích đề: Bốn ràng buộc về nơi lưu và nơi hiển thị, cộng yêu cầu rotation không làm thay đổi buildspec, và quyền đọc chỉ đúng một secret.\n(A) ĐÚNG: Khai báo biến môi trường kiểu SECRETS_MANAGER (hoặc mục env/secrets-manager trong buildspec) tham chiếu theo tên secret và JSON key. CodeBuild lấy giá trị lúc chạy và che giá trị trong log; khi secret xoay vòng, tham chiếu không đổi nên buildspec giữ nguyên.\n(B) ĐÚNG: Service role của project chỉ được cấp secretsmanager:GetSecretValue trên ARN của đúng secret đó (và kms:Decrypt trên CMK nếu secret dùng CMK), thỏa mãn nguyên tắc quyền tối thiểu.\n(C) SAI: Biến môi trường kiểu PLAINTEXT ở cấp project vi phạm trực tiếp một ràng buộc của đề và giá trị hiển thị cho ai đọc được cấu hình project.\n(D) SAI: Gọi AWS CLI trong phase pre_build để lấy secret rồi export ra biến shell dễ dẫn tới in giá trị ra log (ví dụ khi bật set -x) và không được CodeBuild che tự động.\n(E) SAI: Cấp quyền GetSecretValue trên toàn bộ secret trong account vi phạm yêu cầu chỉ đọc đúng một secret.\n(F) SAI: Mã hóa mật khẩu rồi commit ciphertext vào repository vẫn là để bí mật trong source control.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Bí mật trong CodeBuild luôn tham chiếu qua Secrets Manager hoặc Parameter Store bằng kiểu biến môi trường chuyên dụng; CodeBuild sẽ che giá trị trong log. Quyền phải giới hạn tới ARN của từng secret, không dùng dấu sao.",
+      "tagNames": ["SDLC Automation > AWS CodeBuild"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Reference the password through a Secrets Manager typed environment variable so CodeBuild injects and masks it at run time", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Grant the build service role GetSecretValue on that single secret ARN, plus decrypt permission on its KMS key", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Define the password as a plaintext project environment variable so it stays out of the buildspec file", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Retrieve the secret with the AWS CLI in the pre_build phase and export it as a shell variable", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Grant the build service role GetSecretValue on all secrets in the account so rotation never breaks the build", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Encrypt the password with AWS KMS and commit the ciphertext next to the buildspec", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 20,
+      "questionType": "MCQ",
+      "questionText": "An ECS service is released with AWS CodeDeploy blue/green deployments. A schema migration must run against the shared database after the new task set is running and reachable on the test listener, but before any production traffic is routed to it, and the deployment must abort without shifting traffic if the migration fails. Where should the migration be executed?",
+      "explanation": "Phân tích đề: Thời điểm bắt buộc là sau khi task set mới đã chạy và có thể kiểm thử qua test listener, nhưng trước khi traffic production được chuyển sang; nếu migration lỗi thì phải hủy trước khi chuyển traffic.\n(A) SAI: Hook AfterInstall chạy trước khi task set mới sẵn sàng phục vụ, nên chưa thỏa mãn điều kiện đã chạy và kiểm thử được.\n(B) ĐÚNG: Hook BeforeAllowTraffic chạy sau khi task set thay thế đã được tạo và có thể kiểm thử qua test listener, ngay trước bước chuyển traffic production. Hàm hook gọi PutLifecycleEventHookExecutionStatus với Failed sẽ làm deployment dừng và rollback mà chưa có người dùng nào bị ảnh hưởng.\n(C) SAI: AfterAllowTraffic chạy sau khi traffic production đã chuyển, nghĩa là nếu migration hỏng thì người dùng đã bị ảnh hưởng — trái yêu cầu.\n(D) SAI: Chạy migration trong entrypoint của container khiến mỗi task đều cố chạy migration, dễ gây tranh chấp và không cho CodeDeploy cơ chế hủy deployment một cách có kiểm soát.\nĐáp án đúng: B\nĐiểm cần nhớ: Thứ tự hook của ECS blue/green: BeforeInstall, AfterInstall, AfterAllowTestTraffic, BeforeAllowTraffic, AfterAllowTraffic. Việc gì phải xong trước khi người dùng thật nhìn thấy thì đặt ở BeforeAllowTraffic.",
+      "tagNames": ["SDLC Automation > AWS CodeDeploy"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "In an AfterInstall lifecycle hook so the schema is ready as soon as the task set is created", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "In a BeforeAllowTraffic lifecycle hook that reports a failed status to CodeDeploy when the migration fails", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "In an AfterAllowTraffic lifecycle hook so the migration runs against the live version", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "In the container entrypoint so every task applies the migration when it starts", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 21,
+      "questionType": "MSQ",
+      "questionText": "An in-place CodeDeploy deployment to 24 EC2 instances behind an ALB failed after 11 instances were updated. The fleet is now serving two different revisions, and some updated instances are returning errors to customers. The team must both recover from this incident and prevent the same mixed-state exposure in future deployments while keeping in-place deployments. Which TWO actions should the DevOps engineer take?",
+      "explanation": "Phân tích đề: Cần vừa xử lý hiện tại vừa ngăn tái diễn, nhưng vẫn giữ mô hình in-place.\n(A) ĐÚNG: Bật automatic rollback khi deployment fail hoặc khi CloudWatch alarm vi phạm. CodeDeploy sẽ tự triển khai lại revision tốt gần nhất, đưa fleet về trạng thái nhất quán thay vì để con người xử lý thủ công giữa sự cố.\n(B) ĐÚNG: Dùng deployment configuration tích hợp load balancer theo lô nhỏ (ví dụ OneAtATime hoặc HalfAtATime với minimum healthy hosts phù hợp) để instance bị deregister khỏi target group trong lúc cập nhật và chỉ quay lại khi health check đạt; nhờ vậy phiên bản lỗi không phục vụ khách hàng trên diện rộng.\n(C) SAI: Tắt ALB health check để deployment không bị đánh dấu thất bại là làm hỏng chính cơ chế phát hiện lỗi.\n(D) SAI: Đặt minimum healthy hosts bằng 0 cho phép cập nhật toàn bộ cùng lúc, làm mức phơi nhiễm tệ hơn.\n(E) SAI: Tăng thời gian chờ giữa các lô giúp có thêm thời gian quan sát nhưng tự nó không ngăn instance lỗi nhận traffic và không đưa fleet về trạng thái nhất quán.\n(F) SAI: Tăng gấp đôi số instance trước khi deploy là giải pháp chi phí, không giải quyết trạng thái hỗn hợp vốn do cơ chế in-place gây ra.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Với in-place, hai công cụ kiểm soát rủi ro là deployment configuration (kích thước lô và minimum healthy hosts, có tích hợp load balancer) và automatic rollback theo lỗi hoặc alarm. Rollback đưa fleet về một revision duy nhất.",
+      "tagNames": ["SDLC Automation > AWS CodeDeploy"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable automatic rollback on deployment failure and on CloudWatch alarm so the fleet converges back to the last good revision", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Use a load balancer integrated deployment configuration with small batches so instances are deregistered while updating and only return after passing health checks", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Disable the ALB health check during deployments so a partially updated instance does not fail the deployment", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Set minimum healthy hosts to zero so the deployment finishes quickly and the mixed state is short-lived", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Add a wait period between batches so operators can inspect the instances before continuing", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Double the number of instances before each deployment so healthy capacity always remains", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 22,
+      "questionType": "MCQ",
+      "questionText": "An Auto Scaling group is associated with a CodeDeploy deployment group. Newly launched instances pass EC2 status checks and appear in the Auto Scaling group, but CodeDeploy never deploys to them and the instances are eventually terminated after failing the deployment lifecycle. The instance profile already allows reading the revision bucket, and the same revision deploys successfully to the existing instances. What is the MOST likely missing component?",
+      "explanation": "Phân tích đề: Instance mới vào ASG bình thường, quyền đọc bucket đã có, revision vẫn deploy được lên instance cũ. Vậy vấn đề nằm ở phía instance mới, không phải ở revision hay bucket.\n(A) ĐÚNG: Instance mới không có CodeDeploy agent đang chạy nên không bao giờ nhận lệnh deploy; phải cài và khởi động agent qua user data hoặc bake sẵn trong AMI, đồng thời instance profile cần quyền cho agent hoạt động. Instance cũ chạy tốt vì đã có agent từ trước.\n(B) SAI: Nếu appspec.yml sai thì deployment lên instance cũ cũng hỏng theo cùng cách, trái với hiện tượng mô tả.\n(C) SAI: Deployment configuration ảnh hưởng nhịp độ triển khai, không quyết định việc instance có nhận được lệnh hay không.\n(D) SAI: Health check grace period liên quan tới việc ASG đánh giá sức khỏe, không giải thích việc CodeDeploy hoàn toàn không triển khai lên instance đó.\nĐáp án đúng: A\nĐiểm cần nhớ: Instance chỉ trở thành mục tiêu của CodeDeploy khi agent đang chạy và đăng ký được với dịch vụ. Với EC2 dùng ASG, hãy bake agent vào AMI hoặc cài bằng user data, và kiểm tra quyền cùng đường mạng ra dịch vụ CodeDeploy.",
+      "tagNames": ["SDLC Automation > AWS CodeDeploy"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "The CodeDeploy agent is not installed and running on the new instances, so they never receive the deployment", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "The appspec.yml file is missing a hooks section for the new instance type", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "The deployment configuration does not allow enough instances to be updated at once", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "The Auto Scaling health check grace period is shorter than the deployment duration", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 23,
+      "questionType": "MCQ",
+      "questionText": "A team must guarantee that a production deployment can only happen when the automated test stage has passed for that exact change and a named approver has approved it, and that feature branch commits never reach the production deploy action. Developers frequently push to feature branches, and the team wants those pushes to run tests without any risk of triggering production. Which design enforces this with the fewest moving parts?",
+      "explanation": "Phân tích đề: Cần đảm bảo trình tự test rồi approval rồi deploy trên đúng một thay đổi, và commit ở feature branch không bao giờ chạm tới production.\n(A) SAI: Một pipeline duy nhất được kích hoạt bởi mọi branch rồi dựa vào điều kiện trong script để bỏ qua deploy là mong manh: một lỗi logic trong script là đủ để đưa code feature lên production.\n(B) ĐÚNG: Pipeline production chỉ được kích hoạt từ nhánh main, với các stage tuần tự Test, Manual approval (giới hạn bằng IAM cho nhóm approver), rồi Deploy. CodePipeline chỉ chuyển sang stage sau khi stage trước thành công, nên trình tự được dịch vụ bảo đảm; feature branch dùng một pipeline CI riêng chỉ có Build và Test.\n(C) SAI: Đặt approval trước stage test làm người duyệt phải quyết định khi chưa có kết quả kiểm thử, đảo ngược ý nghĩa của gate.\n(D) SAI: Dùng một stage chứa test và deploy chạy song song khiến deploy có thể bắt đầu trước khi test kết thúc, phá vỡ yêu cầu cơ bản.\nĐáp án đúng: B\nĐiểm cần nhớ: CodePipeline thực thi stage tuần tự; hãy để chính cấu trúc stage đảm bảo trình tự thay vì viết điều kiện trong script. Tách pipeline CI cho feature branch và pipeline release cho main là mô hình phổ biến và an toàn.",
+      "tagNames": ["SDLC Automation > AWS CodePipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "One pipeline triggered by all branches, where the deploy action script exits early when the branch is not main", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "A release pipeline triggered only from main with sequential Test, IAM restricted manual approval, and Deploy stages, plus a separate CI pipeline for feature branches", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "One pipeline triggered only from main with the manual approval placed before the test stage so approvers control when tests run", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "One pipeline triggered only from main with the test and deploy actions in the same stage using the same runOrder", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 24,
+      "questionType": "MSQ",
+      "questionText": "A pipeline defined in us-east-1 must deploy a large container-based application into eu-west-1. The first attempts fail in the eu-west-1 deploy action with errors about the input artifact, and transfers of the 2 GB artifact are slow and occasionally time out. Which TWO configurations make this cross-Region deployment work reliably?",
+      "explanation": "Phân tích đề: Deploy cross-Region với artifact lớn; lỗi ở input artifact và truyền chậm.\n(A) ĐÚNG: CodePipeline yêu cầu một artifact store cho mỗi Region mà pipeline có action. Phải khai báo artifact bucket ở eu-west-1 (cùng KMS key tương ứng) để CodePipeline tự sao chép artifact sang đó; thiếu bước này chính là nguyên nhân lỗi input artifact.\n(B) ĐÚNG: Action ở eu-west-1 cần một role có quyền ở Region đó: đọc artifact từ bucket cục bộ, giải mã bằng key tương ứng, và cập nhật dịch vụ đích. Thiếu quyền vùng đích là nguyên nhân phổ biến thứ hai.\n(C) SAI: Giảm kích thước artifact bằng cách bỏ bớt file test có thể hữu ích nhưng không sửa được nguyên nhân cấu hình, và không phải yêu cầu của đề.\n(D) SAI: Tạo pipeline riêng ở eu-west-1 và kích hoạt thủ công phá vỡ luồng release thống nhất, đồng thời làm mất khả năng theo dõi một execution xuyên suốt.\n(E) SAI: Tắt mã hóa artifact để tăng tốc là đánh đổi bảo mật cho một vấn đề vốn không do mã hóa gây ra.\n(F) SAI: Tăng timeout của action deploy chỉ kéo dài thời gian chờ chứ không giải quyết thiếu artifact store hay thiếu quyền.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Cross-Region action trong CodePipeline cần ba thứ: artifact bucket ở mỗi Region liên quan, KMS key dùng được ở Region đó, và role của action có quyền tại Region đích. Với artifact rất lớn, hãy cân nhắc đẩy image lên ECR ở Region đích và chỉ truyền metadata.",
+      "tagNames": ["SDLC Automation > AWS CodePipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Declare an artifact store in eu-west-1 so the pipeline replicates the artifact into that Region before the deploy action runs", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Give the deploy action a role that can read and decrypt the artifact in eu-west-1 and update the target service there", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Reduce the artifact size by excluding test fixtures so the transfer completes within the default timeout", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create a second pipeline in eu-west-1 that the release manager starts manually after the first pipeline succeeds", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Disable artifact encryption so the cross-Region copy is faster", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Increase the timeout of the deploy action to the maximum allowed value", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 25,
+      "questionType": "MCQ",
+      "questionText": "After the build stage, a pipeline must publish a shared library to AWS CodeArtifact and deploy a demo application. The two outputs are unrelated: business requires that a failure to publish the library must never prevent the demo application from being deployed, and that both start as soon as the build finishes so total pipeline time stays short. How should the pipeline be modeled?",
+      "explanation": "Phân tích đề: Hai đầu ra độc lập, một bên lỗi không được chặn bên kia, và cả hai phải bắt đầu ngay sau build.\n(A) SAI: Đặt publish rồi deploy thành hai stage tuần tự khiến lỗi publish chặn hoàn toàn phần deploy, đúng điều cần tránh, và kéo dài thời gian pipeline.\n(B) ĐÚNG: Đặt hai action trong cùng một stage với cùng runOrder để chúng chạy song song ngay sau build. Nếu vẫn cần cô lập hoàn toàn về mặt trạng thái pipeline, tách thành hai pipeline riêng cùng được kích hoạt từ một sự kiện build thành công cũng đạt mục tiêu.\n(C) SAI: Đặt hai action trong cùng stage nhưng khác runOrder biến chúng thành tuần tự trong stage, nên vẫn còn phụ thuộc thứ tự và lỗi ở action trước vẫn chặn action sau.\n(D) SAI: Cho action publish luôn báo thành công để không chặn stage sẽ che giấu lỗi thật, khiến không ai biết thư viện chưa được phát hành.\nĐáp án đúng: B\nĐiểm cần nhớ: Trong CodePipeline, song song nghĩa là cùng stage và cùng runOrder; tuần tự nghĩa là khác stage hoặc khác runOrder. Muốn hai luồng hoàn toàn không ảnh hưởng nhau về trạng thái thì tách pipeline.",
+      "tagNames": ["SDLC Automation > AWS CodePipeline"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Put the CodeArtifact publish in one stage and the demo deploy in the following stage", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Put both actions in the same stage with the same runOrder so they run in parallel, or split them into separate pipelines triggered by the same build event", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Put both actions in the same stage with different runOrder values so the publish completes first", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Keep the sequential stages but make the publish action report success regardless of its outcome", "isCorrect": false }
+      ]
+    }
+  ]
+}

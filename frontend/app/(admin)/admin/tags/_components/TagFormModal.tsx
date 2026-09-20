@@ -37,7 +37,7 @@ function TagFormModal({
       show={show}
       onClose={onClose}
       title={isEditing ? 'Cập nhật Tag' : 'Tạo Tag mới'}
-      maxWidth={550}
+      maxWidth={680}
       footer={
         <ModalActionFooter
           onCancel={onClose}
@@ -53,6 +53,7 @@ function TagFormModal({
             value={formState.examTypeId || ''}
             onChange={(e) => onChangeField('examTypeId', e.target.value)}
             disabled={isEditing}
+            title={examTypes.find((et) => et.id === formState.examTypeId)?.name}
           >
             <option value="" disabled>
               -- Chọn loại kỳ thi --
@@ -85,24 +86,6 @@ function TagFormModal({
               </option>
             ))}
           </Form.Select>
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Thứ tự học (tuỳ chọn)</Form.Label>
-          <Form.Control
-            type="number"
-            value={formState.sortOrder ?? ''}
-            onChange={(e) =>
-              onChangeField(
-                'sortOrder',
-                e.target.value === '' ? null : Number(e.target.value),
-              )
-            }
-            placeholder="Nhỏ = học trước"
-          />
-          <Form.Text className="text-muted">
-            Ép thứ tự học nền tảng trong kế hoạch (VD: VPC trước VPC-Endpoint). Để
-            trống = xếp theo mức độ yếu.
-          </Form.Text>
         </Form.Group>
     </BaseModal>
   );

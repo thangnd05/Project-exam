@@ -112,15 +112,36 @@
 
   :global(.form-control),
   :global(.form-select) {
-    padding: 13px 16px;
     border-radius: 14px;
     border: 2px solid var(--slate-200);
-    background: var(--bg-white);
+    background-color: var(--bg-white);
     font-size: var(--font-size-md);
-    line-height: 1.5;
     color: var(--slate-800);
     box-shadow: none;
     transition: all 0.2s;
+  }
+
+  :global(input.form-control):not([type='file']):not([type='color']) {
+    height: 48px;
+    min-height: 48px;
+    padding: 10px 16px;
+    line-height: 1.4;
+  }
+
+  :global(textarea.form-control) {
+    height: auto;
+    min-height: 88px;
+    padding: 12px 16px;
+    line-height: 1.5;
+  }
+
+  :global(.form-select) {
+    height: 48px;
+    min-height: 48px;
+    padding: 0 2.75rem 0 16px;
+    line-height: 1.4;
+    background-position: right 1rem center;
+    background-size: 16px 12px;
   }
 
   :global(.form-control)::placeholder {
@@ -130,7 +151,7 @@
   :global(.form-control:focus),
   :global(.form-select:focus) {
     border-color: var(--accent-color);
-    background: #fff;
+    background-color: #fff;
     box-shadow: 0 0 0 4px var(--primary-alpha-10);
   }
 

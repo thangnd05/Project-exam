@@ -35,7 +35,8 @@ export const metadata = {
   applicationName: SITE_NAME,
   manifest: '/site.webmanifest',
   icons: {
-    icon: '/favicons/logoWD.svg?v=3',
+    icon: { url: '/favicons/logoWD.svg', type: 'image/svg+xml' },
+    apple: '/favicons/logoWD.svg',
   },
   openGraph: {
     type: 'website',
@@ -44,13 +45,13 @@ export const metadata = {
     url: SITE_URL,
     title: TITLE,
     description: DESCRIPTION,
-    images: [{ url: '/logoW.png', width: 1200, height: 630, alt: SITE_NAME }],
+    images: [{ url: '/favicons/logoWD.svg', alt: SITE_NAME }],
   },
   twitter: {
     card: 'summary_large_image',
     title: TITLE,
     description: DESCRIPTION,
-    images: ['/logoW.png'],
+    images: ['/favicons/logoWD.svg'],
   },
 };
 

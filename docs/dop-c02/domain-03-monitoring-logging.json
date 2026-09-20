@@ -1,0 +1,344 @@
+{
+  "version": 1,
+  "usageScope": "PRACTICE",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MCQ",
+      "questionText": "An ECS service emits business events as structured JSON log lines and also publishes a small set of custom metrics. The operations team needs a dashboard refreshed within a minute, an alarm that pages on-call when the error rate exceeds 2 percent for 5 consecutive minutes, and the ability to turn a log pattern into a numeric metric without deploying a log parsing fleet. Which design covers all three needs with native AWS services?",
+      "explanation": "Phân tích đề: Ba nhu cầu là dashboard gần thời gian thực, alarm theo tỉ lệ lỗi duy trì 5 phút, và biến log pattern thành metric mà không tự dựng hệ thống parse.\n(A) ĐÚNG: CloudWatch bao trọn cả ba: metric và dashboard cho phần hiển thị, metric math để tính tỉ lệ lỗi từ số lỗi chia tổng request rồi đặt alarm với 5 datapoint liên tiếp, và metric filter trên log group để trích xuất metric từ pattern trong log mà không cần parser riêng.\n(B) SAI: Đẩy toàn bộ log sang OpenSearch cho khả năng tìm kiếm mạnh nhưng phải vận hành domain, và alarm cùng dashboard vẫn phải xây riêng — nhiều công hơn cho đúng ba yêu cầu này.\n(C) SAI: Đưa log vào S3 rồi phân tích bằng Athena là mô hình truy vấn theo lô, không đáp ứng dashboard cập nhật trong một phút và không tạo alarm trực tiếp.\n(D) SAI: Dùng công cụ APM bên thứ ba là lựa chọn hợp lệ trong thực tế nhưng đề hỏi thiết kế bằng dịch vụ AWS gốc và thêm chi phí tích hợp không cần thiết.\nĐáp án đúng: A\nĐiểm cần nhớ: CloudWatch là mặt phẳng quan sát mặc định: metric, log, metric filter, metric math, alarm, dashboard. Khi đề yêu cầu cả ba thứ này cùng lúc, câu trả lời gần như luôn là CloudWatch chứ không phải một kho log riêng.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Use CloudWatch metrics and dashboards, a Logs metric filter for the error pattern, and a metric math alarm on the error ratio", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Stream all logs to an Amazon OpenSearch Service domain and build dashboards and alerting there", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Deliver the logs to Amazon S3 and query them with Amazon Athena on a schedule", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Send metrics and logs to a third-party APM platform and page from there", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MSQ",
+      "questionText": "A CloudWatch alarm on a custom metric published every minute by a Lambda function is flapping: it moves between OK and ALARM several times an hour and pages the on-call engineer for spikes that resolve themselves within a minute. The team must stop paging on momentary spikes but must still detect a genuinely sustained problem within roughly ten minutes. Which TWO changes to the alarm achieve this?",
+      "explanation": "Phân tích đề: Cần giảm nhiễu do spike ngắn nhưng vẫn phát hiện sự cố kéo dài trong khoảng mười phút.\n(A) ĐÚNG: Dùng M out of N datapoints (ví dụ 3 trong 5 chu kỳ) để alarm chỉ kích hoạt khi vi phạm lặp lại, loại bỏ spike đơn lẻ mà vẫn phát hiện trong vòng vài phút.\n(B) ĐÚNG: Tăng period hoặc số chu kỳ đánh giá (ví dụ period 2 phút với 5 chu kỳ) làm phẳng nhiễu ngắn hạn và vẫn nằm trong ngưỡng mười phút mà đề chấp nhận.\n(C) SAI: Nâng ngưỡng lên rất cao sẽ giảm số lần page nhưng đồng thời che luôn sự cố thật ở mức nghiêm trọng vừa phải.\n(D) SAI: Chuyển alarm sang trạng thái chỉ thông báo mà không page làm mất hoàn toàn khả năng đánh thức người trực khi có sự cố thật.\n(E) SAI: Đổi thống kê từ Average sang Maximum làm alarm nhạy hơn với spike, đúng ngược lại điều đang cần.\n(F) SAI: Đặt treat missing data là breaching có thể tạo thêm cảnh báo giả khi metric thưa, không giải quyết flapping.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Chống flapping bằng cách điều chỉnh cửa sổ đánh giá: datapoints to alarm M/N và period/evaluation periods. Đổi ngưỡng hay đổi thống kê là thay đổi ý nghĩa của alarm chứ không phải giảm nhiễu.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Require multiple datapoints within the evaluation window, for example 3 out of 5 periods, before entering ALARM", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Lengthen the period or the number of evaluation periods so momentary spikes are smoothed out", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Raise the alarm threshold far above the observed spike values", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Route the alarm to an email list instead of the paging system", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Change the alarm statistic from Average to Maximum", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Configure the alarm to treat missing data as breaching", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "EC2 instances in a private VPC must send operating system logs plus memory and per-process metrics to CloudWatch. Systems Manager already works on these instances and they have an instance profile. The configuration must be identical on every instance, must be applied to instances launched in the future, and must be changeable in one place without connecting to any instance. Which setup should the DevOps engineer implement?",
+      "explanation": "Phân tích đề: Cần metric memory và process (không có sẵn từ hypervisor), cấu hình đồng nhất, áp cho instance tương lai, và sửa ở một nơi duy nhất.\n(A) ĐÚNG: Cài CloudWatch Agent qua Systems Manager, lưu file cấu hình JSON trong Parameter Store, áp bằng State Manager association nhắm theo tag; instance profile cần quyền cloudwatch:PutMetricData, logs:CreateLogStream và logs:PutLogEvents cùng quyền đọc parameter. Sửa parameter một lần là toàn fleet hội tụ.\n(B) SAI: Bật detailed monitoring chỉ tăng tần suất của metric EC2 sẵn có; hypervisor không nhìn thấy memory hay tiến trình bên trong hệ điều hành.\n(C) SAI: Chạy cấu hình wizard trên từng instance vi phạm yêu cầu không kết nối vào instance và không áp dụng cho instance tương lai.\n(D) SAI: Viết script cron gọi PutMetricData là tự làm lại việc của agent, tốn chi phí API và khó chuẩn hóa.\nĐáp án đúng: A\nĐiểm cần nhớ: Ba mảnh ghép của CloudWatch Agent ở quy mô lớn: cài bằng SSM, cấu hình trong Parameter Store, áp và duy trì bằng State Manager. Memory, disk và process luôn cần agent.",
+      "tagNames": ["Monitoring and Logging > CloudWatch Agent"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Install the CloudWatch Agent through Systems Manager, keep its JSON configuration in Parameter Store, and apply it with a State Manager association targeting tags", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable EC2 detailed monitoring so memory and process metrics are delivered every minute", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Run the agent configuration wizard on each instance and start the agent locally", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Write a cron script on each instance that calls PutMetricData with the required values", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "After the CloudWatch Agent was rolled out, host metrics appear correctly in CloudWatch but the log group for /var/log/app.log is never created, even though the file is listed in the agent configuration and the file exists on disk with content. The agent process is running and reports no configuration parse error. What should the DevOps engineer check FIRST?",
+      "explanation": "Phân tích đề: Metric đi được nhưng log thì không, cấu hình đã khai báo đúng file và agent vẫn chạy. Vậy khác biệt nằm ở quyền dành riêng cho log hoặc ở quyền đọc file.\n(A) ĐÚNG: Kiểm tra hai thứ theo đúng thứ tự: instance role có quyền logs:CreateLogGroup, logs:CreateLogStream và logs:PutLogEvents hay không, và tiến trình agent (thường chạy dưới một user riêng) có quyền đọc /var/log/app.log hay không. Một trong hai thiếu là log không bao giờ xuất hiện trong khi metric vẫn đi bình thường.\n(B) SAI: Tạo log group thủ công có thể làm log xuất hiện nhưng che mất nguyên nhân gốc, và nếu thiếu PutLogEvents thì vẫn không có dữ liệu.\n(C) SAI: Cài lại agent phiên bản mới là hành động mò mẫm khi chưa có dấu hiệu nào cho thấy agent lỗi.\n(D) SAI: Thiếu VPC endpoint cho logs sẽ gây timeout chứ không im lặng hoàn toàn, và metric cũng thường bị ảnh hưởng nếu đường mạng hỏng.\nĐáp án đúng: A\nĐiểm cần nhớ: Metric và log dùng hai nhóm quyền khác nhau. Khi chỉ một trong hai hoạt động, hãy soi quyền IAM tương ứng trước, rồi tới quyền đọc file của tiến trình agent.",
+      "tagNames": ["Monitoring and Logging > CloudWatch Agent"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Whether the instance role allows the CloudWatch Logs write actions and whether the agent process can read the log file", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Whether the log group was pre-created in CloudWatch Logs with the exact name", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Whether a newer version of the CloudWatch Agent is available and should be installed", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Whether the VPC has an interface endpoint for CloudWatch Logs", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "A security team must be able to answer, for any account in the organization, who created an IAM user, which principal assumed which role, and from which source IP an API call originated, for activity in every Region including Regions the company does not normally use. The record must survive an administrator in a member account attempting to stop logging. Which configuration should be implemented?",
+      "explanation": "Phân tích đề: Cần độ phủ toàn tổ chức và toàn Region, và không bị tắt bởi quản trị viên của account thành viên.\n(A) ĐÚNG: Organization trail tạo từ management account hoặc delegated administrator, áp dụng cho mọi account hiện có và mới, bật cho tất cả Region; kết hợp SCP deny cloudtrail:StopLogging và cloudtrail:DeleteTrail để member account không tắt được. Log đưa vào bucket ở account log archive riêng.\n(B) SAI: Trail riêng ở từng account để chính account đó quản lý nghĩa là quản trị viên địa phương có thể tắt, đúng rủi ro cần loại bỏ.\n(C) SAI: Event history chỉ giữ 90 ngày, không cấu hình được độ phủ và không đáp ứng yêu cầu lưu trữ bền vững.\n(D) SAI: Chỉ bật Insights events phát hiện bất thường về tần suất API, không phải bản ghi đầy đủ các lời gọi.\nĐáp án đúng: A\nĐiểm cần nhớ: Bộ ba cho CloudTrail cấp tổ chức: organization trail (độ phủ kể cả account mới), SCP chặn tắt trail (chống phá hoại), và bucket ở account log archive riêng (cách ly quyền).",
+      "tagNames": ["Monitoring and Logging > AWS CloudTrail"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An organization trail covering all Regions, delivered to a dedicated log archive account, with an SCP that denies stopping or deleting trails", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "One multi-Region trail per account, owned and maintained by each account team", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "CloudTrail Event history in each account, exported when an investigation is needed", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "CloudTrail Insights events enabled in the management account", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MSQ",
+      "questionText": "A company suspects that a leaked access key was used to copy objects out of a production S3 bucket in a member account. Investigators cannot find any record of the object reads in CloudTrail, and the security team is concerned that an attacker with administrative access in that member account could simply turn logging off. Which TWO controls must be in place to support this and future investigations?",
+      "explanation": "Phân tích đề: Hai thiếu sót: không có bản ghi thao tác đọc object, và nguy cơ trail bị tắt tại account thành viên.\n(A) ĐÚNG: Bật CloudTrail data events cho bucket đó (dùng advanced event selector để giới hạn theo bucket hoặc prefix nhằm kiểm soát chi phí). Thao tác GetObject chỉ được ghi khi data events bật, đây chính là lý do không tìm thấy bản ghi.\n(B) ĐÚNG: Dùng organization trail quản lý từ management account hoặc delegated administrator, kết hợp SCP chặn member account tắt hay sửa trail. Member account không thể vô hiệu hóa bản ghi.\n(C) SAI: S3 server access logging là nguồn bổ trợ có độ trễ và định dạng khác, không thay thế CloudTrail data events cho mục đích điều tra theo principal.\n(D) SAI: Bật versioning trên bucket giúp khôi phục object bị xóa, không tạo ra bản ghi ai đã đọc dữ liệu.\n(E) SAI: Bật Insights events phát hiện bất thường về tần suất lời gọi, không ghi lại từng thao tác đọc object.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Management events được ghi mặc định; data events (S3 object, Lambda Invoke, DynamoDB item) phải bật riêng và tính phí. Câu hỏi không thấy log thao tác trên dữ liệu gần như luôn quy về data events.",
+      "tagNames": ["Monitoring and Logging > AWS CloudTrail"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable CloudTrail data events for that bucket so object level operations are recorded", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Use an organization trail managed centrally and deny member accounts the ability to stop or delete trails", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Enable S3 server access logging on the bucket as the forensic record of object reads", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable versioning on the bucket so copied objects can be traced to their versions", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Enable CloudTrail Insights so unusual read activity is recorded automatically", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MCQ",
+      "questionText": "When an Auto Scaling group launches an instance, two independent things must happen: a Lambda function must register the instance in an internal CMDB, and a message must be posted to a Slack channel. The two actions must not depend on each other, each must retry on its own if it fails, and adding a third consumer later must not require changing the existing code. Which design fits best?",
+      "explanation": "Phân tích đề: Fan-out từ một sự kiện, các consumer độc lập, retry riêng, và dễ thêm consumer mới.\n(A) ĐÚNG: EventBridge rule khớp sự kiện EC2 Instance Launch Successful của Auto Scaling, với nhiều target: Lambda cho CMDB và SNS (hoặc AWS Chatbot) cho Slack. Mỗi target có retry policy và DLQ riêng, và thêm consumer chỉ là thêm target hoặc thêm rule.\n(B) SAI: Một Lambda làm cả hai việc gắn chặt hai mối quan tâm: lỗi ở phần Slack có thể làm hỏng cả phần CMDB, và retry không tách bạch được.\n(C) SAI: Lifecycle hook phù hợp khi cần chặn quá trình launch để làm việc gì đó trước khi instance vào phục vụ; ở đây yêu cầu là thông báo song song, và hook không cung cấp fan-out.\n(D) SAI: Polling API mô tả Auto Scaling activity theo lịch là kiến trúc kéo, có độ trễ và tốn kém, đi ngược mô hình hướng sự kiện.\nĐáp án đúng: A\nĐiểm cần nhớ: EventBridge là bus fan-out: một sự kiện, nhiều rule và nhiều target, mỗi target có retry và DLQ riêng. Đó là lý do nó được ưu tiên hơn việc viết một Lambda điều phối tất cả.",
+      "tagNames": ["Monitoring and Logging > Amazon EventBridge"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An EventBridge rule on the Auto Scaling launch event with the Lambda function and an SNS topic as independent targets", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "One Lambda function subscribed to the event that registers the instance and then posts to Slack", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "An Auto Scaling lifecycle hook that holds the instance while both actions are performed", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A scheduled job that polls the Auto Scaling activity history and reacts to new launches", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "A scheduled EventBridge rule invokes a Lambda function every 15 minutes to reconcile data with a partner system. During a partner outage the invocations failed for two hours, and afterwards the team found no record of which scheduled executions had been lost. The design must retry transient failures automatically and preserve any event that still cannot be delivered so it can be inspected and reprocessed later. What should be configured?",
+      "explanation": "Phân tích đề: Cần retry tự động và giữ lại sự kiện không gửi được để xử lý sau.\n(A) ĐÚNG: Cấu hình retry policy trên target (maximum retry attempts và maximum event age) cùng một dead-letter queue bằng SQS. Sự kiện hết hạn hoặc hết lượt retry sẽ nằm trong DLQ kèm metadata về lý do thất bại.\n(B) SAI: Tăng timeout của Lambda không giúp gì khi nguyên nhân là hệ thống đối tác không phản hồi, và cũng không lưu lại sự kiện thất bại.\n(C) SAI: Tăng tần suất lịch lên mỗi 5 phút chỉ tạo thêm lần thất bại, không giải quyết việc mất dấu sự kiện.\n(D) SAI: Ghi log lỗi trong chính Lambda chỉ hữu ích khi hàm thực sự được gọi; nếu việc gửi tới target thất bại thì không có gì để ghi.\nĐáp án đúng: A\nĐiểm cần nhớ: Trên EventBridge, độ bền của việc giao sự kiện nằm ở target: retry policy và DLQ. Đối với bus, còn có archive và replay để phát lại theo khoảng thời gian.",
+      "tagNames": ["Monitoring and Logging > Amazon EventBridge"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "A retry policy on the rule target together with an SQS dead-letter queue for events that still fail", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A longer Lambda timeout so slow partner responses do not fail the invocation", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "A more frequent schedule so a missed reconciliation is corrected by the next run", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Error logging inside the Lambda function with a CloudWatch alarm on the error metric", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MCQ",
+      "questionText": "A set of microservices on Amazon ECS with Fargate call one another over HTTP. End-to-end latency for one user journey rose from 300 ms to 2 seconds, yet every service dashboard shows normal CPU, memory, and per-service latency. The team must determine which downstream call in the chain is responsible, including calls to DynamoDB and to an external payment provider, and needs the answer during the current incident. What should they add?",
+      "explanation": "Phân tích đề: Mỗi service riêng lẻ trông bình thường nhưng tổng thể chậm; cần nhìn xuyên suốt một request qua nhiều service và cả dependency bên ngoài.\n(A) ĐÚNG: Distributed tracing bằng AWS X-Ray (hoặc ADOT xuất sang X-Ray): service map cho thấy quan hệ và độ trễ từng cạnh, trace timeline cho thấy subsegment nào chiếm thời gian, gồm cả lời gọi AWS SDK tới DynamoDB và HTTP ra ngoài.\n(B) SAI: Thêm nhiều metric latency cho từng service vẫn cho cái nhìn rời rạc, không nối được các bước trong cùng một request.\n(C) SAI: Ghép log theo request id qua nhiều service là cách thủ công, chậm và dễ bỏ sót trong lúc sự cố đang diễn ra.\n(D) SAI: Bật Container Insights cho metric hạ tầng chi tiết hơn nhưng không trả lời câu hỏi dependency nào gây chậm trong một request.\nĐáp án đúng: A\nĐiểm cần nhớ: Metric trả lời có vấn đề hay không, log trả lời chuyện gì xảy ra ở một chỗ, còn trace trả lời thời gian đi đâu trong một request xuyên nhiều dịch vụ. Đề mô tả từng service bình thường nhưng tổng thể chậm chính là trường hợp của tracing.",
+      "tagNames": ["Monitoring and Logging > AWS X-Ray"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Instrument the services for distributed tracing with AWS X-Ray and analyze the service map and trace timelines", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Add more granular latency metrics and alarms to each service dashboard", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Correlate the application logs of all services by request id in CloudWatch Logs Insights", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable Container Insights to collect detailed task level performance metrics", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MSQ",
+      "questionText": "A Lambda function already writes structured logs. The team now wants traces that show its DynamoDB calls and outbound HTTP requests as separate subsegments, with as little code change as possible. The function uses a least-privilege execution role that currently allows only DynamoDB actions and CloudWatch Logs writes. Which TWO actions are required?",
+      "explanation": "Phân tích đề: Cần subsegment cho downstream call, ít sửa code, và role hiện tại rất hẹp.\n(A) ĐÚNG: Bật active tracing trên hàm để có segment của invocation, và dùng X-Ray SDK, Powertools hoặc ADOT để patch AWS SDK và HTTP client; đây là bước tạo ra subsegment cho DynamoDB và HTTP.\n(B) ĐÚNG: Bổ sung xray:PutTraceSegments và xray:PutTelemetryRecords vào execution role, nếu không hàm không gửi được dữ liệu trace lên dịch vụ.\n(C) SAI: Tăng memory của hàm không liên quan tới việc sinh subsegment.\n(D) SAI: Chỉ bật active tracing mà không instrument sẽ cho một segment duy nhất, không có chi tiết downstream — đây là bẫy hay gặp.\n(E) SAI: Gắn managed policy quyền rộng vi phạm nguyên tắc least privilege mà đề nêu rõ cần giữ.\n(F) SAI: Ghi thủ công thời gian gọi DynamoDB vào log là giải pháp thay thế nghèo nàn và đòi hỏi nhiều sửa đổi code hơn.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Active tracing cho segment của dịch vụ; instrumentation trong code cho subsegment của dependency; quyền xray:PutTraceSegments và PutTelemetryRecords cho việc gửi dữ liệu. Thiếu bất kỳ mảnh nào là trace không đầy đủ.",
+      "tagNames": ["Monitoring and Logging > AWS X-Ray"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable active tracing on the function and instrument the AWS SDK and HTTP client with the X-Ray SDK, Powertools or ADOT", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Add the X-Ray write permissions to the execution role", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Increase the function memory so the tracing library has enough resources", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable active tracing only, since Lambda automatically records subsegments for AWS SDK calls", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Attach a broad managed policy to the execution role so no tracing call is denied", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Log the duration of each DynamoDB call manually and build a dashboard from the logs", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MCQ",
+      "questionText": "A company needs one dashboard that shows the same business metric coming from five workload accounts, and a single alarm that pages when the error rate is high in any of them. Developers must not be given console access to the workload accounts, and the team does not want to copy metric data between accounts. What is the MOST scalable pattern?",
+      "explanation": "Phân tích đề: Xem metric của năm account ở một nơi, alarm tổng hợp, không cấp console cho account workload, không sao chép dữ liệu metric.\n(A) ĐÚNG: Bật CloudWatch cross-account observability: các account nguồn là source account, một account giám sát là monitoring account; dashboard và alarm dựng ở account giám sát và đọc metric từ các account nguồn mà không cần sao chép dữ liệu hay cấp console.\n(B) SAI: Viết Lambda định kỳ đọc metric rồi PutMetricData sang account trung tâm chính là sao chép dữ liệu, tốn kém, có độ trễ và làm mất độ phân giải.\n(C) SAI: Cấp cross-account role cho developer để mở console từng account trái ràng buộc và không tạo ra dashboard hợp nhất.\n(D) SAI: Tạo dashboard riêng trong từng account rồi ghép ảnh chụp màn hình không phải giải pháp kỹ thuật và không có alarm tổng hợp.\nĐáp án đúng: A\nĐiểm cần nhớ: CloudWatch cross-account observability cho phép một monitoring account xem metric, log và trace của nhiều source account. Composite alarm dựng ở account giám sát để gộp tín hiệu từ nhiều nguồn.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Enable CloudWatch cross-account observability with a central monitoring account and build the dashboard and composite alarm there", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Run a scheduled Lambda in each account that republishes the metric into the central account", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Give developers a cross-account role so they can open the CloudWatch console in each workload account", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Build a dashboard in each account and assemble the views in a shared document", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 12,
+      "questionType": "MCQ",
+      "questionText": "Application logs in CloudWatch Logs contain the string ORDER_FAILED in free-form lines. The operations team must be able to search these lines during investigations and must also alarm when the number of occurrences exceeds a threshold over five minutes. They do not want to deploy or maintain any log processing component. Which approach satisfies both needs?",
+      "explanation": "Phân tích đề: Vừa cần tìm kiếm ad hoc, vừa cần metric để đặt alarm, và không muốn tự vận hành thành phần xử lý log.\n(A) ĐÚNG: Tạo metric filter trên log group khớp ORDER_FAILED để sinh một custom metric, rồi đặt alarm trên metric đó; việc tìm kiếm ad hoc dùng CloudWatch Logs Insights trên chính log group. Cả hai đều là tính năng có sẵn, không cần thành phần tự vận hành.\n(B) SAI: Subscription filter đẩy log sang Lambda để đếm là tự xây dựng thành phần xử lý, đúng thứ đề muốn tránh.\n(C) SAI: Chạy truy vấn Logs Insights theo lịch cho kết quả truy vấn chứ không phải metric, nên không thể đặt alarm một cách tự nhiên.\n(D) SAI: Xuất log sang S3 và dùng Athena phù hợp cho phân tích lịch sử theo lô, không đáp ứng alarm gần thời gian thực.\nĐáp án đúng: A\nĐiểm cần nhớ: Metric filter biến pattern trong log thành metric để alarm; Logs Insights dùng cho truy vấn tương tác. Khi cần metric có nhiều chiều từ log, hãy nghĩ tới Embedded Metric Format thay vì tạo hàng loạt metric filter.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create a CloudWatch Logs metric filter for the pattern and alarm on the resulting metric, using Logs Insights for ad hoc searches", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Attach a subscription filter that sends matching lines to a Lambda function which counts them and publishes a metric", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Schedule a CloudWatch Logs Insights query every five minutes and alarm on its result", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Export the log group to S3 and query it with Amazon Athena when investigating", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 13,
+      "questionType": "MSQ",
+      "questionText": "When a latency metric breaches its threshold, two things must happen: the on-call engineer must be paged through the company incident tool, and the service must scale out. The team insists that these two behaviors must not be implemented inside one Lambda function, because a failure in the paging integration must never prevent scaling. Which TWO alarm targets should be used?",
+      "explanation": "Phân tích đề: Hai hành động độc lập từ một tín hiệu, không được gói chung trong một Lambda để lỗi bên này không chặn bên kia.\n(A) ĐÚNG: SNS topic (hoặc EventBridge rồi tới công cụ sự cố, hoặc AWS Chatbot) làm kênh paging. Đây là target riêng, lỗi ở đây không ảnh hưởng target khác.\n(B) ĐÚNG: Gắn trực tiếp Auto Scaling policy action vào cùng alarm (hoặc dùng một alarm thứ hai trên cùng metric) để scale out. CloudWatch alarm hỗ trợ nhiều action và chúng thực thi độc lập.\n(C) SAI: Một Lambda vừa page vừa gọi SetDesiredCapacity chính là điều đề cấm.\n(D) SAI: Gửi alarm tới một SQS queue rồi để worker xử lý cả hai việc lại gom chúng vào một đường xử lý chung.\n(E) SAI: Viết alarm vào CloudWatch Logs rồi dùng metric filter để kích hoạt hành động là vòng vèo và thêm độ trễ.\n(F) SAI: Dùng Step Functions điều phối tuần tự hai hành động tạo phụ thuộc thứ tự mà đề muốn loại bỏ.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Một CloudWatch alarm có thể gắn nhiều action thuộc các loại khác nhau (SNS, Auto Scaling policy, EC2 action, Systems Manager). Đây là cách tách biệt trách nhiệm mà không cần code trung gian.",
+      "tagNames": ["Monitoring and Logging > Amazon CloudWatch"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "An SNS topic subscribed by the incident management tool for paging", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A native Auto Scaling policy action attached to the same alarm, or a second alarm on the same metric", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "A single Lambda function that pages the on-call engineer and then updates the desired capacity", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "An SQS queue consumed by a worker that performs both actions in order", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "A CloudWatch Logs entry written by the alarm, with a metric filter that drives both actions", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "A Step Functions state machine that pages first and scales out afterwards", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 14,
+      "questionType": "MCQ",
+      "questionText": "The CloudWatch Agent was installed on a fleet through Systems Manager, and the desired JSON configuration was uploaded to Parameter Store, but CloudWatch still shows only the default set of metrics. The instance role allows reading the parameter and writing metrics and logs, and the agent service is running. What step was skipped?",
+      "explanation": "Phân tích đề: Agent đã cài, cấu hình đã nằm trong Parameter Store, quyền đầy đủ, nhưng agent vẫn dùng cấu hình mặc định.\n(A) ĐÚNG: Phải chạy bước áp cấu hình: dùng SSM document AmazonCloudWatch-ManageAgent với action configure trỏ tới tên parameter (hoặc gọi amazon-cloudwatch-agent-ctl với tham số fetch-config -s). Cài agent và đặt file cấu hình ở Parameter Store là hai việc riêng; nếu không fetch và restart thì agent tiếp tục dùng cấu hình cũ.\n(B) SAI: Cài lại agent không làm nó tự biết phải lấy cấu hình nào từ Parameter Store.\n(C) SAI: Đặt tên parameter theo một tiền tố cụ thể không phải điều kiện bắt buộc; điều quan trọng là truyền đúng tên khi áp cấu hình.\n(D) SAI: Khởi động lại instance có thể khởi động lại agent nhưng vẫn với cấu hình đang lưu cục bộ.\nĐáp án đúng: A\nĐiểm cần nhớ: Vòng đời cấu hình agent gồm ba bước: lưu JSON vào Parameter Store, áp cấu hình bằng SSM document (fetch-config), và duy trì bằng State Manager để instance mới cũng nhận. Bỏ bước giữa là lỗi phổ biến nhất.",
+      "tagNames": ["Monitoring and Logging > CloudWatch Agent"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "The agent was never told to fetch the configuration from Parameter Store and restart with it", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "The agent package must be reinstalled after the parameter is created", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "The parameter name must start with a reserved prefix for the agent to discover it automatically", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "The instances must be rebooted so the agent reloads its configuration", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 15,
+      "questionType": "MSQ",
+      "questionText": "A mixed fleet of Windows and Linux instances, launched by Auto Scaling groups that scale several times a day, must all use a centrally maintained CloudWatch Agent configuration, and a newly launched instance must be shipping logs within a few minutes of launch without any human action. Which TWO elements are required?",
+      "explanation": "Phân tích đề: Cấu hình quản lý tập trung cho hai hệ điều hành, và instance mới tự áp dụng ngay sau khi khởi động.\n(A) ĐÚNG: Lưu cấu hình trong SSM Parameter Store, dùng parameter riêng cho Windows và Linux vì đường dẫn log và tên counter khác nhau. Đây là nguồn sự thật duy nhất để sửa một chỗ.\n(B) ĐÚNG: Áp cấu hình lúc instance khởi động bằng user data hoặc bằng State Manager association nhắm theo tag của Auto Scaling group; instance mới tự nhận mà không cần ai thao tác.\n(C) SAI: Bake cấu hình vào AMI khiến mỗi lần đổi cấu hình phải tạo AMI mới và thay toàn bộ fleet, mất tính tập trung.\n(D) SAI: Copy file cấu hình từ một S3 bucket bằng script tự viết là làm thủ công thứ mà Parameter Store và State Manager đã cung cấp, và khó theo dõi phiên bản.\n(E) SAI: Dùng một cấu hình duy nhất cho cả hai hệ điều hành thường không khả thi vì khác biệt về đường dẫn và bộ đếm hiệu năng.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Với fleet động, hãy ghép Parameter Store (nơi lưu cấu hình) với State Manager hoặc user data (cơ chế áp dụng). Đừng bake cấu hình vào AMI nếu muốn thay đổi nhanh.",
+      "tagNames": ["Monitoring and Logging > CloudWatch Agent"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Store the agent configuration in SSM Parameter Store, with a separate parameter per operating system", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Apply the configuration at launch through user data or a State Manager association targeting the Auto Scaling group tags", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Bake the agent configuration file into the AMIs used by the Auto Scaling groups", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Have a startup script copy the configuration file from an S3 bucket on every boot", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Use one identical configuration document for Windows and Linux to guarantee consistency", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 16,
+      "questionType": "MCQ",
+      "questionText": "An application sends StatsD metrics to the CloudWatch Agent running on the same instance, including a dimension that identifies the tenant. The metrics appear in CloudWatch, but they carry only the instance dimensions and the tenant dimension is missing, so per-tenant alarms cannot be created. What should the DevOps engineer check?",
+      "explanation": "Phân tích đề: Metric tới được CloudWatch nhưng mất chiều tenant, nên vấn đề nằm ở cách metric được gửi hoặc cách agent tổng hợp chiều.\n(A) ĐÚNG: Kiểm tra phần metrics_collected của agent (cấu hình StatsD hoặc collectd) cùng các thiết lập về dimension và aggregation, và kiểm tra định dạng metric mà ứng dụng gửi có đính kèm tag/dimension theo cú pháp agent hiểu hay không. Nếu dimension không được khai báo giữ lại thì agent sẽ gộp mất chiều đó.\n(B) SAI: Thiếu quyền PutMetricData sẽ làm không có metric nào xuất hiện, trái với hiện tượng.\n(C) SAI: Tăng tần suất thu thập không tạo ra chiều dữ liệu bị mất.\n(D) SAI: Thiếu VPC endpoint sẽ gây lỗi gửi metric chứ không làm mất một dimension cụ thể.\nĐáp án đúng: A\nĐiểm cần nhớ: Khi metric có mặt nhưng thiếu chiều, hãy soi cấu hình dimension/aggregation của agent và định dạng phía ứng dụng. Với ứng dụng cần nhiều chiều, cân nhắc Embedded Metric Format thay cho StatsD.",
+      "tagNames": ["Monitoring and Logging > CloudWatch Agent"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "The agent dimension and aggregation settings, and the metric format the application sends", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Whether the instance role allows cloudwatch:PutMetricData", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Whether the collection interval is short enough to capture every dimension value", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Whether the VPC has an interface endpoint for the CloudWatch monitoring API", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 17,
+      "questionType": "MCQ",
+      "questionText": "An audit found that an administrator in a member account had stopped the local CloudTrail trail for three days, and nobody noticed. Leadership now requires a single trail that covers management events in every Region for every account, that member account administrators cannot disable, and that automatically includes accounts created in the future. What should the DevOps engineer implement?",
+      "explanation": "Phân tích đề: Một trail duy nhất, phủ mọi Region và mọi account, không bị member account tắt, và tự bao gồm account mới.\n(A) ĐÚNG: Organization trail tạo ở management account hoặc delegated administrator sẽ tự áp dụng cho mọi account thành viên, kể cả account mới; kết hợp SCP deny cloudtrail:StopLogging, DeleteTrail, UpdateTrail và PutEventSelectors để quản trị viên địa phương không can thiệp được.\n(B) SAI: Yêu cầu mỗi account tự tạo trail và cam kết không tắt là kiểm soát bằng chính sách giấy tờ, đúng thứ đã thất bại.\n(C) SAI: Dùng AWS Config rule để phát hiện trail bị tắt là detective; nó chỉ báo sau khi sự việc đã xảy ra và bản thân Config cũng có thể bị can thiệp trong account đó.\n(D) SAI: Dựa vào Event history không có cấu hình độ phủ, chỉ giữ 90 ngày và không thể xem tập trung cho toàn tổ chức.\nĐáp án đúng: A\nĐiểm cần nhớ: Preventive thì dùng organization trail cộng SCP; detective thì dùng Config rule hoặc EventBridge trên các API nguy hiểm. Đề yêu cầu không thể tắt nghĩa là cần lớp preventive.",
+      "tagNames": ["Monitoring and Logging > AWS CloudTrail"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create an organization trail from the management or delegated administrator account and deny trail modification actions with an SCP", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Require every account to create its own multi-Region trail and document that it must never be stopped", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an AWS Config rule that reports when a trail is not logging and notify the security team", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Rely on CloudTrail Event history, which cannot be disabled by account administrators", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 18,
+      "questionType": "MCQ",
+      "questionText": "Security analysts must run SQL-like queries over two years of CloudTrail management events for all accounts in the organization, get results in minutes, and do so without creating and maintaining Athena tables, partitions, or Glue crawlers. Which option fits these requirements with the least ongoing effort?",
+      "explanation": "Phân tích đề: Truy vấn SQL trên hai năm sự kiện toàn tổ chức, kết quả trong vài phút, không quản lý bảng hay partition.\n(A) ĐÚNG: CloudTrail Lake với organization event data store cho phép đặt retention dài và truy vấn bằng SQL ngay trong dịch vụ; không cần Glue crawler, không cần partition projection.\n(B) SAI: Athena trên bucket CloudTrail rẻ hơn về lưu trữ nhưng phải tạo và duy trì bảng cùng chiến lược partition, đúng thứ đề bài loại trừ.\n(C) SAI: OpenSearch cần quản lý domain, sizing và index lifecycle cho hai năm dữ liệu, là gánh nặng vận hành lớn.\n(D) SAI: CloudWatch Logs Insights dùng cho log group, không phải cách chuẩn để truy vấn kho sự kiện CloudTrail nhiều năm của toàn tổ chức.\nĐáp án đúng: A\nĐiểm cần nhớ: CloudTrail Lake là kho sự kiện có quản lý với truy vấn SQL và retention dài, hỗ trợ organization event data store. Đối lập với Athena: rẻ hơn nhưng phải tự quản lý schema và partition.",
+      "tagNames": ["Monitoring and Logging > AWS CloudTrail"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Create an organization event data store in CloudTrail Lake with two-year retention and query it with SQL", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Create an Athena table over the CloudTrail S3 prefix with partition projection", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Stream the trail into an Amazon OpenSearch Service domain sized for two years of events", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Send the trail to CloudWatch Logs and use Logs Insights for the investigations", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 19,
+      "questionType": "MSQ",
+      "questionText": "CloudTrail log files are delivered to an S3 bucket that must serve as forensic evidence. The company must be able to prove that no log file was modified after delivery, and must detect promptly if anyone attempts to delete objects from that bucket. The bucket currently lives in the same account as the workloads. Which TWO controls should be implemented?",
+      "explanation": "Phân tích đề: Hai mục tiêu: chứng minh file không bị sửa, và phát hiện sớm hành vi xóa.\n(A) ĐÚNG: Chuyển bucket sang một account log archive chuyên dụng với quyền tách biệt, bật S3 Object Lock (hoặc bucket policy deny delete) để file không bị xóa hay ghi đè trong thời gian giữ.\n(B) ĐÚNG: Bật CloudTrail log file validation để sinh digest file cho phép kiểm chứng tính toàn vẹn, và giám sát sự kiện DeleteObject trên bucket log (qua data events và EventBridge) để cảnh báo ngay khi có nỗ lực xóa.\n(C) SAI: Bật versioning giúp khôi phục nhưng tự nó không chứng minh tính toàn vẹn và không cảnh báo khi có hành vi xóa.\n(D) SAI: Mã hóa bucket bằng SSE-KMS bảo vệ tính bí mật, không phải tính toàn vẹn hay khả năng phát hiện xóa.\n(E) SAI: Sao chép log sang Glacier hằng tháng tạo khoảng trống thời gian và vẫn để bản gốc có thể bị sửa trong tháng đó.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Toàn vẹn của log CloudTrail dựa trên log file validation (digest) cộng với lưu trữ bất biến (Object Lock) ở account tách biệt, và giám sát hành vi xóa. Ba lớp này bổ sung chứ không thay thế nhau.",
+      "tagNames": ["Monitoring and Logging > AWS CloudTrail"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Move the trail destination to a dedicated log archive account and protect the bucket with Object Lock or a deny-delete policy", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Enable CloudTrail log file validation and alert on delete attempts against the log bucket", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Enable versioning on the bucket so deleted log files can be recovered", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Encrypt the bucket with a customer managed KMS key so files cannot be altered", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Copy the log files to Amazon S3 Glacier once a month as the archival copy", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 20,
+      "questionType": "MCQ",
+      "questionText": "AWS Config noncompliance notifications and Amazon GuardDuty findings must both start the same Step Functions remediation workflow. Over the next year the security team expects to add several more event sources, including a third-party scanner, and must be able to do so without modifying the workflow definition or its input contract. Which design should be used?",
+      "explanation": "Phân tích đề: Nhiều nguồn sự kiện khác nhau cùng kích hoạt một workflow, và thêm nguồn mới sau này không được sửa workflow.\n(A) ĐÚNG: Tạo rule riêng cho từng nguồn trên EventBridge, tất cả cùng trỏ tới state machine làm target, và dùng input transformer ở mỗi rule để chuẩn hóa payload về đúng hợp đồng đầu vào của workflow. Thêm nguồn mới chỉ là thêm một rule và một input transformer.\n(B) SAI: Một Lambda trung gian nhận mọi nguồn rồi gọi Step Functions thêm một thành phần phải bảo trì và trở thành điểm lỗi, trong khi EventBridge đã làm được việc này bằng cấu hình.\n(C) SAI: Cho workflow tự polling nhiều nguồn là mô hình kéo, chậm và phải sửa workflow mỗi khi có nguồn mới.\n(D) SAI: Tạo một state machine riêng cho mỗi nguồn dẫn tới trùng lặp logic khắc phục và khó giữ đồng nhất.\nĐáp án đúng: A\nĐiểm cần nhớ: EventBridge hỗ trợ fan-in nhiều nguồn về một target; input transformer là nơi chuẩn hóa payload, nhờ đó consumer giữ được hợp đồng đầu vào ổn định khi thêm nguồn mới.",
+      "tagNames": ["Monitoring and Logging > Amazon EventBridge"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "One EventBridge rule per source, all targeting the same state machine, each with an input transformer that normalizes the payload", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "A Lambda function that receives all sources and starts the workflow with a unified payload", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "A workflow that polls each source API on a schedule and processes new items", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "A separate Step Functions state machine per event source, each with its own remediation logic", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 21,
+      "questionType": "MSQ",
+      "questionText": "An EventBridge rule on a custom bus in Account A must invoke a Lambda function that lives in Account B. The rule matches correctly when tested, but invocations never reach the function and the rule shows failed invocations. Which TWO configuration elements are required for this cross-account delivery to work?",
+      "explanation": "Phân tích đề: Rule khớp đúng nhưng không gọi được hàm ở account khác; thiếu phần cấu hình cross-account.\n(A) ĐÚNG: Ở Account A, target của rule phải trỏ tới ARN của hàm ở Account B, và nếu cần thì gắn một IAM role cho rule để EventBridge dùng khi gọi target cross-account.\n(B) ĐÚNG: Ở Account B, hàm Lambda cần resource-based policy cho phép principal events.amazonaws.com gọi InvokeFunction, với condition giới hạn theo ARN của rule nguồn. Thiếu policy này là nguyên nhân phổ biến nhất của failed invocation.\n(C) SAI: Bật versioning cho hàm không liên quan tới quyền gọi cross-account.\n(D) SAI: Tạo VPC peering giữa hai account không cần thiết vì đây là lời gọi API của dịch vụ, không đi qua mạng riêng.\n(E) SAI: Sao chép rule sang Account B và để nó tự lắng nghe bus của Account A là không khả thi; rule chỉ khớp sự kiện trên bus trong chính account và Region của nó.\n(F) SAI: Cấp quyền lambda:InvokeFunction trong identity policy của một IAM user ở Account A không thay thế được resource-based policy của hàm cho principal dịch vụ.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Mọi lời gọi cross-account của EventBridge cần hai vế: cấu hình target (và role nếu cần) ở phía gửi, và resource-based policy cho phép ở phía nhận. Với mô hình bus-to-bus thì phía nhận là event bus policy.",
+      "tagNames": ["Monitoring and Logging > Amazon EventBridge"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "In Account A, configure the rule target with the function ARN in Account B and an invocation role where required", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "In Account B, add a Lambda resource-based policy allowing the EventBridge service principal from that rule to invoke the function", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Enable versioning on the Lambda function and target a published version", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create a VPC peering connection between the two accounts", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Recreate the rule in Account B so it listens to the custom bus in Account A", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Attach an identity policy allowing lambda:InvokeFunction to an IAM user in Account A", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 22,
+      "questionType": "MCQ",
+      "questionText": "A SaaS provider must push events about customer subscriptions into a customer's AWS account so that EventBridge rules can route them to a Lambda function. The provider cannot assume an IAM role in the customer account, and the customer will not expose any public endpoint or long-lived credentials to the provider. Which EventBridge capability fits this requirement?",
+      "explanation": "Phân tích đề: Nhà cung cấp SaaS đẩy sự kiện vào account khách hàng mà không assume role, không endpoint public, không credential dài hạn.\n(A) ĐÚNG: Partner event source: nhà cung cấp SaaS đã tích hợp với EventBridge sẽ tạo partner event source, khách hàng liên kết nó với một partner event bus trong account của mình, rồi viết rule bình thường. Không cần role cho đối tác, không cần endpoint public.\n(B) SAI: API destination là chiều ngược lại, dùng khi EventBridge gọi ra một HTTP endpoint bên ngoài.\n(C) SAI: Cho đối tác quyền PutEvents lên custom bus yêu cầu cấp credential hoặc role cho đối tác, trái ràng buộc.\n(D) SAI: Dựng API Gateway public để đối tác gọi vào chính là mở endpoint public mà khách hàng từ chối.\nĐáp án đúng: A\nĐiểm cần nhớ: Partner event source là sự kiện đi vào tài khoản AWS từ SaaS; API destination là sự kiện đi ra từ EventBridge tới HTTP endpoint. Phân biệt chiều đi là mấu chốt của câu hỏi dạng này.",
+      "tagNames": ["Monitoring and Logging > Amazon EventBridge"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "A partner event source associated with a partner event bus in the customer account", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "An EventBridge API destination pointing at the provider endpoint", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "A custom event bus with a resource policy allowing the provider to call PutEvents with supplied credentials", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "An API Gateway endpoint that receives provider webhooks and forwards them to the bus", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 23,
+      "questionType": "MCQ",
+      "questionText": "Traces for an API Gateway and Lambda application show only the API Gateway segment. The Lambda segment sometimes appears, but there are never subsegments for the DynamoDB calls the function makes with the AWS SDK, so the team cannot tell whether the database or the function code is slow. What is the MOST likely gap?",
+      "explanation": "Phân tích đề: Segment ngoài cùng có, nhưng subsegment cho lời gọi SDK thì không.\n(A) ĐÚNG: Cần bật active tracing trên hàm Lambda và instrument AWS SDK bằng X-Ray SDK, Powertools hoặc ADOT. Active tracing tạo segment cho invocation; chỉ khi SDK được patch thì mỗi lời gọi DynamoDB mới xuất hiện dưới dạng subsegment.\n(B) SAI: Sampling rule quyết định trace nào được ghi, chứ không lược bỏ subsegment bên trong một trace đã được lấy mẫu.\n(C) SAI: Thiếu quyền xray sẽ làm không có dữ liệu trace nào của hàm được gửi, trái với việc segment đôi lúc vẫn xuất hiện.\n(D) SAI: Tracing của API Gateway chỉ ảnh hưởng phần segment của chính nó, không sinh subsegment cho lời gọi bên trong hàm.\nĐáp án đúng: A\nĐiểm cần nhớ: Ghi nhớ ranh giới trách nhiệm: dịch vụ tạo segment, thư viện instrumentation tạo subsegment. Thiếu chi tiết dependency thì hãy tìm phần instrumentation trong code.",
+      "tagNames": ["Monitoring and Logging > AWS X-Ray"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Active tracing is not enabled on the function and the AWS SDK is not instrumented, so no subsegments are produced", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "The default sampling rule excludes subsegments from sampled traces", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "The execution role lacks the X-Ray write permissions", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Tracing is disabled on the API Gateway stage, which suppresses downstream subsegments", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 24,
+      "questionType": "MCQ",
+      "questionText": "A service handling 20,000 requests per second cannot afford to trace every request. The team still needs enough successful request traces to understand normal latency, and must capture essentially every request that ends in a 5xx error, because those are rare and are the reason the team looks at traces at all. Which X-Ray configuration achieves this?",
+      "explanation": "Phân tích đề: Cần giới hạn chi phí nhưng gần như không được bỏ sót trace của request lỗi 5xx.\n(A) ĐÚNG: Cấu hình sampling rule: một rule mặc định với reservoir nhỏ và fixed rate thấp cho traffic bình thường, cộng một rule ưu tiên cao hơn (reservoir và rate cao) khớp với đường dẫn hoặc dịch vụ liên quan tới lỗi, để trace lỗi gần như luôn được giữ.\n(B) SAI: Lấy mẫu 100 phần trăm rồi giảm retention không làm giảm chi phí ghi nhận và xử lý trace.\n(C) SAI: Tắt tracing cho traffic thành công làm mất đường cơ sở để so sánh, khiến trace lỗi khó diễn giải.\n(D) SAI: Lấy mẫu ngẫu nhiên một phần nghìn cho mọi request đồng nghĩa với việc phần lớn lỗi hiếm sẽ không có trace.\nĐáp án đúng: A\nĐiểm cần nhớ: Sampling rule của X-Ray gồm reservoir (số trace bảo đảm mỗi giây) và fixed rate (tỉ lệ phần còn lại), có thể khớp theo service name, host, HTTP method và URL path; rule có priority để quyết định thứ tự áp dụng.",
+      "tagNames": ["Monitoring and Logging > AWS X-Ray"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "A low default sampling rate plus a higher priority rule with a larger reservoir and rate for the error paths", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Sample 100 percent of requests and shorten the trace retention period", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Disable tracing for successful requests and trace only errors", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Apply a uniform random sampling rate of one in one thousand across all requests", "isCorrect": false }
+      ]
+    },
+    {
+      "questionNumber": 25,
+      "questionType": "MSQ",
+      "questionText": "Tasks running on Amazon ECS with Fargate must publish traces to AWS X-Ray. The tasks run in private subnets with no NAT gateway, and today no trace data appears at all. The application code has not been instrumented yet. Which TWO changes are required?",
+      "explanation": "Phân tích đề: Hai lớp vấn đề: không có thành phần thu thập và instrument, và không có đường mạng ra dịch vụ X-Ray.\n(A) ĐÚNG: Chạy X-Ray daemon hoặc ADOT collector dưới dạng sidecar trong task definition, và instrument ứng dụng để sinh segment cùng subsegment. Không có phần này thì không có dữ liệu nào để gửi.\n(B) ĐÚNG: Thêm interface VPC endpoint cho X-Ray (hoặc cung cấp NAT gateway) để sidecar gửi được segment; trong private subnet không có NAT thì đây là điều kiện bắt buộc.\n(C) SAI: Tăng CPU và memory cho task không tạo ra trace.\n(D) SAI: Bật Container Insights cung cấp metric mức container, không phải trace.\n(E) SAI: Gán public IP cho task Fargate đi ngược yêu cầu mạng riêng và thường bị chính sách bảo mật chặn.\n(F) SAI: Cấp quyền xray cho task role là cần thiết nhưng bản thân nó chưa đủ và cũng không phải một trong hai thay đổi trọng yếu mà đề nhấn mạnh so với hai mục trên; nếu thiếu cả sidecar lẫn đường mạng thì quyền không giúp gì.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Trên Fargate, cần sidecar (X-Ray daemon hoặc ADOT collector), instrumentation trong ứng dụng, quyền xray trong task role, và đường mạng tới endpoint X-Ray. Thiếu bất kỳ mảnh nào thì trace không xuất hiện.",
+      "tagNames": ["Monitoring and Logging > AWS X-Ray"],
+      "answers": [
+        { "answerLabel": "A", "answerText": "Add an X-Ray daemon or ADOT collector sidecar to the task definition and instrument the application", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Add an interface VPC endpoint for X-Ray so the collector can publish segments from the private subnets", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Increase the task CPU and memory so the tracing overhead does not cause dropped segments", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Enable Container Insights on the cluster so traces are collected automatically", "isCorrect": false },
+        { "answerLabel": "E", "answerText": "Assign a public IP address to the tasks so they can reach the X-Ray endpoint", "isCorrect": false },
+        { "answerLabel": "F", "answerText": "Replace the task role with one that has administrator permissions so no tracing call is denied", "isCorrect": false }
+      ]
+    }
+  ]
+}
