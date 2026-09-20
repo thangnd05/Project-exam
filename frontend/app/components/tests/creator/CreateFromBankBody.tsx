@@ -559,9 +559,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
 
             {(examParts || []).map((part: any) => {
               const cfg = partConfigs[part.examPartId] ?? defaultPartConfig();
-              const totalInBank = (cfg.bankQuestions || []).length;
               const scopedQuestions = getScopedQuestions(cfg);
-
               const maxInBank = scopedQuestions.length;
 
               const collectionScoped = !!collectionScopeIds && COLLECTION_SCOPED_MODES.includes(cfg.mode);
@@ -579,7 +577,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                     <span className={cx('bankPartName')}>
                       <IoBookOutline size={20} /> {part.name}
                     </span>
-                    <span className={cx('bankPartBadge')}>{totalInBank} câu</span>
+                    <span className={cx('bankPartBadge')}>{maxInBank} câu</span>
                     {cfg.expanded ? <IoChevronUpOutline size={22} /> : <IoChevronDownOutline size={22} />}
                   </button>
 
