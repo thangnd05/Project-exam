@@ -6,8 +6,8 @@
     border-radius: 8px;
     font-size: var(--font-size-smd);
     font-weight: 600;
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
+    background: var(--on-primary-gradient-soft);
+    color: var(--on-primary-gradient);
 }
 
 .modalOverlay {
@@ -53,14 +53,14 @@
         gap: 12px;
 
         svg {
-            color: #fff;
+            color: var(--on-primary-gradient);
             font-size: 2.4rem;
         }
 
         .title {
             font-size: 2.4rem;
             font-weight: 800;
-            color: #fff;
+            color: var(--on-primary-gradient);
             margin: 0 !important;
             letter-spacing: -0.5px;
         }
@@ -71,13 +71,13 @@
             border-radius: 8px;
             font-size: var(--font-size-smd);
             font-weight: 600;
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
+            background: var(--on-primary-gradient-soft);
+            color: var(--on-primary-gradient);
         }
     }
 
     .closeBtn {
-        background: rgba(255, 255, 255, 0.2);
+        background: var(--on-primary-gradient-soft);
         border: none;
         width: 40px;
         height: 40px;
@@ -85,12 +85,12 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #fff;
+        color: var(--on-primary-gradient);
         cursor: pointer;
         transition: all 0.2s;
 
         &:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgb(var(--brand-900-rgb) / 0.14);
             transform: rotate(90deg);
         }
     }
@@ -299,7 +299,7 @@
 
         &.active {
             background: var(--primary-gradient);
-            color: #fff;
+            color: var(--on-primary-gradient);
         }
     }
 }
@@ -515,7 +515,7 @@
 
     &.active {
         background: var(--primary-gradient);
-        color: #fff;
+        color: var(--on-primary-gradient);
         border-color: transparent;
     }
 }
@@ -621,7 +621,7 @@
 
     &.selected {
         background: var(--brand-100);
-        border: 1px solid var(--indigo-200);
+        border: 1px solid var(--brand-200);
     }
 }
 

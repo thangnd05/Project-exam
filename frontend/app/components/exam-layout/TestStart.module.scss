@@ -712,9 +712,9 @@
   }
 
   &.selected {
-    background: rgb(var(--teal-600-rgb) / 0.04);
+    background: rgb(var(--primary-rgb) / 0.04);
     border-color: var(--primary);
-    box-shadow: 0 4px 12px rgb(var(--teal-600-rgb) / 0.06);
+    box-shadow: 0 4px 12px rgb(var(--primary-rgb) / 0.06);
 
     span {
       color: var(--primary);
@@ -812,7 +812,7 @@
     border-radius: 14px;
     border: none;
     background: var(--primary-gradient);
-    color: white;
+    color: var(--on-primary-gradient);
     box-shadow: 0 6px 16px var(--primary-alpha-35);
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.2s ease;
@@ -924,7 +924,7 @@
   &:hover {
     border-color: var(--primary);
     color: var(--primary);
-    background: var(--sky-50);
+    background: var(--brand-50);
     box-shadow: 0 6px 16px var(--primary-alpha-08);
   }
 
@@ -942,7 +942,7 @@
 
 .footer-actions .btn-submit {
   background: var(--primary-gradient);
-  color: white;
+  color: var(--on-primary-gradient);
   border: none;
   padding: 14px 44px;
   border-radius: 12px;
@@ -1034,11 +1034,11 @@
 
   .state-btn-primary {
     background: var(--primary-gradient);
-    color: #fff;
+    color: var(--on-primary-gradient);
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgb(var(--teal-600-rgb) / 0.25);
+      box-shadow: 0 8px 20px rgb(var(--primary-rgb) / 0.25);
     }
   }
 }

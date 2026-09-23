@@ -38,7 +38,7 @@
   border: 2px solid #fff;
   box-sizing: border-box;
   background: var(--primary-gradient);
-  color: var(--white);
+  color: var(--on-primary-gradient);
   font-weight: 700;
   line-height: 1;
   text-transform: uppercase;
@@ -91,12 +91,22 @@
 }
 
 .effect-rainbow {
-  background: conic-gradient(#ff5252, #ff922b, #ffd43b, #51cf66, #22b8cf, #4dabf7, #7048e8, #ff5252);
+  background: conic-gradient(
+    #ff5252,
+    #ff922b,
+    #ffd43b,
+    #51cf66,
+    #22b8cf,
+    #4dabf7,
+    #7048e8,
+    #ff5252
+  );
   animation: cosmeticSpin 4s linear infinite;
 }
 
 @keyframes cosmeticGlow {
-  0%, 100% {
+  0%,
+  100% {
     box-shadow: 0 0 4px 1px rgba(250, 176, 5, 0.55);
   }
   50% {
@@ -105,7 +115,8 @@
 }
 
 @keyframes cosmeticPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     box-shadow: 0 0 4px 1px rgba(34, 139, 230, 0.4);
   }

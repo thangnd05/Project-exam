@@ -359,7 +359,7 @@
   &:hover:not(:disabled) {
     background: var(--accent-act-color);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgb(var(--teal-600-rgb) / 0.3);
+    box-shadow: 0 6px 20px rgb(var(--primary-rgb) / 0.3);
   }
 
   &:disabled {

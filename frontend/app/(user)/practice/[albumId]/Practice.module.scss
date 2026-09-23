@@ -7,7 +7,7 @@ $bg-body: var(--bg-body);
 $bg-white: var(--bg-white);
 $input-bg: var(--input-bg);
 $border-color: var(--border-color);
-$success: var(--green-600);
+$success: var(--success);
 $danger: var(--red-500);
 $shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
 $shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -257,7 +257,7 @@ $transition: all 0.3s ease;
 
     &:hover {
         background: var(--input-bg);
-        border-color: rgb(var(--teal-600-rgb) / 0.3);
+        border-color: rgb(var(--primary-rgb) / 0.3);
     }
 
     &.selected {

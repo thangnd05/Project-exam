@@ -28,18 +28,18 @@
   --brand-900: rgb(var(--brand-900-rgb));
   --text-on-dark: rgb(var(--text-on-dark-rgb));
 
-  --gold-100-rgb: 243 235 218;
-  --gold-200-rgb: 232 213 163;
-  --gold-400-rgb: 220 192 122;
-  --gold-500-rgb: 201 168 75;
-  --gold-600-rgb: 168 139 58;
-  --gold-700-rgb: 125 103 44;
-  --gold-100: rgb(var(--gold-100-rgb));
-  --gold-200: rgb(var(--gold-200-rgb));
-  --gold-400: rgb(var(--gold-400-rgb));
-  --gold-500: rgb(var(--gold-500-rgb));
-  --gold-600: rgb(var(--gold-600-rgb));
-  --gold-700: rgb(var(--gold-700-rgb));
+  --gold-100-rgb: var(--brand-100-rgb);
+  --gold-200-rgb: var(--brand-200-rgb);
+  --gold-400-rgb: var(--brand-400-rgb);
+  --gold-500-rgb: var(--brand-500-rgb);
+  --gold-600-rgb: var(--brand-600-rgb);
+  --gold-700-rgb: var(--brand-700-rgb);
+  --gold-100: var(--brand-100);
+  --gold-200: var(--brand-200);
+  --gold-400: var(--brand-400);
+  --gold-500: var(--brand-500);
+  --gold-600: var(--brand-600);
+  --gold-700: var(--brand-700);
 
   --slate-50-rgb: 248 250 252;
   --slate-100-rgb: 241 245 249;
@@ -111,25 +111,25 @@
   --orange-600: rgb(var(--orange-600-rgb));
   --orange-700: rgb(var(--orange-700-rgb));
 
-  --amber-50-rgb: 255 251 235;
-  --amber-100-rgb: 254 243 199;
-  --amber-200-rgb: 253 230 138;
-  --amber-400-rgb: 251 191 36;
-  --amber-500-rgb: 245 158 11;
-  --amber-600-rgb: 217 119 6;
-  --amber-700-rgb: 180 83 9;
-  --amber-50: rgb(var(--amber-50-rgb));
-  --amber-100: rgb(var(--amber-100-rgb));
-  --amber-200: rgb(var(--amber-200-rgb));
-  --amber-400: rgb(var(--amber-400-rgb));
-  --amber-500: rgb(var(--amber-500-rgb));
-  --amber-600: rgb(var(--amber-600-rgb));
-  --amber-700: rgb(var(--amber-700-rgb));
+  --amber-50-rgb: var(--orange-50-rgb);
+  --amber-100-rgb: var(--orange-100-rgb);
+  --amber-200-rgb: var(--orange-100-rgb);
+  --amber-400-rgb: var(--orange-500-rgb);
+  --amber-500-rgb: var(--orange-500-rgb);
+  --amber-600-rgb: var(--orange-600-rgb);
+  --amber-700-rgb: var(--orange-700-rgb);
+  --amber-50: var(--orange-50);
+  --amber-100: var(--orange-100);
+  --amber-200: var(--orange-100);
+  --amber-400: var(--orange-500);
+  --amber-500: var(--orange-500);
+  --amber-600: var(--orange-600);
+  --amber-700: var(--orange-700);
 
-  --yellow-500-rgb: 234 179 8;
-  --yellow-600-rgb: 202 138 4;
-  --yellow-500: rgb(var(--yellow-500-rgb));
-  --yellow-600: rgb(var(--yellow-600-rgb));
+  --yellow-500-rgb: var(--brand-500-rgb);
+  --yellow-600-rgb: var(--brand-600-rgb);
+  --yellow-500: var(--brand-500);
+  --yellow-600: var(--brand-600);
 
   --green-50-rgb: 240 253 244;
   --green-100-rgb: 220 252 231;
@@ -146,51 +146,51 @@
   --green-700: rgb(var(--green-700-rgb));
   --green-800: rgb(var(--green-800-rgb));
 
-  --emerald-50-rgb: 236 253 245;
-  --emerald-100-rgb: 209 250 229;
-  --emerald-200-rgb: 167 243 208;
-  --emerald-400-rgb: 52 211 153;
-  --emerald-500-rgb: 16 185 129;
-  --emerald-600-rgb: 5 150 105;
-  --emerald-700-rgb: 4 120 87;
-  --emerald-800-rgb: 6 95 70;
-  --emerald-50: rgb(var(--emerald-50-rgb));
-  --emerald-100: rgb(var(--emerald-100-rgb));
-  --emerald-200: rgb(var(--emerald-200-rgb));
-  --emerald-400: rgb(var(--emerald-400-rgb));
-  --emerald-500: rgb(var(--emerald-500-rgb));
-  --emerald-600: rgb(var(--emerald-600-rgb));
-  --emerald-700: rgb(var(--emerald-700-rgb));
-  --emerald-800: rgb(var(--emerald-800-rgb));
+  --emerald-50-rgb: var(--green-50-rgb);
+  --emerald-100-rgb: var(--green-100-rgb);
+  --emerald-200-rgb: var(--green-200-rgb);
+  --emerald-400-rgb: var(--green-500-rgb);
+  --emerald-500-rgb: var(--green-500-rgb);
+  --emerald-600-rgb: var(--green-600-rgb);
+  --emerald-700-rgb: var(--green-700-rgb);
+  --emerald-800-rgb: var(--green-800-rgb);
+  --emerald-50: var(--green-50);
+  --emerald-100: var(--green-100);
+  --emerald-200: var(--green-200);
+  --emerald-400: var(--green-500);
+  --emerald-500: var(--green-500);
+  --emerald-600: var(--green-600);
+  --emerald-700: var(--green-700);
+  --emerald-800: var(--green-800);
 
-  --teal-50-rgb: 240 253 250;
-  --teal-200-rgb: 153 246 228;
-  --teal-500-rgb: 20 184 166;
-  --teal-600-rgb: 13 148 136;
-  --teal-700-rgb: 15 118 110;
-  --teal-900-rgb: 19 78 74;
-  --teal-950-rgb: 4 47 46;
-  --teal-50: rgb(var(--teal-50-rgb));
-  --teal-200: rgb(var(--teal-200-rgb));
-  --teal-500: rgb(var(--teal-500-rgb));
-  --teal-600: rgb(var(--teal-600-rgb));
-  --teal-700: rgb(var(--teal-700-rgb));
-  --teal-900: rgb(var(--teal-900-rgb));
-  --teal-950: rgb(var(--teal-950-rgb));
+  --teal-50-rgb: var(--brand-50-rgb);
+  --teal-200-rgb: var(--brand-200-rgb);
+  --teal-500-rgb: var(--brand-500-rgb);
+  --teal-600-rgb: var(--brand-600-rgb);
+  --teal-700-rgb: var(--brand-700-rgb);
+  --teal-900-rgb: var(--brand-900-rgb);
+  --teal-950-rgb: var(--brand-900-rgb);
+  --teal-50: var(--brand-50);
+  --teal-200: var(--brand-200);
+  --teal-500: var(--brand-500);
+  --teal-600: var(--brand-600);
+  --teal-700: var(--brand-700);
+  --teal-900: var(--brand-900);
+  --teal-950: var(--brand-900);
 
-  --sky-50-rgb: 240 249 255;
-  --sky-100-rgb: 224 242 254;
-  --sky-200-rgb: 186 230 253;
-  --sky-700-rgb: 3 105 161;
-  --sky-50: rgb(var(--sky-50-rgb));
-  --sky-100: rgb(var(--sky-100-rgb));
-  --sky-200: rgb(var(--sky-200-rgb));
-  --sky-700: rgb(var(--sky-700-rgb));
+  --sky-50-rgb: var(--brand-50-rgb);
+  --sky-100-rgb: var(--brand-100-rgb);
+  --sky-200-rgb: var(--brand-200-rgb);
+  --sky-700-rgb: var(--brand-700-rgb);
+  --sky-50: var(--brand-50);
+  --sky-100: var(--brand-100);
+  --sky-200: var(--brand-200);
+  --sky-700: var(--brand-700);
 
-  --indigo-50-rgb: 238 242 255;
-  --indigo-200-rgb: 199 210 254;
-  --indigo-50: rgb(var(--indigo-50-rgb));
-  --indigo-200: rgb(var(--indigo-200-rgb));
+  --indigo-50-rgb: var(--brand-50-rgb);
+  --indigo-200-rgb: var(--brand-200-rgb);
+  --indigo-50: var(--brand-50);
+  --indigo-200: var(--brand-200);
 
   --violet-500-rgb: 139 92 246;
   --violet-500: rgb(var(--violet-500-rgb));
@@ -198,11 +198,11 @@
   --black: #000;
   --white: #fff;
 
-  --warm-input: #f1ece2;
-  --warm-hover: #f3efe6;
-  --warm-border: #e4ddd0;
-  --warm-border-strong: #d0c6b4;
-  --warm-tag-bg: #faf4e6;
+  --warm-input: var(--brand-50);
+  --warm-hover: var(--brand-100);
+  --warm-border: var(--brand-200);
+  --warm-border-strong: var(--brand-400);
+  --warm-tag-bg: var(--brand-50);
   --ink: #161823;
 
   --primary: var(--brand-500);
@@ -215,12 +215,12 @@
   --brand-unique: var(--brand-200);
   --brand-unique-hover: var(--brand-400);
 
-  --premium-gradient: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-600) 100%);
-  --premium-shadow: 0 4px 12px rgb(var(--gold-600-rgb) / 0.32);
-  --premium-on-gradient: var(--ink);
-  --premium-badge-bg: linear-gradient(135deg, var(--gold-100) 0%, var(--gold-200) 100%);
-  --premium-badge-text: var(--gold-700);
-  --premium-badge-border: var(--gold-400);
+  --premium-gradient: var(--primary-gradient);
+  --premium-shadow: 0 4px 12px rgb(var(--brand-600-rgb) / 0.32);
+  --premium-on-gradient: var(--text-on-brand);
+  --premium-badge-bg: linear-gradient(135deg, var(--brand-100) 0%, var(--brand-200) 100%);
+  --premium-badge-text: var(--brand-700);
+  --premium-badge-border: var(--brand-400);
 
   --hero-bg: var(--brand-900);
   --footer-bg: var(--brand-900);
@@ -251,13 +251,33 @@
   --author-tag-text: var(--brand-700);
   --author-tag-border: var(--brand-200);
 
+  --success: var(--green-600);
+  --success-rgb: var(--green-600-rgb);
+  --success-50: var(--green-50);
+  --success-100: var(--green-100);
+  --success-200: var(--green-200);
+  --success-500: var(--green-500);
+  --success-600: var(--green-600);
+  --success-700: var(--green-700);
+  --success-800: var(--green-800);
   --success-bg: var(--green-100);
   --success-text: var(--green-800);
   --success-border: var(--green-200);
 
+  --warning: var(--orange-600);
+  --warning-rgb: var(--orange-600-rgb);
+  --warning-50: var(--orange-50);
+  --warning-100: var(--orange-100);
+  --warning-700: var(--orange-700);
+  --warning-bg: var(--orange-50);
+  --warning-text: var(--orange-700);
+  --warning-border: var(--orange-100);
+
   --danger-bg: var(--red-50);
   --danger-text: var(--red-700);
   --danger-border: var(--red-200);
+
+  --chart-2: var(--violet-500);
 
   --primary-alpha-08: rgb(var(--brand-500-rgb) / 0.08);
   --primary-alpha-10: rgb(var(--brand-500-rgb) / 0.1);
@@ -286,6 +306,10 @@
   --primary-btn-shadow: 0 8px 18px rgb(0 0 0 / 0.08);
   --primary-btn-shadow-hover: 0 12px 24px rgb(0 0 0 / 0.15), 0 0 0 3px var(--primary-alpha-20);
   --primary-btn-shadow-disabled: 0 4px 10px rgb(0 0 0 / 0.06);
+
+  --bs-primary: var(--primary);
+  --bs-link-color: var(--primary);
+  --bs-link-hover-color: var(--hover-accent);
 
   --glass-bg: rgb(255 255 255 / 0.7);
   --glass-border: rgb(255 255 255 / 0.5);
@@ -327,59 +351,6 @@
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 20px;
-}
-
-:root[data-theme='normal'] {
-  --brand-50-rgb: 240 253 250;
-  --brand-100-rgb: 204 251 241;
-  --brand-150-rgb: 179 247 234;
-  --brand-200-rgb: 153 246 228;
-  --brand-300-rgb: 94 234 212;
-  --brand-400-rgb: 45 212 191;
-  --brand-500-rgb: 20 184 166;
-  --brand-600-rgb: 13 148 136;
-  --brand-700-rgb: 15 118 110;
-  --brand-800-rgb: 19 78 74;
-  --brand-900-rgb: 4 47 46;
-  --text-on-dark-rgb: 226 232 240;
-
-  --primary: var(--brand-600);
-  --primary-color: var(--brand-600);
-  --accent-color: var(--brand-600);
-  --accent-act-color: var(--brand-500);
-  --hover-accent: var(--brand-700);
-  --primary-rgb: var(--brand-600-rgb);
-
-  --brand-unique: var(--amber-500);
-  --brand-unique-hover: var(--amber-600);
-
-  --primary-alpha-08: rgb(var(--brand-600-rgb) / 0.08);
-  --primary-alpha-10: rgb(var(--brand-600-rgb) / 0.1);
-  --primary-alpha-15: rgb(var(--brand-600-rgb) / 0.15);
-  --primary-alpha-20: rgb(var(--brand-600-rgb) / 0.2);
-  --primary-alpha-28: rgb(var(--brand-600-rgb) / 0.28);
-  --primary-alpha-35: rgb(var(--brand-600-rgb) / 0.35);
-  --primary-alpha-45: rgb(var(--brand-600-rgb) / 0.45);
-
-  --primary-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-500) 100%);
-
-  --on-primary-gradient: var(--white);
-  --on-primary-gradient-muted: rgb(255 255 255 / 0.92);
-  --on-primary-gradient-subtle: rgb(255 255 255 / 0.85);
-  --on-primary-gradient-soft: rgba(255, 255, 255, 0.18);
-  --on-primary-gradient-border: rgba(255, 255, 255, 0.3);
-  --on-primary-gradient-track: rgba(255, 255, 255, 0.25);
-  --on-primary-gradient-fill: var(--white);
-  --on-primary-gradient-cta: var(--primary);
-
-  --warm-input: #f1f5f9;
-  --warm-hover: #f8f9fa;
-  --warm-border: #e2e8f0;
-  --warm-border-strong: #cbd5e1;
-  --warm-tag-bg: #fff4e5;
-
-  --author-tag-text: var(--amber-700);
-  --author-tag-border: #fcd9a5;
 }
 
 .shadow-md {
@@ -570,7 +541,7 @@ li {
   padding: 0.75rem 1.5rem;
   font-size: var(--font-size-xs2);
   background-color: var(--accent-color);
-  color: var(--white);
+  color: var(--text-on-brand);
   border: none;
   border-radius: 5px;
   font-weight: var(--font-weight-semibold);
@@ -578,7 +549,8 @@ li {
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: var(--accent-act-color);
+    background-color: var(--hover-accent);
+    color: var(--text-on-brand);
     transform: translateY(-1px);
   }
 
@@ -590,6 +562,21 @@ li {
     opacity: 0.7;
     cursor: not-allowed;
   }
+}
+
+.btn-primary {
+  --bs-btn-color: var(--text-on-brand);
+  --bs-btn-bg: var(--primary);
+  --bs-btn-border-color: var(--primary);
+  --bs-btn-hover-color: var(--text-on-brand);
+  --bs-btn-hover-bg: var(--hover-accent);
+  --bs-btn-hover-border-color: var(--hover-accent);
+  --bs-btn-active-color: var(--text-on-brand);
+  --bs-btn-active-bg: var(--hover-accent);
+  --bs-btn-active-border-color: var(--hover-accent);
+  --bs-btn-disabled-color: var(--text-on-brand);
+  --bs-btn-disabled-bg: var(--primary);
+  --bs-btn-disabled-border-color: var(--primary);
 }
 
 .tag-badge {
@@ -606,11 +593,11 @@ li {
 }
 
 .btn-bright-green {
-  background-color: #22bd70 !important;
+  background-color: var(--success-500) !important;
   color: white !important;
   font-size: var(--font-size-sm) !important;
 
   &:hover {
-    background-color: #1ea05e !important;
+    background-color: var(--success-600) !important;
   }
 }

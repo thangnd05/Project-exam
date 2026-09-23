@@ -63,7 +63,7 @@ export const viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" data-theme="normal" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="vi" className={`${inter.variable} ${playfair.variable}`}>
       <body>
         <noscript>Bạn cần bật JavaScript để dùng ứng dụng này.</noscript>
         <div id="root">

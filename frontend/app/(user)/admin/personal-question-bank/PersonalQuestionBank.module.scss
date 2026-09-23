@@ -177,9 +177,9 @@
   border-radius: 999px;
   font-size: var(--font-size-xs2);
   font-weight: 600;
-  background: var(--sky-100);
-  color: var(--sky-700);
-  border: 1px solid var(--sky-200);
+  background: var(--brand-100);
+  color: var(--brand-700);
+  border: 1px solid var(--brand-200);
   vertical-align: middle;
   white-space: nowrap;
 }
@@ -255,6 +255,6 @@
 
 .mediaOpenLink {
   font-size: var(--font-size-smd);
-  color: #0d6efd;
+  color: var(--primary);
   text-decoration: none;
 }

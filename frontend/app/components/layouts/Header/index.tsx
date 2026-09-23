@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {Button, Dropdown} from 'react-bootstrap';
 import Image from 'next/image';
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {toast} from 'react-toastify';
+import {useState} from 'react';
+// import {useCallback, useEffect, useRef, useState} from 'react';
+// import {toast} from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import style from './header.module.scss';
 import images, {imageAssets} from '@/app/assets/images';
@@ -13,8 +14,8 @@ import classNames from 'classnames/bind';
 import {useAuth} from '@/app/hooks/useAuth';
 import {name} from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
-import JoinClassModal from '@/app/components/JoinClassModal/JoinClassModal';
-import CreateClassModal from '@/app/components/CreateClassModal/CreateClassModal';
+// import JoinClassModal from '@/app/components/JoinClassModal/JoinClassModal';
+// import CreateClassModal from '@/app/components/CreateClassModal/CreateClassModal';
 import CreateTestModal from '@/app/components/tests/CreateTestModal';
 import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
@@ -23,87 +24,87 @@ import {useCosmetics} from '@/app/hooks/useCosmetics';
 
 const cx = classNames.bind(style);
 
-const CLASS_MENU_CLOSE_DELAY = 160;
+// const CLASS_MENU_CLOSE_DELAY = 160;
 
 function Header() {
   const {user, logout, roleName} = useAuth();
   const canCreateTest = roleName === 'ADMIN';
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
-  const [showJoinModal, setShowJoinModal] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  // const [showJoinModal, setShowJoinModal] = useState(false);
+  // const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
-  const [showClassMenu, setShowClassMenu] = useState(false);
-  const classMenuTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // const [showClassMenu, setShowClassMenu] = useState(false);
+  // const classMenuTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
-  const clearClassMenuTimer = useCallback(() => {
-    if (classMenuTimer.current) {
-      clearTimeout(classMenuTimer.current);
-      classMenuTimer.current = null;
-    }
-  }, []);
+  // const clearClassMenuTimer = useCallback(() => {
+  //   if (classMenuTimer.current) {
+  //     clearTimeout(classMenuTimer.current);
+  //     classMenuTimer.current = null;
+  //   }
+  // }, []);
 
-  useEffect(() => clearClassMenuTimer, [clearClassMenuTimer]);
+  // useEffect(() => clearClassMenuTimer, [clearClassMenuTimer]);
 
-  const canHover = () => window.matchMedia?.('(hover: hover)').matches ?? false;
+  // const canHover = () => window.matchMedia?.('(hover: hover)').matches ?? false;
 
-  const handleClassMenuEnter = () => {
-    if (!canHover()) return;
-    clearClassMenuTimer();
-    setShowClassMenu(true);
-  };
+  // const handleClassMenuEnter = () => {
+  //   if (!canHover()) return;
+  //   clearClassMenuTimer();
+  //   setShowClassMenu(true);
+  // };
 
-  const handleClassMenuLeave = () => {
-    if (!canHover()) return;
-    clearClassMenuTimer();
-    classMenuTimer.current = setTimeout(
-      () => setShowClassMenu(false),
-      CLASS_MENU_CLOSE_DELAY,
-    );
-  };
+  // const handleClassMenuLeave = () => {
+  //   if (!canHover()) return;
+  //   clearClassMenuTimer();
+  //   classMenuTimer.current = setTimeout(
+  //     () => setShowClassMenu(false),
+  //     CLASS_MENU_CLOSE_DELAY,
+  //   );
+  // };
 
-  const handleClassMenuToggle = (nextShow: boolean) => {
-    clearClassMenuTimer();
-    setShowClassMenu(nextShow);
-  };
+  // const handleClassMenuToggle = (nextShow: boolean) => {
+  //   clearClassMenuTimer();
+  //   setShowClassMenu(nextShow);
+  // };
 
   const handleLogout = async () => {
     await logout();
     router.push(routes.home);
   };
 
-  const requireLogin = (message: string) => {
-    if (user) {
-      return false;
-    }
-    toast.warning(message);
-    router.push(`${routes.login}?mode=signin`);
-    return true;
-  };
+  // const requireLogin = (message: string) => {
+  //   if (user) {
+  //     return false;
+  //   }
+  //   toast.warning(message);
+  //   router.push(`${routes.login}?mode=signin`);
+  //   return true;
+  // };
 
   const handleCreateTest = () => setShowCreateTestModal(true);
 
-  const handleClassAction = (
-    e: React.MouseEvent<HTMLElement>,
-    targetRoute: string | null,
-    modalType: string | null = null,
-  ) => {
-    e.preventDefault();
-    clearClassMenuTimer();
-    setShowClassMenu(false);
-    if (requireLogin('Bạn cần đăng nhập để thao tác lớp học!')) {
-      return;
-    }
+  // const handleClassAction = (
+  //   e: React.MouseEvent<HTMLElement>,
+  //   targetRoute: string | null,
+  //   modalType: string | null = null,
+  // ) => {
+  //   e.preventDefault();
+  //   clearClassMenuTimer();
+  //   setShowClassMenu(false);
+  //   if (requireLogin('Bạn cần đăng nhập để thao tác lớp học!')) {
+  //     return;
+  //   }
 
-    if (modalType === 'join') {
-      setShowJoinModal(true);
-    } else if (modalType === 'create') {
-      setShowCreateModal(true);
-    } else {
-      router.push(targetRoute as string);
-    }
-  };
+  //   if (modalType === 'join') {
+  //     setShowJoinModal(true);
+  //   } else if (modalType === 'create') {
+  //     setShowCreateModal(true);
+  //   } else {
+  //     router.push(targetRoute as string);
+  //   }
+  // };
 
   return (
     <header className={cx('wrapper')}>
@@ -127,11 +128,19 @@ function Header() {
 
           <nav className={cx('zoneCenter')} aria-label="Điều hướng chính">
             <div className={cx('navTrack')}>
-              <Link
+              {/* <Link
                 href={routes.certificateVerifyHome}
                 className={cx('home', {active: pathname === routes.certificateVerifyHome})}
               >
                 Chứng chỉ
+              </Link> */}
+              <Link
+                href={routes.examTypes}
+                className={cx('home', {
+                  active: pathname === routes.examTypes || pathname.startsWith('/exam-types/'),
+                })}
+              >
+                Kỳ thi
               </Link>
               <Link
                 href={routes.myTarget}
@@ -139,19 +148,19 @@ function Header() {
               >
                 Lộ trình
               </Link>
-              <Link
+              {/* <Link
                 href={routes.myAlbums}
                 className={cx('home', {active: pathname === routes.myAlbums})}
               >
                 Từ vựng
-              </Link>
+              </Link> */}
               <Link
                 href={routes.MyTest}
                 className={cx('home', {active: pathname === routes.MyTest})}
               >
                 Bài đã tạo
               </Link>
-              <Dropdown
+              {/* <Dropdown
                 className={cx('customMenu')}
                 align="start"
                 show={showClassMenu}
@@ -187,7 +196,7 @@ function Header() {
                     Tạo lớp học
                   </Dropdown.Item>
                 </Dropdown.Menu>
-              </Dropdown>
+              </Dropdown> */}
             </div>
           </nav>
 
@@ -265,8 +274,8 @@ function Header() {
         </div>
       </div>
 
-      <JoinClassModal show={showJoinModal} onClose={() => setShowJoinModal(false)} />
-      <CreateClassModal show={showCreateModal} onClose={() => setShowCreateModal(false)} />
+      {/* <JoinClassModal show={showJoinModal} onClose={() => setShowJoinModal(false)} />
+      <CreateClassModal show={showCreateModal} onClose={() => setShowCreateModal(false)} /> */}
       <CreateTestModal
         show={showCreateTestModal}
         onClose={() => setShowCreateTestModal(false)}

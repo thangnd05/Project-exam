@@ -114,10 +114,10 @@
     background: var(--red-400);
   }
   &.amber {
-    background: var(--amber-400);
+    background: var(--warning);
   }
   &.green {
-    background: var(--emerald-400);
+    background: var(--success-500);
   }
 }
 
@@ -135,7 +135,7 @@
   flex-direction: column;
   gap: 14px;
   padding: 16px 18px;
-  background: linear-gradient(180deg, #ffffff 0%, var(--teal-50) 100%);
+  background: linear-gradient(180deg, #ffffff 0%, var(--surface-tint) 100%);
 }
 
 .pageHeader {
@@ -181,7 +181,7 @@
   }
   &.w45 {
     width: 45%;
-    background: rgb(var(--teal-200-rgb) / 0.9);
+    background: rgb(var(--brand-200-rgb) / 0.9);
   }
 }
 
@@ -190,7 +190,7 @@
   height: 20px;
   margin-top: 4px;
   border-radius: 999px;
-  background: var(--amber-500);
+  background: var(--primary);
 }
 
 .pageCards {

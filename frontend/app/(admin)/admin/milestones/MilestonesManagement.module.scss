@@ -183,7 +183,7 @@
   }
 
   &.under {
-    background: var(--amber-50);
+    background: var(--warning-bg);
   }
 }
 
@@ -207,7 +207,7 @@
   }
 
   .under & {
-    color: var(--brand-unique-hover);
+    color: var(--warning-text);
   }
 
   .match & {

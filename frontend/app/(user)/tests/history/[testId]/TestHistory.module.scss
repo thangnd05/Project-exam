@@ -75,13 +75,13 @@
 }
 
 .status-completed {
-  background: var(--emerald-50);
-  color: var(--emerald-600);
+  background: var(--success-bg);
+  color: var(--success-600);
 }
 
 .status-in-progress {
-  background: var(--amber-50);
-  color: var(--brand-unique-hover);
+  background: var(--warning-bg);
+  color: var(--warning-text);
 }
 
 .status-expired {

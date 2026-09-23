@@ -7,7 +7,7 @@ $header-bg: #ffffff;
 $content-bg: var(--slate-100);
 $page-bg: #ffffff;
 $primary: var(--accent-act-color);
-$success: var(--emerald-500);
+$success: var(--success);
 $danger: var(--red-500);
 $text-primary: var(--slate-800);
 $text-secondary: var(--slate-500);
@@ -298,7 +298,7 @@ $transition: all 0.3s ease;
         outline: none;
         border-color: $primary;
         background: white;
-        box-shadow: 0 0 0 3px rgb(var(--teal-500-rgb) / 0.1);
+        box-shadow: 0 0 0 3px rgb(var(--primary-rgb) / 0.1);
     }
 
     &::placeholder {

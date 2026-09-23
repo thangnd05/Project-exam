@@ -20,38 +20,38 @@
       "questionNumber": 2,
       "questionType": "MCQ",
       "questionText": "When an Auto Scaling group scales in, users occasionally see failed requests, and engineers lose the application logs that were only stored on the terminated instances. A DevOps engineer must allow in-flight requests to complete and copy the logs off the instance before termination proceeds. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần tạm dừng quá trình chấm dứt để hoàn tất công việc và thu thập nhật ký.\n(A) ĐÚNG: Thêm lifecycle hook cho sự kiện chấm dứt; instance chuyển sang trạng thái chờ, hook kích hoạt tự động hóa gửi nhật ký ra ngoài và chờ kết nối hiện có kết thúc, rồi phát tín hiệu hoàn tất để quá trình chấm dứt tiếp tục.\n(B) SAI: Tăng health check grace period chỉ áp dụng cho giai đoạn khởi động của instance mới, không liên quan tới lúc chấm dứt.\n(C) SAI: Tắt chính sách thu hẹp quy mô làm mất khả năng tiết kiệm chi phí và không giải quyết nguyên nhân.\n(D) SAI: Tăng deregistration delay giúp hoàn tất yêu cầu đang xử lý nhưng không thu thập được nhật ký trước khi instance biến mất.\nĐáp án đúng: A\nĐiểm cần nhớ: Lifecycle hook cho sự kiện chấm dứt cho phép rút êm và thu thập bằng chứng trước khi instance bị hủy.",
+      "explanation": "Phân tích đề: Cần tạm dừng quá trình chấm dứt để hoàn tất công việc và thu thập nhật ký.\n(A) SAI: Tắt chính sách thu hẹp quy mô làm mất khả năng tiết kiệm chi phí và không giải quyết nguyên nhân.\n(B) ĐÚNG: Thêm lifecycle hook cho sự kiện chấm dứt; instance chuyển sang trạng thái chờ, hook kích hoạt tự động hóa gửi nhật ký ra ngoài và chờ kết nối hiện có kết thúc, rồi phát tín hiệu hoàn tất để quá trình chấm dứt tiếp tục.\n(C) SAI: Tăng deregistration delay giúp hoàn tất yêu cầu đang xử lý nhưng không thu thập được nhật ký trước khi instance biến mất.\n(D) SAI: Tăng health check grace period chỉ áp dụng cho giai đoạn khởi động của instance mới, không liên quan tới lúc chấm dứt.\nĐáp án đúng: B\nĐiểm cần nhớ: Lifecycle hook cho sự kiện chấm dứt cho phép rút êm và thu thập bằng chứng trước khi instance bị hủy.",
       "tagNames": ["Resilient Cloud Solutions > AWS Auto Scaling"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Add a termination lifecycle hook that pauses the instance in a wait state while automation ships the logs and connections drain, then signal completion.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Increase the health check grace period on the Auto Scaling group.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Disable scale-in on the Auto Scaling group so instances are never terminated.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Increase the deregistration delay on the target group only.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Disable scale-in on the Auto Scaling group so instances are never terminated.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Add a termination lifecycle hook that pauses the instance in a wait state while automation ships the logs and connections drain, then signal completion.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Increase the deregistration delay on the target group only.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Increase the health check grace period on the Auto Scaling group.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 3,
       "questionType": "MCQ",
       "questionText": "A company serves an application from three Regions in an active-active configuration. Clients must be directed to the Region that gives them the lowest latency, but must never be sent to a Region whose application is failing. Which Amazon Route 53 configuration meets these requirements?",
-      "explanation": "Phân tích đề: Mô hình chủ động nhiều Region, chọn theo độ trễ nhưng phải loại Region hỏng.\n(A) ĐÚNG: Tạo bản ghi latency-based cho từng Region và gắn health check vào từng bản ghi; Route 53 chọn Region có độ trễ thấp nhất trong số các bản ghi đang khỏe mạnh, và tự loại bản ghi có health check thất bại.\n(B) SAI: Latency-based không kèm health check vẫn trả về Region đang hỏng nếu Region đó có độ trễ thấp nhất.\n(C) SAI: Failover routing phù hợp với mô hình chủ động và dự phòng, không phản ánh ba Region cùng phục vụ.\n(D) SAI: Weighted routing chia theo tỉ lệ cố định chứ không tối ưu độ trễ cho từng người dùng.\nĐáp án đúng: A\nĐiểm cần nhớ: Latency-based routing phải đi kèm health check thì mới loại được Region đang hỏng khỏi kết quả.",
+      "explanation": "Phân tích đề: Mô hình chủ động nhiều Region, chọn theo độ trễ nhưng phải loại Region hỏng.\n(A) SAI: Failover routing phù hợp với mô hình chủ động và dự phòng, không phản ánh ba Region cùng phục vụ.\n(B) SAI: Latency-based không kèm health check vẫn trả về Region đang hỏng nếu Region đó có độ trễ thấp nhất.\n(C) SAI: Weighted routing chia theo tỉ lệ cố định chứ không tối ưu độ trễ cho từng người dùng.\n(D) ĐÚNG: Tạo bản ghi latency-based cho từng Region và gắn health check vào từng bản ghi; Route 53 chọn Region có độ trễ thấp nhất trong số các bản ghi đang khỏe mạnh, và tự loại bản ghi có health check thất bại.\nĐáp án đúng: D\nĐiểm cần nhớ: Latency-based routing phải đi kèm health check thì mới loại được Region đang hỏng khỏi kết quả.",
       "tagNames": ["Resilient Cloud Solutions > Route 53 Routing Policies"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Create latency-based records for each Region and associate a health check with each record.", "isCorrect": true },
+        { "answerLabel": "A", "answerText": "Create failover records with one Region as primary and the other two as secondary.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Create latency-based records for each Region without health checks.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Create failover records with one Region as primary and the other two as secondary.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Create weighted records with equal weights for the three Regions.", "isCorrect": false }
+        { "answerLabel": "C", "answerText": "Create weighted records with equal weights for the three Regions.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create latency-based records for each Region and associate a health check with each record.", "isCorrect": true }
       ]
     },
     {
       "questionNumber": 4,
       "questionType": "MCQ",
       "questionText": "A company must guarantee that every account in its AWS Organization applies a standard backup plan to resources tagged Backup=true, including accounts created in the future, and that account owners cannot remove the plan. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần áp chính sách sao lưu cho toàn tổ chức và ngăn tài khoản thành viên gỡ bỏ.\n(A) ĐÚNG: Dùng backup policy ở mức AWS Organizations, gắn vào gốc tổ chức hoặc các đơn vị tổ chức; chính sách được đẩy xuống mọi tài khoản thành viên kể cả tài khoản tạo sau này, và tài khoản thành viên không sửa hay gỡ được chính sách do tổ chức quản lý.\n(B) SAI: Tạo backup plan thủ công trong từng tài khoản không mở rộng được, bỏ sót tài khoản mới và chủ tài khoản có thể xóa.\n(C) SAI: Dùng StackSet triển khai backup plan phủ được tài khoản mới nhưng quản trị viên tài khoản vẫn có thể sửa tài nguyên đã triển khai nếu không có kiểm soát bổ sung.\n(D) SAI: Gửi hướng dẫn cho các đội tự cấu hình là thỏa thuận chứ không phải kiểm soát được thực thi.\nĐáp án đúng: A\nĐiểm cần nhớ: Backup policy của Organizations áp kế hoạch sao lưu cho mọi tài khoản thành viên và không bị gỡ từ bên dưới.",
+      "explanation": "Phân tích đề: Cần áp chính sách sao lưu cho toàn tổ chức và ngăn tài khoản thành viên gỡ bỏ.\n(A) SAI: Tạo backup plan thủ công trong từng tài khoản không mở rộng được, bỏ sót tài khoản mới và chủ tài khoản có thể xóa.\n(B) SAI: Dùng StackSet triển khai backup plan phủ được tài khoản mới nhưng quản trị viên tài khoản vẫn có thể sửa tài nguyên đã triển khai nếu không có kiểm soát bổ sung.\n(C) ĐÚNG: Dùng backup policy ở mức AWS Organizations, gắn vào gốc tổ chức hoặc các đơn vị tổ chức; chính sách được đẩy xuống mọi tài khoản thành viên kể cả tài khoản tạo sau này, và tài khoản thành viên không sửa hay gỡ được chính sách do tổ chức quản lý.\n(D) SAI: Gửi hướng dẫn cho các đội tự cấu hình là thỏa thuận chứ không phải kiểm soát được thực thi.\nĐáp án đúng: C\nĐiểm cần nhớ: Backup policy của Organizations áp kế hoạch sao lưu cho mọi tài khoản thành viên và không bị gỡ từ bên dưới.",
       "tagNames": ["Resilient Cloud Solutions > AWS Backup"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Create an AWS Organizations backup policy defining the plan and tag selection, and attach it to the organizational units.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Create the same AWS Backup plan manually in each member account.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Deploy the backup plan with a CloudFormation StackSet to all accounts.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Create the same AWS Backup plan manually in each member account.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Deploy the backup plan with a CloudFormation StackSet to all accounts.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an AWS Organizations backup policy defining the plan and tag selection, and attach it to the organizational units.", "isCorrect": true },
         { "answerLabel": "D", "answerText": "Publish a standard backup configuration guide and ask each account owner to apply it.", "isCorrect": false }
       ]
     },
@@ -59,64 +59,64 @@
       "questionNumber": 5,
       "questionType": "MCQ",
       "questionText": "A DevOps engineer must prove that an application correctly reconnects when an Amazon Aurora cluster fails over, and must measure how long client errors persist during the event. The test must be repeatable and must run against a pre-production environment on demand. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần kích hoạt chuyển đổi dự phòng của cơ sở dữ liệu một cách có kiểm soát và lặp lại được.\n(A) ĐÚNG: Tạo experiment template của AWS FIS với hành động chuyển đổi dự phòng cụm cơ sở dữ liệu, nhắm tới cụm ở môi trường tiền sản xuất; thí nghiệm chạy theo yêu cầu, lặp lại được, và có thể kèm stop condition cùng việc quan sát chỉ số lỗi trong suốt sự kiện.\n(B) SAI: Khởi động lại instance chính bằng tay là thao tác một lần, khó lặp lại nhất quán và không nằm trong khuôn khổ thí nghiệm có kiểm soát.\n(C) SAI: Chờ một sự kiện bảo trì theo lịch không phải phép thử theo yêu cầu.\n(D) SAI: Đọc tài liệu về hành vi chuyển đổi dự phòng không kiểm chứng được hành vi thật của ứng dụng.\nĐáp án đúng: A\nĐiểm cần nhớ: FIS có hành động chuyển đổi dự phòng cơ sở dữ liệu, cho phép kiểm chứng hành vi kết nối lại một cách lặp lại được.",
+      "explanation": "Phân tích đề: Cần kích hoạt chuyển đổi dự phòng của cơ sở dữ liệu một cách có kiểm soát và lặp lại được.\n(A) SAI: Khởi động lại instance chính bằng tay là thao tác một lần, khó lặp lại nhất quán và không nằm trong khuôn khổ thí nghiệm có kiểm soát.\n(B) SAI: Đọc tài liệu về hành vi chuyển đổi dự phòng không kiểm chứng được hành vi thật của ứng dụng.\n(C) ĐÚNG: Tạo experiment template của AWS FIS với hành động chuyển đổi dự phòng cụm cơ sở dữ liệu, nhắm tới cụm ở môi trường tiền sản xuất; thí nghiệm chạy theo yêu cầu, lặp lại được, và có thể kèm stop condition cùng việc quan sát chỉ số lỗi trong suốt sự kiện.\n(D) SAI: Chờ một sự kiện bảo trì theo lịch không phải phép thử theo yêu cầu.\nĐáp án đúng: C\nĐiểm cần nhớ: FIS có hành động chuyển đổi dự phòng cơ sở dữ liệu, cho phép kiểm chứng hành vi kết nối lại một cách lặp lại được.",
       "tagNames": ["Resilient Cloud Solutions > AWS Fault Injection Service (FIS)"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Create an AWS FIS experiment template with a database cluster failover action targeting the pre-production cluster, and observe the client error metrics during the run.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Reboot the writer instance from the console whenever the team wants to test failover.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Wait for the next scheduled maintenance event and observe the application behavior.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Review the Aurora documentation on failover timing and confirm the driver configuration.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Reboot the writer instance from the console whenever the team wants to test failover.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Review the Aurora documentation on failover timing and confirm the driver configuration.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an AWS FIS experiment template with a database cluster failover action targeting the pre-production cluster, and observe the client error metrics during the run.", "isCorrect": true },
+        { "answerLabel": "D", "answerText": "Wait for the next scheduled maintenance event and observe the application behavior.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 6,
       "questionType": "MCQ",
       "questionText": "A company needs a data store for user session data that must accept writes in both us-east-1 and ap-southeast-1 with single-digit millisecond latency in each Region, and must continue accepting writes locally if either Region becomes unavailable. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần ghi cục bộ ở nhiều Region và tiếp tục ghi khi mất một Region.\n(A) ĐÚNG: Dùng DynamoDB global tables; mỗi Region có bản sao chấp nhận ghi cục bộ với độ trễ thấp, dữ liệu được nhân bản hai chiều, và nếu một Region không khả dụng thì Region còn lại vẫn nhận ghi bình thường.\n(B) SAI: Aurora global database chỉ có một Region nhận ghi tại một thời điểm, nên không đáp ứng yêu cầu ghi ở cả hai nơi.\n(C) SAI: RDS với read replica liên Region chỉ phục vụ đọc ở Region thứ hai, không nhận ghi.\n(D) SAI: Một bảng DynamoDB đơn Region buộc Region còn lại phải ghi qua mạng liên Region, không đạt độ trễ mong muốn và mất khả năng ghi khi Region chứa bảng gặp sự cố.\nĐáp án đúng: A\nĐiểm cần nhớ: DynamoDB global tables cho phép ghi cục bộ ở nhiều Region với nhân bản hai chiều.",
+      "explanation": "Phân tích đề: Cần ghi cục bộ ở nhiều Region và tiếp tục ghi khi mất một Region.\n(A) ĐÚNG: Dùng DynamoDB global tables; mỗi Region có bản sao chấp nhận ghi cục bộ với độ trễ thấp, dữ liệu được nhân bản hai chiều, và nếu một Region không khả dụng thì Region còn lại vẫn nhận ghi bình thường.\n(B) SAI: Một bảng DynamoDB đơn Region buộc Region còn lại phải ghi qua mạng liên Region, không đạt độ trễ mong muốn và mất khả năng ghi khi Region chứa bảng gặp sự cố.\n(C) SAI: Aurora global database chỉ có một Region nhận ghi tại một thời điểm, nên không đáp ứng yêu cầu ghi ở cả hai nơi.\n(D) SAI: RDS với read replica liên Region chỉ phục vụ đọc ở Region thứ hai, không nhận ghi.\nĐáp án đúng: A\nĐiểm cần nhớ: DynamoDB global tables cho phép ghi cục bộ ở nhiều Region với nhân bản hai chiều.",
       "tagNames": ["Resilient Cloud Solutions > Database HA & Replication"],
       "answers": [
         { "answerLabel": "A", "answerText": "Use an Amazon DynamoDB global table replicated to both Regions.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Use an Aurora global database with a secondary cluster in the second Region.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Use Amazon RDS with a cross-Region read replica in the second Region.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Use a single-Region DynamoDB table and access it from both Regions.", "isCorrect": false }
+        { "answerLabel": "B", "answerText": "Use a single-Region DynamoDB table and access it from both Regions.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Use an Aurora global database with a secondary cluster in the second Region.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Use Amazon RDS with a cross-Region read replica in the second Region.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 7,
       "questionType": "MCQ",
       "questionText": "An Aurora cluster has one writer and three readers of different instance sizes. During a failover test, Aurora promoted a small reader that could not handle production write traffic. A DevOps engineer must ensure a specific large reader is promoted first in future failovers. What should the engineer configure?",
-      "explanation": "Phân tích đề: Cần kiểm soát bản sao nào được thăng cấp khi chuyển đổi dự phòng.\n(A) ĐÚNG: Đặt failover priority tier cho các instance trong cụm; Aurora ưu tiên thăng cấp bản sao ở tier có số nhỏ hơn, nên đặt bản sao lớn ở tier cao nhất về mức ưu tiên và các bản sao nhỏ ở tier thấp hơn.\n(B) SAI: Xóa các bản sao nhỏ làm giảm năng lực đọc và khả năng chịu lỗi của cụm.\n(C) SAI: Tăng kích thước toàn bộ bản sao lên bằng writer là cách tốn kém và không phải cơ chế kiểm soát thứ tự thăng cấp.\n(D) SAI: Bật Multi-AZ cho cụm không quyết định bản sao nào được chọn khi thăng cấp.\nĐáp án đúng: A\nĐiểm cần nhớ: Failover priority tier quyết định thứ tự ưu tiên thăng cấp bản sao trong cụm Aurora.",
+      "explanation": "Phân tích đề: Cần kiểm soát bản sao nào được thăng cấp khi chuyển đổi dự phòng.\n(A) SAI: Bật Multi-AZ cho cụm không quyết định bản sao nào được chọn khi thăng cấp.\n(B) SAI: Tăng kích thước toàn bộ bản sao lên bằng writer là cách tốn kém và không phải cơ chế kiểm soát thứ tự thăng cấp.\n(C) SAI: Xóa các bản sao nhỏ làm giảm năng lực đọc và khả năng chịu lỗi của cụm.\n(D) ĐÚNG: Đặt failover priority tier cho các instance trong cụm; Aurora ưu tiên thăng cấp bản sao ở tier có số nhỏ hơn, nên đặt bản sao lớn ở tier cao nhất về mức ưu tiên và các bản sao nhỏ ở tier thấp hơn.\nĐáp án đúng: D\nĐiểm cần nhớ: Failover priority tier quyết định thứ tự ưu tiên thăng cấp bản sao trong cụm Aurora.",
       "tagNames": ["Resilient Cloud Solutions > Database HA & Replication"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Assign failover priority tiers so the large reader is in the highest priority tier and the smaller readers are in lower tiers.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Delete the smaller reader instances from the cluster.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Resize all reader instances to match the writer instance class.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Enable Multi-AZ on the Aurora cluster.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Enable Multi-AZ on the Aurora cluster.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Resize all reader instances to match the writer instance class.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Delete the smaller reader instances from the cluster.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Assign failover priority tiers so the large reader is in the highest priority tier and the smaller readers are in lower tiers.", "isCorrect": true }
       ]
     },
     {
       "questionNumber": 8,
       "questionType": "MSQ",
       "questionText": "A company completed an unplanned failover to its secondary Region during an outage. Customers were served from the secondary Region for 14 hours, during which new orders were written there. The team now plans to return to the primary Region. Which TWO considerations must the plan address? (Choose TWO.)",
-      "explanation": "Phân tích đề: Quay về Region chính sau khi dữ liệu đã thay đổi ở Region thứ cấp.\n(A) ĐÚNG: Phải đồng bộ ngược dữ liệu đã phát sinh ở Region thứ cấp về Region chính, với thứ tự rõ ràng, cách xử lý xung đột và bước xác nhận tính đầy đủ trước khi chuyển lưu lượng lại; bỏ qua bước này sẽ làm mất các đơn hàng tạo trong 14 giờ.\n(B) ĐÚNG: Coi việc quay về là một lần chuyển đổi có kế hoạch riêng, thực hiện trong khung giờ đã thống nhất với các bên liên quan, thay vì một thao tác khẩn cấp; nhờ đó từng bước được kiểm chứng và tránh gây ra sự cố thứ hai.\n(C) SAI: Cho rằng quay về chỉ là chạy ngược các bước của chuyển đi bỏ qua việc dữ liệu đã thay đổi.\n(D) SAI: Quay về ngay khi Region chính khả dụng trở lại là vội vàng, vì Region đó có thể chưa ổn định hoàn toàn.\n(E) SAI: Giữ nguyên ở Region thứ cấp vĩnh viễn là một quyết định kiến trúc lớn chứ không phải nội dung của kế hoạch quay về.\nĐáp án đúng: A, B\nĐiểm cần nhớ: Quay về cần chiến lược đồng bộ ngược dữ liệu và phải được thực hiện như một lần chuyển đổi có kế hoạch.",
+      "explanation": "Phân tích đề: Quay về Region chính sau khi dữ liệu đã thay đổi ở Region thứ cấp.\n(A) SAI: Giữ nguyên ở Region thứ cấp vĩnh viễn là một quyết định kiến trúc lớn chứ không phải nội dung của kế hoạch quay về.\n(B) ĐÚNG: Coi việc quay về là một lần chuyển đổi có kế hoạch riêng, thực hiện trong khung giờ đã thống nhất với các bên liên quan, thay vì một thao tác khẩn cấp; nhờ đó từng bước được kiểm chứng và tránh gây ra sự cố thứ hai.\n(C) SAI: Quay về ngay khi Region chính khả dụng trở lại là vội vàng, vì Region đó có thể chưa ổn định hoàn toàn.\n(D) ĐÚNG: Phải đồng bộ ngược dữ liệu đã phát sinh ở Region thứ cấp về Region chính, với thứ tự rõ ràng, cách xử lý xung đột và bước xác nhận tính đầy đủ trước khi chuyển lưu lượng lại; bỏ qua bước này sẽ làm mất các đơn hàng tạo trong 14 giờ.\n(E) SAI: Cho rằng quay về chỉ là chạy ngược các bước của chuyển đi bỏ qua việc dữ liệu đã thay đổi.\nĐáp án đúng: B, D\nĐiểm cần nhớ: Quay về cần chiến lược đồng bộ ngược dữ liệu và phải được thực hiện như một lần chuyển đổi có kế hoạch.",
       "tagNames": ["Resilient Cloud Solutions > Multi-Region DR Strategies"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Define how data written in the secondary Region is synchronized back to the primary, including conflict handling and a completeness check.", "isCorrect": true },
+        { "answerLabel": "A", "answerText": "Remain in the secondary Region permanently to avoid another switchover.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Treat the fail-back as its own planned switchover performed in an agreed window.", "isCorrect": true },
-        { "answerLabel": "C", "answerText": "Run the failover steps in reverse order, since the process is symmetric.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Fail back as soon as the primary Region endpoints respond again.", "isCorrect": false },
-        { "answerLabel": "E", "answerText": "Remain in the secondary Region permanently to avoid another switchover.", "isCorrect": false }
+        { "answerLabel": "C", "answerText": "Fail back as soon as the primary Region endpoints respond again.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Define how data written in the secondary Region is synchronized back to the primary, including conflict handling and a completeness check.", "isCorrect": true },
+        { "answerLabel": "E", "answerText": "Run the failover steps in reverse order, since the process is symmetric.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 9,
       "questionType": "MCQ",
       "questionText": "A company wants to be certain that its standby Region is genuinely ready to take over, and wants a way to shift traffic between Regions that does not depend on the health of the failing Region or on DNS propagation behavior. Which AWS capability is designed for this?",
-      "explanation": "Phân tích đề: Cần kiểm chứng mức sẵn sàng và có cơ chế chuyển lưu lượng đáng tin cậy trong sự cố.\n(A) ĐÚNG: Amazon Route 53 Application Recovery Controller cung cấp readiness check để so sánh tài nguyên và hạn mức giữa các Region, và routing control là công tắc chạy trên mặt phẳng dữ liệu có độ sẵn sàng cao, cho phép chuyển lưu lượng ngay cả khi Region chính đang suy giảm.\n(B) SAI: Sửa bản ghi DNS thủ công chịu ảnh hưởng của bộ nhớ đệm phân giải và phụ thuộc vào thao tác trong lúc sự cố.\n(C) SAI: Health check thông thường phát hiện được sự cố nhưng không kiểm chứng mức sẵn sàng của Region dự phòng.\n(D) SAI: Chạy diễn tập thủ công hằng quý có giá trị nhưng không phải cơ chế kiểm chứng liên tục và không cung cấp công tắc chuyển lưu lượng.\nĐáp án đúng: A\nĐiểm cần nhớ: Application Recovery Controller cung cấp readiness check và routing control độc lập với tình trạng Region đang hỏng.",
+      "explanation": "Phân tích đề: Cần kiểm chứng mức sẵn sàng và có cơ chế chuyển lưu lượng đáng tin cậy trong sự cố.\n(A) SAI: Sửa bản ghi DNS thủ công chịu ảnh hưởng của bộ nhớ đệm phân giải và phụ thuộc vào thao tác trong lúc sự cố.\n(B) ĐÚNG: Amazon Route 53 Application Recovery Controller cung cấp readiness check để so sánh tài nguyên và hạn mức giữa các Region, và routing control là công tắc chạy trên mặt phẳng dữ liệu có độ sẵn sàng cao, cho phép chuyển lưu lượng ngay cả khi Region chính đang suy giảm.\n(C) SAI: Health check thông thường phát hiện được sự cố nhưng không kiểm chứng mức sẵn sàng của Region dự phòng.\n(D) SAI: Chạy diễn tập thủ công hằng quý có giá trị nhưng không phải cơ chế kiểm chứng liên tục và không cung cấp công tắc chuyển lưu lượng.\nĐáp án đúng: B\nĐiểm cần nhớ: Application Recovery Controller cung cấp readiness check và routing control độc lập với tình trạng Region đang hỏng.",
       "tagNames": ["Resilient Cloud Solutions > Multi-Region DR Strategies"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Amazon Route 53 Application Recovery Controller readiness checks and routing controls.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Manually editing Route 53 records during an incident.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Manually editing Route 53 records during an incident.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Amazon Route 53 Application Recovery Controller readiness checks and routing controls.", "isCorrect": true },
         { "answerLabel": "C", "answerText": "Route 53 health checks on the primary Region endpoints.", "isCorrect": false },
         { "answerLabel": "D", "answerText": "A quarterly manual disaster recovery rehearsal.", "isCorrect": false }
       ]
@@ -125,11 +125,11 @@
       "questionNumber": 10,
       "questionType": "MCQ",
       "questionText": "During Amazon EKS managed node group upgrades, a stateless Deployment briefly drops below the number of replicas required to serve traffic because several pods are evicted at the same time. Which Kubernetes object should a DevOps engineer add to prevent this?",
-      "explanation": "Phân tích đề: Cần giới hạn số pod bị gỡ cùng lúc trong các gián đoạn tự nguyện như nâng cấp node.\n(A) ĐÚNG: PodDisruptionBudget khai báo số pod tối thiểu phải sẵn sàng hoặc số pod tối đa được phép không sẵn sàng; quá trình drain node tôn trọng ngân sách này và chờ thay vì gỡ quá nhiều pod cùng lúc.\n(B) SAI: HorizontalPodAutoscaler điều chỉnh số bản sao theo tải, không bảo vệ trong lúc drain node.\n(C) SAI: ResourceQuota giới hạn tài nguyên trong namespace, không liên quan tới gián đoạn.\n(D) SAI: PriorityClass ảnh hưởng tới thứ tự lập lịch và preemption chứ không giới hạn số pod bị gỡ khi nâng cấp.\nĐáp án đúng: A\nĐiểm cần nhớ: PodDisruptionBudget bảo vệ tính sẵn sàng trong các gián đoạn tự nguyện như drain và nâng cấp node.",
+      "explanation": "Phân tích đề: Cần giới hạn số pod bị gỡ cùng lúc trong các gián đoạn tự nguyện như nâng cấp node.\n(A) SAI: HorizontalPodAutoscaler điều chỉnh số bản sao theo tải, không bảo vệ trong lúc drain node.\n(B) ĐÚNG: PodDisruptionBudget khai báo số pod tối thiểu phải sẵn sàng hoặc số pod tối đa được phép không sẵn sàng; quá trình drain node tôn trọng ngân sách này và chờ thay vì gỡ quá nhiều pod cùng lúc.\n(C) SAI: ResourceQuota giới hạn tài nguyên trong namespace, không liên quan tới gián đoạn.\n(D) SAI: PriorityClass ảnh hưởng tới thứ tự lập lịch và preemption chứ không giới hạn số pod bị gỡ khi nâng cấp.\nĐáp án đúng: B\nĐiểm cần nhớ: PodDisruptionBudget bảo vệ tính sẵn sàng trong các gián đoạn tự nguyện như drain và nâng cấp node.",
       "tagNames": ["Resilient Cloud Solutions > Amazon ECS / EKS"],
       "answers": [
-        { "answerLabel": "A", "answerText": "A PodDisruptionBudget that specifies the minimum number of available pods.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "A HorizontalPodAutoscaler with a higher minimum replica count.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "A HorizontalPodAutoscaler with a higher minimum replica count.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "A PodDisruptionBudget that specifies the minimum number of available pods.", "isCorrect": true },
         { "answerLabel": "C", "answerText": "A ResourceQuota for the namespace.", "isCorrect": false },
         { "answerLabel": "D", "answerText": "A PriorityClass applied to the Deployment pods.", "isCorrect": false }
       ]
@@ -138,12 +138,12 @@
       "questionNumber": 11,
       "questionType": "MCQ",
       "questionText": "Users receive connection errors during every deployment of an application that runs behind an Application Load Balancer, even though the deployment reports success and healthy targets afterwards. Requests typically take up to 25 seconds to complete, and the target group deregistration delay is set to 5 seconds. What should a DevOps engineer change?",
-      "explanation": "Phân tích đề: Target bị gỡ trước khi các yêu cầu đang xử lý kịp hoàn tất.\n(A) ĐÚNG: Tăng deregistration delay lên lớn hơn thời gian xử lý yêu cầu dài nhất, ví dụ trên 25 giây, và bảo đảm ứng dụng xử lý tín hiệu dừng để hoàn tất công việc đang chạy; bộ cân bằng tải ngừng gửi yêu cầu mới tới target nhưng vẫn cho các kết nối hiện có kết thúc trong khoảng thời gian đó.\n(B) SAI: Giảm khoảng thời gian health check chỉ làm phát hiện nhanh hơn chứ không bảo vệ yêu cầu đang xử lý.\n(C) SAI: Tăng số target giúp chịu tải nhưng không ngăn việc cắt kết nối khi một target bị gỡ.\n(D) SAI: Bật sticky session gắn phiên với target, không giúp khi chính target đó đang bị gỡ đăng ký.\nĐáp án đúng: A\nĐiểm cần nhớ: Deregistration delay phải lớn hơn thời gian xử lý yêu cầu dài nhất để việc rút target diễn ra êm.",
+      "explanation": "Phân tích đề: Target bị gỡ trước khi các yêu cầu đang xử lý kịp hoàn tất.\n(A) SAI: Tăng số target giúp chịu tải nhưng không ngăn việc cắt kết nối khi một target bị gỡ.\n(B) SAI: Giảm khoảng thời gian health check chỉ làm phát hiện nhanh hơn chứ không bảo vệ yêu cầu đang xử lý.\n(C) ĐÚNG: Tăng deregistration delay lên lớn hơn thời gian xử lý yêu cầu dài nhất, ví dụ trên 25 giây, và bảo đảm ứng dụng xử lý tín hiệu dừng để hoàn tất công việc đang chạy; bộ cân bằng tải ngừng gửi yêu cầu mới tới target nhưng vẫn cho các kết nối hiện có kết thúc trong khoảng thời gian đó.\n(D) SAI: Bật sticky session gắn phiên với target, không giúp khi chính target đó đang bị gỡ đăng ký.\nĐáp án đúng: C\nĐiểm cần nhớ: Deregistration delay phải lớn hơn thời gian xử lý yêu cầu dài nhất để việc rút target diễn ra êm.",
       "tagNames": ["Resilient Cloud Solutions > Elastic Load Balancing & Health Checks"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Increase the deregistration delay beyond the longest request duration and handle the shutdown signal in the application.", "isCorrect": true },
+        { "answerLabel": "A", "answerText": "Increase the number of targets registered in the target group.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Reduce the target group health check interval and unhealthy threshold.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Increase the number of targets registered in the target group.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Increase the deregistration delay beyond the longest request duration and handle the shutdown signal in the application.", "isCorrect": true },
         { "answerLabel": "D", "answerText": "Enable sticky sessions on the target group.", "isCorrect": false }
       ]
     }

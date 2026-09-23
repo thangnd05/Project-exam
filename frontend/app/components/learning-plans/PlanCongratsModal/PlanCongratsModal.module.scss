@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: rgba(6, 40, 35, 0.55);
+  background: rgb(var(--brand-900-rgb) / 0.55);
   backdrop-filter: blur(3px);
   animation: fadeIn 0.25s ease;
 }
@@ -17,7 +17,7 @@
   overflow: hidden;
   border-radius: 20px;
   background: #fff;
-  box-shadow: 0 24px 64px rgba(6, 40, 35, 0.35);
+  box-shadow: 0 24px 64px rgb(var(--brand-900-rgb) / 0.35);
   text-align: center;
   animation: popIn 0.35s cubic-bezier(0.22, 1.2, 0.36, 1);
 }
@@ -25,8 +25,8 @@
 .hero {
   position: relative;
   padding: 3.2rem 2.4rem 2.4rem;
-  background: linear-gradient(135deg, var(--teal-700) 0%, var(--emerald-500) 60%, var(--emerald-400) 100%);
-  color: #fff;
+  background: var(--primary-gradient);
+  color: var(--on-primary-gradient);
 }
 
 .closeBtn {
@@ -40,14 +40,14 @@
   height: 3.2rem;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
-  color: #fff;
+  background: var(--on-primary-gradient-soft);
+  color: var(--on-primary-gradient);
   font-size: 1.8rem;
   cursor: pointer;
   transition: background 0.2s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.32);
+    background: rgb(var(--brand-900-rgb) / 0.14);
   }
 }
 
@@ -66,7 +66,7 @@
   svg {
     width: 4.4rem;
     height: 4.4rem;
-    color: var(--amber-200);
+    color: var(--on-primary-gradient);
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
   }
 }
@@ -153,8 +153,8 @@
   padding: 1rem 2.4rem;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--teal-700), var(--emerald-500));
-  color: #fff;
+  background: var(--primary-gradient);
+  color: var(--on-primary-gradient);
   font-size: 1.5rem;
   font-weight: 700;
   cursor: pointer;
@@ -162,7 +162,7 @@
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgb(var(--emerald-500-rgb) / 0.35);
+    box-shadow: var(--premium-shadow);
   }
 }
 

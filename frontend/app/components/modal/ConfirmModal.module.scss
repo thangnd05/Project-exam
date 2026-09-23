@@ -39,21 +39,21 @@
         gap: 12px;
 
         .headerIcon {
-            color: #fff;
+            color: var(--on-primary-gradient);
             font-size: 2.4rem;
         }
 
         .title {
             font-size: 2rem;
             font-weight: 800;
-            color: #fff;
+            color: var(--on-primary-gradient);
             margin: 0;
             letter-spacing: -0.3px;
         }
     }
 
     .closeBtn {
-        background: rgba(255, 255, 255, 0.2);
+        background: var(--on-primary-gradient-soft);
         border: none;
         width: 40px;
         height: 40px;
@@ -61,13 +61,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #fff;
+        color: var(--on-primary-gradient);
         font-size: 2rem;
         cursor: pointer;
         transition: all 0.2s;
 
         &:hover {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgb(var(--brand-900-rgb) / 0.14);
             transform: rotate(90deg);
         }
     }
@@ -102,8 +102,8 @@
         }
 
         &.warning {
-            background: var(--amber-100);
-            color: var(--brand-unique-hover);
+            background: var(--warning-100);
+            color: var(--warning-text);
         }
 
         &.success {
@@ -151,11 +151,11 @@
     }
 
     .btnConfirm {
-        color: #fff;
+        color: var(--on-primary-gradient);
 
         &.primary {
             background: var(--primary-gradient);
-            box-shadow: 0 4px 15px rgb(var(--teal-600-rgb) / 0.25);
+            box-shadow: 0 4px 15px rgb(var(--primary-rgb) / 0.25);
 
             &:hover {
                 transform: translateY(-2px);
@@ -164,6 +164,7 @@
         }
 
         &.danger {
+            color: #fff;
             background: var(--red-500);
             box-shadow: 0 4px 15px rgb(var(--red-500-rgb) / 0.3);
 
@@ -175,13 +176,14 @@
         }
 
         &.warning {
-            background: var(--brand-unique-hover);
-            box-shadow: 0 4px 15px rgb(var(--amber-600-rgb) / 0.3);
+            color: #fff;
+            background: var(--warning);
+            box-shadow: 0 4px 15px rgb(var(--warning-rgb) / 0.3);
 
             &:hover {
-                background: var(--amber-700);
+                background: var(--warning-700);
                 transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgb(var(--amber-600-rgb) / 0.4);
+                box-shadow: 0 8px 25px rgb(var(--warning-rgb) / 0.4);
             }
         }
 

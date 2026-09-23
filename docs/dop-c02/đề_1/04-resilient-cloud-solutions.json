@@ -20,38 +20,38 @@
       "questionNumber": 2,
       "questionType": "MCQ",
       "questionText": "A DevOps engineer must replace every instance in an Auto Scaling group so they pick up a new AMI. The replacement must happen gradually, must keep at least 90 percent of capacity in service at all times, and must stop automatically if the new instances fail health checks. Which approach meets these requirements with the LEAST custom scripting?",
-      "explanation": "Phân tích đề: Cần thay thế cuốn chiếu có kiểm soát năng lực tối thiểu và dừng khi lỗi.\n(A) ĐÚNG: Dùng instance refresh của Auto Scaling group với minimum healthy percentage đặt ở 90; dịch vụ thay thế instance theo từng đợt, kiểm tra sức khỏe giữa các đợt và tự dừng quá trình khi instance mới không đạt, mà không cần viết script điều phối.\n(B) SAI: Chấm dứt thủ công từng instance để nhóm tạo lại là thao tác lặp lại và không có cơ chế dừng tự động khi lỗi.\n(C) SAI: Tăng gấp đôi số instance mong muốn rồi giảm lại là cách thô, tốn chi phí và không kiểm chứng sức khỏe theo đợt.\n(D) SAI: Tạo nhóm mới rồi chuyển lưu lượng là mô hình blue/green hợp lệ nhưng đòi hỏi nhiều bước thủ công hơn cho yêu cầu đã nêu.\nĐáp án đúng: A\nĐiểm cần nhớ: Instance refresh thay thế instance theo đợt với ngưỡng năng lực tối thiểu và tự dừng khi kiểm tra sức khỏe thất bại.",
+      "explanation": "Phân tích đề: Cần thay thế cuốn chiếu có kiểm soát năng lực tối thiểu và dừng khi lỗi.\n(A) SAI: Tăng gấp đôi số instance mong muốn rồi giảm lại là cách thô, tốn chi phí và không kiểm chứng sức khỏe theo đợt.\n(B) ĐÚNG: Dùng instance refresh của Auto Scaling group với minimum healthy percentage đặt ở 90; dịch vụ thay thế instance theo từng đợt, kiểm tra sức khỏe giữa các đợt và tự dừng quá trình khi instance mới không đạt, mà không cần viết script điều phối.\n(C) SAI: Tạo nhóm mới rồi chuyển lưu lượng là mô hình blue/green hợp lệ nhưng đòi hỏi nhiều bước thủ công hơn cho yêu cầu đã nêu.\n(D) SAI: Chấm dứt thủ công từng instance để nhóm tạo lại là thao tác lặp lại và không có cơ chế dừng tự động khi lỗi.\nĐáp án đúng: B\nĐiểm cần nhớ: Instance refresh thay thế instance theo đợt với ngưỡng năng lực tối thiểu và tự dừng khi kiểm tra sức khỏe thất bại.",
       "tagNames": ["Resilient Cloud Solutions > AWS Auto Scaling"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Start an instance refresh on the Auto Scaling group with a minimum healthy percentage of 90 and the updated launch template version.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Terminate instances one at a time and let the Auto Scaling group replace them with the new launch template.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Double the desired capacity, wait for the new instances, then reduce the desired capacity back to the original value.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Create a second Auto Scaling group with the new AMI and move the load balancer target group to it.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Double the desired capacity, wait for the new instances, then reduce the desired capacity back to the original value.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Start an instance refresh on the Auto Scaling group with a minimum healthy percentage of 90 and the updated launch template version.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Create a second Auto Scaling group with the new AMI and move the load balancer target group to it.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Terminate instances one at a time and let the Auto Scaling group replace them with the new launch template.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 3,
       "questionType": "MCQ",
       "questionText": "A company runs an active-passive workload in us-east-1 and eu-west-1. Clients use a single domain name. If the primary Region becomes unhealthy, traffic must move to the secondary Region automatically, and clients must not be sent to the primary while it is failing. Which Amazon Route 53 configuration meets these requirements?",
-      "explanation": "Phân tích đề: Mô hình chủ động và dự phòng với chuyển đổi tự động theo tình trạng sức khỏe.\n(A) ĐÚNG: Dùng failover routing policy với một bản ghi primary và một bản ghi secondary, gắn health check vào bản ghi primary; khi health check thất bại, Route 53 ngừng trả về bản ghi primary và trả về bản ghi secondary.\n(B) SAI: Weighted routing chia lưu lượng theo tỉ lệ cố định nên vẫn gửi một phần lưu lượng tới Region đang hỏng nếu không có health check phù hợp, và không phản ánh mô hình chủ động dự phòng.\n(C) SAI: Latency routing chọn theo độ trễ, không phải theo vai trò chính và phụ.\n(D) SAI: Simple routing trả về bản ghi cố định và không có khả năng chuyển đổi khi hỏng.\nĐáp án đúng: A\nĐiểm cần nhớ: Failover routing kèm health check là cấu hình chuẩn cho mô hình chủ động và dự phòng.",
+      "explanation": "Phân tích đề: Mô hình chủ động và dự phòng với chuyển đổi tự động theo tình trạng sức khỏe.\n(A) SAI: Latency routing chọn theo độ trễ, không phải theo vai trò chính và phụ.\n(B) SAI: Weighted routing chia lưu lượng theo tỉ lệ cố định nên vẫn gửi một phần lưu lượng tới Region đang hỏng nếu không có health check phù hợp, và không phản ánh mô hình chủ động dự phòng.\n(C) SAI: Simple routing trả về bản ghi cố định và không có khả năng chuyển đổi khi hỏng.\n(D) ĐÚNG: Dùng failover routing policy với một bản ghi primary và một bản ghi secondary, gắn health check vào bản ghi primary; khi health check thất bại, Route 53 ngừng trả về bản ghi primary và trả về bản ghi secondary.\nĐáp án đúng: D\nĐiểm cần nhớ: Failover routing kèm health check là cấu hình chuẩn cho mô hình chủ động và dự phòng.",
       "tagNames": ["Resilient Cloud Solutions > Route 53 Routing Policies"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Create failover routing records with the primary Region as PRIMARY and the secondary Region as SECONDARY, associating a health check with the primary record.", "isCorrect": true },
+        { "answerLabel": "A", "answerText": "Create latency-based routing records for both Regions.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Create weighted routing records with a weight of 100 for the primary Region and 0 for the secondary Region.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Create latency-based routing records for both Regions.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Create a simple routing record that returns both Regional endpoints.", "isCorrect": false }
+        { "answerLabel": "C", "answerText": "Create a simple routing record that returns both Regional endpoints.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create failover routing records with the primary Region as PRIMARY and the secondary Region as SECONDARY, associating a health check with the primary record.", "isCorrect": true }
       ]
     },
     {
       "questionNumber": 4,
       "questionType": "MCQ",
       "questionText": "A financial services company must guarantee that daily backups of Amazon RDS databases and Amazon EFS file systems cannot be deleted by anyone, including administrators, for 35 days, and that a copy exists in a second AWS account. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần bản sao lưu bất biến trong 35 ngày và bản sao ở tài khoản khác.\n(A) ĐÚNG: Dùng AWS Backup với backup plan sao chép sang vault ở tài khoản thứ hai, và áp AWS Backup Vault Lock ở chế độ tuân thủ với thời hạn lưu giữ tối thiểu; khi vault lock đã ở chế độ tuân thủ thì không ai, kể cả tài khoản gốc, xóa được bản sao lưu trước hạn.\n(B) SAI: Chính sách IAM từ chối hành động xóa có thể bị chính quản trị viên có quyền sửa đổi, nên không đáp ứng yêu cầu chống xóa tuyệt đối.\n(C) SAI: Snapshot thủ công theo lịch kèm quy trình nội bộ không cung cấp tính bất biến được thực thi.\n(D) SAI: Bật versioning cho bucket S3 không áp dụng cho snapshot RDS và EFS theo cách này.\nĐáp án đúng: A\nĐiểm cần nhớ: Vault Lock ở chế độ tuân thủ tạo tính bất biến cho bản sao lưu; kết hợp copy action để có bản sao ở tài khoản khác.",
+      "explanation": "Phân tích đề: Cần bản sao lưu bất biến trong 35 ngày và bản sao ở tài khoản khác.\n(A) SAI: Chính sách IAM từ chối hành động xóa có thể bị chính quản trị viên có quyền sửa đổi, nên không đáp ứng yêu cầu chống xóa tuyệt đối.\n(B) SAI: Snapshot thủ công theo lịch kèm quy trình nội bộ không cung cấp tính bất biến được thực thi.\n(C) ĐÚNG: Dùng AWS Backup với backup plan sao chép sang vault ở tài khoản thứ hai, và áp AWS Backup Vault Lock ở chế độ tuân thủ với thời hạn lưu giữ tối thiểu; khi vault lock đã ở chế độ tuân thủ thì không ai, kể cả tài khoản gốc, xóa được bản sao lưu trước hạn.\n(D) SAI: Bật versioning cho bucket S3 không áp dụng cho snapshot RDS và EFS theo cách này.\nĐáp án đúng: C\nĐiểm cần nhớ: Vault Lock ở chế độ tuân thủ tạo tính bất biến cho bản sao lưu; kết hợp copy action để có bản sao ở tài khoản khác.",
       "tagNames": ["Resilient Cloud Solutions > AWS Backup"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Use an AWS Backup plan with a cross-account copy action, and apply AWS Backup Vault Lock in compliance mode with a 35-day minimum retention.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Use an AWS Backup plan and attach an IAM policy that denies backup deletion actions to all principals.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Schedule native RDS and EFS snapshots with Amazon EventBridge and document a policy that prohibits deletion.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Use an AWS Backup plan and attach an IAM policy that denies backup deletion actions to all principals.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Schedule native RDS and EFS snapshots with Amazon EventBridge and document a policy that prohibits deletion.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Use an AWS Backup plan with a cross-account copy action, and apply AWS Backup Vault Lock in compliance mode with a 35-day minimum retention.", "isCorrect": true },
         { "answerLabel": "D", "answerText": "Export backups to an Amazon S3 bucket with versioning and MFA delete enabled.", "isCorrect": false }
       ]
     },
@@ -59,77 +59,77 @@
       "questionNumber": 5,
       "questionType": "MCQ",
       "questionText": "A DevOps engineer wants to verify that an application correctly fails over when an entire Availability Zone becomes unreachable. The test must run against the production environment during a controlled window, and it must stop immediately and restore normal conditions if the customer-facing error rate alarm triggers. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần thí nghiệm lỗi có kiểm soát trên sản xuất với điều kiện dừng an toàn.\n(A) ĐÚNG: Dùng AWS Fault Injection Service với experiment template mô phỏng mất kết nối tới một vùng sẵn sàng, và khai báo stop condition trỏ tới CloudWatch alarm về tỉ lệ lỗi; khi alarm chuyển sang báo động, FIS dừng thí nghiệm và trạng thái được khôi phục.\n(B) SAI: Tự viết script chấm dứt toàn bộ instance trong một AZ là hành động phá hủy không có cơ chế dừng an toàn và khó khôi phục.\n(C) SAI: Chặn lưu lượng bằng cách sửa network ACL thủ công thiếu cơ chế tự động dừng theo alarm và dễ để lại cấu hình sai.\n(D) SAI: Chỉ xem lại tài liệu kiến trúc không kiểm chứng được hành vi thực tế.\nĐáp án đúng: A\nĐiểm cần nhớ: FIS chạy thí nghiệm lỗi có kiểm soát với stop condition gắn vào alarm để bảo vệ môi trường sản xuất.",
+      "explanation": "Phân tích đề: Cần thí nghiệm lỗi có kiểm soát trên sản xuất với điều kiện dừng an toàn.\n(A) SAI: Tự viết script chấm dứt toàn bộ instance trong một AZ là hành động phá hủy không có cơ chế dừng an toàn và khó khôi phục.\n(B) SAI: Chỉ xem lại tài liệu kiến trúc không kiểm chứng được hành vi thực tế.\n(C) ĐÚNG: Dùng AWS Fault Injection Service với experiment template mô phỏng mất kết nối tới một vùng sẵn sàng, và khai báo stop condition trỏ tới CloudWatch alarm về tỉ lệ lỗi; khi alarm chuyển sang báo động, FIS dừng thí nghiệm và trạng thái được khôi phục.\n(D) SAI: Chặn lưu lượng bằng cách sửa network ACL thủ công thiếu cơ chế tự động dừng theo alarm và dễ để lại cấu hình sai.\nĐáp án đúng: C\nĐiểm cần nhớ: FIS chạy thí nghiệm lỗi có kiểm soát với stop condition gắn vào alarm để bảo vệ môi trường sản xuất.",
       "tagNames": ["Resilient Cloud Solutions > AWS Fault Injection Service (FIS)"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Create an AWS FIS experiment template that disrupts connectivity for the target Availability Zone, and configure a stop condition on the customer-facing error rate alarm.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Write a script that terminates all EC2 instances in one Availability Zone and monitor the application manually.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Modify the network ACLs of the subnets in one Availability Zone to deny all traffic, and revert them after testing.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Review the architecture diagrams to confirm that resources are spread across Availability Zones.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Write a script that terminates all EC2 instances in one Availability Zone and monitor the application manually.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Review the architecture diagrams to confirm that resources are spread across Availability Zones.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an AWS FIS experiment template that disrupts connectivity for the target Availability Zone, and configure a stop condition on the customer-facing error rate alarm.", "isCorrect": true },
+        { "answerLabel": "D", "answerText": "Modify the network ACLs of the subnets in one Availability Zone to deny all traffic, and revert them after testing.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 6,
       "questionType": "MCQ",
       "questionText": "A global application uses Amazon Aurora PostgreSQL in us-east-1. The business requires that if the entire Region fails, the database in eu-west-1 can serve writes within a few minutes, with a recovery point objective of under one second under normal conditions. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần nhân bản liên Region với độ trễ rất thấp và khả năng nhận ghi nhanh khi mất Region.\n(A) ĐÚNG: Aurora Global Database nhân bản tới Region thứ hai với độ trễ thường dưới một giây, và cho phép thăng cấp Region thứ cấp thành Region nhận ghi trong khoảng thời gian ngắn khi xảy ra sự cố Region.\n(B) SAI: Cross-Region read replica thông thường của RDS có độ trễ cao hơn và thời gian thăng cấp dài hơn, khó đạt mục tiêu đã nêu.\n(C) SAI: Khôi phục từ snapshot được sao chép sang Region khác có RPO bằng khoảng cách giữa các snapshot, không thể dưới một giây.\n(D) SAI: Sao lưu logic theo lịch rồi nhập lại có RPO và RTO lớn hơn nhiều so với yêu cầu.\nĐáp án đúng: A\nĐiểm cần nhớ: Aurora Global Database cho RPO dưới một giây và thăng cấp Region thứ cấp nhanh khi mất Region chính.",
+      "explanation": "Phân tích đề: Cần nhân bản liên Region với độ trễ rất thấp và khả năng nhận ghi nhanh khi mất Region.\n(A) ĐÚNG: Aurora Global Database nhân bản tới Region thứ hai với độ trễ thường dưới một giây, và cho phép thăng cấp Region thứ cấp thành Region nhận ghi trong khoảng thời gian ngắn khi xảy ra sự cố Region.\n(B) SAI: Sao lưu logic theo lịch rồi nhập lại có RPO và RTO lớn hơn nhiều so với yêu cầu.\n(C) SAI: Cross-Region read replica thông thường của RDS có độ trễ cao hơn và thời gian thăng cấp dài hơn, khó đạt mục tiêu đã nêu.\n(D) SAI: Khôi phục từ snapshot được sao chép sang Region khác có RPO bằng khoảng cách giữa các snapshot, không thể dưới một giây.\nĐáp án đúng: A\nĐiểm cần nhớ: Aurora Global Database cho RPO dưới một giây và thăng cấp Region thứ cấp nhanh khi mất Region chính.",
       "tagNames": ["Resilient Cloud Solutions > Database HA & Replication"],
       "answers": [
         { "answerLabel": "A", "answerText": "Configure an Aurora global database with a secondary cluster in eu-west-1 and promote it during a Regional failure.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Create a cross-Region read replica of the Aurora cluster and promote it when needed.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Copy automated snapshots to eu-west-1 every 15 minutes and restore them during a failure.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Schedule logical dumps to Amazon S3 with cross-Region replication and import them during a failure.", "isCorrect": false }
+        { "answerLabel": "B", "answerText": "Schedule logical dumps to Amazon S3 with cross-Region replication and import them during a failure.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create a cross-Region read replica of the Aurora cluster and promote it when needed.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Copy automated snapshots to eu-west-1 every 15 minutes and restore them during a failure.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 7,
       "questionType": "MCQ",
       "questionText": "A company runs Amazon RDS for MySQL in a single Availability Zone. During a recent AZ impairment the database was unavailable for three hours. The company must reduce downtime for a similar event to a few minutes, with no application code changes and automatic failover. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần chịu được mất một vùng sẵn sàng với chuyển đổi tự động và không sửa mã ứng dụng.\n(A) ĐÚNG: Bật Multi-AZ cho RDS; dịch vụ duy trì bản sao dự phòng ở vùng sẵn sàng khác và tự chuyển đổi khi vùng chính gặp sự cố, trong khi endpoint không đổi nên ứng dụng không phải sửa chuỗi kết nối.\n(B) SAI: Tạo read replica trong AZ khác giúp phân tải đọc nhưng việc thăng cấp là thao tác thủ công và endpoint thay đổi.\n(C) SAI: Tăng tần suất snapshot cải thiện RPO nhưng việc khôi phục vẫn mất nhiều thời gian, không đạt mục tiêu vài phút.\n(D) SAI: Chuyển sang loại instance lớn hơn không liên quan tới khả năng chịu lỗi vùng sẵn sàng.\nĐáp án đúng: A\nĐiểm cần nhớ: Multi-AZ cung cấp chuyển đổi dự phòng tự động trong Region với endpoint không đổi.",
+      "explanation": "Phân tích đề: Cần chịu được mất một vùng sẵn sàng với chuyển đổi tự động và không sửa mã ứng dụng.\n(A) SAI: Chuyển sang loại instance lớn hơn không liên quan tới khả năng chịu lỗi vùng sẵn sàng.\n(B) SAI: Tăng tần suất snapshot cải thiện RPO nhưng việc khôi phục vẫn mất nhiều thời gian, không đạt mục tiêu vài phút.\n(C) SAI: Tạo read replica trong AZ khác giúp phân tải đọc nhưng việc thăng cấp là thao tác thủ công và endpoint thay đổi.\n(D) ĐÚNG: Bật Multi-AZ cho RDS; dịch vụ duy trì bản sao dự phòng ở vùng sẵn sàng khác và tự chuyển đổi khi vùng chính gặp sự cố, trong khi endpoint không đổi nên ứng dụng không phải sửa chuỗi kết nối.\nĐáp án đúng: D\nĐiểm cần nhớ: Multi-AZ cung cấp chuyển đổi dự phòng tự động trong Region với endpoint không đổi.",
       "tagNames": ["Resilient Cloud Solutions > Database HA & Replication"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Modify the RDS instance to a Multi-AZ deployment so that a standby in another Availability Zone takes over automatically.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Create a read replica in another Availability Zone and promote it manually if the primary fails.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Increase the automated snapshot frequency and restore from the latest snapshot during an outage.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Change the instance class to a larger size with more memory and network throughput.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Change the instance class to a larger size with more memory and network throughput.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Increase the automated snapshot frequency and restore from the latest snapshot during an outage.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create a read replica in another Availability Zone and promote it manually if the primary fails.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Modify the RDS instance to a Multi-AZ deployment so that a standby in another Availability Zone takes over automatically.", "isCorrect": true }
       ]
     },
     {
       "questionNumber": 8,
       "questionType": "MCQ",
       "questionText": "A company must be able to recover a workload in a second AWS Region within 30 minutes of a Regional outage, and the business has approved a moderate ongoing cost. Data is already replicated continuously. The company does not want to run full production capacity in the second Region at all times. Which disaster recovery strategy best fits these requirements?",
-      "explanation": "Phân tích đề: RTO 30 phút, chi phí vừa phải, dữ liệu đã được nhân bản, không chạy đủ năng lực sản xuất.\n(A) SAI: Backup and restore có RTO thường tính bằng giờ vì phải dựng lại hạ tầng và khôi phục dữ liệu.\n(B) ĐÚNG: Warm standby giữ một phiên bản thu nhỏ của toàn bộ kiến trúc luôn chạy ở Region thứ hai; khi cần, chỉ việc mở rộng quy mô lên mức sản xuất và chuyển lưu lượng, nên đạt được RTO vài chục phút với chi phí thấp hơn nhiều so với chạy song song đầy đủ.\n(C) SAI: Multi-site active-active cho RTO gần bằng không nhưng đòi hỏi chạy đủ năng lực ở cả hai Region, vượt ràng buộc chi phí đã nêu.\n(D) SAI: Pilot light giữ mức tối thiểu hơn nữa, thường chỉ có dữ liệu và một phần lõi, nên thời gian phục hồi dài hơn warm standby và khó bảo đảm 30 phút cho toàn bộ workload.\nĐáp án đúng: B\nĐiểm cần nhớ: Warm standby là điểm cân bằng giữa chi phí và RTO vài chục phút; active-active dành cho RTO gần bằng không.",
+      "explanation": "Phân tích đề: RTO 30 phút, chi phí vừa phải, dữ liệu đã được nhân bản, không chạy đủ năng lực sản xuất.\n(A) SAI: Pilot light giữ mức tối thiểu hơn nữa, thường chỉ có dữ liệu và một phần lõi, nên thời gian phục hồi dài hơn warm standby và khó bảo đảm 30 phút cho toàn bộ workload.\n(B) ĐÚNG: Warm standby giữ một phiên bản thu nhỏ của toàn bộ kiến trúc luôn chạy ở Region thứ hai; khi cần, chỉ việc mở rộng quy mô lên mức sản xuất và chuyển lưu lượng, nên đạt được RTO vài chục phút với chi phí thấp hơn nhiều so với chạy song song đầy đủ.\n(C) SAI: Multi-site active-active cho RTO gần bằng không nhưng đòi hỏi chạy đủ năng lực ở cả hai Region, vượt ràng buộc chi phí đã nêu.\n(D) SAI: Backup and restore có RTO thường tính bằng giờ vì phải dựng lại hạ tầng và khôi phục dữ liệu.\nĐáp án đúng: B\nĐiểm cần nhớ: Warm standby là điểm cân bằng giữa chi phí và RTO vài chục phút; active-active dành cho RTO gần bằng không.",
       "tagNames": ["Resilient Cloud Solutions > Multi-Region DR Strategies"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Backup and restore", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Pilot light", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Warm standby", "isCorrect": true },
         { "answerLabel": "C", "answerText": "Multi-site active-active", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Pilot light", "isCorrect": false }
+        { "answerLabel": "D", "answerText": "Backup and restore", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 9,
       "questionType": "MSQ",
       "questionText": "A DevOps engineer is preparing a multi-Region disaster recovery plan. A tabletop review found that the plan has never been executed and that several assumptions are untested. Which TWO actions will most improve the likelihood that the plan works during a real Regional outage? (Choose TWO.)",
-      "explanation": "Phân tích đề: Kế hoạch chưa từng được thực thi nên các giả định chưa được kiểm chứng.\n(A) ĐÚNG: Thực hiện diễn tập thật ở quy mô có kiểm soát và đo thời gian từng bước so với mục tiêu RTO và RPO; diễn tập biến giả định thành dữ liệu và thường lộ ra các bước thiếu, quyền thiếu và phụ thuộc chưa chuẩn bị.\n(B) ĐÚNG: Kiểm chứng rằng hạn mức dịch vụ và năng lực ở Region phục hồi đủ cho mức tải sản xuất hiện tại, vì nhu cầu tăng theo thời gian trong khi hạn mức ở Region ít dùng thường vẫn ở mức mặc định.\n(C) SAI: Viết runbook chi tiết hơn không kiểm chứng được bất kỳ giả định nào.\n(D) SAI: Tăng tần suất sao lưu cải thiện RPO nhưng không trả lời câu hỏi liệu có phục hồi được hay không.\n(E) SAI: Mua thêm năng lực dự phòng trước khi biết điểm nghẽn thật là đầu tư thiếu cơ sở.\nĐáp án đúng: A, B\nĐiểm cần nhớ: Diễn tập thật và kiểm chứng hạn mức cùng năng lực ở Region phục hồi là hai việc có giá trị nhất cho một kế hoạch chưa được kiểm chứng.",
+      "explanation": "Phân tích đề: Kế hoạch chưa từng được thực thi nên các giả định chưa được kiểm chứng.\n(A) SAI: Mua thêm năng lực dự phòng trước khi biết điểm nghẽn thật là đầu tư thiếu cơ sở.\n(B) ĐÚNG: Kiểm chứng rằng hạn mức dịch vụ và năng lực ở Region phục hồi đủ cho mức tải sản xuất hiện tại, vì nhu cầu tăng theo thời gian trong khi hạn mức ở Region ít dùng thường vẫn ở mức mặc định.\n(C) SAI: Tăng tần suất sao lưu cải thiện RPO nhưng không trả lời câu hỏi liệu có phục hồi được hay không.\n(D) ĐÚNG: Thực hiện diễn tập thật ở quy mô có kiểm soát và đo thời gian từng bước so với mục tiêu RTO và RPO; diễn tập biến giả định thành dữ liệu và thường lộ ra các bước thiếu, quyền thiếu và phụ thuộc chưa chuẩn bị.\n(E) SAI: Viết runbook chi tiết hơn không kiểm chứng được bất kỳ giả định nào.\nĐáp án đúng: B, D\nĐiểm cần nhớ: Diễn tập thật và kiểm chứng hạn mức cùng năng lực ở Region phục hồi là hai việc có giá trị nhất cho một kế hoạch chưa được kiểm chứng.",
       "tagNames": ["Resilient Cloud Solutions > Multi-Region DR Strategies"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Run a controlled failover rehearsal and measure each step against the RTO and RPO targets.", "isCorrect": true },
+        { "answerLabel": "A", "answerText": "Purchase additional reserved capacity in the recovery Region.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Verify that service quotas and available capacity in the recovery Region match current production demand.", "isCorrect": true },
-        { "answerLabel": "C", "answerText": "Expand the runbook with more detailed written instructions.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Increase the frequency of backups in the primary Region.", "isCorrect": false },
-        { "answerLabel": "E", "answerText": "Purchase additional reserved capacity in the recovery Region.", "isCorrect": false }
+        { "answerLabel": "C", "answerText": "Increase the frequency of backups in the primary Region.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Run a controlled failover rehearsal and measure each step against the RTO and RPO targets.", "isCorrect": true },
+        { "answerLabel": "E", "answerText": "Expand the runbook with more detailed written instructions.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 10,
       "questionType": "MCQ",
       "questionText": "An Amazon ECS service running on AWS Fargate is configured with 12 tasks across a Region with three Availability Zones. After an AZ impairment the team discovered that 9 of the 12 tasks had been placed in the affected AZ. A DevOps engineer must ensure tasks are distributed so that losing one AZ removes approximately one third of capacity. What should the engineer configure?",
-      "explanation": "Phân tích đề: Task đang bị dồn vào một vùng sẵn sàng.\n(A) ĐÚNG: Đặt placement strategy kiểu spread theo thuộc tính vùng sẵn sàng cho service; ECS phân bố task sao cho số lượng giữa các AZ chênh nhau tối đa một, nên mất một AZ chỉ làm mất khoảng một phần ba năng lực.\n(B) SAI: Chiến lược binpack dồn task để tối ưu tài nguyên, làm mức tập trung tăng lên chứ không giảm.\n(C) SAI: Tăng số task mong muốn mà không đổi chiến lược đặt task vẫn có thể dồn vào một AZ.\n(D) SAI: Bật deployment circuit breaker xử lý việc triển khai hỏng, không liên quan tới phân bố theo AZ.\nĐáp án đúng: A\nĐiểm cần nhớ: Placement strategy spread theo AZ là cách chuẩn để phân bố task ECS đều giữa các vùng sẵn sàng.",
+      "explanation": "Phân tích đề: Task đang bị dồn vào một vùng sẵn sàng.\n(A) SAI: Chiến lược binpack dồn task để tối ưu tài nguyên, làm mức tập trung tăng lên chứ không giảm.\n(B) ĐÚNG: Đặt placement strategy kiểu spread theo thuộc tính vùng sẵn sàng cho service; ECS phân bố task sao cho số lượng giữa các AZ chênh nhau tối đa một, nên mất một AZ chỉ làm mất khoảng một phần ba năng lực.\n(C) SAI: Tăng số task mong muốn mà không đổi chiến lược đặt task vẫn có thể dồn vào một AZ.\n(D) SAI: Bật deployment circuit breaker xử lý việc triển khai hỏng, không liên quan tới phân bố theo AZ.\nĐáp án đúng: B\nĐiểm cần nhớ: Placement strategy spread theo AZ là cách chuẩn để phân bố task ECS đều giữa các vùng sẵn sàng.",
       "tagNames": ["Resilient Cloud Solutions > Amazon ECS / EKS"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Configure a spread placement strategy on the Availability Zone attribute for the service.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Configure a binpack placement strategy on memory for the service.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Configure a binpack placement strategy on memory for the service.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Configure a spread placement strategy on the Availability Zone attribute for the service.", "isCorrect": true },
         { "answerLabel": "C", "answerText": "Increase the desired task count from 12 to 18.", "isCorrect": false },
         { "answerLabel": "D", "answerText": "Enable the deployment circuit breaker with rollback on the service.", "isCorrect": false }
       ]
@@ -138,12 +138,12 @@
       "questionNumber": 11,
       "questionType": "MCQ",
       "questionText": "An Auto Scaling group behind an Application Load Balancer keeps instances in service that pass EC2 status checks but return HTTP 500 for every request because the application process has crashed. A DevOps engineer must ensure such instances are terminated and replaced automatically. What should the engineer change?",
-      "explanation": "Phân tích đề: Nhóm đang dùng kiểu kiểm tra sức khỏe không phản ánh tình trạng ứng dụng.\n(A) ĐÚNG: Đổi health check type của Auto Scaling group sang ELB, để nhóm coi kết quả health check của target group là nguồn đánh giá; instance bị bộ cân bằng tải đánh dấu không khỏe sẽ bị chấm dứt và thay thế.\n(B) SAI: Giữ kiểu EC2 chỉ kiểm tra tình trạng ở mức hạ tầng, nên ứng dụng đã hỏng vẫn được coi là khỏe.\n(C) SAI: Rút ngắn khoảng thời gian health check của target group giúp phát hiện nhanh hơn nhưng nhóm vẫn không thay thế instance nếu kiểu kiểm tra là EC2.\n(D) SAI: Tăng số instance mong muốn chỉ thêm năng lực chứ không loại bỏ instance hỏng.\nĐáp án đúng: A\nĐiểm cần nhớ: Auto Scaling group phải dùng health check type ELB để thay thế instance mà ứng dụng đã hỏng.",
+      "explanation": "Phân tích đề: Nhóm đang dùng kiểu kiểm tra sức khỏe không phản ánh tình trạng ứng dụng.\n(A) SAI: Rút ngắn khoảng thời gian health check của target group giúp phát hiện nhanh hơn nhưng nhóm vẫn không thay thế instance nếu kiểu kiểm tra là EC2.\n(B) SAI: Giữ kiểu EC2 chỉ kiểm tra tình trạng ở mức hạ tầng, nên ứng dụng đã hỏng vẫn được coi là khỏe.\n(C) ĐÚNG: Đổi health check type của Auto Scaling group sang ELB, để nhóm coi kết quả health check của target group là nguồn đánh giá; instance bị bộ cân bằng tải đánh dấu không khỏe sẽ bị chấm dứt và thay thế.\n(D) SAI: Tăng số instance mong muốn chỉ thêm năng lực chứ không loại bỏ instance hỏng.\nĐáp án đúng: C\nĐiểm cần nhớ: Auto Scaling group phải dùng health check type ELB để thay thế instance mà ứng dụng đã hỏng.",
       "tagNames": ["Resilient Cloud Solutions > Elastic Load Balancing & Health Checks"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Change the Auto Scaling group health check type to ELB so load balancer health results drive instance replacement.", "isCorrect": true },
+        { "answerLabel": "A", "answerText": "Reduce the target group health check interval and unhealthy threshold.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Keep the EC2 health check type and reduce the health check grace period.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Reduce the target group health check interval and unhealthy threshold.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Change the Auto Scaling group health check type to ELB so load balancer health results drive instance replacement.", "isCorrect": true },
         { "answerLabel": "D", "answerText": "Increase the desired capacity of the Auto Scaling group.", "isCorrect": false }
       ]
     }

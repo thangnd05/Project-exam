@@ -253,7 +253,7 @@
 
 .flashcard-back {
     background: var(--primary-gradient);
-    color: white;
+    color: var(--on-primary-gradient);
     transform: rotateY(180deg);
 
     .meaning {

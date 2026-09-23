@@ -109,7 +109,7 @@
 @keyframes reviewFlash {
   0%,
   100% {
-    box-shadow: 0 0 0 0 rgb(var(--teal-600-rgb) / 0);
+    box-shadow: 0 0 0 0 rgb(var(--primary-rgb) / 0);
   }
   20% {
     box-shadow: 0 0 0 4px var(--primary-alpha-35);

@@ -6,8 +6,8 @@
   padding: 4px 12px;
   border-radius: 999px;
   border: 1px solid transparent;
-  background: rgb(var(--yellow-500-rgb) / 0.1);
-  color: var(--yellow-600);
+  background: rgb(var(--brand-500-rgb) / 0.1);
+  color: var(--brand-700);
   font-weight: 700;
   font-size: var(--font-size-md);
   user-select: none;
@@ -31,7 +31,7 @@
   &.onDark {
     background: rgb(255 255 255 / 0.08);
     border-color: rgb(255 255 255 / 0.12);
-    color: var(--amber-400);
+    color: var(--brand-200);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
   }

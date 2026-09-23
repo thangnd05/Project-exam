@@ -44,7 +44,7 @@ export default function TestStateScreens({
     const enough = balance >= cost;
     return (
       <div className={cx('state-box')}>
-        <IoLockClosedOutline size={80} color="#f08c00" />
+        <IoLockClosedOutline size={80} color="var(--warning)" />
         <h3>Bài kiểm tra trả phí</h3>
         <p>
            Đầu tư một lần, sử dụng mãi mãi.
@@ -73,7 +73,7 @@ export default function TestStateScreens({
   if (status === 'no-attempts')
     return (
       <div className={cx('state-box')}>
-        <IoAlertCircleOutline size={80} color="#ef4444" />
+        <IoAlertCircleOutline size={80} color="var(--danger-text)" />
         <h3>Hết lượt làm bài</h3>
         <p>Bạn đã hoàn thành số lượt làm bài cho phép cho bài thi này.</p>
         <Button
@@ -89,7 +89,7 @@ export default function TestStateScreens({
   if (status === 'locked')
     return (
       <div className={cx('state-box')}>
-        <IoLockClosedOutline size={80} color="#64748b" />
+        <IoLockClosedOutline size={80} color="var(--text-secondary)" />
         <h3>Phòng thi chưa mở</h3>
         <p>Vui lòng đợi trong giây lát...</p>
         <div className={cx('timer-box', 'mt-4')}>
@@ -101,7 +101,7 @@ export default function TestStateScreens({
   if (status === 'closed')
     return (
       <div className={cx('state-box')}>
-        <IoAlertCircleOutline size={80} color="#ef4444" />
+        <IoAlertCircleOutline size={80} color="var(--danger-text)" />
         <h3>Phòng thi đã đóng</h3>
         <p>Rất tiếc, thời gian tham gia bài thi này đã kết thúc.</p>
         <Button

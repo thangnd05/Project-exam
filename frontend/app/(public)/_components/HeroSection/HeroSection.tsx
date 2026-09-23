@@ -1,20 +1,20 @@
 'use client';
-
 import { useRouter } from 'next/navigation';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
-
-import styles from './HeroSection.module.scss';
-import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
-import QuickTestOrbit, {type QuickTestOrbitHandle} from './QuickTestOrbit';
-import QuickTestConfirmModal from './QuickTestConfirmModal';
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
-import {examTypeKeys} from '@/app/hooks/examTypeKeys';
 import {name as brandName} from '@/app/assets/images';
+import routes from '@/app/configs/Routes';
+import {examTypeKeys} from '@/app/hooks/examTypeKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
+import styles from './HeroSection.module.scss';
+import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
+import QuickTestConfirmModal from './QuickTestConfirmModal';
+import QuickTestOrbit, {type QuickTestOrbitHandle} from './QuickTestOrbit';
+import QuickTestPickerModal from './QuickTestPickerModal';
 
 const cx = classNames.bind(styles);
 
@@ -29,6 +29,7 @@ function HeroSection() {
   const router = useRouter();
   const {quickTests, isLoading: loading} = useQuickChallengeTests();
   const [activeIdx, setActiveIdx] = useState(0);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [pendingTest, setPendingTest] = useState<QuickChallengeCardResponse | null>(null);
   const orbitRef = useRef<QuickTestOrbitHandle | null>(null);
 
@@ -59,9 +60,9 @@ function HeroSection() {
   const active = cards[activeIdx] ?? null;
   const hasQuick = !loading && Boolean(active);
 
-  const handleScrollToExam = () => {
-    document.getElementById('exam-types')?.scrollIntoView({behavior: 'smooth'});
-  };
+  const goToExamTypes = useCallback(() => {
+    router.push(routes.examTypes);
+  }, [router]);
 
   const startTest = useCallback(
     (test: QuickChallengeCardResponse) => {
@@ -73,6 +74,10 @@ function HeroSection() {
   const requestStart = useCallback((test: QuickChallengeCardResponse | null) => {
     if (!test) return;
     setPendingTest(test);
+  }, []);
+
+  const closePicker = useCallback(() => {
+    setPickerOpen(false);
   }, []);
 
   const closeConfirm = useCallback(() => {
@@ -88,19 +93,23 @@ function HeroSection() {
   );
 
   const handleStartQuick = useCallback(() => {
-    if (!active) {
-      handleScrollToExam();
+    if (loading || quickTests.length > 0) {
+      setPickerOpen(true);
       return;
     }
-    requestStart(active);
-  }, [active, requestStart]);
+    goToExamTypes();
+  }, [loading, quickTests.length, goToExamTypes]);
+
+  const handlePickTest = useCallback(
+    (test: QuickChallengeCardResponse) => {
+      setPickerOpen(false);
+      requestStart(test);
+    },
+    [requestStart],
+  );
 
   const goPrev = () => orbitRef.current?.goPrev();
   const goNext = () => orbitRef.current?.goNext();
-
-  const handleScrollDown = () => {
-    window.scrollTo({top: window.innerHeight, behavior: 'smooth'});
-  };
 
   return (
     <section id="hero" className={cx('hero')}>
@@ -131,7 +140,7 @@ function HeroSection() {
                 {hasQuick ? 'Làm kiểm tra nhanh' : 'Khám phá kỳ thi'}
               </button>
               {hasQuick && (
-                <button type="button" className={cx('btnGhost')} onClick={handleScrollToExam}>
+                <button type="button" className={cx('btnGhost')} onClick={goToExamTypes}>
                   Khám phá kỳ thi
                 </button>
               )}
@@ -208,23 +217,13 @@ function HeroSection() {
         </motion.div>
       </div>
 
-      <button
-        type="button"
-        className={cx('scrollCue')}
-        onClick={handleScrollDown}
-        aria-label="Cuộn xuống phần tiếp theo"
-      >
-        <span className={cx('scrollCueLabel')}>Cuộn xuống</span>
-        <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-          <path
-            d="M5 7.5L10 12.5L15 7.5"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </button>
+      <QuickTestPickerModal
+        show={pickerOpen}
+        tests={quickTests}
+        loading={loading}
+        onClose={closePicker}
+        onSelect={handlePickTest}
+      />
 
       <QuickTestConfirmModal
         show={Boolean(pendingTest)}

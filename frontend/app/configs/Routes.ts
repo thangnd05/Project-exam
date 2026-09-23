@@ -47,6 +47,7 @@ const routes = {
 
   testHistory: '/tests/history/:testId',
   testLeaderboard: '/tests/leaderboard/:testId',
+  examTypes: '/exam-types',
   examTypeDetail: '/exam-types/:examTypeId',
   examTypeCollection: '/exam-types/:examTypeId/collections/:collectionId',
   MyTest: '/my-tests',

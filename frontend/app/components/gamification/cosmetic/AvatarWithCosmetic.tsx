@@ -1,7 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
-import type { CosmeticResponse } from '@/app/types';
+import type {CosmeticResponse} from '@/app/types';
 import styles from './AvatarWithCosmetic.module.scss';
 
 const cx = classNames.bind(styles);
@@ -26,10 +26,20 @@ type AvatarWithCosmeticProps = {
   className?: string;
 };
 
-function AvatarWithCosmetic({ src, fallbackSrc, alt = 'Avatar', name, size = 40, frame, badge, className }: AvatarWithCosmeticProps) {
+function AvatarWithCosmetic({
+  src,
+  fallbackSrc,
+  alt = 'Avatar',
+  name,
+  size = 40,
+  frame,
+  badge,
+  className,
+}: AvatarWithCosmeticProps) {
   const ring = Math.max(2, Math.round(size * 0.07));
 
-  const badgeRatio = size <= 48 ? (badge?.imageUrl ? 0.9 : 0.72) : (badge?.imageUrl ? 0.68 : 0.56);
+  const badgeRatio =
+    size <= 48 ? (badge?.imageUrl ? 0.9 : 0.72) : badge?.imageUrl ? 0.68 : 0.56;
   const badgeSize = Math.max(24, Math.round(size * badgeRatio));
 
   const badgeOffset = -Math.round(badgeSize * 0.32);
@@ -49,7 +59,7 @@ function AvatarWithCosmetic({ src, fallbackSrc, alt = 'Avatar', name, size = 40,
   const imgEl = useInitials ? (
     <span
       className={cx('fallback')}
-      style={{ width: size, height: size, fontSize: Math.round(size * 0.44) }}
+      style={{width: size, height: size, fontSize: Math.round(size * 0.44)}}
       aria-label={alt}
     >
       {initial}
@@ -59,7 +69,7 @@ function AvatarWithCosmetic({ src, fallbackSrc, alt = 'Avatar', name, size = 40,
       src={src || fallbackSrc}
       alt={alt}
       className={cx('img')}
-      style={{ width: size, height: size }}
+      style={{width: size, height: size}}
       referrerPolicy="no-referrer"
       onError={(e) => {
         const img = e.target as HTMLImageElement;
@@ -70,15 +80,18 @@ function AvatarWithCosmetic({ src, fallbackSrc, alt = 'Avatar', name, size = 40,
   );
 
   return (
-    <div className={cx('wrap', className)} style={{ width: box, height: box }}>
+    <div className={cx('wrap', className)} style={{width: box, height: box}}>
       {(isColor || isEffect) && (
         <span
-          className={cx('backRing', isEffect && `effect-${frame?.assetValue || 'glow'}`)}
-          style={isColor ? { background: frame?.assetValue } : undefined}
+          className={cx(
+            'backRing',
+            isEffect && `effect-${frame?.assetValue || 'glow'}`,
+          )}
+          style={isColor ? {background: frame?.assetValue} : undefined}
         />
       )}
 
-      <span className={cx('imgSlot')} style={{ width: size, height: size }}>
+      <span className={cx('imgSlot')} style={{width: size, height: size}}>
         {imgEl}
       </span>
 
@@ -88,7 +101,12 @@ function AvatarWithCosmetic({ src, fallbackSrc, alt = 'Avatar', name, size = 40,
           alt=""
           aria-hidden="true"
           className={cx('overlay')}
-          style={{ width: size * 1.42, height: size * 1.42, top: -size * 0.21, left: -size * 0.21 }}
+          style={{
+            width: size * 1.42,
+            height: size * 1.42,
+            top: -size * 0.21,
+            left: -size * 0.21,
+          }}
           referrerPolicy="no-referrer"
         />
       )}
@@ -100,7 +118,12 @@ function AvatarWithCosmetic({ src, fallbackSrc, alt = 'Avatar', name, size = 40,
             alt=""
             aria-hidden="true"
             className={cx('badge', 'badgeImg')}
-            style={{ width: badgeSize, height: badgeSize, right: badgeOffset, bottom: badgeOffset }}
+            style={{
+              width: badgeSize,
+              height: badgeSize,
+              right: badgeOffset,
+              bottom: badgeOffset,
+            }}
             title={badge.name}
             referrerPolicy="no-referrer"
           />

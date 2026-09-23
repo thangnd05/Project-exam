@@ -81,13 +81,13 @@
   background: linear-gradient(135deg, var(--primary) 0%, var(--accent-act-color) 100%);
   color: #fff;
   font-size: 1.8rem;
-  box-shadow: 0 6px 16px rgb(var(--teal-600-rgb) / 0.22);
+  box-shadow: 0 6px 16px rgb(var(--primary-rgb) / 0.22);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgb(var(--teal-600-rgb) / 0.42);
+    box-shadow: 0 8px 20px rgb(var(--primary-rgb) / 0.42);
   }
 
   &:active {

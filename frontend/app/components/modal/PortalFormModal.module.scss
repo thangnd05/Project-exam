@@ -146,7 +146,7 @@
 }
 
 .starActive {
-  color: var(--amber-400);
+  color: var(--primary);
 }
 
 .starInactive {
@@ -175,7 +175,7 @@
 }
 
 .tip svg {
-  color: var(--amber-400);
+  color: var(--primary);
 }
 
 .footer {
@@ -209,13 +209,13 @@
 
 .btnSubmit {
   background: var(--accent-color);
-  color: #fff;
-  box-shadow: 0 4px 15px rgb(var(--teal-600-rgb) / 0.3);
+  color: var(--text-on-brand);
+  box-shadow: 0 4px 15px rgb(var(--primary-rgb) / 0.3);
 }
 
 .btnSubmit:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgb(var(--teal-600-rgb) / 0.4);
+  box-shadow: 0 8px 25px rgb(var(--primary-rgb) / 0.4);
 }
 
 .btnSubmit:disabled,

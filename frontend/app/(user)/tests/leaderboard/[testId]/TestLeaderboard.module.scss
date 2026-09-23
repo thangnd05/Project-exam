@@ -71,7 +71,7 @@
 }
 
 .rankNumberTopTen {
-  color: var(--yellow-600);
+  color: var(--brand-600);
 }
 
 .scoreBadge {
@@ -119,7 +119,7 @@
   padding: 18px 28px;
   border-radius: var(--radius-lg);
   background: var(--primary-gradient);
-  color: #fff;
+  color: var(--on-primary-gradient);
   box-shadow: var(--shadow-md);
 
   &.empty {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import {useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
@@ -37,12 +37,18 @@ function groupByType(items: CosmeticResponse[]): CosmeticGroup[] {
   const groups = new Map<CosmeticType | undefined, CosmeticGroup>();
   items.forEach((item) => {
     if (!groups.has(item.type)) {
-      groups.set(item.type, {type: item.type, typeLabel: item.typeLabel, items: []});
+      groups.set(item.type, {
+        type: item.type,
+        typeLabel: item.typeLabel,
+        items: [],
+      });
     }
     groups.get(item.type)!.items.push(item);
   });
   return Array.from(groups.values()).sort(
-    (a, b) => TYPE_ORDER.indexOf(a.type as CosmeticType) - TYPE_ORDER.indexOf(b.type as CosmeticType),
+    (a, b) =>
+      TYPE_ORDER.indexOf(a.type as CosmeticType) -
+      TYPE_ORDER.indexOf(b.type as CosmeticType),
   );
 }
 
@@ -83,7 +89,13 @@ const defaultFormState: CosmeticFormState = {
   displayOrder: 0,
 };
 
-function CosmeticPreview({item, size = 56}: {item: Partial<CosmeticResponse>; size?: number}) {
+function CosmeticPreview({
+  item,
+  size = 56,
+}: {
+  item: Partial<CosmeticResponse>;
+  size?: number;
+}) {
   const isBadge = item.type === CosmeticType.BADGE;
   return (
     <AvatarWithCosmetic
@@ -111,7 +123,8 @@ function CosmeticsManagement() {
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formState, setFormState] = useState<CosmeticFormState>(defaultFormState);
+  const [formState, setFormState] =
+    useState<CosmeticFormState>(defaultFormState);
   const [errorMessage, setErrorMessage] = useState('');
   const [deleting, setDeleting] = useState<CosmeticResponse | null>(null);
 
@@ -121,7 +134,9 @@ function CosmeticsManagement() {
   const filtered = useMemo(() => {
     const normalized = keyword.trim().toLowerCase();
     if (!normalized) return items;
-    return items.filter((item) => (item.name || '').toLowerCase().includes(normalized));
+    return items.filter((item) =>
+      (item.name || '').toLowerCase().includes(normalized),
+    );
   }, [items, keyword]);
 
   const orderedItems = useMemo(
@@ -172,7 +187,8 @@ function CosmeticsManagement() {
       name: formState.name.trim(),
       description: formState.description.trim(),
       type: formState.type,
-      frameStyle: formState.type === CosmeticType.FRAME ? formState.frameStyle : null,
+      frameStyle:
+        formState.type === CosmeticType.FRAME ? formState.frameStyle : null,
       costCoins: cost,
       assetValue: formState.assetValue.trim(),
       imageUrl: formState.imageUrl.trim(),
@@ -190,7 +206,9 @@ function CosmeticsManagement() {
       setShowModal(false);
       resetForm();
     } catch (error: any) {
-      setErrorMessage(error?.response?.data?.message || 'Không thể lưu vật phẩm.');
+      setErrorMessage(
+        error?.response?.data?.message || 'Không thể lưu vật phẩm.',
+      );
     }
   };
 
@@ -237,7 +255,9 @@ function CosmeticsManagement() {
         onSearchChange={setKeyword}
         searchPlaceholder="Tìm theo tên..."
       />
-      <AdminFieldError message={!showModal ? errorMessage || listErrorMessage : ''} />
+      <AdminFieldError
+        message={!showModal ? errorMessage || listErrorMessage : ''}
+      />
 
       <AdminTable
         showIndex
@@ -252,7 +272,11 @@ function CosmeticsManagement() {
             <button title="Sửa" onClick={() => openEditModal(item)}>
               <Edit size={14} />
             </button>
-            <button className="danger" title="Xóa" onClick={() => setDeleting(item)}>
+            <button
+              className="danger"
+              title="Xóa"
+              onClick={() => setDeleting(item)}
+            >
               <Trash2 size={14} />
             </button>
           </>
@@ -297,7 +321,9 @@ function CosmeticsManagement() {
           <Form.Label>Tên</Form.Label>
           <Form.Control
             value={formState.name}
-            onChange={(e) => setFormState((p) => ({...p, name: e.target.value}))}
+            onChange={(e) =>
+              setFormState((p) => ({...p, name: e.target.value}))
+            }
           />
         </Form.Group>
         <Form.Group className="mb-3">
@@ -306,7 +332,9 @@ function CosmeticsManagement() {
             as="textarea"
             rows={2}
             value={formState.description}
-            onChange={(e) => setFormState((p) => ({...p, description: e.target.value}))}
+            onChange={(e) =>
+              setFormState((p) => ({...p, description: e.target.value}))
+            }
           />
         </Form.Group>
         <div className="d-flex gap-2 mb-3">
@@ -314,7 +342,12 @@ function CosmeticsManagement() {
             <Form.Label>Loại</Form.Label>
             <Form.Select
               value={formState.type}
-              onChange={(e) => setFormState((p) => ({...p, type: e.target.value as CosmeticType}))}
+              onChange={(e) =>
+                setFormState((p) => ({
+                  ...p,
+                  type: e.target.value as CosmeticType,
+                }))
+              }
             >
               {TYPES.map((t) => (
                 <option key={t.value} value={t.value}>
@@ -328,7 +361,9 @@ function CosmeticsManagement() {
               <Form.Label>Kiểu khung</Form.Label>
               <Form.Select
                 value={formState.frameStyle}
-                onChange={(e) => setFormState((p) => ({...p, frameStyle: e.target.value}))}
+                onChange={(e) =>
+                  setFormState((p) => ({...p, frameStyle: e.target.value}))
+                }
               >
                 {FRAME_STYLES.map((s) => (
                   <option key={s.value} value={s.value}>
@@ -346,61 +381,78 @@ function CosmeticsManagement() {
               <Form.Label>URL ảnh huy hiệu (PNG/GIF)</Form.Label>
               <Form.Control
                 value={formState.imageUrl}
-                onChange={(e) => setFormState((p) => ({...p, imageUrl: e.target.value}))}
+                onChange={(e) =>
+                  setFormState((p) => ({...p, imageUrl: e.target.value}))
+                }
                 placeholder="https://.../badge.gif  để trống nếu dùng emoji"
               />
-              <Form.Text muted>Có URL ảnh thì dùng ảnh; bỏ trống thì dùng emoji bên dưới.</Form.Text>
+              <Form.Text muted>
+                Có URL ảnh thì dùng ảnh; bỏ trống thì dùng emoji bên dưới.
+              </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Icon / emoji</Form.Label>
               <Form.Control
                 value={formState.assetValue}
-                onChange={(e) => setFormState((p) => ({...p, assetValue: e.target.value}))}
+                onChange={(e) =>
+                  setFormState((p) => ({...p, assetValue: e.target.value}))
+                }
                 placeholder="vd: 👑 🏆 ⭐ 🔥"
               />
             </Form.Group>
           </>
         )}
 
-        {formState.type === CosmeticType.FRAME && formState.frameStyle === 'COLOR' && (
-          <Form.Group className="mb-3">
-            <Form.Label>Màu / gradient</Form.Label>
-            <Form.Control
-              value={formState.assetValue}
-              onChange={(e) => setFormState((p) => ({...p, assetValue: e.target.value}))}
-              placeholder="vd: linear-gradient(135deg,#f59f00,#f08c00) hoặc #ff5252"
-            />
-          </Form.Group>
-        )}
+        {formState.type === CosmeticType.FRAME &&
+          formState.frameStyle === 'COLOR' && (
+            <Form.Group className="mb-3">
+              <Form.Label>Màu / gradient</Form.Label>
+              <Form.Control
+                value={formState.assetValue}
+                onChange={(e) =>
+                  setFormState((p) => ({...p, assetValue: e.target.value}))
+                }
+                placeholder="vd: linear-gradient(135deg,#f59f00,#f08c00) hoặc #ff5252"
+              />
+            </Form.Group>
+          )}
 
-        {formState.type === CosmeticType.FRAME && formState.frameStyle === 'EFFECT' && (
-          <Form.Group className="mb-3">
-            <Form.Label>Hiệu ứng</Form.Label>
-            <Form.Select
-              value={formState.assetValue}
-              onChange={(e) => setFormState((p) => ({...p, assetValue: e.target.value}))}
-            >
-              <option value="">-- Chọn hiệu ứng --</option>
-              {EFFECT_PRESETS.map((ef) => (
-                <option key={ef.value} value={ef.value}>
-                  {ef.label}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-        )}
+        {formState.type === CosmeticType.FRAME &&
+          formState.frameStyle === 'EFFECT' && (
+            <Form.Group className="mb-3">
+              <Form.Label>Hiệu ứng</Form.Label>
+              <Form.Select
+                value={formState.assetValue}
+                onChange={(e) =>
+                  setFormState((p) => ({...p, assetValue: e.target.value}))
+                }
+              >
+                <option value="">-- Chọn hiệu ứng --</option>
+                {EFFECT_PRESETS.map((ef) => (
+                  <option key={ef.value} value={ef.value}>
+                    {ef.label}
+                  </option>
+                ))}
+              </Form.Select>
+            </Form.Group>
+          )}
 
-        {formState.type === CosmeticType.FRAME && formState.frameStyle === 'IMAGE' && (
-          <Form.Group className="mb-3">
-            <Form.Label>URL ảnh khung (PNG/GIF trong suốt)</Form.Label>
-            <Form.Control
-              value={formState.imageUrl}
-              onChange={(e) => setFormState((p) => ({...p, imageUrl: e.target.value}))}
-              placeholder="https://.../frame.png"
-            />
-            <Form.Text muted>Ảnh nên có nền trong suốt, giữa rỗng để lộ avatar.</Form.Text>
-          </Form.Group>
-        )}
+        {formState.type === CosmeticType.FRAME &&
+          formState.frameStyle === 'IMAGE' && (
+            <Form.Group className="mb-3">
+              <Form.Label>URL ảnh khung (PNG/GIF trong suốt)</Form.Label>
+              <Form.Control
+                value={formState.imageUrl}
+                onChange={(e) =>
+                  setFormState((p) => ({...p, imageUrl: e.target.value}))
+                }
+                placeholder="https://.../frame.png"
+              />
+              <Form.Text muted>
+                Ảnh nên có nền trong suốt, giữa rỗng để lộ avatar.
+              </Form.Text>
+            </Form.Group>
+          )}
         <div className="d-flex gap-2 mb-3">
           <Form.Group className="flex-fill">
             <Form.Label>Giá xu</Form.Label>
@@ -408,7 +460,9 @@ function CosmeticsManagement() {
               type="number"
               min={0}
               value={formState.costCoins}
-              onChange={(e) => setFormState((p) => ({...p, costCoins: e.target.value}))}
+              onChange={(e) =>
+                setFormState((p) => ({...p, costCoins: e.target.value}))
+              }
             />
           </Form.Group>
           <Form.Group className="flex-fill">
@@ -416,7 +470,9 @@ function CosmeticsManagement() {
             <Form.Control
               type="number"
               value={formState.displayOrder}
-              onChange={(e) => setFormState((p) => ({...p, displayOrder: e.target.value}))}
+              onChange={(e) =>
+                setFormState((p) => ({...p, displayOrder: e.target.value}))
+              }
             />
           </Form.Group>
         </div>
@@ -424,7 +480,9 @@ function CosmeticsManagement() {
           type="switch"
           label="Đang bán"
           checked={formState.active}
-          onChange={(e) => setFormState((p) => ({...p, active: e.target.checked}))}
+          onChange={(e) =>
+            setFormState((p) => ({...p, active: e.target.checked}))
+          }
         />
         <AdminFieldError message={errorMessage} />
       </BaseModal>

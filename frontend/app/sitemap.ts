@@ -11,7 +11,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 export const revalidate = 3600;
 
-const STATIC_PATHS = ['', '/about', '/posts', '/policy', '/service', '/certificates/verify'];
+const STATIC_PATHS = ['', '/about', '/posts', '/policy', '/service', '/certificates/verify', '/exam-types'];
 
 const MAX_POSTS = 500;
 

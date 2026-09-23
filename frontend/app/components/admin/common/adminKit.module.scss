@@ -118,15 +118,15 @@
     }
 
     &.bg-warning {
-      background-color: var(--amber-50) !important;
-      color: var(--amber-700) !important;
-      border-color: var(--amber-100);
+      background-color: var(--warning-bg) !important;
+      color: var(--warning-text) !important;
+      border-color: var(--warning-border);
     }
 
     &.bg-success {
-      background-color: var(--green-50) !important;
-      color: var(--green-700) !important;
-      border-color: var(--green-100);
+      background-color: var(--success-50) !important;
+      color: var(--success-700) !important;
+      border-color: var(--success-100);
     }
 
     &.bg-secondary {

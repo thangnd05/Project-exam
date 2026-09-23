@@ -7,12 +7,12 @@
       "questionNumber": 1,
       "questionType": "MCQ",
       "questionText": "A company allows developers to create IAM roles for their own workloads so they are not blocked by the platform team. A security audit found that a developer created a role with administrator permissions and attached it to an EC2 instance. The company must let developers keep creating roles while guaranteeing that no role they create can exceed a defined set of permissions. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần giữ khả năng tự phục vụ nhưng đặt trần quyền cho mọi vai trò do developer tạo.\n(A) ĐÚNG: Dùng permissions boundary: tạo một chính sách ranh giới xác định trần quyền, rồi đặt điều kiện trong chính sách của developer chỉ cho phép hành động tạo vai trò khi ranh giới đó được gắn; vai trò mới không bao giờ có quyền hiệu dụng vượt ngoài ranh giới dù chính sách nào được gắn thêm.\n(B) SAI: Cấm hoàn toàn việc tạo vai trò làm mất tính tự phục vụ, trái yêu cầu.\n(C) SAI: Phát hiện vai trò quá quyền sau khi tạo là kiểm soát phát hiện, để lại khoảng thời gian quyền vượt mức tồn tại.\n(D) SAI: Yêu cầu xem xét thủ công mọi vai trò mới không mở rộng được và tạo nút thắt cổ chai.\nĐáp án đúng: A\nĐiểm cần nhớ: Permissions boundary đặt trần quyền hiệu dụng; bắt buộc gắn nó khi tạo vai trò để ngăn leo thang quyền.",
+      "explanation": "Phân tích đề: Cần giữ khả năng tự phục vụ nhưng đặt trần quyền cho mọi vai trò do developer tạo.\n(A) SAI: Phát hiện vai trò quá quyền sau khi tạo là kiểm soát phát hiện, để lại khoảng thời gian quyền vượt mức tồn tại.\n(B) ĐÚNG: Dùng permissions boundary: tạo một chính sách ranh giới xác định trần quyền, rồi đặt điều kiện trong chính sách của developer chỉ cho phép hành động tạo vai trò khi ranh giới đó được gắn; vai trò mới không bao giờ có quyền hiệu dụng vượt ngoài ranh giới dù chính sách nào được gắn thêm.\n(C) SAI: Cấm hoàn toàn việc tạo vai trò làm mất tính tự phục vụ, trái yêu cầu.\n(D) SAI: Yêu cầu xem xét thủ công mọi vai trò mới không mở rộng được và tạo nút thắt cổ chai.\nĐáp án đúng: B\nĐiểm cần nhớ: Permissions boundary đặt trần quyền hiệu dụng; bắt buộc gắn nó khi tạo vai trò để ngăn leo thang quyền.",
       "tagNames": ["Security and Compliance > AWS IAM"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Create a permissions boundary policy and grant developers the role creation permission only under a condition that requires the boundary to be attached.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Remove the iam:CreateRole permission from developers and require them to request roles from the platform team.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Create an AWS Config rule that detects roles with administrator access and notifies the security team.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Create an AWS Config rule that detects roles with administrator access and notifies the security team.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Create a permissions boundary policy and grant developers the role creation permission only under a condition that requires the boundary to be attached.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Remove the iam:CreateRole permission from developers and require them to request roles from the platform team.", "isCorrect": false },
         { "answerLabel": "D", "answerText": "Require a manual security review of every new IAM role before it can be used.", "isCorrect": false }
       ]
     },
@@ -20,91 +20,91 @@
       "questionNumber": 2,
       "questionType": "MCQ",
       "questionText": "A security team must identify every IAM role and Amazon S3 bucket in an AWS account that can be accessed by principals outside the company's AWS Organization. The finding must be produced continuously rather than through a one-time review. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần phát hiện liên tục quyền truy cập từ ngoài ranh giới tin cậy.\n(A) ĐÚNG: Bật IAM Access Analyzer với vùng tin cậy là tổ chức; dịch vụ phân tích chính sách dựa trên tài nguyên và sinh ra phát hiện cho từng tài nguyên có thể được truy cập bởi principal bên ngoài, cập nhật liên tục khi chính sách thay đổi.\n(B) SAI: Báo cáo thông tin xác thực liệt kê trạng thái người dùng và khóa, không phân tích quyền truy cập từ bên ngoài.\n(C) SAI: Dữ liệu về dịch vụ được truy cập gần đây hỗ trợ thu hẹp quyền chứ không xác định truy cập bên ngoài.\n(D) SAI: Rà soát thủ công chính sách định kỳ không liên tục và dễ bỏ sót đường truy cập gián tiếp.\nĐáp án đúng: A\nĐiểm cần nhớ: IAM Access Analyzer phát hiện tài nguyên có thể truy cập từ ngoài vùng tin cậy đã khai báo.",
+      "explanation": "Phân tích đề: Cần phát hiện liên tục quyền truy cập từ ngoài ranh giới tin cậy.\n(A) ĐÚNG: Bật IAM Access Analyzer với vùng tin cậy là tổ chức; dịch vụ phân tích chính sách dựa trên tài nguyên và sinh ra phát hiện cho từng tài nguyên có thể được truy cập bởi principal bên ngoài, cập nhật liên tục khi chính sách thay đổi.\n(B) SAI: Rà soát thủ công chính sách định kỳ không liên tục và dễ bỏ sót đường truy cập gián tiếp.\n(C) SAI: Báo cáo thông tin xác thực liệt kê trạng thái người dùng và khóa, không phân tích quyền truy cập từ bên ngoài.\n(D) SAI: Dữ liệu về dịch vụ được truy cập gần đây hỗ trợ thu hẹp quyền chứ không xác định truy cập bên ngoài.\nĐáp án đúng: A\nĐiểm cần nhớ: IAM Access Analyzer phát hiện tài nguyên có thể truy cập từ ngoài vùng tin cậy đã khai báo.",
       "tagNames": ["Security and Compliance > AWS IAM"],
       "answers": [
         { "answerLabel": "A", "answerText": "Enable IAM Access Analyzer with the organization as the zone of trust and review the external access findings.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Generate the IAM credential report weekly and review the entries.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Review service last accessed data for each role monthly.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Have the security team review all resource policies each quarter.", "isCorrect": false }
+        { "answerLabel": "B", "answerText": "Have the security team review all resource policies each quarter.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Generate the IAM credential report weekly and review the entries.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Review service last accessed data for each role monthly.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 3,
       "questionType": "MCQ",
       "questionText": "An incident response team determines that temporary credentials for an IAM role used by an application have been leaked. The role is used by many production workloads, so it cannot be deleted. The team must invalidate all credentials issued before the current moment while allowing new sessions to continue working. What should the team do?",
-      "explanation": "Phân tích đề: Thông tin xác thực tạm thời không thể bị xóa trực tiếp, nhưng cần vô hiệu hóa các phiên đã cấp.\n(A) ĐÚNG: Gắn vào vai trò một chính sách nội tuyến từ chối mọi hành động với điều kiện dựa trên thời điểm phát hành phiên, đặt mốc là thời điểm hiện tại; mọi phiên được cấp trước mốc đó bị từ chối, trong khi các phiên mới vẫn hoạt động bình thường.\n(B) SAI: Xóa vai trò làm gián đoạn toàn bộ workload sản xuất đang dùng nó.\n(C) SAI: Xoay vòng khóa truy cập không áp dụng cho phiên vai trò tạm thời vì chúng không dựa trên khóa dài hạn.\n(D) SAI: Chờ phiên hết hạn để lại khoảng thời gian kẻ tấn công vẫn còn quyền.\nĐáp án đúng: A\nĐiểm cần nhớ: Vô hiệu hóa phiên vai trò bằng chính sách từ chối có điều kiện theo thời điểm phát hành phiên.",
+      "explanation": "Phân tích đề: Thông tin xác thực tạm thời không thể bị xóa trực tiếp, nhưng cần vô hiệu hóa các phiên đã cấp.\n(A) SAI: Xóa vai trò làm gián đoạn toàn bộ workload sản xuất đang dùng nó.\n(B) SAI: Chờ phiên hết hạn để lại khoảng thời gian kẻ tấn công vẫn còn quyền.\n(C) SAI: Xoay vòng khóa truy cập không áp dụng cho phiên vai trò tạm thời vì chúng không dựa trên khóa dài hạn.\n(D) ĐÚNG: Gắn vào vai trò một chính sách nội tuyến từ chối mọi hành động với điều kiện dựa trên thời điểm phát hành phiên, đặt mốc là thời điểm hiện tại; mọi phiên được cấp trước mốc đó bị từ chối, trong khi các phiên mới vẫn hoạt động bình thường.\nĐáp án đúng: D\nĐiểm cần nhớ: Vô hiệu hóa phiên vai trò bằng chính sách từ chối có điều kiện theo thời điểm phát hành phiên.",
       "tagNames": ["Security and Compliance > AWS IAM"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Attach an inline policy to the role that denies all actions when the token issue time is earlier than the current time.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Delete the IAM role and recreate it with the same name and permissions.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Delete the IAM role and recreate it with the same name and permissions.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Wait for the temporary credentials to expire naturally.", "isCorrect": false },
         { "answerLabel": "C", "answerText": "Rotate the access keys associated with the role.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Wait for the temporary credentials to expire naturally.", "isCorrect": false }
+        { "answerLabel": "D", "answerText": "Attach an inline policy to the role that denies all actions when the token issue time is earlier than the current time.", "isCorrect": true }
       ]
     },
     {
       "questionNumber": 4,
       "questionType": "MCQ",
       "questionText": "An application retrieves a database password from AWS Secrets Manager. Secrets Manager rotates the password every 30 days. After each rotation the application fails with authentication errors until it is restarted manually. Which change resolves this with the LEAST operational overhead?",
-      "explanation": "Phân tích đề: Ứng dụng đang giữ giá trị cũ trong bộ nhớ và không tự làm mới.\n(A) ĐÚNG: Sửa ứng dụng để bắt lỗi xác thực, đọc lại bí mật rồi thử lại kết nối; kết hợp với chiến lược xoay vòng có giai đoạn hai bộ thông tin xác thực cùng hợp lệ, ứng dụng tự phục hồi mà không cần ai can thiệp.\n(B) SAI: Tắt việc xoay vòng loại bỏ triệu chứng nhưng làm giảm mức bảo mật và thường vi phạm chính sách.\n(C) SAI: Khởi động lại ứng dụng tự động sau mỗi lần xoay vòng là thao tác vận hành nặng nề và gây gián đoạn không cần thiết.\n(D) SAI: Tăng chu kỳ xoay vòng lên một năm chỉ làm sự cố xảy ra thưa hơn chứ không loại bỏ nguyên nhân.\nĐáp án đúng: A\nĐiểm cần nhớ: Ứng dụng phải đọc lại bí mật và thử lại khi gặp lỗi xác thực; đó là cách xử lý xoay vòng đúng.",
+      "explanation": "Phân tích đề: Ứng dụng đang giữ giá trị cũ trong bộ nhớ và không tự làm mới.\n(A) SAI: Tăng chu kỳ xoay vòng lên một năm chỉ làm sự cố xảy ra thưa hơn chứ không loại bỏ nguyên nhân.\n(B) SAI: Tắt việc xoay vòng loại bỏ triệu chứng nhưng làm giảm mức bảo mật và thường vi phạm chính sách.\n(C) ĐÚNG: Sửa ứng dụng để bắt lỗi xác thực, đọc lại bí mật rồi thử lại kết nối; kết hợp với chiến lược xoay vòng có giai đoạn hai bộ thông tin xác thực cùng hợp lệ, ứng dụng tự phục hồi mà không cần ai can thiệp.\n(D) SAI: Khởi động lại ứng dụng tự động sau mỗi lần xoay vòng là thao tác vận hành nặng nề và gây gián đoạn không cần thiết.\nĐáp án đúng: C\nĐiểm cần nhớ: Ứng dụng phải đọc lại bí mật và thử lại khi gặp lỗi xác thực; đó là cách xử lý xoay vòng đúng.",
       "tagNames": ["Security and Compliance > AWS Secrets Manager & Parameter Store"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Update the application to refresh the secret and retry the connection when an authentication error occurs.", "isCorrect": true },
+        { "answerLabel": "A", "answerText": "Change the rotation schedule from 30 days to 365 days.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Disable automatic rotation for the secret.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Configure an EventBridge rule on the rotation event that restarts the application automatically.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Change the rotation schedule from 30 days to 365 days.", "isCorrect": false }
+        { "answerLabel": "C", "answerText": "Update the application to refresh the secret and retry the connection when an authentication error occurs.", "isCorrect": true },
+        { "answerLabel": "D", "answerText": "Configure an EventBridge rule on the rotation event that restarts the application automatically.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 5,
       "questionType": "MCQ",
       "questionText": "A company stores about 900 non-secret configuration values such as endpoint URLs and feature thresholds, organized by application and environment. Teams must be able to grant an application read access to only its own values without writing a new IAM policy for every value. Which approach meets these requirements?",
-      "explanation": "Phân tích đề: Cần phân quyền theo nhóm giá trị mà không viết chính sách cho từng giá trị.\n(A) ĐÚNG: Lưu giá trị trong Parameter Store theo đường dẫn phân cấp bắt đầu bằng ứng dụng rồi tới môi trường, và viết chính sách giới hạn phần tài nguyên theo mẫu tên khớp đúng nhánh đó; một chính sách phục vụ toàn bộ nhánh và việc thêm tham số mới không cần sửa chính sách.\n(B) SAI: Lưu từng giá trị dưới dạng bí mật riêng trong Secrets Manager làm tăng chi phí đáng kể cho dữ liệu không bí mật.\n(C) SAI: Đặt tên phẳng không có cấu trúc buộc phải liệt kê từng tham số trong chính sách.\n(D) SAI: Gộp toàn bộ cấu hình vào một tham số JSON duy nhất khiến mọi ứng dụng đọc được cấu hình của nhau.\nĐáp án đúng: A\nĐiểm cần nhớ: Đường dẫn phân cấp trong Parameter Store cho phép phân quyền theo tiền tố với rất ít chính sách.",
+      "explanation": "Phân tích đề: Cần phân quyền theo nhóm giá trị mà không viết chính sách cho từng giá trị.\n(A) SAI: Lưu từng giá trị dưới dạng bí mật riêng trong Secrets Manager làm tăng chi phí đáng kể cho dữ liệu không bí mật.\n(B) SAI: Gộp toàn bộ cấu hình vào một tham số JSON duy nhất khiến mọi ứng dụng đọc được cấu hình của nhau.\n(C) ĐÚNG: Lưu giá trị trong Parameter Store theo đường dẫn phân cấp bắt đầu bằng ứng dụng rồi tới môi trường, và viết chính sách giới hạn phần tài nguyên theo mẫu tên khớp đúng nhánh đó; một chính sách phục vụ toàn bộ nhánh và việc thêm tham số mới không cần sửa chính sách.\n(D) SAI: Đặt tên phẳng không có cấu trúc buộc phải liệt kê từng tham số trong chính sách.\nĐáp án đúng: C\nĐiểm cần nhớ: Đường dẫn phân cấp trong Parameter Store cho phép phân quyền theo tiền tố với rất ít chính sách.",
       "tagNames": ["Security and Compliance > AWS Secrets Manager & Parameter Store"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Store the values in Parameter Store using a hierarchical path per application and environment, and scope IAM policies to the path prefix.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Store each value as an individual secret in AWS Secrets Manager and grant access per secret.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Store the values with flat names and list each parameter ARN in the IAM policy.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Store all configuration in a single JSON parameter that every application reads.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Store each value as an individual secret in AWS Secrets Manager and grant access per secret.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Store all configuration in a single JSON parameter that every application reads.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Store the values in Parameter Store using a hierarchical path per application and environment, and scope IAM policies to the path prefix.", "isCorrect": true },
+        { "answerLabel": "D", "answerText": "Store the values with flat names and list each parameter ARN in the IAM policy.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 6,
       "questionType": "MCQ",
       "questionText": "A compliance requirement states that every Amazon EBS volume in 90 AWS accounts must be encrypted, that non-compliant volumes must be reported centrally, and that new accounts must be covered automatically. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần đánh giá liên tục trên toàn tổ chức với báo cáo tập trung và tự phủ tài khoản mới.\n(A) ĐÚNG: Triển khai AWS Config rule ở mức tổ chức từ tài khoản quản trị được ủy quyền, nhắm tới các đơn vị tổ chức; quy tắc tự áp cho tài khoản được thêm sau này, và bộ tổng hợp ở tài khoản kiểm toán gom kết quả tuân thủ về một nơi.\n(B) SAI: Tạo Config rule thủ công trong từng tài khoản không mở rộng được và bỏ sót tài khoản mới.\n(C) SAI: Chạy script định kỳ liệt kê volume là giải pháp tự chế phải tự bảo trì và không có khung báo cáo tuân thủ.\n(D) SAI: Bật mã hóa mặc định cho EBS là kiểm soát phòng ngừa hữu ích nhưng không báo cáo các volume chưa mã hóa đã tồn tại.\nĐáp án đúng: A\nĐiểm cần nhớ: Config rule ở mức tổ chức cộng với aggregator cho đánh giá liên tục và báo cáo tập trung, tự phủ tài khoản mới.",
+      "explanation": "Phân tích đề: Cần đánh giá liên tục trên toàn tổ chức với báo cáo tập trung và tự phủ tài khoản mới.\n(A) SAI: Tạo Config rule thủ công trong từng tài khoản không mở rộng được và bỏ sót tài khoản mới.\n(B) ĐÚNG: Triển khai AWS Config rule ở mức tổ chức từ tài khoản quản trị được ủy quyền, nhắm tới các đơn vị tổ chức; quy tắc tự áp cho tài khoản được thêm sau này, và bộ tổng hợp ở tài khoản kiểm toán gom kết quả tuân thủ về một nơi.\n(C) SAI: Bật mã hóa mặc định cho EBS là kiểm soát phòng ngừa hữu ích nhưng không báo cáo các volume chưa mã hóa đã tồn tại.\n(D) SAI: Chạy script định kỳ liệt kê volume là giải pháp tự chế phải tự bảo trì và không có khung báo cáo tuân thủ.\nĐáp án đúng: B\nĐiểm cần nhớ: Config rule ở mức tổ chức cộng với aggregator cho đánh giá liên tục và báo cáo tập trung, tự phủ tài khoản mới.",
       "tagNames": ["Security and Compliance > AWS Config"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Deploy an organization AWS Config rule from the delegated administrator account targeting the organizational units, and aggregate results in an audit account.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Create the same AWS Config rule manually in each of the 90 accounts.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Run a scheduled script in each account that lists EBS volumes and writes unencrypted ones to Amazon S3.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Enable EBS encryption by default in every account and Region.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Create the same AWS Config rule manually in each of the 90 accounts.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Deploy an organization AWS Config rule from the delegated administrator account targeting the organizational units, and aggregate results in an audit account.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Enable EBS encryption by default in every account and Region.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Run a scheduled script in each account that lists EBS volumes and writes unencrypted ones to Amazon S3.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 7,
       "questionType": "MCQ",
       "questionText": "An AWS Config rule reports that security groups allowing unrestricted inbound access on port 22 are non-compliant. The security team requires that such rules are removed automatically within minutes of being created, without a human in the loop. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần khắc phục tự động và nhanh sau khi cấu hình rủi ro xuất hiện.\n(A) ĐÚNG: Dùng Config rule được kích hoạt theo thay đổi cấu hình, gắn với remediation action chạy một tài liệu tự động hóa của Systems Manager để gỡ quy tắc vi phạm; vì đánh giá xảy ra ngay khi mục cấu hình thay đổi nên thời gian tồn tại của rủi ro được rút xuống còn vài phút.\n(B) SAI: Quy tắc đánh giá theo chu kỳ hằng ngày để cấu hình rủi ro tồn tại tới một ngày.\n(C) SAI: Gửi thông báo cho đội bảo mật phụ thuộc vào thời gian phản ứng của con người, trái yêu cầu.\n(D) SAI: Chặn hoàn toàn việc sửa nhóm bảo mật cản trở công việc vận hành hợp lệ.\nĐáp án đúng: A\nĐiểm cần nhớ: Config rule kích hoạt theo thay đổi kèm remediation tự động cho thời gian phản ứng ngắn nhất.",
+      "explanation": "Phân tích đề: Cần khắc phục tự động và nhanh sau khi cấu hình rủi ro xuất hiện.\n(A) ĐÚNG: Dùng Config rule được kích hoạt theo thay đổi cấu hình, gắn với remediation action chạy một tài liệu tự động hóa của Systems Manager để gỡ quy tắc vi phạm; vì đánh giá xảy ra ngay khi mục cấu hình thay đổi nên thời gian tồn tại của rủi ro được rút xuống còn vài phút.\n(B) SAI: Gửi thông báo cho đội bảo mật phụ thuộc vào thời gian phản ứng của con người, trái yêu cầu.\n(C) SAI: Chặn hoàn toàn việc sửa nhóm bảo mật cản trở công việc vận hành hợp lệ.\n(D) SAI: Quy tắc đánh giá theo chu kỳ hằng ngày để cấu hình rủi ro tồn tại tới một ngày.\nĐáp án đúng: A\nĐiểm cần nhớ: Config rule kích hoạt theo thay đổi kèm remediation tự động cho thời gian phản ứng ngắn nhất.",
       "tagNames": ["Security and Compliance > AWS Config"],
       "answers": [
         { "answerLabel": "A", "answerText": "Use a change-triggered AWS Config rule with an automatic remediation action that runs a Systems Manager Automation document to revoke the offending rule.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Use a periodic AWS Config rule that evaluates once per day and remediates non-compliant security groups.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Send the non-compliance notification to the security team through Amazon SNS so an engineer can remove the rule.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Apply a service control policy that denies all security group modification actions.", "isCorrect": false }
+        { "answerLabel": "B", "answerText": "Send the non-compliance notification to the security team through Amazon SNS so an engineer can remove the rule.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Apply a service control policy that denies all security group modification actions.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Use a periodic AWS Config rule that evaluates once per day and remediates non-compliant security groups.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 8,
       "questionType": "MCQ",
       "questionText": "Amazon GuardDuty reports a finding indicating that an EC2 instance in a production account is communicating with a command and control server. The instance is part of a running application. What should the incident response team do FIRST?",
-      "explanation": "Phân tích đề: Cần ngăn chặn nhanh nhưng vẫn giữ được bằng chứng để điều tra.\n(A) ĐÚNG: Cô lập instance ở tầng mạng bằng cách thay nhóm bảo mật sang một nhóm không cho phép lưu lượng ra vào, đồng thời thu hồi các phiên của vai trò gắn với instance; instance vẫn tồn tại để phân tích và kẻ tấn công mất kênh điều khiển cùng thông tin xác thực.\n(B) SAI: Chấm dứt instance ngay lập tức phá hủy bằng chứng trong bộ nhớ và trên đĩa.\n(C) SAI: Khởi động lại instance có thể xóa dấu vết trong bộ nhớ mà không loại bỏ nguyên nhân.\n(D) SAI: Chờ theo dõi thêm trước khi hành động kéo dài thời gian kẻ tấn công còn quyền kiểm soát.\nĐáp án đúng: A\nĐiểm cần nhớ: Ngăn chặn trước bằng cô lập mạng và thu hồi thông tin xác thực; giữ instance để điều tra thay vì chấm dứt.",
+      "explanation": "Phân tích đề: Cần ngăn chặn nhanh nhưng vẫn giữ được bằng chứng để điều tra.\n(A) SAI: Chấm dứt instance ngay lập tức phá hủy bằng chứng trong bộ nhớ và trên đĩa.\n(B) SAI: Khởi động lại instance có thể xóa dấu vết trong bộ nhớ mà không loại bỏ nguyên nhân.\n(C) SAI: Chờ theo dõi thêm trước khi hành động kéo dài thời gian kẻ tấn công còn quyền kiểm soát.\n(D) ĐÚNG: Cô lập instance ở tầng mạng bằng cách thay nhóm bảo mật sang một nhóm không cho phép lưu lượng ra vào, đồng thời thu hồi các phiên của vai trò gắn với instance; instance vẫn tồn tại để phân tích và kẻ tấn công mất kênh điều khiển cùng thông tin xác thực.\nĐáp án đúng: D\nĐiểm cần nhớ: Ngăn chặn trước bằng cô lập mạng và thu hồi thông tin xác thực; giữ instance để điều tra thay vì chấm dứt.",
       "tagNames": ["Security and Compliance > Amazon GuardDuty & Amazon Inspector"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Isolate the instance by replacing its security group with one that blocks all traffic, and revoke the sessions of the instance role.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Terminate the instance immediately so the Auto Scaling group replaces it.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Reboot the instance to clear any running malicious process.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Continue monitoring the finding for 24 hours to confirm the activity is malicious.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Terminate the instance immediately so the Auto Scaling group replaces it.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Reboot the instance to clear any running malicious process.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Continue monitoring the finding for 24 hours to confirm the activity is malicious.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Isolate the instance by replacing its security group with one that blocks all traffic, and revoke the sessions of the instance role.", "isCorrect": true }
       ]
     },
     {
@@ -124,38 +124,38 @@
       "questionNumber": 10,
       "questionType": "MCQ",
       "questionText": "During a customer security review, an auditor asks for evidence that the physical and environmental controls of the data centers hosting the company workload are independently tested. The auditor also asks the company to prove that its own S3 buckets are encrypted. How should a DevOps engineer respond?",
-      "explanation": "Phân tích đề: Hai câu hỏi thuộc hai phía khác nhau của mô hình trách nhiệm chia sẻ.\n(A) ĐÚNG: Tải báo cáo kiểm toán độc lập của nhà cung cấp từ AWS Artifact để chứng minh phần kiểm soát vật lý và môi trường, và xuất bằng chứng về cấu hình mã hóa của chính công ty từ kết quả đánh giá AWS Config để chứng minh phần trách nhiệm của khách hàng.\n(B) SAI: Gửi báo cáo của nhà cung cấp cho cả hai câu hỏi là trả lời sai cho phần cấu hình của khách hàng.\n(C) SAI: Tự soạn một bản mô tả về trung tâm dữ liệu không có giá trị kiểm toán vì không phải đánh giá độc lập.\n(D) SAI: Đề nghị kiểm toán viên tới thăm trung tâm dữ liệu là quy trình không khả thi; kiểm toán hạ tầng do bên thứ ba độc lập thực hiện thay cho mọi khách hàng.\nĐáp án đúng: A\nĐiểm cần nhớ: AWS Artifact phủ phần của nhà cung cấp; phần cấu hình của khách hàng cần bằng chứng từ chính môi trường của họ.",
+      "explanation": "Phân tích đề: Hai câu hỏi thuộc hai phía khác nhau của mô hình trách nhiệm chia sẻ.\n(A) SAI: Tự soạn một bản mô tả về trung tâm dữ liệu không có giá trị kiểm toán vì không phải đánh giá độc lập.\n(B) SAI: Đề nghị kiểm toán viên tới thăm trung tâm dữ liệu là quy trình không khả thi; kiểm toán hạ tầng do bên thứ ba độc lập thực hiện thay cho mọi khách hàng.\n(C) SAI: Gửi báo cáo của nhà cung cấp cho cả hai câu hỏi là trả lời sai cho phần cấu hình của khách hàng.\n(D) ĐÚNG: Tải báo cáo kiểm toán độc lập của nhà cung cấp từ AWS Artifact để chứng minh phần kiểm soát vật lý và môi trường, và xuất bằng chứng về cấu hình mã hóa của chính công ty từ kết quả đánh giá AWS Config để chứng minh phần trách nhiệm của khách hàng.\nĐáp án đúng: D\nĐiểm cần nhớ: AWS Artifact phủ phần của nhà cung cấp; phần cấu hình của khách hàng cần bằng chứng từ chính môi trường của họ.",
       "tagNames": ["Security and Compliance > AWS Artifact"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Download the relevant independent audit report from AWS Artifact for the provider controls, and export AWS Config evidence showing the encryption state of the company's S3 buckets.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Download the AWS Artifact report and submit it as evidence for both questions.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Write an internal description of the data center controls based on public documentation.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Arrange for the auditor to visit an AWS data center to inspect the controls.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Write an internal description of the data center controls based on public documentation.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Arrange for the auditor to visit an AWS data center to inspect the controls.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Download the AWS Artifact report and submit it as evidence for both questions.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Download the relevant independent audit report from AWS Artifact for the provider controls, and export AWS Config evidence showing the encryption state of the company's S3 buckets.", "isCorrect": true }
       ]
     },
     {
       "questionNumber": 11,
       "questionType": "MCQ",
       "questionText": "A company encrypts an Amazon S3 bucket with a customer managed AWS KMS key. An application role in a second AWS account must read objects from the bucket. The role has an identity policy allowing s3:GetObject and kms:Decrypt, but requests fail with an access denied error. What is the MOST likely cause?",
-      "explanation": "Phân tích đề: Truy cập dữ liệu đã mã hóa giữa các tài khoản cần nhiều lớp cho phép.\n(A) ĐÚNG: Chính sách khóa KMS là nguồn kiểm soát chính cho khóa; nếu nó không cho phép principal ở tài khoản thứ hai thực hiện giải mã thì yêu cầu bị từ chối dù chính sách danh tính đã cho phép. Bucket policy cũng phải cho phép principal đó đọc đối tượng.\n(B) SAI: Cho rằng cần thêm quyền vào chính sách danh tính là sai vì quyền đó đã có.\n(C) SAI: Cho rằng khóa phải nằm cùng tài khoản với vai trò là hiểu sai; khóa dùng được giữa các tài khoản nếu chính sách khóa cho phép.\n(D) SAI: Cho rằng phải tắt mã hóa của bucket là đi ngược yêu cầu bảo mật và không phải nguyên nhân.\nĐáp án đúng: A\nĐiểm cần nhớ: Dùng khóa KMS giữa các tài khoản cần chính sách khóa cho phép principal bên ngoài, ngoài chính sách danh tính và bucket policy.",
+      "explanation": "Phân tích đề: Truy cập dữ liệu đã mã hóa giữa các tài khoản cần nhiều lớp cho phép.\n(A) SAI: Cho rằng phải tắt mã hóa của bucket là đi ngược yêu cầu bảo mật và không phải nguyên nhân.\n(B) ĐÚNG: Chính sách khóa KMS là nguồn kiểm soát chính cho khóa; nếu nó không cho phép principal ở tài khoản thứ hai thực hiện giải mã thì yêu cầu bị từ chối dù chính sách danh tính đã cho phép. Bucket policy cũng phải cho phép principal đó đọc đối tượng.\n(C) SAI: Cho rằng khóa phải nằm cùng tài khoản với vai trò là hiểu sai; khóa dùng được giữa các tài khoản nếu chính sách khóa cho phép.\n(D) SAI: Cho rằng cần thêm quyền vào chính sách danh tính là sai vì quyền đó đã có.\nĐáp án đúng: B\nĐiểm cần nhớ: Dùng khóa KMS giữa các tài khoản cần chính sách khóa cho phép principal bên ngoài, ngoài chính sách danh tính và bucket policy.",
       "tagNames": ["Security and Compliance > AWS KMS & Encryption"],
       "answers": [
-        { "answerLabel": "A", "answerText": "The KMS key policy does not grant the second account's role permission to use the key for decryption.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "The identity policy on the role is missing the required S3 and KMS actions.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Server-side encryption must be disabled on the bucket for cross-account reads to work.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "The KMS key policy does not grant the second account's role permission to use the key for decryption.", "isCorrect": true },
         { "answerLabel": "C", "answerText": "A KMS key can only be used by principals in the account that owns the key.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Server-side encryption must be disabled on the bucket for cross-account reads to work.", "isCorrect": false }
+        { "answerLabel": "D", "answerText": "The identity policy on the role is missing the required S3 and KMS actions.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 12,
       "questionType": "MCQ",
       "questionText": "A company must guarantee that no principal in any member account of its AWS Organization, including account administrators, can disable AWS CloudTrail or delete the organization trail. Which solution enforces this?",
-      "explanation": "Phân tích đề: Cần ràng buộc vượt trên quyền của quản trị viên tài khoản thành viên.\n(A) ĐÚNG: Áp service control policy ở mức tổ chức từ chối các hành động dừng, xóa và cập nhật trail; SCP đặt trần quyền cho mọi principal trong tài khoản thành viên nên quản trị viên ở đó cũng không thực hiện được, và không thể bị bỏ qua từ bên trong tài khoản.\n(B) SAI: Chính sách danh tính gắn cho từng vai trò có thể bị quản trị viên tài khoản sửa đổi.\n(C) SAI: Permissions boundary chỉ áp cho các principal được gán nên không phủ toàn bộ tài khoản.\n(D) SAI: Cảnh báo khi trail bị tắt là kiểm soát phát hiện, không ngăn hành động xảy ra.\nĐáp án đúng: A\nĐiểm cần nhớ: SCP là cơ chế duy nhất đặt trần quyền cho cả quản trị viên tài khoản thành viên.",
+      "explanation": "Phân tích đề: Cần ràng buộc vượt trên quyền của quản trị viên tài khoản thành viên.\n(A) SAI: Chính sách danh tính gắn cho từng vai trò có thể bị quản trị viên tài khoản sửa đổi.\n(B) SAI: Permissions boundary chỉ áp cho các principal được gán nên không phủ toàn bộ tài khoản.\n(C) ĐÚNG: Áp service control policy ở mức tổ chức từ chối các hành động dừng, xóa và cập nhật trail; SCP đặt trần quyền cho mọi principal trong tài khoản thành viên nên quản trị viên ở đó cũng không thực hiện được, và không thể bị bỏ qua từ bên trong tài khoản.\n(D) SAI: Cảnh báo khi trail bị tắt là kiểm soát phát hiện, không ngăn hành động xảy ra.\nĐáp án đúng: C\nĐiểm cần nhớ: SCP là cơ chế duy nhất đặt trần quyền cho cả quản trị viên tài khoản thành viên.",
       "tagNames": ["Security and Compliance > AWS Organizations"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Apply a service control policy to the organizational units that denies the CloudTrail stop, delete, and update actions.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Attach an IAM policy denying those actions to every role in the member accounts.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Apply a permissions boundary that excludes CloudTrail actions to the administrator roles.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Attach an IAM policy denying those actions to every role in the member accounts.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Apply a permissions boundary that excludes CloudTrail actions to the administrator roles.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Apply a service control policy to the organizational units that denies the CloudTrail stop, delete, and update actions.", "isCorrect": true },
         { "answerLabel": "D", "answerText": "Create an EventBridge rule that alerts the security team when a trail is stopped or deleted.", "isCorrect": false }
       ]
     },
@@ -163,13 +163,13 @@
       "questionNumber": 13,
       "questionType": "MCQ",
       "questionText": "A company uses AWS Control Tower. A data science team needs one account where they can use an AWS Region that a Control Tower Region deny control currently blocks. The company must keep the control applied to all other accounts. What should a DevOps engineer do?",
-      "explanation": "Phân tích đề: Cần ngoại lệ cho một tài khoản mà không nới kiểm soát cho phần còn lại.\n(A) ĐÚNG: Tạo một đơn vị tổ chức riêng cho tài khoản đó và cấu hình phạm vi kiểm soát sao cho control không áp cho đơn vị tổ chức này, rồi chuyển tài khoản vào đó; giải pháp dựa trên cấu trúc giữ cho mọi tài khoản khác vẫn được bảo vệ và ngoại lệ hiện rõ trong sơ đồ tổ chức.\n(B) SAI: Tắt control cho toàn bộ vùng hạ cánh làm mất bảo vệ ở mọi tài khoản.\n(C) SAI: Sửa trực tiếp service control policy do Control Tower quản lý gây lệch cấu hình và có thể bị ghi đè khi vùng hạ cánh được cập nhật.\n(D) SAI: Đưa tài khoản ra khỏi Control Tower làm mất toàn bộ nền tảng quản trị áp dụng cho nó.\nĐáp án đúng: A\nĐiểm cần nhớ: Xử lý ngoại lệ của Control Tower bằng cấu trúc đơn vị tổ chức, không bằng cách sửa chính sách được quản lý.",
+      "explanation": "Phân tích đề: Cần ngoại lệ cho một tài khoản mà không nới kiểm soát cho phần còn lại.\n(A) SAI: Sửa trực tiếp service control policy do Control Tower quản lý gây lệch cấu hình và có thể bị ghi đè khi vùng hạ cánh được cập nhật.\n(B) SAI: Đưa tài khoản ra khỏi Control Tower làm mất toàn bộ nền tảng quản trị áp dụng cho nó.\n(C) SAI: Tắt control cho toàn bộ vùng hạ cánh làm mất bảo vệ ở mọi tài khoản.\n(D) ĐÚNG: Tạo một đơn vị tổ chức riêng cho tài khoản đó và cấu hình phạm vi kiểm soát sao cho control không áp cho đơn vị tổ chức này, rồi chuyển tài khoản vào đó; giải pháp dựa trên cấu trúc giữ cho mọi tài khoản khác vẫn được bảo vệ và ngoại lệ hiện rõ trong sơ đồ tổ chức.\nĐáp án đúng: D\nĐiểm cần nhớ: Xử lý ngoại lệ của Control Tower bằng cấu trúc đơn vị tổ chức, không bằng cách sửa chính sách được quản lý.",
       "tagNames": ["Security and Compliance > AWS Control Tower"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Create a separate organizational unit that does not have the Region deny control applied, and move the data science account into it.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Disable the Region deny control for the entire landing zone.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Edit the service control policy that Control Tower created so the Region is allowed.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Remove the data science account from AWS Control Tower management.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Edit the service control policy that Control Tower created so the Region is allowed.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Remove the data science account from AWS Control Tower management.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Disable the Region deny control for the entire landing zone.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create a separate organizational unit that does not have the Region deny control applied, and move the data science account into it.", "isCorrect": true }
       ]
     }
   ]

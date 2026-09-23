@@ -135,6 +135,7 @@ public class SecurityConfig {
                                 "/api/auth/reset-password/check",
                                 "/api/exam-types/**",
                                 "/api/exam-categories/**",
+                                "/api/exam-parts/**",
                                 "/api/evaluations/**",
                                 "/api/tests/**",
                                 // [TẮT XÁC THỰC EMAIL] "/api/auth/verify",

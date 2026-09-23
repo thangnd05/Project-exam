@@ -1,7 +1,7 @@
 $primary: var(--accent-act-color);
-$success: var(--emerald-500);
+$success: var(--success);
 $danger: var(--red-500);
-$purple: var(--violet-500);
+$purple: var(--chart-2);
 $text-primary: var(--slate-800);
 $text-secondary: var(--slate-500);
 $text-muted: var(--slate-400);
@@ -82,7 +82,7 @@ $radius-lg: 16px;
     &:focus {
         outline: none;
         border-color: var(--accent-act-color);
-        box-shadow: 0 0 0 3px rgb(var(--teal-500-rgb) / 0.15);
+        box-shadow: 0 0 0 3px rgb(var(--primary-rgb) / 0.15);
     }
 }
 
@@ -228,7 +228,7 @@ $radius-lg: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgb(var(--teal-500-rgb) / 0.1);
+    background: rgb(var(--primary-rgb) / 0.1);
     color: $primary;
 }
 

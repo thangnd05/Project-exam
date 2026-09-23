@@ -1,7 +1,7 @@
 $text-primary: var(--slate-800);
 $text-secondary: var(--slate-500);
 $border-color: var(--slate-200);
-$success: var(--emerald-500);
+$success: var(--success);
 $danger: var(--red-500);
 
 .tableWrap {
@@ -35,7 +35,7 @@ $danger: var(--red-500);
     }
 
     tbody tr:hover td {
-        background: rgb(var(--teal-500-rgb) / 0.04);
+        background: rgb(var(--primary-rgb) / 0.04);
     }
 }
 

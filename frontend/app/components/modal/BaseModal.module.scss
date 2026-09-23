@@ -44,7 +44,7 @@
   gap: 12px;
 
   svg {
-    color: #fff;
+    color: var(--on-primary-gradient);
     font-size: 2.4rem;
   }
 }
@@ -52,13 +52,13 @@
 .title {
   font-size: 2.4rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--on-primary-gradient);
   margin: 0 !important;
   letter-spacing: -0.5px;
 }
 
 .closeBtn {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--on-primary-gradient-soft);
   border: none;
   width: 40px;
   height: 40px;
@@ -66,12 +66,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: var(--on-primary-gradient);
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgb(var(--brand-900-rgb) / 0.14);
     transform: rotate(90deg);
   }
 
@@ -214,8 +214,8 @@
 
   .btnSubmit {
     background: var(--primary-gradient);
-    color: #fff;
-    box-shadow: 0 4px 15px rgb(var(--teal-600-rgb) / 0.25);
+    color: var(--on-primary-gradient);
+    box-shadow: 0 4px 15px rgb(var(--primary-rgb) / 0.25);
 
     &:hover:not(:disabled) {
       transform: translateY(-2px);

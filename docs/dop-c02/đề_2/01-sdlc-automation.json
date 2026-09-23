@@ -7,65 +7,65 @@
       "questionNumber": 1,
       "questionType": "MCQ",
       "questionText": "A DevOps engineer must start an AWS CodeBuild project only when a commit is pushed to the release branch of an AWS CodeCommit repository. Commits to all other branches must not start any build. The solution must not poll the repository. Which approach meets these requirements?",
-      "explanation": "Phân tích đề: Cần kích hoạt theo sự kiện và lọc đúng nhánh, không thăm dò.\n(A) ĐÚNG: Tạo EventBridge rule khớp sự kiện thay đổi tham chiếu của CodeCommit, với event pattern lọc theo tên kho và referenceName bằng release; target là CodeBuild project. Việc lọc nằm ngay trong pattern nên build chỉ được gọi cho đúng nhánh cần.\n(B) SAI: Tạo rule khớp mọi sự kiện của kho rồi kiểm tra tên nhánh trong buildspec khiến build vẫn khởi chạy và tính phí cho các nhánh không liên quan.\n(C) SAI: Cấu hình CodeBuild thăm dò kho định kỳ trái yêu cầu và tạo độ trễ.\n(D) SAI: Dùng CodeCommit trigger gửi tới SNS rồi để người nhận bấm chạy build không phải tự động hóa.\nĐáp án đúng: A\nĐiểm cần nhớ: Lọc theo referenceName ngay trong event pattern của EventBridge thay vì lọc bên trong target.",
+      "explanation": "Phân tích đề: Cần kích hoạt theo sự kiện và lọc đúng nhánh, không thăm dò.\n(A) SAI: Cấu hình CodeBuild thăm dò kho định kỳ trái yêu cầu và tạo độ trễ.\n(B) SAI: Dùng CodeCommit trigger gửi tới SNS rồi để người nhận bấm chạy build không phải tự động hóa.\n(C) SAI: Tạo rule khớp mọi sự kiện của kho rồi kiểm tra tên nhánh trong buildspec khiến build vẫn khởi chạy và tính phí cho các nhánh không liên quan.\n(D) ĐÚNG: Tạo EventBridge rule khớp sự kiện thay đổi tham chiếu của CodeCommit, với event pattern lọc theo tên kho và referenceName bằng release; target là CodeBuild project. Việc lọc nằm ngay trong pattern nên build chỉ được gọi cho đúng nhánh cần.\nĐáp án đúng: D\nĐiểm cần nhớ: Lọc theo referenceName ngay trong event pattern của EventBridge thay vì lọc bên trong target.",
       "tagNames": ["SDLC Automation > AWS CodeCommit"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Create an EventBridge rule matching the CodeCommit reference change event with a pattern that filters on the repository name and the release branch, targeting the CodeBuild project.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Create an EventBridge rule matching all events from the repository and check the branch name inside the buildspec before running the build steps.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Configure the CodeBuild project source to poll the CodeCommit repository for changes every five minutes.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Create a CodeCommit trigger that publishes to an Amazon SNS topic so an engineer can start the build.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Configure the CodeBuild project source to poll the CodeCommit repository for changes every five minutes.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Create a CodeCommit trigger that publishes to an Amazon SNS topic so an engineer can start the build.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an EventBridge rule matching all events from the repository and check the branch name inside the buildspec before running the build steps.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Create an EventBridge rule matching the CodeCommit reference change event with a pattern that filters on the repository name and the release branch, targeting the CodeBuild project.", "isCorrect": true }
       ]
     },
     {
       "questionNumber": 2,
       "questionType": "MCQ",
       "questionText": "A compliance rule states that the main branch of a CodeCommit repository must never receive a force push and that no one may delete the branch, including users who hold repository write permissions. Which solution enforces this?",
-      "explanation": "Phân tích đề: Cần chặn hai hành động cụ thể trên đúng một nhánh, kể cả với người có quyền ghi.\n(A) ĐÚNG: Gắn một IAM policy từ chối các hành động GitPush và DeleteBranch với điều kiện trên khóa ngữ cảnh tham chiếu để chỉ áp cho nhánh main, và giới hạn kiểu push là force; lệnh từ chối rõ ràng thắng mọi lệnh cho phép nên người có quyền ghi vẫn bị chặn đúng hai hành động này.\n(B) SAI: Approval rule template áp quy tắc phê duyệt cho pull request nhưng không ngăn được thao tác push trực tiếp hay xóa nhánh.\n(C) SAI: Gỡ quyền ghi của mọi người làm họ không làm việc được trên các nhánh khác.\n(D) SAI: Cảnh báo khi phát hiện force push là kiểm soát phát hiện, lịch sử đã bị viết lại trước khi ai kịp phản ứng.\nĐáp án đúng: A\nĐiểm cần nhớ: Dùng IAM policy với điều kiện theo tham chiếu nhánh để chặn force push và xóa nhánh; từ chối rõ ràng luôn thắng.",
+      "explanation": "Phân tích đề: Cần chặn hai hành động cụ thể trên đúng một nhánh, kể cả với người có quyền ghi.\n(A) ĐÚNG: Gắn một IAM policy từ chối các hành động GitPush và DeleteBranch với điều kiện trên khóa ngữ cảnh tham chiếu để chỉ áp cho nhánh main, và giới hạn kiểu push là force; lệnh từ chối rõ ràng thắng mọi lệnh cho phép nên người có quyền ghi vẫn bị chặn đúng hai hành động này.\n(B) SAI: Cảnh báo khi phát hiện force push là kiểm soát phát hiện, lịch sử đã bị viết lại trước khi ai kịp phản ứng.\n(C) SAI: Gỡ quyền ghi của mọi người làm họ không làm việc được trên các nhánh khác.\n(D) SAI: Approval rule template áp quy tắc phê duyệt cho pull request nhưng không ngăn được thao tác push trực tiếp hay xóa nhánh.\nĐáp án đúng: A\nĐiểm cần nhớ: Dùng IAM policy với điều kiện theo tham chiếu nhánh để chặn force push và xóa nhánh; từ chối rõ ràng luôn thắng.",
       "tagNames": ["SDLC Automation > AWS CodeCommit"],
       "answers": [
         { "answerLabel": "A", "answerText": "Attach an IAM policy that denies the push and delete branch actions with a condition restricting them to the main branch reference.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Create an approval rule template requiring two approvals and associate it with the repository.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Create an EventBridge rule that notifies the security team when a force push occurs on the main branch.", "isCorrect": false },
         { "answerLabel": "C", "answerText": "Remove write permissions from all users and require every change to go through the platform team.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Create an EventBridge rule that notifies the security team when a force push occurs on the main branch.", "isCorrect": false }
+        { "answerLabel": "D", "answerText": "Create an approval rule template requiring two approvals and associate it with the repository.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 3,
       "questionType": "MCQ",
       "questionText": "A company runs a self-managed GitLab server on an Amazon EC2 instance in a private subnet with no public endpoint. The company wants AWS CodePipeline to use this GitLab server as a source without exposing the server to the internet. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Nguồn mã nằm trong mạng riêng, cần kết nối mà không mở ra Internet.\n(A) ĐÚNG: Tạo AWS CodeConnections host cho GitLab self-managed và cấu hình nó dùng VPC với subnet cùng security group phù hợp; kết nối đi qua mạng riêng nên máy chủ GitLab không cần địa chỉ công khai, và CodePipeline dùng connection này làm nguồn.\n(B) SAI: Gán địa chỉ công khai và mở cổng cho dải địa chỉ của dịch vụ vi phạm yêu cầu không phơi máy chủ ra Internet.\n(C) SAI: Đẩy gương mã sang CodeCommit rồi dùng làm nguồn là cách vòng, thêm bước đồng bộ phải bảo trì và làm mất trạng thái pull request.\n(D) SAI: Dùng một instance trung gian tự viết script kéo mã rồi tải lên S3 là giải pháp tự chế phải tự bảo trì.\nĐáp án đúng: A\nĐiểm cần nhớ: CodeConnections host kèm cấu hình VPC cho phép kết nối tới Git server tự quản lý trong mạng riêng.",
+      "explanation": "Phân tích đề: Nguồn mã nằm trong mạng riêng, cần kết nối mà không mở ra Internet.\n(A) SAI: Đẩy gương mã sang CodeCommit rồi dùng làm nguồn là cách vòng, thêm bước đồng bộ phải bảo trì và làm mất trạng thái pull request.\n(B) SAI: Dùng một instance trung gian tự viết script kéo mã rồi tải lên S3 là giải pháp tự chế phải tự bảo trì.\n(C) ĐÚNG: Tạo AWS CodeConnections host cho GitLab self-managed và cấu hình nó dùng VPC với subnet cùng security group phù hợp; kết nối đi qua mạng riêng nên máy chủ GitLab không cần địa chỉ công khai, và CodePipeline dùng connection này làm nguồn.\n(D) SAI: Gán địa chỉ công khai và mở cổng cho dải địa chỉ của dịch vụ vi phạm yêu cầu không phơi máy chủ ra Internet.\nĐáp án đúng: C\nĐiểm cần nhớ: CodeConnections host kèm cấu hình VPC cho phép kết nối tới Git server tự quản lý trong mạng riêng.",
       "tagNames": ["SDLC Automation > GitHub / GitLab / Bitbucket Integration"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Create an AWS CodeConnections host for the self-managed GitLab instance configured with the VPC, subnets, and security group, then create a connection and use it as the pipeline source.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Assign an Elastic IP address to the GitLab instance and allow inbound access from the AWS service IP ranges.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Configure GitLab to mirror all repositories into AWS CodeCommit and use CodeCommit as the pipeline source.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Run a scheduled EC2 job that clones the repository and uploads a source archive to Amazon S3 for the pipeline.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Configure GitLab to mirror all repositories into AWS CodeCommit and use CodeCommit as the pipeline source.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Run a scheduled EC2 job that clones the repository and uploads a source archive to Amazon S3 for the pipeline.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create an AWS CodeConnections host for the self-managed GitLab instance configured with the VPC, subnets, and security group, then create a connection and use it as the pipeline source.", "isCorrect": true },
+        { "answerLabel": "D", "answerText": "Assign an Elastic IP address to the GitLab instance and allow inbound access from the AWS service IP ranges.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 4,
       "questionType": "MSQ",
       "questionText": "A team hosts code in GitHub and runs a CodePipeline that deploys on every merge to main. Roughly 40 percent of merges only change documentation files, and these runs waste build minutes and delay real releases. The team wants to avoid running the pipeline for documentation-only changes while keeping automatic deployment for code changes. Which TWO approaches achieve this? (Choose TWO.)",
-      "explanation": "Phân tích đề: Cần bỏ qua các lần chạy không liên quan tới mã.\n(A) ĐÚNG: Cấu hình bộ lọc trigger trên source action theo đường dẫn tệp, loại trừ thư mục tài liệu; pipeline chỉ khởi chạy khi có thay đổi ngoài các đường dẫn đã loại trừ.\n(B) ĐÚNG: Thêm một bước sớm trong pipeline so sánh danh sách tệp thay đổi và kết thúc sớm nếu chỉ có tài liệu; cách này không ngăn pipeline khởi chạy nhưng dừng trước các giai đoạn tốn kém như build và deploy.\n(C) SAI: Chuyển sang kích hoạt thủ công làm mất tính tự động cho cả các thay đổi mã hợp lệ.\n(D) SAI: Tách tài liệu sang một kho riêng là thay đổi tổ chức mã lớn, và câu hỏi hỏi cách xử lý trong cấu trúc hiện tại.\n(E) SAI: Giảm tần suất chạy pipeline theo lịch làm chậm việc phát hành các thay đổi mã.\nĐáp án đúng: A, B\nĐiểm cần nhớ: Lọc theo đường dẫn tệp ở source trigger, hoặc kết thúc sớm trong pipeline, để bỏ qua thay đổi không liên quan.",
+      "explanation": "Phân tích đề: Cần bỏ qua các lần chạy không liên quan tới mã.\n(A) ĐÚNG: Thêm một bước sớm trong pipeline so sánh danh sách tệp thay đổi và kết thúc sớm nếu chỉ có tài liệu; cách này không ngăn pipeline khởi chạy nhưng dừng trước các giai đoạn tốn kém như build và deploy.\n(B) SAI: Giảm tần suất chạy pipeline theo lịch làm chậm việc phát hành các thay đổi mã.\n(C) ĐÚNG: Cấu hình bộ lọc trigger trên source action theo đường dẫn tệp, loại trừ thư mục tài liệu; pipeline chỉ khởi chạy khi có thay đổi ngoài các đường dẫn đã loại trừ.\n(D) SAI: Tách tài liệu sang một kho riêng là thay đổi tổ chức mã lớn, và câu hỏi hỏi cách xử lý trong cấu trúc hiện tại.\n(E) SAI: Chuyển sang kích hoạt thủ công làm mất tính tự động cho cả các thay đổi mã hợp lệ.\nĐáp án đúng: A, C\nĐiểm cần nhớ: Lọc theo đường dẫn tệp ở source trigger, hoặc kết thúc sớm trong pipeline, để bỏ qua thay đổi không liên quan.",
       "tagNames": ["SDLC Automation > GitHub / GitLab / Bitbucket Integration"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Configure a trigger filter on the source action that excludes the documentation file paths.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Add an early pipeline action that inspects the changed file list and stops the execution when only documentation changed.", "isCorrect": true },
-        { "answerLabel": "C", "answerText": "Change the pipeline to manual execution and start it when a code change is merged.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Add an early pipeline action that inspects the changed file list and stops the execution when only documentation changed.", "isCorrect": true },
+        { "answerLabel": "B", "answerText": "Change the pipeline to run on a nightly schedule instead of on merges.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Configure a trigger filter on the source action that excludes the documentation file paths.", "isCorrect": true },
         { "answerLabel": "D", "answerText": "Move all documentation into a separate repository that has no pipeline.", "isCorrect": false },
-        { "answerLabel": "E", "answerText": "Change the pipeline to run on a nightly schedule instead of on merges.", "isCorrect": false }
+        { "answerLabel": "E", "answerText": "Change the pipeline to manual execution and start it when a code change is merged.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 5,
       "questionType": "MCQ",
       "questionText": "A CodeBuild project runs a test suite that takes 45 minutes because tests execute sequentially. The tests are independent and can be split into shards. The team wants to reduce elapsed time without maintaining separate CodeBuild projects for each shard. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần chạy song song các phần kiểm thử độc lập từ một project duy nhất.\n(A) ĐÚNG: Dùng batch build ở chế độ build-matrix hoặc build-fan-out của CodeBuild; một project sinh ra nhiều build chạy song song với biến môi trường khác nhau xác định shard, và kết quả được tổng hợp lại cho pipeline.\n(B) SAI: Tăng compute type làm mỗi bước nhanh hơn chút ít nhưng các bài kiểm thử vẫn chạy tuần tự.\n(C) SAI: Tạo một project riêng cho mỗi shard chính là điều đề bài muốn tránh.\n(D) SAI: Tăng thời gian chờ chỉ nới giới hạn chứ không rút ngắn thời gian chạy.\nĐáp án đúng: A\nĐiểm cần nhớ: Batch build của CodeBuild chạy nhiều build song song từ một project, phù hợp để chia nhỏ bộ kiểm thử.",
+      "explanation": "Phân tích đề: Cần chạy song song các phần kiểm thử độc lập từ một project duy nhất.\n(A) SAI: Tạo một project riêng cho mỗi shard chính là điều đề bài muốn tránh.\n(B) ĐÚNG: Dùng batch build ở chế độ build-matrix hoặc build-fan-out của CodeBuild; một project sinh ra nhiều build chạy song song với biến môi trường khác nhau xác định shard, và kết quả được tổng hợp lại cho pipeline.\n(C) SAI: Tăng compute type làm mỗi bước nhanh hơn chút ít nhưng các bài kiểm thử vẫn chạy tuần tự.\n(D) SAI: Tăng thời gian chờ chỉ nới giới hạn chứ không rút ngắn thời gian chạy.\nĐáp án đúng: B\nĐiểm cần nhớ: Batch build của CodeBuild chạy nhiều build song song từ một project, phù hợp để chia nhỏ bộ kiểm thử.",
       "tagNames": ["SDLC Automation > AWS CodeBuild"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Configure a CodeBuild batch build that fans out into parallel builds, each running a different test shard selected by an environment variable.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Change the build environment to the largest available compute type.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Create one CodeBuild project per shard and invoke them from parallel pipeline actions.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Create one CodeBuild project per shard and invoke them from parallel pipeline actions.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Configure a CodeBuild batch build that fans out into parallel builds, each running a different test shard selected by an environment variable.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Change the build environment to the largest available compute type.", "isCorrect": false },
         { "answerLabel": "D", "answerText": "Increase the build timeout so the suite always has time to finish.", "isCorrect": false }
       ]
     },
@@ -73,37 +73,37 @@
       "questionNumber": 6,
       "questionType": "MCQ",
       "questionText": "A DevOps engineer must make unit test results from a CodeBuild project visible in the AWS console so that failures can be reviewed per test case, without storing raw output in Amazon S3 and reading it manually. What should the engineer configure?",
-      "explanation": "Phân tích đề: Cần kết quả kiểm thử hiển thị có cấu trúc theo từng ca kiểm thử.\n(A) ĐÚNG: Khai báo phần reports trong buildspec trỏ tới tệp kết quả theo định dạng được hỗ trợ, ví dụ JUnit XML; CodeBuild tạo test report group và hiển thị kết quả theo từng ca kiểm thử kèm tỉ lệ đạt và lịch sử qua các lần chạy.\n(B) SAI: Ghi kết quả ra CloudWatch Logs cho văn bản thô, phải tự đọc và không có cấu trúc theo ca kiểm thử.\n(C) SAI: Tải tệp kết quả lên S3 rồi mở thủ công chính là điều đề bài muốn tránh.\n(D) SAI: Gửi kết quả qua SNS tới hộp thư không cung cấp giao diện xem lịch sử và chi tiết từng ca.\nĐáp án đúng: A\nĐiểm cần nhớ: Khai báo reports trong buildspec để CodeBuild hiển thị kết quả kiểm thử theo từng ca trong test report group.",
+      "explanation": "Phân tích đề: Cần kết quả kiểm thử hiển thị có cấu trúc theo từng ca kiểm thử.\n(A) ĐÚNG: Khai báo phần reports trong buildspec trỏ tới tệp kết quả theo định dạng được hỗ trợ, ví dụ JUnit XML; CodeBuild tạo test report group và hiển thị kết quả theo từng ca kiểm thử kèm tỉ lệ đạt và lịch sử qua các lần chạy.\n(B) SAI: Gửi kết quả qua SNS tới hộp thư không cung cấp giao diện xem lịch sử và chi tiết từng ca.\n(C) SAI: Tải tệp kết quả lên S3 rồi mở thủ công chính là điều đề bài muốn tránh.\n(D) SAI: Ghi kết quả ra CloudWatch Logs cho văn bản thô, phải tự đọc và không có cấu trúc theo ca kiểm thử.\nĐáp án đúng: A\nĐiểm cần nhớ: Khai báo reports trong buildspec để CodeBuild hiển thị kết quả kiểm thử theo từng ca trong test report group.",
       "tagNames": ["SDLC Automation > AWS CodeBuild"],
       "answers": [
         { "answerLabel": "A", "answerText": "Add a reports section to the buildspec that points at the JUnit-format result files so CodeBuild creates a test report group.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Write the test output to CloudWatch Logs and review the log stream after each build.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Publish a summary of the test output to an Amazon SNS topic subscribed by the team.", "isCorrect": false },
         { "answerLabel": "C", "answerText": "Upload the result files to an S3 bucket as build artifacts and open them when a build fails.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Publish a summary of the test output to an Amazon SNS topic subscribed by the team.", "isCorrect": false }
+        { "answerLabel": "D", "answerText": "Write the test output to CloudWatch Logs and review the log stream after each build.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 7,
       "questionType": "MCQ",
       "questionText": "A CodeBuild project in a tooling account must push build artifacts to an Amazon S3 bucket owned by a production account, and the production account must be able to read the objects afterwards. Objects uploaded by the build are currently unreadable by production account principals. What is the MOST likely cause and the correct fix?",
-      "explanation": "Phân tích đề: Đối tượng được tải lên bởi tài khoản khác nên quyền sở hữu đối tượng là vấn đề điển hình.\n(A) ĐÚNG: Khi một principal ở tài khoản khác tải đối tượng lên, tài khoản sở hữu bucket có thể không sở hữu đối tượng nếu cấu hình quyền sở hữu không phù hợp; đặt bucket owner enforced cho object ownership, hoặc yêu cầu build gửi kèm ACL trao quyền cho chủ bucket, để tài khoản production đọc được.\n(B) SAI: Cấp thêm quyền cho vai trò build ở tài khoản tooling không thay đổi việc ai sở hữu đối tượng đã tải lên.\n(C) SAI: Bật versioning cho bucket không liên quan tới quyền đọc đối tượng.\n(D) SAI: Mã hóa bằng khóa do dịch vụ quản lý không giải quyết vấn đề quyền sở hữu, và có thể tạo thêm rào cản về quyền giải mã.\nĐáp án đúng: A\nĐiểm cần nhớ: Với upload giữa các tài khoản, hãy kiểm tra cấu hình object ownership của bucket để chủ bucket sở hữu đối tượng.",
+      "explanation": "Phân tích đề: Đối tượng được tải lên bởi tài khoản khác nên quyền sở hữu đối tượng là vấn đề điển hình.\n(A) SAI: Bật versioning cho bucket không liên quan tới quyền đọc đối tượng.\n(B) SAI: Cấp thêm quyền cho vai trò build ở tài khoản tooling không thay đổi việc ai sở hữu đối tượng đã tải lên.\n(C) SAI: Mã hóa bằng khóa do dịch vụ quản lý không giải quyết vấn đề quyền sở hữu, và có thể tạo thêm rào cản về quyền giải mã.\n(D) ĐÚNG: Khi một principal ở tài khoản khác tải đối tượng lên, tài khoản sở hữu bucket có thể không sở hữu đối tượng nếu cấu hình quyền sở hữu không phù hợp; đặt bucket owner enforced cho object ownership, hoặc yêu cầu build gửi kèm ACL trao quyền cho chủ bucket, để tài khoản production đọc được.\nĐáp án đúng: D\nĐiểm cần nhớ: Với upload giữa các tài khoản, hãy kiểm tra cấu hình object ownership của bucket để chủ bucket sở hữu đối tượng.",
       "tagNames": ["SDLC Automation > AWS CodeBuild"],
       "answers": [
-        { "answerLabel": "A", "answerText": "The production account does not own the uploaded objects; set the bucket object ownership to bucket owner enforced so the bucket owner owns all objects.", "isCorrect": true },
+        { "answerLabel": "A", "answerText": "Versioning is disabled on the destination bucket; enable versioning so objects become readable.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "The CodeBuild service role lacks s3:PutObject; add the permission to the role in the tooling account.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Versioning is disabled on the destination bucket; enable versioning so objects become readable.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "The objects are unencrypted; enable default encryption with an AWS managed key on the bucket.", "isCorrect": false }
+        { "answerLabel": "C", "answerText": "The objects are unencrypted; enable default encryption with an AWS managed key on the bucket.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "The production account does not own the uploaded objects; set the bucket object ownership to bucket owner enforced so the bucket owner owns all objects.", "isCorrect": true }
       ]
     },
     {
       "questionNumber": 8,
       "questionType": "MCQ",
       "questionText": "A company deploys a web application to an Amazon EC2 Auto Scaling group using AWS CodeDeploy with the blue/green deployment type. After a successful deployment, the team wants the original instances to remain available for one hour so they can be inspected if a latent defect appears, and then be removed automatically. Which setting achieves this?",
-      "explanation": "Phân tích đề: Cần giữ đội hình cũ một khoảng thời gian rồi tự dọn dẹp.\n(A) ĐÚNG: Trong deployment group, đặt hành động với instance gốc là terminate the original instances kèm thời gian chờ một giờ; CodeDeploy giữ các instance cũ trong khoảng đó rồi tự chấm dứt chúng, nên vẫn có thể kiểm tra mà không cần thao tác dọn dẹp thủ công.\n(B) SAI: Chọn keep the original instances running khiến chúng tồn tại vô thời hạn và phát sinh chi phí cho tới khi có người xóa.\n(C) SAI: Chấm dứt ngay lập tức làm mất khả năng kiểm tra khi phát hiện lỗi muộn.\n(D) SAI: Tạo một tác vụ theo lịch tự viết để xóa instance là làm lại thứ CodeDeploy đã cung cấp và dễ xóa nhầm.\nĐáp án đúng: A\nĐiểm cần nhớ: Deployment group của blue/green có tùy chọn chấm dứt instance gốc sau một khoảng chờ có thể cấu hình.",
+      "explanation": "Phân tích đề: Cần giữ đội hình cũ một khoảng thời gian rồi tự dọn dẹp.\n(A) SAI: Chọn keep the original instances running khiến chúng tồn tại vô thời hạn và phát sinh chi phí cho tới khi có người xóa.\n(B) ĐÚNG: Trong deployment group, đặt hành động với instance gốc là terminate the original instances kèm thời gian chờ một giờ; CodeDeploy giữ các instance cũ trong khoảng đó rồi tự chấm dứt chúng, nên vẫn có thể kiểm tra mà không cần thao tác dọn dẹp thủ công.\n(C) SAI: Chấm dứt ngay lập tức làm mất khả năng kiểm tra khi phát hiện lỗi muộn.\n(D) SAI: Tạo một tác vụ theo lịch tự viết để xóa instance là làm lại thứ CodeDeploy đã cung cấp và dễ xóa nhầm.\nĐáp án đúng: B\nĐiểm cần nhớ: Deployment group của blue/green có tùy chọn chấm dứt instance gốc sau một khoảng chờ có thể cấu hình.",
       "tagNames": ["SDLC Automation > AWS CodeDeploy"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Configure the deployment group to terminate the original instances with a wait time of one hour after the deployment succeeds.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Configure the deployment group to keep the original instances running indefinitely.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Configure the deployment group to keep the original instances running indefinitely.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Configure the deployment group to terminate the original instances with a wait time of one hour after the deployment succeeds.", "isCorrect": true },
         { "answerLabel": "C", "answerText": "Configure the deployment group to terminate the original instances immediately after traffic is rerouted.", "isCorrect": false },
         { "answerLabel": "D", "answerText": "Create a scheduled Lambda function that terminates instances tagged as belonging to the previous deployment.", "isCorrect": false }
       ]
@@ -112,12 +112,12 @@
       "questionNumber": 9,
       "questionType": "MCQ",
       "questionText": "A CodeDeploy deployment to an EC2 fleet completes successfully, but 20 minutes later the application begins returning errors because of a defect that only appears under production load. The company wants CodeDeploy to revert to the previous revision automatically when an existing CloudWatch alarm on the application error rate enters the ALARM state, even after the deployment has finished. Which configuration meets this requirement?",
-      "explanation": "Phân tích đề: Cần quay lại phiên bản trước dựa trên alarm, kể cả sau khi deployment đã kết thúc.\n(A) ĐÚNG: Bật rollback when alarm threshold is met trong deployment group và liên kết alarm về tỉ lệ lỗi; CodeDeploy theo dõi alarm và tự khởi tạo một deployment quay lại bản trước khi alarm chuyển sang báo động.\n(B) SAI: Chỉ bật rollback khi deployment thất bại không áp dụng vì deployment đã báo thành công.\n(C) SAI: Tạo hành động của alarm gửi thông báo cho đội trực là phản ứng thủ công, không tự động quay lại.\n(D) SAI: Thêm hook ValidateService chỉ chạy trong quá trình deployment nên không phát hiện lỗi xuất hiện 20 phút sau đó.\nĐáp án đúng: A\nĐiểm cần nhớ: Deployment group có thể tự rollback theo trạng thái CloudWatch alarm, không chỉ khi deployment thất bại.",
+      "explanation": "Phân tích đề: Cần quay lại phiên bản trước dựa trên alarm, kể cả sau khi deployment đã kết thúc.\n(A) SAI: Chỉ bật rollback khi deployment thất bại không áp dụng vì deployment đã báo thành công.\n(B) SAI: Tạo hành động của alarm gửi thông báo cho đội trực là phản ứng thủ công, không tự động quay lại.\n(C) ĐÚNG: Bật rollback when alarm threshold is met trong deployment group và liên kết alarm về tỉ lệ lỗi; CodeDeploy theo dõi alarm và tự khởi tạo một deployment quay lại bản trước khi alarm chuyển sang báo động.\n(D) SAI: Thêm hook ValidateService chỉ chạy trong quá trình deployment nên không phát hiện lỗi xuất hiện 20 phút sau đó.\nĐáp án đúng: C\nĐiểm cần nhớ: Deployment group có thể tự rollback theo trạng thái CloudWatch alarm, không chỉ khi deployment thất bại.",
       "tagNames": ["SDLC Automation > AWS CodeDeploy"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Enable alarm-based rollback on the deployment group and associate the application error rate CloudWatch alarm with it.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Enable rollback on deployment failure for the deployment group.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Add an Amazon SNS notification action to the alarm so the on-call engineer can redeploy the previous revision.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Enable rollback on deployment failure for the deployment group.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Add an Amazon SNS notification action to the alarm so the on-call engineer can redeploy the previous revision.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Enable alarm-based rollback on the deployment group and associate the application error rate CloudWatch alarm with it.", "isCorrect": true },
         { "answerLabel": "D", "answerText": "Add a ValidateService lifecycle hook that checks the error rate before completing the deployment.", "isCorrect": false }
       ]
     },
@@ -125,52 +125,52 @@
       "questionNumber": 10,
       "questionType": "MCQ",
       "questionText": "A company must use the same CodeDeploy application to deploy to Amazon EC2 instances in AWS and to physical servers in its own data center. Which requirement must be satisfied for the on-premises servers?",
-      "explanation": "Phân tích đề: CodeDeploy hỗ trợ máy chủ tại chỗ nhưng cần đăng ký và xác thực.\n(A) ĐÚNG: Cài CodeDeploy agent trên máy chủ tại chỗ và đăng ký chúng như on-premises instance, dùng thông tin xác thực IAM để agent xác thực với dịch vụ; sau đó gắn thẻ để deployment group nhắm tới đúng nhóm máy chủ.\n(B) SAI: Máy chủ tại chỗ không cần nằm trong VPC và không thể gắn instance profile của EC2.\n(C) SAI: Dùng một EC2 instance làm proxy để triển khai hộ không phải mô hình mà CodeDeploy hỗ trợ.\n(D) SAI: Chuyển toàn bộ máy chủ tại chỗ lên EC2 là thay đổi hạ tầng lớn, không phải yêu cầu để CodeDeploy hoạt động.\nĐáp án đúng: A\nĐiểm cần nhớ: Máy chủ tại chỗ phải cài CodeDeploy agent và được đăng ký làm on-premises instance với thông tin xác thực IAM.",
+      "explanation": "Phân tích đề: CodeDeploy hỗ trợ máy chủ tại chỗ nhưng cần đăng ký và xác thực.\n(A) SAI: Chuyển toàn bộ máy chủ tại chỗ lên EC2 là thay đổi hạ tầng lớn, không phải yêu cầu để CodeDeploy hoạt động.\n(B) SAI: Dùng một EC2 instance làm proxy để triển khai hộ không phải mô hình mà CodeDeploy hỗ trợ.\n(C) SAI: Máy chủ tại chỗ không cần nằm trong VPC và không thể gắn instance profile của EC2.\n(D) ĐÚNG: Cài CodeDeploy agent trên máy chủ tại chỗ và đăng ký chúng như on-premises instance, dùng thông tin xác thực IAM để agent xác thực với dịch vụ; sau đó gắn thẻ để deployment group nhắm tới đúng nhóm máy chủ.\nĐáp án đúng: D\nĐiểm cần nhớ: Máy chủ tại chỗ phải cài CodeDeploy agent và được đăng ký làm on-premises instance với thông tin xác thực IAM.",
       "tagNames": ["SDLC Automation > AWS CodeDeploy"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Install the CodeDeploy agent on each server, register them as on-premises instances with IAM credentials, and tag them for the deployment group.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Connect the data center to a VPC and attach an EC2 instance profile to each physical server.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Deploy to an EC2 instance that acts as a proxy and have it copy the revision to the physical servers.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Migrate the physical servers to Amazon EC2 because CodeDeploy supports only AWS compute.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Migrate the physical servers to Amazon EC2 because CodeDeploy supports only AWS compute.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Deploy to an EC2 instance that acts as a proxy and have it copy the revision to the physical servers.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Connect the data center to a VPC and attach an EC2 instance profile to each physical server.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Install the CodeDeploy agent on each server, register them as on-premises instances with IAM credentials, and tag them for the deployment group.", "isCorrect": true }
       ]
     },
     {
       "questionNumber": 11,
       "questionType": "MCQ",
       "questionText": "A pipeline uses an Amazon S3 bucket as its source. Developers upload a new application package to a fixed object key when they want to release. The pipeline never starts automatically after an upload. What is the required configuration?",
-      "explanation": "Phân tích đề: Nguồn S3 cần cơ chế phát hiện đối tượng mới.\n(A) ĐÚNG: Bật versioning trên bucket và dùng EventBridge để phát hiện sự kiện tạo đối tượng rồi khởi chạy pipeline; CodePipeline với nguồn S3 yêu cầu bucket bật versioning, và cách phát hiện thay đổi được khuyến nghị là qua sự kiện thay vì thăm dò.\n(B) SAI: Chỉ tải tệp lên mà không bật versioning khiến nguồn S3 không hoạt động đúng với CodePipeline.\n(C) SAI: Đổi sang một khóa đối tượng khác cho mỗi lần phát hành đòi hỏi sửa cấu hình pipeline mỗi lần, không khả thi.\n(D) SAI: Yêu cầu developer bấm khởi chạy pipeline thủ công là bỏ tự động hóa chứ không sửa nguyên nhân.\nĐáp án đúng: A\nĐiểm cần nhớ: Nguồn S3 của CodePipeline cần bucket bật versioning và nên dùng sự kiện EventBridge để kích hoạt.",
+      "explanation": "Phân tích đề: Nguồn S3 cần cơ chế phát hiện đối tượng mới.\n(A) SAI: Chỉ tải tệp lên mà không bật versioning khiến nguồn S3 không hoạt động đúng với CodePipeline.\n(B) ĐÚNG: Bật versioning trên bucket và dùng EventBridge để phát hiện sự kiện tạo đối tượng rồi khởi chạy pipeline; CodePipeline với nguồn S3 yêu cầu bucket bật versioning, và cách phát hiện thay đổi được khuyến nghị là qua sự kiện thay vì thăm dò.\n(C) SAI: Yêu cầu developer bấm khởi chạy pipeline thủ công là bỏ tự động hóa chứ không sửa nguyên nhân.\n(D) SAI: Đổi sang một khóa đối tượng khác cho mỗi lần phát hành đòi hỏi sửa cấu hình pipeline mỗi lần, không khả thi.\nĐáp án đúng: B\nĐiểm cần nhớ: Nguồn S3 của CodePipeline cần bucket bật versioning và nên dùng sự kiện EventBridge để kích hoạt.",
       "tagNames": ["SDLC Automation > AWS CodePipeline"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Enable versioning on the source bucket and configure an EventBridge rule on the object created event to start the pipeline.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Leave versioning disabled and rely on CodePipeline detecting the new object automatically.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Upload each release to a new object key and update the pipeline source configuration each time.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Ask developers to start the pipeline manually from the console after each upload.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Leave versioning disabled and rely on CodePipeline detecting the new object automatically.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Enable versioning on the source bucket and configure an EventBridge rule on the object created event to start the pipeline.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Ask developers to start the pipeline manually from the console after each upload.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Upload each release to a new object key and update the pipeline source configuration each time.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 12,
       "questionType": "MCQ",
       "questionText": "A CodeBuild action in a pipeline produces a build identifier that a later CloudFormation deploy action must receive as a template parameter. The team wants to pass this value between actions without writing it to an external store. Which CodePipeline capability supports this?",
-      "explanation": "Phân tích đề: Cần truyền giá trị động giữa các action trong cùng pipeline.\n(A) ĐÚNG: Dùng output variable của action kết hợp namespace; action CodeBuild xuất biến qua exported variables, được gán namespace, và action sau tham chiếu giá trị theo cú pháp biến của pipeline để truyền vào tham số của CloudFormation.\n(B) SAI: Ghi giá trị vào Parameter Store rồi đọc lại là dùng kho bên ngoài, trái yêu cầu, và thêm điểm hỏng.\n(C) SAI: Đưa giá trị vào tên tệp artifact rồi phân tích chuỗi là cách làm mong manh và khó bảo trì.\n(D) SAI: Đặt giá trị cứng trong cấu hình action làm mất tính động của mỗi lần chạy.\nĐáp án đúng: A\nĐiểm cần nhớ: Action trong CodePipeline có thể xuất biến và action sau tham chiếu qua namespace, không cần kho ngoài.",
+      "explanation": "Phân tích đề: Cần truyền giá trị động giữa các action trong cùng pipeline.\n(A) ĐÚNG: Dùng output variable của action kết hợp namespace; action CodeBuild xuất biến qua exported variables, được gán namespace, và action sau tham chiếu giá trị theo cú pháp biến của pipeline để truyền vào tham số của CloudFormation.\n(B) SAI: Đặt giá trị cứng trong cấu hình action làm mất tính động của mỗi lần chạy.\n(C) SAI: Ghi giá trị vào Parameter Store rồi đọc lại là dùng kho bên ngoài, trái yêu cầu, và thêm điểm hỏng.\n(D) SAI: Đưa giá trị vào tên tệp artifact rồi phân tích chuỗi là cách làm mong manh và khó bảo trì.\nĐáp án đúng: A\nĐiểm cần nhớ: Action trong CodePipeline có thể xuất biến và action sau tham chiếu qua namespace, không cần kho ngoài.",
       "tagNames": ["SDLC Automation > AWS CodePipeline"],
       "answers": [
         { "answerLabel": "A", "answerText": "Export a variable from the CodeBuild action, assign the action a namespace, and reference the namespaced variable in the deploy action configuration.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Write the value to AWS Systems Manager Parameter Store in the build and read it in the deploy action.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Encode the value into the output artifact file name and parse it in the deploy action.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Hard-code the value in the CloudFormation action parameter overrides.", "isCorrect": false }
+        { "answerLabel": "B", "answerText": "Hard-code the value in the CloudFormation action parameter overrides.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Write the value to AWS Systems Manager Parameter Store in the build and read it in the deploy action.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Encode the value into the output artifact file name and parse it in the deploy action.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 13,
       "questionType": "MSQ",
       "questionText": "A pipeline deploys to production and occasionally two executions run close together, so an older revision overwrites a newer one in production. The team must ensure that only one execution can be in the deployment stage at a time and that the most recent change is the one that ends up deployed. Which TWO configurations help achieve this? (Choose TWO.)",
-      "explanation": "Phân tích đề: Cần tránh việc hai lần chạy chồng lấn và bảo đảm bản mới nhất thắng.\n(A) ĐÚNG: Đặt pipeline ở execution mode superseded, để khi một lần chạy mới bắt đầu trong lúc lần cũ còn đang chờ, lần cũ bị thay thế và bản mới nhất là bản tiến tiếp; điều này trực tiếp bảo đảm bản mới nhất thắng.\n(B) ĐÚNG: Bật transition lock hoặc cấu hình để stage triển khai chỉ xử lý một lần chạy tại một thời điểm, tránh hai execution cùng vào giai đoạn triển khai.\n(C) SAI: Tăng số lần thử lại của stage không liên quan tới việc hai lần chạy chồng lấn.\n(D) SAI: Chuyển pipeline sang chạy theo lịch mỗi giờ làm chậm việc phát hành và vẫn có thể gom nhiều thay đổi vào một lần chạy.\n(E) SAI: Yêu cầu developer chờ nhau trước khi merge là thỏa thuận chứ không phải kiểm soát kỹ thuật.\nĐáp án đúng: A, B\nĐiểm cần nhớ: Execution mode superseded bảo đảm bản mới nhất thắng; giới hạn một execution trong stage triển khai tránh ghi đè chéo.",
+      "explanation": "Phân tích đề: Cần tránh việc hai lần chạy chồng lấn và bảo đảm bản mới nhất thắng.\n(A) SAI: Tăng số lần thử lại của stage không liên quan tới việc hai lần chạy chồng lấn.\n(B) ĐÚNG: Đặt pipeline ở execution mode superseded, để khi một lần chạy mới bắt đầu trong lúc lần cũ còn đang chờ, lần cũ bị thay thế và bản mới nhất là bản tiến tiếp; điều này trực tiếp bảo đảm bản mới nhất thắng.\n(C) SAI: Chuyển pipeline sang chạy theo lịch mỗi giờ làm chậm việc phát hành và vẫn có thể gom nhiều thay đổi vào một lần chạy.\n(D) ĐÚNG: Bật transition lock hoặc cấu hình để stage triển khai chỉ xử lý một lần chạy tại một thời điểm, tránh hai execution cùng vào giai đoạn triển khai.\n(E) SAI: Yêu cầu developer chờ nhau trước khi merge là thỏa thuận chứ không phải kiểm soát kỹ thuật.\nĐáp án đúng: B, D\nĐiểm cần nhớ: Execution mode superseded bảo đảm bản mới nhất thắng; giới hạn một execution trong stage triển khai tránh ghi đè chéo.",
       "tagNames": ["SDLC Automation > AWS CodePipeline"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Use the superseded execution mode so a newer execution replaces an older one that is still waiting.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Restrict the deployment stage so that only one execution can occupy it at a time.", "isCorrect": true },
-        { "answerLabel": "C", "answerText": "Configure the deployment stage to retry failed actions three times.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Change the pipeline trigger to a scheduled hourly execution.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Configure the deployment stage to retry failed actions three times.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Use the superseded execution mode so a newer execution replaces an older one that is still waiting.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Change the pipeline trigger to a scheduled hourly execution.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Restrict the deployment stage so that only one execution can occupy it at a time.", "isCorrect": true },
         { "answerLabel": "E", "answerText": "Ask developers to coordinate and avoid merging changes close together.", "isCorrect": false }
       ]
     },
@@ -178,51 +178,51 @@
       "questionNumber": 14,
       "questionType": "MCQ",
       "questionText": "A DevOps engineer must build a pipeline that deploys the same CloudFormation template to three AWS Regions. The deployments must run in parallel to reduce total time, and a failure in one Region must not prevent the engineer from seeing the outcome in the other Regions. Which pipeline design meets these requirements?",
-      "explanation": "Phân tích đề: Cần triển khai song song tới nhiều Region trong một pipeline.\n(A) ĐÚNG: Trong một stage, tạo ba deploy action với cùng runOrder, mỗi action đặt Region đích khác nhau; các action chạy song song và kết quả của từng action được báo cáo riêng, nên một Region thất bại không che giấu kết quả của hai Region còn lại.\n(B) SAI: Ba stage liên tiếp khiến triển khai chạy tuần tự và một thất bại sớm chặn các stage sau.\n(C) SAI: Tạo ba pipeline riêng làm mất khả năng theo dõi một lần phát hành thống nhất.\n(D) SAI: Dùng một action rồi vòng lặp qua các Region trong script làm mất khả năng báo cáo trạng thái riêng cho từng Region.\nĐáp án đúng: A\nĐiểm cần nhớ: Các action cùng stage với cùng runOrder chạy song song; action deploy có thể chỉ định Region đích khác nhau.",
+      "explanation": "Phân tích đề: Cần triển khai song song tới nhiều Region trong một pipeline.\n(A) SAI: Dùng một action rồi vòng lặp qua các Region trong script làm mất khả năng báo cáo trạng thái riêng cho từng Region.\n(B) SAI: Tạo ba pipeline riêng làm mất khả năng theo dõi một lần phát hành thống nhất.\n(C) ĐÚNG: Trong một stage, tạo ba deploy action với cùng runOrder, mỗi action đặt Region đích khác nhau; các action chạy song song và kết quả của từng action được báo cáo riêng, nên một Region thất bại không che giấu kết quả của hai Region còn lại.\n(D) SAI: Ba stage liên tiếp khiến triển khai chạy tuần tự và một thất bại sớm chặn các stage sau.\nĐáp án đúng: C\nĐiểm cần nhớ: Các action cùng stage với cùng runOrder chạy song song; action deploy có thể chỉ định Region đích khác nhau.",
       "tagNames": ["SDLC Automation > AWS CodePipeline"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Create one stage containing three CloudFormation deploy actions with the same runOrder, each targeting a different Region.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Create three sequential stages, one per Region, each with a single deploy action.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Create three separate pipelines, one per Region, and start them from the same source event.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Create a single CodeBuild action that loops over the three Regions and deploys the stack with the CLI.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Create a single CodeBuild action that loops over the three Regions and deploys the stack with the CLI.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Create three separate pipelines, one per Region, and start them from the same source event.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Create one stage containing three CloudFormation deploy actions with the same runOrder, each targeting a different Region.", "isCorrect": true },
+        { "answerLabel": "D", "answerText": "Create three sequential stages, one per Region, each with a single deploy action.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 15,
       "questionType": "MCQ",
       "questionText": "A security team is concerned that an attacker could publish a malicious public package with the same name as one of the company's internal packages, causing builds to resolve the public version instead. The company uses AWS CodeArtifact with an upstream connection to the public npm registry. Which CodeArtifact feature prevents this?",
-      "explanation": "Phân tích đề: Đây là kịch bản thay thế phụ thuộc, khi gói công khai trùng tên gói nội bộ bị ưu tiên.\n(A) ĐÚNG: Dùng package origin control để chặn việc gói cùng tên được lấy từ nguồn bên ngoài sau khi gói nội bộ đã tồn tại; CodeArtifact chỉ cho phép phiên bản xuất bản trực tiếp vào repository và không nhận bản từ registry công khai cho gói đó.\n(B) SAI: Bật quét lỗ hổng phát hiện gói có lỗ hổng nhưng không ngăn việc phân giải sai nguồn.\n(C) SAI: Gỡ external connection làm mọi gói công khai không lấy được, ảnh hưởng tới toàn bộ quá trình xây dựng.\n(D) SAI: Đổi tên toàn bộ gói nội bộ theo tiền tố riêng làm giảm rủi ro nhưng là thay đổi diện rộng và không phải cơ chế mà dịch vụ cung cấp cho vấn đề này.\nĐáp án đúng: A\nĐiểm cần nhớ: Package origin control ngăn gói nội bộ bị thay thế bằng gói trùng tên từ registry công khai.",
+      "explanation": "Phân tích đề: Đây là kịch bản thay thế phụ thuộc, khi gói công khai trùng tên gói nội bộ bị ưu tiên.\n(A) SAI: Đổi tên toàn bộ gói nội bộ theo tiền tố riêng làm giảm rủi ro nhưng là thay đổi diện rộng và không phải cơ chế mà dịch vụ cung cấp cho vấn đề này.\n(B) SAI: Gỡ external connection làm mọi gói công khai không lấy được, ảnh hưởng tới toàn bộ quá trình xây dựng.\n(C) SAI: Bật quét lỗ hổng phát hiện gói có lỗ hổng nhưng không ngăn việc phân giải sai nguồn.\n(D) ĐÚNG: Dùng package origin control để chặn việc gói cùng tên được lấy từ nguồn bên ngoài sau khi gói nội bộ đã tồn tại; CodeArtifact chỉ cho phép phiên bản xuất bản trực tiếp vào repository và không nhận bản từ registry công khai cho gói đó.\nĐáp án đúng: D\nĐiểm cần nhớ: Package origin control ngăn gói nội bộ bị thay thế bằng gói trùng tên từ registry công khai.",
       "tagNames": ["SDLC Automation > AWS CodeArtifact"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Configure package origin controls so that packages published internally cannot also be ingested from the public upstream repository.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Enable vulnerability scanning on the CodeArtifact repository.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Remove the external connection so no public packages can be retrieved.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Rename all internal packages with a company-specific prefix.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Rename all internal packages with a company-specific prefix.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Remove the external connection so no public packages can be retrieved.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Enable vulnerability scanning on the CodeArtifact repository.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Configure package origin controls so that packages published internally cannot also be ingested from the public upstream repository.", "isCorrect": true }
       ]
     },
     {
       "questionNumber": 16,
       "questionType": "MCQ",
       "questionText": "A DevOps engineer must ensure that all package assets stored in AWS CodeArtifact are encrypted with a key that the company controls and can disable if a security incident occurs. What should the engineer configure?",
-      "explanation": "Phân tích đề: Cần khóa do khách hàng kiểm soát cho dữ liệu trong CodeArtifact.\n(A) ĐÚNG: Chỉ định một khóa KMS do khách hàng quản lý khi tạo CodeArtifact domain; toàn bộ asset trong các repository thuộc domain được mã hóa bằng khóa đó, và công ty có thể vô hiệu hóa khóa để chấm dứt khả năng truy cập khi cần.\n(B) SAI: Khóa do dịch vụ quản lý không cho phép công ty vô hiệu hóa theo ý mình.\n(C) SAI: Mã hóa gói ở phía client trước khi xuất bản làm hỏng khả năng phân giải phụ thuộc của trình quản lý gói.\n(D) SAI: Bật mã hóa mặc định cho một bucket S3 không áp dụng vì CodeArtifact không lưu asset trong bucket do khách hàng quản lý.\nĐáp án đúng: A\nĐiểm cần nhớ: Khóa mã hóa của CodeArtifact được chỉ định ở mức domain và nên là khóa do khách hàng quản lý khi cần quyền kiểm soát.",
+      "explanation": "Phân tích đề: Cần khóa do khách hàng kiểm soát cho dữ liệu trong CodeArtifact.\n(A) SAI: Mã hóa gói ở phía client trước khi xuất bản làm hỏng khả năng phân giải phụ thuộc của trình quản lý gói.\n(B) ĐÚNG: Chỉ định một khóa KMS do khách hàng quản lý khi tạo CodeArtifact domain; toàn bộ asset trong các repository thuộc domain được mã hóa bằng khóa đó, và công ty có thể vô hiệu hóa khóa để chấm dứt khả năng truy cập khi cần.\n(C) SAI: Bật mã hóa mặc định cho một bucket S3 không áp dụng vì CodeArtifact không lưu asset trong bucket do khách hàng quản lý.\n(D) SAI: Khóa do dịch vụ quản lý không cho phép công ty vô hiệu hóa theo ý mình.\nĐáp án đúng: B\nĐiểm cần nhớ: Khóa mã hóa của CodeArtifact được chỉ định ở mức domain và nên là khóa do khách hàng quản lý khi cần quyền kiểm soát.",
       "tagNames": ["SDLC Automation > AWS CodeArtifact"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Create the CodeArtifact domain with a customer managed AWS KMS key so all repository assets in the domain use that key.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Rely on the default AWS managed key used by CodeArtifact.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Encrypt each package with a client-side key before publishing it to the repository.", "isCorrect": false },
-        { "answerLabel": "D", "answerText": "Enable default encryption on the S3 bucket that backs the repository.", "isCorrect": false }
+        { "answerLabel": "A", "answerText": "Encrypt each package with a client-side key before publishing it to the repository.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Create the CodeArtifact domain with a customer managed AWS KMS key so all repository assets in the domain use that key.", "isCorrect": true },
+        { "answerLabel": "C", "answerText": "Enable default encryption on the S3 bucket that backs the repository.", "isCorrect": false },
+        { "answerLabel": "D", "answerText": "Rely on the default AWS managed key used by CodeArtifact.", "isCorrect": false }
       ]
     },
     {
       "questionNumber": 17,
       "questionType": "MCQ",
       "questionText": "A company deploys the same container image to Amazon ECS clusters in three Regions. Deployments in the two secondary Regions are slow because tasks pull the image across Regions from a single Amazon ECR repository. The company wants pulls to be served locally in each Region without changing the build pipeline. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: Cần image có sẵn cục bộ ở mỗi Region mà không sửa pipeline.\n(A) ĐÚNG: Cấu hình ECR cross-Region replication ở mức registry; mỗi image được đẩy lên Region chính sẽ tự sao chép sang các Region đã khai báo, và task trong mỗi Region kéo image từ repository cục bộ, trong khi pipeline vẫn chỉ đẩy một lần.\n(B) SAI: Sửa pipeline để đẩy image tới ba repository là thay đổi pipeline, trái yêu cầu, và làm tăng thời gian build.\n(C) SAI: Dùng pull through cache phục vụ việc lấy image từ registry bên ngoài chứ không nhân bản image nội bộ giữa các Region.\n(D) SAI: Tăng kích thước task hoặc băng thông không giải quyết được độ trễ do kéo image qua Region.\nĐáp án đúng: A\nĐiểm cần nhớ: ECR cross-Region replication tự sao chép image sang các Region khác, giúp task kéo image cục bộ.",
+      "explanation": "Phân tích đề: Cần image có sẵn cục bộ ở mỗi Region mà không sửa pipeline.\n(A) SAI: Sửa pipeline để đẩy image tới ba repository là thay đổi pipeline, trái yêu cầu, và làm tăng thời gian build.\n(B) SAI: Dùng pull through cache phục vụ việc lấy image từ registry bên ngoài chứ không nhân bản image nội bộ giữa các Region.\n(C) ĐÚNG: Cấu hình ECR cross-Region replication ở mức registry; mỗi image được đẩy lên Region chính sẽ tự sao chép sang các Region đã khai báo, và task trong mỗi Region kéo image từ repository cục bộ, trong khi pipeline vẫn chỉ đẩy một lần.\n(D) SAI: Tăng kích thước task hoặc băng thông không giải quyết được độ trễ do kéo image qua Region.\nĐáp án đúng: C\nĐiểm cần nhớ: ECR cross-Region replication tự sao chép image sang các Region khác, giúp task kéo image cục bộ.",
       "tagNames": ["SDLC Automation > Amazon ECR"],
       "answers": [
-        { "answerLabel": "A", "answerText": "Configure ECR cross-Region replication so images pushed to the primary repository are copied automatically to repositories in the other Regions.", "isCorrect": true },
-        { "answerLabel": "B", "answerText": "Modify the build pipeline to push the image to a separate ECR repository in each Region.", "isCorrect": false },
-        { "answerLabel": "C", "answerText": "Configure an ECR pull through cache rule in each secondary Region.", "isCorrect": false },
+        { "answerLabel": "A", "answerText": "Modify the build pipeline to push the image to a separate ECR repository in each Region.", "isCorrect": false },
+        { "answerLabel": "B", "answerText": "Configure an ECR pull through cache rule in each secondary Region.", "isCorrect": false },
+        { "answerLabel": "C", "answerText": "Configure ECR cross-Region replication so images pushed to the primary repository are copied automatically to repositories in the other Regions.", "isCorrect": true },
         { "answerLabel": "D", "answerText": "Increase the task CPU and memory allocation so image pulls complete faster.", "isCorrect": false }
       ]
     }

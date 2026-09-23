@@ -65,9 +65,9 @@
         border-radius: 999px;
         font-weight: 700;
         font-size: 1.15rem;
-        color: var(--amber-700);
+        color: var(--brand-700);
         background: rgba(255, 255, 255, 0.92);
-        border: 1px solid rgb(var(--amber-700-rgb) / 0.3);
+        border: 1px solid rgb(var(--brand-700-rgb) / 0.3);
         box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         backdrop-filter: blur(2px);
         z-index: 2;
@@ -77,8 +77,8 @@
         }
 
         &.owned {
-            color: #2f9e44;
-            border-color: rgba(47, 158, 68, 0.35);
+            color: var(--success-text);
+            border-color: rgb(var(--success-rgb) / 0.35);
         }
     }
 }
@@ -187,7 +187,7 @@
     transition: all 0.2s;
 
     &:hover {
-        background: var(--amber-50);
+        background: var(--brand-50);
         border-color: var(--brand-unique);
         color: var(--brand-unique);
     }
@@ -201,8 +201,8 @@
 
 .status-locked {
     color: var(--hover-accent) !important;
-    background: rgb(var(--teal-500-rgb) / 0.18) !important;
-    border-color: rgb(var(--teal-500-rgb) / 0.35) !important;
+    background: rgb(var(--primary-rgb) / 0.18) !important;
+    border-color: rgb(var(--primary-rgb) / 0.35) !important;
 }
 
 .status-expired {
