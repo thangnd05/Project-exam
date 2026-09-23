@@ -1,4 +1,5 @@
 'use client';
+import {useState} from 'react';
 import Link from 'next/link';
 import {useQueries, useQuery} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
@@ -8,7 +9,7 @@ import {
   IoChevronForward,
   IoDocumentTextOutline,
   IoHelpCircleOutline,
-  IoRibbonOutline,
+  IoLayersOutline,
   IoTimeOutline,
 } from 'react-icons/io5';
 
@@ -60,6 +61,11 @@ const parseCode = (name?: string) => {
   return match?.[1]?.toUpperCase() ?? '';
 };
 
+const LEVELS = ['Foundational', 'Associate', 'Professional', 'Specialty'];
+
+const parseLevel = (name?: string) =>
+  LEVELS.find((level) => new RegExp(`\\b${level}\\b`, 'i').test(name ?? '')) ?? '';
+
 const isAwsExam = (exam: ExamTypeResponse) =>
   /aws/i.test(`${exam.name ?? ''} ${exam.parentName ?? ''}`);
 
@@ -69,6 +75,27 @@ const formatDuration = (minutes?: number | null) => {
   if (!minutes) return 'Theo đề';
   return `${minutes} phút`;
 };
+
+const getInitials = (name?: string) => {
+  const words = (name ?? '').replace(/\(.*?\)/g, '').trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return '?';
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+};
+
+function ExamLogo({url, name}: {url?: string; name?: string}) {
+  const [failed, setFailed] = useState(false);
+
+  return (
+    <span className={cx('card-icon')} aria-hidden="true">
+      {url && !failed ? (
+        <img src={url} alt="" onError={() => setFailed(true)} />
+      ) : (
+        <span className={cx('card-initials')}>{getInitials(name)}</span>
+      )}
+    </span>
+  );
+}
 
 function ExamCatalog() {
   const {data: exams = [], isLoading, isError} = useQuery({
@@ -88,13 +115,10 @@ function ExamCatalog() {
     })),
   });
 
-  const domainsByExam: Record<string, string[]> = {};
+  const domainCountByExam: Record<string, number> = {};
   exams.forEach((exam, index) => {
     const parts = partQueries[index]?.data ?? [];
-    domainsByExam[exam.examTypeId] = [...parts]
-      .sort((a, b) => (a.displayOrder ?? 0) - (b.displayOrder ?? 0))
-      .map((part) => part.name?.trim())
-      .filter((name): name is string => Boolean(name));
+    domainCountByExam[exam.examTypeId] = parts.filter((part) => part.name?.trim()).length;
   });
 
   const scale = getScoreScale(exams[0]?.scoringMethod || 'AWS_SCALE');
@@ -134,7 +158,8 @@ function ExamCatalog() {
               const meta = code ? EXAM_META[code] : undefined;
               const duration = formatDuration(exam.durationMinutes ?? null);
               const href = buildExamTypeDetailPath(exam.examTypeId);
-              const domains = domainsByExam[exam.examTypeId] ?? [];
+              const domainCount = domainCountByExam[exam.examTypeId] ?? 0;
+              const level = parseLevel(exam.name);
 
               return (
                 <Link
@@ -144,11 +169,10 @@ function ExamCatalog() {
                   aria-label={`Mở kho đề ${exam.name}`}
                 >
                   <div className={cx('card-head')}>
-                    <span className={cx('card-icon')}>
-                      <IoRibbonOutline />
-                    </span>
+                    <ExamLogo url={exam.imageUrl} name={exam.name} />
                     <div className={cx('card-tags')}>
                       {code ? <span className={cx('code')}>{code}</span> : null}
+                      {level ? <span className={cx('level')}>{level}</span> : null}
                     </div>
                   </div>
 
@@ -165,17 +189,13 @@ function ExamCatalog() {
                         <span>{meta.questions} câu</span>
                       </li>
                     ) : null}
+                    {domainCount ? (
+                      <li className={cx('meta-item')}>
+                        <IoLayersOutline />
+                        <span>{domainCount} lĩnh vực</span>
+                      </li>
+                    ) : null}
                   </ul>
-
-                  {domains.length ? (
-                    <ul className={cx('domains')}>
-                      {domains.map((domain) => (
-                        <li key={domain} className={cx('domain')}>
-                          {domain}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
 
                   <span className={cx('cta')}>
                     Luyện đề
