@@ -581,6 +581,32 @@ li {
   --bs-btn-disabled-border-color: var(--primary);
 }
 
+.btn-outline-primary {
+  --bs-btn-color: var(--brand-700);
+  --bs-btn-border-color: var(--primary);
+  --bs-btn-hover-color: var(--text-on-brand);
+  --bs-btn-hover-bg: var(--primary);
+  --bs-btn-hover-border-color: var(--primary);
+  --bs-btn-active-color: var(--text-on-brand);
+  --bs-btn-active-bg: var(--hover-accent);
+  --bs-btn-active-border-color: var(--hover-accent);
+  --bs-btn-disabled-color: var(--brand-700);
+  --bs-btn-disabled-border-color: var(--primary);
+}
+
+.alert-info,
+.alert-primary {
+  --bs-alert-color: var(--brand-800);
+  --bs-alert-bg: var(--brand-50);
+  --bs-alert-border-color: var(--brand-200);
+  --bs-alert-link-color: var(--brand-800);
+}
+
+.text-info,
+.text-primary {
+  color: var(--primary) !important;
+}
+
 .tag-badge {
   font-size: var(--font-size-ssm) !important;
   padding: 0.6rem 1.2rem !important;

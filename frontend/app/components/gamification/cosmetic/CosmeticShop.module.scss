@@ -51,8 +51,8 @@
   }
 
   &.equipped {
-    border-color: #228be6;
-    box-shadow: 0 0 0 2px rgba(34, 139, 230, 0.15);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-alpha-15);
   }
 }
 

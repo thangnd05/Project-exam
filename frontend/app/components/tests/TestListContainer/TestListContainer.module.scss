@@ -74,19 +74,19 @@ $brand-border: var(--slate-200);
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(135deg, #0f6bdc 0%, #004fb0 100%);
-  color: white;
+  background: var(--primary-gradient);
+  color: var(--on-primary-gradient);
   padding: 14px 28px;
   border-radius: 16px;
   font-weight: 700;
   font-size: 1.8rem;
   border: none;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 20px rgba(15, 107, 220, 0.3);
+  box-shadow: 0 8px 20px var(--primary-alpha-28);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(15, 107, 220, 0.4);
+    box-shadow: 0 12px 28px var(--primary-alpha-45);
   }
 
   &:active {

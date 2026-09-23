@@ -22,7 +22,7 @@ const TrafficHeatmap = ({ data = [] }: { data?: DayHours[] }) => {
     const shade = (v: number) => {
         if (!v) return '#f1f5f9';
         const t = 0.18 + 0.82 * (v / max);
-        return `rgba(20, 184, 166, ${t})`;
+        return `rgba(201, 168, 75, ${t})`;
     };
 
     return (

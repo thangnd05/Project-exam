@@ -297,7 +297,7 @@ export const MonthlyActivityCombo = ({ data }: { data: MonthPerformance[] }) => 
 export const SkillRadar = ({ data }: { data: NameValue[] }) => (
     <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={data} outerRadius="70%">
-            <PolarGrid stroke="rgba(20, 184, 166, 0.18)" />
+            <PolarGrid stroke="rgba(201, 168, 75, 0.18)" />
             <PolarAngleAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} />
             <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
             <Radar

@@ -1,176 +1,99 @@
 'use client';
 
 import Link from 'next/link';
-import {Container} from 'react-bootstrap';
-import {useEffect, useRef, useState} from 'react';
-import {motion, useInView} from 'framer-motion';
-import type {Transition} from 'framer-motion';
-import {FaFacebookSquare, FaInstagram, FaYoutube} from 'react-icons/fa';
-
-import styles from './footer.module.scss';
 import Image from 'next/image';
-import {imageAssets} from '@/app/assets/images';
+import { Container } from 'react-bootstrap';
+import { FaFacebookF, FaInstagram, FaYoutube } from 'react-icons/fa';
+
+import { imageAssets } from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
 
-function useCountUp(target: number, isActive: boolean, duration = 1400) {
-  const [value, setValue] = useState(0);
-  const startedRef = useRef(false);
+import styles from './footer.module.scss';
 
-  useEffect(() => {
-    if (!isActive || startedRef.current) return undefined;
-    startedRef.current = true;
-    const start = performance.now();
-    let raf: number;
+type FooterLink = { label: string; href: string };
 
-    const tick = (now: number) => {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(target * eased));
-      if (progress < 1) {
-        raf = requestAnimationFrame(tick);
-      }
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [target, isActive, duration]);
-
-  return value;
-}
-
-const STATS = [
-  {target: 500, suffix: '+', label: 'Câu hỏi trắc nghiệm'},
-  {target: 50, suffix: '+', label: 'Bộ đề hoàn chỉnh'},
-  {target: 100, suffix: '%', label: 'Cơ hội thi tốt nhất'},
-];
-
-const LINKS = [
-  {to: routes.about, label: 'Giới thiệu'},
-  {to: routes.policy, label: 'Chính sách'},
-  {to: routes.service, label: 'Điều khoản & dịch vụ'},
+const COLUMNS: { title: string; links: FooterLink[] }[] = [
+  {
+    title: 'Luyện thi',
+    links: [
+      { label: 'Kỳ thi', href: routes.examTypes },
+      { label: 'Lộ trình học', href: routes.generatePlan },
+      { label: 'Đề của tôi', href: routes.MyTest },
+    ],
+  },
+  {
+    title: 'Hỗ trợ',
+    links: [
+      { label: 'Giới thiệu', href: routes.about },
+      { label: 'Chính sách', href: routes.policy },
+      { label: 'Điều khoản & dịch vụ', href: routes.service },
+    ],
+  },
 ];
 
 const SOCIALS = [
-  {href: 'https://facebook.com', label: 'Facebook', Icon: FaFacebookSquare},
-  {href: 'https://instagram.com', label: 'Instagram', Icon: FaInstagram},
-  {href: 'https://youtube.com', label: 'YouTube', Icon: FaYoutube},
+  { href: 'https://facebook.com', label: 'Facebook', Icon: FaFacebookF },
+  { href: 'https://instagram.com', label: 'Instagram', Icon: FaInstagram },
+  { href: 'https://youtube.com', label: 'YouTube', Icon: FaYoutube },
 ];
 
-const fadeUp = {
-  initial: {opacity: 0, y: 18},
-  whileInView: {opacity: 1, y: 0},
-  viewport: {once: true, amount: 0.3},
-  transition: {duration: 0.55, ease: [0.22, 1, 0.36, 1]} as Transition,
-};
-
-type StatCardProps = {
-  target: number;
-  suffix: string;
-  label: string;
-  isActive: boolean;
-  index: number;
-};
-
-const StatCard = ({target, suffix, label, isActive, index}: StatCardProps) => {
-  const value = useCountUp(target, isActive);
-
-  return (
-    <motion.div
-      className={styles.statCard}
-      initial={{opacity: 0, y: 14, scale: 0.97}}
-      whileInView={{opacity: 1, y: 0, scale: 1}}
-      viewport={{once: true, amount: 0.4}}
-      transition={{duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1]}}
-    >
-      <span className={styles.statValue}>
-        {value}
-        {suffix}
-      </span>
-      <span className={styles.statLabel}>{label}</span>
-    </motion.div>
-  );
-};
-
 function Footer() {
-  const statsRef = useRef<HTMLDivElement>(null);
-  const inView = useInView(statsRef, {once: true, amount: 0.35});
-
   return (
     <footer className={styles.footer}>
       <Container className={styles.container}>
-        <div className={styles.topGrid}>
-          <motion.div className={styles.brandCol} {...fadeUp}>
-            <div className={styles.logoRow}>
-              <div className={styles.logoWrapper}>
-                <Image src={imageAssets.logoW} alt="WinDe logo" width={34} height={34} />
-              </div>
-              <div className={styles.brandText}>
-                <h3 className={styles.brandName}>WinDe</h3>
-                <span className={styles.brandBadge}>Nền tảng luyện thi</span>
-              </div>
-            </div>
-            <p className={styles.brandSub}>
-              Đồng hành cùng bạn trên hành trình chinh phục tri thức.
-            </p>
-            <div className={styles.socialIcons}>
-              {SOCIALS.map(({href, label, Icon}) => (
-                <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}>
-                  <Icon />
-                </a>
-              ))}
-            </div>
-          </motion.div>
+        <div className={styles.top}>
+          <div className={styles.brandCol}>
+            <Link href={routes.home} className={styles.brand} aria-label="WinDe - Trang chủ">
+              <span className={styles.logoWrapper}>
+                <Image src={imageAssets.logoW} alt="" width={28} height={28} />
+              </span>
+              <span className={styles.brandName}>WinDe</span>
+            </Link>
+          </div>
 
-          <div className={styles.infoGrid}>
-            <motion.nav className={styles.linksCol} aria-label="Liên kết footer" {...fadeUp} transition={{...fadeUp.transition, delay: 0.06}}>
-              <span className={styles.colTitle}>Liên kết</span>
+          {COLUMNS.map(({ title, links }) => (
+            <nav key={title} className={styles.linkCol} aria-label={title}>
+              <h4 className={styles.colTitle}>{title}</h4>
               <ul className={styles.linkList}>
-                {LINKS.map(({to, label}) => (
-                  <li key={to}>
-                    <Link className={styles.footerLink} href={to}>
+                {links.map(({ label, href }) => (
+                  <li key={label}>
+                    <Link className={styles.footerLink} href={href}>
                       {label}
                     </Link>
                   </li>
                 ))}
               </ul>
-            </motion.nav>
+            </nav>
+          ))}
 
-            <div className={styles.statsCol} ref={statsRef}>
-              <motion.span
-                className={styles.colTitle}
-                initial={{opacity: 0}}
-                whileInView={{opacity: 1}}
-                viewport={{once: true}}
-                transition={{duration: 0.4}}
-              >
-                Con số ấn tượng
-              </motion.span>
-              <div className={styles.statsGrid}>
-                {STATS.map((stat, index) => (
-                  <StatCard key={stat.label} {...stat} isActive={inView} index={index} />
-                ))}
-              </div>
+          <div className={styles.linkCol}>
+            <h4 className={styles.colTitle}>Theo dõi</h4>
+            <div className={styles.socials}>
+              {SOCIALS.map(({ href, label, Icon }) => (
+                <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}>
+                  <Icon />
+                </a>
+              ))}
             </div>
           </div>
         </div>
+      </Container>
 
-        <div className={styles.divider} />
+      <div className={styles.divider} />
 
-        <motion.div
-          className={styles.bottomBar}
-          initial={{opacity: 0}}
-          whileInView={{opacity: 1}}
-          viewport={{once: true}}
-          transition={{duration: 0.5, delay: 0.1}}
-        >
-          <div className={styles.bottomLeft}>
-            <span className={styles.contactText}>Liên hệ</span>
-            <a className={styles.emailLink} href="mailto:winde.contact@gmail.com">
-              winde.contact@gmail.com
-            </a>
+      <Container className={styles.container}>
+        <div className={styles.bottom}>
+          <span className={styles.copyright}>© WinDe 2026. All rights reserved.</span>
+          <div className={styles.legal}>
+            <Link className={styles.legalLink} href={routes.service}>
+              Điều khoản
+            </Link>
+            <span className={styles.legalSep} aria-hidden="true" />
+            <Link className={styles.legalLink} href={routes.policy}>
+              Quyền riêng tư
+            </Link>
           </div>
-          <span className={styles.copyrightText}>© 2026 WinDe. All rights reserved.</span>
-        </motion.div>
+        </div>
       </Container>
     </footer>
   );

@@ -45,7 +45,7 @@ const LocationsMap = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
         const v = counts[norm(name)];
         if (!v) return '#e9eef5';
         const t = 0.25 + 0.75 * (v / max);
-        return `rgba(20, 184, 166, ${t})`;
+        return `rgba(201, 168, 75, ${t})`;
     };
 
     return (
