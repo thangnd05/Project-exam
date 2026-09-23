@@ -6,14 +6,17 @@
 }
 
 .modal-header {
-    background: var(--primary-gradient);
+    background: var(--header-gradient);
+    --on-primary-gradient: var(--on-header);
+    --on-primary-gradient-soft: rgb(255 255 255 / 0.2);
     color: var(--on-primary-gradient);
+    text-shadow: 0 1px 2px rgb(var(--brand-900-rgb) / 0.25);
     border: none;
     padding: 25px 30px;
 
     .btn-close {
-        filter: none;
-        opacity: 0.7;
+        filter: invert(1) grayscale(100%) brightness(200%);
+        opacity: 0.85;
     }
 
     .modal-title {

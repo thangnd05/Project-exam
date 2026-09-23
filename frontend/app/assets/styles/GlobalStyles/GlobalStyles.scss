@@ -288,6 +288,8 @@
   --primary-alpha-45: rgb(var(--brand-500-rgb) / 0.45);
 
   --primary-gradient: linear-gradient(135deg, var(--brand-200) 0%, var(--brand-500) 52%, var(--brand-600) 100%);
+  --header-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-500) 50%, var(--brand-700) 100%);
+  --on-header: var(--brand-50);
 
   --hero-gradient: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-500) 100%);
   --hero-shadow: 0 12px 30px var(--primary-alpha-28);
