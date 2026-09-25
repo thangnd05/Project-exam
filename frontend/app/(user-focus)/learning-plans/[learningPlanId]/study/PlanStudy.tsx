@@ -12,6 +12,8 @@ import { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { getRecoveryResourceLinkProps } from '@/app/utils/recoveryResource';
 import { getApiBaseUrl, getFullMediaUrl } from '@/app/utils/mediaUrl';
 import { useStreak } from '@/app/hooks/useStreak';
+import { useStreakRestoreGate } from '@/app/components/gamification/streak/hooks/useStreakRestoreGate';
+import StreakRestoreModal from '@/app/components/gamification/streak/StreakRestoreModal';
 import PlanPartTaskList from '@/app/components/learning-plans/PlanPartTaskList/PlanPartTaskList';
 import { useSubmitSession } from './_hooks/useSubmitSession';
 import { usePlanSession } from './_hooks/usePlanSession';
@@ -124,6 +126,7 @@ function PlanStudy() {
   const [searchParams, setSearchParams] = useSearchParamsState();
   const router = useRouter();
   const { refreshStreak } = useStreak();
+  const { blocked, allow, streakReady } = useStreakRestoreGate();
   const taskIdFromUrl = searchParams.get('taskId');
 
   const answersStorageKey = `plan-study-answers-${learningPlanId}-${taskIdFromUrl || 'current'}`;
@@ -139,6 +142,7 @@ function PlanStudy() {
   const { session, isLoading: loading, error: loadError } = usePlanSession(
     learningPlanId,
     taskIdFromUrl,
+    streakReady && !blocked,
   );
 
   const error = formError || loadError;
@@ -227,8 +231,13 @@ function PlanStudy() {
     );
   };
 
-  if (loading) {
-    return <div className={cx('wrapper')}><div className={cx('loading')}>Đang tải...</div></div>;
+  if (!streakReady || blocked || loading) {
+    return (
+      <div className={cx('wrapper')}>
+        <div className={cx('loading')}>Đang tải...</div>
+        <StreakRestoreModal show={blocked} onClose={allow} />
+      </div>
+    );
   }
 
   if (!session) {

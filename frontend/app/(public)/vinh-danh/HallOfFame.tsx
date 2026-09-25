@@ -1,0 +1,144 @@
+'use client';
+import Link from 'next/link';
+import {useRouter, useSearchParams} from 'next/navigation';
+import {Container} from 'react-bootstrap';
+import classNames from 'classnames/bind';
+
+import PageHeader from '@/app/components/PageHeader/PageHeader';
+import routes from '@/app/configs/Routes';
+import {getFullMediaUrl} from '@/app/utils/mediaUrl';
+import {hallOfFameTabLabel, useHallOfFameExams} from '../_components/HeroSection/hooks/useHallOfFameExams';
+import {useQuickLeaderboard} from '../_components/HeroSection/hooks/useQuickLeaderboard';
+import styles from './HallOfFame.module.scss';
+
+const cx = classNames.bind(styles);
+const PAGE_LIMIT = 100;
+
+const initials = (name: string) => {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'K';
+  if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
+  return `${parts[0].slice(0, 1)}${parts[parts.length - 1].slice(0, 1)}`.toUpperCase();
+};
+
+const formatDuration = (totalSeconds?: number | null) => {
+  if (totalSeconds == null) return '—';
+  const sec = Math.max(0, Math.floor(totalSeconds));
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+};
+
+function HallOfFame() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const requestedId = searchParams.get('examTypeId');
+  const {exams, isLoading: examsLoading, isError: examsError} = useHallOfFameExams();
+  const selected = exams.find((exam) => exam.examTypeId === requestedId) ?? exams[0];
+  const selectedId = selected?.examTypeId;
+  const {entries, totalParticipants, isLoading, isError} = useQuickLeaderboard(PAGE_LIMIT, selectedId);
+
+  const selectExam = (examTypeId: string) => {
+    router.replace(`${routes.hallOfFame}?examTypeId=${encodeURIComponent(examTypeId)}`);
+  };
+
+  return (
+    <div className={cx('page')}>
+      <Container>
+        <Link className={cx('back')} href={routes.home}>
+          Về trang chủ
+        </Link>
+        <PageHeader
+          label="Vinh danh"
+          title={selected?.name || 'Bảng xếp hạng bài thi thử'}
+          description="Mỗi tab là một kỳ thi AWS không tick Linh hoạt. Chỉ tính bài full mock: điểm cao hơn, thời gian làm ngắn hơn, rồi ai nộp bài trước."
+          badgeLabel={
+            totalParticipants > 0 ? `${totalParticipants} người đã hoàn thành` : undefined
+          }
+        />
+
+        {exams.length > 0 && (
+          <div className={cx('tabs')} role="tablist" aria-label="Kỳ thi">
+            {exams.map((exam) => {
+              const active = exam.examTypeId === selectedId;
+              return (
+                <button
+                  key={exam.examTypeId}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  className={cx('tab', {tabActive: active})}
+                  onClick={() => selectExam(exam.examTypeId)}
+                >
+                  {hallOfFameTabLabel(exam.name)}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {examsLoading || (selectedId && isLoading) ? (
+          <p className={cx('status')}>Đang tải bảng vinh danh…</p>
+        ) : examsError || isError ? (
+          <p className={cx('status')}>Không tải được bảng xếp hạng. Thử lại sau.</p>
+        ) : exams.length === 0 ? (
+          <p className={cx('status')}>Chưa có kỳ thi chuẩn để vinh danh.</p>
+        ) : entries.length === 0 ? (
+          <p className={cx('status')}>Chưa có ai hoàn thành bài thi thử.</p>
+        ) : (
+          <div className={cx('tableWrap')}>
+            {totalParticipants > entries.length && (
+              <p className={cx('note')}>
+                Hiển thị {entries.length} người điểm cao nhất trong {totalParticipants} người.
+              </p>
+            )}
+            <table className={cx('table')}>
+              <thead>
+                <tr>
+                  <th>Hạng</th>
+                  <th>Người làm</th>
+                  <th>Kỳ thi</th>
+                  <th>Điểm</th>
+                  <th>Thời gian</th>
+                </tr>
+              </thead>
+              <tbody>
+                {entries.map((entry) => {
+                  const avatar = getFullMediaUrl(entry.avatarUrl);
+                  return (
+                    <tr key={entry.rank} className={cx({podium: entry.rank <= 3})}>
+                      <td data-label="Hạng">
+                        <span className={cx('rank', `rank${entry.rank}`)}>{entry.rank}</span>
+                      </td>
+                      <td data-label="Người làm">
+                        <span className={cx('person')}>
+                          {avatar ? (
+                            <img className={cx('avatar')} src={avatar} alt="" />
+                          ) : (
+                            <span className={cx('avatar', 'fallback')} aria-hidden="true">
+                              {initials(entry.displayName)}
+                            </span>
+                          )}
+                          <span className={cx('name')}>{entry.displayName}</span>
+                        </span>
+                      </td>
+                      <td data-label="Kỳ thi">{entry.examTypeName || '—'}</td>
+                      <td data-label="Điểm">
+                        <span className={cx('score')}>{entry.totalScore ?? 0}</span>
+                      </td>
+                      <td data-label="Thời gian">{formatDuration(entry.durationTaken)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Container>
+    </div>
+  );
+}
+
+export default HallOfFame;

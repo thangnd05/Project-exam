@@ -4,6 +4,8 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { getTtsUrl } from '@/app/utils/mediaUrl';
 import { useStreak } from '@/app/hooks/useStreak';
+import { useStreakRestoreGate } from '@/app/components/gamification/streak/hooks/useStreakRestoreGate';
+import StreakRestoreModal from '@/app/components/gamification/streak/StreakRestoreModal';
 import {
   useCheckPracticeAnswer,
   useGeneratePracticeQuestion,
@@ -48,6 +50,7 @@ const Practice = () => {
     const [sessionScore, setSessionScore] = useState({correct: 0, total: 0});
     const audioRef = useRef<AutoplayAudioElement | null>(null);
     const { refreshStreak } = useStreak();
+    const { blocked, allow, streakReady } = useStreakRestoreGate();
     const markMutation = useMarkVocabKnown(albumId);
     const markingKnown = markMutation.isPending;
     const checkMutation = useCheckPracticeAnswer(albumId);
@@ -74,8 +77,9 @@ const Practice = () => {
     }, [albumId, generateMutation]);
 
     useEffect(() => {
+        if (!streakReady || blocked) return;
         fetchQuestion();
-    }, [fetchQuestion]);
+    }, [fetchQuestion, streakReady, blocked]);
 
     useEffect(() => {
         if (!question?.word || !audioRef.current) return;
@@ -160,7 +164,7 @@ const Practice = () => {
         });
     };
 
-    if (loading) {
+    if (!streakReady || blocked || loading) {
         return (
             <div className={cx('wrapper')}>
                 <Container className={cx('loadingContainer')}>
@@ -173,6 +177,7 @@ const Practice = () => {
                         <p className={cx('loadingText')}>Đang tải câu hỏi...</p>
                     </motion.div>
                 </Container>
+                <StreakRestoreModal show={blocked} onClose={allow} />
             </div>
         );
     }

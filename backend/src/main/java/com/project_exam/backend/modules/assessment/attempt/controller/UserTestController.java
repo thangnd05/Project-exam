@@ -6,6 +6,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.StartUserTestRequ
 import com.project_exam.backend.modules.assessment.attempt.dto.StartUserTestResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestUpdateRequest;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
+import com.project_exam.backend.modules.assessment.attempt.dto.QuickLeaderboardResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.service.TestReviewService;
@@ -47,6 +48,14 @@ public class UserTestController {
 
     @Value("${app.frontend.origin}")
     private String frontendOrigin;
+
+    @GetMapping("/full-mock/leaderboard")
+    public ResponseEntity<QuickLeaderboardResponse> getQuickChallengeLeaderboard(
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(required = false) String examTypeId
+    ) {
+        return ResponseEntity.ok(userTestService.getQuickChallengeLeaderboard(limit, examTypeId));
+    }
 
     @GetMapping("/{userTestId}")
     public ResponseEntity<UserTestResponse> getUserTestById(

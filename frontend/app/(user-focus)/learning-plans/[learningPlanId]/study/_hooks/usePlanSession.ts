@@ -8,14 +8,18 @@ export const planSessionKeys = {
   session: (learningPlanId?: string, taskId?: string | null) => ['plan-session', learningPlanId, taskId || null],
 };
 
-export function usePlanSession(learningPlanId: string, taskId?: string | null) {
+export function usePlanSession(
+  learningPlanId: string,
+  taskId?: string | null,
+  enabled = true,
+) {
   const query = useQuery({
     queryKey: planSessionKeys.session(learningPlanId, taskId),
     queryFn: () =>
       taskId
         ? startTaskSession(learningPlanId, taskId)
         : getCurrentSession(learningPlanId),
-    enabled: !!learningPlanId,
+    enabled: !!learningPlanId && enabled,
     retry: false,
     staleTime: 0,
     gcTime: 0,
@@ -23,7 +27,7 @@ export function usePlanSession(learningPlanId: string, taskId?: string | null) {
 
   return {
     session: query.data ?? null,
-    isLoading: query.isLoading,
+    isLoading: query.isPending,
     isError: query.isError,
     error: query.isError ? getApiErrorMessage(query.error) : null,
   };

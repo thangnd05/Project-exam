@@ -7,6 +7,7 @@ import type {
   StartUserTestRequest,
   StartUserTestResponse,
   TestAdminResponse,
+  QuickLeaderboardResponse,
   TestLeaderboardResponse,
   UserTestResponse,
 } from '@/app/types';
@@ -43,6 +44,15 @@ export const getMyAttemptsByTest = (testId: string): Promise<UserTestResponse[]>
 
 export const getLeaderboardByTest = (testId: string): Promise<TestLeaderboardResponse> => {
   return axios.get(`${BASE_URL}/by-test/${testId}`).then((res) => res.data);
+};
+
+export const getQuickChallengeLeaderboard = (
+  limit = 10,
+  examTypeId?: string,
+): Promise<QuickLeaderboardResponse> => {
+  return axios
+    .get(`${BASE_URL}/full-mock/leaderboard`, { params: { limit, examTypeId } })
+    .then((res) => res.data);
 };
 
 export const checkActiveUserTest = (testId: string, isGuest?: boolean, config: AxiosRequestConfig = {}, { mode, examPartIds }: StartTestOptions = {}): Promise<ActiveUserTestResponse> => {

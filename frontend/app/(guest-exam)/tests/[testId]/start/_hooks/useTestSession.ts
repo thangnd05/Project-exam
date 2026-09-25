@@ -14,6 +14,7 @@ import type { ExamUserAnswers } from '@/app/components/exam-layout/examLayoutTyp
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useStreak } from '@/app/hooks/useStreak';
+import { useStreakRestoreGate } from '@/app/components/gamification/streak/hooks/useStreakRestoreGate';
 import { useCoins } from '@/app/hooks/useCoins';
 import { getOrCreateGuestSessionId, guestHeaders } from '@/app/utils/guestSession';
 import type { UserTestMode } from '@/app/enums';
@@ -48,6 +49,7 @@ export function useTestSession() {
 
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { refreshStreak } = useStreak();
+  const { blocked: streakRestoreBlocked, allow: allowStreakRestore, streakReady } = useStreakRestoreGate();
   const { balance, refreshCoins } = useCoins();
   const [purchasing, setPurchasing] = useState(false);
 
@@ -70,6 +72,8 @@ export function useTestSession() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittingRef = useRef(false);
   const [status, setStatus] = useState('loading');
+  const examCanStart = status === 'open' || status === 'active';
+  const holdStart = isAuthenticated && examCanStart && (!streakReady || streakRestoreBlocked);
 
   const visibleParts = useMemo(() => {
     const parts = test.parts || [];
@@ -224,6 +228,7 @@ export function useTestSession() {
   }, [testId, authLoading, loadTest]);
 
   useEffect(() => {
+    if (holdStart) return;
     if (status === 'open' && test?.testId) {
       const existing = sessionStorage.getItem(`userTest-${sessionKey}`);
       if (existing) {
@@ -253,7 +258,7 @@ export function useTestSession() {
           else setStatus('error');
         });
     }
-  }, [status, test, sessionKey, isPractice, selectedPartIds, isGuest, guestCfg]);
+  }, [status, test, sessionKey, isPractice, selectedPartIds, isGuest, guestCfg, holdStart]);
 
   useEffect(() => {
     if (status === 'active' && userTestId) {
@@ -371,7 +376,7 @@ export function useTestSession() {
   }, [isPractice, startedAt, test?.durationMinutes, test?.availableTo]);
 
   useEffect(() => {
-    if (status !== 'active') return undefined;
+    if (status !== 'active' || holdStart) return undefined;
     if (deadline == null) {
       setTimeLeft(null);
       return undefined;
@@ -388,7 +393,7 @@ export function useTestSession() {
     tick();
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
-  }, [status, deadline]);
+  }, [status, deadline, holdStart]);
 
   const handlePurchase = async () => {
     setPurchasing(true);
@@ -431,5 +436,8 @@ export function useTestSession() {
     goToStep: flow.goToStep,
     goToQuestion: flow.goToQuestion,
     canNavigateToQuestion: flow.canNavigateToQuestion,
+    streakRestoreBlocked,
+    allowStreakRestore,
+    holdStart,
   };
 }

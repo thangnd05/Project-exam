@@ -128,6 +128,20 @@ export interface TestLeaderboardResponse {
   totalParticipants: number;
 }
 
+export interface QuickLeaderboardEntry {
+  rank: number;
+  displayName: string;
+  avatarUrl?: string | null;
+  totalScore?: number | null;
+  durationTaken?: number | null;
+  examTypeName?: string | null;
+}
+
+export interface QuickLeaderboardResponse {
+  entries: QuickLeaderboardEntry[];
+  totalParticipants: number;
+}
+
 export interface EvaluationRequest {
   content: string;
   rating: number;

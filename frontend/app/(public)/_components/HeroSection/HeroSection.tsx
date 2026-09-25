@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useMemo, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
@@ -12,8 +12,10 @@ import type {ExamTypeResponse} from '@/app/types/exam-type';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
 import styles from './HeroSection.module.scss';
 import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
+import QuickLeaderboard from './QuickLeaderboard';
 import QuickTestConfirmModal from './QuickTestConfirmModal';
-import QuickTestOrbit, {type QuickTestOrbitHandle} from './QuickTestOrbit';
+// Tạm ẩn vòng đề kiểm tra nhanh.
+// import QuickTestOrbit, {type QuickTestOrbitHandle} from './QuickTestOrbit';
 import QuickTestPickerModal from './QuickTestPickerModal';
 
 const cx = classNames.bind(styles);
@@ -28,10 +30,10 @@ const normalizeExamTypes = (payload: any): ExamTypeResponse[] => {
 function HeroSection() {
   const router = useRouter();
   const {quickTests, isLoading: loading} = useQuickChallengeTests();
-  const [activeIdx, setActiveIdx] = useState(0);
+  // const [activeIdx, setActiveIdx] = useState(0);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pendingTest, setPendingTest] = useState<QuickChallengeCardResponse | null>(null);
-  const orbitRef = useRef<QuickTestOrbitHandle | null>(null);
+  // const orbitRef = useRef<QuickTestOrbitHandle | null>(null);
 
   const {data: examTypeCount = 0} = useQuery({
     queryKey: examTypeKeys.standard,
@@ -53,11 +55,11 @@ function HeroSection() {
     return out;
   }, [quickTests]);
 
-  useEffect(() => {
-    if (activeIdx >= cards.length) setActiveIdx(0);
-  }, [cards.length, activeIdx]);
+  // useEffect(() => {
+  //   if (activeIdx >= cards.length) setActiveIdx(0);
+  // }, [cards.length, activeIdx]);
 
-  const active = cards[activeIdx] ?? null;
+  const active = cards[0] ?? null;
   const hasQuick = !loading && Boolean(active);
 
   const goToExamTypes = useCallback(() => {
@@ -108,8 +110,8 @@ function HeroSection() {
     [requestStart],
   );
 
-  const goPrev = () => orbitRef.current?.goPrev();
-  const goNext = () => orbitRef.current?.goNext();
+  // const goPrev = () => orbitRef.current?.goPrev();
+  // const goNext = () => orbitRef.current?.goNext();
 
   return (
     <section id="hero" className={cx('hero')}>
@@ -160,11 +162,13 @@ function HeroSection() {
         </motion.div>
 
         <motion.div
-          className={cx('stage')}
+          className={cx('stage', 'stageBoard')}
           initial={{opacity: 0, scale: 0.92}}
           animate={{opacity: 1, scale: 1}}
           transition={{duration: 1.1, delay: 0.15, ease: [0.22, 1, 0.36, 1]}}
         >
+          <QuickLeaderboard />
+          {/* Tạm ẩn vòng đề kiểm tra nhanh.
           {hasQuick ? (
             <QuickTestOrbit
               ref={orbitRef}
@@ -214,6 +218,7 @@ function HeroSection() {
               </button>
             </div>
           )}
+          */}
         </motion.div>
       </div>
 

@@ -78,6 +78,21 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     List<UserTest> findByUserIdAndTestIdOrderByStartedAtDesc(String userId, String testId);
     List<UserTest> findByTestIdAndStatus(String testId, UserTest.Status status);
 
+    @Query("""
+            SELECT ut FROM UserTest ut
+            WHERE ut.status = :status
+              AND (ut.mode IS NULL OR ut.mode <> :practiceMode)
+              AND ut.testId IN (
+                SELECT t.testId FROM Test t
+                WHERE t.examCategoryId = (
+                  SELECT c.examCategoryId FROM ExamCategory c WHERE c.code = :categoryCode
+                )
+              )
+            """)
+    List<UserTest> findCompletedByCategoryCode(@Param("categoryCode") String categoryCode,
+                                               @Param("status") UserTest.Status status,
+                                               @Param("practiceMode") UserTest.Mode practiceMode);
+
     List<UserTest> findByUserIdAndStatusAndFinishedAtIsNotNullOrderByFinishedAtDesc(
             String userId, UserTest.Status status);
 

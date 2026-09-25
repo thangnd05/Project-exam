@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import TestStateScreens from './_components/TestStateScreens';
 import { useTestSession } from './_hooks/useTestSession';
 import ExamLayoutRenderer from '@/app/components/exam-layout/ExamLayoutRenderer';
+import StreakRestoreModal from '@/app/components/gamification/streak/StreakRestoreModal';
 
 const STATE_SCREEN_STATUSES = ['loading', 'payment', 'no-attempts', 'locked', 'closed'];
 
@@ -34,6 +35,9 @@ function TestStart() {
     goPrev,
     goToQuestion,
     canNavigateToQuestion,
+    streakRestoreBlocked,
+    allowStreakRestore,
+    holdStart,
   } = useTestSession();
 
   const formatTime = (seconds: number | null) => {
@@ -42,6 +46,24 @@ function TestStart() {
     const s = seconds % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
+
+  if ((status === 'open' || status === 'active') && holdStart) {
+    return (
+      <>
+        <TestStateScreens
+          status="loading"
+          test={test}
+          balance={balance}
+          purchasing={purchasing}
+          preCountdown={preCountdown}
+          formatTime={formatTime}
+          onBack={() => router.back()}
+          onPurchase={handlePurchase}
+        />
+        <StreakRestoreModal show={streakRestoreBlocked} onClose={allowStreakRestore} />
+      </>
+    );
+  }
 
   if (STATE_SCREEN_STATUSES.includes(status)) {
     return (

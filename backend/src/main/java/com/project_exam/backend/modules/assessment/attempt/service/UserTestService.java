@@ -20,6 +20,7 @@ import com.project_exam.backend.modules.certificate.service.CertificateService;
 import com.project_exam.backend.modules.assessment.attempt.mapper.UserTestMapper;
 import com.project_exam.backend.modules.assessment.attempt.util.AttemptTimeUtil;
 import com.project_exam.backend.modules.assessment.attempt.mapper.LeaderboardMapper;
+import com.project_exam.backend.modules.assessment.attempt.dto.QuickLeaderboardResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.TestLeaderboardResponse;
 import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamCategory;
@@ -87,6 +88,7 @@ public class UserTestService {
     private static final int LEADERBOARD_TOP_LIMIT = 100;
 
     private static final String QUICK_CHALLENGE_CODE = "QUICK_CHALLENGE";
+    private static final String FULL_MOCK_CODE = "FULL_MOCK";
 
     public UserTestResponse toResponse(UserTest userTest) {
         Test test = userTest.getTestId() == null ? null
@@ -687,6 +689,154 @@ public class UserTestService {
         return list.stream()
                 .map(u -> userTestMapper.toResponse(u, test.getExamTypeId(), userNameById.get(u.getUserId())))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public QuickLeaderboardResponse getQuickChallengeLeaderboard(int limit, String examTypeId) {
+        int safeLimit = Math.min(Math.max(limit, 1), LEADERBOARD_TOP_LIMIT);
+        if (examTypeId == null || examTypeId.isBlank()) {
+            return emptyHallOfFame();
+        }
+        ExamType examType = examTypeRepository.findById(examTypeId).orElse(null);
+        if (examType == null || Boolean.TRUE.equals(examType.getFlexible())) {
+            return emptyHallOfFame();
+        }
+
+        List<UserTest> attempts = userTestRepository.findCompletedByCategoryCode(
+                FULL_MOCK_CODE, UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE);
+        Map<String, Test> testsById = loadTests(attempts);
+        List<UserTest> forExam = attempts.stream()
+                .filter(attempt -> {
+                    Test test = testsById.get(attempt.getTestId());
+                    return test != null && examTypeId.equals(test.getExamTypeId());
+                })
+                .toList();
+
+        Map<String, UserTest> bestByPerson = new LinkedHashMap<>();
+        for (UserTest attempt : forExam) {
+            String key = personKey(attempt);
+            if (key == null) {
+                continue;
+            }
+            UserTest currentBest = bestByPerson.get(key);
+            if (currentBest == null || compareHallOfFame(attempt, currentBest) < 0) {
+                bestByPerson.put(key, attempt);
+            }
+        }
+
+        List<UserTest> ranked = bestByPerson.values().stream()
+                .sorted(this::compareHallOfFame)
+                .toList();
+
+        List<UserTest> top = ranked.size() > safeLimit ? ranked.subList(0, safeLimit) : ranked;
+
+        Set<String> userIds = top.stream()
+                .map(UserTest::getUserId)
+                .filter(id -> id != null && !id.isBlank())
+                .collect(Collectors.toSet());
+        Map<String, User> usersById = userIds.isEmpty()
+                ? Map.of()
+                : userRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(User::getUserId, user -> user));
+
+        List<QuickLeaderboardResponse.Entry> entries = new ArrayList<>();
+        for (int i = 0; i < top.size(); i++) {
+            UserTest attempt = top.get(i);
+            User user = attempt.getUserId() == null ? null : usersById.get(attempt.getUserId());
+            entries.add(QuickLeaderboardResponse.Entry.builder()
+                    .rank(i + 1)
+                    .displayName(displayName(user))
+                    .avatarUrl(user != null ? user.getAvatarUrl() : null)
+                    .totalScore(attempt.getTotalScore())
+                    .durationTaken(durationSeconds(attempt))
+                    .examTypeName(examType.getName())
+                    .build());
+        }
+
+        return QuickLeaderboardResponse.builder()
+                .entries(entries)
+                .totalParticipants(ranked.size())
+                .build();
+    }
+
+    private QuickLeaderboardResponse emptyHallOfFame() {
+        return QuickLeaderboardResponse.builder()
+                .entries(List.of())
+                .totalParticipants(0)
+                .build();
+    }
+
+    private Map<String, Test> loadTests(Collection<UserTest> attempts) {
+        Set<String> testIds = attempts.stream()
+                .map(UserTest::getTestId)
+                .filter(id -> id != null && !id.isBlank())
+                .collect(Collectors.toSet());
+        if (testIds.isEmpty()) {
+            return Map.of();
+        }
+        return testRepository.findAllById(testIds).stream()
+                .collect(Collectors.toMap(Test::getTestId, test -> test));
+    }
+
+    private int compareHallOfFame(UserTest left, UserTest right) {
+        int byScore = Integer.compare(hallScore(right), hallScore(left));
+        if (byScore != 0) {
+            return byScore;
+        }
+        int byDuration = Long.compare(getDurationTaken(left), getDurationTaken(right));
+        if (byDuration != 0) {
+            return byDuration;
+        }
+        int byFinished = compareEarlier(left.getFinishedAt(), right.getFinishedAt());
+        if (byFinished != 0) {
+            return byFinished;
+        }
+        return compareEarlier(left.getStartedAt(), right.getStartedAt());
+    }
+
+    private int hallScore(UserTest attempt) {
+        return attempt.getTotalScore() != null ? attempt.getTotalScore() : Integer.MIN_VALUE;
+    }
+
+    private int compareEarlier(Instant left, Instant right) {
+        if (left == null && right == null) {
+            return 0;
+        }
+        if (left == null) {
+            return 1;
+        }
+        if (right == null) {
+            return -1;
+        }
+        return left.compareTo(right);
+    }
+
+    private String personKey(UserTest attempt) {
+        if (attempt.getUserId() != null && !attempt.getUserId().isBlank()) {
+            return "user:" + attempt.getUserId();
+        }
+        if (attempt.getGuestSessionId() != null && !attempt.getGuestSessionId().isBlank()) {
+            return "guest:" + attempt.getGuestSessionId();
+        }
+        return null;
+    }
+
+    private String displayName(User user) {
+        if (user == null) {
+            return "Khách";
+        }
+        if (user.getFullName() != null && !user.getFullName().isBlank()) {
+            return user.getFullName().trim();
+        }
+        if (user.getUserName() != null && !user.getUserName().isBlank()) {
+            return user.getUserName().trim();
+        }
+        return "Khách";
+    }
+
+    private Long durationSeconds(UserTest userTest) {
+        long seconds = getDurationTaken(userTest);
+        return seconds == Long.MAX_VALUE ? null : seconds;
     }
 
     public TestLeaderboardResponse getAttemptsByTest(String testId, String currentUserId) {

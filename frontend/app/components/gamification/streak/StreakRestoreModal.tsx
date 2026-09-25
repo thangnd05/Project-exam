@@ -70,8 +70,8 @@ function StreakRestoreModal({ show, onClose }: StreakRestoreModalProps) {
           <span className={cx('lost')}>{lostStreak}</span>
         </div>
         <p className={cx('lead')}>
-          Bạn vừa làm đứt chuỗi <strong>{lostStreak} ngày</strong>. Dùng xu để nối lại
-          và tiếp tục từ đúng số ngày đã mất.
+          Bạn vừa làm đứt chuỗi <strong>{lostStreak} ngày</strong>. Khôi phục bằng xu để nối lại
+          trước khi làm bài. Nếu để sau, xong bài này chuỗi bắt đầu lại từ 1.
         </p>
         <div className={cx('rows')}>
           <div className={cx('row')}>

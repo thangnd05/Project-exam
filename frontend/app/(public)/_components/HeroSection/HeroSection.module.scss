@@ -226,6 +226,12 @@
   gap: 22px;
 }
 
+.stage.stageBoard {
+  width: 100%;
+  margin-right: 0;
+  align-items: stretch;
+}
+
 .stageEmpty {
   display: grid;
   place-items: center;
