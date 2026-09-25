@@ -1143,8 +1143,7 @@ public class QuestionDocumentImportService {
     }
 
     private boolean isHighlightedRun(XWPFRun run) {
-        return run.getTextHightlightColor() != null
-                && !"none".equalsIgnoreCase(String.valueOf(run.getTextHightlightColor()));
+        return run.isHighlighted();
     }
 
     private ParsedOption parseOptionText(String rawOptionText) {

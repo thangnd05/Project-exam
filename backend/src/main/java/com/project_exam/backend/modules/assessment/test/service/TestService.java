@@ -29,7 +29,6 @@ import com.project_exam.backend.modules.assessment.test.repository.TestPartRepos
 import com.project_exam.backend.modules.assessment.test.repository.TestQuestionRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
 import com.project_exam.backend.modules.assessment.test.repository.UserTestAccessRepository;
-import com.project_exam.backend.modules.gamification.coin.service.CoinService;
 import com.project_exam.backend.modules.classroom.member.domain.ClassMember.MemberStatus;
 
 import com.project_exam.backend.modules.assessment.exam.domain.ExamCategory;
@@ -53,7 +52,6 @@ import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepos
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
 
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
-import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswerRepository;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.assessment.attempt.service.UserTestService;
 
@@ -90,12 +88,10 @@ public class TestService {
     private final SkillRepository skillRepository;
     private final PassageRepository  passageRepository;
     private final UserTestRepository userTestRepository;
-    private final UserAnswerRepository userAnswerRepository;
     private final UserTestService userTestService;
     private final ClassRepository classRepository;
     private final ClassMemberRepository classMemberRepository;
     private final UserTestAccessRepository userTestAccessRepository;
-    private final CoinService coinService;
     private final PassageMapper passageMapper;
     private final com.project_exam.backend.modules.assessment.exam.repository.PassageMediaRepository passageMediaRepository;
     private final com.project_exam.backend.modules.assessment.exam.mapper.PassageMediaMapper passageMediaMapper;
