@@ -1,10 +1,8 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
 
-import com.project_exam.backend.modules.assessment.exam.dto.TagRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.TagResponse;
 import com.project_exam.backend.modules.assessment.exam.service.TagService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

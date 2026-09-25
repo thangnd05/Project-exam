@@ -143,6 +143,14 @@ function Header() {
                 Kỳ thi
               </Link>
               <Link
+                href={routes.resources}
+                className={cx('home', {
+                  active: pathname === routes.resources || pathname.startsWith('/resources/'),
+                })}
+              >
+                Tài liệu
+              </Link>
+              <Link
                 href={routes.myTarget}
                 className={cx('home', {active: pathname === routes.myTarget})}
               >

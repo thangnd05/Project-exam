@@ -262,6 +262,13 @@ function MobileBottomNav() {
 
                   <div className={cx('menuList')}>
                     <Link
+                      href={routes.resources}
+                      className={cx('menuItem')}
+                      onClick={closeSheet}
+                    >
+                      Tài liệu
+                    </Link>
+                    <Link
                       href={routes.myTarget}
                       className={cx('menuItem')}
                       onClick={closeSheet}

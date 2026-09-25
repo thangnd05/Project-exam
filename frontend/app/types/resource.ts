@@ -5,6 +5,7 @@ export interface RecoveryResourceRequest {
   description?: string;
   url?: string;
   tagIds?: string[];
+  examTypeId?: string;
   examPartId?: string;
 }
 

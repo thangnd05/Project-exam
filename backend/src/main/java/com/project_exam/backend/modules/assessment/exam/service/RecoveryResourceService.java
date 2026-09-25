@@ -67,7 +67,7 @@ public class RecoveryResourceService {
             throw new BadRequestException("Vui lòng upload file hoặc cung cấp URL.");
         }
 
-        applyExamPart(resource, request.getExamPartId());
+        applyExamLink(resource, request.getExamTypeId(), request.getExamPartId());
 
         resource = resourceRepository.save(resource);
         syncResourceTags(resource.getResourceId(), request.getTagIds());
@@ -104,8 +104,8 @@ public class RecoveryResourceService {
             resource.setUrl(request.getUrl().trim());
         }
 
-        if (request.getExamPartId() != null) {
-            applyExamPart(resource, request.getExamPartId());
+        if (request.getExamPartId() != null || request.getExamTypeId() != null) {
+            applyExamLink(resource, request.getExamTypeId(), request.getExamPartId());
         }
 
         resource = resourceRepository.save(resource);
@@ -209,16 +209,23 @@ public class RecoveryResourceService {
         }
     }
 
-    private void applyExamPart(RecoveryResource resource, String examPartId) {
-        if (examPartId == null || examPartId.isBlank()) {
-            resource.setExamPartId(null);
-            resource.setExamTypeId(null);
+    private void applyExamLink(RecoveryResource resource, String examTypeId, String examPartId) {
+        if (examPartId != null && !examPartId.isBlank()) {
+            ExamPart part = examPartRepository.findById(examPartId)
+                    .orElseThrow(() -> new NotFoundException("Part không tồn tại: " + examPartId));
+            resource.setExamPartId(part.getExamPartId());
+            resource.setExamTypeId(part.getExamTypeId());
             return;
         }
-        ExamPart part = examPartRepository.findById(examPartId)
-                .orElseThrow(() -> new NotFoundException("Part không tồn tại: " + examPartId));
-        resource.setExamPartId(part.getExamPartId());
-        resource.setExamTypeId(part.getExamTypeId());
+        resource.setExamPartId(null);
+        if (examTypeId != null && !examTypeId.isBlank()) {
+            if (!examTypeRepository.existsById(examTypeId)) {
+                throw new NotFoundException("Loại kỳ thi không tồn tại: " + examTypeId);
+            }
+            resource.setExamTypeId(examTypeId);
+            return;
+        }
+        resource.setExamTypeId(null);
     }
 
     private RecoveryResourceResponse toResponse(RecoveryResource resource) {

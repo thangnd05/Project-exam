@@ -1,12 +1,9 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
 
-import com.project_exam.backend.modules.assessment.exam.dto.PassageRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.exam.service.PassageService;
 import com.project_exam.backend.shared.exception.NotFoundException;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -38,7 +38,11 @@ function HallOfFame() {
   const {exams, isLoading: examsLoading, isError: examsError} = useHallOfFameExams();
   const selected = exams.find((exam) => exam.examTypeId === requestedId) ?? exams[0];
   const selectedId = selected?.examTypeId;
-  const {entries, totalParticipants, isLoading, isError} = useQuickLeaderboard(PAGE_LIMIT, selectedId);
+  const {entries, totalParticipants, isLoading, isPlaceholderData, isError} = useQuickLeaderboard(
+    PAGE_LIMIT,
+    selectedId,
+  );
+  const showLoading = (examsLoading || Boolean(selectedId && isLoading)) && !isPlaceholderData;
 
   const selectExam = (examTypeId: string) => {
     router.replace(`${routes.hallOfFame}?examTypeId=${encodeURIComponent(examTypeId)}`);
@@ -79,7 +83,7 @@ function HallOfFame() {
           </div>
         )}
 
-        {examsLoading || (selectedId && isLoading) ? (
+        {showLoading ? (
           <p className={cx('status')}>Đang tải bảng vinh danh…</p>
         ) : examsError || isError ? (
           <p className={cx('status')}>Không tải được bảng xếp hạng. Thử lại sau.</p>

@@ -1,11 +1,8 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
 
-import com.project_exam.backend.modules.assessment.exam.dto.ScoringConversionRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ScoringConversionResponse;
 import com.project_exam.backend.modules.assessment.exam.service.ScoringConversionService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -24,7 +24,11 @@ function QuickLeaderboard() {
   const [pickedId, setPickedId] = useState<string | null>(null);
   const selected = exams.find((exam) => exam.examTypeId === pickedId) ?? exams[0];
   const selectedId = selected?.examTypeId;
-  const {entries, totalParticipants, isLoading, isError} = useQuickLeaderboard(HERO_LIMIT, selectedId);
+  const {entries, totalParticipants, isLoading, isPlaceholderData, isError} = useQuickLeaderboard(
+    HERO_LIMIT,
+    selectedId,
+  );
+  const showSkeleton = (examsLoading || Boolean(selectedId && isLoading)) && !isPlaceholderData;
 
   return (
     <aside className={cx('board')} aria-label="Bảng vinh danh bài thi thử">
@@ -55,7 +59,7 @@ function QuickLeaderboard() {
         {selected?.name && <p className={cx('examTitle')}>{selected.name}</p>}
       </header>
 
-      {examsLoading || (selectedId && isLoading) ? (
+      {showSkeleton ? (
         <ul className={cx('list')} aria-hidden="true">
           {Array.from({length: 6}, (_, index) => (
             <li key={index} className={cx('row', 'skeleton')} />

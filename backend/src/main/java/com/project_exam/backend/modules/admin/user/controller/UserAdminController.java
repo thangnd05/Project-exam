@@ -1,24 +1,16 @@
 package com.project_exam.backend.modules.admin.user.controller;
 
 import com.project_exam.backend.modules.users.user.dto.UserUpsertRequest;
-import com.project_exam.backend.modules.users.user.dto.ProfileOverviewResponse;
-import com.project_exam.backend.modules.users.user.dto.ProfileActivityResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.users.user.dto.UserResponse;
 import com.project_exam.backend.modules.users.user.service.UserService;
-import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
 import java.util.List;
 
 @RestController

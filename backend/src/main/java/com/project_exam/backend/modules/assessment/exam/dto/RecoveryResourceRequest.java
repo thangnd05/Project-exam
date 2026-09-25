@@ -13,5 +13,6 @@ public class RecoveryResourceRequest {
     private String description;
     private String url;
     private List<String> tagIds;
+    private String examTypeId;
     private String examPartId;
 }

@@ -1,26 +1,14 @@
 package com.project_exam.backend.modules.admin.posts.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project_exam.backend.modules.posts.post.dto.ImageUploadResponse;
-import com.project_exam.backend.modules.posts.post.dto.PostUpsertRequest;
-import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.posts.post.dto.PostResponse;
-import com.project_exam.backend.modules.posts.post.dto.PostSummaryResponse;
 import com.project_exam.backend.modules.posts.post.dto.UpdatePostStatusRequest;
-import com.project_exam.backend.modules.posts.post.domain.Post;
 import com.project_exam.backend.modules.posts.post.service.PostService;
-import com.project_exam.backend.modules.posts.post.service.PostViewThrottleService;
-import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/admin/posts")

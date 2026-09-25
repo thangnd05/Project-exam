@@ -352,6 +352,7 @@ function RecoveryResourcesManagement() {
         description: formState.description.trim(),
         url: formState.url.trim() || null,
         tagIds: [...new Set(formState.tagIds || [])],
+        examTypeId: formExamTypeId || '',
         examPartId: formState.examPartId || '',
       };
       if (editingId) {

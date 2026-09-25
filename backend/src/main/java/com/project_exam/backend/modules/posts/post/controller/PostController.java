@@ -6,7 +6,6 @@ import com.project_exam.backend.modules.posts.post.dto.PostUpsertRequest;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.posts.post.dto.PostResponse;
 import com.project_exam.backend.modules.posts.post.dto.PostSummaryResponse;
-import com.project_exam.backend.modules.posts.post.dto.UpdatePostStatusRequest;
 import com.project_exam.backend.modules.posts.post.domain.Post;
 import com.project_exam.backend.modules.posts.post.service.PostService;
 import com.project_exam.backend.modules.posts.post.service.PostViewThrottleService;

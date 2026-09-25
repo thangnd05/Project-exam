@@ -1,6 +1,5 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
 
-import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeLayoutRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeLayoutResponse;
 import com.project_exam.backend.modules.assessment.exam.service.ExamTypeLayoutService;
 import lombok.RequiredArgsConstructor;

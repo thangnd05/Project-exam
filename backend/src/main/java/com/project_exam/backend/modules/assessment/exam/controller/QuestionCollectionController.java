@@ -1,11 +1,8 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
 
-import com.project_exam.backend.modules.assessment.exam.dto.QuestionCollectionRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCollectionResponse;
 import com.project_exam.backend.modules.assessment.exam.service.QuestionCollectionService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

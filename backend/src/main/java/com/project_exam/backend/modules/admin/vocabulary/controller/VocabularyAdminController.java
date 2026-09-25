@@ -7,7 +7,6 @@ import com.project_exam.backend.modules.vocabulary.word.service.VocabularyServic
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

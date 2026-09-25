@@ -1,11 +1,8 @@
 package com.project_exam.backend.modules.assessment.exam.controller;
 
-import com.project_exam.backend.modules.assessment.exam.dto.SkillRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.SkillResponse;
 import com.project_exam.backend.modules.assessment.exam.service.SkillService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

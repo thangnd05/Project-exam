@@ -1,16 +1,13 @@
 package com.project_exam.backend.modules.admin.classroom.controller;
 
-import com.project_exam.backend.modules.classroom.chapter.dto.ChapterRequest;
 import com.project_exam.backend.modules.classroom.chapter.dto.ChapterResponse;
 import com.project_exam.backend.modules.classroom.chapter.service.ChapterService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/admin/chapters")

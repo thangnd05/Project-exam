@@ -1,26 +1,24 @@
 'use client';
+import {useRouter} from 'next/navigation';
 import {useState} from 'react';
 import Link from 'next/link';
-import {useQueries, useQuery} from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {Container} from 'react-bootstrap';
 import {
   IoAlertCircleOutline,
+  IoBookOutline,
   IoChevronForward,
   IoDocumentTextOutline,
   IoHelpCircleOutline,
-  IoLayersOutline,
   IoTimeOutline,
 } from 'react-icons/io5';
 
-import {getExamPartsByExamType} from '@/app/apis/examPartApi';
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
-import {buildExamTypeDetailPath} from '@/app/configs/Routes';
-import {baseMetaKeys} from '@/app/hooks/useBaseMetaData';
+import routes, {buildExamTypeDetailPath} from '@/app/configs/Routes';
 import {examTypeKeys} from '@/app/hooks/examTypeKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
-import {getScoreScale} from '@/app/utils/scoreScale';
 import styles from './ExamCatalog.module.scss';
 
 const cx = classNames.bind(styles);
@@ -98,6 +96,7 @@ function ExamLogo({url, name}: {url?: string; name?: string}) {
 }
 
 function ExamCatalog() {
+  const router = useRouter();
   const {data: exams = [], isLoading, isError} = useQuery({
     queryKey: examTypeKeys.standard,
     queryFn: getStandardExamTypes,
@@ -107,30 +106,16 @@ function ExamCatalog() {
         .sort((a, b) => (a.name ?? '').localeCompare(b.name ?? '', 'en')),
   });
 
-  const partQueries = useQueries({
-    queries: exams.map((exam) => ({
-      queryKey: baseMetaKeys.examParts(exam.examTypeId),
-      queryFn: () => getExamPartsByExamType(exam.examTypeId),
-      staleTime: 5 * 60 * 1000,
-    })),
-  });
-
-  const domainCountByExam: Record<string, number> = {};
-  exams.forEach((exam, index) => {
-    const parts = partQueries[index]?.data ?? [];
-    domainCountByExam[exam.examTypeId] = parts.filter((part) => part.name?.trim()).length;
-  });
-
-  const scale = getScoreScale(exams[0]?.scoringMethod || 'AWS_SCALE');
-
   return (
     <div className={cx('wrapper')}>
       <Container>
         <PageHeader
           title="Kỳ thi đang mở"
           label="AWS Certification"
-          description="Các chứng chỉ AWS hiện có trên WinDe. Luyện đề sát format, chấm theo thang điểm AWS, xem đáp án và chẩn đoán phần còn yếu."
-          badgeLabel={isLoading ? undefined : `${exams.length} kỳ thi · Thang điểm ${scale.min}–${scale.max}`}
+          description="Luyện đề sát format, xem đáp án và biết phần còn yếu."
+          actionText="Tài liệu"
+          actionIcon={IoBookOutline}
+          onAction={() => router.push(routes.resources)}
         />
 
         {isLoading ? (
@@ -158,7 +143,6 @@ function ExamCatalog() {
               const meta = code ? EXAM_META[code] : undefined;
               const duration = formatDuration(exam.durationMinutes ?? null);
               const href = buildExamTypeDetailPath(exam.examTypeId);
-              const domainCount = domainCountByExam[exam.examTypeId] ?? 0;
               const level = parseLevel(exam.name);
 
               return (
@@ -187,12 +171,6 @@ function ExamCatalog() {
                       <li className={cx('meta-item')}>
                         <IoHelpCircleOutline />
                         <span>{meta.questions} câu</span>
-                      </li>
-                    ) : null}
-                    {domainCount ? (
-                      <li className={cx('meta-item')}>
-                        <IoLayersOutline />
-                        <span>{domainCount} lĩnh vực</span>
                       </li>
                     ) : null}
                   </ul>

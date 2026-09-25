@@ -33,7 +33,6 @@ import com.project_exam.backend.modules.assessment.learning.dto.SubmitSessionReq
 import com.project_exam.backend.modules.assessment.learning.dto.SubmitSessionResponse;
 import com.project_exam.backend.modules.assessment.learning.dto.TaskSessionHistoryResponse;
 import com.project_exam.backend.modules.assessment.learning.mapper.LearningMapper;
-import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionAnswerRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionQuestionRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionRepository;
@@ -64,7 +63,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LearningPlanSessionService {
 
-    private final LearningPlanRepository planRepository;
     private final LearningPlanTaskRepository taskRepository;
     private final LearningPlanSessionRepository sessionRepository;
     private final LearningPlanSessionQuestionRepository sessionQuestionRepository;

@@ -49,6 +49,7 @@ const routes = {
   testLeaderboard: '/tests/leaderboard/:testId',
   hallOfFame: '/vinh-danh',
   examTypes: '/exam-types',
+  resources: '/resources',
   examTypeDetail: '/exam-types/:examTypeId',
   examTypeCollection: '/exam-types/:examTypeId/collections/:collectionId',
   MyTest: '/my-tests',
