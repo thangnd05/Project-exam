@@ -27,10 +27,12 @@ public class ClassMember {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(length = 10, nullable = false)
     private MemberStatus status = MemberStatus.PENDING;
 
+    @Builder.Default
     @Column(name = "joined_at")
     private Instant joinedAt = Instant.now();
 

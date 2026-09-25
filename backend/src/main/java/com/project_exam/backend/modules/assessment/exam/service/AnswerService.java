@@ -145,14 +145,6 @@ public class AnswerService {
                 ));
     }
 
-    private String findQuestionIdForAnswer(List<Answer> allAnswers, String answerId) {
-        return allAnswers.stream()
-                .filter(a -> a.getAnswerId().equals(answerId))
-                .findFirst()
-                .map(Answer::getQuestionId)
-                .orElse(null);
-    }
-
     public Map<String, List<AnswerAdminResponse>> getAnswersForMultipleQuestionsForAdmin(
             List<String> questionIds
     ) {

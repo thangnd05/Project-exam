@@ -2,7 +2,6 @@ package com.project_exam.backend.modules.assessment.exam.controller;
 
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceResponse;
 import com.project_exam.backend.modules.assessment.exam.service.RecoveryResourceService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,7 +22,6 @@ import java.util.Locale;
 public class RecoveryResourceController {
 
     private final RecoveryResourceService resourceService;
-    private final ObjectMapper objectMapper;
 
     @GetMapping
     public ResponseEntity<List<RecoveryResourceResponse>> getAllResources() {

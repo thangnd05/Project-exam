@@ -41,6 +41,7 @@ public class PageVisit {
     @Column(name = "country", length = 100)
     private String country;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false)
     private Instant createdAt = Instant.now();
 }

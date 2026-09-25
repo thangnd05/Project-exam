@@ -36,7 +36,6 @@ public class RecoveryResourceService {
     private final TagRepository tagRepository;
     private final ExamPartRepository examPartRepository;
     private final ExamTypeRepository examTypeRepository;
-    private final TagService tagService;
     private final TagMapper tagMapper;
     private final RecoveryResourceMapper recoveryResourceMapper;
     private final CloudinaryService cloudinaryService;

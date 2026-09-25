@@ -86,7 +86,7 @@ public class TagService {
 
     @Transactional
     public void deleteTag(String tagId) {
-        Tag tag = tagRepository.findById(tagId)
+        tagRepository.findById(tagId)
                 .orElseThrow(() -> new NotFoundException("Tag không tồn tại: " + tagId));
 
         deleteTagRecursive(tagId);

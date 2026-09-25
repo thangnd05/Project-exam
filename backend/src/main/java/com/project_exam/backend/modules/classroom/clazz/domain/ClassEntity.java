@@ -33,6 +33,7 @@ public class ClassEntity {
     @Column(name = "teacher_id", nullable = false)
     private String teacherId;
 
+    @Builder.Default
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();
 }

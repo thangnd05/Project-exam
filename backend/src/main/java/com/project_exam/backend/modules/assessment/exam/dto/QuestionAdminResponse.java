@@ -1,7 +1,5 @@
 package com.project_exam.backend.modules.assessment.exam.dto;
 
-import com.project_exam.backend.modules.assessment.exam.dto.PassageMediaResponse;
-import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import lombok.*;
 
