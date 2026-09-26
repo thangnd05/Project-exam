@@ -5,7 +5,7 @@ import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
-@Table(name = "skills")
+@Table(name = "skills", schema = "assessment")
 @Getter
 @Setter
 @NoArgsConstructor

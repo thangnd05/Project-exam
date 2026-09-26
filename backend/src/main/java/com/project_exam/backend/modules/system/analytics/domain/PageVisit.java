@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "page_visits",
+@Table(name = "page_visits", schema = "system",
         indexes = {
                 @Index(name = "idx_page_visits_created_at", columnList = "created_at"),
                 @Index(name = "idx_page_visits_session_key", columnList = "session_key")

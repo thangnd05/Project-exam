@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.time.Instant;
 
 @Entity
-@Table(name = "user_streaks", indexes = {
+@Table(name = "user_streaks", schema = "gamification", indexes = {
         @Index(name = "idx_user_streaks_user_id", columnList = "user_id")
 })
 @Getter

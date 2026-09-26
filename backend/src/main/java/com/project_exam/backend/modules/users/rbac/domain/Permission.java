@@ -5,7 +5,7 @@ import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
-@Table(name = "permissions")
+@Table(name = "permissions", schema = "users")
 @Getter
 @Setter
 @NoArgsConstructor

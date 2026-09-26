@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
-@Table(name = "learning_plan_tasks", indexes = {
+@Table(name = "learning_plan_tasks", schema = "assessment", indexes = {
 
         @Index(name = "idx_learning_plan_tasks_tag_id", columnList = "tag_id"),
         @Index(name = "idx_learning_plan_tasks_exam_part_id", columnList = "exam_part_id")

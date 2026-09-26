@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "passage_media", indexes = {
+@Table(name = "passage_media", schema = "assessment", indexes = {
         @Index(name = "idx_passage_media_passage_id", columnList = "passage_id")
 })
 @Getter

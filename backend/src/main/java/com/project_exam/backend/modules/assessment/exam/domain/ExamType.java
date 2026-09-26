@@ -5,7 +5,7 @@ import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
-@Table(name = "exam_types", indexes = {
+@Table(name = "exam_types", schema = "assessment", indexes = {
         @Index(name = "idx_exam_types_parent_id", columnList = "parent_id")
 })
 @Getter

@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Entity
-@Table(name = "email_verifications", indexes = {
+@Table(name = "email_verifications", schema = "auth", indexes = {
         @Index(name = "idx_email_verifications_user_id", columnList = "user_id"),
         @Index(name = "idx_email_verifications_token", columnList = "token")
 })

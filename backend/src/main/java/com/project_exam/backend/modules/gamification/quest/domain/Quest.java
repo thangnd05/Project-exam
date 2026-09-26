@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "quests")
+@Table(name = "quests", schema = "gamification")
 @Getter
 @Setter
 @NoArgsConstructor

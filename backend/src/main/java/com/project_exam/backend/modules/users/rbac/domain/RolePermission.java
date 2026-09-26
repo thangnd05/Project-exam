@@ -7,6 +7,7 @@ import lombok.*;
 @Entity
 @Table(
         name = "role_permissions",
+        schema = "users",
         uniqueConstraints = @UniqueConstraint(columnNames = {"role_id", "permission_id"}),
         indexes = {
                 @Index(name = "idx_role_permissions_permission_id", columnList = "permission_id")

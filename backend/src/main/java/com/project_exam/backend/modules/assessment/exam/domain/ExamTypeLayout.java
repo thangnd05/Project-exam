@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "exam_type_layouts", indexes = {
+@Table(name = "exam_type_layouts", schema = "assessment", indexes = {
         @Index(name = "idx_exam_type_layouts_exam_type_id", columnList = "exam_type_id", unique = true)
 })
 @Getter

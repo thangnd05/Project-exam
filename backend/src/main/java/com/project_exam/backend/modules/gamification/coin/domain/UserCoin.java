@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "user_coins", indexes = {
+@Table(name = "user_coins", schema = "gamification", indexes = {
         @Index(name = "idx_user_coins_user_id", columnList = "user_id")
 })
 @Getter

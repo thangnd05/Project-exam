@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "comments", indexes = {
+@Table(name = "comments", schema = "posts", indexes = {
     @Index(name = "idx_comments_post_id", columnList = "post_id"),
     @Index(name = "idx_comments_user_id", columnList = "user_id"),
     @Index(name = "idx_comments_parent_id", columnList = "parent_id")

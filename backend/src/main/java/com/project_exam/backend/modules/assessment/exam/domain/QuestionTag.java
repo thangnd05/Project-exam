@@ -5,7 +5,7 @@ import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
 @Entity
-@Table(name = "question_tags",
+@Table(name = "question_tags", schema = "assessment",
        uniqueConstraints = @UniqueConstraint(columnNames = {"question_id", "tag_id"}),
        indexes = {
            @Index(name = "idx_question_tags_tag_id", columnList = "tag_id")

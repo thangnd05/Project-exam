@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "vocabulary_album", indexes = {
+@Table(name = "vocabulary_album", schema = "vocabulary", indexes = {
     @Index(name = "idx_vocabulary_album_user_id", columnList = "user_id")
 })
 @Getter

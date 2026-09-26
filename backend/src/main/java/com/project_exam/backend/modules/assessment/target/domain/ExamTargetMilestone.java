@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "exam_target_milestones",
+@Table(name = "exam_target_milestones", schema = "assessment",
         uniqueConstraints = @UniqueConstraint(columnNames = {"exam_type_id", "milestone_score"}))
 @Getter
 @Setter

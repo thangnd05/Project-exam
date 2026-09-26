@@ -14,7 +14,7 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Entity
-@Table(name = "audit_logs", indexes = {
+@Table(name = "audit_logs", schema = "system", indexes = {
         @Index(name = "idx_audit_logs_user_id", columnList = "user_id")
 })
 @Getter

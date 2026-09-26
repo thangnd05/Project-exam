@@ -7,6 +7,7 @@ import lombok.*;
 @Entity
 @Table(
     name = "post_category",
+    schema = "posts",
     uniqueConstraints = @UniqueConstraint(columnNames = {"post_id", "category_id"}),
     indexes = {
         @Index(name = "idx_post_category_category_id", columnList = "category_id")

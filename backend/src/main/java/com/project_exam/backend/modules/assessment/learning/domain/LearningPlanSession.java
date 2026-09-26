@@ -8,7 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.Instant;
 
 @Entity
-@Table(name = "learning_plan_sessions", indexes = {
+@Table(name = "learning_plan_sessions", schema = "assessment", indexes = {
 
         @Index(name = "idx_learning_plan_sessions_task_id", columnList = "task_id"),
         @Index(name = "idx_learning_plan_sessions_resource_id", columnList = "resource_id")

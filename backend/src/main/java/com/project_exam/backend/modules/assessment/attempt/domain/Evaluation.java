@@ -14,7 +14,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "evaluation",
+@Table(name = "evaluation", schema = "assessment",
         indexes = {
                 @Index(name = "idx_evaluation_user_id", columnList = "user_id")
         })

@@ -8,7 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.Instant;
 
 @Entity
-@Table(name = "user_question_exposures",
+@Table(name = "user_question_exposures", schema = "assessment",
         uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "question_id"}),
         indexes = {
                 @Index(name = "idx_user_question_exposures_question_id", columnList = "question_id")

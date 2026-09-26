@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Entity
-@Table(name = "questions", indexes = {
+@Table(name = "questions", schema = "assessment", indexes = {
         @Index(name = "idx_questions_exam_part_id", columnList = "exam_part_id"),
         @Index(name = "idx_questions_passage_id", columnList = "passage_id"),
         @Index(name = "idx_questions_collection_id", columnList = "collection_id"),

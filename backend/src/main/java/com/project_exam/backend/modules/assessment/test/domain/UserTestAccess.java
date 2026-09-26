@@ -9,6 +9,7 @@ import java.time.Instant;
 @Entity
 @Table(
         name = "user_test_accesses",
+        schema = "assessment",
         uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "test_id"}),
         indexes = {
                 @Index(name = "idx_user_test_accesses_test_id", columnList = "test_id")

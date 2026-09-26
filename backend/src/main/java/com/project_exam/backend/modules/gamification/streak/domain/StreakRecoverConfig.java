@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "streak_recover_config")
+@Table(name = "streak_recover_config", schema = "gamification")
 @Getter
 @Setter
 @NoArgsConstructor
