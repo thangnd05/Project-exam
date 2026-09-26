@@ -18,6 +18,11 @@ import java.util.Set;
 public class AuditLogInterceptor implements HandlerInterceptor {
 
     private static final Set<String> AUDIT_METHODS = Set.of("POST", "PUT", "PATCH", "DELETE");
+    private static final Set<String> SKIP_POST_ENDPOINTS = Set.of(
+            "/api/analytics/visit",
+            "/api/auth/refresh",
+            "/api/user-answers/batch"
+    );
 
     private final AuditLogService auditLogService;
     private final AuthUtils authUtils;
@@ -32,7 +37,7 @@ public class AuditLogInterceptor implements HandlerInterceptor {
         String method = request.getMethod();
         String endpoint = request.getRequestURI();
 
-        if (!AUDIT_METHODS.contains(method) || endpoint.startsWith("/api/admin/audits")) {
+        if (shouldSkip(method, endpoint)) {
             return;
         }
 
@@ -56,6 +61,14 @@ public class AuditLogInterceptor implements HandlerInterceptor {
         auditLog.setSuccess(statusCode >= 200 && statusCode < 400);
 
         auditLogService.save(auditLog);
+    }
+
+    private boolean shouldSkip(String method, String endpoint) {
+        if (!AUDIT_METHODS.contains(method) || endpoint.startsWith("/api/admin/audits")) {
+            return true;
+        }
+        return "POST".equals(method)
+                && (SKIP_POST_ENDPOINTS.contains(endpoint) || endpoint.startsWith("/api/questions/preview/"));
     }
 
     private String extractUserIdSafely(HttpServletRequest request) {
