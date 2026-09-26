@@ -1,10 +1,10 @@
 package com.project_exam.backend.modules.admin.certificate.controller;
 
-import com.project_exam.backend.modules.certificate.dto.CertificateResponse;
-import com.project_exam.backend.modules.certificate.dto.CertificateTemplateRequest;
-import com.project_exam.backend.modules.certificate.dto.CertificateTemplateResponse;
-import com.project_exam.backend.modules.certificate.dto.RevokeCertificateRequest;
-import com.project_exam.backend.modules.certificate.service.CertificateAdminService;
+import com.project_exam.backend.modules.assessment.certificate.dto.CertificateResponse;
+import com.project_exam.backend.modules.assessment.certificate.dto.CertificateTemplateRequest;
+import com.project_exam.backend.modules.assessment.certificate.dto.CertificateTemplateResponse;
+import com.project_exam.backend.modules.assessment.certificate.dto.RevokeCertificateRequest;
+import com.project_exam.backend.modules.assessment.certificate.service.CertificateAdminService;
 import com.project_exam.backend.shared.dto.MessageResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.security.PermissionCatalog;

@@ -1,6 +1,6 @@
 package com.project_exam.backend.infrastructure.scheduler;
 
-import com.project_exam.backend.modules.analytics.service.VisitTrackingService;
+import com.project_exam.backend.modules.system.analytics.service.VisitTrackingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

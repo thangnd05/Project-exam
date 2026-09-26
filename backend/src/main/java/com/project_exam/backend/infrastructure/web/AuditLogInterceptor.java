@@ -1,8 +1,8 @@
 package com.project_exam.backend.infrastructure.web;
 
-import com.project_exam.backend.modules.audit.domain.AuditLog;
-import com.project_exam.backend.modules.audit.service.AuditContext;
-import com.project_exam.backend.modules.audit.service.AuditLogService;
+import com.project_exam.backend.modules.system.audit.domain.AuditLog;
+import com.project_exam.backend.modules.system.audit.service.AuditContext;
+import com.project_exam.backend.modules.system.audit.service.AuditLogService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

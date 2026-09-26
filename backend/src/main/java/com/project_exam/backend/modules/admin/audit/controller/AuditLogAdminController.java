@@ -1,8 +1,8 @@
 package com.project_exam.backend.modules.admin.audit.controller;
 
 import com.project_exam.backend.shared.dto.PageResponse;
-import com.project_exam.backend.modules.audit.dto.AuditLogResponse;
-import com.project_exam.backend.modules.audit.service.AuditLogService;
+import com.project_exam.backend.modules.system.audit.dto.AuditLogResponse;
+import com.project_exam.backend.modules.system.audit.service.AuditLogService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import lombok.RequiredArgsConstructor;

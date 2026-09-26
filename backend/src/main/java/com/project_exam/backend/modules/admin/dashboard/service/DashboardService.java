@@ -6,7 +6,7 @@ import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsRespon
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse.*;
 import com.project_exam.backend.modules.admin.dashboard.dto.MonthlyPerformanceResponse;
 import com.project_exam.backend.modules.admin.dashboard.dto.TrafficLocationsResponse;
-import com.project_exam.backend.modules.analytics.repository.PageVisitRepository;
+import com.project_exam.backend.modules.system.analytics.repository.PageVisitRepository;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;

@@ -1,6 +1,6 @@
 package com.project_exam.backend.modules.users.rbac.service;
 
-import com.project_exam.backend.modules.audit.service.AuditContext;
+import com.project_exam.backend.modules.system.audit.service.AuditContext;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ConflictException;

@@ -16,7 +16,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultRes
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
 import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
-import com.project_exam.backend.modules.certificate.service.CertificateService;
+import com.project_exam.backend.modules.assessment.certificate.service.CertificateService;
 import com.project_exam.backend.modules.assessment.attempt.mapper.UserTestMapper;
 import com.project_exam.backend.modules.assessment.attempt.util.AttemptTimeUtil;
 import com.project_exam.backend.modules.assessment.attempt.mapper.LeaderboardMapper;
