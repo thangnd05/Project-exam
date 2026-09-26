@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { getApiBaseUrl } from '@/app/utils/mediaUrl';
+import { getCookie } from '@/app/utils/cookie';
 
 const axiosClient: AxiosInstance = axios.create({
   baseURL: getApiBaseUrl(),
@@ -8,14 +9,6 @@ const axiosClient: AxiosInstance = axios.create({
 
 axiosClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-
-    const getCookie = (name: string): string | null | undefined => {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(';').shift();
-      return null;
-    };
-
     const csrfToken = getCookie('XSRF-TOKEN');
 
     if (csrfToken) {

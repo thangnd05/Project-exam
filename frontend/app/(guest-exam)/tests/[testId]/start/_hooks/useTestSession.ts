@@ -5,7 +5,7 @@ import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { checkActiveUserTest, startUserTest, submitUserTest } from '@/app/apis/userTestApi';
-import { getAnswersByUserTest, batchSaveAnswers } from '@/app/apis/userAnswerApi';
+import { getAnswersByUserTest, batchSaveAnswers, sendAnswersOnExit } from '@/app/apis/userAnswerApi';
 import { getUserTestInfo, purchaseTestAccess } from '@/app/apis/testApi';
 import { getExamTypeLayout } from '@/app/apis/examTypeApi';
 import { resolveLayoutConfig } from '@/app/components/exam-layout/resolveLayoutConfig';
@@ -17,6 +17,14 @@ import { useStreak } from '@/app/hooks/useStreak';
 import { useStreakRestoreGate } from '@/app/components/gamification/streak/hooks/useStreakRestoreGate';
 import { useCoins } from '@/app/hooks/useCoins';
 import { getOrCreateGuestSessionId, guestHeaders } from '@/app/utils/guestSession';
+import {
+  clearExamSession,
+  pruneExpiredExamSessions,
+  readExamSessionId,
+  readExamSessionState,
+  writeExamSessionId,
+  writeExamSessionState,
+} from '@/app/utils/examStorage';
 import type { UserTestMode } from '@/app/enums';
 import type { TestPartResponse, TestResponse, UserAnswerRequest } from '@/app/types';
 import { enrichTestWithPassageMedia } from './passageUtils';
@@ -29,6 +37,7 @@ type ActiveTest = Omit<TestResponse, 'testId' | 'status'> & {
 };
 
 const PRACTICE_MODE_PARAM = 'practice' as UserTestMode;
+const AUTOSAVE_INTERVAL_MS = 60000;
 
 export function useTestSession() {
   const { testId } = useParams<{ testId: string }>();
@@ -99,33 +108,40 @@ export function useTestSession() {
 
   const flow = useExamFlowNavigation({ visibleParts, layoutConfig });
 
+  const userAnswersRef = useRef(userAnswers);
+  const pendingSinceRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    userAnswersRef.current = userAnswers;
+  }, [userAnswers]);
+
+  const buildAnswersPayload = useCallback((): UserAnswerRequest[] => {
+    if (!userTestId) return [];
+    return Object.entries(userAnswersRef.current).map(([qid, ans]) => ({
+      userTestId,
+      questionId: String(qid),
+      selectedAnswerId: ans?.selectedAnswerId || null,
+      selectedAnswerIds: ans?.selectedAnswerIds || null,
+      answerText: ans?.answerText || null,
+    }));
+  }, [userTestId]);
+
   const loadTest = useCallback(() => {
-    const savedState = sessionStorage.getItem(`userTestState-${sessionKey}`);
+    pruneExpiredExamSessions();
+
+    const savedState = readExamSessionState(sessionKey);
     let restored = false;
     let savedStartedAt: string | null = null;
 
     if (savedState) {
-      let parsed: any = null;
-      try {
-        parsed = JSON.parse(savedState);
-      } catch {
-        sessionStorage.removeItem(`userTestState-${sessionKey}`);
-      }
-      if (parsed) {
-        setUserTestId(parsed.userTestId || null);
-        setUserAnswers(parsed.userAnswers || {});
+      setUserTestId(savedState.userTestId);
+      setUserAnswers(savedState.userAnswers);
+      flow.restoreStepState(savedState.currentStepIndex, savedState.maxStepIndex);
+      savedStartedAt = savedState.startedAt;
+      restored = true;
 
-        const savedStep = Number.isInteger(parsed.currentStepIndex)
-          ? parsed.currentStepIndex
-          : 0;
-        const savedMax = Number.isInteger(parsed.maxStepIndex)
-          ? parsed.maxStepIndex
-          : savedStep;
-        flow.restoreStepState(savedStep, savedMax);
-
-        if (typeof parsed.startedAt === 'string') savedStartedAt = parsed.startedAt;
-        restored = true;
-      }
+      // Bản local có thể mới hơn server nếu lần lưu trước thất bại.
+      if (Object.keys(savedState.userAnswers).length > 0) pendingSinceRef.current = Date.now();
     }
 
     getUserTestInfo(testId)
@@ -198,7 +214,7 @@ export function useTestSession() {
                 setUserTestId(activeUserTestId);
                 setUserAnswers(answersMap);
               }
-              sessionStorage.setItem(`userTest-${sessionKey}`, activeUserTestId);
+              writeExamSessionId(sessionKey, activeUserTestId);
               restored = true;
             }
           } catch (err) {
@@ -230,16 +246,11 @@ export function useTestSession() {
   useEffect(() => {
     if (holdStart) return;
     if (status === 'open' && test?.testId) {
-      const existing = sessionStorage.getItem(`userTest-${sessionKey}`);
+      const existing = readExamSessionId(sessionKey);
       if (existing) {
         setUserTestId(existing);
-        try {
-          const saved = JSON.parse(
-            sessionStorage.getItem(`userTestState-${sessionKey}`) || 'null',
-          );
-          if (saved?.startedAt) setStartedAt(saved.startedAt);
-        } catch {
-        }
+        const saved = readExamSessionState(sessionKey);
+        if (saved?.startedAt) setStartedAt(saved.startedAt);
         setStatus('active');
         return;
       }
@@ -249,7 +260,7 @@ export function useTestSession() {
       })
         .then((data) => {
           setUserTestId(data.userTestId ?? null);
-          sessionStorage.setItem(`userTest-${sessionKey}`, data.userTestId as string);
+          writeExamSessionId(sessionKey, data.userTestId as string);
           if (!isPractice) setStartedAt(data.startedAt || null);
           setStatus('active');
         })
@@ -262,17 +273,13 @@ export function useTestSession() {
 
   useEffect(() => {
     if (status === 'active' && userTestId) {
-      sessionStorage.setItem(
-        `userTestState-${sessionKey}`,
-        JSON.stringify({
-          userTestId,
-          userAnswers,
-          startedAt,
-          currentStepIndex: flow.currentStepIndex,
-          maxStepIndex: flow.maxStepIndex,
-          lastSavedAt: Date.now(),
-        }),
-      );
+      writeExamSessionState(sessionKey, {
+        userTestId,
+        userAnswers,
+        startedAt,
+        currentStepIndex: flow.currentStepIndex,
+        maxStepIndex: flow.maxStepIndex,
+      });
     }
   }, [
     userAnswers,
@@ -286,20 +293,45 @@ export function useTestSession() {
 
   useEffect(() => {
     if (status !== 'active' || !userTestId) return undefined;
-    const entries = Object.entries(userAnswers);
-    if (entries.length === 0) return undefined;
-    const handle = setTimeout(() => {
-      const payload: UserAnswerRequest[] = entries.map(([qid, ans]) => ({
-        userTestId,
-        questionId: String(qid),
-        selectedAnswerId: ans?.selectedAnswerId || null,
-        selectedAnswerIds: ans?.selectedAnswerIds || null,
-        answerText: ans?.answerText || null,
-      }));
-      batchSaveAnswers(payload, isGuest, guestCfg).catch(() => {});
-    }, 2000);
-    return () => clearTimeout(handle);
-  }, [userAnswers, status, userTestId, isGuest, guestCfg]);
+
+    const timer = setInterval(() => {
+      if (pendingSinceRef.current === null) return;
+      const payload = buildAnswersPayload();
+      if (payload.length === 0) return;
+
+      pendingSinceRef.current = null;
+      batchSaveAnswers(payload, isGuest, guestCfg).catch((err) => {
+        const httpStatus = err?.response?.status;
+        // 4xx nghĩa là bài đã nộp hoặc hết giờ, thử lại cũng vô ích.
+        if (!(httpStatus >= 400 && httpStatus < 500)) pendingSinceRef.current = Date.now();
+      });
+    }, AUTOSAVE_INTERVAL_MS);
+
+    return () => clearInterval(timer);
+  }, [status, userTestId, isGuest, guestCfg, buildAnswersPayload]);
+
+  useEffect(() => {
+    if (status !== 'active' || !userTestId) return undefined;
+
+    const flush = () => {
+      if (submittingRef.current || pendingSinceRef.current === null) return;
+      const payload = buildAnswersPayload();
+      if (payload.length === 0) return;
+      pendingSinceRef.current = null;
+      sendAnswersOnExit(payload, isGuest, guestSessionId);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') flush();
+    };
+
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [status, userTestId, isGuest, guestSessionId, buildAnswersPayload]);
 
   useEffect(() => {
     if (status === 'locked' && preCountdown !== null) {
@@ -314,6 +346,7 @@ export function useTestSession() {
   }, [preCountdown, status]);
 
   const handleAnswerChange = (questionId: string, type: string, value: string) => {
+    if (pendingSinceRef.current === null) pendingSinceRef.current = Date.now();
     setUserAnswers((prev) => {
       if (type === 'MSQ') {
         const current = prev[questionId]?.selectedAnswerIds || [];
@@ -333,23 +366,16 @@ export function useTestSession() {
     submittingRef.current = true;
     setIsSubmitting(true);
     try {
-      const payload: UserAnswerRequest[] = Object.entries(userAnswers).map(([qid, ans]) => ({
-        userTestId,
-        questionId: String(qid),
-        selectedAnswerId: ans.selectedAnswerId || null,
-        selectedAnswerIds: ans.selectedAnswerIds || null,
-        answerText: ans.answerText || null,
-      }));
+      pendingSinceRef.current = null;
+      const payload = buildAnswersPayload();
       if (payload.length > 0) await batchSaveAnswers(payload, isGuest, guestCfg);
       const result = await submitUserTest(userTestId, isGuest, guestCfg);
-      sessionStorage.removeItem(`userTest-${sessionKey}`);
-      sessionStorage.removeItem(`userTestState-${sessionKey}`);
+      clearExamSession(sessionKey);
       if (!isGuest) refreshStreak();
       router.push(`/tests/result/${userTestId}`);
     } catch (err: any) {
       if (err?.response?.status === 409) {
-        sessionStorage.removeItem(`userTest-${sessionKey}`);
-        sessionStorage.removeItem(`userTestState-${sessionKey}`);
+        clearExamSession(sessionKey);
         router.push(`/tests/result/${userTestId}`);
         return;
       }

@@ -1,6 +1,7 @@
 export * from './apiError';
 export * from './authRedirect';
 export * from './collectionTree';
+export * from './examStorage';
 export * from './format-date-time';
 export * from './formatNumber';
 export * from './guestSession';
