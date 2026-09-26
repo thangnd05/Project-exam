@@ -16,7 +16,11 @@ import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestCollectionResponse;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
-import com.project_exam.backend.modules.assessment.test.service.TestService;
+import com.project_exam.backend.modules.assessment.test.service.ClassTestQueryService;
+import com.project_exam.backend.modules.assessment.test.service.PersonalTestQueryService;
+import com.project_exam.backend.modules.assessment.test.service.TestCatalogService;
+import com.project_exam.backend.modules.assessment.test.service.TestPaperQueryService;
+import com.project_exam.backend.modules.assessment.test.service.TestSummaryAssembler;
 import com.project_exam.backend.modules.assessment.test.service.TestQuestionAssignmentService;
 import com.project_exam.backend.modules.assessment.test.service.TestAccessService;
 import com.project_exam.backend.modules.assessment.test.service.TestCommandService;
@@ -37,7 +41,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TestController {
 
-    private final TestService testService;
+    private final TestCatalogService testCatalogService;
+    private final TestPaperQueryService testPaperQueryService;
+    private final ClassTestQueryService classTestQueryService;
+    private final PersonalTestQueryService personalTestQueryService;
+    private final TestSummaryAssembler testSummaryAssembler;
     private final TestQuestionAssignmentService testQuestionAssignmentService;
     private final TestAccessService testAccessService;
     private final TestCommandService testCommandService;
@@ -46,7 +54,7 @@ public class TestController {
 
     @GetMapping
     public ResponseEntity<List<TestResponse>> getAllTests() {
-        return ResponseEntity.ok(testService.getAllTests());
+        return ResponseEntity.ok(testCatalogService.getAllTests());
     }
 
     @GetMapping("/usertest/{testId}")
@@ -60,7 +68,7 @@ public class TestController {
         } catch (Exception e) {
             userId = null;
         }
-        TestResponse response = testService.getTestFullById(testId, userId);
+        TestResponse response = testPaperQueryService.getTestFullById(testId, userId);
         if (response == null) {
             throw new NotFoundException("Không tìm thấy bài test");
         }
@@ -70,7 +78,7 @@ public class TestController {
     @GetMapping("/{testId}/parts-summary")
     public ResponseEntity<List<com.project_exam.backend.modules.assessment.test.dto.TestPartSummaryResponse>>
             getPartsSummary(@PathVariable String testId) {
-        return ResponseEntity.ok(testService.getPartsSummary(testId));
+        return ResponseEntity.ok(testPaperQueryService.getPartsSummary(testId));
     }
 
     @GetMapping("/admintest/{testId}")
@@ -78,14 +86,14 @@ public class TestController {
             @PathVariable String testId,
             HttpServletRequest httpRequest
     ) {
-        Test test = testService.getTestById(testId)
+        Test test = testPaperQueryService.getTestById(testId)
                 .orElseThrow(() -> new NotFoundException("Test không tồn tại"));
         String userId = authUtils.getUserId(httpRequest);
         boolean isOwner = userId != null && userId.equals(test.getCreatedBy());
         if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xem chi tiết đề này.");
         }
-        return ResponseEntity.ok(testService.getTestFullByIdAdmin(testId));
+        return ResponseEntity.ok(testPaperQueryService.getTestFullByIdAdmin(testId));
     }
 
     @PostMapping
@@ -125,7 +133,7 @@ public class TestController {
         test.setCreatedBy(currentUserId);
         test.setCreatedAt(Instant.now());
         Test savedTest = testCommandService.save(test);
-        TestResponse response = testService.buildUserTestSummary(savedTest, currentUserId);
+        TestResponse response = testSummaryAssembler.buildUserTestSummary(savedTest, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -160,7 +168,7 @@ public class TestController {
     ) {
         String userId = authUtils.getUserId(httpRequest);
         Test updated = testCommandService.updateTest(id, request, userId);
-        return ResponseEntity.ok(testService.buildUserTestSummary(updated, updated.getCreatedBy()));
+        return ResponseEntity.ok(testSummaryAssembler.buildUserTestSummary(updated, updated.getCreatedBy()));
     }
 
     @PostMapping("/{testId}/purchase")
@@ -174,7 +182,7 @@ public class TestController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTest(@PathVariable String id, HttpServletRequest httpRequest) {
-        if (testService.getTestById(id).isEmpty()) {
+        if (testPaperQueryService.getTestById(id).isEmpty()) {
             throw new NotFoundException("Test không tồn tại");
         }
         String userId = authUtils.getUserId(httpRequest);
@@ -185,7 +193,7 @@ public class TestController {
     @GetMapping("/my")
     public List<TestResponse> getMyTests(HttpServletRequest request) {
         String userId = authUtils.getUserId(request);
-        return testService.getTestsByUser(userId);
+        return personalTestQueryService.getTestsByUser(userId);
     }
 
     @GetMapping("/user/by-exam-type/{examTypeId}")
@@ -202,7 +210,7 @@ public class TestController {
         } catch (Exception e) {
             userId = null;
         }
-        return ResponseEntity.ok(testService.getAdminTestsByExamTypePaged(examTypeId, page, size, userId));
+        return ResponseEntity.ok(testCatalogService.getAdminTestsByExamTypePaged(examTypeId, page, size, userId));
     }
 
     @GetMapping("/certificate-exams/by-exam-type/{examTypeId}")
@@ -216,14 +224,14 @@ public class TestController {
         } catch (Exception e) {
             userId = null;
         }
-        return ResponseEntity.ok(testService.getCertificateExamsByExamType(examTypeId, userId));
+        return ResponseEntity.ok(testCatalogService.getCertificateExamsByExamType(examTypeId, userId));
     }
 
     @GetMapping("/collections/by-exam-type/{examTypeId}")
     public ResponseEntity<List<TestCollectionResponse>> getTestCollectionsByExamType(
             @PathVariable String examTypeId
     ) {
-        return ResponseEntity.ok(testService.getTestCollectionsByExamType(examTypeId));
+        return ResponseEntity.ok(testCatalogService.getTestCollectionsByExamType(examTypeId));
     }
 
     @GetMapping("/user/by-collection/{collectionId}")
@@ -239,12 +247,12 @@ public class TestController {
         } catch (Exception e) {
             userId = null;
         }
-        return ResponseEntity.ok(testService.getTestsByCollectionPaged(collectionId, page, size, userId));
+        return ResponseEntity.ok(testCatalogService.getTestsByCollectionPaged(collectionId, page, size, userId));
     }
 
     @GetMapping("/quick-challenge")
     public ResponseEntity<List<QuickChallengeCardResponse>> getQuickChallengeTests() {
-        return ResponseEntity.ok(testService.getQuickChallengeTests());
+        return ResponseEntity.ok(testCatalogService.getQuickChallengeTests());
     }
 
     @GetMapping("/{testId}/can-start")
@@ -253,7 +261,7 @@ public class TestController {
             HttpServletRequest request
     ) {
         String userId = authUtils.getUserId(request);
-        Test test = testService.getTestById(testId)
+        Test test = testPaperQueryService.getTestById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
 
         if (test.getClassId() != null) {
@@ -274,14 +282,14 @@ public class TestController {
             HttpServletRequest request
     ) {
         String userId = authUtils.getUserId(request);
-        List<TestResponse> responses = testService.getTestByClassId(classId, userId);
+        List<TestResponse> responses = classTestQueryService.getTestByClassId(classId, userId);
         return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/my-all-test")
     public ResponseEntity<List<TestResponse>> getTestsCreateBy(HttpServletRequest request) {
         String userId = authUtils.getUserId(request);
-        List<TestResponse> responses = testService.getTestByCreateBy(userId);
+        List<TestResponse> responses = personalTestQueryService.getTestByCreateBy(userId);
         return ResponseEntity.ok(responses);
     }
 
@@ -292,7 +300,7 @@ public class TestController {
             @RequestParam(defaultValue = "12") int size
     ) {
         String userId = authUtils.getUserId(request);
-        return ResponseEntity.ok(testService.getMyPersonalTestsPaged(userId, page, size));
+        return ResponseEntity.ok(personalTestQueryService.getMyPersonalTestsPaged(userId, page, size));
     }
 
 }

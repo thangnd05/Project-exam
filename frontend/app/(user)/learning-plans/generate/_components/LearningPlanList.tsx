@@ -214,7 +214,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
                 type="button"
                 className={cx('btn', 'btnPrimary', 'btnSm')}
                 disabled={resyncing === p.learningPlanId}
-                title="Sinh lại từ bài chẩn đoán cũ theo mục tiêu hiện tại, giữ tiến độ ải đã vượt"
+                title="Cập nhật ngưỡng vượt ải theo mục tiêu hiện tại, giữ tiến độ ải đã vượt"
                 onClick={() => resyncMutation.mutate(p.learningPlanId)}
               >
                 {resyncing === p.learningPlanId ? 'Đang cập nhật...' : 'Cập nhật mục tiêu'}

@@ -2,6 +2,7 @@ package com.project_exam.backend.modules.assessment.learning.controller;
 
 import com.project_exam.backend.modules.assessment.learning.dto.CurrentSessionResponse;
 import com.project_exam.backend.modules.assessment.learning.dto.GeneratePlanRequest;
+import com.project_exam.backend.modules.assessment.learning.dto.GenerateSyllabusPlanRequest;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanResponse;
 import com.project_exam.backend.modules.assessment.learning.dto.SubmitSessionRequest;
 import com.project_exam.backend.modules.assessment.learning.dto.SubmitSessionResponse;
@@ -34,6 +35,16 @@ public class LearningPlanController {
     ) {
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(learningPlanService.generatePlan(userId, request));
+    }
+
+    @PostMapping("/generate-syllabus")
+    public ResponseEntity<PlanResponse> generateSyllabus(
+            @Valid @RequestBody GenerateSyllabusPlanRequest request,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(learningPlanService.generateSyllabusPlan(userId, request));
     }
 
     @PostMapping("/{learningPlanId}/resync")

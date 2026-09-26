@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
-import { generatePlan } from '@/app/apis/learningPlanApi';
+import { generatePlan, generateSyllabusPlan } from '@/app/apis/learningPlanApi';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
@@ -64,4 +64,8 @@ export function useUserTarget(examTypeId?: string) {
 
 export function useGeneratePlanMutation() {
   return useMutation({ mutationFn: generatePlan });
+}
+
+export function useGenerateSyllabusPlanMutation() {
+  return useMutation({ mutationFn: generateSyllabusPlan });
 }

@@ -44,10 +44,12 @@ function PlanComparison() {
   );
 
   const chartData = useMemo(() => {
-    return sorted.map((p, idx) => {
-      const prev = idx > 0 ? sorted[idx - 1] : null;
+    // Lộ trình sinh theo chương trình học không có readiness ban đầu nên không so sánh được.
+    const diagnosed = sorted.filter((p) => p.baselineReadiness != null);
+    return diagnosed.map((p, idx) => {
+      const prev = idx > 0 ? diagnosed[idx - 1] : null;
 
-      const readiness = p.baselineReadiness ?? 0;
+      const readiness = p.baselineReadiness as number;
       const prevReadiness = prev ? prev.baselineReadiness ?? null : null;
       const diffVsPrev =
         prevReadiness != null ? readiness - prevReadiness : null;

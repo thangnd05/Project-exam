@@ -154,7 +154,8 @@ function PlanDetail() {
         <div className={cx('alert', 'alertWarning')}>
           <span>
             Lộ trình này sinh theo <strong>mục tiêu cũ</strong>  ngưỡng vượt ải chưa áp
-            mục tiêu hiện tại. Cập nhật lại ngay từ chính bài chẩn đoán cũ,{' '}
+            mục tiêu hiện tại. Cập nhật lại ngay
+            {plan.sourceUserTestId ? ' từ chính bài chẩn đoán cũ,' : ','}{' '}
             <strong>không cần thi lại</strong>  tiến độ các ải đã vượt được giữ nguyên.
           </span>
           <button

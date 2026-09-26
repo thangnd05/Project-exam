@@ -13,14 +13,18 @@ import InfoTip from '@/app/components/InfoTip/InfoTip';
 import { TERM_TIPS } from '@/app/utils/termTips';
 import { buildPlanSummary, isPracticeAttempt, planStageLabel } from '@/app/utils/planLabels';
 import { getReadinessLabel } from '@/app/utils/readiness-label';
+import { getLearnerLevel } from '@/app/utils/learnerLevel';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import type { PlanResponse } from '@/app/types';
 import {
   useCompletedUserTests,
   useExamTypes,
   useGeneratePlanMutation,
+  useGenerateSyllabusPlanMutation,
   useUserTarget,
 } from '@/app/hooks/useGeneratePlan';
+
+type PlanSource = 'DIAGNOSIS' | 'SYLLABUS';
 
 const cx = classNames.bind(styles);
 
@@ -28,7 +32,13 @@ function GeneratePlan() {
   const router = useRouter();
   const [searchParams, setSearchParams] = useSearchParamsState();
 
+  const forcedSyllabus = searchParams.get('source') === 'syllabus';
+
   const [userTestId, setUserTestId] = useState(searchParams.get('userTestId') || '');
+  const [planSource, setPlanSource] = useState<PlanSource>(
+    forcedSyllabus ? 'SYLLABUS' : 'DIAGNOSIS',
+  );
+  const [planSourceTouched, setPlanSourceTouched] = useState(forcedSyllabus);
 
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PlanResponse | null>(null);
@@ -57,7 +67,8 @@ function GeneratePlan() {
   } = useUserTarget(sourceExamTypeId);
 
   const generatePlanMutation = useGeneratePlanMutation();
-  const submitting = generatePlanMutation.isPending;
+  const generateSyllabusMutation = useGenerateSyllabusPlanMutation();
+  const submitting = generatePlanMutation.isPending || generateSyllabusMutation.isPending;
 
   useEffect(() => {
     if (!sourceExamTypeId && examTypes.length > 0) {
@@ -75,7 +86,17 @@ function GeneratePlan() {
 
   const hasTarget = Boolean(userTarget?.hasTarget);
 
-  const testFormLocked = !sourceExamTypeId || loadingTarget || !!targetError || !hasTarget;
+  const examTypeReady = Boolean(sourceExamTypeId) && !loadingTarget && !targetError;
+  // Lộ trình theo chương trình học chạy được khi chưa đặt mục tiêu; chẩn đoán từ bài thi thì không.
+  const formLocked = !examTypeReady || (planSource === 'DIAGNOSIS' && !hasTarget);
+
+  // Người tự khai là mới, hoặc chưa có bài nào của kỳ thi này, thì mặc định đi theo chương trình học.
+  useEffect(() => {
+    if (planSourceTouched || !sourceExamTypeId || loadingList) return;
+    const beginner =
+      getLearnerLevel(sourceExamTypeId) === 'BEGINNER' || filteredUserTests.length === 0;
+    setPlanSource(beginner ? 'SYLLABUS' : 'DIAGNOSIS');
+  }, [planSourceTouched, sourceExamTypeId, loadingList, filteredUserTests.length]);
 
   useEffect(() => {
     if (!userTestId || loadingList) return;
@@ -118,10 +139,9 @@ function GeneratePlan() {
     e.preventDefault();
     setError(null);
     setResult(null);
-    const payload = { userTestId };
 
-    generatePlanMutation.mutate(payload, {
-      onSuccess: (data) => {
+    const handlers = {
+      onSuccess: (data: PlanResponse) => {
         setResult(data);
         if (data?.examTypeId) {
           setFilterExamTypeId(data.examTypeId);
@@ -132,7 +152,19 @@ function GeneratePlan() {
       onError: (err: any) => {
         setError(err?.response?.data?.message || err.message || 'Lỗi không xác định');
       },
-    });
+    };
+
+    if (planSource === 'SYLLABUS') {
+      generateSyllabusMutation.mutate({ examTypeId: sourceExamTypeId }, handlers);
+      return;
+    }
+    generatePlanMutation.mutate({ userTestId }, handlers);
+  };
+
+  const handlePlanSourceChange = (next: PlanSource) => {
+    setPlanSourceTouched(true);
+    setPlanSource(next);
+    setError(null);
   };
 
   return (
@@ -146,9 +178,13 @@ function GeneratePlan() {
         <div className={cx('stepItem')}>
           <span className={cx('stepNum')}>1</span>
           <div>
-            <div className={cx('stepTitle')}>Chọn bài thi đã làm</div>
+            <div className={cx('stepTitle')}>
+              {planSource === 'SYLLABUS' ? 'Chọn kỳ thi muốn học' : 'Chọn bài thi đã làm'}
+            </div>
             <div className={cx('stepDesc')}>
-              Hệ thống chẩn đoán điểm yếu của bạn từ bài này.
+              {planSource === 'SYLLABUS'
+                ? 'Chưa làm bài nào cũng được  lộ trình đi theo chương trình của kỳ thi.'
+                : 'Hệ thống chẩn đoán điểm yếu của bạn từ bài này.'}
             </div>
           </div>
         </div>
@@ -186,10 +222,21 @@ function GeneratePlan() {
       )}
 
       {sourceExamTypeId && !loadingTarget && !targetError && !hasTarget && (
-        <div className={cx('alert', 'alertWarning')}>
+        <div className={cx('alert', planSource === 'SYLLABUS' ? 'alertInfo' : 'alertWarning')}>
           <span>
-            Bạn chưa đặt mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot;.
-            Sang tab <strong>Mục tiêu</strong> đặt trước (có mốc gợi ý sẵn), rồi quay lại đây sinh lộ trình.
+            {planSource === 'SYLLABUS' ? (
+              <>
+                Bạn chưa đặt mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot; nên
+                ngưỡng vượt ải tạm dùng mức mặc định. Cứ sinh lộ trình và học trước; khi nào đặt
+                mục tiêu, bấm <strong>Cập nhật theo mục tiêu mới</strong> là lộ trình áp ngưỡng
+                đúng mà vẫn giữ tiến độ.
+              </>
+            ) : (
+              <>
+                Bạn chưa đặt mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot;.
+                Sang tab <strong>Mục tiêu</strong> đặt trước (có mốc gợi ý sẵn), rồi quay lại đây sinh lộ trình.
+              </>
+            )}
           </span>
           <Link
             href={`/my-target?examTypeId=${encodeURIComponent(sourceExamTypeId)}`}
@@ -228,6 +275,30 @@ function GeneratePlan() {
               </div>
 
               <div className={cx('fieldGroup')} style={{ flex: 1 }}>
+                <label className={cx('fieldLabel')}>Lộ trình dựa trên</label>
+                <select
+                  className={cx('select')}
+                  value={planSource}
+                  onChange={(e) => handlePlanSourceChange(e.target.value as PlanSource)}
+                  disabled={!examTypeReady}
+                >
+                  <option value="SYLLABUS">
+                    Chương trình học  tôi mới bắt đầu, chưa làm bài nào
+                  </option>
+                  <option value="DIAGNOSIS">
+                    Kết quả một bài thi  chẩn đoán điểm yếu của tôi
+                  </option>
+                </select>
+                <small className={cx('muted')}>
+                  {planSource === 'SYLLABUS'
+                    ? 'Đi tuần tự hết các chủ điểm của từng Part. Làm bài thi thử sau để sinh lộ trình sát hơn.'
+                    : 'Ưu tiên các chủ điểm bạn làm sai nhiều nhất trong bài đã chọn.'}
+                </small>
+              </div>
+            </div>
+
+            {planSource === 'DIAGNOSIS' && (
+              <div className={cx('fieldGroup')} style={{ marginBottom: '1.6rem' }}>
                 <label className={cx('fieldLabel')}>
                   Chọn bài thi muốn lập kế hoạch
                 </label>
@@ -247,7 +318,7 @@ function GeneratePlan() {
                   value={userTestId}
                   onChange={(e) => setUserTestId(e.target.value)}
                   required
-                  disabled={testFormLocked}
+                  disabled={formLocked}
                 >
                   <option value="">-- Chọn bài thi --</option>
                   {filteredUserTests.map((t) => (
@@ -266,12 +337,16 @@ function GeneratePlan() {
                 </small>
               )}
               </div>
-            </div>
+            )}
 
             <button
               type="submit"
               className={cx('btn', 'btnPrimary', 'btnLg')}
-              disabled={submitting || testFormLocked || !userTestId || filteredUserTests.length === 0}
+              disabled={
+                submitting ||
+                formLocked ||
+                (planSource === 'DIAGNOSIS' && (!userTestId || filteredUserTests.length === 0))
+              }
               style={{ marginTop: '1.6rem' }}
             >
               {submitting ? 'Đang sinh lộ trình...' : 'Sinh lộ trình'}
@@ -313,14 +388,25 @@ function GeneratePlan() {
             <p>{buildPlanSummary(result)}</p>
             <ul className={cx('metaList')}>
               <li><strong>Giai đoạn:</strong> {planStageLabel(result.planStage)}</li>
-              <li>
-                <strong>Độ sẵn sàng (chẩn đoán):</strong>
-                <InfoTip text={TERM_TIPS.readiness} />{' '}
-                {result.baselineReadiness ?? '-'}% ({getReadinessLabel(result.readinessLevel)})
-              </li>
+              {result.baselineReadiness != null && (
+                <li>
+                  <strong>Độ sẵn sàng (chẩn đoán):</strong>
+                  <InfoTip text={TERM_TIPS.readiness} />{' '}
+                  {result.baselineReadiness}% ({getReadinessLabel(result.readinessLevel)})
+                </li>
+              )}
               <li><strong>Mục tiêu:</strong> {result.targetScore ?? 'N/A'}</li>
               <li><strong>Ải:</strong> {result.totalTasks}</li>
             </ul>
+
+            {!result.sourceUserTestId && (
+              <div className={cx('alert')}>
+                Lộ trình này đi theo <strong>chương trình của kỳ thi</strong> nên chưa có chẩn đoán
+                điểm mạnh yếu. Học được một thời gian, hãy làm một{' '}
+                <strong>bài thi thử đầy đủ</strong> rồi sinh lộ trình mới để được ưu tiên đúng chỗ
+                bạn còn yếu.
+              </div>
+            )}
 
             {result.diagnosisSourceCategory === 'QUICK_CHALLENGE' && (
               <div className={cx('alert')}>
@@ -339,8 +425,9 @@ function GeneratePlan() {
 
             {(result.partsWithoutTasks?.length ?? 0) > 0 && (
               <div className={cx('alert', 'alertWarning')}>
-                Part chưa đạt mục tiêu nhưng <strong>chưa có ải</strong> vì câu trong đề chưa gắn tag:{' '}
-                {result.partsWithoutTasks!.join(', ')}. Gắn tag câu hỏi (admin) rồi sinh lộ trình lại.
+                Part <strong>chưa có ải</strong> vì chưa có câu hỏi luyện tập nào được gắn tag:{' '}
+                {result.partsWithoutTasks!.join(', ')}. Thêm câu hỏi ở phạm vi luyện tập và gắn tag
+                (admin) rồi sinh lộ trình lại.
               </div>
             )}
 

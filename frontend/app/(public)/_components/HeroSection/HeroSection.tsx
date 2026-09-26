@@ -5,8 +5,10 @@ import {useQuery} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
+import {getUserTarget} from '@/app/apis/userTargetApi';
 import {name as brandName} from '@/app/assets/images';
-import routes from '@/app/configs/Routes';
+import routes, {buildExamTypeDetailPath} from '@/app/configs/Routes';
+import {useAuth} from '@/app/hooks/useAuth';
 import {examTypeKeys} from '@/app/hooks/examTypeKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
@@ -29,6 +31,7 @@ const normalizeExamTypes = (payload: any): ExamTypeResponse[] => {
 
 function HeroSection() {
   const router = useRouter();
+  const {isAuthenticated, loading: authLoading} = useAuth();
   const {quickTests, isLoading: loading} = useQuickChallengeTests();
   // const [activeIdx, setActiveIdx] = useState(0);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -92,6 +95,58 @@ function HeroSection() {
       startTest(test);
     },
     [startTest],
+  );
+
+  const exploreExam = useCallback(
+    (test: QuickChallengeCardResponse) => {
+      setPendingTest(null);
+      router.push(test.examTypeId ? buildExamTypeDetailPath(test.examTypeId) : routes.examTypes);
+    },
+    [router],
+  );
+
+  const startSyllabusPlan = useCallback(
+    async (test: QuickChallengeCardResponse) => {
+      setPendingTest(null);
+      const examTypeId = test.examTypeId;
+      if (!examTypeId) {
+        router.push(routes.examTypes);
+        return;
+      }
+
+      const planUrl = `${routes.generatePlan}?${new URLSearchParams({
+        examTypeId,
+        source: 'syllabus',
+      }).toString()}`;
+
+      if (!authLoading && !isAuthenticated) {
+        router.push(
+          `${routes.login}?${new URLSearchParams({
+            from: planUrl,
+            flash: 'Đăng nhập để WinDe lưu lộ trình học của bạn.',
+          }).toString()}`,
+        );
+        return;
+      }
+
+      // Chưa có mục tiêu thì đặt trước, xong quay lại đúng bước sinh lộ trình.
+      try {
+        const target = await getUserTarget(examTypeId);
+        if (!target?.hasTarget) {
+          router.push(
+            `${routes.myTarget}?${new URLSearchParams({
+              examTypeId,
+              next: planUrl,
+            }).toString()}`,
+          );
+          return;
+        }
+      } catch {
+        // Không kiểm tra được mục tiêu thì cứ sang trang sinh lộ trình, ở đó vẫn xử lý được.
+      }
+      router.push(planUrl);
+    },
+    [router, isAuthenticated, authLoading],
   );
 
   const handleStartQuick = useCallback(() => {
@@ -235,6 +290,8 @@ function HeroSection() {
         test={pendingTest}
         onClose={closeConfirm}
         onConfirm={confirmStart}
+        onExploreExam={exploreExam}
+        onStartSyllabusPlan={startSyllabusPlan}
       />
     </section>
   );

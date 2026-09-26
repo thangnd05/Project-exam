@@ -220,7 +220,10 @@ function TargetDashboard() {
                 <>
                   <div className={cx('statValue')}>Lộ trình #{activePlan.planSequence ?? '?'}</div>
                   <div className={cx('statHint')}>
-                    Ban đầu {activePlan.baselineReadiness ?? '-'}% ·{' '}
+                    {activePlan.baselineReadiness != null
+                      ? `Ban đầu ${activePlan.baselineReadiness}%`
+                      : 'Theo chương trình học'}{' '}
+                    ·{' '}
                     {activePlan.passedTasks ?? 0}/{activePlan.totalTasks ?? 0} ải đã pass
                   </div>
                   <div className={pageCx('statTileFooter')}>

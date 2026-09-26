@@ -27,13 +27,11 @@ public class TestAccessService {
     private final UserTestRepository userTestRepository;
     private final UserTestAccessRepository userTestAccessRepository;
     private final CoinService coinService;
-    private final TestService testService;
+    private final TestAccessPolicy accessPolicy;
+    private final TestSummaryAssembler summaryAssembler;
 
-    private boolean hasTestAccess(Test test, String userId) {
-        if (test.getCostCoins() == null || test.getCostCoins() <= 0) return true;
-        if (userId == null) return false;
-        if (userId.equals(test.getCreatedBy())) return true;
-        return userTestAccessRepository.existsByUserIdAndTestId(userId, test.getTestId());
+    public boolean hasAccess(Test test, String userId) {
+        return accessPolicy.hasAccess(test, userId);
     }
 
     public CanStartTestResponse canStartTest(String userId, Test test) {
@@ -68,7 +66,7 @@ public class TestAccessService {
         }
 
         boolean paid = test.getCostCoins() != null && test.getCostCoins() > 0;
-        boolean owned = hasTestAccess(test, userId);
+        boolean owned = hasAccess(test, userId);
         if (paid && !owned) {
             return CanStartTestResponse.builder()
                     .canStart(false)
@@ -111,6 +109,6 @@ public class TestAccessService {
         access.setPurchasedAt(Instant.now());
         userTestAccessRepository.save(access);
 
-        return testService.buildUserTestSummary(test, userId);
+        return summaryAssembler.buildUserTestSummary(test, userId);
     }
 }

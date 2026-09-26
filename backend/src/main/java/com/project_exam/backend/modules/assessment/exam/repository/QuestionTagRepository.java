@@ -1,5 +1,6 @@
 package com.project_exam.backend.modules.assessment.exam.repository;
 
+import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.domain.QuestionTag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -30,6 +31,16 @@ public interface QuestionTagRepository extends JpaRepository<QuestionTag, String
             WHERE q.examPartId = :examPartId
             """)
     List<String> findDistinctTagIdsByExamPartId(@Param("examPartId") String examPartId);
+
+    @Query("""
+            SELECT DISTINCT qt.tagId FROM QuestionTag qt
+            JOIN Question q ON q.questionId = qt.questionId
+            WHERE q.examPartId = :examPartId
+              AND q.usageScope IN :scopes
+            """)
+    List<String> findDistinctTagIdsByExamPartIdAndUsageScopeIn(
+            @Param("examPartId") String examPartId,
+            @Param("scopes") java.util.Collection<Question.UsageScope> scopes);
 
     @Query("""
             SELECT DISTINCT qt.tagId FROM QuestionTag qt

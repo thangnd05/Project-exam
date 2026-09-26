@@ -44,6 +44,15 @@ function UserTarget() {
     }
   }, [searchParams]);
 
+  // Được điều hướng tới đây chỉ để đặt mục tiêu thì giữ đúng bước tiếp theo của luồng cũ.
+  const nextAfterTarget = useMemo(() => {
+    const next = searchParams.get('next');
+    if (next && next.startsWith('/') && !next.startsWith('//')) return next;
+    return selectedExamTypeId
+      ? `/learning-plans/generate?examTypeId=${encodeURIComponent(selectedExamTypeId)}`
+      : '/learning-plans/generate';
+  }, [searchParams, selectedExamTypeId]);
+
   const {
     isScaled,
     maxScore: maxTargetScore,
@@ -225,16 +234,7 @@ function UserTarget() {
             })}
           </div>
           <div className={planCx('actionBar')} style={{ marginTop: '1rem' }}>
-            <ButtonPrime
-              as="link"
-              href={
-                selectedExamTypeId
-                  ? `/learning-plans/generate?examTypeId=${selectedExamTypeId}`
-                  : '/learning-plans/generate'
-              }
-              variant="primary"
-              size="sm"
-            >
+            <ButtonPrime as="link" href={nextAfterTarget} variant="primary" size="sm">
               Sinh lộ trình vượt ải
             </ButtonPrime>
           </div>

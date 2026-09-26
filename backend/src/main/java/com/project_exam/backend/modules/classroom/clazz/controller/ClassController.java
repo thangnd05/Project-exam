@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.classroom.clazz.dto.ClassResponse;
 import com.project_exam.backend.modules.classroom.clazz.dto.ClassSimpleResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
 import com.project_exam.backend.modules.classroom.clazz.service.ClassService;
-import com.project_exam.backend.modules.assessment.test.service.TestService;
+import com.project_exam.backend.modules.assessment.test.service.ClassTestQueryService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -22,7 +22,7 @@ import java.util.List;
 public class ClassController {
 
     private final ClassService classService;
-    private final TestService testService;
+    private final ClassTestQueryService classTestQueryService;
     private final AuthUtils authUtils;
 
     @PostMapping
@@ -75,7 +75,7 @@ public class ClassController {
             @PathVariable String chapterId,
             HttpServletRequest request) {
         String userId = authUtils.getUserId(request);
-        List<TestResponse> responses = testService.getTestByClassIdAndChapterId(classId, chapterId, userId);
+        List<TestResponse> responses = classTestQueryService.getTestByClassIdAndChapterId(classId, chapterId, userId);
         return ResponseEntity.ok(responses);
     }
 }

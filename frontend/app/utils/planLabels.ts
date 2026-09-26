@@ -59,7 +59,10 @@ export function isCapstoneTask(task?: PlanTaskResponse | null): boolean {
 
 export function buildPlanSummary(plan: PlanResponse): string {
   const target = plan.targetScore == null ? 'đạt mục tiêu' : `đạt ${plan.targetScore} điểm`;
-  return `Readiness ${plan.baselineReadiness ?? 0}%. ${plan.totalTasks ?? 0} ải cho Part chưa đạt mục tiêu, để ${target}.`;
+  if (plan.baselineReadiness == null) {
+    return `Đi theo chương trình học, chưa có chẩn đoán. ${plan.totalTasks ?? 0} ải trải đều các Part, để ${target}.`;
+  }
+  return `Readiness ${plan.baselineReadiness}%. ${plan.totalTasks ?? 0} ải cho Part chưa đạt mục tiêu, để ${target}.`;
 }
 
 export function buildResyncMessage(plan?: PlanResponse | null): string {

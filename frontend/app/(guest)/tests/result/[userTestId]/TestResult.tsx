@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Container, Spinner, Alert } from "react-bootstrap";
 import { toast } from "react-toastify";
 import classNames from "classnames/bind";
@@ -16,6 +16,7 @@ import {
 
 import { useAuth } from "@/app/hooks/useAuth";
 import { getGuestSessionId, guestHeaders } from "@/app/utils/guestSession";
+import { isBeginnerLevel } from "@/app/utils/learnerLevel";
 import { getScoreScale } from "@/app/utils/scoreScale";
 import { useTestResult } from "./_hooks/useTestResult";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";
@@ -44,6 +45,13 @@ const TestResult = () => {
   const error = isError ? "Không thể tải kết quả bài thi này" : "";
 
   const scoreScale = getScoreScale(enhanced?.scoringMethod);
+
+  const isQuickChallenge = enhanced?.examCategoryCode === 'QUICK_CHALLENGE';
+  const [isBeginner, setIsBeginner] = useState(false);
+
+  useEffect(() => {
+    setIsBeginner(Boolean(isQuickChallenge) && isBeginnerLevel(enhanced?.examTypeId));
+  }, [isQuickChallenge, enhanced?.examTypeId]);
 
   const formatTime = (start?: string, end?: string) => {
     if (!start || !end) return "--:--";
@@ -96,13 +104,15 @@ const TestResult = () => {
         <div className={cx("result-layout")}>
 
           <div className={cx("result-card")}>
-            <h1>Hoàn thành bài thi!</h1>
+            <h1>{isBeginner ? "Đây là điểm xuất phát" : "Hoàn thành bài thi!"}</h1>
 
             <div className={cx("result-body")}>
               <div className={cx("score-display")}>
-                {enhanced?.examCategoryCode === 'QUICK_CHALLENGE' ? (
+                {isQuickChallenge ? (
                   <>
-                    <span className={cx("label")}>Độ chính xác</span>
+                    <span className={cx("label")}>
+                      {isBeginner ? "Điểm xuất phát" : "Độ chính xác"}
+                    </span>
                     <div className={cx("points")}>
                       {enhanced?.percentage ?? 0}%
                     </div>

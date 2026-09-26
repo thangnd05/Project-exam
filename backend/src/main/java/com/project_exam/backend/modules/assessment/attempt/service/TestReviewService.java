@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRe
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
-import com.project_exam.backend.modules.assessment.test.service.TestService;
+import com.project_exam.backend.modules.assessment.test.service.TestPaperQueryService;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class TestReviewService {
 
     private final UserTestRepository userTestRepository;
     private final TestRepository testRepository;
-    private final TestService testService;
+    private final TestPaperQueryService testPaperQueryService;
 
     @Transactional(readOnly = true)
     public TestAdminResponse getReviewTestForUser(String userTestId, String userId) {
@@ -59,6 +59,6 @@ public class TestReviewService {
             throw new ForbiddenException("Đề vẫn đang mở, chưa tới lúc xem đáp án.");
         }
 
-        return testService.getTestFullByIdAdmin(test.getTestId());
+        return testPaperQueryService.getTestFullByIdAdmin(test.getTestId());
     }
 }

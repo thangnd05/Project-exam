@@ -1,9 +1,11 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import InfoTip from '@/app/components/InfoTip/InfoTip';
 import { TERM_TIPS } from '@/app/utils/termTips';
+import { isBeginnerLevel } from '@/app/utils/learnerLevel';
 import { buildGaugeView } from '@/app/utils/readiness-label';
 import styles from './Result.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
@@ -24,6 +26,8 @@ const COLOR_MAP: Record<string, GaugeColor> = {
   ALMOST_READY:      { color: brandColors.primary, bg: brandColors.brand50 },
   NEEDS_IMPROVEMENT: { color: brandColors.unique, bg: '#fffbeb' },
   NOT_READY:         { color: '#ef4444', bg: '#fef2f2' },
+
+  STARTING:   { color: brandColors.primary, bg: brandColors.brand50 },
 };
 
 type ReadinessGaugeProps = {
@@ -34,10 +38,16 @@ function ReadinessGauge({ enhanced }: ReadinessGaugeProps) {
   const router = useRouter();
   const { examCategoryCode, examTypeId, readinessLevel, hasTarget, correct, total } = enhanced;
 
-  const { gaugePercentage, displayValue, gaugeLabel, gaugeTitle, gaugeMessage, gaugeLevel } =
-    buildGaugeView(enhanced);
-
   const isQuickChallenge = examCategoryCode === 'QUICK_CHALLENGE';
+
+  const [isBeginner, setIsBeginner] = useState(false);
+
+  useEffect(() => {
+    setIsBeginner(isQuickChallenge && isBeginnerLevel(examTypeId));
+  }, [isQuickChallenge, examTypeId]);
+
+  const { gaugePercentage, displayValue, gaugeLabel, gaugeTitle, gaugeMessage, gaugeLevel } =
+    buildGaugeView(enhanced, { isBeginner });
 
   const { color, bg } = isQuickChallenge
     ? ((gaugeLevel && COLOR_MAP[gaugeLevel]) || COLOR_MAP.WEAK)
@@ -100,7 +110,9 @@ function ReadinessGauge({ enhanced }: ReadinessGaugeProps) {
           style={{ backgroundColor: effectiveColor }}
           onClick={() => router.push(`/exam-types/${examTypeId}`)}
         >
-          Làm Full Mock Exam để biết khả năng của bản thân
+          {isBeginner
+            ? 'Xem cấu trúc kỳ thi để bắt đầu từ nền tảng'
+            : 'Làm Full Mock Exam để biết khả năng của bản thân'}
         </div>
       )}
     </div>

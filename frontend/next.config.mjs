@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 
-const API_ORIGIN = (process.env.API_ORIGIN || 'http://localhost:8080').replace(/\/$/, '');
+const API_ORIGIN = (process.env.API_ORIGIN ?? '').replace(/\/$/, '');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {

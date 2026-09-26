@@ -3,6 +3,7 @@ import axios from './axiosClient';
 import type {
   CurrentSessionResponse,
   GeneratePlanRequest,
+  GenerateSyllabusPlanRequest,
   PlanResponse,
   SubmitSessionAnswerItem,
   SubmitSessionResponse,
@@ -13,6 +14,12 @@ const BASE_URL = '/api/learning-plans';
 
 export const generatePlan = (payload: GeneratePlanRequest): Promise<PlanResponse> => {
   return axios.post(`${BASE_URL}/generate`, payload).then((res) => res.data);
+};
+
+export const generateSyllabusPlan = (
+  payload: GenerateSyllabusPlanRequest,
+): Promise<PlanResponse> => {
+  return axios.post(`${BASE_URL}/generate-syllabus`, payload).then((res) => res.data);
 };
 
 export const resyncPlan = (learningPlanId: string): Promise<PlanResponse> => {

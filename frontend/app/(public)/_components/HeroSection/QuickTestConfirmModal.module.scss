@@ -32,6 +32,117 @@
   color: var(--text-secondary);
 }
 
+.options {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+  text-align: left;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-color, #fff);
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 6%);
+  }
+}
+
+.optionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--surface-tint);
+  color: var(--primary);
+  font-size: 2rem;
+}
+
+.optionIconSoft {
+  color: var(--text-secondary);
+}
+
+.optionText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.optionTitle {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.optionHint {
+  font-size: 1.25rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.optionArrow {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: 1.6rem;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0 8px;
+}
+
+.panelLead {
+  margin: 0;
+  font-size: 1.4rem;
+  line-height: 1.6;
+  color: var(--text-color);
+
+  strong {
+    font-weight: 700;
+  }
+}
+
+.panelLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+}
+
+.linkBtn {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--primary);
+  }
+}
+
 .meta {
   display: flex;
   flex-wrap: wrap;

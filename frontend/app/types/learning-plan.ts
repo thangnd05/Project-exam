@@ -8,6 +8,13 @@ export interface GeneratePlanRequest {
   focusExamPartIds?: string[];
 }
 
+export interface GenerateSyllabusPlanRequest {
+  examTypeId: string;
+  deadlineDays?: number;
+  targetScore?: number;
+  focusExamPartIds?: string[];
+}
+
 export interface RecommendedResourceResponse {
   resourceId: string;
   title?: string;

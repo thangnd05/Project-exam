@@ -18,6 +18,7 @@ import com.project_exam.backend.modules.assessment.learning.domain.PlanStage;
 import com.project_exam.backend.modules.assessment.learning.domain.PlanTaskType;
 import com.project_exam.backend.modules.assessment.learning.domain.TaskStatus;
 import com.project_exam.backend.modules.assessment.learning.dto.GeneratePlanRequest;
+import com.project_exam.backend.modules.assessment.learning.dto.GenerateSyllabusPlanRequest;
 import com.project_exam.backend.modules.assessment.learning.dto.PlanResponse;
 import com.project_exam.backend.modules.assessment.learning.mapper.LearningMapper;
 import com.project_exam.backend.modules.assessment.learning.support.LearningPlanQuestionTargets;
@@ -60,6 +61,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LearningPlanService {
 
+    /** Ngưỡng vượt ải khi người dùng chưa đặt mục tiêu cho Part đó. */
+    private static final int DEFAULT_PASS_ACCURACY = 70;
+
     private final EnhancedResultService enhancedResultService;
     private final LearningPlanRepository planRepository;
     private final LearningPlanTaskRepository taskRepository;
@@ -90,7 +94,14 @@ public class LearningPlanService {
             closeActivePlans(userId, blueprint.examTypeId(), LearningPlan.Status.COMPLETED, null);
             return buildTargetAchievedResponse(userId, blueprint.examTypeId(), blueprint.result());
         }
-        return createPlanFromBlueprint(userId, request, blueprint);
+        return createPlanFromBlueprint(
+                userId, request.getUserTestId(), request.getDeadlineDays(), blueprint);
+    }
+
+    @Transactional
+    public PlanResponse generateSyllabusPlan(String userId, GenerateSyllabusPlanRequest request) {
+        Blueprint blueprint = prepareSyllabusBlueprint(userId, request);
+        return createPlanFromBlueprint(userId, null, request.getDeadlineDays(), blueprint);
     }
 
     @Transactional
@@ -100,16 +111,7 @@ public class LearningPlanService {
             throw new BadRequestException(
                     "Chỉ cập nhật được lộ trình đang chạy. Hãy đặt lộ trình này làm hiện tại trước.");
         }
-        if (plan.getSourceUserTestId() == null) {
-            throw new BadRequestException(
-                    "Lộ trình này không còn bài chẩn đoán gốc. Hãy chọn một bài thi để sinh lộ trình mới.");
-        }
-
-        GeneratePlanRequest request = new GeneratePlanRequest();
-        request.setUserTestId(plan.getSourceUserTestId());
-        request.setDeadlineDays(plan.getDeadlineDays());
-
-        Blueprint blueprint = prepareBlueprint(userId, request);
+        Blueprint blueprint = rebuildBlueprintFor(userId, plan);
         if (blueprint.targetAchieved()) {
             closeActivePlans(userId, blueprint.examTypeId(), LearningPlan.Status.COMPLETED, null);
             return buildTargetAchievedResponse(userId, blueprint.examTypeId(), blueprint.result());
@@ -134,6 +136,21 @@ public class LearningPlanService {
                 loadDiagnosisSources(List.of(plan)));
         response.setReopenedTasks(changes.reopened());
         return response;
+    }
+
+    /** Dựng lại blueprint cho đúng nguồn của lộ trình: bài chẩn đoán cũ, hoặc chương trình học. */
+    private Blueprint rebuildBlueprintFor(String userId, LearningPlan plan) {
+        if (plan.getSourceUserTestId() == null) {
+            GenerateSyllabusPlanRequest request = new GenerateSyllabusPlanRequest();
+            request.setExamTypeId(plan.getExamTypeId());
+            request.setDeadlineDays(plan.getDeadlineDays());
+            return prepareSyllabusBlueprint(userId, request);
+        }
+
+        GeneratePlanRequest request = new GeneratePlanRequest();
+        request.setUserTestId(plan.getSourceUserTestId());
+        request.setDeadlineDays(plan.getDeadlineDays());
+        return prepareBlueprint(userId, request);
     }
 
     private Blueprint prepareBlueprint(String userId, GeneratePlanRequest request) {
@@ -199,21 +216,72 @@ public class LearningPlanService {
                 partRequirements, candidates, partsWithoutTasks);
     }
 
+    /**
+     * Lộ trình cho người chưa làm bài nào: đi theo toàn bộ chương trình của kỳ thi
+     * thay vì theo % đúng của một bài chẩn đoán.
+     */
+    private Blueprint prepareSyllabusBlueprint(String userId, GenerateSyllabusPlanRequest request) {
+        String examTypeId = request.getExamTypeId();
+        List<ExamPart> examParts = examPartRepository.findByExamTypeId(examTypeId);
+        if (examParts.isEmpty()) {
+            throw new BadRequestException(
+                    "Kỳ thi này chưa có Part nào nên chưa sinh được lộ trình cho người mới.");
+        }
+
+        // Người mới chưa cần đặt mục tiêu: thiếu ngưỡng thì dùng mức sàn, đặt mục tiêu sau rồi resync.
+        UserTarget userTarget = userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId)
+                .orElse(null);
+        Integer targetScore = resolveTargetScore(
+                request.getTargetScore(), Optional.ofNullable(userTarget));
+        Map<String, Integer> partRequirements = userTargetService.getEffectiveRequirements(userId, examTypeId);
+
+        Set<String> focusPartIds = request.getFocusExamPartIds() == null
+                ? Set.of()
+                : new HashSet<>(request.getFocusExamPartIds());
+
+        List<TaskCandidate> candidates = new ArrayList<>();
+        List<String> partsWithoutTasks = new ArrayList<>();
+        for (ExamPart part : examParts) {
+            if (!matchesFocus(part.getExamPartId(), focusPartIds)) {
+                continue;
+            }
+            int passAccuracy = partRequirements.getOrDefault(
+                    part.getExamPartId(), DEFAULT_PASS_ACCURACY);
+            List<TaskCandidate> partTasks = collectTasksForPart(
+                    part.getExamPartId(), null, passAccuracy, passAccuracy, Map::of);
+            if (partTasks.isEmpty()) {
+                partsWithoutTasks.add(part.getName() != null ? part.getName() : part.getExamPartId());
+                continue;
+            }
+            candidates.addAll(partTasks);
+        }
+
+        if (candidates.isEmpty()) {
+            throw new BadRequestException(
+                    "Chưa tạo được lộ trình cho kỳ thi này: chưa có câu hỏi luyện tập nào được gắn tag. "
+                            + "Thêm câu hỏi ở phạm vi luyện tập và gắn tag (admin) rồi thử lại.");
+        }
+
+        return Blueprint.syllabus(
+                examTypeId, userTarget, targetScore, partRequirements, candidates, partsWithoutTasks);
+    }
+
     private PlanResponse createPlanFromBlueprint(
-            String userId, GeneratePlanRequest request, Blueprint blueprint) {
+            String userId, String sourceUserTestId, Integer deadlineDays, Blueprint blueprint) {
         String examTypeId = blueprint.examTypeId();
         int planSequence = (int) planRepository.countByUserIdAndExamTypeId(userId, examTypeId) + 1;
 
         LearningPlan plan = new LearningPlan();
         plan.setUserId(userId);
         plan.setExamTypeId(examTypeId);
-        plan.setSourceUserTestId(request.getUserTestId());
-        plan.setUserTargetId(blueprint.userTarget().getUserTargetId());
+        plan.setSourceUserTestId(sourceUserTestId);
+        plan.setUserTargetId(userTargetIdOf(blueprint));
         plan.setTargetScore(blueprint.targetScore());
-        plan.setDeadlineDays(request.getDeadlineDays());
-        plan.setBaselineReadiness(resolveReadinessScore(blueprint.result()));
+        plan.setDeadlineDays(deadlineDays);
+        plan.setBaselineReadiness(
+                blueprint.result() != null ? resolveReadinessScore(blueprint.result()) : null);
         plan.setPlanStage(PlanStage.FOUNDATION);
-        plan.setPassAccuracyDefault(Collections.min(blueprint.partRequirements().values()));
+        plan.setPassAccuracyDefault(passAccuracyDefaultOf(blueprint));
         plan.setStatus(LearningPlan.Status.ACTIVE);
         plan.setPlanSequence(planSequence);
         plan.setPartsWithoutTasks(joinPartsWithoutTasks(blueprint.partsWithoutTasks()));
@@ -235,7 +303,7 @@ public class LearningPlanService {
                 savedTasks,
                 blueprint.partsWithoutTasks(),
                 taskViewAssembler.lookupsFor(savedTasks),
-                loadDiagnosisSources(List.of(plan)).get(plan.getSourceUserTestId()));
+                diagnosisSourceOf(plan, loadDiagnosisSources(List.of(plan))));
     }
 
     private LearningPlanTask newTaskFrom(String learningPlanId, TaskCandidate c, int taskOrder) {
@@ -246,7 +314,7 @@ public class LearningPlanService {
         task.setTargetQuestionCount(c.targetQuestionCount());
         task.setTaskOrder(taskOrder);
         task.setPassAccuracy(c.passAccuracy());
-        task.setBaselineAccuracy(round2(c.baselinePct()));
+        task.setBaselineAccuracy(c.baselinePct() != null ? round2(c.baselinePct()) : null);
         task.setAttemptCount(0);
         task.setWrongCountAtDiagnosis(c.wrongCount());
         if (c.taskType() == PlanTaskType.TAG) {
@@ -400,18 +468,24 @@ public class LearningPlanService {
             }
 
             List<TaskCandidate> partTasks = collectTasksForPart(
-                    part, requiredPercent, requiredPercent, questionIdsByPart);
+                    part.getExamPartId(), part, requiredPercent, requiredPercent, questionIdsByPart);
             candidates.addAll(partTasks);
         }
         return candidates;
     }
 
     private int requirePartThreshold(PartBreakdownResponse part, Map<String, Integer> partRequirements) {
-        Integer required = partRequirements.get(part.getExamPartId());
+        return requirePartThreshold(
+                part.getExamPartId(), part.getPartName(), partRequirements);
+    }
+
+    private int requirePartThreshold(
+            String examPartId, String partName, Map<String, Integer> partRequirements) {
+        Integer required = partRequirements.get(examPartId);
         if (required == null) {
             throw new BadRequestException(
                     "Thiếu ngưỡng % cho Part \""
-                            + (part.getPartName() != null ? part.getPartName() : part.getExamPartId())
+                            + (partName != null ? partName : examPartId)
                             + "\". Cập nhật mục tiêu (aim từng Part / mốc) rồi thử lại.");
         }
         return required;
@@ -464,14 +538,64 @@ public class LearningPlanService {
         return byPart;
     }
 
+    /**
+     * Gom ải cho một Part. {@code breakdown} null nghĩa là chưa có bài chẩn đoán nên đi theo
+     * chương trình học; lúc đó {@code threshold} và {@code questionIdsByPart} không dùng tới.
+     */
     private List<TaskCandidate> collectTasksForPart(
-            PartBreakdownResponse part,
+            String examPartId,
+            PartBreakdownResponse breakdown,
             double threshold,
             int passAccuracy,
             Supplier<Map<String, List<String>>> questionIdsByPart) {
         List<TaskCandidate> partTasks = new ArrayList<>();
         Set<String> usedTagIds = new HashSet<>();
 
+        if (breakdown == null) {
+            // Chỉ lấy tag thật sự có câu luyện, tránh sinh ải mà phiên học không rút được câu nào.
+            List<String> tagIds = questionTagRepository.findDistinctTagIdsByExamPartIdAndUsageScopeIn(
+                    examPartId, Question.UsageScope.FOR_PRACTICE);
+            for (String tagId : tagIds) {
+                addTaskIfNew(partTasks, usedTagIds, new TaskCandidate(
+                        tagId,
+                        examPartId,
+                        PlanTaskType.TAG,
+                        LearningPlanQuestionTargets.TAG_TARGET,
+                        null,
+                        passAccuracy,
+                        null));
+            }
+            if (partTasks.isEmpty()) {
+                return List.of();
+            }
+        } else {
+            collectDiagnosedTagTasks(
+                    partTasks, usedTagIds, breakdown, threshold, passAccuracy, questionIdsByPart);
+        }
+
+        Map<String, Integer> sortOrderByTag = loadTagSortOrders(partTasks);
+        partTasks.sort(Comparator.comparingInt(t -> tagSortRank(sortOrderByTag.get(t.tagId()))));
+
+        ExamPart examPart = examPartRepository.findById(examPartId).orElse(null);
+        int capstoneTarget = LearningPlanQuestionTargets.resolveCapstoneTarget(examPart);
+        Double capstoneBaseline = breakdown != null ? breakdown.getPercentage() : null;
+        Integer capstoneWrong = breakdown != null ? breakdown.getWrong() : null;
+        partTasks.add(capstoneCandidate(
+                examPartId, PlanTaskType.PART_CAPSTONE_1, capstoneTarget,
+                capstoneBaseline, passAccuracy, capstoneWrong));
+        partTasks.add(capstoneCandidate(
+                examPartId, PlanTaskType.PART_CAPSTONE_2, capstoneTarget,
+                capstoneBaseline, passAccuracy, capstoneWrong));
+        return partTasks;
+    }
+
+    private void collectDiagnosedTagTasks(
+            List<TaskCandidate> partTasks,
+            Set<String> usedTagIds,
+            PartBreakdownResponse part,
+            double threshold,
+            int passAccuracy,
+            Supplier<Map<String, List<String>>> questionIdsByPart) {
         if (part.getTags() != null) {
             for (TagBreakdownResponse tag : part.getTags()) {
                 if (tag.getTagId() == null || tag.getPercentage() >= threshold) {
@@ -508,17 +632,6 @@ public class LearningPlanService {
                         buildTaskCandidate(fallbackTagId, null, part, passAccuracy));
             }
         }
-
-        Map<String, Integer> sortOrderByTag = loadTagSortOrders(partTasks);
-        partTasks.sort(Comparator.comparingInt(t -> tagSortRank(sortOrderByTag.get(t.tagId()))));
-
-        ExamPart examPart = examPartRepository.findById(part.getExamPartId()).orElse(null);
-        int capstoneTarget = LearningPlanQuestionTargets.resolveCapstoneTarget(examPart);
-        partTasks.add(buildCapstoneCandidate(
-                part, passAccuracy, PlanTaskType.PART_CAPSTONE_1, capstoneTarget));
-        partTasks.add(buildCapstoneCandidate(
-                part, passAccuracy, PlanTaskType.PART_CAPSTONE_2, capstoneTarget));
-        return partTasks;
     }
 
     private Map<String, Integer> loadTagSortOrders(List<TaskCandidate> tasks) {
@@ -555,19 +668,21 @@ public class LearningPlanService {
                 wrong);
     }
 
-    private TaskCandidate buildCapstoneCandidate(
-            PartBreakdownResponse part,
-            int passAccuracy,
+    private TaskCandidate capstoneCandidate(
+            String examPartId,
             PlanTaskType capstoneType,
-            int targetQuestionCount) {
+            int targetQuestionCount,
+            Double baselinePct,
+            int passAccuracy,
+            Integer wrongCount) {
         return new TaskCandidate(
                 null,
-                part.getExamPartId(),
+                examPartId,
                 capstoneType,
                 targetQuestionCount,
-                part.getPercentage(),
+                baselinePct,
                 passAccuracy,
-                part.getWrong());
+                wrongCount);
     }
 
     private void addTaskIfNew(
@@ -591,10 +706,21 @@ public class LearningPlanService {
         return focusPartIds.isEmpty() || focusPartIds.contains(examPartId);
     }
 
+    private static String userTargetIdOf(Blueprint blueprint) {
+        return blueprint.userTarget() != null ? blueprint.userTarget().getUserTargetId() : null;
+    }
+
+    private static int passAccuracyDefaultOf(Blueprint blueprint) {
+        Map<String, Integer> partRequirements = blueprint.partRequirements();
+        return partRequirements.isEmpty()
+                ? DEFAULT_PASS_ACCURACY
+                : Collections.min(partRequirements.values());
+    }
+
     private PlanChanges applyBlueprintInPlace(LearningPlan plan, Blueprint blueprint) {
-        plan.setUserTargetId(blueprint.userTarget().getUserTargetId());
+        plan.setUserTargetId(userTargetIdOf(blueprint));
         plan.setTargetScore(blueprint.targetScore());
-        plan.setPassAccuracyDefault(Collections.min(blueprint.partRequirements().values()));
+        plan.setPassAccuracyDefault(passAccuracyDefaultOf(blueprint));
         plan.setPartsWithoutTasks(joinPartsWithoutTasks(blueprint.partsWithoutTasks()));
         planRepository.save(plan);
 
@@ -704,6 +830,18 @@ public class LearningPlanService {
         static Blueprint targetAchieved(String examTypeId, EnhancedResultResponse result) {
             return new Blueprint(true, examTypeId, result, null, null, Map.of(), List.of(), List.of());
         }
+
+        static Blueprint syllabus(
+                String examTypeId,
+                UserTarget userTarget,
+                Integer targetScore,
+                Map<String, Integer> partRequirements,
+                List<TaskCandidate> candidates,
+                List<String> partsWithoutTasks) {
+            return new Blueprint(
+                    false, examTypeId, null, userTarget, targetScore,
+                    partRequirements, candidates, partsWithoutTasks);
+        }
     }
 
     private record PlanChanges(int added, int reopened) {}
@@ -746,9 +884,15 @@ public class LearningPlanService {
                 taskViewAssembler.buildPartGroups(tasks, lookups));
         response.setRecommendedTaskId(pickRecommendedTaskId(tasks, lookups));
         response.setTargetOutdated(isTargetOutdated(plan, currentTargets.get(plan.getExamTypeId())));
-        applyDiagnosisSource(response, diagnosisSources.get(plan.getSourceUserTestId()));
+        applyDiagnosisSource(response, diagnosisSourceOf(plan, diagnosisSources));
         response.setPartsWithoutTasks(splitPartsWithoutTasks(plan.getPartsWithoutTasks()));
         return response;
+    }
+
+    private DiagnosisSource diagnosisSourceOf(
+            LearningPlan plan, Map<String, DiagnosisSource> diagnosisSources) {
+        String sourceUserTestId = plan.getSourceUserTestId();
+        return sourceUserTestId != null ? diagnosisSources.get(sourceUserTestId) : null;
     }
 
     private void applyDiagnosisSource(PlanResponse response, DiagnosisSource source) {
@@ -856,8 +1000,8 @@ public class LearningPlanService {
             String examPartId,
             PlanTaskType taskType,
             int targetQuestionCount,
-            double baselinePct,
+            Double baselinePct,
             int passAccuracy,
-            int wrongCount
+            Integer wrongCount
     ) {}
 }

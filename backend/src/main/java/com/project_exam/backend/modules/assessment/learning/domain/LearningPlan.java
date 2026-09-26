@@ -31,7 +31,7 @@ public class LearningPlan {
     @Column(name = "exam_type_id", nullable = false)
     private String examTypeId;
 
-    @Column(name = "source_user_test_id", nullable = false)
+    @Column(name = "source_user_test_id")
     private String sourceUserTestId;
 
     @Column(name = "target_score")

@@ -79,6 +79,7 @@ export function buildGaugeView(
     | 'readinessScore'
     | 'readinessLevel'
   >,
+  options?: { isBeginner?: boolean },
 ): GaugeView {
   const {
     examCategoryCode, percentage, hasTarget, targetScore,
@@ -87,6 +88,17 @@ export function buildGaugeView(
 
   if (examCategoryCode === 'QUICK_CHALLENGE') {
     const pct = percentage ?? 0;
+    if (options?.isBeginner) {
+      return {
+        gaugePercentage: pct,
+        displayValue: `${pct}%`,
+        gaugeLabel: 'Điểm xuất phát',
+        gaugeTitle: 'Mốc bắt đầu của bạn',
+        gaugeMessage: 'Bạn chưa học kỳ này nên điểm thấp là bình thường. Con số này dùng để '
+          + 'xếp bước bắt đầu, không phải kết quả thi.',
+        gaugeLevel: 'STARTING',
+      };
+    }
     const tier = QUICK_CHALLENGE_TIERS.find((t) => pct >= t.min)
       ?? QUICK_CHALLENGE_TIERS[QUICK_CHALLENGE_TIERS.length - 1];
     return {

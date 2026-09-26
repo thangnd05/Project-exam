@@ -1,4 +1,4 @@
-const API_ORIGIN = (process.env.API_ORIGIN || 'http://localhost:8080').replace(/\/$/, '');
+const API_ORIGIN = (process.env.API_ORIGIN ?? '').replace(/\/$/, '');
 
 export type PublicResource<T> =
   | { ok: true; data: T }
