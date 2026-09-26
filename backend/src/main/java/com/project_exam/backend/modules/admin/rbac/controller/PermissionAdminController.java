@@ -1,17 +1,15 @@
 package com.project_exam.backend.modules.admin.rbac.controller;
 
 import com.project_exam.backend.modules.users.rbac.dto.PermissionResponse;
-import com.project_exam.backend.modules.users.rbac.repository.PermissionRepository;
+import com.project_exam.backend.modules.users.rbac.service.PermissionService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -19,23 +17,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PermissionAdminController {
 
-    private final PermissionRepository permissionRepository;
+    private final PermissionService permissionService;
     private final AuthUtils authUtils;
 
     @GetMapping
-    public ResponseEntity<List<PermissionResponse>> getAllPermissions(HttpServletRequest httpRequest) {
+    public ResponseEntity<List<PermissionResponse>> getAllPermissions() {
         authUtils.requirePermission(PermissionCatalog.ROLE_MANAGE);
-        List<PermissionResponse> result = permissionRepository.findAll().stream()
-                .map(p -> PermissionResponse.builder()
-                        .permissionId(p.getPermissionId())
-                        .code(p.getCode())
-                        .description(p.getDescription())
-                        .groupName(p.getGroupName())
-                        .build())
-                .sorted(Comparator.comparing(PermissionResponse::getGroupName,
-                                Comparator.nullsLast(Comparator.naturalOrder()))
-                        .thenComparing(PermissionResponse::getCode))
-                .toList();
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(permissionService.findAll());
     }
 }

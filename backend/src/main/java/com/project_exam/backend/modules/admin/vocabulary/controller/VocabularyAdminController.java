@@ -46,11 +46,7 @@ public class VocabularyAdminController {
             throw new BadRequestException("Dữ liệu thô không được để trống.");
         }
 
-        String result = geminiService.standardizeVocabulary(rawText);
-
-        String cleaned = result.replaceAll("(?s)```json\\s*|```", "").trim();
-
-        return ResponseEntity.ok(Map.of("data", cleaned));
+        return ResponseEntity.ok(Map.of("data", geminiService.standardizeVocabulary(rawText)));
     }
 
     @PutMapping("/{id}")

@@ -105,7 +105,8 @@ public class GeminiService {
         logger.info("Gọi Gemini API để chuẩn hóa từ vựng (độ dài input: {} ký tự).", rawText.length());
 
         String prompt = buildVocabularyPrompt(rawText);
-        return callGeminiApi(prompt, VOCAB_TEMPERATURE, VOCAB_MAX_TOKENS);
+        String result = callGeminiApi(prompt, VOCAB_TEMPERATURE, VOCAB_MAX_TOKENS);
+        return result.replaceAll("(?s)```json\\s*|```", "").trim();
     }
 
     private String buildExplainPrompt(Question question, List<Answer> answers, Passage passage) {

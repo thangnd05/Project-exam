@@ -226,6 +226,14 @@ public class TestCatalogService {
         return summaryAssembler.buildAdminTestSummariesBatch(result);
     }
 
+    public List<TestAdminResponse> getAllTestsByAdminAndExamType(String examTypeId) {
+        Set<String> adminIds = adminUserProvider.adminUserIds();
+        if (adminIds.isEmpty()) return new ArrayList<>();
+
+        List<Test> result = testRepository.findByExamTypeIdAndCreatedByIn(examTypeId, adminIds);
+        return summaryAssembler.buildAdminTestSummariesBatch(result);
+    }
+
     public List<TestAdminResponse> getAdminTestsByCreatedUser(String userId) {
         if (userId == null) {
             return List.of();

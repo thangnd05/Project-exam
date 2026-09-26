@@ -18,6 +18,8 @@ public interface TestRepository extends JpaRepository<Test, String> {
 
     List<Test> findByCreatedByIn(Collection<String> userIds);
 
+    List<Test> findByExamTypeIdAndCreatedByIn(String examTypeId, Collection<String> createdByIds);
+
     List<Test>findByClassId(String classId);
 
     List<Test> findByExamCategoryId(String examCategoryId);

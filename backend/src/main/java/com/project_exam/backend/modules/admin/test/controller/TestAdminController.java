@@ -26,10 +26,6 @@ public class TestAdminController {
     @GetMapping("/by-exam-type/{examTypeId}")
     public ResponseEntity<List<TestAdminResponse>> getAdminTestsByExamType(@PathVariable String examTypeId) {
         authUtils.requirePermission(PermissionCatalog.TEST_MANAGE);
-        List<TestAdminResponse> adminTests = testCatalogService.getAllTestsByAdmin()
-                .stream()
-                .filter(t -> t.getExamTypeId().equals(examTypeId))
-                .toList();
-        return ResponseEntity.ok(adminTests);
+        return ResponseEntity.ok(testCatalogService.getAllTestsByAdminAndExamType(examTypeId));
     }
 }
