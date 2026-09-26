@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: PageProps<'/resources/[resour
   const title = resource.title;
   const description =
     toMetaDescription(resource.description) ||
-    [resource.examTypeName, resource.examPartName].filter(Boolean).join(' - ') ||
+    [resource.examTypeName, ...(resource.examPartNames ?? [])].filter(Boolean).join(' - ') ||
     undefined;
 
   return {

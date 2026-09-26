@@ -19,6 +19,7 @@ public class RecoveryResourceResponse {
     private final List<TagResponse> tags;
     private final String examTypeId;
     private final String examTypeName;
-    private final String examPartId;
-    private final String examPartName;
+    /** Suy ra từ tag, sắp theo thứ tự phần thi. */
+    private final List<String> examPartIds;
+    private final List<String> examPartNames;
 }

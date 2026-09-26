@@ -15,6 +15,8 @@ export interface TagResponse {
   examPartId?: string | null;
   examPartName?: string | null;
   sortOrder?: number;
+  /** Số tài liệu gắn tag (chỉ có ở danh sách tag theo kỳ thi) */
+  resourceCount?: number;
 }
 
 export interface AnswerRequest {

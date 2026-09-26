@@ -35,29 +35,31 @@ public class LearningPlanResourceLookup {
         }
 
         List<ResourceTag> links = resourceTagRepository.findByTagIdIn(distinctTagIds);
-        Map<String, String> tagToResourceId = new LinkedHashMap<>();
-        for (ResourceTag link : links) {
-            tagToResourceId.putIfAbsent(link.getTagId(), link.getResourceId());
-        }
-        if (tagToResourceId.isEmpty()) {
+        if (links.isEmpty()) {
             return Map.of();
         }
+        Set<String> resourceIds = links.stream().map(ResourceTag::getResourceId).collect(Collectors.toSet());
+        // Tài liệu tạo sớm nhất của mỗi tag được chọn, để kết quả ổn định giữa các lần gọi.
+        Map<String, Integer> rankById = new HashMap<>();
+        List<RecoveryResource> ordered = recoveryResourceRepository.findByResourceIdInOrderByCreatedAtAscTitleAsc(resourceIds);
+        for (int i = 0; i < ordered.size(); i++) rankById.put(ordered.get(i).getResourceId(), i);
 
-        Set<String> resourceIds = new HashSet<>(tagToResourceId.values());
-        Map<String, RecoveryResource> resourceById = recoveryResourceRepository.findAllById(resourceIds)
-                .stream()
-                .collect(Collectors.toMap(RecoveryResource::getResourceId, r -> r, (a, b) -> a));
-
-        Map<String, RecommendedResourceResponse> result = new HashMap<>();
-        for (Map.Entry<String, String> entry : tagToResourceId.entrySet()) {
-            RecoveryResource r = resourceById.get(entry.getValue());
-            if (r != null) {
-                result.put(entry.getKey(), toDto(r));
+        Map<String, RecoveryResource> firstByTag = new HashMap<>();
+        for (ResourceTag link : links) {
+            Integer rank = rankById.get(link.getResourceId());
+            if (rank == null) continue;
+            RecoveryResource current = firstByTag.get(link.getTagId());
+            if (current == null || rank < rankById.get(current.getResourceId())) {
+                firstByTag.put(link.getTagId(), ordered.get(rank));
             }
         }
+
+        Map<String, RecommendedResourceResponse> result = new HashMap<>();
+        firstByTag.forEach((tagId, r) -> result.put(tagId, toDto(r)));
         return result;
     }
 
+    /** Tài liệu của mỗi phần thi = tài liệu có ít nhất một tag thuộc phần thi đó. */
     public Map<String, List<RecommendedResourceResponse>> findByExamPartIds(Collection<String> examPartIds) {
         if (examPartIds == null || examPartIds.isEmpty()) {
             return Map.of();
@@ -66,11 +68,32 @@ public class LearningPlanResourceLookup {
         if (distinctPartIds.isEmpty()) {
             return Map.of();
         }
-        return recoveryResourceRepository.findByExamPartIdInOrderByCreatedAtAsc(distinctPartIds).stream()
-                .collect(Collectors.groupingBy(
-                        RecoveryResource::getExamPartId,
-                        LinkedHashMap::new,
-                        Collectors.mapping(this::toDto, Collectors.toList())));
+        // partId -> (resourceId -> sortOrder nhỏ nhất của tag thuộc part đó)
+        Map<String, Map<String, Integer>> rankByPart = new HashMap<>();
+        for (Object[] row : resourceTagRepository.findResourcePartPairs(distinctPartIds)) {
+            int sortOrder = row[2] != null ? (Integer) row[2] : Integer.MAX_VALUE;
+            rankByPart.computeIfAbsent((String) row[1], k -> new HashMap<>())
+                    .merge((String) row[0], sortOrder, Math::min);
+        }
+        if (rankByPart.isEmpty()) {
+            return Map.of();
+        }
+        Set<String> resourceIds = rankByPart.values().stream()
+                .flatMap(m -> m.keySet().stream())
+                .collect(Collectors.toSet());
+        Map<String, RecoveryResource> resourceById = recoveryResourceRepository.findAllById(resourceIds).stream()
+                .collect(Collectors.toMap(RecoveryResource::getResourceId, r -> r));
+
+        // Trong mỗi phần thi, xếp theo thứ tự tag rồi tiêu đề.
+        Map<String, List<RecommendedResourceResponse>> result = new LinkedHashMap<>();
+        rankByPart.forEach((partId, ranks) -> result.put(partId, ranks.keySet().stream()
+                .map(resourceById::get)
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing((RecoveryResource r) -> ranks.get(r.getResourceId()))
+                        .thenComparing(RecoveryResource::getTitle, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
+                .map(this::toDto)
+                .toList()));
+        return result;
     }
 
     public RecommendedResourceResponse toDto(RecoveryResource r) {

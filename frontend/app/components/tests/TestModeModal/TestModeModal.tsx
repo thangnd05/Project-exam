@@ -220,7 +220,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
                 {partResources.map((r) => (
                   <li key={r.resourceId}>
                     <RecoveryResourceLink resource={r} className={cx('guide-link')}>
-                      {r.examPartName ? `${r.examPartName}: ` : ''}{r.title}
+                      {r.title}
                     </RecoveryResourceLink>
                   </li>
                 ))}

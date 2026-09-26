@@ -12,4 +12,6 @@ public class TagResponse {
     private final String examPartId;
     private final String examPartName;
     private final Integer sortOrder;
+    /** Chỉ có ở danh sách tag theo kỳ thi. */
+    private final Long resourceCount;
 }

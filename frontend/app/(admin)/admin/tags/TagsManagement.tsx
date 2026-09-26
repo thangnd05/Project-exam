@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {ChevronDown, ChevronRight, Edit, Plus, Trash2} from 'lucide-react';
+import {ChevronDown, ChevronRight, Edit, FileText, Plus, Trash2} from 'lucide-react';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import TagFormModal, {type TagFormState} from './_components/TagFormModal';
@@ -88,6 +88,13 @@ function PartGroupNode({group, isExpanded, searchTerm, onToggle, onAddToPart, on
                 <span className={cx('tagName')}>{tag.name}</span>
                 <span className={cx('sortOrder')} title="Thứ tự hiển thị">
                   {tag.sortOrder ?? '—'}
+                </span>
+                <span
+                  className={cx('resourceCount', {empty: !tag.resourceCount})}
+                  title={tag.resourceCount ? `${tag.resourceCount} tài liệu gắn tag này` : 'Chưa có tài liệu'}
+                >
+                  <FileText size={12} />
+                  {tag.resourceCount ?? 0}
                 </span>
               </div>
               <div className={cx('treeNodeActions')}>

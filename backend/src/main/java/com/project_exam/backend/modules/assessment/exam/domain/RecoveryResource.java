@@ -9,8 +9,7 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "recovery_resources", schema = "assessment", indexes = {
-        @Index(name = "idx_recovery_resources_exam_type_id", columnList = "exam_type_id"),
-        @Index(name = "idx_recovery_resources_exam_part_id", columnList = "exam_part_id")
+        @Index(name = "idx_recovery_resources_exam_type_id", columnList = "exam_type_id")
 })
 @Getter
 @Setter
@@ -37,11 +36,9 @@ public class RecoveryResource {
     @Column(name = "cloudinary_public_id")
     private String cloudinaryPublicId;
 
+    // Phần thi không lưu ở đây: suy ra từ tag, vì một tài liệu có thể phủ nhiều phần thi.
     @Column(name = "exam_type_id")
     private String examTypeId;
-
-    @Column(name = "exam_part_id")
-    private String examPartId;
 
     @Column(name = "created_by")
     private String createdBy;

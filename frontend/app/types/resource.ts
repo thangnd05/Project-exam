@@ -6,7 +6,6 @@ export interface RecoveryResourceRequest {
   url?: string;
   tagIds?: string[];
   examTypeId?: string;
-  examPartId?: string;
 }
 
 export interface RecoveryResourceResponse {
@@ -20,6 +19,7 @@ export interface RecoveryResourceResponse {
   tags?: TagResponse[];
   examTypeId?: string;
   examTypeName?: string;
-  examPartId?: string;
-  examPartName?: string;
+  /** Suy ra từ tag, theo thứ tự phần thi */
+  examPartIds?: string[];
+  examPartNames?: string[];
 }

@@ -10,8 +10,6 @@ public interface RecoveryResourceRepository extends JpaRepository<RecoveryResour
 
     List<RecoveryResource> findByCreatedBy(String createdBy);
 
-    List<RecoveryResource> findByExamPartIdOrderByCreatedAtAsc(String examPartId);
-
-    List<RecoveryResource> findByExamPartIdInOrderByCreatedAtAsc(Collection<String> examPartIds);
+    List<RecoveryResource> findByResourceIdInOrderByCreatedAtAscTitleAsc(Collection<String> resourceIds);
 
 }

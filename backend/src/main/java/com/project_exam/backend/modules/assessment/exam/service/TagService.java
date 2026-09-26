@@ -96,10 +96,17 @@ public class TagService {
         for (int i = 0; i < parts.size(); i++) partRank.put(parts.get(i).getExamPartId(), i);
         Map<String, String> partNames = partNamesOf(parts);
 
+        Map<String, Long> resourceCounts = new HashMap<>();
+        for (Object[] row : resourceTagRepository.countByTagForExamType(examTypeId)) {
+            resourceCounts.put((String) row[0], (Long) row[1]);
+        }
+
         List<Tag> tags = new ArrayList<>(tagRepository.findByExamTypeIdOrderBySortOrderAsc(examTypeId));
         tags.sort(Comparator.comparingInt(t -> partRank.getOrDefault(t.getExamPartId(), Integer.MAX_VALUE)));
         return tags.stream()
-                .map(t -> toResponse(t, partNames))
+                .map(t -> tagMapper.toResponse(t,
+                        t.getExamPartId() == null ? null : partNames.get(t.getExamPartId()),
+                        resourceCounts.getOrDefault(t.getTagId(), 0L)))
                 .collect(Collectors.toList());
     }
 

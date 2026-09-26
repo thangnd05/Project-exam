@@ -14,5 +14,4 @@ public class RecoveryResourceRequest {
     private String url;
     private List<String> tagIds;
     private String examTypeId;
-    private String examPartId;
 }

@@ -12,6 +12,10 @@ public class TagMapper {
     }
 
     public TagResponse toResponse(Tag tag, String examPartName) {
+        return toResponse(tag, examPartName, null);
+    }
+
+    public TagResponse toResponse(Tag tag, String examPartName, Long resourceCount) {
         return TagResponse.builder()
                 .tagId(tag.getTagId())
                 .name(tag.getName())
@@ -19,6 +23,7 @@ public class TagMapper {
                 .examPartId(tag.getExamPartId())
                 .examPartName(examPartName)
                 .sortOrder(tag.getSortOrder())
+                .resourceCount(resourceCount)
                 .build();
     }
 }

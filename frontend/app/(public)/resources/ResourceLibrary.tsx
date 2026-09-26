@@ -51,7 +51,7 @@ const matchesKeyword = (
     resource.title,
     resource.description,
     examNameOf(resource, examKeyOf(resource), names),
-    resource.examPartName,
+    ...(resource.examPartNames ?? []),
     resource.originalFileName,
     ...(resource.tags ?? []).map((tag) => tag.name),
   ]
@@ -77,13 +77,8 @@ const groupByExam = (
     groups.set(id, current);
   });
 
+  // Giữ thứ tự backend trả về (theo thứ tự phần thi và tag).
   return [...groups.values()]
-    .map((group) => ({
-      ...group,
-      resources: [...group.resources].sort((a, b) =>
-        (a.title ?? '').localeCompare(b.title ?? '', 'vi'),
-      ),
-    }))
     .sort((a, b) => {
       if (a.id === UNASSIGNED_EXAM) return 1;
       if (b.id === UNASSIGNED_EXAM) return -1;
@@ -234,9 +229,9 @@ function ResourceLibrary() {
                       <h3>{resource.title}</h3>
                       {resource.description ? <p>{resource.description}</p> : null}
                       <div className={cx('tags')}>
-                        {resource.examPartName ? (
-                          <span className={cx('tag', 'part')}>{resource.examPartName}</span>
-                        ) : null}
+                        {(resource.examPartNames ?? []).map((partName) => (
+                          <span key={partName} className={cx('tag', 'part')}>{partName}</span>
+                        ))}
                         {(resource.tags ?? []).slice(0, 3).map((tag) => (
                           <span key={tag.tagId} className={cx('tag')}>
                             {tag.name}

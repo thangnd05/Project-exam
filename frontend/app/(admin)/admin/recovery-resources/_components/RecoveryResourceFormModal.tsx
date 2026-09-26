@@ -4,7 +4,7 @@ import {Form} from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import TagSelector from '@/app/components/TagSelector/TagSelector';
-import type {ExamPartResponse, TagResponse} from '@/app/types';
+import type {TagResponse} from '@/app/types';
 import type {RecoveryExamTypeOption} from '../_hooks/useRecoveryResources';
 
 export interface RecoveryResourceFormState {
@@ -12,7 +12,6 @@ export interface RecoveryResourceFormState {
   description: string;
   url: string;
   tagIds: string[];
-  examPartId: string;
 }
 
 interface RecoveryResourceFormModalProps {
@@ -23,7 +22,6 @@ interface RecoveryResourceFormModalProps {
   formExamTypeId: string;
   onExamTypeChange: (examTypeId: string) => void;
   availableTags: TagResponse[];
-  availableParts: ExamPartResponse[];
   selectedFile: File | null;
   onChangeField: (field: string, value: string) => void;
   onFileChange: (file: File | null) => void;
@@ -41,7 +39,6 @@ function RecoveryResourceFormModal({
   formExamTypeId,
   onExamTypeChange,
   availableTags,
-  availableParts,
   selectedFile,
   onChangeField,
   onFileChange,
@@ -119,7 +116,7 @@ function RecoveryResourceFormModal({
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Loại kỳ thi (để chọn tag / Part)</Form.Label>
+          <Form.Label>Loại kỳ thi</Form.Label>
           <Form.Select
             value={formExamTypeId}
             onChange={(e) => onExamTypeChange(e.target.value)}
@@ -133,38 +130,23 @@ function RecoveryResourceFormModal({
           </Form.Select>
         </Form.Group>
 
-        {formExamTypeId && (
-          <Form.Group className="mb-3">
-            <Form.Label>Gắn Part (tùy chọn)</Form.Label>
-            <Form.Select
-              value={formState.examPartId || ''}
-              onChange={(e) => onChangeField('examPartId', e.target.value)}
-            >
-              <option value="">- Không gắn Part </option>
-              {availableParts.map((part) => (
-                <option key={part.examPartId} value={part.examPartId}>
-                  {part.name}
-                </option>
-              ))}
-            </Form.Select>
-            <Form.Text className="text-muted">
-              Dùng cho tài liệu giới thiệu / cách làm của một Part (VD: &quot;Cách làm Part 1&quot;).
-            </Form.Text>
-          </Form.Group>
-        )}
-
         <Form.Group className="mb-3">
           {!formExamTypeId ? (
             <Form.Text className="text-muted">
               Chọn loại kỳ thi ở trên để gắn hoặc thay đổi tag cho tài liệu.
             </Form.Text>
           ) : availableTags.length > 0 ? (
-            <TagSelector
-              tags={availableTags}
-              selectedIds={selectedTagIds}
-              onToggle={onToggleTag}
-              label="Gắn Tag (liên kết kiến thức)"
-            />
+            <>
+              <TagSelector
+                tags={availableTags}
+                selectedIds={selectedTagIds}
+                onToggle={onToggleTag}
+                label="Gắn Tag (liên kết kiến thức)"
+              />
+              <Form.Text className="text-muted">
+                Phần thi của tài liệu được lấy theo tag. Một tài liệu có thể gắn tag của nhiều phần thi.
+              </Form.Text>
+            </>
           ) : (
             <Form.Text className="text-muted">
               Loại kỳ thi này chưa có tag. Tạo tag tại mục Quản lý Tag trước.

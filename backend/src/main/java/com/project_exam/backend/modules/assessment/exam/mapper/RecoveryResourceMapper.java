@@ -1,5 +1,6 @@
 package com.project_exam.backend.modules.assessment.exam.mapper;
 
+import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 import com.project_exam.backend.modules.assessment.exam.domain.RecoveryResource;
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.TagResponse;
@@ -11,7 +12,7 @@ import java.util.List;
 public class RecoveryResourceMapper {
 
     public RecoveryResourceResponse toResponse(RecoveryResource resource, List<TagResponse> tags,
-                                               String examTypeName, String examPartName) {
+                                               String examTypeName, List<ExamPart> examParts) {
         return RecoveryResourceResponse.builder()
                 .resourceId(resource.getResourceId())
                 .title(resource.getTitle())
@@ -23,8 +24,8 @@ public class RecoveryResourceMapper {
                 .tags(tags)
                 .examTypeId(resource.getExamTypeId())
                 .examTypeName(examTypeName)
-                .examPartId(resource.getExamPartId())
-                .examPartName(examPartName)
+                .examPartIds(examParts.stream().map(ExamPart::getExamPartId).toList())
+                .examPartNames(examParts.stream().map(ExamPart::getName).toList())
                 .build();
     }
 }

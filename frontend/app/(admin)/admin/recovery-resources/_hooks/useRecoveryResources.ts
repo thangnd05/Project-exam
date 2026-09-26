@@ -5,7 +5,6 @@ import {keepPreviousData} from '@/app/configs/queryClient';
 import {useAdminCrud} from '@/app/hooks/useAdminCrud';
 
 import {getExamTypes} from '@/app/apis/examTypeApi';
-import {getExamPartsByExamType} from '@/app/apis/examPartApi';
 import {getTagsFlatByExamType} from '@/app/apis/tagApi';
 import {
   getAllResources,
@@ -14,7 +13,6 @@ import {
   deleteResource,
 } from '@/app/apis/recoveryResourceApi';
 import type {
-  ExamPartResponse,
   ExamTypeResponse,
   RecoveryResourceRequest,
   RecoveryResourceResponse,
@@ -30,7 +28,6 @@ export const recoveryResourceKeys = {
   resources: ['recovery-resources'] as const,
   examTypes: ['recovery-exam-types'] as const,
   tags: (examTypeId?: string) => ['recovery-tags-flat', examTypeId ?? null] as const,
-  parts: (examTypeId?: string) => ['recovery-exam-parts', examTypeId ?? null] as const,
 };
 
 const EMPTY: never[] = [];
@@ -65,18 +62,6 @@ export function useRecoveryResources() {
     updateMutation: crud.updateMutation,
     deleteMutation: crud.deleteMutation,
   };
-}
-
-export function usePartsByExamType(examTypeId: string): ExamPartResponse[] {
-  const query = useQuery({
-    queryKey: recoveryResourceKeys.parts(examTypeId),
-    queryFn: () => getExamPartsByExamType(examTypeId),
-    enabled: !!examTypeId,
-    placeholderData: keepPreviousData,
-    select: asArray,
-  });
-
-  return query.data ?? EMPTY;
 }
 
 export function useTagsByExamType(examTypeId: string): TagResponse[] {

@@ -13,7 +13,7 @@ import RecoveryResourceLink from '@/app/components/RecoveryResourceLink/Recovery
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
 import {isMarkdownResource} from '@/app/utils/recoveryResource';
 import type {RecoveryResourceResponse, TagResponse} from '@/app/types';
-import {usePartsByExamType, useRecoveryResources, useTagsByExamType} from './_hooks/useRecoveryResources';
+import {useRecoveryResources, useTagsByExamType} from './_hooks/useRecoveryResources';
 import styles from './RecoveryResourcesManagement.module.scss';
 
 const cx = classNames.bind(styles);
@@ -23,7 +23,6 @@ const emptyForm: RecoveryResourceFormState = {
   description: '',
   url: '',
   tagIds: [],
-  examPartId: '',
 };
 
 const SHARED_PART_KEY = '__shared__';
@@ -130,7 +129,6 @@ function RecoveryResourcesManagement() {
 
   const availableTags = useTagsByExamType(selectedExamTypeId);
   const formAvailableTags = useTagsByExamType(formExamTypeId);
-  const formAvailableParts = usePartsByExamType(formExamTypeId);
 
   const fetchError = resourcesError ? 'Không thể tải danh sách tài liệu.' : '';
 
@@ -232,6 +230,19 @@ function RecoveryResourcesManagement() {
       }
     });
 
+    // Trong mỗi phần thi, xếp tài liệu theo tag đứng đầu của nó trong phần thi đó
+    // (vị trí trong availableTags = thứ tự tag), rồi theo tiêu đề.
+    const tagRank = new Map(availableTags.map((tag, index): [string, number] => [tag.tagId, index]));
+    groupMap.forEach((group, key) => {
+      const rankOf = (resource: RecoveryResourceResponse) => Math.min(
+        ...(resource.tags || [])
+          .filter((tag) => groupKeyOf(tag) === key)
+          .map((tag) => tagRank.get(tag.tagId) ?? Number.MAX_SAFE_INTEGER),
+      );
+      group.resources.sort((a, b) =>
+        rankOf(a) - rankOf(b) || (a.title ?? '').localeCompare(b.title ?? '', 'vi'));
+    });
+
     return {groups, ungrouped};
   }, [selectedExamTypeId, availableTags, filteredResources]);
 
@@ -295,7 +306,6 @@ function RecoveryResourcesManagement() {
       description: resource.description || '',
       url: resource.url || '',
       tagIds: (resource.tags || []).map((t) => t.tagId),
-      examPartId: resource.examPartId || '',
     });
     setSelectedFile(null);
     setFormExamTypeId(
@@ -310,7 +320,8 @@ function RecoveryResourcesManagement() {
 
   const handleFormExamTypeChange = (examTypeId: string) => {
     setFormExamTypeId(examTypeId);
-    setFormState((prev) => ({...prev, examPartId: ''}));
+    // Tag phải cùng kỳ thi với tài liệu nên bỏ các tag của kỳ thi cũ.
+    setFormState((prev) => ({...prev, tagIds: []}));
   };
 
   const handleToggleTag = (tagId: string) => {
@@ -339,7 +350,6 @@ function RecoveryResourcesManagement() {
         url: formState.url.trim() || null,
         tagIds: [...new Set(formState.tagIds || [])],
         examTypeId: formExamTypeId || '',
-        examPartId: formState.examPartId || '',
       };
       if (editingId) {
         await updateMutation.mutateAsync({id: editingId, payload, file: selectedFile});
@@ -348,8 +358,8 @@ function RecoveryResourcesManagement() {
       }
       setShowFormModal(false);
       resetForm();
-    } catch {
-      setErrorMessage('Không thể lưu tài liệu. Vui lòng thử lại.');
+    } catch (error: any) {
+      setErrorMessage(error?.response?.data?.message || 'Không thể lưu tài liệu. Vui lòng thử lại.');
     } finally {
       setSubmitting(false);
     }
@@ -494,7 +504,6 @@ function RecoveryResourcesManagement() {
         formExamTypeId={formExamTypeId}
         onExamTypeChange={handleFormExamTypeChange}
         availableTags={formAvailableTags}
-        availableParts={formAvailableParts}
         selectedFile={selectedFile}
         onChangeField={(field, value) =>
           setFormState((prev) => ({...prev, [field]: value}))
