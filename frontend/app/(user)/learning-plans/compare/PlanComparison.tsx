@@ -56,7 +56,7 @@ function PlanComparison() {
 
       return {
         key: p.learningPlanId,
-        label: `Lộ trình #${p.planSequence ?? '?'}`,
+        label: `Lộ trình ${p.planSequence ?? '?'}`,
         readiness,
         status: p.status,
         planStage: p.planStage,
@@ -123,7 +123,7 @@ function PlanComparison() {
                   })}
                 >
                   <div className={cx('planHead')}>
-                    <span className={cx('planNo')}>Lộ trình #{p.planSequence ?? '?'}</span>
+                    <span className={cx('planNo')}>Lộ trình {p.planSequence ?? '?'}</span>
                     <span className={cx('badge', planStatusVariant(p.status))}>
                       {planStatusLabel(p.status)}
                     </span>

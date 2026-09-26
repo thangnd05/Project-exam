@@ -9,6 +9,6 @@ import lombok.*;
 public class TagRequest {
     private String name;
     private String examTypeId;
-    private String parentId;
+    private String examPartId;
     private Integer sortOrder;
 }

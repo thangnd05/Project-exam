@@ -232,7 +232,7 @@ public class RecoveryResourceService {
                 .stream()
                 .map(rt -> tagRepository.findById(rt.getTagId()).orElse(null))
                 .filter(Objects::nonNull)
-                .map(t -> tagMapper.toResponse(t, null))
+                .map(tagMapper::toResponse)
                 .collect(Collectors.toList());
 
         String examPartName = resource.getExamPartId() == null ? null

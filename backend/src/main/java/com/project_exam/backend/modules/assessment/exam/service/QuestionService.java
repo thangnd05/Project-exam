@@ -538,17 +538,17 @@ public class QuestionService {
             ids.addAll(tagIds);
         }
         if (tagNames != null && !tagNames.isEmpty()) {
-            ExamPart part = examPartRepository.findById(examPartId).orElse(null);
+            ExamPart part = examPartId == null ? null : examPartRepository.findById(examPartId).orElse(null);
             if (part != null) {
 
                 ids.addAll(tagService.resolveTagIdsByNames(
-                        tagNames, part.getExamTypeId(), part.getName()));
+                        tagNames, part.getExamTypeId(), part.getExamPartId()));
             }
         }
-        List<String> distinct = ids.stream()
+        List<String> distinct = tagService.filterTagIdsForExamPart(ids.stream()
                 .filter(Objects::nonNull)
                 .distinct()
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()), examPartId);
         if (!distinct.isEmpty()) {
             tagService.syncQuestionTags(questionId, distinct);
         }

@@ -3,9 +3,10 @@
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 
 import {getExamTypes} from '@/app/apis/examTypeApi';
-import {createTag, deleteTag, getTagTreeByExamType, getTagsFlatByExamType, updateTag} from '@/app/apis/tagApi';
+import {getExamPartsByExamType} from '@/app/apis/examPartApi';
+import {createTag, deleteTag, getTagsFlatByExamType, updateTag} from '@/app/apis/tagApi';
 import {examTypeKeys} from '@/app/hooks/useExamTypes';
-import type {TagRequest, TagResponse} from '@/app/types';
+import type {ExamPartResponse, TagRequest, TagResponse} from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const tagKeys = {
@@ -15,7 +16,6 @@ export const tagKeys = {
 
 export interface AdminTag extends TagResponse {
   name: string;
-  children?: AdminTag[];
 }
 
 export type TagExamTypeOption = {id: string; name?: string};
@@ -56,25 +56,27 @@ export function useAdminExamTypesForTags() {
   };
 }
 
-export function useTagTree(examTypeId?: string) {
-  const treeQuery = useQuery({
-    queryKey: [...tagKeys.byExamType(examTypeId), 'tree'],
-    queryFn: () => getTagTreeByExamType(examTypeId as string),
-    enabled: !!examTypeId,
-  });
-  const flatQuery = useQuery({
+export function useTagList(examTypeId?: string) {
+  const query = useQuery({
     queryKey: [...tagKeys.byExamType(examTypeId), 'flat'],
     queryFn: () => getTagsFlatByExamType(examTypeId as string),
     enabled: !!examTypeId,
   });
 
-  const refetch = () => Promise.all([treeQuery.refetch(), flatQuery.refetch()]);
-
   return {
-    tagTree: (treeQuery.data ?? []) as AdminTag[],
-    flatTags: (flatQuery.data ?? []) as AdminTag[],
-    isLoading: treeQuery.isLoading || flatQuery.isLoading,
-    isError: treeQuery.isError || flatQuery.isError,
-    refetch,
+    tags: (query.data ?? EMPTY_LIST) as AdminTag[],
+    isLoading: query.isLoading,
+    isError: query.isError,
   };
+}
+
+export function useExamPartsForTags(examTypeId?: string) {
+  const query = useQuery({
+    queryKey: ['admin-tags-exam-parts', examTypeId ?? null],
+    queryFn: () => getExamPartsByExamType(examTypeId as string),
+    enabled: !!examTypeId,
+    select: (list): ExamPartResponse[] =>
+      [...list].sort((a, b) => (a.displayOrder ?? 999) - (b.displayOrder ?? 999)),
+  });
+  return {examParts: query.data ?? EMPTY_LIST};
 }

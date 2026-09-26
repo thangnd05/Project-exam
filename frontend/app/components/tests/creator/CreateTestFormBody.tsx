@@ -208,45 +208,37 @@ const CreateTestFormBody = ({
   const normTag = (s?: string | null) => (s || '').trim().toLowerCase();
   const resolveTagNamesToIds = (tagNames: string[] = []): string[] => {
     if (!tagNames.length || !availableTags.length) return [];
-    const byId = new Map<string, any>(availableTags.map((t: any) => [t.tagId, t]));
     const byName = new Map<string, any[]>();
     availableTags.forEach((t: any) => {
       const k = normTag(t.name);
       if (!byName.has(k)) byName.set(k, []);
       byName.get(k)!.push(t);
     });
-    const partName = examParts.find(
-      (p: any) => String(p.examPartId) === String(testInfo.examPartId),
-    )?.name || '';
-    const partRootId = availableTags.find(
-      (t: any) => (t.parentId == null || t.parentId === '' || !byId.has(t.parentId))
-        && normTag(t.name) === normTag(partName),
-    )?.tagId || null;
+    const partId = testInfo.examPartId ? String(testInfo.examPartId) : null;
 
     const ids: string[] = [];
     tagNames.forEach((rawSpec) => {
       const spec = (rawSpec || '').trim();
       if (!spec) return;
-      let parentName: string | null = null;
-      let childName = spec;
+      // Spec dạng "Tag" hoặc "Phần thi > Tag".
+      let partName: string | null = null;
+      let tagName = spec;
       const gt = spec.indexOf('>');
       if (gt >= 0) {
-        parentName = spec.slice(0, gt).trim();
-        childName = spec.slice(gt + 1).trim();
+        partName = spec.slice(0, gt).trim();
+        tagName = spec.slice(gt + 1).trim();
       }
-      const cands = byName.get(normTag(childName)) || [];
+      let cands = byName.get(normTag(tagName)) || [];
+      if (partName) {
+        cands = cands.filter((t: any) => normTag(t.examPartName) === normTag(partName));
+      }
       if (!cands.length) return;
       let chosen = null;
-      if (parentName) {
-        chosen = cands.find((t: any) => {
-          const p = t.parentId ? byId.get(t.parentId) : null;
-          return p && normTag(p.name) === normTag(parentName);
-        });
-      } else if (partRootId) {
-        chosen = cands.find((t: any) => t.parentId === partRootId)
-          || cands.find((t: any) => t.tagId === partRootId);
+      if (cands.length > 1 && partId) {
+        const inPart = cands.filter((t: any) => t.examPartId === partId);
+        if (inPart.length === 1) chosen = inPart[0];
       }
-      if (!chosen && !parentName && cands.length === 1) chosen = cands[0];
+      if (!chosen && cands.length === 1) chosen = cands[0];
       if (chosen && !ids.includes(chosen.tagId)) ids.push(chosen.tagId);
     });
     return ids;

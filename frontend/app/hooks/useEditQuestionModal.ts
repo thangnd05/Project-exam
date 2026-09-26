@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'react-toastify';
 import { getQuestionById } from '@/app/apis/questionApi';
 import { getExamPartById } from '@/app/apis/examPartApi';
@@ -336,6 +336,13 @@ export function useEditQuestionModal({
     );
   };
 
+  // Chỉ tag dùng chung hoặc cùng phần thi với câu hỏi mới gắn được.
+  const partTags = useMemo(
+    () => availableTags.filter((t) => !t.examPartId || t.examPartId === formData.examPartId),
+    [availableTags, formData.examPartId],
+  );
+  const partTagIds = useMemo(() => new Set(partTags.map((t) => t.tagId)), [partTags]);
+
   const handleSave = () => {
     const correctCount = formData.options.filter((opt) => opt.isCorrect).length;
     if (correctCount === 0) {
@@ -360,7 +367,7 @@ export function useEditQuestionModal({
         answerText: opt.content,
         isCorrect: opt.isCorrect,
       })),
-      tagIds: selectedTagIds,
+      tagIds: selectedTagIds.filter((id) => partTagIds.has(id)),
     };
 
     const cleanExtraContents = extraContents.map((t) => t?.trim()).filter(Boolean);
@@ -421,7 +428,7 @@ export function useEditQuestionModal({
     existingMedia,
     confirmDeleteMedia,
     setConfirmDeleteMedia,
-    availableTags,
+    availableTags: partTags,
     selectedTagIds,
     questionCollections,
     isDeletingMedia,

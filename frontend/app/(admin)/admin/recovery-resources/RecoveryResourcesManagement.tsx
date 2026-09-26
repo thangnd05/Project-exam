@@ -26,21 +26,7 @@ const emptyForm: RecoveryResourceFormState = {
   examPartId: '',
 };
 
-const getRootTagId = (tag: TagResponse, tagById: Map<string, TagResponse>) => {
-  let current: TagResponse | undefined = tag;
-  let depth = 0;
-
-  while (current?.parentId && depth < 20) {
-    const parent = tagById.get(current.parentId);
-    if (!parent) {
-      break;
-    }
-    current = parent;
-    depth += 1;
-  }
-
-  return current?.tagId || null;
-};
+const SHARED_PART_KEY = '__shared__';
 
 interface ResourceCardProps {
   resource: RecoveryResourceResponse;
@@ -153,8 +139,8 @@ function RecoveryResourcesManagement() {
       setSelectedParentTagId('');
       return;
     }
-    const firstRootId = availableTags.find((tag) => !tag.parentId)?.tagId || '';
-    setSelectedParentTagId(firstRootId);
+    const firstGroupKey = availableTags.length ? availableTags[0].examPartId || SHARED_PART_KEY : '';
+    setSelectedParentTagId(firstGroupKey);
   }, [selectedExamTypeId, availableTags]);
 
   const filteredResources = useMemo(() => {
@@ -191,13 +177,18 @@ function RecoveryResourcesManagement() {
       return null;
     }
 
+    // Nhóm theo phần thi của tag (danh sách tag đã được backend sắp theo thứ tự phần thi).
     const tagById = new Map(availableTags.map((tag): [string, TagResponse] => [tag.tagId, tag]));
-    const rootTags = availableTags.filter((tag) => !tag.parentId);
-    const groups = rootTags.map((parentTag) => ({
-      parentTag,
-      resources: [] as RecoveryResourceResponse[],
-    }));
-    const groupMap = new Map(groups.map((group): [string, (typeof groups)[number]] => [group.parentTag.tagId, group]));
+    const groupKeyOf = (tag: TagResponse) => (tag.examPartId ?? tagById.get(tag.tagId)?.examPartId) || SHARED_PART_KEY;
+    const groupMap = new Map<string, {parentTag: {tagId: string; name: string}; resources: RecoveryResourceResponse[]}>();
+    availableTags.forEach((tag) => {
+      const key = groupKeyOf(tag);
+      if (!groupMap.has(key)) {
+        const name = key === SHARED_PART_KEY ? 'Dùng chung' : tag.examPartName || 'Phần thi';
+        groupMap.set(key, {parentTag: {tagId: key, name}, resources: []});
+      }
+    });
+    const groups = Array.from(groupMap.values());
     const ungrouped: RecoveryResourceResponse[] = [];
     const ungroupedIds = new Set<string>();
 
@@ -220,12 +211,7 @@ function RecoveryResourcesManagement() {
       }
 
       const parentIds = new Set<string>();
-      examTags.forEach((tag) => {
-        const rootId = tag.parentId ? getRootTagId(tag, tagById) : tag.tagId;
-        if (rootId) {
-          parentIds.add(rootId);
-        }
-      });
+      examTags.forEach((tag) => parentIds.add(groupKeyOf(tag)));
 
       if (parentIds.size === 0) {
         pushUngrouped(resource);
@@ -256,7 +242,7 @@ function RecoveryResourcesManagement() {
 
     if (selectedParentTagId === '__ungrouped__') {
       return {
-        title: 'Chưa gán tag cha',
+        title: 'Chưa gán tag',
         resources: parentTagGroups.ungrouped,
       };
     }
@@ -478,7 +464,7 @@ function RecoveryResourcesManagement() {
                 })}
                 onClick={() => setSelectedParentTagId('__ungrouped__')}
               >
-                <span className={cx('parentTabTitle')}>Chưa gán tag cha</span>
+                <span className={cx('parentTabTitle')}>Chưa gán tag</span>
                 <span className={cx('parentTabCount')}>{parentTagGroups.ungrouped.length}</span>
               </button>
             )}

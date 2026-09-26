@@ -49,7 +49,7 @@ function PlanCongratsModal({ show, onClose, onNext, totalTasks, planSequence }: 
           </div>
           <h2 className={cx('heroTitle')}>Chúc mừng!</h2>
           <p className={cx('heroSub')}>
-            Bạn đã vượt toàn bộ ải của lộ trình{planSequence != null ? ` #${planSequence}` : ''}
+            Bạn đã vượt toàn bộ ải của lộ trình{planSequence != null ? ` ${planSequence}` : ''}
           </p>
         </div>
 

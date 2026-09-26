@@ -174,7 +174,7 @@ function PlanDetail() {
 
       <PageHeader
         compact
-        label={`Lộ trình #${plan.planSequence ?? '?'} · ${planStatusLabel(plan.status)}`}
+        label={`Lộ trình ${plan.planSequence ?? '?'} · ${planStatusLabel(plan.status)}`}
         title={
           plan.planStage === PlanStage.MOCK
             ? 'Đã vượt hết ải  sẵn sàng thi thử!'

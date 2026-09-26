@@ -112,6 +112,11 @@
     font-size: 1.6rem;
     color: var(--slate-800);
   }
+
+  &.sharedGroup {
+    font-style: italic;
+    color: var(--gray-600);
+  }
 }
 
 .sortOrder {

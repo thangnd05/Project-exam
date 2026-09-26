@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useBaseMetaData } from '@/app/hooks/useBaseMetaData';
 import { durationMinutesFromExamType } from '@/app/hooks/useExamTypes';
 import { useTestSubmission } from '@/app/hooks/useTestSubmission';
@@ -145,7 +145,12 @@ export const useCreateTest = ({
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   const [notification, setNotification] = useState<CreatorNotification>({});
 
-  const { examTypes, examParts, questionCollections, availableTags } = useBaseMetaData(testInfo.examTypeId);
+  const { examTypes, examParts, questionCollections, availableTags: examTypeTags } = useBaseMetaData(testInfo.examTypeId);
+  // Chỉ hiện tag dùng chung hoặc thuộc phần thi đang chọn.
+  const availableTags = useMemo(
+    () => examTypeTags.filter((t: any) => !t.examPartId || t.examPartId === testInfo.examPartId),
+    [examTypeTags, testInfo.examPartId],
+  );
 
   const { handleSubmit: submitLogic, isSubmitting } = useTestSubmission({
     mode,

@@ -218,7 +218,7 @@ function TargetDashboard() {
               <div className={cx('statLabel')}>Lộ trình đang học</div>
               {activePlan ? (
                 <>
-                  <div className={cx('statValue')}>Lộ trình #{activePlan.planSequence ?? '?'}</div>
+                  <div className={cx('statValue')}>Lộ trình {activePlan.planSequence ?? '?'}</div>
                   <div className={cx('statHint')}>
                     {activePlan.baselineReadiness != null
                       ? `Ban đầu ${activePlan.baselineReadiness}%`

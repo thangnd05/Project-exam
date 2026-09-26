@@ -1,18 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import LearningPlanList from './_components/LearningPlanList';
-import PlanPartTaskList from '@/app/components/learning-plans/PlanPartTaskList/PlanPartTaskList';
 import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
-import InfoTip from '@/app/components/InfoTip/InfoTip';
-import { TERM_TIPS } from '@/app/utils/termTips';
-import { buildPlanSummary, isPracticeAttempt, planStageLabel } from '@/app/utils/planLabels';
-import { getReadinessLabel } from '@/app/utils/readiness-label';
+import { isPracticeAttempt } from '@/app/utils/planLabels';
 import { getLearnerLevel } from '@/app/utils/learnerLevel';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import type { PlanResponse } from '@/app/types';
@@ -29,7 +24,6 @@ type PlanSource = 'DIAGNOSIS' | 'SYLLABUS';
 const cx = classNames.bind(styles);
 
 function GeneratePlan() {
-  const router = useRouter();
   const [searchParams, setSearchParams] = useSearchParamsState();
 
   const forcedSyllabus = searchParams.get('source') === 'syllabus';
@@ -366,81 +360,6 @@ function GeneratePlan() {
             <br />
             <small>Bạn có thể đặt mục tiêu cao hơn trong tab Mục tiêu, hoặc tiếp tục làm bài thi thử để duy trì phong độ.</small>
           </span>
-        </div>
-      )}
-
-      {result && !result.targetAchieved && (
-        <div className={cx('card', 'cardPrimary')}>
-          <div className={cx('cardHeader')} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-            <div>
-              <strong>Lộ trình #{result.planSequence ?? '-'}:</strong>{' '}
-              <code className={cx('code')}>{result.learningPlanId.slice(0, 8)}…</code>
-            </div>
-            <button
-              type="button"
-              className={cx('btn', 'btnPrimary', 'btnSm')}
-              onClick={() => router.push(`/learning-plans/${result.learningPlanId}#chon-ai-hoc`)}
-            >
-              Chọn ải để học
-            </button>
-          </div>
-          <div className={cx('cardBody')}>
-            <p>{buildPlanSummary(result)}</p>
-            <ul className={cx('metaList')}>
-              <li><strong>Giai đoạn:</strong> {planStageLabel(result.planStage)}</li>
-              {result.baselineReadiness != null && (
-                <li>
-                  <strong>Độ sẵn sàng (chẩn đoán):</strong>
-                  <InfoTip text={TERM_TIPS.readiness} />{' '}
-                  {result.baselineReadiness}% ({getReadinessLabel(result.readinessLevel)})
-                </li>
-              )}
-              <li><strong>Mục tiêu:</strong> {result.targetScore ?? 'N/A'}</li>
-              <li><strong>Ải:</strong> {result.totalTasks}</li>
-            </ul>
-
-            {!result.sourceUserTestId && (
-              <div className={cx('alert')}>
-                Lộ trình này đi theo <strong>chương trình của kỳ thi</strong> nên chưa có chẩn đoán
-                điểm mạnh yếu. Học được một thời gian, hãy làm một{' '}
-                <strong>bài thi thử đầy đủ</strong> rồi sinh lộ trình mới để được ưu tiên đúng chỗ
-                bạn còn yếu.
-              </div>
-            )}
-
-            {result.diagnosisSourceCategory === 'QUICK_CHALLENGE' && (
-              <div className={cx('alert')}>
-                Lộ trình này chẩn đoán từ một <strong>bài thử thách nhanh</strong>. Ôn xong các ải,
-                hãy làm một <strong>bài thi thử đầy đủ</strong> để chẩn đoán chính xác hơn.
-              </div>
-            )}
-
-            {result.diagnosisSourcePractice && (
-              <div className={cx('alert', 'alertWarning')}>
-                Lộ trình này chẩn đoán từ một <strong>bài luyện theo Part</strong> nên chỉ phủ các
-                Part đã luyện. Làm một <strong>bài thi thử trọn đề</strong> rồi sinh lại để có lộ
-                trình cho toàn bộ kỳ thi.
-              </div>
-            )}
-
-            {(result.partsWithoutTasks?.length ?? 0) > 0 && (
-              <div className={cx('alert', 'alertWarning')}>
-                Part <strong>chưa có ải</strong> vì chưa có câu hỏi luyện tập nào được gắn tag:{' '}
-                {result.partsWithoutTasks!.join(', ')}. Thêm câu hỏi ở phạm vi luyện tập và gắn tag
-                (admin) rồi sinh lộ trình lại.
-              </div>
-            )}
-
-            <h5 className={cx('sectionTitle')} style={{ marginTop: '1.6rem' }}>
-              Chọn Part và ải ({result.partGroups?.length || 0})
-            </h5>
-            <PlanPartTaskList
-              partGroups={result.partGroups || []}
-              learningPlanId={result.learningPlanId}
-              recommendedTaskId={result.recommendedTaskId}
-              studyAction="link"
-            />
-          </div>
         </div>
       )}
 

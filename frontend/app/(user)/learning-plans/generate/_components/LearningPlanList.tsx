@@ -181,7 +181,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
         <div key={p.learningPlanId} className={cx('planListItem')}>
           <div className={cx('planListMain')}>
             <div className={cx('planListTitle')}>
-              Lộ trình #{p.planSequence ?? '?'}
+              Lộ trình {p.planSequence ?? '?'}
               <span className={cx('badge', planStatusVariant(p.status))}>
                 {planStatusLabel(p.status)}
               </span>
@@ -268,7 +268,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
         confirmText="Đồng ý chuyển"
         message={
           switchTarget
-            ? `Chuyển sang lộ trình #${switchTarget.planSequence ?? '?'}? Lộ trình đang học hiện tại sẽ được lưu lại với trạng thái "Đã thay".`
+            ? `Chuyển sang lộ trình ${switchTarget.planSequence ?? '?'}? Lộ trình đang học hiện tại sẽ được lưu lại với trạng thái "Đã thay".`
             : ''
         }
       />
@@ -279,7 +279,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
         title="Xác nhận xóa lộ trình"
         message={
           deleteTarget
-            ? `Bạn có chắc muốn xóa lộ trình #${deleteTarget.planSequence ?? '?'}? Toàn bộ dữ liệu ải và phiên học sẽ bị mất vĩnh viễn.`
+            ? `Bạn có chắc muốn xóa lộ trình ${deleteTarget.planSequence ?? '?'}? Toàn bộ dữ liệu ải và phiên học sẽ bị mất vĩnh viễn.`
             : ''
         }
       />

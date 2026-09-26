@@ -144,7 +144,7 @@ function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsP
           </h3>
         </div>
         <p className={cx('chartCardDesc')}>
-          Trục ngang: thứ tự lộ trình (#1 → mới nhất). Cột = độ sẵn sàng ban đầu khi tạo lộ trình từ bài thi thử.
+          Trục ngang: thứ tự lộ trình (1 → mới nhất). Cột = độ sẵn sàng ban đầu khi tạo lộ trình từ bài thi thử.
         </p>
 
         <div className={cx('chartContainer')}>

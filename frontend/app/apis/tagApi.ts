@@ -4,10 +4,6 @@ import type { TagRequest, TagResponse } from '@/app/types';
 const BASE_URL = '/api/tags';
 const ADMIN_BASE_URL = '/api/admin/tags';
 
-export const getTagTreeByExamType = (examTypeId: string): Promise<TagResponse[]> => {
-  return axios.get(`${BASE_URL}/tree/${examTypeId}`).then((res) => res.data);
-};
-
 export const getTagsFlatByExamType = (examTypeId: string): Promise<TagResponse[]> => {
   return axios.get(`${BASE_URL}/flat/${examTypeId}`).then((res) => res.data);
 };

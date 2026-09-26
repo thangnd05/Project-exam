@@ -73,7 +73,7 @@ function TaskHistory() {
           href={`/learning-plans/${learningPlanId}`}
           className={cx('btn', 'btnGhost', 'btnSm')}
         >
-          ← Lộ trình #{plan.planSequence ?? '?'}
+          ← Lộ trình {plan.planSequence ?? '?'}
         </Link>
         <Link
           href={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}

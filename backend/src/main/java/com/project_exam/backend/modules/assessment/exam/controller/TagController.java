@@ -15,11 +15,6 @@ public class TagController {
 
     private final TagService tagService;
 
-    @GetMapping("/tree/{examTypeId}")
-    public ResponseEntity<List<TagResponse>> getTagTree(@PathVariable String examTypeId) {
-        return ResponseEntity.ok(tagService.getTagTreeByExamType(examTypeId));
-    }
-
     @GetMapping("/flat/{examTypeId}")
     public ResponseEntity<List<TagResponse>> getTagsFlat(@PathVariable String examTypeId) {
         return ResponseEntity.ok(tagService.getTagsFlatByExamType(examTypeId));

@@ -8,108 +8,102 @@ import {ChevronDown, ChevronRight, Edit, Plus, Trash2} from 'lucide-react';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import TagFormModal, {type TagFormState} from './_components/TagFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
-import {useAdminExamTypesForTags, useTagTree, useTags, type AdminTag} from './_hooks/useTags';
-import type {TagResponse} from '@/app/types';
+import {useAdminExamTypesForTags, useExamPartsForTags, useTagList, useTags, type AdminTag} from './_hooks/useTags';
+import type {TagRequest, TagResponse} from '@/app/types';
 import styles from './TagsManagement.module.scss';
 
 const cx = classNames.bind(styles);
 
-const emptyForm: TagFormState = {name: '', parentId: null, examTypeId: '', sortOrder: null};
+const SHARED_GROUP_KEY = '__shared__';
 
-function nextSortOrder(tags: AdminTag[], parentId: string | null): number {
+const emptyForm: TagFormState = {name: '', examPartId: null, examTypeId: '', sortOrder: null};
+
+type PartGroup = {
+  key: string;
+  examPartId: string | null;
+  name: string;
+  displayOrder?: number;
+  tags: AdminTag[];
+};
+
+function nextSortOrder(tags: AdminTag[], examPartId: string | null): number {
   const max = tags.reduce((highest, tag) => {
-    if ((tag.parentId || null) !== parentId || tag.sortOrder == null) return highest;
+    if ((tag.examPartId || null) !== examPartId || tag.sortOrder == null) return highest;
     return Math.max(highest, tag.sortOrder);
   }, 0);
   return max + 1;
 }
 
-type TagTreeNodeProps = {
-  tag: AdminTag;
-  flatTags: AdminTag[];
-  level: number;
-  expandedIds: Set<string>;
-  toggleExpand: (tagId: string) => void;
+type PartGroupNodeProps = {
+  group: PartGroup;
+  isExpanded: boolean;
+  searchTerm: string;
+  onToggle: (key: string) => void;
+  onAddToPart: (examPartId: string | null) => void;
   onEdit: (tag: AdminTag) => void;
   onDelete: (tag: AdminTag) => void;
-  onAddChild: (tag: AdminTag) => void;
-  searchTerm: string;
 };
 
-function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, searchTerm}: TagTreeNodeProps) {
-  const hasChildren = tag.children && tag.children.length > 0;
-  const isExpanded = expandedIds.has(tag.tagId);
+function PartGroupNode({group, isExpanded, searchTerm, onToggle, onAddToPart, onEdit, onDelete}: PartGroupNodeProps) {
   const keyword = searchTerm.trim().toLowerCase();
-  const matchesSearch = !keyword || tag.name.toLowerCase().includes(keyword);
-  const childrenMatchSearch = hasChildren && tag.children!.some(function checkMatch(c: AdminTag): boolean {
-    if (c.name.toLowerCase().includes(keyword)) return true;
-    return c.children?.some(checkMatch) || false;
-  });
+  const visibleTags = keyword
+    ? group.tags.filter((t) => t.name.toLowerCase().includes(keyword))
+    : group.tags;
+  if (keyword && visibleTags.length === 0) return null;
 
-  if (keyword && !matchesSearch && !childrenMatchSearch) return null;
+  const open = isExpanded || Boolean(keyword);
+  const hasTags = group.tags.length > 0;
 
-  const nodeContent = (
-    <>
-      <div className={cx('treeNode', {childConnector: level > 0})}>
+  return (
+    <div className={cx('rootGroup')}>
+      <div className={cx('treeNode')}>
         <div className={cx('treeNodeLeft')}>
-          {hasChildren ? (
-            <button
-              className={cx('expandBtn')}
-              onClick={() => toggleExpand(tag.tagId)}
-            >
-              {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
+          {hasTags ? (
+            <button className={cx('expandBtn')} onClick={() => onToggle(group.key)}>
+              {open ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
             </button>
           ) : (
             <span className={cx('expandPlaceholder')} />
           )}
-          <span className={cx('tagName', {root: level === 0})}>
-            {tag.name}
-          </span>
-          <span className={cx('sortOrder')} title="Thứ tự hiển thị">
-            {tag.sortOrder ?? '—'}
-          </span>
-          {hasChildren && (
-            <span className={cx('childCount')}>{tag.children!.length}</span>
+          <span className={cx('tagName', 'root', {sharedGroup: !group.examPartId})}>{group.name}</span>
+          {group.displayOrder != null && (
+            <span className={cx('sortOrder')} title="Thứ tự phần thi">
+              {group.displayOrder}
+            </span>
           )}
+          <span className={cx('childCount')} title="Số tag">{group.tags.length}</span>
         </div>
         <div className={cx('treeNodeActions')}>
-          <button onClick={() => onAddChild(tag)} title="Thêm tag con">
+          <button onClick={() => onAddToPart(group.examPartId)} title="Thêm tag vào phần thi này">
             <Plus size={16} />
-          </button>
-          <button onClick={() => onEdit(tag)} title="Sửa">
-            <Edit size={16} />
-          </button>
-          <button onClick={() => onDelete(tag)} title="Xóa">
-            <Trash2 size={16} />
           </button>
         </div>
       </div>
-      {hasChildren && isExpanded && (
+      {hasTags && open && (
         <div className={cx('childrenWrapper')}>
-          {tag.children!.map((child) => (
-            <TagTreeNode
-              key={child.tagId}
-              tag={child}
-              flatTags={flatTags}
-              level={level + 1}
-              expandedIds={expandedIds}
-              toggleExpand={toggleExpand}
-              onEdit={onEdit}
-              onDelete={onDelete}
-              onAddChild={onAddChild}
-              searchTerm={searchTerm}
-            />
+          {visibleTags.map((tag) => (
+            <div key={tag.tagId} className={cx('treeNode')}>
+              <div className={cx('treeNodeLeft')}>
+                <span className={cx('expandPlaceholder')} />
+                <span className={cx('tagName')}>{tag.name}</span>
+                <span className={cx('sortOrder')} title="Thứ tự hiển thị">
+                  {tag.sortOrder ?? '—'}
+                </span>
+              </div>
+              <div className={cx('treeNodeActions')}>
+                <button onClick={() => onEdit(tag)} title="Sửa">
+                  <Edit size={16} />
+                </button>
+                <button onClick={() => onDelete(tag)} title="Xóa">
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       )}
-    </>
+    </div>
   );
-
-  if (level === 0) {
-    return <div className={cx('rootGroup')}>{nodeContent}</div>;
-  }
-
-  return nodeContent;
 }
 
 function TagsManagement() {
@@ -120,18 +114,28 @@ function TagsManagement() {
   const [formState, setFormState] = useState<TagFormState>(emptyForm);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingTag, setDeletingTag] = useState<AdminTag | null>(null);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
-  const [preserveExpandedOnRefetch, setPreserveExpandedOnRefetch] = useState(false);
+  // Lưu các nhóm đang thu gọn để nhóm mới luôn mở mặc định.
+  const [collapsedKeys, setCollapsedKeys] = useState<Set<string>>(new Set());
 
   const { examTypes = [] } = useAdminExamTypesForTags();
+  const {tags, isLoading: loading, isError: tagLoadError} = useTagList(selectedExamTypeId);
+  const {examParts} = useExamPartsForTags(selectedExamTypeId);
 
-  const {
-    tagTree,
-    flatTags,
-    isLoading: loading,
-    isError: tagLoadError,
-    refetch: refetchTags,
-  } = useTagTree(selectedExamTypeId);
+  const partGroups = useMemo<PartGroup[]>(() => {
+    const groups: PartGroup[] = examParts.map((p) => ({
+      key: p.examPartId,
+      examPartId: p.examPartId,
+      name: p.name || '(Chưa đặt tên)',
+      displayOrder: p.displayOrder,
+      tags: tags.filter((t) => t.examPartId === p.examPartId),
+    }));
+    const knownPartIds = new Set(examParts.map((p) => p.examPartId));
+    const shared = tags.filter((t) => !t.examPartId || !knownPartIds.has(t.examPartId));
+    if (shared.length > 0) {
+      groups.push({key: SHARED_GROUP_KEY, examPartId: null, name: 'Dùng chung mọi phần thi', tags: shared});
+    }
+    return groups;
+  }, [examParts, tags]);
 
   const {createMutation, updateMutation, deleteMutation} = useTags();
   const submitting =
@@ -149,48 +153,19 @@ function TagsManagement() {
     }
   }, [tagLoadError]);
 
-  useEffect(() => {
-    if (preserveExpandedOnRefetch || tagTree.length === 0) return;
-    setExpandedIds(new Set(tagTree.map((t) => t.tagId)));
-  }, [tagTree, preserveExpandedOnRefetch]);
-
-  const fetchTags = useCallback(async (examTypeIdOverride?: string, {preserveExpanded = false} = {}) => {
-    const examTypeId = examTypeIdOverride || selectedExamTypeId;
-    if (!examTypeId) return;
-    setPreserveExpandedOnRefetch(preserveExpanded);
-    setErrorMessage('');
-    await refetchTags();
-    setPreserveExpandedOnRefetch(false);
-  }, [refetchTags, selectedExamTypeId]);
-
-  const toggleExpand = useCallback((tagId: string) => {
-    setExpandedIds((prev) => {
+  const toggleGroup = useCallback((key: string) => {
+    setCollapsedKeys((prev) => {
       const next = new Set(prev);
-      if (next.has(tagId)) next.delete(tagId);
-      else next.add(tagId);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   }, []);
 
-  const expandAll = useCallback(() => {
-    const allIds = new Set<string>();
-    const collect = (nodes: AdminTag[]) => {
-      for (const n of nodes) {
-        if (n.children && n.children.length > 0) {
-          allIds.add(n.tagId);
-          collect(n.children);
-        }
-      }
-    };
-    collect(tagTree);
-    setExpandedIds(allIds);
-  }, [tagTree]);
-
-  const collapseAll = useCallback(() => setExpandedIds(new Set()), []);
-
-  const parentOptions = useMemo(
-    () => flatTags.filter((t) => t.tagId !== editingTagId),
-    [flatTags, editingTagId],
+  const expandAll = useCallback(() => setCollapsedKeys(new Set()), []);
+  const collapseAll = useCallback(
+    () => setCollapsedKeys(new Set(partGroups.map((g) => g.key))),
+    [partGroups],
   );
 
   const resetForm = () => {
@@ -199,26 +174,14 @@ function TagsManagement() {
     setErrorMessage('');
   };
 
-  const openCreateModal = () => {
+  const openCreateModal = (examPartId: string | null = examParts[0]?.examPartId ?? null) => {
     setEditingTagId(null);
     setErrorMessage('');
     setFormState({
       name: '',
-      parentId: null,
+      examPartId,
       examTypeId: selectedExamTypeId,
-      sortOrder: nextSortOrder(flatTags, null),
-    });
-    setShowFormModal(true);
-  };
-
-  const openCreateChildModal = (parentTag: AdminTag) => {
-    setEditingTagId(null);
-    setErrorMessage('');
-    setFormState({
-      name: '',
-      parentId: parentTag.tagId,
-      examTypeId: parentTag.examTypeId || selectedExamTypeId,
-      sortOrder: nextSortOrder(flatTags, parentTag.tagId),
+      sortOrder: nextSortOrder(tags, examPartId),
     });
     setShowFormModal(true);
   };
@@ -227,11 +190,21 @@ function TagsManagement() {
     setEditingTagId(tag.tagId);
     setFormState({
       name: tag.name,
-      parentId: tag.parentId || null,
+      examPartId: tag.examPartId || null,
       examTypeId: tag.examTypeId || selectedExamTypeId,
       sortOrder: tag.sortOrder ?? null,
     });
     setShowFormModal(true);
+  };
+
+  const handleFormFieldChange = (field: keyof TagFormState, value: string | number | null) => {
+    setFormState((prev) => {
+      const next = {...prev, [field]: value} as TagFormState;
+      if (field === 'examPartId' && !editingTagId) {
+        next.sortOrder = nextSortOrder(tags, (value as string | null) || null);
+      }
+      return next;
+    });
   };
 
   const handleSubmit = () => {
@@ -245,12 +218,12 @@ function TagsManagement() {
       return;
     }
     setErrorMessage('');
-    const payload = {
+    const payload: TagRequest = {
       name: formState.name.trim(),
       examTypeId,
-      parentId: formState.parentId || null,
+      examPartId: formState.examPartId || null,
       sortOrder: formState.sortOrder ?? null,
-    } as any;
+    };
 
     const onSuccess = (savedTag: TagResponse) => {
       const targetExamTypeId = savedTag?.examTypeId || examTypeId;
@@ -260,17 +233,12 @@ function TagsManagement() {
       setSearchTerm('');
       setShowFormModal(false);
       resetForm();
-      fetchTags(targetExamTypeId, {preserveExpanded: true});
-      if (savedTag?.tagId) {
-        setExpandedIds((previous) => {
-          const next = new Set(previous);
-          next.add(savedTag.tagId);
-          if (savedTag.parentId) {
-            next.add(savedTag.parentId);
-          }
-          return next;
-        });
-      }
+      const groupKey = savedTag?.examPartId || SHARED_GROUP_KEY;
+      setCollapsedKeys((prev) => {
+        const next = new Set(prev);
+        next.delete(groupKey);
+        return next;
+      });
     };
     const onError = (error: any) => {
       const apiMessage = error?.response?.data?.message;
@@ -288,10 +256,7 @@ function TagsManagement() {
     if (!deletingTag) return;
     setErrorMessage('');
     deleteMutation.mutate(deletingTag.tagId, {
-      onSuccess: () => {
-        setDeletingTag(null);
-        fetchTags(undefined, {preserveExpanded: true});
-      },
+      onSuccess: () => setDeletingTag(null),
       onError: () => setErrorMessage('Không thể xóa tag này.'),
     });
   };
@@ -302,7 +267,7 @@ function TagsManagement() {
         title="Quản lý Tag câu hỏi"
         description="Phân loại câu hỏi theo chủ đề, kỹ năng chi tiết."
       >
-        <Button onClick={openCreateModal} disabled={!selectedExamTypeId}>
+        <Button onClick={() => openCreateModal()} disabled={!selectedExamTypeId}>
           <Plus size={16} className="me-1" />
           Thêm Tag
         </Button>
@@ -330,7 +295,7 @@ function TagsManagement() {
 
       <div className={cx('treeWrapper')}>
         <div className={cx('treeToolbar')}>
-          <span className={cx('treeCount')}>{flatTags.length} tags</span>
+          <span className={cx('treeCount')}>{tags.length} tags</span>
           <div className={cx('treeToolbarActions')}>
             <button onClick={expandAll}>Mở tất cả</button>
             <button onClick={collapseAll}>Thu gọn</button>
@@ -344,31 +309,23 @@ function TagsManagement() {
           </div>
         )}
 
-        {!loading && flatTags.length === 0 && (
+        {!loading && partGroups.length === 0 && (
           <div className="text-center py-4 text-muted">
-            Không có tag nào.
-          </div>
-        )}
-
-        {!loading && flatTags.length > 0 && tagTree.length === 0 && (
-          <div className="text-center py-4 text-muted">
-            Có {flatTags.length} tag nhưng không hiển thị được cây. Kiểm tra tag cha hợp lệ.
+            Loại kỳ thi này chưa có phần thi và tag nào.
           </div>
         )}
 
         {!loading &&
-          tagTree.map((tag) => (
-            <TagTreeNode
-              key={tag.tagId}
-              tag={tag}
-              flatTags={flatTags}
-              level={0}
-              expandedIds={expandedIds}
-              toggleExpand={toggleExpand}
+          partGroups.map((group) => (
+            <PartGroupNode
+              key={group.key}
+              group={group}
+              isExpanded={!collapsedKeys.has(group.key)}
+              searchTerm={searchTerm}
+              onToggle={toggleGroup}
+              onAddToPart={openCreateModal}
               onEdit={openEditModal}
               onDelete={setDeletingTag}
-              onAddChild={openCreateChildModal}
-              searchTerm={searchTerm}
             />
           ))}
       </div>
@@ -378,10 +335,8 @@ function TagsManagement() {
         isEditing={Boolean(editingTagId)}
         formState={formState}
         examTypes={examTypes}
-        parentOptions={parentOptions}
-        onChangeField={(field, value) =>
-          setFormState((prev) => ({...prev, [field]: value} as TagFormState))
-        }
+        examParts={examParts}
+        onChangeField={handleFormFieldChange}
         onClose={() => {
           if (submitting) return;
           setShowFormModal(false);
@@ -398,7 +353,7 @@ function TagsManagement() {
         }}
         onConfirm={handleConfirmDelete}
         title="Xác nhận xóa Tag"
-        message={`Bạn có chắc muốn xóa tag "${deletingTag?.name || ''}" không? Tất cả tag con cũng sẽ bị xóa.`}
+        message={`Bạn có chắc muốn xóa tag "${deletingTag?.name || ''}" không? Tag sẽ bị gỡ khỏi các câu hỏi và tài liệu đang gắn.`}
       />
     </div>
   );

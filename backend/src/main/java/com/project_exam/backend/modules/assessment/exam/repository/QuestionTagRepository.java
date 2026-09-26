@@ -48,4 +48,13 @@ public interface QuestionTagRepository extends JpaRepository<QuestionTag, String
             """)
     List<String> findDistinctTagIdsByQuestionIdIn(@Param("questionIds") java.util.Collection<String> questionIds);
 
+    @Query("""
+            SELECT COUNT(qt) FROM QuestionTag qt
+            JOIN Question q ON q.questionId = qt.questionId
+            WHERE qt.tagId IN :tagIds
+              AND (q.examPartId IS NULL OR q.examPartId <> :examPartId)
+            """)
+    long countLinksOutsideExamPart(@Param("tagIds") java.util.Collection<String> tagIds,
+                                   @Param("examPartId") String examPartId);
+
 }

@@ -6,7 +6,7 @@ import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 
 export type TagFormState = {
   name: string;
-  parentId: string | null;
+  examPartId: string | null;
   examTypeId: string;
   sortOrder: number | null;
 };
@@ -16,7 +16,7 @@ type TagFormModalProps = {
   isEditing: boolean;
   formState: TagFormState;
   examTypes: Array<{id: string; name?: string}>;
-  parentOptions: Array<{tagId: string; name?: string}>;
+  examParts: Array<{examPartId: string; name?: string}>;
   onChangeField: (field: keyof TagFormState, value: string | number | null) => void;
   onClose: () => void;
   onSubmit: () => void;
@@ -27,7 +27,7 @@ function TagFormModal({
   isEditing,
   formState,
   examTypes,
-  parentOptions,
+  examParts,
   onChangeField,
   onClose,
   onSubmit,
@@ -66,26 +66,29 @@ function TagFormModal({
           </Form.Select>
         </Form.Group>
         <Form.Group className="mb-3">
+          <Form.Label>Phần thi</Form.Label>
+          <Form.Select
+            value={formState.examPartId || ''}
+            onChange={(e) => onChangeField('examPartId', e.target.value || null)}
+          >
+            <option value="">-- Dùng chung mọi phần thi --</option>
+            {examParts.map((p) => (
+              <option key={p.examPartId} value={p.examPartId}>
+                {p.name}
+              </option>
+            ))}
+          </Form.Select>
+          <Form.Text className="text-muted">
+            Câu hỏi chỉ gắn được tag cùng phần thi hoặc tag dùng chung.
+          </Form.Text>
+        </Form.Group>
+        <Form.Group className="mb-3">
           <Form.Label>Tên Tag</Form.Label>
           <Form.Control
             value={formState.name}
             onChange={(e) => onChangeField('name', e.target.value)}
             placeholder="VD: Ngữ pháp, Giới từ, AWS S3..."
           />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Tag cha (tuỳ chọn)</Form.Label>
-          <Form.Select
-            value={formState.parentId || ''}
-            onChange={(e) => onChangeField('parentId', e.target.value || null)}
-          >
-            <option value="">-- Không có (root) --</option>
-            {parentOptions.map((t) => (
-              <option key={t.tagId} value={t.tagId}>
-                {t.name}
-              </option>
-            ))}
-          </Form.Select>
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Thứ tự hiển thị</Form.Label>
@@ -105,7 +108,7 @@ function TagFormModal({
             }}
           />
           <Form.Text className="text-muted">
-            Trong cùng một domain, số nhỏ hơn được xếp trước. Để trống nếu chưa sắp.
+            Trong cùng một phần thi, số nhỏ hơn được xếp trước. Để trống nếu chưa sắp.
           </Form.Text>
         </Form.Group>
     </BaseModal>

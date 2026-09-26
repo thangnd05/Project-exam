@@ -3,7 +3,8 @@ import { MediaType, PassageType, QuestionType, QuestionUsageScope } from '@/app/
 export interface TagRequest {
   name?: string;
   examTypeId?: string;
-  parentId?: string;
+  /** null = tag dùng chung cho mọi phần thi */
+  examPartId?: string | null;
   sortOrder?: number | null;
 }
 
@@ -11,9 +12,9 @@ export interface TagResponse {
   tagId: string;
   name?: string;
   examTypeId?: string;
-  parentId?: string;
+  examPartId?: string | null;
+  examPartName?: string | null;
   sortOrder?: number;
-  children?: TagResponse[];
 }
 
 export interface AnswerRequest {

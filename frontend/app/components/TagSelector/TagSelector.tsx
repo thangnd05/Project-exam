@@ -5,9 +5,10 @@ import { Badge } from 'react-bootstrap';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from './TagSelector.module.scss';
-import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 const cx = classNames.bind(styles);
+
+const SHARED_PART_KEY = '__shared__';
 
 type TagSelectorProps = {
     tags?: any[];
@@ -16,30 +17,20 @@ type TagSelectorProps = {
     label?: string;
 };
 
-const isRoot = (tag: any, byId: Map<any, any>) => {
-    const pid = tag.parentId;
-    if (pid == null || pid === '') return true;
-
-    return !byId.has(pid);
-};
+type PartGroup = { key: string; name: string; tags: any[] };
 
 const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân loại' }: TagSelectorProps) => {
-    const { byId, childrenOf, roots, hasHierarchy } = useMemo(() => {
-        const map = new Map(tags.map((t) => [t.tagId, t]));
-        const children = new Map();
+    // Tag được nhóm theo phần thi; thứ tự nhóm theo thứ tự tag backend trả về.
+    const groups = useMemo(() => {
+        const map = new Map<string, PartGroup>();
         tags.forEach((t) => {
-            if (t.parentId && map.has(t.parentId)) {
-                if (!children.has(t.parentId)) children.set(t.parentId, []);
-                children.get(t.parentId).push(t);
+            const key = t.examPartId || SHARED_PART_KEY;
+            if (!map.has(key)) {
+                map.set(key, { key, name: t.examPartId ? t.examPartName || 'Phần thi' : 'Dùng chung', tags: [] });
             }
+            map.get(key)!.tags.push(t);
         });
-        const rootList = tags.filter((t) => isRoot(t, map));
-        return {
-            byId: map,
-            childrenOf: (id: any): any[] => children.get(id) || EMPTY_LIST,
-            roots: rootList,
-            hasHierarchy: children.size > 0,
-        };
+        return Array.from(map.values());
     }, [tags]);
 
     const [openOverride, setOpenOverride] = useState<Record<string, boolean>>({});
@@ -63,36 +54,19 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
         );
     };
 
-    const countSelectedDescendants = (tagId: any): number => {
-        let count = 0;
-        childrenOf(tagId).forEach((c) => {
-            if (selectedSet.has(c.tagId)) count += 1;
-            count += countSelectedDescendants(c.tagId);
-        });
-        return count;
-    };
-
-    const renderNode = (tag: any): React.ReactNode => {
-        const kids = childrenOf(tag.tagId);
-        if (kids.length === 0) {
-            return <Chip key={tag.tagId} tag={tag} />;
-        }
-        const selCount = countSelectedDescendants(tag.tagId);
-
-        const open =
-            openOverride[tag.tagId] !== undefined ? openOverride[tag.tagId] : true;
+    const renderGroup = (group: PartGroup) => {
+        const selCount = group.tags.filter((t) => selectedSet.has(t.tagId)).length;
+        const open = openOverride[group.key] !== undefined ? openOverride[group.key] : true;
         return (
-            <div key={tag.tagId} className={cx('group')}>
+            <div key={group.key} className={cx('group')}>
                 <button
                     type="button"
                     className={cx('groupHeader')}
-                    onClick={() =>
-                        setOpenOverride((prev) => ({ ...prev, [tag.tagId]: !open }))
-                    }
+                    onClick={() => setOpenOverride((prev) => ({ ...prev, [group.key]: !open }))}
                     aria-expanded={open}
                 >
                     {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                    <span className={cx('groupName')}>{tag.name}</span>
+                    <span className={cx('groupName')}>{group.name}</span>
                     {selCount > 0 && (
                         <Badge bg="primary" pill className="ms-1">
                             {selCount}
@@ -101,7 +75,7 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
                 </button>
                 {open && (
                     <div className={cx('groupBody')}>
-                        {kids.map((child) => renderNode(child))}
+                        {group.tags.map((tag) => <Chip key={tag.tagId} tag={tag} />)}
                     </div>
                 )}
             </div>
@@ -111,8 +85,8 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
     return (
         <div className="mb-2">
             {label && <label className="fw-bold mb-1 d-block">{label}</label>}
-            {hasHierarchy ? (
-                <div className={cx('groupList')}>{roots.map((r) => renderNode(r))}</div>
+            {groups.length > 1 ? (
+                <div className={cx('groupList')}>{groups.map(renderGroup)}</div>
             ) : (
                 <div className="d-flex flex-wrap gap-2">
                     {tags.map((tag) => (
