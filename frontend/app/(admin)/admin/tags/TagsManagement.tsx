@@ -16,6 +16,14 @@ const cx = classNames.bind(styles);
 
 const emptyForm: TagFormState = {name: '', parentId: null, examTypeId: '', sortOrder: null};
 
+function nextSortOrder(tags: AdminTag[], parentId: string | null): number {
+  const max = tags.reduce((highest, tag) => {
+    if ((tag.parentId || null) !== parentId || tag.sortOrder == null) return highest;
+    return Math.max(highest, tag.sortOrder);
+  }, 0);
+  return max + 1;
+}
+
 type TagTreeNodeProps = {
   tag: AdminTag;
   flatTags: AdminTag[];
@@ -56,6 +64,9 @@ function TagTreeNode({tag, flatTags, level, expandedIds, toggleExpand, onEdit, o
           )}
           <span className={cx('tagName', {root: level === 0})}>
             {tag.name}
+          </span>
+          <span className={cx('sortOrder')} title="Thứ tự hiển thị">
+            {tag.sortOrder ?? '—'}
           </span>
           {hasChildren && (
             <span className={cx('childCount')}>{tag.children!.length}</span>
@@ -189,18 +200,25 @@ function TagsManagement() {
   };
 
   const openCreateModal = () => {
-    resetForm();
-    setFormState((prev) => ({...prev, examTypeId: selectedExamTypeId}));
+    setEditingTagId(null);
+    setErrorMessage('');
+    setFormState({
+      name: '',
+      parentId: null,
+      examTypeId: selectedExamTypeId,
+      sortOrder: nextSortOrder(flatTags, null),
+    });
     setShowFormModal(true);
   };
 
   const openCreateChildModal = (parentTag: AdminTag) => {
-    resetForm();
+    setEditingTagId(null);
+    setErrorMessage('');
     setFormState({
       name: '',
       parentId: parentTag.tagId,
       examTypeId: parentTag.examTypeId || selectedExamTypeId,
-      sortOrder: null,
+      sortOrder: nextSortOrder(flatTags, parentTag.tagId),
     });
     setShowFormModal(true);
   };

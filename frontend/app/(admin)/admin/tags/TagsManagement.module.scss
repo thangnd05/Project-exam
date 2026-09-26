@@ -114,6 +114,18 @@
   }
 }
 
+.sortOrder {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  background: var(--brand-50);
+  padding: 0.1rem 0.7rem;
+  border-radius: 1rem;
+  flex-shrink: 0;
+  min-width: 2.4rem;
+  text-align: center;
+}
+
 .childCount {
   font-size: 1.2rem;
   color: var(--gray-400);

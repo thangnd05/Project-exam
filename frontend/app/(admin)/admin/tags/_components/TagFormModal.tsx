@@ -87,6 +87,27 @@ function TagFormModal({
             ))}
           </Form.Select>
         </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Thứ tự hiển thị</Form.Label>
+          <Form.Control
+            type="number"
+            min={0}
+            value={formState.sortOrder ?? ''}
+            placeholder="Số nhỏ hơn hiện trước"
+            onChange={(event) => {
+              const raw = event.target.value;
+              if (raw === '') {
+                onChangeField('sortOrder', null);
+                return;
+              }
+              const parsed = Number(raw);
+              onChangeField('sortOrder', Number.isFinite(parsed) ? parsed : null);
+            }}
+          />
+          <Form.Text className="text-muted">
+            Trong cùng một domain, số nhỏ hơn được xếp trước. Để trống nếu chưa sắp.
+          </Form.Text>
+        </Form.Group>
     </BaseModal>
   );
 }

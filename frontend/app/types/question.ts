@@ -4,7 +4,7 @@ export interface TagRequest {
   name?: string;
   examTypeId?: string;
   parentId?: string;
-  sortOrder?: number;
+  sortOrder?: number | null;
 }
 
 export interface TagResponse {
