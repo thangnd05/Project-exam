@@ -106,7 +106,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
   const quillFormats = [
     'header',
     'bold', 'italic', 'underline', 'strike', 'blockquote',
-    'list', 'bullet',
+    'list',
     'link', 'image', 'code-block',
   ];
 

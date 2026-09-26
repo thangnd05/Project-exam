@@ -44,7 +44,7 @@ const QUILL_FORMATS = [
   'header', 'size',
   'bold', 'italic', 'underline', 'strike',
   'color', 'background',
-  'list', 'bullet', 'align',
+  'list', 'align',
   'link', 'blockquote',
 ];
 
