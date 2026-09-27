@@ -1,5 +1,6 @@
 'use client';
 
+import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
@@ -109,7 +110,7 @@ function TestByExamType() {
 
   const handleOpenTarget = () => {
     if (!user) {
-      router.push(routes.login);
+      router.push(buildLoginUrlFromHere());
       return;
     }
     router.push(`${routes.myTarget}?examTypeId=${examTypeId}`);

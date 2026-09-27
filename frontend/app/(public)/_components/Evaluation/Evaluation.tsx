@@ -1,5 +1,6 @@
 'use client';
 
+import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -11,7 +12,6 @@ import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import {toast} from 'react-toastify';
 import {useAuth} from '@/app/hooks/useAuth';
-import routes from '@/app/configs/Routes';
 import EvaluationModal from './modals/EvaluationModal';
 import {useEvaluations} from './hooks/useEvaluations';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
@@ -70,7 +70,7 @@ const Evaluation = () => {
   const handleWriteReviewClick = () => {
     if (!user) {
       toast.warning(' Bạn cần đăng nhập để gửi đánh giá!');
-      router.push(routes.login);
+      router.push(buildLoginUrlFromHere());
       return;
     }
     setShowModal(true);

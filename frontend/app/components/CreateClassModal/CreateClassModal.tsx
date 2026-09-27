@@ -1,5 +1,6 @@
 'use client';
 
+import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Alert } from 'react-bootstrap';
@@ -41,7 +42,7 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
 
       setTimeout(() => {
         onClose();
-        router.push(routes.login);
+        router.push(buildLoginUrlFromHere());
       }, 1200);
 
       return;

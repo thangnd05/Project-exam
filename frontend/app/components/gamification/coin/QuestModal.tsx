@@ -21,8 +21,10 @@ const cx = classNames.bind(styles);
 const CONDITION_ORDER: QuestConditionType[] = [
   QuestConditionType.NONE,
   QuestConditionType.COMPLETE_TEST,
+  QuestConditionType.SET_TARGET,
   QuestConditionType.STREAK_DAYS,
   QuestConditionType.CREATE_LEARNING_PLAN,
+  QuestConditionType.COMPLETE_PLAN_TASK,
   QuestConditionType.COMPLETE_LEARNING_PLAN,
 ];
 
@@ -33,7 +35,9 @@ type QuestGroup = {
 };
 
 const groupTitle = (quest: UserQuestResponse) =>
-  quest.conditionType === QuestConditionType.NONE ? 'Nhiệm vụ chung' : quest.conditionLabel;
+  quest.conditionType === QuestConditionType.NONE
+    ? 'Nhiệm vụ chung'
+    : quest.conditionLabel;
 
 function groupByCondition(quests: UserQuestResponse[]): QuestGroup[] {
   const groups = new Map<UserQuestResponse['conditionType'], QuestGroup>();
@@ -60,10 +64,7 @@ function QuestModal({show, onClose}: QuestModalProps) {
   const claimMutation = useClaimQuest();
   const claimingId = claimMutation.isPending ? claimMutation.variables : null;
 
-  const {
-    data: quests = [],
-    isLoading: loading,
-  } = useQuery({
+  const {data: quests = [], isLoading: loading} = useQuery({
     queryKey: QUESTS_QUERY_KEY,
     queryFn: getMyQuests,
     enabled: show,
@@ -77,7 +78,8 @@ function QuestModal({show, onClose}: QuestModalProps) {
       },
       onError: (error) => {
         toast.error(
-          error?.response?.data?.message || 'Không thể nhận nhiệm vụ. Vui lòng thử lại.',
+          error?.response?.data?.message ||
+            'Không thể nhận nhiệm vụ. Vui lòng thử lại.',
         );
       },
     });
@@ -103,7 +105,9 @@ function QuestModal({show, onClose}: QuestModalProps) {
       );
     }
     if (quests.length === 0) {
-      return <div className={cx('placeholder')}>Hiện chưa có nhiệm vụ nào.</div>;
+      return (
+        <div className={cx('placeholder')}>Hiện chưa có nhiệm vụ nào.</div>
+      );
     }
     return (
       <div className={cx('groups')}>
@@ -118,9 +122,13 @@ function QuestModal({show, onClose}: QuestModalProps) {
   };
 
   const renderQuestCard = (quest: UserQuestResponse) => {
-    const hasTarget = quest.conditionType !== QuestConditionType.NONE && quest.target! > 0;
+    const hasTarget =
+      quest.conditionType !== QuestConditionType.NONE && quest.target! > 0;
     const progressPct = hasTarget
-      ? Math.min(100, Math.round((quest.currentProgress! / quest.target!) * 100))
+      ? Math.min(
+          100,
+          Math.round((quest.currentProgress! / quest.target!) * 100),
+        )
       : 100;
 
     return (
@@ -138,7 +146,10 @@ function QuestModal({show, onClose}: QuestModalProps) {
         {hasTarget && (
           <div className={cx('progress')}>
             <div className={cx('progressBar')}>
-              <div className={cx('progressFill')} style={{width: `${progressPct}%`}} />
+              <div
+                className={cx('progressFill')}
+                style={{width: `${progressPct}%`}}
+              />
             </div>
             <span className={cx('progressText')}>
               {quest.conditionLabel}: {quest.currentProgress}/{quest.target}

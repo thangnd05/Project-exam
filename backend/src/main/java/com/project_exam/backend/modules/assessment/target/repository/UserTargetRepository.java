@@ -14,4 +14,6 @@ public interface UserTargetRepository extends JpaRepository<UserTarget, String> 
 
     /** Mọi mục tiêu của user  dùng khi dựng danh sách plan nhiều kỳ thi (tránh query từng plan). */
     List<UserTarget> findByUserId(String userId);
+
+    long countByUserId(String userId);
 }

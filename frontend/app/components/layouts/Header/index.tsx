@@ -14,11 +14,13 @@ import classNames from 'classnames/bind';
 import {useAuth} from '@/app/hooks/useAuth';
 import {name} from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
+import {buildLoginUrl} from '@/app/utils/authRedirect';
 // import JoinClassModal from '@/app/components/JoinClassModal/JoinClassModal';
 // import CreateClassModal from '@/app/components/CreateClassModal/CreateClassModal';
 import CreateTestModal from '@/app/components/tests/CreateTestModal';
 import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
+import FirstTimeHint from '@/app/components/gamification/onboarding/FirstTimeHint';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import {useCosmetics} from '@/app/hooks/useCosmetics';
 
@@ -68,6 +70,23 @@ function Header() {
   //   clearClassMenuTimer();
   //   setShowClassMenu(nextShow);
   // };
+
+  const statsWithHint = (
+    <FirstTimeHint
+      hintKey="streak-coins"
+      enabled={Boolean(user)}
+      title="Chuỗi ngày học và xu"
+      body={
+        <>
+          <p>🔥 Chuỗi tăng mỗi ngày bạn làm bài hoặc học một nhiệm vụ trong lộ trình. Bỏ một ngày là chuỗi về 0.</p>
+          <p>🪙 Hoàn thành nhiệm vụ để nhận xu, dùng xu đổi khung và huy hiệu cho avatar. Bấm vào số xu để xem nhiệm vụ, chấm đỏ nghĩa là có thưởng chưa nhận.</p>
+        </>
+      }
+    >
+      <StreakBadge variant="onDark" />
+      <CoinQuestMenu variant="onDark" />
+    </FirstTimeHint>
+  );
 
   const handleLogout = async () => {
     await logout();
@@ -151,6 +170,14 @@ function Header() {
                 Tài liệu
               </Link>
               <Link
+                href={routes.posts}
+                className={cx('home', {
+                  active: pathname === routes.posts || pathname.startsWith('/posts/'),
+                })}
+              >
+                Bài viết
+              </Link>
+              <Link
                 href={routes.myTarget}
                 className={cx('home', {active: pathname === routes.myTarget})}
               >
@@ -212,8 +239,7 @@ function Header() {
             {user && (
               <div className={cx('mobileHeaderActions')}>
                 <div className={cx('statsCluster')}>
-                  <StreakBadge variant="onDark" />
-                  <CoinQuestMenu variant="onDark" />
+                  {statsWithHint}
                 </div>
               </div>
             )}
@@ -221,10 +247,10 @@ function Header() {
             <div className={cx('desktopUtils')}>
               {!user ? (
                 <div className={cx('authLinks')}>
-                  <Link href={`${routes.login}?mode=signin`} className={cx('home')}>
+                  <Link href={buildLoginUrl(pathname === routes.home ? null : pathname, {mode: 'signin'})} className={cx('home')}>
                     Đăng nhập
                   </Link>
-                  <Link href={`${routes.login}?mode=signup`} className={cx('home')}>
+                  <Link href={buildLoginUrl(pathname === routes.home ? null : pathname, {mode: 'signup'})} className={cx('home')}>
                     Đăng ký
                   </Link>
                 </div>
@@ -242,8 +268,7 @@ function Header() {
                     </div>
                   )}
                   <div className={cx('statsCluster')}>
-                    <StreakBadge variant="onDark" />
-                    <CoinQuestMenu variant="onDark" />
+                    {statsWithHint}
                   </div>
                   <Dropdown>
                     <Dropdown.Toggle

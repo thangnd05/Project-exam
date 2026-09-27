@@ -1,7 +1,19 @@
 .trigger {
+  position: relative;
   border: none;
   background: transparent;
   padding: 0;
   cursor: pointer;
   display: inline-flex;
+}
+
+.dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 0 2px var(--slate-900);
 }

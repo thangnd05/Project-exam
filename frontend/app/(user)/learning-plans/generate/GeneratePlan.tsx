@@ -9,6 +9,7 @@ import LearningPlanList from './_components/LearningPlanList';
 import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
 import { isPracticeAttempt } from '@/app/utils/planLabels';
 import { getLearnerLevel } from '@/app/utils/learnerLevel';
+import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import type { PlanResponse } from '@/app/types';
 import {
@@ -233,7 +234,13 @@ function GeneratePlan() {
             )}
           </span>
           <Link
-            href={`/my-target?examTypeId=${encodeURIComponent(sourceExamTypeId)}`}
+            href={`/my-target?${new URLSearchParams({
+              examTypeId: sourceExamTypeId,
+              next: `${routes.generatePlan}?${new URLSearchParams({
+                examTypeId: sourceExamTypeId,
+                ...(userTestId ? { userTestId } : {}),
+              }).toString()}`,
+            }).toString()}`}
             className={cx('btn', 'btnPrimary', 'btnSm')}
           >
             Đặt mục tiêu
@@ -300,11 +307,15 @@ function GeneratePlan() {
                 <div className={cx('muted')}>Đang tải danh sách bài thi...</div>
               ) : userTests.length === 0 ? (
                 <div className={cx('alert', 'alertWarning')}>
-                  Bạn chưa có bài thi nào đã hoàn thành. Hãy làm một bài thử thách nhanh hoặc thi thử trước.
+                  Bạn chưa có bài thi nào đã hoàn thành. Hãy làm một bài thử thách nhanh hoặc thi thử trước.{' '}
+                  <Link href={sourceExamTypeId ? buildExamTypeDetailPath(sourceExamTypeId) : routes.examTypes}>
+                    Chọn bài để làm
+                  </Link>
                 </div>
               ) : filteredUserTests.length === 0 ? (
                 <div className={cx('alert', 'alertWarning')}>
-                  Chưa có bài hoàn thành cho loại kỳ thi này. Hãy làm bài thi thử thuộc &quot;{sourceExamTypeName || 'kỳ thi đã chọn'}&quot; hoặc đổi loại kỳ thi.
+                  Chưa có bài hoàn thành cho loại kỳ thi này. Hãy làm bài thi thử thuộc &quot;{sourceExamTypeName || 'kỳ thi đã chọn'}&quot; hoặc đổi loại kỳ thi.{' '}
+                  <Link href={buildExamTypeDetailPath(sourceExamTypeId)}>Xem đề thi</Link>
                 </div>
               ) : (
                 <select

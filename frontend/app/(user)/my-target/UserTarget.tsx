@@ -1,6 +1,6 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
@@ -23,6 +23,7 @@ const planCx = classNamesBind.bind(planStyles);
 
 function UserTarget() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [targetScore, setTargetScore] = useState('');
   const [customParts, setCustomParts] = useState<Record<string, number>>({});
@@ -135,12 +136,16 @@ function UserTarget() {
       },
       {
         onSuccess: () => {
-          toast.success(
-            isUpdate
-              ? 'Đã cập nhật mục tiêu. Lộ trình đang chạy sẽ hiện nút "Cập nhật theo mục tiêu mới"  bấm là xong, không cần thi lại.'
-              : 'Đã lưu mục tiêu! Sang tab "Lập kế hoạch" để sinh lộ trình.',
-          );
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+          if (isUpdate) {
+            toast.success(
+              'Đã cập nhật mục tiêu. Lộ trình đang chạy sẽ hiện nút "Cập nhật theo mục tiêu mới"  bấm là xong, không cần thi lại.',
+            );
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+          }
+          // Mục tiêu đầu tiên: đi thẳng sang bước sinh lộ trình thay vì bắt người dùng tự tìm tab.
+          toast.success('Đã lưu mục tiêu! Giờ cùng sinh lộ trình học nhé.');
+          router.push(nextAfterTarget);
         },
         onError: () => toast.error('Lỗi khi lưu mục tiêu.'),
       },

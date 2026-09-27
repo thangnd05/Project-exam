@@ -1,0 +1,42 @@
+.target {
+  display: inline-flex;
+  align-items: center;
+  gap: inherit;
+}
+
+.popover {
+  max-width: 300px;
+  border: none;
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  font-size: 1.35rem;
+}
+
+.title {
+  margin: 0 0 6px;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.body {
+  line-height: 1.5;
+  color: var(--slate-600);
+
+  p {
+    margin: 0 0 6px;
+  }
+}
+
+.okBtn {
+  display: block;
+  margin: 10px 0 0 auto;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary-btn-bg);
+  color: var(--primary-btn-fg);
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+}

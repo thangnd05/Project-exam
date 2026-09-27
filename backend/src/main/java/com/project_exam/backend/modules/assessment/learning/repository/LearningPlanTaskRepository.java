@@ -4,6 +4,8 @@ import com.project_exam.backend.modules.assessment.learning.domain.LearningPlanT
 import com.project_exam.backend.modules.assessment.learning.domain.PlanTaskType;
 import com.project_exam.backend.modules.assessment.learning.domain.TaskStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,6 +29,14 @@ public interface LearningPlanTaskRepository extends JpaRepository<LearningPlanTa
             TaskStatus status);
 
     long countByLearningPlanIdAndStatus(String learningPlanId, TaskStatus status);
+
+    @Query("""
+            SELECT COUNT(t) FROM LearningPlanTask t, LearningPlan p
+            WHERE t.learningPlanId = p.learningPlanId
+              AND p.userId = :userId
+              AND t.status = :status
+            """)
+    long countByUserIdAndStatus(@Param("userId") String userId, @Param("status") TaskStatus status);
 
     List<LearningPlanTask> findByLearningPlanIdAndStatusOrderByTaskOrderAsc(
             String learningPlanId, TaskStatus status);

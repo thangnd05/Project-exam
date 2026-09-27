@@ -1,5 +1,6 @@
 'use client';
 
+import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
@@ -68,7 +69,7 @@ function MyTest() {
 
   useEffect(() => {
     if (!user) {
-      router.push('/login');
+      router.push(buildLoginUrlFromHere());
     }
   }, [user, router]);
 

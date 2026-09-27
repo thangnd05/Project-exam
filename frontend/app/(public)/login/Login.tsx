@@ -125,10 +125,22 @@ function Login() {
         recaptchaToken,
       });
 
-      setMessage(data.message || 'Đăng ký thành công! Bạn có thể đăng nhập ngay.');
-      setMessageType('success');
-      toast.success('Đăng ký thành công! Đăng nhập để bắt đầu nhé.');
-      setIsSignUp(false);
+      try {
+        const userData = await loginMutation.mutateAsync({
+          identifier: regEmail,
+          password: regPassword,
+        });
+        if (!userData?.id) throw new Error('User data invalid');
+        await claimGuestAfterLogin();
+        login(userData);
+        toast.success('Chào mừng bạn đến với WinDe!');
+      } catch {
+        setMessage(data.message || 'Đăng ký thành công! Bạn có thể đăng nhập ngay.');
+        setMessageType('success');
+        toast.success('Đăng ký thành công! Đăng nhập để bắt đầu nhé.');
+        setLoginIdentifier(regEmail);
+        setIsSignUp(false);
+      }
     } catch (err: any) {
       const errorMessage =
         err.response?.data?.message ||

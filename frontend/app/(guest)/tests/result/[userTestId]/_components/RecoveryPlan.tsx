@@ -5,6 +5,7 @@ import { IoCalendarOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import routes from '@/app/configs/Routes';
 import { buildRecoveryMessage } from '@/app/utils/readiness-label';
+import { buildGuestSignupUrl } from '@/app/utils/authRedirect';
 import styles from './Result.module.scss';
 
 const cx = classNames.bind(styles);
@@ -37,7 +38,9 @@ function RecoveryPlan({
   const canCreateTarget = !isGuest && !hasTarget && Boolean(examTypeId);
   const canCreatePlan = !isGuest && hasTarget && !isTargetMet;
 
-  if (!recoveryMessage && !canCreateTarget && !canCreatePlan) return null;
+  const canSignUp = Boolean(isGuest && userTestId);
+
+  if (!recoveryMessage && !canCreateTarget && !canCreatePlan && !canSignUp) return null;
 
   const handleGoToTarget = () => {
     const params = new URLSearchParams();
@@ -68,6 +71,16 @@ function RecoveryPlan({
           onClick={handleGoToTarget}
         >
           Đặt mục tiêu
+        </button>
+      )}
+      {canSignUp && (
+        <button
+          type="button"
+          className={cx('recoveryPlanCta')}
+          onClick={() => router.push(buildGuestSignupUrl(`/tests/result/${userTestId}`))}
+        >
+          <IoCalendarOutline size={20} aria-hidden />
+          Đăng ký để nhận lộ trình học
         </button>
       )}
       {canCreatePlan && (

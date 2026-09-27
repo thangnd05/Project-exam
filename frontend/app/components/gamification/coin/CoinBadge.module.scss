@@ -11,7 +11,7 @@
   font-weight: 700;
   font-size: var(--font-size-md);
   user-select: none;
-  cursor: default;
+  cursor: pointer;
   box-shadow: none;
   transition:
     background 0.2s ease,
@@ -28,11 +28,20 @@
     letter-spacing: 0.01em;
   }
 
+  &:hover {
+    background: rgb(var(--brand-500-rgb) / 0.16);
+  }
+
   &.onDark {
     background: rgb(255 255 255 / 0.08);
     border-color: rgb(255 255 255 / 0.12);
     color: var(--brand-200);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+
+    &:hover {
+      background: rgb(255 255 255 / 0.16);
+      border-color: rgb(255 255 255 / 0.22);
+    }
   }
 }

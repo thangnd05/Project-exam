@@ -25,6 +25,8 @@ const CONDITION_TYPES = [
   {value: QuestConditionType.STREAK_DAYS, label: 'Đạt chuỗi ngày học'},
   {value: QuestConditionType.CREATE_LEARNING_PLAN, label: 'Tạo lộ trình học'},
   {value: QuestConditionType.COMPLETE_LEARNING_PLAN, label: 'Hoàn thành lộ trình học'},
+  {value: QuestConditionType.SET_TARGET, label: 'Đặt mục tiêu'},
+  {value: QuestConditionType.COMPLETE_PLAN_TASK, label: 'Hoàn thành nhiệm vụ trong lộ trình'},
 ];
 
 interface QuestFormState {

@@ -1,5 +1,6 @@
 'use client';
 
+import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 
@@ -7,7 +8,6 @@ import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { FaEdit, FaImage, FaTag } from 'react-icons/fa';
 import { useAuth } from '@/app/hooks/useAuth';
-import routes from '@/app/configs/Routes';
 import type { CategoryResponse, PostResponse } from '@/app/types';
 import RichTextEditor, { type RichTextEditorHandle } from '@/app/components/RichTextEditor/RichTextEditor';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
@@ -115,7 +115,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
       toast.warning(' Bạn cần đăng nhập trước khi đăng bài viết!');
       setTimeout(() => {
         onClose();
-        router.push(routes.login);
+        router.push(buildLoginUrlFromHere());
       }, 1200);
       return;
     }

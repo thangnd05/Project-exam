@@ -21,6 +21,7 @@ import { getScoreScale } from "@/app/utils/scoreScale";
 import { useTestResult } from "./_hooks/useTestResult";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";
 import CertificateBanner from "./_components/CertificateBanner";
+import GuestSaveBanner from "./_components/GuestSaveBanner";
 import ReadinessGauge from "./_components/ReadinessGauge";
 import RecoveryPlan from "./_components/RecoveryPlan";
 import TagAnalysisTable from "./_components/TagAnalysisTable";
@@ -99,6 +100,7 @@ const TestResult = () => {
     <div className={cx("wrapper")}>
       <Container>
 
+        {isGuest && <GuestSaveBanner userTestId={userTestId} />}
         <CertificateBanner userTestId={userTestId} enabled={!authLoading && isAuthenticated} />
 
         <div className={cx("result-layout")}>
@@ -188,12 +190,14 @@ const TestResult = () => {
                 Xem đáp án & giải thích
               </ButtonPrime>
 
-              <ButtonPrime
-                variant="ghost"
-                onClick={() => router.push(`/tests/history/${testId}`)}
-              >
-                <IoSchoolOutline /> Lịch sử bài thi
-              </ButtonPrime>
+              {!isGuest && (
+                <ButtonPrime
+                  variant="ghost"
+                  onClick={() => router.push(`/tests/history/${testId}`)}
+                >
+                  <IoSchoolOutline /> Lịch sử bài thi
+                </ButtonPrime>
+              )}
 
               <ButtonPrime variant="primary" onClick={() => router.push("/")}>
                 <IoHomeOutline /> Trang chủ
