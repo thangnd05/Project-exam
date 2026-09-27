@@ -16,7 +16,6 @@ import com.project_exam.backend.modules.assessment.test.repository.TestRepositor
 import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +23,6 @@ import com.project_exam.backend.shared.util.AppTime;
 
 import java.time.*;
 import java.time.format.TextStyle;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,26 +49,18 @@ public class DashboardService {
         );
     }
 
-    private static final long SESSION_GAP_MINUTES = 30;
-
-    private static final long SESSION_GAP_SECONDS = SESSION_GAP_MINUTES * 60;
+    private static final int TOP_COUNTRIES_LIMIT = 50;
 
     private Traffic buildTraffic(LocalDate today) {
         LocalDateTime todayStart = today.atStartOfDay();
-        LocalDate weekStartDate = today.minusDays(6);
-        LocalDateTime weekStart = weekStartDate.atStartOfDay();
+        LocalDateTime weekStart = today.minusDays(6).atStartOfDay();
+        LocalDateTime tomorrowStart = today.plusDays(1).atStartOfDay();
 
-        List<SessionStart> sessions = computeSessionStarts(today.minusDays(8).atStartOfDay());
-
-        long visitsToday = sessions.stream()
-                .filter(s -> !s.time().isBefore(todayStart)).count();
+        long visitsToday = pageVisitRepository.countByCreatedAtGreaterThanEqual(AppTime.instant(todayStart));
 
         List<DayHours> heatmap = buildHeatmap(today);
 
-        List<CountryTraffic> topCountries = pageVisitRepository.findTopCountriesSince(AppTime.instant(weekStart), PageRequest.of(0, 50))
-                .stream()
-                .map(row -> new CountryTraffic((String) row[0], (String) row[1], ((Number) row[2]).longValue()))
-                .collect(Collectors.toList());
+        List<CountryTraffic> topCountries = topCountriesBetween(weekStart, tomorrowStart);
 
         return new Traffic(
                 visitsToday,
@@ -79,35 +69,33 @@ public class DashboardService {
         );
     }
 
-    private List<SessionStart> computeSessionStarts(LocalDateTime from) {
-        return sessionStartsFromRows(pageVisitRepository.findSessionRowsSince(AppTime.instant(from)));
+    private List<CountryTraffic> countryCountsBetween(LocalDateTime from, LocalDateTime to) {
+        return pageVisitRepository.countByCountryBetween(AppTime.instant(from), AppTime.instant(to))
+                .stream()
+                .map(row -> new CountryTraffic((String) row[0],
+                        row[1] != null ? (String) row[1] : (String) row[0],
+                        ((Number) row[2]).longValue()))
+                .collect(Collectors.toList());
     }
 
-    private List<SessionStart> sessionStartsFromRows(List<Object[]> rows) {
-        List<SessionStart> starts = new ArrayList<>();
-        String prevKey = null;
-        LocalDateTime prevTime = null;
-        for (Object[] row : rows) {
-            String key = (String) row[0];
-            LocalDateTime ts = AppTime.local((Instant) row[1]);
-            String userId = (String) row[2];
-
-            boolean newSession = key == null
-                    || !java.util.Objects.equals(key, prevKey)
-                    || prevTime == null
-                    || ChronoUnit.SECONDS.between(prevTime, ts) > SESSION_GAP_SECONDS;
-            if (newSession) {
-                starts.add(new SessionStart(ts, userId));
-            }
-            prevKey = key;
-            prevTime = ts;
-        }
-        return starts;
+    private List<CountryTraffic> topCountries(List<CountryTraffic> counts) {
+        return counts.stream()
+                .sorted(Comparator.comparingLong(CountryTraffic::getValue).reversed()
+                        .thenComparing(CountryTraffic::getName))
+                .limit(TOP_COUNTRIES_LIMIT)
+                .collect(Collectors.toList());
     }
 
-    private record SessionStart(LocalDateTime time, String userId) {}
+    private List<CountryTraffic> topCountriesBetween(LocalDateTime from, LocalDateTime to) {
+        return topCountries(countryCountsBetween(from, to));
+    }
 
-    private static final int TOP_COUNTRIES_LIMIT = 50;
+    private List<LocalDateTime> visitTimesBetween(LocalDateTime from, LocalDateTime to) {
+        return pageVisitRepository.findCreatedAtBetween(AppTime.instant(from), AppTime.instant(to))
+                .stream()
+                .map(AppTime::local)
+                .collect(Collectors.toList());
+    }
 
     @Transactional(readOnly = true)
     public TrafficLocationsResponse getTrafficLocations(YearMonth monthParam) {
@@ -125,44 +113,11 @@ public class DashboardService {
         LocalDateTime monthStart = month.atDay(1).atStartOfDay();
         LocalDateTime monthEnd = month.plusMonths(1).atDay(1).atStartOfDay();
 
-        List<Object[]> rows = pageVisitRepository.findLocationRowsBetween(
-                AppTime.instant(monthStart.minusDays(1)), AppTime.instant(monthEnd));
-
-        Map<String, long[]> countByCode = new HashMap<>();
-        Map<String, String> nameByCode = new HashMap<>();
-
-        String prevKey = null;
-        LocalDateTime prevTime = null;
-        for (Object[] row : rows) {
-            String key = (String) row[0];
-            LocalDateTime ts = AppTime.local((Instant) row[1]);
-            String code = (String) row[2];
-            String name = (String) row[3];
-
-            boolean newSession = key == null
-                    || !Objects.equals(key, prevKey)
-                    || prevTime == null
-                    || ChronoUnit.SECONDS.between(prevTime, ts) > SESSION_GAP_SECONDS;
-            prevKey = key;
-            prevTime = ts;
-
-            if (!newSession || ts.isBefore(monthStart) || code == null || "LO".equals(code)) continue;
-
-            countByCode.computeIfAbsent(code, k -> new long[1])[0]++;
-            if (name != null) nameByCode.putIfAbsent(code, name);
-        }
-
-        List<CountryTraffic> topCountries = countByCode.entrySet().stream()
-                .map(e -> new CountryTraffic(e.getKey(), nameByCode.getOrDefault(e.getKey(), e.getKey()), e.getValue()[0]))
-                .sorted(Comparator.comparingLong(CountryTraffic::getValue).reversed()
-                        .thenComparing(CountryTraffic::getName))
-                .limit(TOP_COUNTRIES_LIMIT)
-                .collect(Collectors.toList());
-
-        long totalVisits = countByCode.values().stream().mapToLong(v -> v[0]).sum();
+        List<CountryTraffic> counts = countryCountsBetween(monthStart, monthEnd);
+        long totalVisits = counts.stream().mapToLong(CountryTraffic::getValue).sum();
 
         return new TrafficLocationsResponse(
-                month.toString(), totalVisits, availableMonths, topCountries);
+                month.toString(), totalVisits, availableMonths, topCountries(counts));
     }
 
     @Transactional(readOnly = true)
@@ -176,17 +131,13 @@ public class DashboardService {
     private List<DayHours> buildHeatmap(LocalDate endDate) {
         LocalDate startDate = endDate.minusDays(6);
 
-        LocalDateTime scanFrom = startDate.minusDays(1).atStartOfDay();
-        LocalDateTime scanTo = endDate.plusDays(1).atStartOfDay();
-
         Map<LocalDate, long[]> heatBuckets = new LinkedHashMap<>();
         for (int i = 0; i < 7; i++) {
             heatBuckets.put(startDate.plusDays(i), new long[24]);
         }
-        for (SessionStart s : sessionStartsFromRows(
-                pageVisitRepository.findSessionRowsBetween(AppTime.instant(scanFrom), AppTime.instant(scanTo)))) {
-            long[] hrs = heatBuckets.get(s.time().toLocalDate());
-            if (hrs != null) hrs[s.time().getHour()]++;
+        for (LocalDateTime t : visitTimesBetween(startDate.atStartOfDay(), endDate.plusDays(1).atStartOfDay())) {
+            long[] hrs = heatBuckets.get(t.toLocalDate());
+            if (hrs != null) hrs[t.getHour()]++;
         }
 
         List<DayHours> heatmap = new ArrayList<>();
@@ -245,11 +196,10 @@ public class DashboardService {
 
         long[] visits = new long[12];
         long[][] hourHistogram = new long[12][24];
-        for (SessionStart s : computeSessionStarts(yearStart)) {
-            if (s.time().getYear() != year) continue;
-            int m = s.time().getMonthValue() - 1;
+        for (LocalDateTime t : visitTimesBetween(yearStart, yearStart.plusYears(1))) {
+            int m = t.getMonthValue() - 1;
             visits[m]++;
-            hourHistogram[m][s.time().getHour()]++;
+            hourHistogram[m][t.getHour()]++;
         }
 
         List<MonthPerformance> months = new ArrayList<>();

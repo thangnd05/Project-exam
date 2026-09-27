@@ -17,6 +17,9 @@ public class VisitTrackingService {
 
     private static final int MAX_PATH_LENGTH = 255;
 
+    // Khớp với SESSION_GAP_MS ở FE (VisitTracker): trong khoảng này cùng session_key không tính thêm lượt.
+    private static final Duration SESSION_GAP = Duration.ofMinutes(30);
+
     private final PageVisitRepository pageVisitRepository;
     private final GeoIpService geoIpService;
 
@@ -25,10 +28,15 @@ public class VisitTrackingService {
         if (!StringUtils.hasText(path)) {
             return;
         }
+        String key = trim(sessionKey, 64);
+        if (StringUtils.hasText(key)
+                && pageVisitRepository.existsBySessionKeyAndCreatedAtAfter(key, Instant.now().minus(SESSION_GAP))) {
+            return;
+        }
         GeoIpService.Country country = geoIpService.resolve(ipAddress);
         pageVisitRepository.save(PageVisit.builder()
                 .path(trim(path, MAX_PATH_LENGTH))
-                .sessionKey(trim(sessionKey, 64))
+                .sessionKey(key)
                 .userId(userId)
                 .ipAddress(trim(ipAddress, 45))
                 .countryCode(country.code())
