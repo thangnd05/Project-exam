@@ -48,6 +48,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class TestCatalogService {
 
+    private static final String QUICK_CHALLENGE_CODE = "QUICK_CHALLENGE";
+
     private final TestRepository testRepository;
     private final TestPartRepository testPartRepository;
     private final AdminUserProvider adminUserProvider;
@@ -71,7 +73,7 @@ public class TestCatalogService {
     }
 
     public List<QuickChallengeCardResponse> getQuickChallengeTests() {
-        String categoryId = examCategoryRepository.findByCode("QUICK_CHALLENGE")
+        String categoryId = examCategoryRepository.findByCode(QUICK_CHALLENGE_CODE)
                 .map(ExamCategory::getExamCategoryId)
                 .orElse(null);
         if (categoryId == null) {
@@ -141,13 +143,17 @@ public class TestCatalogService {
         Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) return PageResponse.empty(safePage, safeSize);
 
-        Set<String> certificateCategoryIds = hasActiveCertificateTemplate(examTypeId)
-                ? certificateCategoryIds()
-                : Set.of();
-        Page<Test> testPage = certificateCategoryIds.isEmpty()
+        Set<String> excludedCategoryIds = new HashSet<>();
+        if (hasActiveCertificateTemplate(examTypeId)) {
+            excludedCategoryIds.addAll(certificateCategoryIds());
+        }
+        examCategoryRepository.findByCode(QUICK_CHALLENGE_CODE)
+                .map(ExamCategory::getExamCategoryId)
+                .ifPresent(excludedCategoryIds::add);
+        Page<Test> testPage = excludedCategoryIds.isEmpty()
                 ? testRepository.findByExamTypeIdAndClassIdIsNullAndCreatedByIn(examTypeId, adminIds, pageable)
                 : testRepository.findByExamTypeExcludingCategories(
-                        examTypeId, adminIds, certificateCategoryIds, pageable);
+                        examTypeId, adminIds, excludedCategoryIds, pageable);
 
         return summaryAssembler.toTestPageResponse(testPage, userId);
     }

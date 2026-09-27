@@ -7,7 +7,7 @@ import {motion} from 'framer-motion';
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
 import {getUserTarget} from '@/app/apis/userTargetApi';
 import {name as brandName} from '@/app/assets/images';
-import routes, {buildExamTypeDetailPath} from '@/app/configs/Routes';
+import routes from '@/app/configs/Routes';
 import {useAuth} from '@/app/hooks/useAuth';
 import {examTypeKeys} from '@/app/hooks/examTypeKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
@@ -95,14 +95,6 @@ function HeroSection() {
       startTest(test);
     },
     [startTest],
-  );
-
-  const exploreExam = useCallback(
-    (test: QuickChallengeCardResponse) => {
-      setPendingTest(null);
-      router.push(test.examTypeId ? buildExamTypeDetailPath(test.examTypeId) : routes.examTypes);
-    },
-    [router],
   );
 
   const startSyllabusPlan = useCallback(
@@ -290,7 +282,6 @@ function HeroSection() {
         test={pendingTest}
         onClose={closeConfirm}
         onConfirm={confirmStart}
-        onExploreExam={exploreExam}
         onStartSyllabusPlan={startSyllabusPlan}
       />
     </section>

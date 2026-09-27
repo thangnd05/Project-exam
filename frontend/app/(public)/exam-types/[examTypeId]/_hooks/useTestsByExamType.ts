@@ -4,14 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import { keepPreviousData } from '@/app/configs/queryClient';
 import {
   getTestsByExamType,
-  getTestCollectionsByExamType,
   getCertificateExamsByExamType,
 } from '@/app/apis/testApi';
 import { getExamTypeById, getExamTypeChildren } from '@/app/apis/examTypeApi';
 import type {
   CertificateExamListResponse,
   ExamTypeResponse,
-  TestCollectionResponse,
   TestResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
@@ -21,7 +19,6 @@ const PAGE_SIZE = 12;
 export const examTypeTestsKeys = {
   tests: (id?: string, page?: number) => ['examtype-tests', id, page],
   name: (id?: string) => ['examtype-name', id],
-  folders: (id?: string) => ['examtype-folders', id],
   children: (id?: string) => ['examtype-children', id],
   certificateExams: (id?: string) => ['examtype-certificate-exams', id],
 };
@@ -44,13 +41,6 @@ export function useTestsByExamType(examTypeId?: string, page = 0) {
     select: (data) => data?.name ?? '',
   });
 
-  const foldersQuery = useQuery({
-    queryKey: examTypeTestsKeys.folders(examTypeId),
-    queryFn: () => getTestCollectionsByExamType(examTypeId as string),
-    enabled: !!examTypeId,
-    select: normalizeArray<TestCollectionResponse>,
-  });
-
   const childrenQuery = useQuery({
     queryKey: examTypeTestsKeys.children(examTypeId),
     queryFn: () => getExamTypeChildren(examTypeId as string),
@@ -71,7 +61,6 @@ export function useTestsByExamType(examTypeId?: string, page = 0) {
     certificateExam: (certificateExamsQuery.data ?? null) as CertificateExamListResponse | null,
     totalPages: testsQuery.data?.totalPages ?? 0,
     examTypeName: nameQuery.data ?? '',
-    folders: foldersQuery.data ?? EMPTY_LIST,
     children: childrenQuery.data ?? EMPTY_LIST,
     isLoading: testsQuery.isLoading,
   };

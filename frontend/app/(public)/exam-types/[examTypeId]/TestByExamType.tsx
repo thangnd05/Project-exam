@@ -8,14 +8,13 @@ import classNames from 'classnames/bind';
 import { FaBullseye } from 'react-icons/fa';
 import {
   IoDocumentTextOutline,
-  IoFolderOpenOutline,
   IoChevronForward,
   IoSchoolOutline,
   IoRibbonOutline,
   IoChevronDown,
 } from 'react-icons/io5';
 import TestCard from '@/app/components/tests/TestCard/TestCard';
-import routes, { buildExamTypeCollectionPath, buildExamTypeDetailPath } from '@/app/configs/Routes';
+import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
 
 import style from './TestByExamType.module.scss';
@@ -34,7 +33,7 @@ function TestByExamType() {
   const [currentPage, setCurrentPage] = useState(0);
   const [certificateOpen, setCertificateOpen] = useState(false);
 
-  const { tests, totalPages, examTypeName, folders, children, certificateExam, isLoading } =
+  const { tests, totalPages, examTypeName, children, certificateExam, isLoading } =
     useTestsByExamType(examTypeId, currentPage);
 
   useEffect(() => {
@@ -119,7 +118,7 @@ function TestByExamType() {
   const emptyState = (
     <div className={cx('empty-state')}>
       <IoDocumentTextOutline className={cx('icon')} />
-      <h4>Bộ đề này hiện đang được soạn thảo</h4>
+      <h4>Chưa có đề thi nào</h4>
       <p className="text-muted">
         Vui lòng quay lại sau để trải nghiệm những thử thách mới.
       </p>
@@ -169,51 +168,17 @@ function TestByExamType() {
     </div>
   );
 
-  const folderSection = folders.length > 0 && (
-    <div className={cx('folder-section')}>
-      <div className={cx('folder-section-title')}>
-        <IoFolderOpenOutline /> Bộ đề
-      </div>
-      <div className={cx('folder-grid')}>
-        {folders.map((folder) => (
-          <button
-            key={folder.collectionId}
-            type="button"
-            className={cx('folder-card')}
-            onClick={() => router.push(buildExamTypeCollectionPath(examTypeId, folder.collectionId))}
-          >
-            <span className={cx('folder-card-icon')}>
-              <IoFolderOpenOutline />
-            </span>
-            <span className={cx('folder-card-body')}>
-              <span className={cx('folder-card-name')}>{folder.name}</span>
-              <span className={cx('folder-card-count')}>{folder.testCount} đề</span>
-            </span>
-            <IoChevronForward className={cx('folder-card-arrow')} />
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-
   return (
     <TestListContainer
       title={examTypeName || 'Loại bài tập'}
-      label="Khám phá bộ đề"
+      label="Danh sách đề thi"
       secondaryActionText="Mục tiêu của tôi"
       secondaryActionIcon={FaBullseye}
       onSecondaryAction={handleOpenTarget}
       tests={tests}
       countdowns={countdowns}
       emptyState={emptyState}
-      topSlot={
-        (certificateSection || folderSection) && (
-          <>
-            {certificateSection}
-            {folderSection}
-          </>
-        )
-      }
+      topSlot={certificateSection || undefined}
       footer={
         <Pagination
           currentPage={currentPage}
