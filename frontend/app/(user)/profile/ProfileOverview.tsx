@@ -153,6 +153,7 @@ function ProfileOverview() {
                 <div className={cx('avatarWrap')}>
                   <AvatarWithCosmetic
                     src={profileOverview.avatarUrl}
+                    name={profileOverview.userName || fullName}
                     alt={fullName}
                     size={110}
                     frame={cosmeticFrame}

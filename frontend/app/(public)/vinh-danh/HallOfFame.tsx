@@ -5,6 +5,7 @@ import {FaFire} from 'react-icons/fa6';
 import {Container} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 
+import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import routes from '@/app/configs/Routes';
 import {getFullMediaUrl} from '@/app/utils/mediaUrl';
@@ -15,13 +16,6 @@ import styles from './HallOfFame.module.scss';
 
 const cx = classNames.bind(styles);
 const PAGE_LIMIT = 100;
-
-const initials = (name: string) => {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return 'K';
-  if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
-  return `${parts[0].slice(0, 1)}${parts[parts.length - 1].slice(0, 1)}`.toUpperCase();
-};
 
 const formatDuration = (totalSeconds?: number | null) => {
   if (totalSeconds == null) return '—';
@@ -137,7 +131,6 @@ function HallOfFame() {
               </thead>
               <tbody>
                 {streakBoard.entries.map((entry) => {
-                  const avatar = getFullMediaUrl(entry.avatarUrl);
                   return (
                     <tr key={entry.rank} className={cx({podium: entry.rank <= 3})}>
                       <td data-label="Hạng">
@@ -145,13 +138,12 @@ function HallOfFame() {
                       </td>
                       <td data-label="Người học">
                         <span className={cx('person')}>
-                          {avatar ? (
-                            <img className={cx('avatar')} src={avatar} alt="" />
-                          ) : (
-                            <span className={cx('avatar', 'fallback')} aria-hidden="true">
-                              {initials(entry.displayName)}
-                            </span>
-                          )}
+                          <AvatarWithCosmetic
+                            src={getFullMediaUrl(entry.avatarUrl)}
+                            name={entry.userName || (/ui-avatars\.com/i.test(entry.avatarUrl || '') ? undefined : entry.displayName)}
+                            alt=""
+                            size={36}
+                          />
                           <span className={cx('name')}>{entry.displayName}</span>
                         </span>
                       </td>
@@ -186,7 +178,6 @@ function HallOfFame() {
               </thead>
               <tbody>
                 {examBoard.entries.map((entry) => {
-                  const avatar = getFullMediaUrl(entry.avatarUrl);
                   return (
                     <tr key={entry.rank} className={cx({podium: entry.rank <= 3})}>
                       <td data-label="Hạng">
@@ -194,13 +185,12 @@ function HallOfFame() {
                       </td>
                       <td data-label="Người làm">
                         <span className={cx('person')}>
-                          {avatar ? (
-                            <img className={cx('avatar')} src={avatar} alt="" />
-                          ) : (
-                            <span className={cx('avatar', 'fallback')} aria-hidden="true">
-                              {initials(entry.displayName)}
-                            </span>
-                          )}
+                          <AvatarWithCosmetic
+                            src={getFullMediaUrl(entry.avatarUrl)}
+                            name={entry.userName || (/ui-avatars\.com/i.test(entry.avatarUrl || '') ? undefined : entry.displayName)}
+                            alt=""
+                            size={36}
+                          />
                           <span className={cx('name')}>{entry.displayName}</span>
                         </span>
                       </td>

@@ -4,6 +4,7 @@ import {useState} from 'react';
 import {FaFire} from 'react-icons/fa6';
 import classNames from 'classnames/bind';
 
+import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import routes from '@/app/configs/Routes';
 import {getFullMediaUrl} from '@/app/utils/mediaUrl';
 import {hallOfFameTabLabel, useHallOfFameExams} from './hooks/useHallOfFameExams';
@@ -17,17 +18,11 @@ const HERO_LIMIT = 5;
 type BoardRow = {
   rank: number;
   displayName: string;
+  userName?: string | null;
   avatarUrl?: string | null;
   value: number;
   unit: string;
   fire?: boolean;
-};
-
-const initials = (name: string) => {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) return 'K';
-  if (parts.length === 1) return parts[0].slice(0, 1).toUpperCase();
-  return `${parts[0].slice(0, 1)}${parts[parts.length - 1].slice(0, 1)}`.toUpperCase();
 };
 
 function QuickLeaderboard() {
@@ -43,6 +38,7 @@ function QuickLeaderboard() {
     ? streakBoard.entries.map((entry) => ({
         rank: entry.rank,
         displayName: entry.displayName,
+        userName: entry.userName,
         avatarUrl: entry.avatarUrl,
         value: entry.longestStreak ?? 0,
         unit: '',
@@ -51,6 +47,7 @@ function QuickLeaderboard() {
     : examBoard.entries.map((entry) => ({
         rank: entry.rank,
         displayName: entry.displayName,
+        userName: entry.userName,
         avatarUrl: entry.avatarUrl,
         value: entry.totalScore ?? 0,
         unit: 'điểm',
@@ -142,19 +139,17 @@ function QuickLeaderboard() {
                 </li>
               );
             }
-            const avatar = getFullMediaUrl(entry.avatarUrl);
             return (
               <li key={entry.rank} className={cx('row', `rank${entry.rank}`)}>
                 <span className={cx('rank')} aria-label={`Hạng ${entry.rank}`}>
                   {entry.rank}
                 </span>
-                {avatar ? (
-                  <img className={cx('avatar')} src={avatar} alt="" />
-                ) : (
-                  <span className={cx('avatar', 'fallback')} aria-hidden="true">
-                    {initials(entry.displayName)}
-                  </span>
-                )}
+                <AvatarWithCosmetic
+                  src={getFullMediaUrl(entry.avatarUrl)}
+                  name={entry.userName || (/ui-avatars\.com/i.test(entry.avatarUrl || '') ? undefined : entry.displayName)}
+                  alt=""
+                  size={36}
+                />
                 <span className={cx('who')}>
                   <span className={cx('name')}>{entry.displayName}</span>
                 </span>

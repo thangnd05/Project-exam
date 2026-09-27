@@ -14,6 +14,7 @@ import {useAuth} from '@/app/hooks/useAuth';
 import routes from '@/app/configs/Routes';
 import EvaluationModal from './modals/EvaluationModal';
 import {useEvaluations} from './hooks/useEvaluations';
+import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const Slider = dynamic(() => import('react-slick'), { ssr: false });
@@ -77,13 +78,6 @@ const Evaluation = () => {
 
   const handleReviewSuccess = () => {
     refetchEvaluations();
-  };
-
-  const getInitials = (name?: string) => {
-    if (!name) return '?';
-    const words = name.trim().split(/\s+/).filter(Boolean);
-    if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
   };
 
   const formatDate = (dateString?: string) => {
@@ -152,18 +146,12 @@ const Evaluation = () => {
                       </div>
                       <p className={cx('review-content')}>"{review.content}"</p>
                       <div className={cx('review-footer')}>
-                        {review.avatarUrl ? (
-                          <img
-                            src={review.avatarUrl}
-                            alt={review.username}
-                            className={cx('avatar')}
-                            referrerPolicy="no-referrer"
-                          />
-                        ) : (
-                          <div className={cx('avatar', 'avatar-initials')}>
-                            {getInitials(review.username)}
-                          </div>
-                        )}
+                        <AvatarWithCosmetic
+                          src={review.avatarUrl}
+                          name={review.username}
+                          alt={review.username || ''}
+                          size={44}
+                        />
                         <div className={cx('user-info')}>
                           <h4 className={cx('user-name')}>{review.username}</h4>
                           <span className={cx('user-role')}>

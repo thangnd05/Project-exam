@@ -126,6 +126,7 @@ export interface StreakRecoverConfigResponse {
 export interface StreakLeaderboardEntry {
   rank: number;
   displayName: string;
+  userName?: string | null;
   avatarUrl?: string | null;
   longestStreak: number;
 }

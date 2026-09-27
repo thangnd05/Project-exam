@@ -19,6 +19,7 @@ public class QuickLeaderboardResponse {
     public static class Entry {
         private int rank;
         private String displayName;
+        private String userName;
         private String avatarUrl;
         private Integer totalScore;
         private Long durationTaken;

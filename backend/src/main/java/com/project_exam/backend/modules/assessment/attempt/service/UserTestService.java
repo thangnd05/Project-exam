@@ -746,6 +746,7 @@ public class UserTestService {
             entries.add(QuickLeaderboardResponse.Entry.builder()
                     .rank(i + 1)
                     .displayName(displayName(user))
+                    .userName(user != null ? user.getUserName() : null)
                     .avatarUrl(user != null ? user.getAvatarUrl() : null)
                     .totalScore(attempt.getTotalScore())
                     .durationTaken(durationSeconds(attempt))

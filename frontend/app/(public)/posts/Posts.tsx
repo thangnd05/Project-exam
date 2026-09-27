@@ -7,6 +7,7 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info, Newspaper, Bookmark } from 'lucide-react';
 import { usePosts } from '@/app/hooks/usePosts';
 import routes from '@/app/configs/Routes';
+import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import Pagination from '@/app/components/Pagination/Pagination';
 import CreatePostModal from '@/app/components/CreatePostModal/CreatePostModal';
@@ -154,7 +155,12 @@ function Posts() {
                 <p className={cx('cardExcerpt')}>{(post as any).summary || post.title}</p>
                 <div className={cx('cardFooter')}>
                   <div className={cx('author')}>
-                    <img src={post.authorAvatar || 'https://i.pravatar.cc/150?img=12'} alt={post.authorName} referrerPolicy="no-referrer" />
+                    <AvatarWithCosmetic
+                      src={post.authorAvatar}
+                      name={post.authorName}
+                      alt={post.authorName || ''}
+                      size={32}
+                    />
                     <span>{post.authorName}</span>
                   </div>
                   <div className={cx('stats')}>

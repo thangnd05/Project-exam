@@ -142,6 +142,7 @@ public class StreakService {
             entries.add(StreakLeaderboardResponse.Entry.builder()
                     .rank(i + 1)
                     .displayName(displayName(user))
+                    .userName(user != null ? user.getUserName() : null)
                     .avatarUrl(user != null ? user.getAvatarUrl() : null)
                     .longestStreak(longest)
                     .build());

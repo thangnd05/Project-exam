@@ -131,6 +131,7 @@ export interface TestLeaderboardResponse {
 export interface QuickLeaderboardEntry {
   rank: number;
   displayName: string;
+  userName?: string | null;
   avatarUrl?: string | null;
   totalScore?: number | null;
   durationTaken?: number | null;

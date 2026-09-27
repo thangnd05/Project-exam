@@ -5,6 +5,7 @@ import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { IoPersonCircleOutline, IoCameraOutline } from 'react-icons/io5';
 import { Spinner } from 'react-bootstrap';
+import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import commonModalStyles from '@/app/components/modal/CommonFormModal.module.scss';
@@ -171,8 +172,13 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
     >
       <div className={cx('avatarSection')}>
         <div className={cx('avatarPreviewWrap')} onClick={triggerFileInput}>
-          {avatarPreview ? (
-            <img src={avatarPreview} alt="Avatar Preview" className={cx('avatarImage')} referrerPolicy="no-referrer" />
+          {avatarPreview || formValues.userName || formValues.fullName ? (
+            <AvatarWithCosmetic
+              src={avatarPreview}
+              name={formValues.userName || formValues.fullName}
+              alt="Avatar"
+              size={100}
+            />
           ) : (
             <div className={cx('avatarPlaceholder')}>
               <IoPersonCircleOutline size={64} color="#cbd5e1" />

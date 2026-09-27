@@ -8,6 +8,15 @@ const cx = classNames.bind(styles);
 
 type CosmeticLike = Partial<CosmeticResponse>;
 
+function nameFromDefaultAvatar(src?: unknown) {
+  if (typeof src !== 'string' || !/ui-avatars\.com/i.test(src)) return '';
+  try {
+    return (new URL(src).searchParams.get('name') || '').replace(/\+/g, ' ').trim();
+  } catch {
+    return '';
+  }
+}
+
 function resolveStyle(frame?: CosmeticLike | null) {
   if (!frame) return null;
   if (frame.frameStyle) return frame.frameStyle;
@@ -51,7 +60,7 @@ function AvatarWithCosmetic({
   const pad = isColor || isEffect ? ring : 0;
   const box = size + pad * 2;
 
-  const label = (name || (alt !== 'Avatar' ? alt : '') || '').trim();
+  const label = (name || nameFromDefaultAvatar(src) || (alt !== 'Avatar' ? alt : '') || '').trim();
   const initial = label ? label.charAt(0).toUpperCase() : '';
   const isDefaultAvatar = !src || /ui-avatars\.com/i.test(src);
   const useInitials = isDefaultAvatar && Boolean(initial);

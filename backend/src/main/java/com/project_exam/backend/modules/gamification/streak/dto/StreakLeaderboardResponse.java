@@ -19,6 +19,7 @@ public class StreakLeaderboardResponse {
     public static class Entry {
         private int rank;
         private String displayName;
+        private String userName;
         private String avatarUrl;
         private int longestStreak;
     }
