@@ -160,11 +160,11 @@ public class StreakService {
         if (user == null) {
             return "Người dùng";
         }
-        if (user.getFullName() != null && !user.getFullName().isBlank()) {
-            return user.getFullName().trim();
-        }
         if (user.getUserName() != null && !user.getUserName().isBlank()) {
             return user.getUserName().trim();
+        }
+        if (user.getFullName() != null && !user.getFullName().isBlank()) {
+            return user.getFullName().trim();
         }
         return "Người dùng";
     }

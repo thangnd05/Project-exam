@@ -100,7 +100,7 @@ function HallOfFame() {
             className={cx('tab', 'tabFire', {tabActive: fireBoard})}
             onClick={selectFire}
           >
-            Chuỗi
+            Streak
           </button>
         </div>
 
@@ -144,7 +144,7 @@ function HallOfFame() {
                             alt=""
                             size={36}
                           />
-                          <span className={cx('name')}>{entry.displayName}</span>
+                          <span className={cx('name')}>{entry.userName || entry.displayName}</span>
                         </span>
                       </td>
                       <td data-label="Chuỗi dài nhất">
@@ -191,7 +191,7 @@ function HallOfFame() {
                             alt=""
                             size={36}
                           />
-                          <span className={cx('name')}>{entry.displayName}</span>
+                          <span className={cx('name')}>{entry.userName || entry.displayName}</span>
                         </span>
                       </td>
                       <td data-label="Kỳ thi">{entry.examTypeName || '—'}</td>

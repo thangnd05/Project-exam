@@ -45,12 +45,6 @@ function TargetDashboard() {
     [plans],
   );
 
-  const nextStepTo = useMemo(() => {
-    if (activePlan) return `/learning-plans/${activePlan.learningPlanId}`;
-    if (latestMock?.userTestId) return `/learning-plans/generate?userTestId=${latestMock.userTestId}`;
-    return examTypeId ? `/learning-plans/generate?examTypeId=${examTypeId}` : '/learning-plans/generate';
-  }, [activePlan, latestMock, examTypeId]);
-
   const partNameOf = (id: string) =>
     examParts.find((p) => p.examPartId === id)?.name || id;
 
@@ -275,23 +269,6 @@ function TargetDashboard() {
         />
       )}
 
-      {!loading && (
-        <div className={cx('actionBar', 'dashboardFooterActions')}>
-          <ButtonPrime as="link" href={nextStepTo} variant="primary" size="lg">
-            {activePlan ? 'Vào lộ trình đang học' : 'Lập lộ trình ôn'}
-          </ButtonPrime>
-          {latestMock?.userTestId && (
-            <ButtonPrime
-              as="link"
-              href={`/tests/result/${latestMock.userTestId}`}
-              variant="outline"
-              size="lg"
-            >
-              Xem chẩn đoán bài gần nhất
-            </ButtonPrime>
-          )}
-        </div>
-      )}
     </div>
   );
 }

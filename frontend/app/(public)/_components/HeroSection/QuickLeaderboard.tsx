@@ -98,12 +98,12 @@ function QuickLeaderboard() {
             className={cx('tab', 'tabFire', {tabActive: fireBoard})}
             onClick={() => setFireBoard(true)}
           >
-            Chuỗi
+            Streak
           </button>
         </div>
         {(fireBoard || selected?.name) && (
           <p className={cx('examTitle')}>
-            {fireBoard ? 'Chuỗi ngày dài nhất từng đạt' : selected?.name}
+            {fireBoard ? 'Chuỗi ngày học liên tiếp dài nhất' : selected?.name}
           </p>
         )}
       </header>
@@ -151,7 +151,7 @@ function QuickLeaderboard() {
                   size={36}
                 />
                 <span className={cx('who')}>
-                  <span className={cx('name')}>{entry.displayName}</span>
+                  <span className={cx('name')}>{entry.userName || entry.displayName}</span>
                 </span>
                 <span className={cx('score', {fire: entry.fire})}>
                   {entry.fire && <FaFire className={cx('flame')} aria-hidden="true" />}
