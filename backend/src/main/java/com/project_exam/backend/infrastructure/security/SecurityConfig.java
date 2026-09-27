@@ -146,7 +146,8 @@ public class SecurityConfig {
                                 "/api/milestones/**",
                                 "/api/certificates/verify/**",
                                 "/api/certificates/public",
-                                "/api/user-tests/full-mock/leaderboard").permitAll()
+                                "/api/user-tests/full-mock/leaderboard",
+                                "/api/streak/leaderboard").permitAll()
 
                         .requestMatchers(
                                 "/api/user-tests/guest",

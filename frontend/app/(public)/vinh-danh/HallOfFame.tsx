@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import {useRouter, useSearchParams} from 'next/navigation';
+import {FaFire} from 'react-icons/fa6';
 import {Container} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 
@@ -9,6 +10,7 @@ import routes from '@/app/configs/Routes';
 import {getFullMediaUrl} from '@/app/utils/mediaUrl';
 import {hallOfFameTabLabel, useHallOfFameExams} from '../_components/HeroSection/hooks/useHallOfFameExams';
 import {useQuickLeaderboard} from '../_components/HeroSection/hooks/useQuickLeaderboard';
+import {useStreakLeaderboard} from '../_components/HeroSection/hooks/useStreakLeaderboard';
 import styles from './HallOfFame.module.scss';
 
 const cx = classNames.bind(styles);
@@ -35,17 +37,27 @@ function HallOfFame() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const requestedId = searchParams.get('examTypeId');
+  const fireBoard = searchParams.get('board') === 'streak';
   const {exams, isLoading: examsLoading, isError: examsError} = useHallOfFameExams();
   const selected = exams.find((exam) => exam.examTypeId === requestedId) ?? exams[0];
   const selectedId = selected?.examTypeId;
-  const {entries, totalParticipants, isLoading, isPlaceholderData, isError} = useQuickLeaderboard(
-    PAGE_LIMIT,
-    selectedId,
-  );
-  const showLoading = (examsLoading || Boolean(selectedId && isLoading)) && !isPlaceholderData;
+  const examBoard = useQuickLeaderboard(PAGE_LIMIT, fireBoard ? undefined : selectedId);
+  const streakBoard = useStreakLeaderboard(PAGE_LIMIT, fireBoard);
+  const entries = fireBoard ? streakBoard.entries : examBoard.entries;
+  const totalParticipants = fireBoard ? streakBoard.totalParticipants : examBoard.totalParticipants;
+  const isLoading = fireBoard ? streakBoard.isLoading : examBoard.isLoading;
+  const isPlaceholderData = fireBoard ? streakBoard.isPlaceholderData : examBoard.isPlaceholderData;
+  const isError = fireBoard ? streakBoard.isError : examBoard.isError;
+  const showLoading = fireBoard
+    ? isLoading && !isPlaceholderData
+    : (examsLoading || Boolean(selectedId && isLoading)) && !isPlaceholderData;
 
   const selectExam = (examTypeId: string) => {
     router.replace(`${routes.hallOfFame}?examTypeId=${encodeURIComponent(examTypeId)}`);
+  };
+
+  const selectFire = () => {
+    router.replace(`${routes.hallOfFame}?board=streak`);
   };
 
   return (
@@ -56,41 +68,105 @@ function HallOfFame() {
         </Link>
         <PageHeader
           label="Vinh danh"
-          title={selected?.name || 'Bảng xếp hạng bài thi thử'}
-          description="Mỗi tab là một kỳ thi AWS không tick Linh hoạt. Chỉ tính bài full mock: điểm cao hơn, thời gian làm ngắn hơn, rồi ai nộp bài trước."
+          title={fireBoard ? 'Top người giữ lửa' : selected?.name || 'Bảng xếp hạng bài thi thử'}
+          description={
+            fireBoard
+              ? 'Xếp theo chuỗi ngày học dài nhất mỗi người từng đạt. Chuỗi đang đứt vẫn giữ hạng theo mốc cao nhất đó.'
+              : 'Mỗi tab là một kỳ thi AWS không tick Linh hoạt. Chỉ tính bài full mock: điểm cao hơn, thời gian làm ngắn hơn, rồi ai nộp bài trước.'
+          }
           badgeLabel={
-            totalParticipants > 0 ? `${totalParticipants} người đã hoàn thành` : undefined
+            totalParticipants > 0
+              ? fireBoard
+                ? `${totalParticipants} người đã giữ lửa`
+                : `${totalParticipants} người đã hoàn thành`
+              : undefined
           }
         />
 
-        {exams.length > 0 && (
-          <div className={cx('tabs')} role="tablist" aria-label="Kỳ thi">
-            {exams.map((exam) => {
-              const active = exam.examTypeId === selectedId;
-              return (
-                <button
-                  key={exam.examTypeId}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  className={cx('tab', {tabActive: active})}
-                  onClick={() => selectExam(exam.examTypeId)}
-                >
-                  {hallOfFameTabLabel(exam.name)}
-                </button>
-              );
-            })}
-          </div>
-        )}
+        <div className={cx('tabs')} role="tablist" aria-label="Bảng xếp hạng">
+          {exams.map((exam) => {
+            const active = !fireBoard && exam.examTypeId === selectedId;
+            return (
+              <button
+                key={exam.examTypeId}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                className={cx('tab', {tabActive: active})}
+                onClick={() => selectExam(exam.examTypeId)}
+              >
+                {hallOfFameTabLabel(exam.name)}
+              </button>
+            );
+          })}
+          <button
+            type="button"
+            role="tab"
+            aria-selected={fireBoard}
+            className={cx('tab', 'tabFire', {tabActive: fireBoard})}
+            onClick={selectFire}
+          >
+            Chuỗi
+          </button>
+        </div>
 
         {showLoading ? (
           <p className={cx('status')}>Đang tải bảng vinh danh…</p>
-        ) : examsError || isError ? (
+        ) : (!fireBoard && examsError) || isError ? (
           <p className={cx('status')}>Không tải được bảng xếp hạng. Thử lại sau.</p>
-        ) : exams.length === 0 ? (
+        ) : !fireBoard && exams.length === 0 ? (
           <p className={cx('status')}>Chưa có kỳ thi chuẩn để vinh danh.</p>
         ) : entries.length === 0 ? (
-          <p className={cx('status')}>Chưa có ai hoàn thành bài thi thử.</p>
+          <p className={cx('status')}>
+            {fireBoard ? 'Chưa có ai giữ được chuỗi ngày học.' : 'Chưa có ai hoàn thành bài thi thử.'}
+          </p>
+        ) : fireBoard ? (
+          <div className={cx('tableWrap')}>
+            {totalParticipants > entries.length && (
+              <p className={cx('note')}>
+                Hiển thị {entries.length} người chuỗi dài nhất trong {totalParticipants} người.
+              </p>
+            )}
+            <table className={cx('table')}>
+              <thead>
+                <tr>
+                  <th>Hạng</th>
+                  <th>Người học</th>
+                  <th>Chuỗi dài nhất</th>
+                </tr>
+              </thead>
+              <tbody>
+                {streakBoard.entries.map((entry) => {
+                  const avatar = getFullMediaUrl(entry.avatarUrl);
+                  return (
+                    <tr key={entry.rank} className={cx({podium: entry.rank <= 3})}>
+                      <td data-label="Hạng">
+                        <span className={cx('rank', `rank${entry.rank}`)}>{entry.rank}</span>
+                      </td>
+                      <td data-label="Người học">
+                        <span className={cx('person')}>
+                          {avatar ? (
+                            <img className={cx('avatar')} src={avatar} alt="" />
+                          ) : (
+                            <span className={cx('avatar', 'fallback')} aria-hidden="true">
+                              {initials(entry.displayName)}
+                            </span>
+                          )}
+                          <span className={cx('name')}>{entry.displayName}</span>
+                        </span>
+                      </td>
+                      <td data-label="Chuỗi dài nhất">
+                        <span className={cx('streak')}>
+                          <FaFire aria-hidden="true" />
+                          {entry.longestStreak ?? 0}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className={cx('tableWrap')}>
             {totalParticipants > entries.length && (
@@ -109,7 +185,7 @@ function HallOfFame() {
                 </tr>
               </thead>
               <tbody>
-                {entries.map((entry) => {
+                {examBoard.entries.map((entry) => {
                   const avatar = getFullMediaUrl(entry.avatarUrl);
                   return (
                     <tr key={entry.rank} className={cx({podium: entry.rank <= 3})}>

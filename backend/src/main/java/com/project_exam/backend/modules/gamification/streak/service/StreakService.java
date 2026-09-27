@@ -3,12 +3,16 @@ package com.project_exam.backend.modules.gamification.streak.service;
 import com.project_exam.backend.modules.gamification.coin.service.CoinService;
 import com.project_exam.backend.modules.gamification.streak.domain.StreakActivityType;
 import com.project_exam.backend.modules.gamification.streak.domain.UserStreak;
+import com.project_exam.backend.modules.gamification.streak.dto.StreakLeaderboardResponse;
 import com.project_exam.backend.modules.gamification.streak.dto.StreakRecoverConfigResponse;
 import com.project_exam.backend.modules.gamification.streak.dto.StreakResponse;
 import com.project_exam.backend.modules.gamification.streak.mapper.StreakMapper;
 import com.project_exam.backend.modules.gamification.streak.repository.UserStreakRepository;
+import com.project_exam.backend.modules.users.user.domain.User;
+import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +20,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class StreakService {
 
     private static final ZoneId VN = ZoneId.of("Asia/Ho_Chi_Minh");
+    private static final int LEADERBOARD_TOP_LIMIT = 100;
 
     private final UserStreakRepository userStreakRepository;
+    private final UserRepository userRepository;
     private final StreakRecoverConfigService recoverConfigService;
     private final CoinService coinService;
     private final StreakMapper streakMapper;
@@ -107,6 +118,54 @@ public class StreakService {
         userStreakRepository.save(streak);
 
         return buildResponse(streak, today, false);
+    }
+
+    @Transactional(readOnly = true)
+    public StreakLeaderboardResponse getLeaderboard(int limit) {
+        int safeLimit = Math.min(Math.max(limit, 1), LEADERBOARD_TOP_LIMIT);
+        List<UserStreak> ranked = userStreakRepository.findRankedByLongestStreak(PageRequest.of(0, safeLimit));
+
+        Set<String> userIds = ranked.stream()
+                .map(UserStreak::getUserId)
+                .filter(id -> id != null && !id.isBlank())
+                .collect(Collectors.toSet());
+        Map<String, User> usersById = userIds.isEmpty()
+                ? Map.of()
+                : userRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(User::getUserId, user -> user));
+
+        List<StreakLeaderboardResponse.Entry> entries = new ArrayList<>();
+        for (int i = 0; i < ranked.size(); i++) {
+            UserStreak streak = ranked.get(i);
+            User user = streak.getUserId() == null ? null : usersById.get(streak.getUserId());
+            int longest = streak.getLongestStreak() == null ? 0 : streak.getLongestStreak();
+            entries.add(StreakLeaderboardResponse.Entry.builder()
+                    .rank(i + 1)
+                    .displayName(displayName(user))
+                    .avatarUrl(user != null ? user.getAvatarUrl() : null)
+                    .longestStreak(longest)
+                    .build());
+        }
+
+        long total = userStreakRepository.countByLongestStreakGreaterThan(0);
+        int totalParticipants = total > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) total;
+        return StreakLeaderboardResponse.builder()
+                .entries(entries)
+                .totalParticipants(totalParticipants)
+                .build();
+    }
+
+    private String displayName(User user) {
+        if (user == null) {
+            return "Người dùng";
+        }
+        if (user.getFullName() != null && !user.getFullName().isBlank()) {
+            return user.getFullName().trim();
+        }
+        if (user.getUserName() != null && !user.getUserName().isBlank()) {
+            return user.getUserName().trim();
+        }
+        return "Người dùng";
     }
 
     private StreakResponse buildResponse(UserStreak streak, LocalDate today, boolean increased) {

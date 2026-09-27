@@ -1,5 +1,6 @@
 package com.project_exam.backend.modules.gamification.streak.controller;
 
+import com.project_exam.backend.modules.gamification.streak.dto.StreakLeaderboardResponse;
 import com.project_exam.backend.modules.gamification.streak.dto.StreakResponse;
 import com.project_exam.backend.modules.gamification.streak.service.StreakService;
 import com.project_exam.backend.shared.util.AuthUtils;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -18,6 +20,13 @@ public class StreakController {
 
     private final StreakService streakService;
     private final AuthUtils authUtils;
+
+    @GetMapping("/leaderboard")
+    public ResponseEntity<StreakLeaderboardResponse> getLeaderboard(
+            @RequestParam(defaultValue = "10") int limit
+    ) {
+        return ResponseEntity.ok(streakService.getLeaderboard(limit));
+    }
 
     @GetMapping("/me")
     public ResponseEntity<StreakResponse> getMyStreak(HttpServletRequest httpRequest) {

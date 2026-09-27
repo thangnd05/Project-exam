@@ -122,3 +122,15 @@ export interface StreakRecoverConfigResponse {
   costCoins?: number;
   active?: boolean;
 }
+
+export interface StreakLeaderboardEntry {
+  rank: number;
+  displayName: string;
+  avatarUrl?: string | null;
+  longestStreak: number;
+}
+
+export interface StreakLeaderboardResponse {
+  entries: StreakLeaderboardEntry[];
+  totalParticipants: number;
+}

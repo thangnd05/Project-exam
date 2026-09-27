@@ -12,6 +12,9 @@
 
 .tab {
   appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   border: 1px solid var(--border-color);
   background: var(--bg-white, #fff);
   color: var(--text-color);
@@ -20,6 +23,10 @@
   font-size: 1.4rem;
   font-weight: 700;
   cursor: pointer;
+}
+
+.tabFire {
+  color: var(--orange-600, #ea580c);
 }
 
 .tabActive {
@@ -141,6 +148,14 @@
 .score {
   font-weight: 800;
   color: var(--brand-900);
+}
+
+.streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  color: var(--orange-600, #ea580c);
 }
 
 @media (max-width: 720px) {
