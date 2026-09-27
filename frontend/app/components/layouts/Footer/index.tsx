@@ -84,15 +84,6 @@ function Footer() {
       <Container className={styles.container}>
         <div className={styles.bottom}>
           <span className={styles.copyright}>© WinDe 2026. All rights reserved.</span>
-          <div className={styles.legal}>
-            <Link className={styles.legalLink} href={routes.service}>
-              Điều khoản
-            </Link>
-            <span className={styles.legalSep} aria-hidden="true" />
-            <Link className={styles.legalLink} href={routes.policy}>
-              Quyền riêng tư
-            </Link>
-          </div>
         </div>
       </Container>
     </footer>

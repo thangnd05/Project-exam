@@ -121,6 +121,39 @@
   color: var(--brand-200);
 }
 
+.vacant {
+  min-height: 36px;
+  padding: 4px 8px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgb(var(--brand-200-rgb) / 0.12);
+
+  .rank {
+    color: rgb(var(--text-on-dark-rgb) / 0.28);
+  }
+}
+
+.seat {
+  display: block;
+  border-style: dashed;
+  border-color: rgb(var(--brand-200-rgb) / 0.28);
+  background: rgb(255 255 255 / 0.02);
+}
+
+.ghost {
+  display: block;
+  width: 46%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.vacantScore {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: rgb(var(--text-on-dark-rgb) / 0.22);
+}
+
 .avatar {
   width: 36px;
   height: 36px;

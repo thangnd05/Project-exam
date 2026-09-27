@@ -55,7 +55,9 @@ function QuickTestConfirmModal({
       : 'Không giới hạn';
 
   const questionLabel =
-    test.totalQuestions != null ? `${test.totalQuestions} câu hỏi` : '- câu hỏi';
+    test.totalQuestions != null
+      ? `${test.totalQuestions} câu hỏi`
+      : '- câu hỏi';
 
   const examName = shortExamName(test.examTypeName || test.title);
 
@@ -73,7 +75,9 @@ function QuickTestConfirmModal({
     <BaseModal
       show={show}
       onClose={onClose}
-      title={step === 'ask' ? `Bắt đầu với ${examName}?` : 'Bắt đầu từ nền tảng'}
+      title={
+        step === 'ask' ? `Bắt đầu với ${examName}?` : 'Bắt đầu từ nền tảng'
+      }
       maxWidth={560}
       footer={
         step === 'beginner' ? (
@@ -99,17 +103,20 @@ function QuickTestConfirmModal({
           ) : null}
 
           <p className={cx('examName')}>{examName}</p>
-          <p className={cx('hint')}>
-            Bạn đã học kỳ thi này chưa? Câu trả lời giúp WinDe gợi ý đúng bước tiếp theo.
-          </p>
 
           <div className={cx('options')}>
-            <button type="button" className={cx('option')} onClick={chooseStudied}>
+            <button
+              type="button"
+              className={cx('option')}
+              onClick={chooseStudied}
+            >
               <span className={cx('optionIcon')}>
                 <IoTrendingUpOutline aria-hidden="true" />
               </span>
               <span className={cx('optionText')}>
-                <span className={cx('optionTitle')}>Mình đã học kỳ thi này</span>
+                <span className={cx('optionTitle')}>
+                  Mình đã học kỳ thi này
+                </span>
                 <span className={cx('optionHint')}>
                   Làm bài kiểm tra nhanh để biết đang yếu phần nào.
                 </span>
@@ -117,7 +124,11 @@ function QuickTestConfirmModal({
               <IoPlayOutline className={cx('optionArrow')} aria-hidden="true" />
             </button>
 
-            <button type="button" className={cx('option')} onClick={chooseBeginner}>
+            <button
+              type="button"
+              className={cx('option')}
+              onClick={chooseBeginner}
+            >
               <span className={cx('optionIcon', 'optionIconSoft')}>
                 <IoLeafOutline aria-hidden="true" />
               </span>
@@ -127,7 +138,10 @@ function QuickTestConfirmModal({
                   Xem nên bắt đầu từ đâu trước khi làm bài.
                 </span>
               </span>
-              <IoArrowForward className={cx('optionArrow')} aria-hidden="true" />
+              <IoArrowForward
+                className={cx('optionArrow')}
+                aria-hidden="true"
+              />
             </button>
           </div>
 
@@ -145,19 +159,29 @@ function QuickTestConfirmModal({
       ) : (
         <div className={cx('panel')}>
           <p className={cx('panelLead')}>
-            Bài kiểm tra nhanh chấm theo số câu đúng. Khi chưa học, kết quả sẽ rất thấp và
-            không cho biết bạn yếu chỗ nào — chỉ cho biết bạn chưa học.
+            Bài kiểm tra nhanh chấm theo số câu đúng. Khi chưa học, kết quả sẽ
+            rất thấp và không cho biết bạn yếu chỗ nào — chỉ cho biết bạn chưa
+            học.
           </p>
           <p className={cx('panelLead')}>
-            WinDe sẽ dựng lộ trình đi theo chương trình của <strong>{examName}</strong>: từng
-            phần thi, từng chủ điểm, học tới đâu luyện tới đó. Làm bài nhanh sau, khi đã quen
-            dạng đề, thì kết quả mới có ích.
+            WinDe sẽ dựng lộ trình đi theo chương trình của{' '}
+            <strong>{examName}</strong>: từng phần thi, từng chủ điểm, học tới
+            đâu luyện tới đó. Làm bài nhanh sau, khi đã quen dạng đề, thì kết
+            quả mới có ích.
           </p>
           <div className={cx('panelLinks')}>
-            <button type="button" className={cx('linkBtn')} onClick={() => onExploreExam?.(test)}>
+            <button
+              type="button"
+              className={cx('linkBtn')}
+              onClick={() => onExploreExam?.(test)}
+            >
               Xem cấu trúc kỳ thi trước
             </button>
-            <button type="button" className={cx('linkBtn')} onClick={() => onConfirm?.(test)}>
+            <button
+              type="button"
+              className={cx('linkBtn')}
+              onClick={() => onConfirm?.(test)}
+            >
               Vẫn muốn thử bài nhanh ngay
             </button>
           </div>

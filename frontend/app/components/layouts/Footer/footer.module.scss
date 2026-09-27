@@ -133,49 +133,12 @@ $line: rgba(255, 255, 255, 0.1);
 .bottom {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
   padding: 24px 0;
-
-  // Keep links clear of the floating scroll-to-top button
-  @media (min-width: 577px) {
-    padding-right: 72px;
-  }
-
-  @media (max-width: 576px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-.legal {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
 }
 
 .copyright {
   font-size: 1.45rem;
   color: $text-muted;
-}
-
-.legalLink {
-  font-size: 1.45rem;
-  font-weight: 500;
-  color: #fff;
-  text-decoration: none;
-
-  &:hover {
-    color: var(--brand-400);
-    text-decoration: none;
-  }
-}
-
-.legalSep {
-  width: 1px;
-  height: 16px;
-  background: rgba(255, 255, 255, 0.25);
 }
 
 .socials {

@@ -34,10 +34,11 @@
   --on-primary-gradient: var(--on-header);
   --on-primary-gradient-soft: rgb(255 255 255 / 0.2);
   text-shadow: 0 1px 2px rgb(var(--brand-900-rgb) / 0.25);
-  padding: 24px 30px;
+  padding: 22px 22px 22px 28px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 16px;
   flex-shrink: 0;
 }
 
@@ -45,41 +46,55 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex: 1;
+  min-width: 0;
 
   svg {
     color: var(--on-primary-gradient);
     font-size: 2.4rem;
+    flex-shrink: 0;
   }
 }
 
 .title {
-  font-size: 2.4rem;
+  font-size: 2.2rem;
   font-weight: 800;
+  line-height: 1.3;
   color: var(--on-primary-gradient);
   margin: 0 !important;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.4px;
 }
 
 .closeBtn {
-  background: var(--on-primary-gradient-soft);
+  flex-shrink: 0;
+  margin-top: 1px;
+  background: var(--primary-btn-bg);
   border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--on-primary-gradient);
+  color: var(--brand-800);
   cursor: pointer;
-  transition: all 0.2s;
+  line-height: 0;
+  box-shadow: 0 1px 2px rgb(var(--brand-900-rgb) / 0.16);
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 
   &:hover {
-    background: rgb(var(--brand-900-rgb) / 0.14);
+    background: var(--brand-50);
     transform: rotate(90deg);
   }
 
   svg {
-    font-size: 2rem;
+    display: block;
+    width: 1.8rem;
+    height: 1.8rem;
+    font-size: 1.8rem;
   }
 }
 

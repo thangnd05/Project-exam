@@ -10,7 +10,7 @@ import {useQuickLeaderboard} from './hooks/useQuickLeaderboard';
 import styles from './QuickLeaderboard.module.scss';
 
 const cx = classNames.bind(styles);
-const HERO_LIMIT = 10;
+const HERO_LIMIT = 5;
 
 const initials = (name: string) => {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -61,7 +61,7 @@ function QuickLeaderboard() {
 
       {showSkeleton ? (
         <ul className={cx('list')} aria-hidden="true">
-          {Array.from({length: 6}, (_, index) => (
+          {Array.from({length: HERO_LIMIT}, (_, index) => (
             <li key={index} className={cx('row', 'skeleton')} />
           ))}
         </ul>
@@ -69,11 +69,27 @@ function QuickLeaderboard() {
         <p className={cx('empty')}>Chưa tải được bảng vinh danh.</p>
       ) : exams.length === 0 ? (
         <p className={cx('empty')}>Chưa có kỳ thi chuẩn để vinh danh.</p>
-      ) : entries.length === 0 ? (
-        <p className={cx('empty')}>Chưa có ai hoàn thành bài thi thử kỳ này.</p>
       ) : (
         <ol className={cx('list')}>
-          {entries.map((entry) => {
+          {Array.from({length: HERO_LIMIT}, (_, index) => {
+            const entry = entries[index];
+            const rank = index + 1;
+            if (!entry) {
+              return (
+                <li key={rank} className={cx('row', 'vacant')} aria-label={`Hạng ${rank}, chưa có người`}>
+                  <span className={cx('rank')} aria-hidden="true">
+                    {rank}
+                  </span>
+                  <span className={cx('avatar', 'seat')} aria-hidden="true" />
+                  <span className={cx('who')} aria-hidden="true">
+                    <span className={cx('ghost')} />
+                  </span>
+                  <span className={cx('vacantScore')} aria-hidden="true">
+                    —
+                  </span>
+                </li>
+              );
+            }
             const avatar = getFullMediaUrl(entry.avatarUrl);
             return (
               <li key={entry.rank} className={cx('row', `rank${entry.rank}`)}>
