@@ -59,11 +59,11 @@ export function useUserTargetData(selectedExamTypeId?: string) {
   };
 }
 
-export function useCurrentUserTarget(selectedExamTypeId?: string) {
+export function useCurrentUserTarget(selectedExamTypeId?: string, enabled = true) {
   const query = useQuery({
     queryKey: userTargetKeys.current(selectedExamTypeId),
     queryFn: () => getUserTarget(selectedExamTypeId),
-    enabled: !!selectedExamTypeId,
+    enabled: enabled && !!selectedExamTypeId,
   });
 
   return {

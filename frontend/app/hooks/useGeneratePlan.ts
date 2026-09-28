@@ -30,10 +30,11 @@ export function useExamTypes() {
   };
 }
 
-export function useCompletedUserTests() {
+export function useCompletedUserTests(enabled = true) {
   const query = useQuery({
     queryKey: generatePlanKeys.userTests,
     queryFn: () => getMyCompletedUserTests(),
+    enabled,
   });
 
   return {
@@ -44,11 +45,11 @@ export function useCompletedUserTests() {
   };
 }
 
-export function useUserTarget(examTypeId?: string) {
+export function useUserTarget(examTypeId?: string, enabled = true) {
   const query = useQuery({
     queryKey: generatePlanKeys.target(examTypeId),
     queryFn: () => getUserTarget(examTypeId),
-    enabled: !!examTypeId,
+    enabled: enabled && !!examTypeId,
   });
 
   return {

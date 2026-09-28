@@ -11,6 +11,8 @@ import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
 import { isPracticeAttempt } from '@/app/utils/planLabels';
 import { getLearnerLevel } from '@/app/utils/learnerLevel';
 import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
+import { useAuth } from '@/app/hooks/useAuth';
+import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import type { PlanResponse } from '@/app/types';
 import {
@@ -28,6 +30,10 @@ const cx = classNames.bind(styles);
 function GeneratePlan() {
   const router = useRouter();
   const [searchParams, setSearchParams] = useSearchParamsState();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  // Khách vẫn xem được trang, chỉ khi bấm thao tác mới bị đưa sang đăng nhập.
+  const isGuest = !authLoading && !isAuthenticated;
+  const requireLogin = () => router.push(buildLoginUrlFromHere('Bạn cần đăng nhập để sinh lộ trình!'));
 
   const forcedSyllabus = searchParams.get('source') === 'syllabus';
   const userTestIdFromUrl = searchParams.get('userTestId') || '';
@@ -58,14 +64,14 @@ function GeneratePlan() {
     userTests,
     isLoading: loadingList,
     error: userTestsError,
-  } = useCompletedUserTests();
+  } = useCompletedUserTests(isAuthenticated);
 
   const {
     userTarget,
     isLoading: loadingTarget,
     error: targetError,
     refetch: refetchTarget,
-  } = useUserTarget(sourceExamTypeId);
+  } = useUserTarget(sourceExamTypeId, isAuthenticated);
 
   const generatePlanMutation = useGeneratePlanMutation();
   const generateSyllabusMutation = useGenerateSyllabusPlanMutation();
@@ -139,6 +145,10 @@ function GeneratePlan() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      requireLogin();
+      return;
+    }
     setError(null);
     setResult(null);
 
@@ -229,7 +239,7 @@ function GeneratePlan() {
         </div>
       )}
 
-      {sourceExamTypeId && !loadingTarget && !targetError && !hasTarget && (
+      {isAuthenticated && sourceExamTypeId && !loadingTarget && !targetError && !hasTarget && (
         <div className={cx('alert', planSource === 'SYLLABUS' ? 'alertInfo' : 'alertWarning')}>
           <span>
             {planSource === 'SYLLABUS' ? (
@@ -318,7 +328,14 @@ function GeneratePlan() {
                 <label className={cx('fieldLabel')}>
                   Chọn bài thi muốn lập lộ trình
                 </label>
-              {loadingList ? (
+              {isGuest ? (
+                <div className={cx('alert', 'alertInfo')}>
+                  <span>Đăng nhập để chọn bài thi bạn đã làm.</span>
+                  <button type="button" className={cx('btn', 'btnPrimary', 'btnSm')} onClick={requireLogin}>
+                    Đăng nhập
+                  </button>
+                </div>
+              ) : loadingList ? (
                 <div className={cx('muted')}>Đang tải danh sách bài thi...</div>
               ) : userTests.length === 0 ? (
                 <div className={cx('alert', 'alertWarning')}>
@@ -363,9 +380,11 @@ function GeneratePlan() {
               type="submit"
               className={cx('btn', 'btnPrimary', 'btnLg')}
               disabled={
+                authLoading ||
                 submitting ||
-                formLocked ||
-                (planSource === 'DIAGNOSIS' && (!userTestId || filteredUserTests.length === 0))
+                (!isGuest &&
+                  (formLocked ||
+                    (planSource === 'DIAGNOSIS' && (!userTestId || filteredUserTests.length === 0))))
               }
               style={{ marginTop: '1.6rem' }}
             >
@@ -389,6 +408,16 @@ function GeneratePlan() {
         </div>
       )}
 
+      {isGuest && (
+        <div className={cx('alert', 'alertInfo')}>
+          <span>Đăng nhập để sinh, lưu và theo dõi tiến độ lộ trình của bạn.</span>
+          <button type="button" className={cx('btn', 'btnPrimary', 'btnSm')} onClick={requireLogin}>
+            Đăng nhập
+          </button>
+        </div>
+      )}
+
+      {isAuthenticated && (
       <LearningPlanList
         loadAll
         allowAllInFilter
@@ -401,6 +430,7 @@ function GeneratePlan() {
         emptyMessage={null}
         showRefreshButton={false}
       />
+      )}
     </div>
   );
 }

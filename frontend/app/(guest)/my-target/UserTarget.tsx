@@ -11,6 +11,8 @@ import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.s
 import styles from './UserTarget.module.scss';
 import { sortPartsByLookup } from '@/app/utils/partOrder';
 import useMilestoneScoring from '@/app/hooks/useMilestoneScoring';
+import { useAuth } from '@/app/hooks/useAuth';
+import { buildLoginUrl } from '@/app/utils/authRedirect';
 import type { MilestoneResponse } from '@/app/types';
 import { useCurrentUserTarget, useUserTargetData } from './_hooks/useUserTargetData';
 import {
@@ -27,8 +29,13 @@ function UserTarget() {
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [targetScore, setTargetScore] = useState('');
   const [customParts, setCustomParts] = useState<Record<string, number>>({});
+  // Khách vẫn xem và thử chọn mức điểm được, chỉ khi lưu mới bị đưa sang đăng nhập.
+  const { isAuthenticated } = useAuth();
 
-  const { target, isError: targetIsError } = useCurrentUserTarget(selectedExamTypeId);
+  const { target, isError: targetIsError } = useCurrentUserTarget(
+    selectedExamTypeId,
+    isAuthenticated,
+  );
   const currentTarget = target?.hasTarget ? target : null;
 
   const { examTypes, examParts, skills, scoringConversions, milestones } =
@@ -95,7 +102,8 @@ function UserTarget() {
   const [suggestedFor, setSuggestedFor] = useState('');
   useEffect(() => {
     if (!selectedExamTypeId || suggestedFor === selectedExamTypeId) return;
-    if (!target || target.hasTarget || targetScore || milestones.length === 0) return;
+    if (isAuthenticated && (!target || target.hasTarget)) return;
+    if (targetScore || milestones.length === 0) return;
     const sorted = milestones
       .filter((m) => !m.examTypeId || m.examTypeId === selectedExamTypeId)
       .sort((a, b) => (a.milestoneScore ?? 0) - (b.milestoneScore ?? 0));
@@ -103,7 +111,7 @@ function UserTarget() {
     if (middle?.milestoneScore == null) return;
     setTargetScore(String(middle.milestoneScore));
     setSuggestedFor(selectedExamTypeId);
-  }, [selectedExamTypeId, suggestedFor, target, targetScore, milestones]);
+  }, [selectedExamTypeId, suggestedFor, target, targetScore, milestones, isAuthenticated]);
 
   const matchedMilestone = useMemo<MilestoneResponse | null>(() => {
     if (!targetScore) return null;
@@ -130,6 +138,17 @@ function UserTarget() {
   const handleSave = () => {
     if (!targetScore || !selectedExamTypeId) {
       toast.warn('Nhập điểm mục tiêu trước.');
+      return;
+    }
+    if (!isAuthenticated) {
+      // Giữ cả next để đăng nhập xong quay lại đây, lưu xong vẫn đi tiếp đúng luồng.
+      const backParams = new URLSearchParams(searchParams.toString());
+      backParams.set('examTypeId', selectedExamTypeId);
+      router.push(
+        buildLoginUrl(`/my-target?${backParams.toString()}`, {
+          flash: 'Bạn cần đăng nhập để lưu mục tiêu!',
+        }),
+      );
       return;
     }
     const isUpdate = hasSavedTarget;

@@ -4,7 +4,11 @@ const AUTH_COOKIE = 'accessToken';
 
 const PUBLIC_EXCEPTIONS = ['/certificates/verify'];
 
+// Chỉ mở đúng trang này (không gồm trang con), khách xem được, bấm thao tác mới bắt đăng nhập.
+const PUBLIC_EXACT = ['/learning-plans', '/learning-plans/generate', '/my-target'];
+
 const isPublicException = (pathname: string) =>
+  PUBLIC_EXACT.includes(pathname.replace(/\/$/, '')) ||
   PUBLIC_EXCEPTIONS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 
 export default function proxy(request: NextRequest) {

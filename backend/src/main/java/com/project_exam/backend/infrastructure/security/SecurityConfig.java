@@ -136,6 +136,8 @@ public class SecurityConfig {
                                 "/api/exam-types/**",
                                 "/api/exam-categories/**",
                                 "/api/exam-parts/**",
+                                "/api/skills/**",
+                                "/api/scoring-conversions/**",
                                 "/api/evaluations/**",
                                 "/api/tests/**",
                                 // [TẮT XÁC THỰC EMAIL] "/api/auth/verify",

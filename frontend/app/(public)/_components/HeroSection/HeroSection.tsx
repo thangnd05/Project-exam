@@ -111,13 +111,14 @@ function HeroSection() {
         source: 'syllabus',
       }).toString()}`;
 
+      const targetUrl = `${routes.myTarget}?${new URLSearchParams({
+        examTypeId,
+        next: planUrl,
+      }).toString()}`;
+
+      // Khách xem trước trang mục tiêu được, tới lúc lưu mới cần đăng nhập.
       if (!authLoading && !isAuthenticated) {
-        router.push(
-          `${routes.login}?${new URLSearchParams({
-            from: planUrl,
-            flash: 'Đăng nhập để WinDe lưu lộ trình học của bạn.',
-          }).toString()}`,
-        );
+        router.push(targetUrl);
         return;
       }
 
@@ -125,12 +126,7 @@ function HeroSection() {
       try {
         const target = await getUserTarget(examTypeId);
         if (!target?.hasTarget) {
-          router.push(
-            `${routes.myTarget}?${new URLSearchParams({
-              examTypeId,
-              next: planUrl,
-            }).toString()}`,
-          );
+          router.push(targetUrl);
           return;
         }
       } catch {

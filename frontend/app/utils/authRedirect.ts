@@ -35,9 +35,10 @@ export const buildGuestSignupUrl = (from: string): string =>
   buildLoginUrl(from, { mode: 'signup' });
 
 // Đăng nhập xong quay lại đúng trang đang đứng thay vì rơi về trang chủ.
-export const buildLoginUrlFromHere = (): string =>
+export const buildLoginUrlFromHere = (flash?: string): string =>
   buildLoginUrl(
     typeof window === 'undefined' ? null : window.location.pathname + window.location.search,
+    { flash },
   );
 
 export const saveOAuthRedirect = (target: string | null | undefined): void => {
