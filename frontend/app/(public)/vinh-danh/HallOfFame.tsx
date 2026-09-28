@@ -66,7 +66,7 @@ function HallOfFame() {
           description={
             fireBoard
               ? 'Xếp theo chuỗi ngày học dài nhất mỗi người từng đạt. Chuỗi đang đứt vẫn giữ hạng theo mốc cao nhất đó.'
-              : 'Mỗi tab là một kỳ thi AWS không tick Linh hoạt. Chỉ tính bài full mock: điểm cao hơn, thời gian làm ngắn hơn, rồi ai nộp bài trước.'
+              : 'Mỗi bảng là một kỳ thi AWS. Chỉ tính bài thi thử đầy đủ, xếp theo điểm cao hơn, rồi thời gian làm ngắn hơn, rồi ai nộp bài trước.'
           }
           badgeLabel={
             totalParticipants > 0

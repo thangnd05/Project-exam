@@ -200,6 +200,8 @@ public class SecurityConfig {
                             SecurityContextHolder.clearContext();
                             response.sendRedirect(frontendOrigin + "/oauth2/redirect");
                         })
+                        .failureHandler((request, response, exception) ->
+                                response.sendRedirect(frontendOrigin + "/login?error=oauth2_failed"))
                 );
 
         http.addFilterBefore(authRateLimitFilter, UsernamePasswordAuthenticationFilter.class);

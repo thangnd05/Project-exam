@@ -183,7 +183,7 @@ function TargetDashboard() {
                 </div>
               )}
               {!mockScore && (
-                <div className={cx('statHint')}>Chưa có mock  làm bài để xem tiến độ.</div>
+                <div className={cx('statHint')}>Chưa có bài thi thử nào, làm bài để xem tiến độ.</div>
               )}
             </div>
 
@@ -233,7 +233,7 @@ function TargetDashboard() {
                 </>
               ) : (
                 <>
-                  <div className={cx('statHint')}>Chưa có plan đang học.</div>
+                  <div className={cx('statHint')}>Chưa có lộ trình đang học.</div>
                   {latestMock?.userTestId && (
                     <div className={pageCx('statTileFooter')}>
                       <ButtonPrime
@@ -252,7 +252,7 @@ function TargetDashboard() {
           </div>
 
           <div className={classNames(cx('card'), pageCx('partSection'))}>
-            <div className={cx('cardHeader')}>% từng Part  hiện tại vs aim</div>
+            <div className={cx('cardHeader')}>% đúng từng phần: hiện tại so với mục tiêu</div>
             <div className={cx('cardBody')}>
               <TargetDashboardPartChart rows={partChartRows} />
             </div>

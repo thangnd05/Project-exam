@@ -544,16 +544,10 @@
     background: transparent;
 
     padding: 18px 20px;
-    transition: background 0.2s;
 
     &:not(:first-child) {
 
       border-top: 1px solid var(--slate-200);
-    }
-
-    &:hover {
-      border-color: transparent;
-      background: var(--slate-50);
     }
 
     .q-text {
@@ -596,21 +590,9 @@
   background: white;
   padding: 28px;
   border-radius: 16px;
-  border: 1px solid var(--primary-alpha-08);
-  box-shadow: 0 6px 16px rgb(var(--slate-900-rgb) / 0.04);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--slate-200);
   position: relative;
   overflow: hidden;
-
-  &.is-current,
-  &:focus-within,
-  &:hover {
-    border-color: var(--primary);
-  }
-
-  &:hover {
-    box-shadow: 0 10px 24px rgb(var(--slate-900-rgb) / 0.08);
-  }
 
   .q-number {
     font-weight: 800;
@@ -676,16 +658,10 @@
   gap: 14px;
   padding: 14px 20px;
   border-radius: 12px;
-  background: var(--slate-50);
+  background: var(--bg-white);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--slate-200);
-
-  &:hover {
-    background: var(--slate-100);
-    border-color: var(--slate-300);
-    transform: translateY(-1px);
-  }
 
   input[type='radio'],
   input[type='checkbox'] {
@@ -1001,6 +977,36 @@
 
   .state-actions {
     margin-top: 28px;
+  }
+}
+
+.ready-facts {
+  list-style: none;
+  margin: 20px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 460px;
+  text-align: left;
+  font-size: 1.6rem;
+  color: var(--text-secondary);
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  svg {
+    flex-shrink: 0;
+    font-size: 2rem;
+    margin-top: 1px;
+    color: var(--primary);
+  }
+
+  strong {
+    color: var(--dark-color);
   }
 }
 

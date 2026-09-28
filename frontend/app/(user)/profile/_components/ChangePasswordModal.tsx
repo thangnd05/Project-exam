@@ -67,11 +67,6 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
       return;
     }
 
-    if (newPassword.length < 8) {
-      toast.warning('Mật khẩu mới phải có ít nhất 8 ký tự.');
-      return;
-    }
-
     if (newPassword !== confirmNewPassword) {
       toast.warning('Xác nhận mật khẩu mới không khớp.');
       return;
@@ -155,7 +150,7 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
             value={formValues.newPassword}
             onChange={(event) => updateField('newPassword', event.target.value)}
             disabled={submitting}
-            placeholder="Tối thiểu 8 ký tự"
+            placeholder="Nhập mật khẩu mới"
           />
           <button
             type="button"

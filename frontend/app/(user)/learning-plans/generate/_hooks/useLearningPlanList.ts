@@ -99,7 +99,7 @@ export function useLearningPlanList({
     error: query.error
       ? (query.error as any)?.response?.data?.message
         || query.error.message
-        || 'Không tải được danh sách plan'
+        || 'Không tải được danh sách lộ trình'
       : null,
     filterExamTypeId,
     setFilterExamTypeId,

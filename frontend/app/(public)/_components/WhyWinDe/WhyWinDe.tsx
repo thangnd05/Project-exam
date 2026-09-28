@@ -19,7 +19,7 @@ const points = [
   },
   {
     id: 'mock',
-    title: 'Mock sát đề thật',
+    title: 'Đề thi thử sát đề thật',
     text: 'Ngày thi đỡ bỡ ngỡ vì bạn đã luyện đúng cấu trúc, đúng nhịp thời gian như đề thật.',
   },
   {

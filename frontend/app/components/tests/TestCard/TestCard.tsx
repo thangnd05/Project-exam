@@ -9,6 +9,8 @@ import {
     IoLockClosedOutline,
     IoLockOpenOutline,
     IoCreateOutline,
+    IoPersonOutline,
+    IoLogInOutline,
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './TestCard.module.scss';
@@ -22,6 +24,8 @@ import TestModeModal from '@/app/components/tests/TestModeModal/TestModeModal';
 import type { TestModeSelection } from '@/app/components/tests/TestModeModal/TestModeModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { useAuth } from '@/app/hooks/useAuth';
+import { useGuestAllowedCategories } from '@/app/hooks/useGuestAllowedCategories';
+import { buildLoginUrl } from '@/app/utils/authRedirect';
 import type { TestResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
@@ -80,13 +84,27 @@ function TestCard({ test, countdowns }: TestCardProps) {
         getTestStatus(test, now, countdowns);
 
     // Lịch sử và bảng xếp hạng cần đăng nhập, khách bấm vào sẽ bị đẩy sang trang đăng nhập.
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, loading: authLoading } = useAuth();
+    const isGuest = !authLoading && !isAuthenticated;
+    const { isGuestAllowed } = useGuestAllowedCategories(isGuest);
+    // null = chưa biết (đang tải hoặc đã đăng nhập) thì không hiện nhãn.
+    const guestAllowed = isGuest ? isGuestAllowed(test) : null;
+    const needsLogin = guestAllowed === false;
     const showLeaderboard =
         isAuthenticated &&
         (test.availableTo == null || now > new Date(test.availableTo));
 
     const handleStart = () => {
         if (!canStart) return;
+        // Khách mở đề cần tài khoản thì đưa thẳng sang đăng nhập, không để bấm tới bước bắt đầu mới biết.
+        if (needsLogin) {
+            router.push(
+                buildLoginUrl(window.location.pathname + window.location.search, {
+                    flash: 'Đề này cần tài khoản. Đăng nhập hoặc đăng ký miễn phí để làm bài.',
+                }),
+            );
+            return;
+        }
         setShowModeModal(true);
     };
 
@@ -159,6 +177,17 @@ function TestCard({ test, countdowns }: TestCardProps) {
                     </div>
                 </div>
 
+                {guestAllowed !== null && (
+                    <div className={cx('access-line', guestAllowed ? 'access-guest' : 'access-login')}>
+                        {guestAllowed ? <IoPersonOutline /> : <IoLogInOutline />}
+                        <span>
+                            {guestAllowed
+                                ? 'Làm thử không cần tài khoản'
+                                : 'Cần đăng nhập để làm bài'}
+                        </span>
+                    </div>
+                )}
+
                 <div className={cx('info-item', 'created-line')}>
                     <IoCreateOutline />
                     <span>Thời gian tạo: <strong>{formatFullDateTime(test.createdAt)}</strong></span>
@@ -172,7 +201,7 @@ function TestCard({ test, countdowns }: TestCardProps) {
                         onClick={handleStart}
                         disabled={!canStart}
                     >
-                        {buttonText}
+                        {needsLogin && canStart ? 'Đăng nhập để làm' : buttonText}
                     </ButtonPrime>
 
                     {isAuthenticated && (

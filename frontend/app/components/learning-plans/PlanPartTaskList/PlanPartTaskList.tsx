@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import classNames from 'classnames/bind';
 import {
+  ArrowUpRight,
   BookOpen,
   Check,
   ChevronDown,
@@ -57,6 +58,12 @@ function shortMapLabel(name?: string, max = 48) {
   if (readable.length <= max) return readable;
   const cut = readable.slice(0, max - 1).replace(/\s+\S*$/, '');
   return `${cut || readable.slice(0, max - 1)}…`;
+}
+
+function resourceTitle(name?: string) {
+  if (!name) return 'Mở tài liệu';
+  // "VPC-Traffic-Control.md" -> "VPC Traffic Control"
+  return name.replace(/\.(md|pdf|docx?|txt)$/i, '').replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function buildPathD(from: number, to: number) {
@@ -279,15 +286,22 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
           <div className={cx('resourceInfo')}>
             <div className={cx('resourceLabel')}>
               <BookOpen size={14} /> Giới thiệu chặng (đọc trước)
+              <span className={cx('resourceCount')}>{group.partResources!.length} tài liệu</span>
             </div>
-            {group.partResources!.map((r) => (
-              <div key={r.resourceId}>
-                <RecoveryResourceLink resource={r} className={cx('resourceLink')}>
-                  {r.title || r.originalFileName || 'Mở tài liệu'}
+            <div className={cx('resourceGrid')}>
+              {group.partResources!.map((r, i) => (
+                <RecoveryResourceLink key={r.resourceId} resource={r} className={cx('resourceTile')}>
+                  <span className={cx('resourceTileNo')}>{i + 1}</span>
+                  <span className={cx('resourceTileBody')}>
+                    <span className={cx('resourceTileTitle')}>
+                      {resourceTitle(r.title || r.originalFileName)}
+                    </span>
+                    {r.description && <span className={cx('resourceTileDesc')}>{r.description}</span>}
+                  </span>
+                  <ArrowUpRight size={14} className={cx('resourceTileIcon')} />
                 </RecoveryResourceLink>
-                {r.description && <p className={cx('resourceDesc')}>{r.description}</p>}
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}

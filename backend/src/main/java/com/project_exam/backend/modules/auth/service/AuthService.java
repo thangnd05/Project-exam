@@ -449,10 +449,8 @@ public class AuthService {
 
     private void validateNewPassword(String newPassword, String confirmNewPassword) {
         if (!Objects.equals(newPassword, confirmNewPassword)) throw new BadRequestException("Mật khẩu xác nhận không khớp");
-        if (newPassword == null || newPassword.length() < 8) {
-            throw new BadRequestException("M\u1eadt kh\u1ea9u ph\u1ea3i c\u00f3 \u00edt nh\u1ea5t 8 k\u00fd t\u1ef1");
-        }
-        if (newPassword.length() > 72) {
+        // Kh\u00f4ng \u00e9p \u0111\u1ed9 d\u00e0i t\u1ed1i thi\u1ec3u, gi\u1ed1ng l\u00fac \u0111\u0103ng k\u00fd. Ch\u1ec9 ch\u1eb7n tr\u00ean 72 k\u00fd t\u1ef1 v\u00ec BCrypt b\u1ecf qua ph\u1ea7n th\u1eeba.
+        if (newPassword != null && newPassword.length() > 72) {
             throw new BadRequestException("M\u1eadt kh\u1ea9u kh\u00f4ng \u0111\u01b0\u1ee3c v\u01b0\u1ee3t qu\u00e1 72 k\u00fd t\u1ef1");
         }
     }

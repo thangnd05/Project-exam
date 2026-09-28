@@ -70,7 +70,7 @@ function QuickLeaderboard() {
       <header className={cx('head')}>
         <div className={cx('headRow')}>
           <p className={cx('kicker')}>Vinh danh</p>
-          <span className={cx('count')}>Top {HERO_LIMIT}</span>
+          <span className={cx('count')}>{HERO_LIMIT} hạng đầu</span>
         </div>
         <div className={cx('tabs')} role="tablist" aria-label="Bảng xếp hạng">
           {exams.map((exam) => {
@@ -98,7 +98,7 @@ function QuickLeaderboard() {
             className={cx('tab', 'tabFire', {tabActive: fireBoard})}
             onClick={() => setFireBoard(true)}
           >
-            Streak
+            Chuỗi ngày
           </button>
         </div>
         {(fireBoard || selected?.name) && (

@@ -405,6 +405,12 @@
     background: var(--emerald-50);
     border: 1px solid var(--green-200);
   }
+
+  &.info {
+    color: var(--accent-color);
+    background: var(--primary-alpha-10);
+    border: 1px solid var(--primary-alpha-20);
+  }
 }
 
 .loading-spinner {

@@ -263,7 +263,7 @@ function PlanStudy() {
       <div className={cx('wrapper')}>
         <div className={cx('alert', 'alertSuccess')}>
           <span>
-            Đã hoàn thành ải theo từng Part. Làm Full Mock để kiểm tra readiness.
+            Đã hoàn thành ải của từng phần. Làm bài thi thử đầy đủ để kiểm tra độ sẵn sàng.
             <br />
             <small>
               Làm một bài <strong>thi thử trọn đề</strong>, sau đó quay lại trang kế hoạch
@@ -306,7 +306,7 @@ function PlanStudy() {
         <div className={cx('card')}>
           <div className={cx('cardBody')}>
             <h3 className={cx('title', 'pickTitle')}>
-              Chọn Part và ải để học
+              Chọn phần và ải để học
             </h3>
             <p className={cx('muted')} style={{ marginBottom: '1.2rem' }}>
               Đọc tài liệu trong từng ải trước, sau đó bấm Học ải để luyện.
@@ -375,7 +375,7 @@ function PlanStudy() {
               <div>
                 <div className={cx('statLabel')}>Đang học</div>
                 <h3 className={cx('activeTaskTitle')}>
-                  {session.activeTask?.examPartName || 'Part'}
+                  {session.activeTask?.examPartName || 'Phần'}
                   {' · Ải '}{taskDisplayName(session.activeTask)}
                 </h3>
                 <div className={cx('actionBar')}>

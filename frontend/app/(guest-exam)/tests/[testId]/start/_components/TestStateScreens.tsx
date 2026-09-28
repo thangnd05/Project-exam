@@ -5,6 +5,11 @@ import classNames from 'classnames/bind';
 import {
   IoLockClosedOutline,
   IoAlertCircleOutline,
+  IoPlayCircleOutline,
+  IoListOutline,
+  IoTimeOutline,
+  IoSaveOutline,
+  IoCheckmarkDoneOutline,
 } from 'react-icons/io5';
 import styles from '@/app/components/exam-layout/TestStart.module.scss';
 
@@ -12,7 +17,7 @@ const cx = classNames.bind(styles);
 
 type TestStateScreensProps = {
   status: string;
-  test: { costCoins?: number | null };
+  test: { title?: string; durationMinutes?: number | null; costCoins?: number | null };
   balance: number;
   purchasing: boolean;
   preCountdown: number | null;
@@ -20,6 +25,9 @@ type TestStateScreensProps = {
   onBack: () => void;
   onPurchase: () => void;
   onRetry?: () => void;
+  questionCount?: number;
+  partCount?: number;
+  onStart?: () => void;
 };
 
 export default function TestStateScreens({
@@ -32,14 +40,70 @@ export default function TestStateScreens({
   onBack,
   onPurchase,
   onRetry,
+  questionCount = 0,
+  partCount = 0,
+  onStart,
 }: TestStateScreensProps) {
   if (status === 'loading')
     return (
       <div className={cx('state-box')}>
         <Spinner animation="grow" variant="primary" />
-        <h3>Đang niêm phong đề thi...</h3>
+        <h3>Đang tải đề thi...</h3>
       </div>
     );
+
+  if (status === 'ready') {
+    const timed = (test.durationMinutes ?? 0) > 0;
+    return (
+      <div className={cx('state-box')}>
+        <IoPlayCircleOutline size={80} color="var(--primary)" />
+        <h3>{test.title || 'Sẵn sàng làm bài'}</h3>
+        <ul className={cx('ready-facts')}>
+          <li>
+            <IoListOutline />
+            <span><strong>{questionCount}</strong> câu hỏi{partCount > 1 ? `, chia thành ${partCount} phần` : ''}</span>
+          </li>
+          <li>
+            <IoTimeOutline />
+            <span>
+              {timed ? (
+                <>Thời gian: <strong>{test.durationMinutes} phút</strong>, tính từ lúc bấm bắt đầu</>
+              ) : (
+                <>Không giới hạn thời gian</>
+              )}
+            </span>
+          </li>
+          <li>
+            <IoSaveOutline />
+            <span>Câu trả lời được lưu tự động, lỡ tải lại trang vẫn làm tiếp được.</span>
+          </li>
+          <li>
+            <IoCheckmarkDoneOutline />
+            <span>
+              Làm xong bấm <strong>Nộp bài</strong> để xem điểm và đáp án.
+              {timed && ' Hết giờ bài sẽ tự nộp.'}
+            </span>
+          </li>
+        </ul>
+        <div className={cx('state-actions')}>
+          <button
+            type="button"
+            className={cx('state-btn', 'state-btn-secondary')}
+            onClick={onBack}
+          >
+            Quay lại
+          </button>
+          <button
+            type="button"
+            className={cx('state-btn', 'state-btn-primary')}
+            onClick={onStart}
+          >
+            Bắt đầu làm bài
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (status === 'payment') {
     const cost = test.costCoins || 0;

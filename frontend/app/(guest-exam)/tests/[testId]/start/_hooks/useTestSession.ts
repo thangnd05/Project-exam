@@ -81,6 +81,8 @@ export function useTestSession() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittingRef = useRef(false);
   const [status, setStatus] = useState('loading');
+  // Bài thi tính giờ phải bấm "Bắt đầu" ở màn sẵn sàng rồi mới tạo lượt làm, lúc đó đồng hồ mới chạy.
+  const [readyConfirmed, setReadyConfirmed] = useState(isPractice);
   const examCanStart = status === 'open' || status === 'active';
   const holdStart = isAuthenticated && examCanStart && (!streakReady || streakRestoreBlocked);
 
@@ -254,6 +256,10 @@ export function useTestSession() {
         setStatus('active');
         return;
       }
+      if (!readyConfirmed) {
+        setStatus('ready');
+        return;
+      }
       startUserTest(test.testId, isGuest, guestCfg, {
         mode: isPractice ? PRACTICE_MODE_PARAM : undefined,
         examPartIds: isPractice ? selectedPartIds : undefined,
@@ -269,7 +275,12 @@ export function useTestSession() {
           else setStatus('error');
         });
     }
-  }, [status, test, sessionKey, isPractice, selectedPartIds, isGuest, guestCfg, holdStart]);
+  }, [status, test, sessionKey, isPractice, selectedPartIds, isGuest, guestCfg, holdStart, readyConfirmed]);
+
+  const confirmReady = useCallback(() => {
+    setReadyConfirmed(true);
+    setStatus('open');
+  }, []);
 
   useEffect(() => {
     if (status === 'active' && userTestId) {
@@ -459,6 +470,7 @@ export function useTestSession() {
     handleSubmit,
     handlePurchase,
     retryLoad,
+    confirmReady,
     isPaged: flow.isPaged,
     flowSteps: flow.flowSteps,
     currentStepIndex: flow.currentStepIndex,

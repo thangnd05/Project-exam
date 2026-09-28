@@ -21,7 +21,7 @@ const faqs = [
   {
     id: 'quick',
     q: 'Kiểm tra nhanh khác gì đề thi thật?',
-    a: 'Bài ngắn hơn, đủ để lộ điểm yếu và hướng ôn. Khi đã quen nhịp, bạn có thể chuyển sang bộ đề mock sát cấu trúc kỳ thi thật hơn.',
+    a: 'Bài ngắn hơn, đủ để lộ điểm yếu và hướng ôn. Khi đã quen nhịp, bạn có thể chuyển sang bộ đề thi thử sát cấu trúc kỳ thi thật hơn.',
   },
   {
     id: 'path',

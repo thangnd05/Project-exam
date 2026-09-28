@@ -6,6 +6,8 @@ import { toast } from 'react-toastify';
 import { queryClient } from '@/app/configs/queryClient';
 import { getCurrentUser, logout as logoutRequest } from '@/app/apis/authApi';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
+import routes from '@/app/configs/Routes';
 
 export type AuthUser = {
   userId: string;
@@ -37,6 +39,21 @@ export type AuthContextValue = {
 export const AuthContext = createContext<AuthContextValue | null>(null);
 
 export const CURRENT_USER_QUERY_KEY = ['currentUser'];
+
+// Chỉ xoá dữ liệu gắn với tài khoản (bài thi dở, trình độ đã chọn). Các cờ "đã xem gợi ý",
+// mã khách truy cập... thuộc về trình duyệt; xoá đi thì popup gợi ý lại hiện sau mỗi lần đăng xuất.
+const USER_STORAGE_PREFIXES = ['userTest-', 'userTestState-', 'winde:learner-level'];
+
+const clearUserStorage = () => {
+  try {
+    Object.keys(localStorage)
+      .filter((key) => USER_STORAGE_PREFIXES.some((prefix) => key.startsWith(prefix)))
+      .forEach((key) => localStorage.removeItem(key));
+    sessionStorage.clear();
+  } catch {
+    // Trình duyệt chặn storage thì bỏ qua.
+  }
+};
 
 const normalizeUser = (data: any): AuthUser => ({
   userId: data.id,
@@ -91,8 +108,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!userRef.current) return;
 
       queryClient.setQueryData(CURRENT_USER_QUERY_KEY, null);
-      localStorage.clear();
-      sessionStorage.clear();
+      clearUserStorage();
 
       if (!expiredToastShownRef.current) {
         expiredToastShownRef.current = true;
@@ -102,10 +118,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         toast.info(reason);
       }
 
-      const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
+      const publicPaths = [routes.login, routes.forgot, routes.reset];
       const onPublicPage = publicPaths.some((p) => window.location.pathname.startsWith(p));
       if (!onPublicPage) {
-        window.location.href = '/login';
+        // Kèm from để đăng nhập lại xong quay về đúng trang đang xem.
+        window.location.href = buildLoginUrlFromHere();
       }
     };
 
@@ -133,8 +150,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       console.error('Logout error:', err);
     } finally {
       queryClient.setQueryData(CURRENT_USER_QUERY_KEY, null);
-      localStorage.clear();
-      sessionStorage.clear();
+      clearUserStorage();
     }
   }, []);
 

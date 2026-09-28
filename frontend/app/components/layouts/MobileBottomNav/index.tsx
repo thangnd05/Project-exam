@@ -19,7 +19,7 @@ import CreateTestModal from '@/app/components/tests/CreateTestModal';
 import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
-import { FaBook, FaChalkboardUser, FaHouse, FaPlus, FaUser, FaXmark } from 'react-icons/fa6';
+import { FaBook, FaChalkboardUser, FaGraduationCap, FaHouse, FaPlus, FaUser, FaXmark } from 'react-icons/fa6';
 
 const cx = classNames.bind(styles);
 
@@ -66,8 +66,8 @@ function MobileBottomNav() {
 
   if (hidden) return null;
 
-  const isHomeActive =
-    pathname === routes.home || pathname.startsWith('/exam-types');
+  const isHomeActive = pathname === routes.home;
+  const isExamActive = pathname.startsWith('/exam-types');
   // const isPostsActive = pathname.startsWith('/posts');
   const isClassActive =
     pathname.startsWith('/my-classes') ||
@@ -123,6 +123,15 @@ function MobileBottomNav() {
         >
           <FaHouse className={cx('tabIcon')} />
           <span className={cx('tabLabel')}>Trang chủ</span>
+        </Link>
+
+        <Link
+          href={routes.examTypes}
+          className={cx('tab', {active: isExamActive})}
+          aria-current={isExamActive ? 'page' : undefined}
+        >
+          <FaGraduationCap className={cx('tabIcon')} />
+          <span className={cx('tabLabel')}>Kỳ thi</span>
         </Link>
 
         {/* <Link

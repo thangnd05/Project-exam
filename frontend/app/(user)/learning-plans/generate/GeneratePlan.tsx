@@ -301,7 +301,7 @@ function GeneratePlan() {
                 </select>
                 <small className={cx('muted')}>
                   {planSource === 'SYLLABUS'
-                    ? 'Đi tuần tự hết các chủ điểm của từng Part. Làm bài thi thử sau để sinh lộ trình sát hơn.'
+                    ? 'Đi tuần tự hết các chủ điểm của từng phần. Làm bài thi thử sau để sinh lộ trình sát hơn.'
                     : 'Ưu tiên các chủ điểm bạn làm sai nhiều nhất trong bài đã chọn.'}
                 </small>
               </div>
@@ -339,14 +339,14 @@ function GeneratePlan() {
                     <option key={t.userTestId} value={t.userTestId}>
                       {t.testTitle ? `${t.testTitle}  ` : ''}
                       {formatDate(t.finishedAt)} · Điểm {t.totalScore ?? '-'}
-                      {isPracticeAttempt(t) ? ' · Luyện theo Part' : ''}
+                      {isPracticeAttempt(t) ? ' · Luyện theo phần' : ''}
                     </option>
                   ))}
                 </select>
               )}
               {isPracticeAttempt(selectedTest) && (
                 <small className={cx('warningText')}>
-                  Bài này chỉ luyện một phần đề nên lộ trình sinh ra chỉ phủ các Part đã luyện.
+                  Bài này chỉ luyện một phần đề nên lộ trình sinh ra chỉ phủ các phần đã luyện.
                   Muốn lộ trình đầy đủ, hãy chọn một bài thi thử trọn đề.
                 </small>
               )}

@@ -68,7 +68,7 @@ function PlanComparisonTooltip({ active, payload }: { active?: boolean; payload?
       )}
       {row.diffVsPrev != null && (
         <p>
-          <strong>So với plan trước:</strong>{' '}
+          <strong>So với lộ trình trước:</strong>{' '}
           {row.diffVsPrev > 0 ? '+' : ''}
           {row.diffVsPrev}%
         </p>
@@ -139,7 +139,7 @@ function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsP
       <div className={cx('chartCard')}>
         <div className={cx('chartCardHeader')}>
           <h3 className={cx('chartCardTitle')}>
-            Tiến triển độ sẵn sàng qua các plan
+            Tiến triển độ sẵn sàng qua các lộ trình
             {examTypeName ? ` · ${examTypeName}` : ''}
           </h3>
         </div>
@@ -171,7 +171,7 @@ function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsP
                 wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
                 formatter={(value) => {
                   if (value === 'readiness') return 'Độ sẵn sàng ban đầu';
-                  if (value === 'diffVsPrev') return 'Chênh so với plan trước';
+                  if (value === 'diffVsPrev') return 'Chênh so với lộ trình trước';
                   return value;
                 }}
               />

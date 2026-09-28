@@ -346,7 +346,7 @@ function QuestionAreaBlock({
 
   return (
     <>
-      {isPractice && <h1 className={cx('exam-title')}>Luyện tập theo Part</h1>}
+      {isPractice && <h1 className={cx('exam-title')}>Luyện theo phần</h1>}
 
       {visibleParts.map((part) => (
         <div key={part.testPartId} className={cx('part-section')}>

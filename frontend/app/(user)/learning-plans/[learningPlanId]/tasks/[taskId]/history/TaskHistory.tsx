@@ -52,9 +52,9 @@ function TaskHistory() {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('alert', 'alertWarning')}>
-          <span>Không tìm thấy ải này trong plan.</span>
+          <span>Không tìm thấy ải này trong lộ trình.</span>
           <Link href={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnOutline', 'btnSm')}>
-            Về plan
+            Về lộ trình
           </Link>
         </div>
       </div>
@@ -84,7 +84,7 @@ function TaskHistory() {
       </div>
 
       <h2 className={cx('title')}>
-        {task.examPartName || 'Part'} · Ải {taskDisplayName(task)}
+        {task.examPartName || 'Phần'} · Ải {taskDisplayName(task)}
       </h2>
       <div className={cx('actionBar')} style={{ marginBottom: '2rem' }}>
         <span className={cx('badge', 'badgeMuted')}>

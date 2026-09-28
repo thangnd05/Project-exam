@@ -118,7 +118,7 @@ function TargetAchieved() {
             <p className={cx('heroMeta')}>
               {target.achievedAt
                 ? <>Đạt mục tiêu lúc: {formatDate(target.achievedAt)}</>
-                : <>Mock đạt mục tiêu: {formatDate(latestMock?.finishedAt)}</>}
+                : <>Bài thi thử đạt mục tiêu: {formatDate(latestMock?.finishedAt)}</>}
             </p>
           </div>
 
@@ -164,7 +164,7 @@ function TargetAchieved() {
                       variant="outline"
                       size="sm"
                     >
-                      Vào trang target
+                      Vào trang mục tiêu
                     </ButtonPrime>
                   </div>
                 </div>
@@ -178,7 +178,7 @@ function TargetAchieved() {
               <ul style={{ paddingLeft: '2rem', margin: 0, fontSize: 'var(--font-size-ssm)' }}>
                 <li>
                   <Link href={`/my-target?examTypeId=${examTypeId}`}>Đặt mục tiêu mới</Link>
-                  {' '}- chỉnh điểm + aim từng Part.
+                  {' '}- chỉnh điểm và mục tiêu từng phần.
                 </li>
                 <li>
                   <Link href={`/learning-plans/compare?examTypeId=${examTypeId}`}>

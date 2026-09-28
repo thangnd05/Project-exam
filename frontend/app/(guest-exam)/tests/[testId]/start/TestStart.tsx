@@ -12,7 +12,7 @@ import styles from '@/app/components/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);
 
-const STATE_SCREEN_STATUSES = ['loading', 'payment', 'no-attempts', 'locked', 'closed', 'error'];
+const STATE_SCREEN_STATUSES = ['loading', 'ready', 'payment', 'no-attempts', 'locked', 'closed', 'error'];
 
 function TestStart() {
   const router = useRouter();
@@ -35,6 +35,7 @@ function TestStart() {
     handleSubmit,
     handlePurchase,
     retryLoad,
+    confirmReady,
     isPaged,
     flowSteps,
     currentStepIndex,
@@ -85,6 +86,9 @@ function TestStart() {
         onBack={() => router.back()}
         onPurchase={handlePurchase}
         onRetry={retryLoad}
+        questionCount={allQuestions.length}
+        partCount={visibleParts.length}
+        onStart={confirmReady}
       />
     );
   }

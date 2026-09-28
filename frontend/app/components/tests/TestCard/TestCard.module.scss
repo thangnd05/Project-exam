@@ -141,6 +141,33 @@
     }
 }
 
+.access-line {
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 12px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 1.15rem;
+    font-weight: 600;
+
+    svg {
+        font-size: 1.35rem;
+        flex-shrink: 0;
+    }
+
+    &.access-guest {
+        color: var(--success-text);
+        background: var(--success-bg);
+    }
+
+    &.access-login {
+        color: var(--slate-700);
+        background: var(--slate-100);
+    }
+}
+
 .created-line {
     margin-top: -4px;
     margin-bottom: 14px;

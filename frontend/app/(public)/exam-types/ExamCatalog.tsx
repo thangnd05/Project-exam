@@ -59,10 +59,20 @@ const parseCode = (name?: string) => {
   return match?.[1]?.toUpperCase() ?? '';
 };
 
-const LEVELS = ['Foundational', 'Associate', 'Professional', 'Specialty'];
+// Tên cấp độ lấy từ tên chứng chỉ AWS (tiếng Anh), hiển thị bằng tiếng Việt.
+const LEVEL_LABELS: Record<string, string> = {
+  Foundational: 'Cơ bản',
+  Associate: 'Trung cấp',
+  Professional: 'Chuyên gia',
+  Specialty: 'Chuyên sâu',
+};
 
-const parseLevel = (name?: string) =>
-  LEVELS.find((level) => new RegExp(`\\b${level}\\b`, 'i').test(name ?? '')) ?? '';
+const parseLevel = (name?: string) => {
+  const level = Object.keys(LEVEL_LABELS).find((key) =>
+    new RegExp(`\\b${key}\\b`, 'i').test(name ?? ''),
+  );
+  return level ? LEVEL_LABELS[level] : '';
+};
 
 const isAwsExam = (exam: ExamTypeResponse) =>
   /aws/i.test(`${exam.name ?? ''} ${exam.parentName ?? ''}`);
@@ -111,7 +121,7 @@ function ExamCatalog() {
       <Container>
         <PageHeader
           title="Kỳ thi đang mở"
-          label="AWS Certification"
+          label="Chứng chỉ AWS"
           description="Luyện đề sát format, xem đáp án và biết phần còn yếu."
           actionText="Tài liệu"
           actionIcon={IoBookOutline}

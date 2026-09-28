@@ -27,6 +27,12 @@ const cx = classNames.bind(style);
 
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
 
+// Lỗi do trang /oauth2/redirect hoặc backend gắn vào ?error= khi đăng nhập Google thất bại.
+const OAUTH_ERROR_TEXT: Record<string, string> = {
+  oauth2_failed: 'Đăng nhập bằng Google thất bại. Vui lòng thử lại.',
+  oauth2_timeout: 'Đăng nhập bằng Google mất quá nhiều thời gian. Vui lòng thử lại.',
+};
+
 function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
 
@@ -61,10 +67,15 @@ function Login() {
       setIsSignUp(mode === 'signup');
     }
 
+    const error = searchParams.get('error');
     const flash = searchParams.get('flash');
-    if (flash) {
-      setMessage(flash);
+    if (error) {
+      setMessage(OAUTH_ERROR_TEXT[error] || OAUTH_ERROR_TEXT.oauth2_failed);
       setMessageType('error');
+    } else if (flash) {
+      // Flash là lời nhắc thân thiện ("Đăng nhập để..."), không phải lỗi.
+      setMessage(flash);
+      setMessageType('info');
     }
   }, [searchParams]);
 

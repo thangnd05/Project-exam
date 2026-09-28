@@ -132,7 +132,7 @@ function ProfileOverview() {
       <div className={cx('container')}>
         <header className={cx('header')}>
           <h1 className={cx('title')}>
-            Dashboard Cá Nhân
+            Tổng quan cá nhân
           </h1>
           <p className={cx('subtitle')}>
             Tổng quan thông tin tài khoản và phân tích tiến độ học tập.

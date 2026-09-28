@@ -176,12 +176,12 @@ function HeroSection() {
         >
           <p className={cx('brand')}>{brandName}</p>
           <h1 className={cx('headline')}>
-            Từ hôm nay đến ngày thi
+            Luyện thi chứng chỉ AWS
             <br />
-            <span className={cx('accent')}>lộ trình</span> dành riêng bạn
+            theo <span className={cx('accent')}>lộ trình</span> dành riêng bạn
           </h1>
           <p className={cx('lede')}>
-            Thử kiểm tra nhanh để lộ điểm yếu và ôn theo lộ trình sát đề thật.
+            Làm bài kiểm tra nhanh để biết điểm yếu, rồi ôn theo lộ trình sát đề thật.
           </p>
           <div className={cx('ctaBlock')}>
             <div className={cx('actions')}>
@@ -203,7 +203,7 @@ function HeroSection() {
                   </span>
                 </>
               )}
-              <span>Không cần đăng ký</span>
+              <span>Đăng ký miễn phí</span>
             </p>
           </div>
         </motion.div>

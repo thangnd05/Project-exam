@@ -37,8 +37,8 @@ function PartRowTooltip({ row }: { row: PartChartRow }) {
         {row.current == null
           ? 'Chưa có dữ liệu thi thử'
           : row.reached
-            ? 'Đạt aim'
-            : `Còn ${(row.aim - row.current).toFixed(1)}% để đạt aim`}
+            ? 'Đạt mục tiêu'
+            : `Còn ${(row.aim - row.current).toFixed(1)}% để đạt mục tiêu`}
       </p>
     </div>
   );
@@ -48,7 +48,7 @@ function TargetDashboardPartChart({ rows }: { rows: PartChartRow[] }) {
   if (!rows.length) {
     return (
       <p className={cx('emptyPartHint')}>
-        Chưa có yêu cầu từng part. Hãy cập nhật mục tiêu tại trang Cài đặt target.
+        Chưa có mục tiêu cho từng phần. Hãy cập nhật ở trang Mục tiêu.
       </p>
     );
   }
@@ -87,7 +87,7 @@ function TargetDashboardPartChart({ rows }: { rows: PartChartRow[] }) {
                 <div
                   className={cx('partCompareTrack')}
                   role="img"
-                  aria-label={`${row.name}: hiện tại ${hasCurrent ? formatPercent(row.current) : 'chưa có'}, aim ${aimPct}%`}
+                  aria-label={`${row.name}: hiện tại ${hasCurrent ? formatPercent(row.current) : 'chưa có'}, mục tiêu ${aimPct}%`}
                 >
                   <div
                     className={cx('partCompareFill', {
@@ -119,7 +119,7 @@ function TargetDashboardPartChart({ rows }: { rows: PartChartRow[] }) {
         </span>
         <span className={cx('partCompareLegendItem')}>
           <span className={cx('partCompareLegendSwatch', 'aimMark')} />
-          Vạch aim
+          Vạch mục tiêu
         </span>
       </div>
     </div>

@@ -54,7 +54,7 @@ function MockStageGuide({ plan }: MockStageGuideProps) {
             <div>
               <div className={cx('stepTitle')}>Làm một bài thi thử trọn đề</div>
               <div className={cx('stepDesc')}>
-                Bài Full Mock chấm lại độ sẵn sàng thật sau khi luyện  chính xác hơn luyện lẻ từng Part.
+                Bài thi thử đầy đủ chấm lại độ sẵn sàng thật sau khi luyện, chính xác hơn luyện lẻ từng phần.
               </div>
               {!freshMock && (
                 <Link
@@ -90,7 +90,7 @@ function MockStageGuide({ plan }: MockStageGuideProps) {
               {isPracticeAttempt(freshMock) && (
                 <>
                   {' '}
-                  <small>(bài luyện theo Part  lộ trình sinh ra chỉ phủ Part đã luyện)</small>
+                  <small>(bài luyện theo phần, lộ trình sinh ra chỉ phủ các phần đã luyện)</small>
                 </>
               )}
             </span>

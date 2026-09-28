@@ -338,7 +338,7 @@ export const useTestSubmission = ({
             }
         } else {
             if (!testInfo.examPartId) {
-                toast.warning('Vui lòng chọn Phần thi (Part)!', { autoClose: TOAST_VALIDATION_MS });
+                toast.warning('Vui lòng chọn phần thi!', { autoClose: TOAST_VALIDATION_MS });
                 return false;
             }
         }

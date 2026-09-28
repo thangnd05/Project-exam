@@ -146,7 +146,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
           onClick={() => setTab('exam')}
         >
           <IoDocumentTextOutline />
-          Luyện thi
+          Thi thử
         </button>
         <button
           type="button"
@@ -154,7 +154,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
           onClick={() => setTab('practice')}
         >
           <IoRadioButtonOnOutline />
-          Luyện tập
+          Luyện theo phần
         </button>
       </div>
 
@@ -202,13 +202,13 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
             className={cx('exam-start')}
             onClick={handleStartFull}
           >
-            Bắt đầu thi
+            Bắt đầu thi thử
           </button>
         </div>
       ) : (
         <div className={cx('practice')}>
           <p className={cx('practice-hint')}>
-            Chọn Part để luyện  <strong>không giới hạn thời gian</strong>.
+            Chọn phần muốn luyện, <strong>không giới hạn thời gian</strong>.
           </p>
 
           {partResources.length > 0 && (
@@ -241,7 +241,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
               >
                 <span className={cx('checkbox', { checked: allSelected })} />
                 <span className={cx('part-name')}>
-                  Chọn tất cả {parts.length} Part
+                  Chọn tất cả {parts.length} phần
                 </span>
                 <span className={cx('part-count')}>{totalQuestions} câu</span>
               </button>

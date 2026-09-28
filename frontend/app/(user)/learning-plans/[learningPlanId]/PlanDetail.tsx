@@ -234,7 +234,7 @@ function PlanDetail() {
       {plan.diagnosisSourcePractice && (
         <div className={cx('alert', 'alertWarning')}>
           <span>
-            Lộ trình này chẩn đoán từ một <strong>bài luyện theo Part</strong> nên chỉ phủ các Part
+            Lộ trình này chẩn đoán từ một <strong>bài luyện theo phần</strong> nên chỉ phủ các phần
             đã luyện. Làm bài thi thử trọn đề rồi sinh lại để có lộ trình đầy đủ.
           </span>
           <Link
