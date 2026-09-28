@@ -25,9 +25,10 @@ type PlanResultViewProps = {
   result?: PlanResultData | null;
   onRetry?: () => void;
   onPickAnother?: () => void;
+  onNext?: () => void;
 };
 
-function PlanResultView({ result, onRetry, onPickAnother }: PlanResultViewProps) {
+function PlanResultView({ result, onRetry, onPickAnother, onNext }: PlanResultViewProps) {
   const items = useMemo(
     () =>
       (result?.reviewItems || []).map((item, idx) => ({
@@ -74,7 +75,16 @@ function PlanResultView({ result, onRetry, onPickAnother }: PlanResultViewProps)
           </p>
         </div>
         <div className={cx('resultActions')}>
-          <button type="button" className={cx('btn', 'btnPrimary', 'btnSm')} onClick={onRetry}>
+          {result.passed && onNext && (
+            <button type="button" className={cx('btn', 'btnPrimary', 'btnSm')} onClick={onNext}>
+              Ải tiếp theo →
+            </button>
+          )}
+          <button
+            type="button"
+            className={cx('btn', result.passed && onNext ? 'btnOutline' : 'btnPrimary', 'btnSm')}
+            onClick={onRetry}
+          >
             {result.passed ? 'Làm lại ải này' : 'Thử lại'}
           </button>
           <button

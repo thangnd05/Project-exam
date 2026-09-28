@@ -132,7 +132,7 @@ function PlanPartTaskList({
   const openIds = openOverride ?? fallbackOpen;
 
   if (!orderedGroups.length) {
-    return <p className={cx('muted')}>Chưa có ải trong kế hoạch.</p>;
+    return <p className={cx('muted')}>Chưa có ải trong lộ trình.</p>;
   }
 
   const togglePart = (partId: string) => {

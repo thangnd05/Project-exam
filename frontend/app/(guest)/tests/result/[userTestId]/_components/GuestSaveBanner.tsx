@@ -25,7 +25,7 @@ function GuestSaveBanner({ userTestId }: GuestSaveBannerProps) {
         <h3 className={cx('title')}>Lưu kết quả này và nhận lộ trình học riêng</h3>
         <p className={cx('desc')}>
           Tạo tài khoản miễn phí, bài vừa làm sẽ được lưu lại để WinDe chẩn đoán điểm yếu
-          và lập kế hoạch ôn tập cho bạn.
+          và lập lộ trình ôn tập cho bạn.
         </p>
       </div>
       <ButtonPrime variant="primary" onClick={() => router.push(buildGuestSignupUrl(`/tests/result/${userTestId}`))}>

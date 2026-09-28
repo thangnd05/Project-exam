@@ -227,7 +227,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
                 disabled={switching === p.learningPlanId}
                 onClick={() => setSwitchTarget(p)}
               >
-                {switching === p.learningPlanId ? 'Đang chuyển...' : 'Đổi kế hoạch'}
+                {switching === p.learningPlanId ? 'Đang chuyển...' : 'Đổi lộ trình'}
               </button>
             )}
             <Link
@@ -263,7 +263,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
         show={Boolean(switchTarget)}
         onClose={() => setSwitchTarget(null)}
         onConfirm={handleSwitchConfirm}
-        title="Đổi kế hoạch học"
+        title="Đổi lộ trình học"
         icon={IoSwapHorizontalOutline}
         confirmText="Đồng ý chuyển"
         message={

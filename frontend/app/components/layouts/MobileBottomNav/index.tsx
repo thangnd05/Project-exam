@@ -6,20 +6,21 @@ import { usePathname, useRouter } from 'next/navigation';
 import {useEffect, useState} from 'react';
 import {createPortal} from 'react-dom';
 import classNames from 'classnames/bind';
-import {toast} from 'react-toastify';
+// import {toast} from 'react-toastify';
 
 import styles from './MobileBottomNav.module.scss';
 import routes from '@/app/configs/Routes';
 import {useAuth} from '@/app/hooks/useAuth';
 import {useCosmetics} from '@/app/hooks/useCosmetics';
 import images from '@/app/assets/images';
-import JoinClassModal from '@/app/components/JoinClassModal/JoinClassModal';
-import CreateClassModal from '@/app/components/CreateClassModal/CreateClassModal';
+// import JoinClassModal from '@/app/components/JoinClassModal/JoinClassModal';
+// import CreateClassModal from '@/app/components/CreateClassModal/CreateClassModal';
 import CreateTestModal from '@/app/components/tests/CreateTestModal';
 import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
-import { FaBook, FaChalkboardUser, FaGraduationCap, FaHouse, FaPlus, FaUser, FaXmark } from 'react-icons/fa6';
+import {useStreak} from '@/app/hooks/useStreak';
+import { FaGraduationCap, FaHouse, FaPlus, FaRoute, FaUser, FaXmark } from 'react-icons/fa6';
 
 const cx = classNames.bind(styles);
 
@@ -44,10 +45,13 @@ function MobileBottomNav() {
   const canCreateTest = roleName === 'ADMIN';
   const canManageTests = roleName === 'ADMIN';
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
-  const [activeSheet, setActiveSheet] = useState<'class' | 'menu' | null>(null);
-  const [showJoinModal, setShowJoinModal] = useState(false);
-  const [showCreateClassModal, setShowCreateClassModal] = useState(false);
+  // Giữ đúng các mục như menu desktop; Lớp học và Từ vựng đang tạm ẩn ở cả hai nơi.
+  const [activeSheet, setActiveSheet] = useState<'menu' | null>(null);
+  // const [showJoinModal, setShowJoinModal] = useState(false);
+  // const [showCreateClassModal, setShowCreateClassModal] = useState(false);
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
+  const {longestStreak, streakReady} = useStreak();
+  const showStats = streakReady && longestStreak > 0;
 
   const hidden = isHiddenRoute(pathname);
   const sheetOpen = activeSheet !== null;
@@ -69,41 +73,36 @@ function MobileBottomNav() {
   const isHomeActive = pathname === routes.home;
   const isExamActive = pathname.startsWith('/exam-types');
   // const isPostsActive = pathname.startsWith('/posts');
-  const isClassActive =
-    pathname.startsWith('/my-classes') ||
-    pathname.startsWith('/class') ||
-    pathname.startsWith('/classes');
-  const isVocabActive =
-    pathname.startsWith('/my-albums') ||
-    pathname.startsWith('/albums/') ||
-    pathname.startsWith('/practice/');
-  const isProfileActive = pathname.startsWith('/profile');
+  const isPlanActive =
+    pathname.startsWith(routes.myTarget) || pathname.startsWith(routes.learningPlans);
+  const isProfileActive =
+    pathname.startsWith('/profile') || pathname.startsWith(routes.myCertificates);
 
-  const requireLogin = (message: string) => {
-    if (user) {
-      return false;
-    }
-    toast.warning(message);
-    router.push(`${routes.login}?mode=signin`);
-    setActiveSheet(null);
-    return true;
-  };
+  // const requireLogin = (message: string) => {
+  //   if (user) {
+  //     return false;
+  //   }
+  //   toast.warning(message);
+  //   router.push(`${routes.login}?mode=signin`);
+  //   setActiveSheet(null);
+  //   return true;
+  // };
 
   const handleCreateTest = () => setShowCreateTestModal(true);
 
-  const handleClassAction = (modalType: string | null, targetRoute?: string) => {
-    if (requireLogin('Bạn cần đăng nhập để thao tác lớp học!')) {
-      return;
-    }
-    if (modalType === 'join') {
-      setShowJoinModal(true);
-    } else if (modalType === 'create') {
-      setShowCreateClassModal(true);
-    } else if (targetRoute) {
-      router.push(targetRoute);
-    }
-    setActiveSheet(null);
-  };
+  // const handleClassAction = (modalType: string | null, targetRoute?: string) => {
+  //   if (requireLogin('Bạn cần đăng nhập để thao tác lớp học!')) {
+  //     return;
+  //   }
+  //   if (modalType === 'join') {
+  //     setShowJoinModal(true);
+  //   } else if (modalType === 'create') {
+  //     setShowCreateClassModal(true);
+  //   } else if (targetRoute) {
+  //     router.push(targetRoute);
+  //   }
+  //   setActiveSheet(null);
+  // };
 
   const handleLogout = async () => {
     await logout();
@@ -154,20 +153,18 @@ function MobileBottomNav() {
           </button>
         )}
 
-        <button
-          type="button"
-          className={cx('tab', {active: isClassActive || activeSheet === 'class'})}
-          onClick={() => setActiveSheet('class')}
-          aria-label="Lớp học"
-          aria-expanded={activeSheet === 'class'}
+        <Link
+          href={routes.learningPlans}
+          className={cx('tab', {active: isPlanActive})}
+          aria-current={isPlanActive ? 'page' : undefined}
         >
-          <FaChalkboardUser className={cx('tabIcon')} />
-          <span className={cx('tabLabel')}>Lớp học</span>
-        </button>
+          <FaRoute className={cx('tabIcon')} />
+          <span className={cx('tabLabel')}>Lộ trình</span>
+        </Link>
 
         <button
           type="button"
-          className={cx('tab', {active: activeSheet === 'menu' || isProfileActive || isVocabActive})}
+          className={cx('tab', {active: activeSheet === 'menu' || isProfileActive})}
           onClick={() => setActiveSheet('menu')}
           aria-label="Menu"
           aria-expanded={activeSheet === 'menu'}
@@ -200,7 +197,7 @@ function MobileBottomNav() {
             className={cx('sheet', {open: sheetOpen})}
             role="dialog"
             aria-modal="true"
-            aria-label={activeSheet === 'class' ? 'Lớp học' : 'Menu'}
+            aria-label="Menu"
             onClick={(e) => e.stopPropagation()}
           >
             <button
@@ -211,7 +208,7 @@ function MobileBottomNav() {
             />
             <div className={cx('sheetHeader')}>
               <span className={cx('sheetTitle')}>
-                {activeSheet === 'class' ? 'Lớp học' : 'Menu'}
+                Menu
               </span>
               <button
                 type="button"
@@ -224,31 +221,7 @@ function MobileBottomNav() {
             </div>
 
             <div className={cx('sheetBody')}>
-              {activeSheet === 'class' ? (
-                <div className={cx('menuSection')}>
-                  <button
-                    type="button"
-                    className={cx('menuAction')}
-                    onClick={() => handleClassAction('join')}
-                  >
-                    Tham gia lớp học
-                  </button>
-                  <button
-                    type="button"
-                    className={cx('menuAction')}
-                    onClick={() => handleClassAction(null, routes.myClasses)}
-                  >
-                    Vào lớp học
-                  </button>
-                  <button
-                    type="button"
-                    className={cx('menuAction')}
-                    onClick={() => handleClassAction('create')}
-                  >
-                    Tạo lớp học
-                  </button>
-                </div>
-              ) : (
+              {/* Sheet "Lớp học" (Tham gia / Vào / Tạo lớp học) tạm ẩn cùng menu desktop. */}
                 <>
                   {user && (
                     <div className={cx('userRow')}>
@@ -262,10 +235,12 @@ function MobileBottomNav() {
                       />
                       <div className={cx('userMeta')}>
                         <span className={cx('userName')}>{user.userName}</span>
-                        <div className={cx('statsRow')}>
-                          <StreakBadge />
-                          <CoinQuestMenu />
-                        </div>
+                        {showStats && (
+                          <div className={cx('statsRow')}>
+                            <StreakBadge />
+                            <CoinQuestMenu />
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}
@@ -278,21 +253,6 @@ function MobileBottomNav() {
                     >
                       Tài liệu
                     </Link>
-                    <Link
-                      href={routes.learningPlans}
-                      className={cx('menuItem')}
-                      onClick={closeSheet}
-                    >
-                      Lộ trình
-                    </Link>
-                    <Link
-                      href={routes.myAlbums}
-                      className={cx('menuItem')}
-                      onClick={closeSheet}
-                    >
-                      <FaBook className={cx('menuItemIcon')} />
-                      Từ vựng
-                    </Link>
                     {canManageTests && (
                       <Link
                         href={routes.MyTest}
@@ -303,13 +263,22 @@ function MobileBottomNav() {
                       </Link>
                     )}
                     {user ? (
-                      <Link
-                        href={routes.profile}
-                        className={cx('menuItem')}
-                        onClick={closeSheet}
-                      >
-                        Hồ sơ
-                      </Link>
+                      <>
+                        <Link
+                          href={routes.profile}
+                          className={cx('menuItem')}
+                          onClick={closeSheet}
+                        >
+                          Hồ sơ
+                        </Link>
+                        <Link
+                          href={routes.myCertificates}
+                          className={cx('menuItem')}
+                          onClick={closeSheet}
+                        >
+                          Chứng chỉ của tôi
+                        </Link>
+                      </>
                     ) : (
                       <>
                         <Link
@@ -340,18 +309,17 @@ function MobileBottomNav() {
                     </button>
                   )}
                 </>
-              )}
             </div>
           </div>
         </div>,
         document.body,
       )}
 
-      <JoinClassModal show={showJoinModal} onClose={() => setShowJoinModal(false)} />
+      {/* <JoinClassModal show={showJoinModal} onClose={() => setShowJoinModal(false)} />
       <CreateClassModal
         show={showCreateClassModal}
         onClose={() => setShowCreateClassModal(false)}
-      />
+      /> */}
       <CreateTestModal
         show={showCreateTestModal}
         onClose={() => setShowCreateTestModal(false)}

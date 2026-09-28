@@ -3,9 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { IoCalendarOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
-import routes from '@/app/configs/Routes';
 import { buildRecoveryMessage } from '@/app/utils/readiness-label';
-import { buildGuestSignupUrl } from '@/app/utils/authRedirect';
+import { buildPlanFromTestUrl, buildGeneratePlanUrl } from '@/app/utils/planFromTest';
 import styles from './Result.module.scss';
 
 const cx = classNames.bind(styles);
@@ -43,17 +42,11 @@ function RecoveryPlan({
   if (!recoveryMessage && !canCreateTarget && !canCreatePlan && !canSignUp) return null;
 
   const handleGoToTarget = () => {
-    const params = new URLSearchParams();
-    if (examTypeId) params.set('examTypeId', String(examTypeId));
-    router.push(`${routes.myTarget}?${params.toString()}`);
+    router.push(buildPlanFromTestUrl({ userTestId, examTypeId, hasTarget: false }));
   };
 
   const handleGoToPlan = () => {
-    const params = new URLSearchParams();
-    if (userTestId) params.set('userTestId', userTestId);
-    if (examTypeId) params.set('examTypeId', String(examTypeId));
-    const qs = params.toString();
-    router.push(qs ? `${routes.generatePlan}?${qs}` : routes.generatePlan);
+    router.push(buildGeneratePlanUrl(userTestId, examTypeId));
   };
 
   return (
@@ -77,7 +70,7 @@ function RecoveryPlan({
         <button
           type="button"
           className={cx('recoveryPlanCta')}
-          onClick={() => router.push(buildGuestSignupUrl(`/tests/result/${userTestId}`))}
+          onClick={() => router.push(buildPlanFromTestUrl({ userTestId, examTypeId, isGuest: true }))}
         >
           <IoCalendarOutline size={20} aria-hidden />
           Đăng ký để nhận lộ trình học
@@ -90,7 +83,7 @@ function RecoveryPlan({
           onClick={handleGoToPlan}
         >
           <IoCalendarOutline size={20} aria-hidden />
-          Lập kế hoạch học
+          Lập lộ trình học
         </button>
       )}
     </div>

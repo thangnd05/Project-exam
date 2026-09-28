@@ -46,7 +46,7 @@ function PlanSessionReview() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <Link href={backTo} className={cx('btn', 'btnGhost', 'btnSm')}>
-            ← {taskId ? 'Lịch sử ải' : 'Kế hoạch'}
+            ← {taskId ? 'Lịch sử ải' : 'Lộ trình'}
           </Link>
         </div>
         <div className={cx('alert', 'alertDanger')}>

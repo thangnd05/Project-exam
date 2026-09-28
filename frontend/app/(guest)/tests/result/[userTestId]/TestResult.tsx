@@ -12,12 +12,14 @@ import {
   IoTimeOutline,
   IoSchoolOutline,
   IoLockClosedOutline,
+  IoCalendarOutline,
 } from "react-icons/io5";
 
 import { useAuth } from "@/app/hooks/useAuth";
 import { getGuestSessionId, guestHeaders } from "@/app/utils/guestSession";
 import { isBeginnerLevel } from "@/app/utils/learnerLevel";
 import { getScoreScale } from "@/app/utils/scoreScale";
+import { buildPlanFromTestUrl } from "@/app/utils/planFromTest";
 import { useTestResult } from "./_hooks/useTestResult";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";
 import CertificateBanner from "./_components/CertificateBanner";
@@ -70,6 +72,15 @@ const TestResult = () => {
       return;
     }
     router.push(`/tests/result/${userTestId}/review`);
+  };
+
+  const handlePlanFromTest = () => {
+    router.push(buildPlanFromTestUrl({
+      userTestId,
+      examTypeId: enhanced?.examTypeId,
+      hasTarget: enhanced ? Boolean(enhanced.hasTarget) : undefined,
+      isGuest,
+    }));
   };
 
   if (loading)
@@ -199,8 +210,12 @@ const TestResult = () => {
                 </ButtonPrime>
               )}
 
-              <ButtonPrime variant="primary" onClick={() => router.push("/")}>
+              <ButtonPrime variant="ghost" onClick={() => router.push("/")}>
                 <IoHomeOutline /> Trang chủ
+              </ButtonPrime>
+
+              <ButtonPrime variant="primary" onClick={handlePlanFromTest}>
+                <IoCalendarOutline /> Lập lộ trình từ bài này
               </ButtonPrime>
             </div>
           </div>

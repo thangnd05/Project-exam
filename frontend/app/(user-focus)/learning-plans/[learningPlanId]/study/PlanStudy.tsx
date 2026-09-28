@@ -245,7 +245,7 @@ function PlanStudy() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <Link href={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
-            ← Kế hoạch
+            ← Lộ trình
           </Link>
         </div>
         <div className={cx('alert', 'alertDanger')}>{error || 'Không mở được ải này.'}</div>
@@ -266,7 +266,7 @@ function PlanStudy() {
             Đã hoàn thành ải của từng phần. Làm bài thi thử đầy đủ để kiểm tra độ sẵn sàng.
             <br />
             <small>
-              Làm một bài <strong>thi thử trọn đề</strong>, sau đó quay lại trang kế hoạch
+              Làm một bài <strong>thi thử trọn đề</strong>, sau đó quay lại trang lộ trình
               hệ thống sẽ gợi ý sinh lộ trình mới từ chính bài vừa làm.
             </small>
           </span>
@@ -294,7 +294,7 @@ function PlanStudy() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <Link href={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
-            ← Kế hoạch
+            ← Lộ trình
           </Link>
         </div>
 

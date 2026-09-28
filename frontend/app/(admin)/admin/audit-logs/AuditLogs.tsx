@@ -83,9 +83,9 @@ function AuditLogs() {
         ),
     },
     {
-      key: 'full_name',
+      key: 'user_name',
       header: 'Người thực hiện',
-      render: (log: AuditLogRow) => log.full_name || log.user_name || 'Unknown',
+      render: (log: AuditLogRow) => log.user_name || log.full_name || 'Unknown',
     },
     {key: 'ip_address', header: 'IP', render: (log: AuditLogRow) => log.ip_address || '-'},
     {

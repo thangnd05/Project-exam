@@ -23,6 +23,7 @@ import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import FirstTimeHint from '@/app/components/gamification/onboarding/FirstTimeHint';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import {useCosmetics} from '@/app/hooks/useCosmetics';
+import {useStreak} from '@/app/hooks/useStreak';
 
 const cx = classNames.bind(style);
 
@@ -73,7 +74,11 @@ function Header() {
   //   setShowClassMenu(nextShow);
   // };
 
-  const statsWithHint = (
+  // Chưa làm xong bài/ải nào thì chưa hiện chuỗi và xu, để người mới tập trung vào bài đầu tiên.
+  const {longestStreak, streakReady} = useStreak();
+  const showStats = Boolean(user) && streakReady && longestStreak > 0;
+
+  const statsWithHint = showStats && (
     <FirstTimeHint
       hintKey="streak-coins"
       enabled={Boolean(user)}
@@ -242,7 +247,7 @@ function Header() {
           </nav>
 
           <div className={cx('zoneRight')}>
-            {user && (
+            {showStats && (
               <div className={cx('mobileHeaderActions')}>
                 <div className={cx('statsCluster')}>
                   {statsWithHint}
@@ -273,9 +278,11 @@ function Header() {
                       </Button>
                     </div>
                   )}
-                  <div className={cx('statsCluster')}>
-                    {statsWithHint}
-                  </div>
+                  {showStats && (
+                    <div className={cx('statsCluster')}>
+                      {statsWithHint}
+                    </div>
+                  )}
                   <Dropdown>
                     <Dropdown.Toggle
                       as="div"

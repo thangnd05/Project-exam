@@ -7,6 +7,7 @@ import PlanCongratsModal, { markCongratsSeen } from '@/app/components/learning-p
 import PlanResultView from '@/app/components/learning-plans/PlanResultView/PlanResultView';
 import { toPlanResult } from '@/app/utils/planResult';
 import { usePlanResult } from './_hooks/usePlanResult';
+import { usePlanDetail } from '@/app/hooks/usePlanDetail';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { PlanStage } from '@/app/enums';
 
@@ -26,6 +27,13 @@ function PlanResult() {
   const retry = () => router.push(`/learning-plans/${learningPlanId}/study?taskId=${taskId}`);
 
   const allTasksDone = !!sessionResult?.passed && sessionResult?.planStage === PlanStage.MOCK;
+
+  // Nộp ải xong thì lộ trình đã được tải lại, ải được gợi ý lúc này chính là ải kế tiếp.
+  const { plan } = usePlanDetail(learningPlanId);
+  const nextTaskId = plan?.recommendedTaskId;
+  const goToNext = !allTasksDone && nextTaskId && nextTaskId !== taskId
+    ? () => router.push(`/learning-plans/${learningPlanId}/study?taskId=${nextTaskId}`)
+    : undefined;
   useEffect(() => {
     if (!allTasksDone) return;
     setShowCongrats(true);
@@ -45,7 +53,7 @@ function PlanResult() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <button type="button" className={cx('btn', 'btnGhost', 'btnSm')} onClick={goToPicker}>
-            ← Kế hoạch
+            ← Lộ trình
           </button>
         </div>
         <div className={cx('alert', 'alertDanger')}>
@@ -69,6 +77,7 @@ function PlanResult() {
         result={result}
         onRetry={retry}
         onPickAnother={goToPicker}
+        onNext={goToNext}
       />
     </div>
   );

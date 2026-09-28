@@ -30,7 +30,7 @@ const steps = [
   {
     id: 'path',
     index: '03',
-    title: 'Luyện theo kế hoạch',
+    title: 'Luyện theo lộ trình',
     text: 'Nhận lộ trình cá nhân: đúng thứ tự, đúng chỗ còn yếu. Không còn mò giữa hàng đống tài liệu.',
     hint: 'Luyện đúng chỗ hổng',
     shot: imageAssets.learningPlan,

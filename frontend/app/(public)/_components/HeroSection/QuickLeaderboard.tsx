@@ -7,7 +7,10 @@ import classNames from 'classnames/bind';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import routes from '@/app/configs/Routes';
 import {getFullMediaUrl} from '@/app/utils/mediaUrl';
-import {hallOfFameTabLabel, useHallOfFameExams} from './hooks/useHallOfFameExams';
+import {
+  hallOfFameTabLabel,
+  useHallOfFameExams,
+} from './hooks/useHallOfFameExams';
 import {useQuickLeaderboard} from './hooks/useQuickLeaderboard';
 import {useStreakLeaderboard} from './hooks/useStreakLeaderboard';
 import styles from './QuickLeaderboard.module.scss';
@@ -26,12 +29,20 @@ type BoardRow = {
 };
 
 function QuickLeaderboard() {
-  const {exams, isLoading: examsLoading, isError: examsError} = useHallOfFameExams();
+  const {
+    exams,
+    isLoading: examsLoading,
+    isError: examsError,
+  } = useHallOfFameExams();
   const [pickedId, setPickedId] = useState<string | null>(null);
   const [fireBoard, setFireBoard] = useState(false);
-  const selected = exams.find((exam) => exam.examTypeId === pickedId) ?? exams[0];
+  const selected =
+    exams.find((exam) => exam.examTypeId === pickedId) ?? exams[0];
   const selectedId = selected?.examTypeId;
-  const examBoard = useQuickLeaderboard(HERO_LIMIT, fireBoard ? undefined : selectedId);
+  const examBoard = useQuickLeaderboard(
+    HERO_LIMIT,
+    fireBoard ? undefined : selectedId,
+  );
   const streakBoard = useStreakLeaderboard(HERO_LIMIT, fireBoard);
 
   const entries: BoardRow[] = fireBoard
@@ -52,13 +63,18 @@ function QuickLeaderboard() {
         value: entry.totalScore ?? 0,
         unit: 'điểm',
       }));
-  const totalParticipants = fireBoard ? streakBoard.totalParticipants : examBoard.totalParticipants;
+  const totalParticipants = fireBoard
+    ? streakBoard.totalParticipants
+    : examBoard.totalParticipants;
   const boardLoading = fireBoard ? streakBoard.isLoading : examBoard.isLoading;
-  const boardPlaceholder = fireBoard ? streakBoard.isPlaceholderData : examBoard.isPlaceholderData;
+  const boardPlaceholder = fireBoard
+    ? streakBoard.isPlaceholderData
+    : examBoard.isPlaceholderData;
   const boardError = fireBoard ? streakBoard.isError : examBoard.isError;
   const showSkeleton = fireBoard
     ? boardLoading && !boardPlaceholder
-    : (examsLoading || Boolean(selectedId && boardLoading)) && !boardPlaceholder;
+    : (examsLoading || Boolean(selectedId && boardLoading)) &&
+      !boardPlaceholder;
   const moreHref = fireBoard
     ? `${routes.hallOfFame}?board=streak`
     : selectedId
@@ -66,7 +82,14 @@ function QuickLeaderboard() {
       : routes.hallOfFame;
 
   return (
-    <aside className={cx('board')} aria-label={fireBoard ? 'Bảng vinh danh người giữ lửa' : 'Bảng vinh danh bài thi thử'}>
+    <aside
+      className={cx('board')}
+      aria-label={
+        fireBoard
+          ? 'Bảng vinh danh người giữ lửa'
+          : 'Bảng vinh danh bài thi thử'
+      }
+    >
       <header className={cx('head')}>
         <div className={cx('headRow')}>
           <p className={cx('kicker')}>Vinh danh</p>
@@ -98,7 +121,7 @@ function QuickLeaderboard() {
             className={cx('tab', 'tabFire', {tabActive: fireBoard})}
             onClick={() => setFireBoard(true)}
           >
-            Chuỗi ngày
+            Streak
           </button>
         </div>
         {(fireBoard || selected?.name) && (
@@ -117,7 +140,9 @@ function QuickLeaderboard() {
       ) : (!fireBoard && examsError) || boardError ? (
         <p className={cx('slot', 'empty')}>Chưa tải được bảng vinh danh.</p>
       ) : !fireBoard && exams.length === 0 ? (
-        <p className={cx('slot', 'empty')}>Chưa có kỳ thi chuẩn để vinh danh.</p>
+        <p className={cx('slot', 'empty')}>
+          Chưa có kỳ thi chuẩn để vinh danh.
+        </p>
       ) : (
         <ol className={cx('list')}>
           {Array.from({length: HERO_LIMIT}, (_, index) => {
@@ -125,7 +150,11 @@ function QuickLeaderboard() {
             const rank = index + 1;
             if (!entry) {
               return (
-                <li key={rank} className={cx('row', 'vacant')} aria-label={`Hạng ${rank}, chưa có người`}>
+                <li
+                  key={rank}
+                  className={cx('row', 'vacant')}
+                  aria-label={`Hạng ${rank}, chưa có người`}
+                >
                   <span className={cx('rank')} aria-hidden="true">
                     {rank}
                   </span>
@@ -146,15 +175,24 @@ function QuickLeaderboard() {
                 </span>
                 <AvatarWithCosmetic
                   src={getFullMediaUrl(entry.avatarUrl)}
-                  name={entry.userName || (/ui-avatars\.com/i.test(entry.avatarUrl || '') ? undefined : entry.displayName)}
+                  name={
+                    entry.userName ||
+                    (/ui-avatars\.com/i.test(entry.avatarUrl || '')
+                      ? undefined
+                      : entry.displayName)
+                  }
                   alt=""
                   size={36}
                 />
                 <span className={cx('who')}>
-                  <span className={cx('name')}>{entry.userName || entry.displayName}</span>
+                  <span className={cx('name')}>
+                    {entry.userName || entry.displayName}
+                  </span>
                 </span>
                 <span className={cx('score', {fire: entry.fire})}>
-                  {entry.fire && <FaFire className={cx('flame')} aria-hidden="true" />}
+                  {entry.fire && (
+                    <FaFire className={cx('flame')} aria-hidden="true" />
+                  )}
                   <span className={cx('scoreValue')}>
                     {entry.value}
                     {entry.unit ? <small>{entry.unit}</small> : null}

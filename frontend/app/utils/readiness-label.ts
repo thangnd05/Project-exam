@@ -151,7 +151,7 @@ export function buildRecoveryMessage({
 }): string | null {
   if (hasTarget && isTargetMet !== true) {
     return 'Bạn chưa đạt điểm mục tiêu. '
-      + 'Hãy lập kế hoạch học để luyện đúng những phần thi còn yếu.';
+      + 'Hãy lập lộ trình học để luyện đúng những phần thi còn yếu.';
   }
   if (!hasTarget && readinessLevel !== 'READY') {
     const score = readinessScore ?? 0;

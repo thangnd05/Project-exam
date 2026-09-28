@@ -262,7 +262,8 @@ function PlanDetail() {
           roadmapHeading={{
             title: 'Bản đồ ải của bạn',
             tip: TERM_TIPS.task,
-            description: `${partGroups.length} chặng · ${totalTasks} ải.`,
+            description: `${partGroups.length} chặng · ${totalTasks} ải. Mỗi chặng là một phần thi, `
+              + 'mỗi ải là một lượt luyện ngắn về một chủ đề  đạt đủ % câu đúng là vượt ải.',
           }}
         />
       )}

@@ -30,12 +30,16 @@ function GeneratePlan() {
   const [searchParams, setSearchParams] = useSearchParamsState();
 
   const forcedSyllabus = searchParams.get('source') === 'syllabus';
+  const userTestIdFromUrl = searchParams.get('userTestId') || '';
 
-  const [userTestId, setUserTestId] = useState(searchParams.get('userTestId') || '');
+  const [userTestId, setUserTestId] = useState(userTestIdFromUrl);
   const [planSource, setPlanSource] = useState<PlanSource>(
     forcedSyllabus ? 'SYLLABUS' : 'DIAGNOSIS',
   );
-  const [planSourceTouched, setPlanSourceTouched] = useState(forcedSyllabus);
+  // Đi từ trang kết quả sang thì đã chọn sẵn bài, không tự đổi sang chương trình học.
+  const [planSourceTouched, setPlanSourceTouched] = useState(
+    forcedSyllabus || Boolean(userTestIdFromUrl),
+  );
 
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PlanResponse | null>(null);
@@ -95,13 +99,14 @@ function GeneratePlan() {
     setPlanSource(beginner ? 'SYLLABUS' : 'DIAGNOSIS');
   }, [planSourceTouched, sourceExamTypeId, loadingList, filteredUserTests.length]);
 
+  // Đổi kỳ thi thủ công đã tự bỏ chọn bài; ở đây chỉ bỏ khi bài không còn tồn tại, để bài
+  // truyền từ trang kết quả không bị xoá trước khi kỳ thi kịp đồng bộ theo bài đó.
   useEffect(() => {
     if (!userTestId || loadingList) return;
-    const stillVisible = filteredUserTests.some((t) => t.userTestId === userTestId);
-    if (!stillVisible) {
+    if (!userTests.some((t) => t.userTestId === userTestId)) {
       setUserTestId('');
     }
-  }, [sourceExamTypeId, filteredUserTests, userTestId, loadingList]);
+  }, [userTests, userTestId, loadingList]);
 
   const selectedTest = useMemo(
     () => userTests.find((t) => t.userTestId === userTestId),
@@ -195,7 +200,8 @@ function GeneratePlan() {
           <div>
             <div className={cx('stepTitle')}>Sinh lộ trình</div>
             <div className={cx('stepDesc')}>
-              Lộ trình chia theo từng phần thi, mỗi phần là chuỗi ải cần vượt.
+              Lộ trình chia thành các chặng (mỗi chặng là một phần thi). Mỗi chặng gồm nhiều ải
+              lượt luyện ngắn về một chủ đề, làm đủ % câu đúng là vượt.
             </div>
           </div>
         </div>
@@ -310,7 +316,7 @@ function GeneratePlan() {
             {planSource === 'DIAGNOSIS' && (
               <div className={cx('fieldGroup')} style={{ marginBottom: '1.6rem' }}>
                 <label className={cx('fieldLabel')}>
-                  Chọn bài thi muốn lập kế hoạch
+                  Chọn bài thi muốn lập lộ trình
                 </label>
               {loadingList ? (
                 <div className={cx('muted')}>Đang tải danh sách bài thi...</div>
