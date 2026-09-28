@@ -1000,46 +1000,62 @@
   }
 
   .state-actions {
-    display: flex;
-    gap: 12px;
     margin-top: 28px;
   }
+}
 
-  .state-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 28px;
-    border-radius: 50px;
-    font-size: 1.6rem;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
-    transition: all 0.2s;
+// Dùng chung cho màn trạng thái và hộp xác nhận nộp bài.
+.state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
 
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
+.state-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 50px;
+  font-size: 1.6rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
+}
 
-  .state-btn-secondary {
-    background: var(--slate-200);
-    color: var(--slate-600);
+.state-btn-secondary {
+  background: var(--slate-200);
+  color: var(--slate-600);
 
-    &:hover:not(:disabled) {
-      background: var(--slate-300);
-    }
+  &:hover:not(:disabled) {
+    background: var(--slate-300);
   }
+}
 
-  .state-btn-primary {
-    background: var(--primary-gradient);
-    color: var(--on-primary-gradient);
+.state-btn-primary {
+  background: var(--primary-gradient);
+  color: var(--on-primary-gradient);
 
-    &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgb(var(--primary-rgb) / 0.25);
-    }
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgb(var(--primary-rgb) / 0.25);
+  }
+}
+
+.submit-confirm-text {
+  font-size: 1.6rem;
+  color: var(--text-secondary);
+  margin: 0;
+
+  strong {
+    color: var(--danger-text);
   }
 }
 

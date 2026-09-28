@@ -91,6 +91,20 @@ function UserTarget() {
     }
   }, [selectedExamTypeId, target, targetIsError]);
 
+  // Người mới chưa biết đặt bao nhiêu: chọn sẵn mức gợi ý ở giữa, mỗi kỳ thi chỉ gợi ý một lần.
+  const [suggestedFor, setSuggestedFor] = useState('');
+  useEffect(() => {
+    if (!selectedExamTypeId || suggestedFor === selectedExamTypeId) return;
+    if (!target || target.hasTarget || targetScore || milestones.length === 0) return;
+    const sorted = milestones
+      .filter((m) => !m.examTypeId || m.examTypeId === selectedExamTypeId)
+      .sort((a, b) => (a.milestoneScore ?? 0) - (b.milestoneScore ?? 0));
+    const middle = sorted[Math.floor((sorted.length - 1) / 2)];
+    if (middle?.milestoneScore == null) return;
+    setTargetScore(String(middle.milestoneScore));
+    setSuggestedFor(selectedExamTypeId);
+  }, [selectedExamTypeId, suggestedFor, target, targetScore, milestones]);
+
   const matchedMilestone = useMemo<MilestoneResponse | null>(() => {
     if (!targetScore) return null;
     return milestones.find((m) => m.milestoneScore === Number(targetScore)) || null;
@@ -220,6 +234,12 @@ function UserTarget() {
       <div className={planCx('headerBar')}>
         <h2 className={classNames(planCx('title'), cx('pageTitle'))}>Mục tiêu của tôi</h2>
       </div>
+      {!hasSavedTarget && (
+        <p className={classNames(planCx('muted'), cx('pageSubtitle'))}>
+          Chọn kỳ thi và mức điểm bạn muốn đạt. WinDe dựa vào đó để biết mỗi phần cần luyện tới đâu
+          rồi lập lộ trình cho bạn.
+        </p>
+      )}
 
       {hasSavedTarget && currentTarget && (
         <section className={cx('currentTargetCard')} aria-label="Mục tiêu hiện tại">
@@ -261,7 +281,7 @@ function UserTarget() {
                 setCustomParts({});
               }}
             >
-              <option value="">-- Chọn --</option>
+              <option value="">-- Chọn kỳ thi bạn muốn học --</option>
               {examTypes.map((et) => (
                 <option key={et.examTypeId} value={et.examTypeId}>
                   {et.name}
@@ -275,11 +295,12 @@ function UserTarget() {
               <label className={cx('fieldLabelLarge')}>Điểm mục tiêu</label>
               {milestones.length > 0 && (
                 <div className={cx('milestoneChips')}>
-                  <span className={cx('chipsLabel')}>Gợi ý từ admin:</span>
+                  <span className={cx('chipsLabel')}>Mức điểm gợi ý:</span>
                   {milestones.map((m) => (
                     <button
                       key={m.examTargetMilestoneId}
                       type="button"
+                      title={m.description || undefined}
                       className={classNames(planCx('badge'), cx('chip', {
                         active: Number(targetScore) === m.milestoneScore,
                       }))}
@@ -292,6 +313,11 @@ function UserTarget() {
                     </button>
                   ))}
                 </div>
+              )}
+              {suggestedFor === selectedExamTypeId && !hasSavedTarget && (
+                <p className={cx('partSectionHint')}>
+                  Chưa biết đặt bao nhiêu? WinDe đã chọn sẵn một mức vừa sức, sau này đổi lúc nào cũng được.
+                </p>
               )}
               <div className={cx('scoreInputRow')}>
                 <input
@@ -308,14 +334,13 @@ function UserTarget() {
                 />
                 {targetScore && matchedMilestone && (
                   <span className={cx('milestoneHint', 'matched')}>
-                    Trùng mốc &quot;{matchedMilestone.milestoneScore}
-                    {matchedMilestone.description && `  ${matchedMilestone.description}`}
-                    &quot;  dùng cấu hình admin
+                    Mức {matchedMilestone.milestoneScore}
+                    {matchedMilestone.description && `: ${matchedMilestone.description}`}
                   </span>
                 )}
                 {targetScore && !matchedMilestone && (
                   <span className={cx('milestoneHint', 'custom')}>
-                    Không trùng mốc nào  chia đều {evenPctForScore(targetScore)}% mỗi part
+                    Điểm tự chọn: mỗi phần thi cần đúng khoảng {evenPctForScore(targetScore)}%
                   </span>
                 )}
               </div>
@@ -323,15 +348,16 @@ function UserTarget() {
           )}
 
           {targetScore && partRequirements.length > 0 && (
-            <div className={cx('partSection')}>
-              <div className={cx('partSectionTitle')}>
-                Yêu cầu từng phần thi
-              </div>
+            <details className={cx('partSection')} open={Object.keys(customParts).length > 0}>
+              <summary className={cx('partSectionTitle')}>
+                Nâng cao: số câu cần đúng ở từng phần thi{' '}
+                <span className={cx('partSectionOptional')}>(không bắt buộc)</span>
+              </summary>
               <div className={cx('partSectionBody')}>
                 <p className={cx('partSectionHint')}>
                   {matchedMilestone
-                    ? 'Giá trị từ cấu hình quản trị viên. Hãy sửa lại nếu không phù hợp.'
-                    : `Chia đều ${evenPctForScore(targetScore)}%. Hãy sửa lại nếu không phù hợp.`}
+                    ? 'Đã điền sẵn theo mức điểm bạn chọn. Chỉ sửa nếu bạn muốn dồn sức vào phần nào đó.'
+                    : `Đã điền sẵn: mỗi phần cần đúng khoảng ${evenPctForScore(targetScore)}%. Chỉ sửa nếu bạn muốn dồn sức vào phần nào đó.`}
                 </p>
 
                 {partRequirements.map((pr) => {
@@ -384,7 +410,7 @@ function UserTarget() {
                   );
                 })}
               </div>
-            </div>
+            </details>
           )}
 
           {scoreEstimateBlock}

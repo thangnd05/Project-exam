@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
@@ -25,6 +26,7 @@ type PlanSource = 'DIAGNOSIS' | 'SYLLABUS';
 const cx = classNames.bind(styles);
 
 function GeneratePlan() {
+  const router = useRouter();
   const [searchParams, setSearchParams] = useSearchParamsState();
 
   const forcedSyllabus = searchParams.get('source') === 'syllabus';
@@ -137,6 +139,11 @@ function GeneratePlan() {
 
     const handlers = {
       onSuccess: (data: PlanResponse) => {
+        // Sinh xong thì đưa thẳng vào lộ trình mới, người mới không phải tự tìm trong danh sách.
+        if (!data?.targetAchieved && data?.learningPlanId) {
+          router.push(`/learning-plans/${data.learningPlanId}`);
+          return;
+        }
         setResult(data);
         if (data?.examTypeId) {
           setFilterExamTypeId(data.examTypeId);
@@ -270,9 +277,11 @@ function GeneratePlan() {
                     ))
                   )}
                 </select>
-                <small className={cx('muted')}>
-                  Chỉ hiện bài đã hoàn thành thuộc loại kỳ thi này.
-                </small>
+                {planSource === 'DIAGNOSIS' && (
+                  <small className={cx('muted')}>
+                    Chỉ hiện bài đã hoàn thành thuộc loại kỳ thi này.
+                  </small>
+                )}
               </div>
 
               <div className={cx('fieldGroup')} style={{ flex: 1 }}>
@@ -367,7 +376,7 @@ function GeneratePlan() {
       {result?.targetAchieved && (
         <div className={cx('alert', 'alertSuccess')}>
           <span>
-            Bạn đã đạt mục tiêu (readiness {result.baselineReadiness ?? 0}%)  chưa cần sinh lộ trình mới.
+            Bạn đã đạt mục tiêu (mức sẵn sàng {result.baselineReadiness ?? 0}%), chưa cần sinh lộ trình mới.
             <br />
             <small>Bạn có thể đặt mục tiêu cao hơn trong tab Mục tiêu, hoặc tiếp tục làm bài thi thử để duy trì phong độ.</small>
           </span>

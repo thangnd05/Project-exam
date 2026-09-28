@@ -112,7 +112,7 @@ function ReadinessGauge({ enhanced }: ReadinessGaugeProps) {
         >
           {isBeginner
             ? 'Xem cấu trúc kỳ thi để bắt đầu từ nền tảng'
-            : 'Làm Full Mock Exam để biết khả năng của bản thân'}
+            : 'Làm một đề thi thử đầy đủ để biết chính xác trình độ của bạn'}
         </div>
       )}
     </div>

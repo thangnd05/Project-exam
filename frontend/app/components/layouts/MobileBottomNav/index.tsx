@@ -19,7 +19,7 @@ import CreateTestModal from '@/app/components/tests/CreateTestModal';
 import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
-import { FaBook, FaChalkboardUser, FaHouse, FaNewspaper, FaPlus, FaUser, FaXmark } from 'react-icons/fa6';
+import { FaBook, FaChalkboardUser, FaHouse, FaPlus, FaUser, FaXmark } from 'react-icons/fa6';
 
 const cx = classNames.bind(styles);
 
@@ -42,6 +42,7 @@ function MobileBottomNav() {
   const router = useRouter();
   const {user, logout, roleName} = useAuth();
   const canCreateTest = roleName === 'ADMIN';
+  const canManageTests = roleName === 'ADMIN';
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
   const [activeSheet, setActiveSheet] = useState<'class' | 'menu' | null>(null);
   const [showJoinModal, setShowJoinModal] = useState(false);
@@ -67,7 +68,7 @@ function MobileBottomNav() {
 
   const isHomeActive =
     pathname === routes.home || pathname.startsWith('/exam-types');
-  const isPostsActive = pathname.startsWith('/posts');
+  // const isPostsActive = pathname.startsWith('/posts');
   const isClassActive =
     pathname.startsWith('/my-classes') ||
     pathname.startsWith('/class') ||
@@ -124,14 +125,14 @@ function MobileBottomNav() {
           <span className={cx('tabLabel')}>Trang chủ</span>
         </Link>
 
-        <Link
+        {/* <Link
           href={routes.posts}
           className={cx('tab', {active: isPostsActive})}
           aria-current={isPostsActive ? 'page' : undefined}
         >
           <FaNewspaper className={cx('tabIcon')} />
           <span className={cx('tabLabel')}>Bài viết</span>
-        </Link>
+        </Link> */}
 
         {canCreateTest && (
           <button
@@ -269,7 +270,7 @@ function MobileBottomNav() {
                       Tài liệu
                     </Link>
                     <Link
-                      href={routes.myTarget}
+                      href={routes.learningPlans}
                       className={cx('menuItem')}
                       onClick={closeSheet}
                     >
@@ -283,13 +284,15 @@ function MobileBottomNav() {
                       <FaBook className={cx('menuItemIcon')} />
                       Từ vựng
                     </Link>
-                    <Link
-                      href={routes.MyTest}
-                      className={cx('menuItem')}
-                      onClick={closeSheet}
-                    >
-                      Bài đã tạo
-                    </Link>
+                    {canManageTests && (
+                      <Link
+                        href={routes.MyTest}
+                        className={cx('menuItem')}
+                        onClick={closeSheet}
+                      >
+                        Bài đã tạo
+                      </Link>
+                    )}
                     {user ? (
                       <Link
                         href={routes.profile}

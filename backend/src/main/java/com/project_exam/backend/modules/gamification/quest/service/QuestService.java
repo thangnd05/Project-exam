@@ -108,6 +108,11 @@ public class QuestService {
     public void delete(String questId) {
         Quest quest = questRepository.findById(questId)
                 .orElseThrow(() -> new NotFoundException("Nhiệm vụ không tồn tại"));
+        long claimCount = claimRepository.countByQuestId(questId);
+        if (claimCount > 0) {
+            throw new ConflictException(
+                    "Nhiệm vụ đã có " + claimCount + " người nhận thưởng nên không thể xóa. Hãy tắt nhiệm vụ thay vì xóa.");
+        }
         questRepository.delete(quest);
     }
 

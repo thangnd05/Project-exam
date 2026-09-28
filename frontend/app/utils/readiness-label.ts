@@ -9,7 +9,7 @@ const READINESS_COPY: Record<string, ReadinessCopy> = {
   },
   ALMOST_READY: {
     label: 'Gần sẵn sàng',
-    message: 'Tập trung sửa lỗi sai và làm final check.',
+    message: 'Tập trung sửa các lỗi hay sai và làm thêm một đề thi thử để chắc chắn.',
   },
   NEEDS_IMPROVEMENT: {
     label: 'Cần cải thiện',
@@ -17,7 +17,7 @@ const READINESS_COPY: Record<string, ReadinessCopy> = {
   },
   NOT_READY: {
     label: 'Chưa sẵn sàng',
-    message: 'Bạn cần củng cố nền tảng trước khi làm mock tiếp.',
+    message: 'Bạn cần củng cố nền tảng trước khi làm đề thi thử tiếp.',
   },
 };
 
@@ -150,14 +150,14 @@ export function buildRecoveryMessage({
   readinessLevel?: string | null;
 }): string | null {
   if (hasTarget && isTargetMet !== true) {
-    return 'Mục tiêu của bạn: Lấp đầy khoảng trống kiến thức để đạt target. '
-      + 'Hãy lập kế hoạch học để luyện tập theo những phần thi bạn chưa đạt mục tiêu đề ra.';
+    return 'Bạn chưa đạt điểm mục tiêu. '
+      + 'Hãy lập kế hoạch học để luyện đúng những phần thi còn yếu.';
   }
   if (!hasTarget && readinessLevel !== 'READY') {
     const score = readinessScore ?? 0;
     const next = Math.min(score + NEXT_READINESS_STEP, 100);
-    return `Mục tiêu: tăng độ sẵn sàng từ ${score}% lên ${next}%. `
-      + 'Hãy đặt mục tiêu điểm và aim từng phần thi để hệ thống gợi ý lộ trình phù hợp.';
+    return `Bước tiếp theo: nâng mức sẵn sàng từ ${score}% lên ${next}%. `
+      + 'Hãy đặt điểm mục tiêu để WinDe lập lộ trình học phù hợp với bạn.';
   }
   return null;
 }

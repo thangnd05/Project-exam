@@ -436,6 +436,11 @@ export function useTestSession() {
     }
   };
 
+  const retryLoad = () => {
+    setStatus('loading');
+    loadTest();
+  };
+
   return {
     isPractice,
     status,
@@ -453,6 +458,7 @@ export function useTestSession() {
     handleAnswerChange,
     handleSubmit,
     handlePurchase,
+    retryLoad,
     isPaged: flow.isPaged,
     flowSteps: flow.flowSteps,
     currentStepIndex: flow.currentStepIndex,

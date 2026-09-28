@@ -21,6 +21,7 @@ import {
 import TestModeModal from '@/app/components/tests/TestModeModal/TestModeModal';
 import type { TestModeSelection } from '@/app/components/tests/TestModeModal/TestModeModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import { useAuth } from '@/app/hooks/useAuth';
 import type { TestResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
@@ -78,8 +79,11 @@ function TestCard({ test, countdowns }: TestCardProps) {
     const { status, statusLabel, buttonText, canStart } =
         getTestStatus(test, now, countdowns);
 
+    // Lịch sử và bảng xếp hạng cần đăng nhập, khách bấm vào sẽ bị đẩy sang trang đăng nhập.
+    const { isAuthenticated } = useAuth();
     const showLeaderboard =
-        test.availableTo == null || now > new Date(test.availableTo);
+        isAuthenticated &&
+        (test.availableTo == null || now > new Date(test.availableTo));
 
     const handleStart = () => {
         if (!canStart) return;
@@ -160,7 +164,7 @@ function TestCard({ test, countdowns }: TestCardProps) {
                     <span>Thời gian tạo: <strong>{formatFullDateTime(test.createdAt)}</strong></span>
                 </div>
 
-                <div className={cx('btn-group', {hasRank: showLeaderboard})}>
+                <div className={cx('btn-group', {hasRank: showLeaderboard, solo: !isAuthenticated})}>
                     <ButtonPrime
                         variant="primary"
                         size="sm"
@@ -171,16 +175,18 @@ function TestCard({ test, countdowns }: TestCardProps) {
                         {buttonText}
                     </ButtonPrime>
 
-                    <ButtonPrime
-                        variant="outline"
-                        size="sm"
-                        className={cx('btn-outline-modern')}
-                        onClick={() =>
-                            router.push(`/tests/history/${test.testId}`)
-                        }
-                    >
-                        Lịch sử
-                    </ButtonPrime>
+                    {isAuthenticated && (
+                        <ButtonPrime
+                            variant="outline"
+                            size="sm"
+                            className={cx('btn-outline-modern')}
+                            onClick={() =>
+                                router.push(`/tests/history/${test.testId}`)
+                            }
+                        >
+                            Lịch sử
+                        </ButtonPrime>
+                    )}
 
                     {showLeaderboard && (
                         <ButtonPrime

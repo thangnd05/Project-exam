@@ -59,6 +59,7 @@ const routes = {
   certificateVerifyHome: '/certificates/verify',
   certificateVerify: '/certificates/verify/:code',
 
+  learningPlans: '/learning-plans',
   generatePlan: '/learning-plans/generate',
   planCompare: '/learning-plans/compare',
   planDetail: '/learning-plans/:learningPlanId',

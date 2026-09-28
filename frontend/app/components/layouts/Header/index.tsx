@@ -31,6 +31,8 @@ const cx = classNames.bind(style);
 function Header() {
   const {user, logout, roleName} = useAuth();
   const canCreateTest = roleName === 'ADMIN';
+  // "Bài đã tạo" là công cụ soạn đề, tạm thời chỉ mở cho admin.
+  const canManageTests = roleName === 'ADMIN';
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
   // const [showJoinModal, setShowJoinModal] = useState(false);
   // const [showCreateModal, setShowCreateModal] = useState(false);
@@ -169,17 +171,19 @@ function Header() {
               >
                 Tài liệu
               </Link>
-              <Link
+              {/* <Link
                 href={routes.posts}
                 className={cx('home', {
                   active: pathname === routes.posts || pathname.startsWith('/posts/'),
                 })}
               >
                 Bài viết
-              </Link>
+              </Link> */}
               <Link
-                href={routes.myTarget}
-                className={cx('home', {active: pathname === routes.myTarget})}
+                href={routes.learningPlans}
+                className={cx('home', {
+                  active: pathname.startsWith(routes.myTarget) || pathname.startsWith(routes.learningPlans),
+                })}
               >
                 Lộ trình
               </Link>
@@ -189,12 +193,14 @@ function Header() {
               >
                 Từ vựng
               </Link> */}
-              <Link
-                href={routes.MyTest}
-                className={cx('home', {active: pathname === routes.MyTest})}
-              >
-                Bài đã tạo
-              </Link>
+              {canManageTests && (
+                <Link
+                  href={routes.MyTest}
+                  className={cx('home', {active: pathname === routes.MyTest})}
+                >
+                  Bài đã tạo
+                </Link>
+              )}
               {/* <Dropdown
                 className={cx('customMenu')}
                 align="start"

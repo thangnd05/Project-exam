@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
+import {toast} from 'react-toastify';
 
 import {useQuests} from './_hooks/useQuests';
 import {toDateTimeLocalInput, fromDateTimeLocalInput} from '@/app/utils/format-date-time';
@@ -161,13 +162,13 @@ function QuestsManagement() {
       return;
     }
     setSubmitting(true);
-    setErrorMessage('');
     try {
       await removeQuest(deletingQuest.questId);
-      setDeletingQuest(null);
-    } catch (error) {
-      setErrorMessage('Không thể xóa nhiệm vụ.');
+      toast.success('Đã xóa nhiệm vụ.');
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Không thể xóa nhiệm vụ.');
     } finally {
+      setDeletingQuest(null);
       setSubmitting(false);
     }
   };

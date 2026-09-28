@@ -248,7 +248,7 @@ function PlanDetail() {
 
       {(plan.partsWithoutTasks?.length ?? 0) > 0 && (
         <div className={cx('alert', 'alertWarning')}>
-          Part chưa đạt mục tiêu nhưng chưa có ải (thiếu tag trên câu hỏi):{' '}
+          Các phần thi sau chưa đạt mục tiêu nhưng tạm thời chưa có bài luyện, WinDe đang bổ sung:{' '}
           <strong>{plan.partsWithoutTasks!.join(', ')}</strong>
         </div>
       )}

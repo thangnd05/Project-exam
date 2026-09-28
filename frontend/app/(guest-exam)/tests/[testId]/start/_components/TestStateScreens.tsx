@@ -19,6 +19,7 @@ type TestStateScreensProps = {
   formatTime: (seconds: number | null) => string;
   onBack: () => void;
   onPurchase: () => void;
+  onRetry?: () => void;
 };
 
 export default function TestStateScreens({
@@ -30,6 +31,7 @@ export default function TestStateScreens({
   formatTime,
   onBack,
   onPurchase,
+  onRetry,
 }: TestStateScreensProps) {
   if (status === 'loading')
     return (
@@ -111,6 +113,33 @@ export default function TestStateScreens({
         >
           Quay lại
         </Button>
+      </div>
+    );
+
+  if (status === 'error')
+    return (
+      <div className={cx('state-box')}>
+        <IoAlertCircleOutline size={80} color="var(--danger-text)" />
+        <h3>Không tải được đề thi</h3>
+        <p>Có thể mạng đang chập chờn. Bạn thử tải lại, bài đã làm (nếu có) vẫn được giữ.</p>
+        <div className={cx('state-actions')}>
+          <button
+            type="button"
+            className={cx('state-btn', 'state-btn-secondary')}
+            onClick={onBack}
+          >
+            Quay lại
+          </button>
+          {onRetry && (
+            <button
+              type="button"
+              className={cx('state-btn', 'state-btn-primary')}
+              onClick={onRetry}
+            >
+              Thử lại
+            </button>
+          )}
+        </div>
       </div>
     );
 

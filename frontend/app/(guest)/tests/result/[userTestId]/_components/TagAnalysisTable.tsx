@@ -121,7 +121,7 @@ function TagAnalysisTable({ enhanced, userTestId }: TagAnalysisTableProps) {
             ))}
 
             <tr className={cx("total-row")}>
-              <td className={cx("col-name")}>Total</td>
+              <td className={cx("col-name")}>Tổng</td>
               <td>{totals.correct}</td>
               <td>{totals.wrong}</td>
               <td>{totals.skipped}</td>

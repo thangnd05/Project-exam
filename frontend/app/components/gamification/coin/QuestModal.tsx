@@ -28,29 +28,17 @@ const CONDITION_ORDER: QuestConditionType[] = [
   QuestConditionType.COMPLETE_LEARNING_PLAN,
 ];
 
-type QuestGroup = {
-  type: UserQuestResponse['conditionType'];
-  title?: string;
-  items: UserQuestResponse[];
-};
+const byCondition = (a: UserQuestResponse, b: UserQuestResponse) =>
+  CONDITION_ORDER.indexOf(a.conditionType!) - CONDITION_ORDER.indexOf(b.conditionType!);
 
-const groupTitle = (quest: UserQuestResponse) =>
-  quest.conditionType === QuestConditionType.NONE
-    ? 'Nhiệm vụ chung'
-    : quest.conditionLabel;
-
-function groupByCondition(quests: UserQuestResponse[]): QuestGroup[] {
-  const groups = new Map<UserQuestResponse['conditionType'], QuestGroup>();
-  quests.forEach((quest) => {
-    const key = quest.conditionType;
-    if (!groups.has(key)) {
-      groups.set(key, {type: key, title: groupTitle(quest), items: []});
-    }
-    groups.get(key)!.items.push(quest);
-  });
-  return Array.from(groups.values()).sort(
-    (a, b) => CONDITION_ORDER.indexOf(a.type!) - CONDITION_ORDER.indexOf(b.type!),
-  );
+// Chia theo trạng thái thay vì loại điều kiện: việc cần làm ngay nằm trên, đã nhận thu gọn cuối cùng.
+function groupByStatus(quests: UserQuestResponse[]) {
+  const sorted = [...quests].sort(byCondition);
+  return {
+    claimable: sorted.filter((q) => !q.claimed && q.eligible),
+    inProgress: sorted.filter((q) => !q.claimed && !q.eligible),
+    claimed: sorted.filter((q) => q.claimed),
+  };
 }
 
 type QuestModalProps = {
@@ -109,19 +97,34 @@ function QuestModal({show, onClose}: QuestModalProps) {
         <div className={cx('placeholder')}>Hiện chưa có nhiệm vụ nào.</div>
       );
     }
+    const {claimable, inProgress, claimed} = groupByStatus(quests);
     return (
       <div className={cx('groups')}>
-        {groupByCondition(quests).map((group) => (
-          <section key={group.type} className={cx('group')}>
-            <h3 className={cx('groupTitle')}>{group.title}</h3>
-            <div className={cx('grid')}>{group.items.map(renderQuestCard)}</div>
+        {claimable.length > 0 && (
+          <section>
+            <h3 className={cx('groupTitle', 'groupTitleHot')}>
+              Có thể nhận ({claimable.length})
+            </h3>
+            <div className={cx('list')}>{claimable.map(renderQuestRow)}</div>
           </section>
-        ))}
+        )}
+        {inProgress.length > 0 && (
+          <section>
+            <h3 className={cx('groupTitle')}>Đang làm ({inProgress.length})</h3>
+            <div className={cx('list')}>{inProgress.map(renderQuestRow)}</div>
+          </section>
+        )}
+        {claimed.length > 0 && (
+          <details className={cx('claimedGroup')}>
+            <summary className={cx('groupTitle')}>Đã nhận ({claimed.length})</summary>
+            <div className={cx('list')}>{claimed.map(renderQuestRow)}</div>
+          </details>
+        )}
       </div>
     );
   };
 
-  const renderQuestCard = (quest: UserQuestResponse) => {
+  const renderQuestRow = (quest: UserQuestResponse) => {
     const hasTarget =
       quest.conditionType !== QuestConditionType.NONE && quest.target! > 0;
     const progressPct = hasTarget
@@ -132,58 +135,55 @@ function QuestModal({show, onClose}: QuestModalProps) {
       : 100;
 
     return (
-      <div key={quest.questId} className={cx('card', {claimed: quest.claimed})}>
-        <div className={cx('cardHead')}>
-          <h4>{quest.title}</h4>
-          <span className={cx('reward')}>
-            <CircleDollarSign size={15} />
-            {quest.rewardCoins}
-          </span>
+      <div key={quest.questId} className={cx('row', {claimed: quest.claimed})}>
+        <div className={cx('rowMain')}>
+          <h4 className={cx('rowTitle')}>{quest.title}</h4>
+          {quest.description && (
+            <p className={cx('desc')} title={quest.description}>
+              {quest.description}
+            </p>
+          )}
+          {hasTarget && !quest.claimed && (
+            <div className={cx('progress')}>
+              <div className={cx('progressBar')}>
+                <div
+                  className={cx('progressFill')}
+                  style={{width: `${progressPct}%`}}
+                />
+              </div>
+              <span className={cx('progressText')}>
+                {quest.conditionLabel}: {quest.currentProgress}/{quest.target}
+              </span>
+            </div>
+          )}
+          {quest.endAt && !quest.claimed && (
+            <div className={cx('deadline')}>
+              <Clock size={13} />
+              Kết thúc: {formatEndAt(quest.endAt)}
+            </div>
+          )}
         </div>
 
-        {quest.description && <p className={cx('desc')}>{quest.description}</p>}
-
-        {hasTarget && (
-          <div className={cx('progress')}>
-            <div className={cx('progressBar')}>
-              <div
-                className={cx('progressFill')}
-                style={{width: `${progressPct}%`}}
-              />
-            </div>
-            <span className={cx('progressText')}>
-              {quest.conditionLabel}: {quest.currentProgress}/{quest.target}
-            </span>
-          </div>
-        )}
-
-        {quest.endAt && (
-          <div className={cx('deadline')}>
-            <Clock size={13} />
-            Kết thúc: {formatEndAt(quest.endAt)}
-          </div>
-        )}
-
-        <div className={cx('cardFoot')}>
+        <div className={cx('rowSide')}>
+          <span className={cx('reward')}>
+            <CircleDollarSign size={14} />
+            {quest.rewardCoins}
+          </span>
           {quest.claimed ? (
             <span className={cx('doneBadge')}>
-              <CheckCircle2 size={16} />
+              <CheckCircle2 size={15} />
               Đã nhận
             </span>
-          ) : (
+          ) : quest.eligible ? (
             <button
               type="button"
               className={cx('claimBtn')}
-              disabled={!quest.eligible || claimingId === quest.questId}
+              disabled={claimingId === quest.questId}
               onClick={() => handleClaim(quest)}
             >
-              {claimingId === quest.questId
-                ? 'Đang nhận...'
-                : quest.eligible
-                  ? 'Nhận xu'
-                  : 'Chưa đủ điều kiện'}
+              {claimingId === quest.questId ? 'Đang nhận...' : 'Nhận xu'}
             </button>
-          )}
+          ) : null}
         </div>
       </div>
     );

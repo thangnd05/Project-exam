@@ -97,6 +97,16 @@
   font-weight: var(--font-weight-semibold);
   color: var(--text-color);
   margin-bottom: 0.8rem;
+  cursor: pointer;
+}
+
+.partSection:not([open]) .partSectionTitle {
+  margin-bottom: 0;
+}
+
+.partSectionOptional {
+  font-weight: normal;
+  color: var(--text-secondary);
 }
 
 .partSectionBody {
