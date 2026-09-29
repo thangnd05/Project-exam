@@ -7,16 +7,13 @@ import classNames from 'classnames/bind';
 import { BookmarkCheck } from 'lucide-react';
 import { IoArrowForward, IoExitOutline, IoTrashOutline } from 'react-icons/io5';
 
-import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import { buildLoginUrl } from '@/app/utils/authRedirect';
 import { clearGuestSessionId } from '@/app/utils/guestSession';
 import { buildGeneratePlanUrl, buildTargetUrl } from '@/app/utils/planFromTest';
-import styles from './CertificateBanner.module.scss';
 import promptStyles from './GuestSaveBanner.module.scss';
 
-const cx = classNames.bind(styles);
 const px = classNames.bind(promptStyles);
 
 const PROMPT_SEEN_KEY = 'guestResultPromptSeen';
@@ -88,25 +85,6 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
 
   return (
     <>
-      <div className={cx('banner', 'pending')}>
-        <BookmarkCheck size={28} className={cx('icon')} />
-        <div className={cx('content')}>
-          <h3 className={cx('title')}>Lưu kết quả này và xây lộ trình cá nhân hóa?</h3>
-          <p className={cx('desc')}>
-            Đăng nhập để lưu bài vừa làm vào tài khoản, WinDe sẽ chẩn đoán điểm yếu và lập lộ
-            trình ôn tập cho bạn. Nếu thoát, kết quả này sẽ bị xóa.
-          </p>
-        </div>
-        <div className={px('bannerActions')}>
-          <ButtonPrime variant="ghost" onClick={openExitConfirm}>
-            Thoát
-          </ButtonPrime>
-          <ButtonPrime variant="primary" onClick={handleSave}>
-            Đăng nhập & lưu
-          </ButtonPrime>
-        </div>
-      </div>
-
       <BaseModal
         show={promptOpen}
         onClose={() => setPromptOpen(false)}
