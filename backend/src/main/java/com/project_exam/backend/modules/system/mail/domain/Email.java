@@ -1,5 +1,8 @@
 package com.project_exam.backend.modules.system.mail.domain;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import jakarta.persistence.*;
 import lombok.*;
@@ -15,6 +18,8 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE system.emails SET deleted_at = now() WHERE email_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Email {
 
     @Id
@@ -57,4 +62,7 @@ public class Email {
 
     @Column(name = "updated_by")
     private String updatedBy;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 }

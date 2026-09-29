@@ -35,6 +35,5 @@ public interface SavedPostRepository extends JpaRepository<SavedPost, String> {
                                       @Param("status") Post.PostStatus status,
                                       @Param("keyword") String keyword,
                                       Pageable pageable);
-    void deleteByPostId(String postId);
     void deleteByUserId(String userId);
 }

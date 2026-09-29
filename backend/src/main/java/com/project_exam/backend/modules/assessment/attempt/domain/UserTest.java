@@ -1,5 +1,8 @@
 package com.project_exam.backend.modules.assessment.attempt.domain;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
@@ -15,6 +18,8 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE assessment.user_tests SET deleted_at = now() WHERE user_test_id = ? AND version = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class UserTest {
 
     @Id
@@ -49,6 +54,9 @@ public class UserTest {
 
     @Version
     private Long version;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
     public enum Status {
         IN_PROGRESS,

@@ -1,5 +1,8 @@
 package com.project_exam.backend.modules.gamification.cosmetic.domain;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
@@ -12,6 +15,8 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE gamification.cosmetics SET deleted_at = now() WHERE cosmetic_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Cosmetic {
     @Id
     @UuidV7
@@ -47,4 +52,7 @@ public class Cosmetic {
 
     @Column(nullable = false)
     private Instant createdAt = Instant.now();
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 }

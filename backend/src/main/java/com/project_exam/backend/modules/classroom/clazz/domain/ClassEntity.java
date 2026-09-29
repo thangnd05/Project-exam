@@ -1,5 +1,8 @@
 package com.project_exam.backend.modules.classroom.clazz.domain;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
@@ -14,6 +17,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE classroom.classes SET deleted_at = now() WHERE class_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class ClassEntity {
 
     @Id
@@ -36,4 +41,7 @@ public class ClassEntity {
     @Builder.Default
     @Column(name = "created_at")
     private Instant createdAt = Instant.now();
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 }

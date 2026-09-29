@@ -36,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -130,7 +131,13 @@ public class AuthService {
             throw new UnauthorizedException("Refresh token không hợp lệ");
         }
 
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+        UserDetails userDetails;
+        try {
+            userDetails = customUserDetailsService.loadUserByUsername(username);
+        } catch (UsernameNotFoundException e) {
+            // Tài khoản đã bị xoá (mềm) sau khi cấp token.
+            throw new UnauthorizedException("Tài khoản không còn tồn tại");
+        }
         if (!jwtService.isTokenValid(refreshToken, userDetails)) {
             throw new UnauthorizedException("Refresh token hết hạn hoặc không hợp lệ");
         }
@@ -248,7 +255,7 @@ public class AuthService {
             User existUser = existing.get();
             if (existUser.getVerified()) throw new ConflictException("Email đã được sử dụng");
             emailVerificationRepository.deleteByUserId(existUser.getUserId());
-            userRepository.delete(existUser);
+            userRepository.hardDeleteById(existUser.getUserId());
         }
 
         User user = new User();

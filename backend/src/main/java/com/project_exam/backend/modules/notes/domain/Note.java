@@ -1,5 +1,8 @@
 package com.project_exam.backend.modules.notes.domain;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,6 +17,8 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE notes.notes SET deleted_at = now() WHERE note_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Note {
 
     @Id
@@ -34,6 +39,9 @@ public class Note {
 
     @Column(nullable = false)
     private Instant updatedAt = Instant.now();
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
     public Note(String userId, String title, String content) {
         this.userId = userId;

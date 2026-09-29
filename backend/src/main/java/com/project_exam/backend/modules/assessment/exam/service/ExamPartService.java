@@ -2,6 +2,7 @@ package com.project_exam.backend.modules.assessment.exam.service;
 
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.exception.BadRequestException;
+import com.project_exam.backend.shared.exception.ConflictException;
 
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartResponse;
@@ -10,6 +11,8 @@ import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 import com.project_exam.backend.modules.assessment.exam.mapper.ExamPartMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
+import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
+import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,8 @@ public class ExamPartService {
     private final ExamPartRepository examPartRepository;
     private final ExamTypeRepository examTypeRepository;
     private final ExamPartMapper examPartMapper;
+    private final QuestionRepository questionRepository;
+    private final TestPartRepository testPartRepository;
 
     public List<ExamPartResponse> findAll() {
         return examPartRepository.findAllOrdered().stream()
@@ -79,6 +84,15 @@ public class ExamPartService {
     public void delete(String id) {
         ExamPart part = examPartRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam part không tồn tại"));
+        // Trước đây FK CASCADE xoá kèm câu hỏi/part của đề; xoá mềm không cascade
+        // nên chặn khi còn nội dung.
+        long questionCount = questionRepository.countByExamPartId(id);
+        long testPartCount = testPartRepository.countActiveByExamPartId(id);
+        if (questionCount > 0 || testPartCount > 0) {
+            throw new ConflictException(
+                    "Không thể xoá: phần thi này còn " + questionCount + " câu hỏi và nằm trong "
+                            + testPartCount + " đề thi. Hãy xoá chúng trước.");
+        }
         examPartRepository.delete(part);
     }
 

@@ -1,5 +1,8 @@
 package com.project_exam.backend.modules.assessment.exam.domain;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
@@ -21,6 +24,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE assessment.questions SET deleted_at = now() WHERE question_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Question {
 
     @Id
@@ -73,6 +78,9 @@ public class Question {
     @Column(name = "usage_scope", nullable = false)
     @Enumerated(EnumType.STRING)
     private UsageScope usageScope = UsageScope.EXAM;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
     public enum UsageScope {
 

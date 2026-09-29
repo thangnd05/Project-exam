@@ -1,5 +1,8 @@
 package com.project_exam.backend.modules.assessment.exam.domain;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
@@ -15,6 +18,8 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE assessment.recovery_resources SET deleted_at = now() WHERE resource_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class RecoveryResource {
 
     @Id
@@ -46,5 +51,8 @@ public class RecoveryResource {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
 }

@@ -1,5 +1,8 @@
 package com.project_exam.backend.modules.users.user.domain;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
@@ -13,6 +16,8 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE users.users SET deleted_at = now() WHERE user_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class User {
     @Id
     @UuidV7
@@ -44,5 +49,8 @@ public class User {
 
     @Column(name = "is_premium", nullable = false)
     private Boolean isPremium = false;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
 }

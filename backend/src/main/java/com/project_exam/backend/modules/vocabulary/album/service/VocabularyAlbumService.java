@@ -10,10 +10,12 @@ import com.project_exam.backend.modules.vocabulary.album.mapper.VocabularyAlbumM
 import com.project_exam.backend.modules.vocabulary.album.repository.VocabularyAlbumRepository;
 import com.project_exam.backend.modules.vocabulary.learning.repository.UserVocabularyRepository;
 import com.project_exam.backend.modules.vocabulary.word.repository.VocabularyRepository;
+import com.project_exam.backend.modules.vocabulary.word.domain.Vocabulary;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -70,11 +72,19 @@ public class VocabularyAlbumService {
         return toResponse(album);
     }
 
+    @Transactional
     public void delete(String id, String userId) {
         VocabularyAlbum album = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Album không tồn tại"));
         requireOwner(album, userId);
 
+        // Trước đây FK CASCADE xoá kèm từ trong album và tiến độ học của chúng. Xoá mềm từ
+        // (cùng deleted_at với album), còn tiến độ học (bảng liên kết) thì xoá thật.
+        List<Vocabulary> words = vocabularyRepository.findByAlbumId(id);
+        if (!words.isEmpty()) {
+            userVocabularyRepository.deleteByVocabIdIn(words.stream().map(Vocabulary::getVocabId).toList());
+            vocabularyRepository.deleteAll(words);
+        }
         repository.delete(album);
     }
 

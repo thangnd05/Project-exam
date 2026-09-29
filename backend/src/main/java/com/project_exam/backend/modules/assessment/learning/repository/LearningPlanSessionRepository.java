@@ -22,6 +22,4 @@ public interface LearningPlanSessionRepository extends JpaRepository<LearningPla
             String learningPlanId, String taskId);
 
     List<LearningPlanSession> findByLearningPlanId(String learningPlanId);
-
-    void deleteByLearningPlanId(String learningPlanId);
 }

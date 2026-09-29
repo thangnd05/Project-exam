@@ -82,7 +82,7 @@ public class RoleService {
                     "Còn " + inUse + " người dùng đang mang vai trò này. Hãy chuyển họ sang vai trò khác trước.");
         }
 
-        rolePermissionRepository.deleteByRoleId(id);
+        // Xoá mềm: role_permissions giữ nguyên để khôi phục vai trò còn đủ quyền.
         roleRepository.delete(role);
         roleAuthorityCache.invalidateAfterCommit(id);
         AuditContext.describe("Xoá vai trò '" + role.getRoleName() + "'");

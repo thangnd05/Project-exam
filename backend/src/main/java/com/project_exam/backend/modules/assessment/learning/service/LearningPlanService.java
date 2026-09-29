@@ -29,8 +29,6 @@ import com.project_exam.backend.modules.assessment.learning.support.PlanTaskView
 import com.project_exam.backend.modules.assessment.attempt.util.ReadinessThresholds;
 import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanRepository;
-import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionAnswerRepository;
-import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionQuestionRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanSessionRepository;
 import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanTaskRepository;
 import com.project_exam.backend.modules.assessment.target.domain.UserTarget;
@@ -80,8 +78,6 @@ public class LearningPlanService {
     private final PlanTaskViewAssembler taskViewAssembler;
     private final UserTargetProgressService userTargetProgressService;
     private final LearningPlanSessionRepository sessionRepository;
-    private final LearningPlanSessionQuestionRepository sessionQuestionRepository;
-    private final LearningPlanSessionAnswerRepository sessionAnswerRepository;
     private final LearningMapper learningMapper;
     private final LearningPlanAccess planAccess;
     private final LearningPlanProgressSupport progressSupport;
@@ -439,16 +435,7 @@ public class LearningPlanService {
     @Transactional
     public void deletePlan(String userId, String learningPlanId) {
         LearningPlan plan = planAccess.requireOwnedPlan(userId, learningPlanId);
-        List<LearningPlanSession> sessions = sessionRepository.findByLearningPlanId(learningPlanId);
-        if (!sessions.isEmpty()) {
-            List<String> sessionIds = sessions.stream()
-                    .map(LearningPlanSession::getSessionId)
-                    .toList();
-            sessionAnswerRepository.deleteBySessionIdIn(sessionIds);
-            sessionQuestionRepository.deleteBySessionIdIn(sessionIds);
-            sessionRepository.deleteByLearningPlanId(learningPlanId);
-        }
-        taskRepository.deleteByLearningPlanId(learningPlanId);
+        // Xoá mềm: session/task chỉ truy cập qua plan nên giữ nguyên để khôi phục được.
         planRepository.delete(plan);
     }
 

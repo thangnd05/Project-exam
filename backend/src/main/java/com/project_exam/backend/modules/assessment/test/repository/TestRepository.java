@@ -58,4 +58,8 @@ public interface TestRepository extends JpaRepository<Test, String> {
                                                  @Param("excludedCategoryIds") Collection<String> excludedCategoryIds,
                                                  Pageable pageable);
 
+
+    long countByExamCategoryId(String examCategoryId);
+
+    long countByExamTypeId(String examTypeId);
 }

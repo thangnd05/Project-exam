@@ -6,15 +6,12 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
-import com.project_exam.backend.modules.assessment.test.domain.TestPart;
 import com.project_exam.backend.modules.assessment.test.dto.CreateTestRequest;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
-import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
-import com.project_exam.backend.modules.assessment.test.repository.TestQuestionRepository;
-import com.project_exam.backend.modules.assessment.attempt.domain.UserAnswer;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
-import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswerRepository;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
+import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanRepository;
+import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamCategoryRepository;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -28,12 +25,11 @@ import java.util.List;
 public class TestCommandService {
 
     private final TestRepository testRepository;
+    private final UserTestRepository userTestRepository;
+    private final TestPartRepository testPartRepository;
+    private final LearningPlanRepository learningPlanRepository;
     private final AuthUtils authUtils;
     private final ClassAccessGuard classAccessGuard;
-    private final UserTestRepository userTestRepository;
-    private final UserAnswerRepository userAnswerRepository;
-    private final TestPartRepository testPartRepository;
-    private final TestQuestionRepository testQuestionRepository;
     private final ExamCategoryRepository examCategoryRepository;
 
     public Test save(Test test) {
@@ -66,21 +62,16 @@ public class TestCommandService {
 
     @Transactional
     public void cascadeDeleteTestInternal(String testId) {
-
+        // Xoá mềm đề kèm part, các lượt làm và lộ trình dựng từ chúng (trước đây FK CASCADE).
+        // Cùng deleted_at vì now() cố định trong transaction -> khôi phục cả cụm bằng một UPDATE.
+        // test_questions và user_answers giữ nguyên.
         List<UserTest> userTests = userTestRepository.findByTestId(testId);
-        for (UserTest ut : userTests) {
-            List<UserAnswer> uas = userAnswerRepository.findByUserTestId(ut.getUserTestId());
-            if (!uas.isEmpty()) userAnswerRepository.deleteAll(uas);
+        if (!userTests.isEmpty()) {
+            learningPlanRepository.deleteAll(learningPlanRepository.findBySourceUserTestIdIn(
+                    userTests.stream().map(UserTest::getUserTestId).toList()));
+            userTestRepository.deleteAll(userTests);
         }
-        if (!userTests.isEmpty()) userTestRepository.deleteAll(userTests);
-
-        List<TestPart> parts = testPartRepository.findByTestId(testId);
-        for (TestPart p : parts) {
-            testQuestionRepository.deleteByTestPartId(p.getTestPartId());
-        }
-
-        if (!parts.isEmpty()) testPartRepository.deleteAll(parts);
-
+        testPartRepository.deleteAll(testPartRepository.findByTestId(testId));
         testRepository.deleteById(testId);
     }
 

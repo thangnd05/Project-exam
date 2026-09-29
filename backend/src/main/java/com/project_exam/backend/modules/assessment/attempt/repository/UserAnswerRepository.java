@@ -16,10 +16,6 @@ public interface UserAnswerRepository extends JpaRepository<UserAnswer, String> 
     Optional<UserAnswer> findByUserTestIdAndQuestionId(String userTestId, String questionId);
 
     @Modifying
-    @Query("DELETE FROM UserAnswer ua WHERE ua.questionId = :questionId")
-    void deleteByQuestionId(@Param("questionId") String questionId);
-
-    @Modifying
     @Query("DELETE FROM UserAnswer ua WHERE ua.userTestId IN :userTestIds")
     void deleteByUserTestIdIn(@Param("userTestIds") List<String> userTestIds);
 }

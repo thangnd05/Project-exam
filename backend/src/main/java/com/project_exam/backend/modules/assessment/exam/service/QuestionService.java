@@ -42,11 +42,9 @@ import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepos
 import com.project_exam.backend.modules.assessment.exam.repository.PassageMediaRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.PassageRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
-import com.project_exam.backend.modules.assessment.exam.repository.QuestionTagRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestQuestionRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
-import com.project_exam.backend.modules.assessment.attempt.repository.UserAnswerRepository;
 import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 import com.project_exam.backend.modules.classroom.member.repository.ClassMemberRepository;
 import com.project_exam.backend.shared.util.AuthUtils;
@@ -81,9 +79,7 @@ public class QuestionService {
     private final QuestionJsonImportService questionJsonImportService;
     private final AdminUserProvider adminUserProvider;
     private final ClassAccessGuard classAccessGuard;
-    private final UserAnswerRepository userAnswerRepository;
     private final TagService tagService;
-    private final QuestionTagRepository questionTagRepository;
     private final PassageMapper passageMapper;
     private final PassageMediaMapper passageMediaMapper;
     private final AnswerMapper answerMapper;
@@ -567,10 +563,9 @@ public class QuestionService {
 
     @Transactional
     public void cascadeDeleteQuestionInternal(String questionId) {
-        userAnswerRepository.deleteByQuestionId(questionId);
+        // Xoá mềm: gỡ khỏi các đề để lượt làm mới không gặp lại câu này, còn đáp án,
+        // tag và bài làm cũ (user_answers) giữ nguyên để xem lại lịch sử / khôi phục.
         testQuestionRepository.deleteByQuestionId(questionId);
-        answerRepository.deleteByQuestionId(questionId);
-        questionTagRepository.deleteByQuestionId(questionId);
         questionRepository.deleteById(questionId);
     }
 

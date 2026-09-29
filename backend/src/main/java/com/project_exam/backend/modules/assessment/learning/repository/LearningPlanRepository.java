@@ -14,6 +14,8 @@ public interface LearningPlanRepository extends JpaRepository<LearningPlan, Stri
 
     List<LearningPlan> findByUserIdOrderByCreatedAtDesc(String userId);
 
+    List<LearningPlan> findBySourceUserTestIdIn(java.util.Collection<String> sourceUserTestIds);
+
     Optional<LearningPlan> findTopByUserIdAndExamTypeIdAndStatusOrderByCreatedAtDesc(
             String userId, String examTypeId, LearningPlan.Status status);
 

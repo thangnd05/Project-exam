@@ -19,12 +19,12 @@ public interface QuestionRepository extends JpaRepository<Question, String>, Jpa
     List<Question> findByChapterId(String chapterId);
     List<Question> findByClassId(String classId);
 
-    @Query(value = "SELECT * FROM assessment.questions WHERE exam_part_id = :examPartId ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
+    @Query(value = "SELECT * FROM assessment.questions WHERE exam_part_id = :examPartId AND deleted_at IS NULL ORDER BY RANDOM() LIMIT :limit", nativeQuery = true)
     List<Question> findRandomByExamPart(@Param("examPartId") String examPartId, @Param("limit") int limit);
 
     @Query(value = """
             SELECT question_id FROM assessment.questions
-            WHERE exam_part_id = :examPartId AND usage_scope IN (:scopes)
+            WHERE exam_part_id = :examPartId AND usage_scope IN (:scopes) AND deleted_at IS NULL
             ORDER BY RANDOM() LIMIT :limit
             """,
             nativeQuery = true)
@@ -41,10 +41,10 @@ public interface QuestionRepository extends JpaRepository<Question, String>, Jpa
     @Query("SELECT COUNT(q) FROM Question q WHERE q.examPartId = :examPartId")
     long countByExamPartId(@Param("examPartId") String examPartId);
 
-    @Query(value = "SELECT * FROM assessment.questions WHERE exam_part_id = :examPartId ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM assessment.questions WHERE exam_part_id = :examPartId AND deleted_at IS NULL ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Question findOneRandomQuestion(@Param("examPartId") String examPartId);
 
-    @Query(value = "SELECT * FROM assessment.questions WHERE exam_part_id = :examPartId AND class_id = :classId ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
+    @Query(value = "SELECT * FROM assessment.questions WHERE exam_part_id = :examPartId AND class_id = :classId AND deleted_at IS NULL ORDER BY RANDOM() LIMIT 1", nativeQuery = true)
     Question findOneRandomQuestionByClass(@Param("examPartId") String examPartId, @Param("classId") String classId);
 
     @Query("""
@@ -227,7 +227,7 @@ public interface QuestionRepository extends JpaRepository<Question, String>, Jpa
 
     @Query(value = """
         SELECT * FROM assessment.questions
-        WHERE exam_part_id = :examPartId AND created_by = :createdBy
+        WHERE exam_part_id = :examPartId AND created_by = :createdBy AND deleted_at IS NULL
           AND class_id IS NULL AND chapter_id IS NULL
           AND is_bank = true
           AND usage_scope IN (:scopes)
@@ -241,7 +241,7 @@ public interface QuestionRepository extends JpaRepository<Question, String>, Jpa
 
     @Query(value = """
         SELECT * FROM assessment.questions
-        WHERE exam_part_id = :examPartId AND created_by = :createdBy
+        WHERE exam_part_id = :examPartId AND created_by = :createdBy AND deleted_at IS NULL
           AND class_id IS NULL AND chapter_id IS NULL
           AND is_bank = true
           AND usage_scope IN (:scopes)
@@ -257,7 +257,7 @@ public interface QuestionRepository extends JpaRepository<Question, String>, Jpa
 
     @Query(value = """
         SELECT * FROM assessment.questions
-        WHERE exam_part_id = :examPartId AND class_id = :classId AND is_bank = true
+        WHERE exam_part_id = :examPartId AND class_id = :classId AND is_bank = true AND deleted_at IS NULL
           AND usage_scope IN (:scopes)
         ORDER BY question_number ASC NULLS LAST, created_at ASC, question_id ASC
         LIMIT :limit OFFSET :offset
@@ -271,7 +271,7 @@ public interface QuestionRepository extends JpaRepository<Question, String>, Jpa
 
     @Query(value = """
         SELECT * FROM assessment.questions
-        WHERE exam_part_id = :examPartId AND class_id = :classId AND chapter_id = :chapterId AND is_bank = true
+        WHERE exam_part_id = :examPartId AND class_id = :classId AND chapter_id = :chapterId AND is_bank = true AND deleted_at IS NULL
           AND usage_scope IN (:scopes)
         ORDER BY question_number ASC NULLS LAST, created_at ASC, question_id ASC
         LIMIT :limit OFFSET :offset
@@ -347,7 +347,7 @@ public interface QuestionRepository extends JpaRepository<Question, String>, Jpa
     @Query(value = """
             SELECT q.question_id FROM assessment.questions q
             INNER JOIN assessment.question_tags qt ON qt.question_id = q.question_id
-            WHERE qt.tag_id = :tagId AND q.exam_part_id = :examPartId
+            WHERE qt.tag_id = :tagId AND q.exam_part_id = :examPartId AND q.deleted_at IS NULL
               AND q.usage_scope IN (:scopes)
             ORDER BY RANDOM()
             LIMIT :limit
@@ -362,7 +362,7 @@ public interface QuestionRepository extends JpaRepository<Question, String>, Jpa
             SELECT EXISTS (
                 SELECT 1 FROM assessment.questions q
                 INNER JOIN assessment.question_tags qt ON qt.question_id = q.question_id
-                WHERE qt.tag_id = :tagId AND q.exam_part_id = :examPartId
+                WHERE qt.tag_id = :tagId AND q.exam_part_id = :examPartId AND q.deleted_at IS NULL
                   AND q.usage_scope IN (:scopes)
             )
             """, nativeQuery = true)

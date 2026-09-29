@@ -214,10 +214,8 @@ public class PostService {
             throw new ForbiddenException("Bạn không có quyền xóa post này");
         }
 
-        postCategoryRepository.deleteByPostId(id);
-        commentRepository.deleteByPostId(id);
-        reactRepository.findByPostId(id).forEach(reactRepository::delete);
-        savedPostRepository.deleteByPostId(id);
+        // Xoá mềm: comment/react/saved/post_category chỉ đọc qua postId (hoặc join Post)
+        // nên tự ẩn theo bài; giữ nguyên để khôi phục bài còn đủ tương tác.
         postRepository.delete(post);
     }
 

@@ -130,12 +130,10 @@ public class RecoveryResourceService {
         RecoveryResource resource = resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new NotFoundException("Tài liệu không tồn tại: " + resourceId));
 
-        if (resource.getCloudinaryPublicId() != null) {
-            try { cloudinaryService.deleteFile(resource.getCloudinaryPublicId()); } catch (Exception ignored) {}
-        }
-
+        // Xoá mềm: giữ file Cloudinary để còn khôi phục được. resource_tags thì xoá thật vì
+        // nhiều query đếm/tra theo tag không join sang recovery_resources.
         resourceTagRepository.deleteByResourceId(resourceId);
-        resourceRepository.deleteById(resourceId);
+        resourceRepository.delete(resource);
     }
 
     public List<RecoveryResourceResponse> getAllResources() {

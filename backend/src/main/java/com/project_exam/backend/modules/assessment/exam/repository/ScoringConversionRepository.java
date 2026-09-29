@@ -12,4 +12,6 @@ public interface ScoringConversionRepository extends JpaRepository<ScoringConver
     List<ScoringConversion> findByExamTypeIdAndSkillId(String examTypeId, String skillId);
     List<ScoringConversion> findBySkillId(String skillId);
     List<ScoringConversion> findByExamTypeId(String examTypeId);
+
+    long countBySkillId(String skillId);
 }

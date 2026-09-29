@@ -24,4 +24,8 @@ public interface ExamPartRepository extends JpaRepository<ExamPart, String> {
 
     ExamPart findByName(String name);
 
+
+    long countBySkillId(String skillId);
+
+    long countByExamTypeId(String examTypeId);
 }

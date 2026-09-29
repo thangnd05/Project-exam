@@ -74,7 +74,7 @@ public class MilestoneService {
     public void delete(String id) {
         ExamTargetMilestone m = milestoneRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Milestone không tồn tại"));
-        partRequirementRepository.deleteByExamTargetMilestoneId(id);
+        // Xoá mềm: target_part_requirements giữ nguyên, chỉ đọc qua milestone.
         milestoneRepository.delete(m);
     }
 

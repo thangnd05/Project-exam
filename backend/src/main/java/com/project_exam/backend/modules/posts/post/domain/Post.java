@@ -1,5 +1,8 @@
 package com.project_exam.backend.modules.posts.post.domain;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
@@ -14,6 +17,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE posts.posts SET deleted_at = now() WHERE id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class Post {
 
     @Id
@@ -44,6 +49,9 @@ public class Post {
     @Builder.Default
     @Column(name = "view_count", nullable = false)
     private Long viewCount = 0L;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
     public enum PostStatus {
         PENDING,

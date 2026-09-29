@@ -3,6 +3,7 @@ package com.project_exam.backend.modules.assessment.attempt.repository;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -63,6 +64,11 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
                                         @Param("practiceMode") UserTest.Mode practiceMode,
                                         @Param("cutoff") java.time.Instant cutoff,
                                         org.springframework.data.domain.Pageable pageable);
+
+    // Xoá thật (bỏ qua @SQLDelete): chỉ dùng để dọn bài làm dở bị bỏ.
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query(value = "DELETE FROM assessment.user_tests WHERE user_test_id IN (:ids)", nativeQuery = true)
+    void hardDeleteByIdIn(@Param("ids") Collection<String> ids);
 
     @Query("SELECT ut FROM UserTest ut WHERE ut.status = :status AND ut.mode <> :practiceMode "
             + "AND ut.startedAt < :cutoff "

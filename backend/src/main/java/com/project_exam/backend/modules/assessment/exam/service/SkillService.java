@@ -1,11 +1,14 @@
 package com.project_exam.backend.modules.assessment.exam.service;
 
+import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 
 import com.project_exam.backend.modules.assessment.exam.dto.SkillRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.SkillResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.Skill;
 import com.project_exam.backend.modules.assessment.exam.mapper.SkillMapper;
+import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
+import com.project_exam.backend.modules.assessment.exam.repository.ScoringConversionRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.SkillRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,8 @@ public class SkillService {
 
     private final SkillRepository skillRepository;
     private final SkillMapper skillMapper;
+    private final ExamPartRepository examPartRepository;
+    private final ScoringConversionRepository scoringConversionRepository;
 
     public List<SkillResponse> findAll() {
         return skillRepository.findAll().stream()
@@ -51,6 +56,11 @@ public class SkillService {
     public void delete(String id) {
         Skill skill = skillRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Skill không tồn tại"));
+        // Trước đây FK RESTRICT chặn ở DB; xoá mềm không đụng FK nên phải chặn ở đây.
+        if (examPartRepository.countBySkillId(id) > 0 || scoringConversionRepository.countBySkillId(id) > 0) {
+            throw new ConflictException(
+                    "Không thể xoá: kỹ năng đang được phần thi hoặc bảng quy đổi điểm sử dụng.");
+        }
         skillRepository.delete(skill);
     }
 

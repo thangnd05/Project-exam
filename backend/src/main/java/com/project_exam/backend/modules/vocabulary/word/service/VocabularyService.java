@@ -11,11 +11,13 @@ import com.project_exam.backend.modules.vocabulary.album.domain.VocabularyAlbum;
 import com.project_exam.backend.modules.vocabulary.word.mapper.VocabularyMapper;
 import com.project_exam.backend.modules.vocabulary.album.repository.VocabularyAlbumRepository;
 import com.project_exam.backend.modules.vocabulary.word.repository.VocabularyRepository;
+import com.project_exam.backend.modules.vocabulary.learning.repository.UserVocabularyRepository;
 import com.project_exam.backend.modules.vocabulary.lookup.service.DictionaryApiService;
 import com.project_exam.backend.modules.vocabulary.lookup.service.TextToSpeechService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -28,6 +30,7 @@ public class VocabularyService {
     private final DictionaryApiService dictionaryApiService;
     private final TextToSpeechService textToSpeechService;
     private final VocabularyMapper vocabularyMapper;
+    private final UserVocabularyRepository userVocabularyRepository;
 
     public List<VocabularyResponse> findAll() {
         return repository.findAll()
@@ -43,10 +46,13 @@ public class VocabularyService {
         return toResponse(vocab);
     }
 
+    @Transactional
     public void delete(String id) {
         Vocabulary vocab = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Vocabulary không tồn tại"));
 
+        // Tiến độ học là bảng liên kết, không join sang vocabulary khi đếm -> xoá thật như FK CASCADE cũ.
+        userVocabularyRepository.deleteByVocabIdIn(List.of(id));
         repository.delete(vocab);
     }
 

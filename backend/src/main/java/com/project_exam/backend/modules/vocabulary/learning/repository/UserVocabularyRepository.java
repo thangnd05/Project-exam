@@ -15,6 +15,7 @@ public interface UserVocabularyRepository extends JpaRepository<UserVocabulary, 
     Optional<UserVocabulary> findByUserIdAndVocabId(String userId, String vocabId);
     List<UserVocabulary> findByUserId(String userId);
     void deleteByUserId(String userId);
+    void deleteByVocabIdIn(java.util.Collection<String> vocabIds);
     long countByUserId(String userId);
     long countByUserIdAndStatus(String userId, UserVocabulary.Status status);
 

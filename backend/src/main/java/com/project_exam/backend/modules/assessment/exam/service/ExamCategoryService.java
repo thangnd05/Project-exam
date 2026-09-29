@@ -5,7 +5,9 @@ import com.project_exam.backend.modules.assessment.exam.dto.ExamCategoryRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamCategoryResponse;
 import com.project_exam.backend.modules.assessment.exam.mapper.ExamCategoryMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamCategoryRepository;
+import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
+import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,7 @@ public class ExamCategoryService {
 
     private final ExamCategoryRepository examCategoryRepository;
     private final ExamCategoryMapper examCategoryMapper;
+    private final TestRepository testRepository;
 
     public List<ExamCategoryResponse> findAll() {
         return examCategoryRepository.findAll().stream()
@@ -76,6 +79,12 @@ public class ExamCategoryService {
     public void delete(String id) {
         ExamCategory category = examCategoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam category không tồn tại"));
+        // Trước đây FK RESTRICT chặn ở DB; xoá mềm không đụng FK nên phải chặn ở đây.
+        long inUse = testRepository.countByExamCategoryId(id);
+        if (inUse > 0) {
+            throw new ConflictException(
+                    "Không thể xoá: còn " + inUse + " đề thi thuộc danh mục này. Hãy chuyển chúng sang danh mục khác trước.");
+        }
         examCategoryRepository.delete(category);
     }
 

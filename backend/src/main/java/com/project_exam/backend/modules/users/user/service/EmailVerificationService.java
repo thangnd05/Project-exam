@@ -47,7 +47,7 @@ public class EmailVerificationService {
         } catch (Exception e) {
 
             emailVerificationRepository.deleteByUserId(user.getUserId());
-            userRepository.deleteById(user.getUserId());
+            userRepository.hardDeleteById(user.getUserId());
             throw new BadRequestException("Không thể gửi email xác thực. Vui lòng kiểm tra địa chỉ email.");
         }
     }
@@ -71,7 +71,7 @@ public class EmailVerificationService {
             emailVerificationRepository.save(ev);
 
             if (!user.getVerified()) {
-                userRepository.delete(user);
+                userRepository.hardDeleteById(user.getUserId());
             }
 
             throw new BadRequestException(
@@ -103,7 +103,7 @@ public class EmailVerificationService {
             User user = userRepository.findById(ev.getUserId()).orElse(null);
             if (user != null && !user.getVerified()) {
                 emailVerificationRepository.delete(ev);
-                userRepository.delete(user);
+                userRepository.hardDeleteById(user.getUserId());
             }
         }
     }

@@ -1,5 +1,8 @@
 package com.project_exam.backend.modules.assessment.certificate.domain;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
@@ -16,6 +19,8 @@ import java.time.Instant;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE assessment.user_certificates SET deleted_at = now() WHERE certificate_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class UserCertificate {
 
     @Id
@@ -68,6 +73,9 @@ public class UserCertificate {
 
     @Column(name = "revoked_reason", length = 500)
     private String revokedReason;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 
     public enum Status {
         ACTIVE,

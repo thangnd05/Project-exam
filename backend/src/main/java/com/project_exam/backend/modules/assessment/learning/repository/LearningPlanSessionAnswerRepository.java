@@ -8,6 +8,4 @@ import java.util.List;
 public interface LearningPlanSessionAnswerRepository extends JpaRepository<LearningPlanSessionAnswer, String> {
 
     List<LearningPlanSessionAnswer> findBySessionId(String sessionId);
-
-    void deleteBySessionIdIn(List<String> sessionIds);
 }

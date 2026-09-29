@@ -8,7 +8,9 @@ import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeResponse;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamType;
 import com.project_exam.backend.modules.assessment.exam.mapper.ExamTypeMapper;
+import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
+import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,8 @@ public class ExamTypeService {
 
     private final ExamTypeRepository examTypeRepository;
     private final ExamTypeMapper examTypeMapper;
+    private final ExamPartRepository examPartRepository;
+    private final TestRepository testRepository;
 
     public List<ExamTypeResponse> findAll() {
         return examTypeRepository.findAll().stream()
@@ -89,6 +93,15 @@ public class ExamTypeService {
         if (examTypeRepository.existsByParentId(id)) {
             throw new ConflictException(
                     "Không thể xoá: loại kỳ thi này đang chứa các loại con. Hãy xoá/tách chúng trước.");
+        }
+        // Trước đây FK CASCADE xoá kèm toàn bộ phần thi/đề/bài làm; xoá mềm không cascade
+        // nên chặn khi còn nội dung để không sót đề "mồ côi" vẫn hiện ra ngoài.
+        long partCount = examPartRepository.countByExamTypeId(id);
+        long testCount = testRepository.countByExamTypeId(id);
+        if (partCount > 0 || testCount > 0) {
+            throw new ConflictException(
+                    "Không thể xoá: loại kỳ thi này còn " + partCount + " phần thi và " + testCount
+                            + " đề thi. Hãy xoá chúng trước.");
         }
         examTypeRepository.delete(type);
     }

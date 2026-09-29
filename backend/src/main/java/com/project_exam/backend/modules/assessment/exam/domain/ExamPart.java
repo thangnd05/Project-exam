@@ -1,5 +1,9 @@
 package com.project_exam.backend.modules.assessment.exam.domain;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import java.time.Instant;
+
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
@@ -13,6 +17,8 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE assessment.exam_parts SET deleted_at = now() WHERE exam_part_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class ExamPart {
 
     @Id
@@ -36,4 +42,7 @@ public class ExamPart {
 
     @Column(name = "display_order", nullable = false)
     private Integer displayOrder = 999;
+
+    @Column(name = "deleted_at")
+    private Instant deletedAt;
 }

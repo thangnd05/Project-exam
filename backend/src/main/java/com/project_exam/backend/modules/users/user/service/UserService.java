@@ -6,6 +6,7 @@ import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.exception.BadRequestException;
 
 import com.project_exam.backend.infrastructure.cloudinary.CloudinaryService;
+import com.project_exam.backend.infrastructure.security.RefreshTokenStore;
 import com.project_exam.backend.modules.users.user.dto.UserUpsertRequest;
 import com.project_exam.backend.modules.users.user.dto.ProfileOverviewResponse;
 import com.project_exam.backend.modules.users.user.dto.ProfileActivityResponse;
@@ -24,6 +25,10 @@ import com.project_exam.backend.modules.assessment.test.repository.TestRepositor
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.vocabulary.learning.repository.UserVocabularyRepository;
 import com.project_exam.backend.modules.classroom.member.repository.ClassMemberRepository;
+import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
+import com.project_exam.backend.modules.posts.post.repository.PostRepository;
+import com.project_exam.backend.modules.posts.comment.repository.CommentRepository;
+import com.project_exam.backend.modules.assessment.attempt.repository.EvaluationRepository;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.modules.system.mail.domain.MailTemplateCode;
 import com.project_exam.backend.modules.system.mail.service.MailService;
@@ -34,6 +39,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,6 +66,11 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserProfileMapper userProfileMapper;
     private final MailService mailService;
+    private final RefreshTokenStore refreshTokenStore;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final EvaluationRepository evaluationRepository;
+    private final ClassRepository classRepository;
 
     private UserResponse toResponse(User user) {
         return userMapper.toResponse(user);
@@ -399,13 +410,24 @@ public class UserService {
         return getUserCurrent(userId).map(this::toResponse);
     }
 
+    @Transactional
     public boolean deleteUser(String id, String currentUserId) {
         boolean isSelf = currentUserId != null && currentUserId.equals(id);
         if (!isSelf && !authUtils.hasPermission(PermissionCatalog.USER_MANAGE)) {
             throw new ForbiddenException("Bạn không có quyền xoá user này.");
         }
         return userRepository.findById(id).map(user -> {
+            // Xoá mềm user kèm nội dung người khác nhìn thấy (bảng xếp hạng, bài viết, bình luận,
+            // đánh giá, lớp đang dạy) — trước đây FK CASCADE xoá chúng. Cùng deleted_at nên khôi
+            // phục cả cụm được. Dữ liệu riêng tư (ghi chú, từ vựng, lộ trình...) giữ nguyên.
+            userTestRepository.deleteAll(userTestRepository.findByUserId(id));
+            postRepository.deleteAll(postRepository.findByUserId(id));
+            commentRepository.deleteAll(commentRepository.findByUserId(id));
+            evaluationRepository.deleteAll(evaluationRepository.findByUserId(id));
+            classRepository.deleteAll(classRepository.findByTeacherId(id));
             userRepository.delete(user);
+            // Thu hồi refresh token để phiên cũ không gia hạn được.
+            refreshTokenStore.revokeAllForUser(user.getUserId());
             return true;
         }).orElse(false);
     }

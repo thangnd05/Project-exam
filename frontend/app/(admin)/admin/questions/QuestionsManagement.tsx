@@ -422,8 +422,8 @@ function QuestionsManagement() {
         title="Xóa câu hỏi"
         message={
           <>
-            Xóa vĩnh viễn câu &ldquo;{truncate(deletingQuestion?.questionText, 80)}&rdquo;? Câu
-            này sẽ bị gỡ khỏi mọi đề đang chứa nó và không khôi phục được.
+            Xóa câu &ldquo;{truncate(deletingQuestion?.questionText, 80)}&rdquo;? Câu này sẽ bị
+            gỡ khỏi mọi đề đang chứa nó; kết quả các bài đã làm vẫn được giữ lại.
           </>
         }
       />

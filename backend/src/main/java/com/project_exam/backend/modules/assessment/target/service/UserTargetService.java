@@ -74,7 +74,7 @@ public class UserTargetService {
     public void delete(String userId, String examTypeId) {
         UserTarget ut = userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId)
                 .orElseThrow(() -> new NotFoundException("Chưa đặt mục tiêu cho loại đề này"));
-        userTargetPartRepository.deleteByUserTargetId(ut.getUserTargetId());
+        // Xoá mềm: user_target_parts giữ nguyên, chỉ đọc qua user_target_id.
         userTargetRepository.delete(ut);
     }
 

@@ -17,4 +17,9 @@ public interface TestPartRepository extends JpaRepository<TestPart, String> {
     @Query("SELECT tp FROM TestPart tp LEFT JOIN ExamPart ep ON ep.examPartId = tp.examPartId "
             + "WHERE tp.testId = :testId ORDER BY COALESCE(ep.displayOrder, 999) ASC")
     List<TestPart> findByTestIdOrderByExamPartDisplayOrder(@Param("testId") String testId);
+
+    // Chỉ đếm part của đề chưa xoá (TestPart không có deleted_at riêng).
+    @Query("SELECT COUNT(tp) FROM TestPart tp WHERE tp.examPartId = :examPartId "
+            + "AND EXISTS (SELECT 1 FROM Test t WHERE t.testId = tp.testId)")
+    long countActiveByExamPartId(@Param("examPartId") String examPartId);
 }

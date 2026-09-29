@@ -15,6 +15,7 @@ import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.EnhancedResultResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.UserTestResponse;
 import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
+import com.project_exam.backend.modules.assessment.learning.repository.LearningPlanRepository;
 import com.project_exam.backend.modules.assessment.target.service.UserTargetProgressService;
 import com.project_exam.backend.modules.assessment.certificate.service.CertificateService;
 import com.project_exam.backend.modules.assessment.attempt.mapper.UserTestMapper;
@@ -84,6 +85,7 @@ public class UserTestService {
     private final UserTargetRepository userTargetRepository;
     private final UserTargetProgressService userTargetProgressService;
     private final CertificateService certificateService;
+    private final LearningPlanRepository learningPlanRepository;
 
     private static final int LEADERBOARD_TOP_LIMIT = 100;
 
@@ -388,12 +390,15 @@ public class UserTestService {
         userTest.setStatus(status);
         return toResponse(userTestRepository.save(userTest));
     }
+    @Transactional
     public boolean delete(String id, String currentUserId) {
         return userTestRepository.findById(id).map(u -> {
             boolean isOwner = currentUserId != null && currentUserId.equals(u.getUserId());
             if (!isOwner && !authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) {
                 throw new ForbiddenException("Bạn không có quyền xoá bài làm này.");
             }
+            // Lộ trình dựng từ bài chẩn đoán này đi theo nó (trước đây FK CASCADE).
+            learningPlanRepository.deleteAll(learningPlanRepository.findBySourceUserTestIdIn(List.of(id)));
             userTestRepository.delete(u);
             return true;
         }).orElse(false);
@@ -667,7 +672,7 @@ public class UserTestService {
                 .map(UserTest::getUserTestId)
                 .collect(Collectors.toList());
         userAnswerRepository.deleteByUserTestIdIn(ids);
-        userTestRepository.deleteAll(abandoned);
+        userTestRepository.hardDeleteByIdIn(ids);
         return abandoned.size();
     }
 
