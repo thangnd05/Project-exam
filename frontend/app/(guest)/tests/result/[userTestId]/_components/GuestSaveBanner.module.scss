@@ -1,0 +1,127 @@
+.bannerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  flex-shrink: 0;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 0 8px;
+}
+
+.lead {
+  margin: 0;
+  font-size: 1.5rem;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-color, #fff);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    border-color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 6%);
+  }
+}
+
+.optionIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--surface-tint);
+  color: var(--primary);
+  font-size: 2rem;
+}
+
+.optionDanger {
+  .optionIcon {
+    background: var(--danger-bg);
+    color: var(--danger-text);
+  }
+
+  &:hover {
+    border-color: var(--danger-border);
+  }
+}
+
+.optionText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.optionTitle {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.optionHint {
+  font-size: 1.25rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.optionArrow {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: 1.6rem;
+}
+
+.later {
+  align-self: center;
+  margin-top: 2px;
+  padding: 4px 8px;
+  border: 0;
+  background: none;
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-color);
+  }
+}
+
+@media (max-width: 768px) {
+  .bannerActions {
+    width: 100%;
+
+    > * {
+      flex: 1;
+    }
+  }
+}

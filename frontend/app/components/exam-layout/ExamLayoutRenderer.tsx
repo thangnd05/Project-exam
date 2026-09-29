@@ -47,6 +47,8 @@ type ExamLayoutRendererProps = {
   questionIndexMap: QuestionIndexMap;
   userAnswers: ExamUserAnswers;
   handleAnswerChange: AnswerChangeHandler;
+  flaggedQuestionIds?: string[];
+  onToggleFlag?: (questionId: string) => void;
   allQuestions: ExamQuestion[];
   timeLeft?: number | null;
   formatTime: (seconds: number) => string;
@@ -74,6 +76,8 @@ function ExamLayoutRenderer({
   questionIndexMap,
   userAnswers,
   handleAnswerChange,
+  flaggedQuestionIds,
+  onToggleFlag,
   allQuestions,
   timeLeft,
   formatTime,
@@ -128,6 +132,7 @@ function ExamLayoutRenderer({
     isPaged,
     canNavigateToQuestion,
     currentQuestionIds: currentStepQuestionIds,
+    flaggedQuestionIds,
   };
 
   const renderBlockNode = (block: LayoutBlock, zone: string) => {
@@ -256,6 +261,8 @@ function ExamLayoutRenderer({
       questionIndexMap={questionIndexMap}
       userAnswers={userAnswers}
       handleAnswerChange={handleAnswerChange}
+      flaggedQuestionIds={flaggedQuestionIds}
+      onToggleFlag={onToggleFlag}
       config={config.questionArea}
       isPaged={isPaged}
       flowSteps={flowSteps}

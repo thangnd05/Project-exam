@@ -9,6 +9,7 @@ import {getUserTarget} from '@/app/apis/userTargetApi';
 import {name as brandName} from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
 import {useAuth} from '@/app/hooks/useAuth';
+import {buildLoginUrl} from '@/app/utils/authRedirect';
 import {examTypeKeys} from '@/app/hooks/examTypeKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
@@ -116,9 +117,11 @@ function HeroSection() {
         next: planUrl,
       }).toString()}`;
 
-      // Khách xem trước trang mục tiêu được, tới lúc lưu mới cần đăng nhập.
+      // Khách đăng nhập trước, xong quay về đúng bước đặt mục tiêu rồi sinh lộ trình.
       if (!authLoading && !isAuthenticated) {
-        router.push(targetUrl);
+        router.push(buildLoginUrl(targetUrl, {
+          flash: 'Đăng nhập để xây lộ trình cá nhân hóa cho kỳ thi này.',
+        }));
         return;
       }
 
@@ -279,6 +282,7 @@ function HeroSection() {
         onClose={closeConfirm}
         onConfirm={confirmStart}
         onStartSyllabusPlan={startSyllabusPlan}
+        isGuest={!authLoading && !isAuthenticated}
       />
     </section>
   );

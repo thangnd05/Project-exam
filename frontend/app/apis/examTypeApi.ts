@@ -56,6 +56,6 @@ export const getOwnExamTypeLayout = (examTypeId: string): Promise<ExamTypeLayout
 
 export const updateExamTypeLayout = (examTypeId: string, config?: string): Promise<ExamTypeLayoutResponse> => {
   return axios
-    .put(`${BASE_URL}/${examTypeId}/layout`, { config })
+    .put(`${ADMIN_BASE_URL}/${examTypeId}/layout`, { config })
     .then((res) => res.data);
 };

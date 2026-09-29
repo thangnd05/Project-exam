@@ -27,6 +27,7 @@ type QuickTestConfirmModalProps = {
   onClose?: () => void;
   onConfirm?: (test: QuickChallengeCardResponse) => void;
   onStartSyllabusPlan?: (test: QuickChallengeCardResponse) => void;
+  isGuest?: boolean;
 };
 
 function QuickTestConfirmModal({
@@ -35,6 +36,7 @@ function QuickTestConfirmModal({
   onClose,
   onConfirm,
   onStartSyllabusPlan,
+  isGuest = false,
 }: QuickTestConfirmModalProps) {
   if (!test) return null;
 
@@ -89,11 +91,11 @@ function QuickTestConfirmModal({
               <IoTrendingUpOutline aria-hidden="true" />
             </span>
             <span className={cx('optionText')}>
-              <span className={cx('optionTitle')}>
-                Mình đã học kỳ thi này
-              </span>
+              <span className={cx('optionTitle')}>Làm bài thi thử ngay</span>
               <span className={cx('optionHint')}>
-                Làm bài kiểm tra nhanh để biết đang yếu phần nào.
+                {isGuest
+                  ? 'Không cần đăng nhập, làm xong biết ngay đang yếu phần nào.'
+                  : 'Làm xong biết ngay đang yếu phần nào.'}
               </span>
             </span>
             <IoPlayOutline className={cx('optionArrow')} aria-hidden="true" />
@@ -108,9 +110,13 @@ function QuickTestConfirmModal({
               <IoLeafOutline aria-hidden="true" />
             </span>
             <span className={cx('optionText')}>
-              <span className={cx('optionTitle')}>Mình chưa học gì</span>
+              <span className={cx('optionTitle')}>
+                {isGuest
+                  ? 'Đăng nhập để xây lộ trình cá nhân hóa'
+                  : 'Xây lộ trình cá nhân hóa'}
+              </span>
               <span className={cx('optionHint')}>
-                Xem nên bắt đầu từ đâu trước khi làm bài.
+                Đặt mục tiêu và nhận lộ trình ôn tập riêng, tiến độ lưu vào tài khoản.
               </span>
             </span>
             <IoArrowForward

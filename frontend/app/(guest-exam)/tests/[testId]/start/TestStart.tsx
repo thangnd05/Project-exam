@@ -32,6 +32,8 @@ function TestStart() {
     allQuestions,
     questionIndexMap,
     handleAnswerChange,
+    flaggedQuestionIds,
+    toggleFlag,
     handleSubmit,
     handlePurchase,
     retryLoad,
@@ -117,6 +119,8 @@ function TestStart() {
         questionIndexMap={questionIndexMap}
         userAnswers={userAnswers}
         handleAnswerChange={handleAnswerChange}
+        flaggedQuestionIds={flaggedQuestionIds}
+        onToggleFlag={toggleFlag}
         allQuestions={allQuestions}
         timeLeft={timeLeft}
         formatTime={formatTime}
@@ -168,6 +172,12 @@ function TestStart() {
             <>
               Bạn đã trả lời hết {allQuestions.length} câu. Nộp rồi thì không
               sửa được nữa.
+            </>
+          )}
+          {flaggedQuestionIds.length > 0 && (
+            <>
+              {' '}
+              Còn <strong>{flaggedQuestionIds.length} câu</strong> bạn đã đánh dấu để xem lại.
             </>
           )}
         </p>

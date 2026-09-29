@@ -20,6 +20,7 @@ type TestStartDashboardProps = {
   isPaged?: boolean;
   canNavigateToQuestion?: ((questionId: string) => boolean) | null;
   currentQuestionIds?: Set<string> | null;
+  flaggedQuestionIds?: string[] | null;
   gridMaxHeight?: string | number | null;
 };
 
@@ -31,8 +32,10 @@ function TestStartDashboard({
   isPaged = false,
   canNavigateToQuestion,
   currentQuestionIds = null,
+  flaggedQuestionIds = null,
   gridMaxHeight = null,
 }: TestStartDashboardProps) {
+  const flaggedSet = new Set(flaggedQuestionIds ?? []);
   const gridStyle: React.CSSProperties | undefined =
     columns || gridMaxHeight
       ? {
@@ -59,15 +62,21 @@ function TestStartDashboard({
                 ? !canNavigateToQuestion(q.questionId)
                 : false;
             const isCurrent = currentQuestionIds ? currentQuestionIds.has(q.questionId) : false;
+            const isFlagged = flaggedSet.has(q.questionId);
             return (
               <button
                 key={q.questionId}
                 type="button"
-                className={cx('q-nav-item', { answered: isAnswered, current: isCurrent, locked })}
+                className={cx('q-nav-item', {
+                  answered: isAnswered,
+                  current: isCurrent,
+                  flagged: isFlagged,
+                  locked,
+                })}
                 onClick={() => !locked && onScrollToQuestion(q.questionId)}
                 disabled={locked}
                 aria-current={isCurrent ? 'true' : undefined}
-                aria-label={`Câu ${idx + 1}${isAnswered ? ', đã làm' : ''}${locked ? ', đang khoá' : ''}`}
+                aria-label={`Câu ${idx + 1}${isAnswered ? ', đã làm' : ''}${isFlagged ? ', đã đánh dấu' : ''}${locked ? ', đang khoá' : ''}`}
               >
                 {idx + 1}
               </button>
@@ -83,6 +92,12 @@ function TestStartDashboard({
             <span className={cx('dot')} />
             <span>Chưa làm</span>
           </div>
+          {flaggedQuestionIds && (
+            <div className={cx('status-item')}>
+              <span className={cx('dot', 'flagged')} />
+              <span>Đánh dấu ({flaggedQuestionIds.length})</span>
+            </div>
+          )}
         </div>
       </div>
     </div>

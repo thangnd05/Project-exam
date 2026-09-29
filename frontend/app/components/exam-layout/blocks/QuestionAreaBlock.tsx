@@ -2,6 +2,7 @@
 
 import { useLayoutEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
+import { IoFlag, IoFlagOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
@@ -45,6 +46,8 @@ type QuestionAreaBlockProps = {
   questionIndexMap: QuestionIndexMap;
   userAnswers: ExamUserAnswers;
   handleAnswerChange: AnswerChangeHandler;
+  flaggedQuestionIds?: string[];
+  onToggleFlag?: (questionId: string) => void;
   config?: LayoutQuestionArea;
 
   isPaged?: boolean;
@@ -61,6 +64,8 @@ function QuestionAreaBlock({
   questionIndexMap,
   userAnswers,
   handleAnswerChange,
+  flaggedQuestionIds,
+  onToggleFlag,
   config,
 
   isPaged = false,
@@ -168,12 +173,27 @@ function QuestionAreaBlock({
   };
 
   const renderQuestionOnly = (q: ExamQuestion, absoluteIndex: number) => {
+    const flagged = flaggedQuestionIds?.includes(q.questionId) ?? false;
     return (
       <div key={q.questionId} id={`q-${q.questionId}`} className={cx('question-card')}>
-        <span className={cx('q-text')}>
-          <span className={cx('q-number')}>Câu {absoluteIndex}:</span>
-          {q.questionText}
-        </span>
+        <div className={cx('q-head')}>
+          <span className={cx('q-text')}>
+            <span className={cx('q-number')}>Câu {absoluteIndex}:</span>
+            {q.questionText}
+          </span>
+          {onToggleFlag && (
+            <button
+              type="button"
+              className={cx('q-flag-btn', { active: flagged })}
+              onClick={() => onToggleFlag(q.questionId)}
+              aria-pressed={flagged}
+              title={flagged ? 'Bỏ đánh dấu' : 'Đánh dấu để xem lại'}
+            >
+              {flagged ? <IoFlag size={16} /> : <IoFlagOutline size={16} />}
+              <span>{flagged ? 'Đã đánh dấu' : 'Đánh dấu'}</span>
+            </button>
+          )}
+        </div>
 
         {q.questionType === QuestionType.MCQ && (
           <div className={cx('mcq-group')}>

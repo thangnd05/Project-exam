@@ -10,6 +10,7 @@ export type ExamSessionState = {
   startedAt: string | null;
   currentStepIndex: number;
   maxStepIndex: number;
+  flaggedQuestionIds: string[];
   lastSavedAt: number;
 };
 
@@ -81,6 +82,9 @@ export const readExamSessionState = (sessionKey: string): ExamSessionState | nul
     startedAt: typeof parsed.startedAt === 'string' ? parsed.startedAt : null,
     currentStepIndex: step,
     maxStepIndex: Math.max(step, maxStep),
+    flaggedQuestionIds: Array.isArray(parsed.flaggedQuestionIds)
+      ? parsed.flaggedQuestionIds.filter((id): id is string => typeof id === 'string')
+      : [],
     lastSavedAt: parsed.lastSavedAt as number,
   };
 };

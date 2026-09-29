@@ -192,6 +192,21 @@
     box-shadow: 0 0 0 2px var(--primary);
   }
 
+  // Góc gấp màu cam, giữ nguyên màu nền để vẫn biết câu đã làm hay chưa.
+  &.flagged {
+    position: relative;
+    overflow: hidden;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      border-top: 16px solid var(--warning);
+      border-left: 16px solid transparent;
+    }
+  }
+
   &.locked {
     opacity: 0.45;
     cursor: not-allowed;
@@ -228,6 +243,15 @@
 
       &.answered {
         background: var(--primary);
+      }
+
+      &.flagged {
+        width: 0;
+        height: 0;
+        border-radius: 0;
+        background: none;
+        border-top: 12px solid var(--warning);
+        border-left: 12px solid transparent;
       }
     }
 
@@ -609,6 +633,46 @@
     line-height: 1.6;
   }
 
+  .q-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    .q-text {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  .q-flag-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--slate-200);
+    background: white;
+    color: var(--slate-500);
+    font-size: 1.3rem;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+
+    &.active {
+      background: var(--warning-bg);
+      border-color: var(--warning-border);
+      color: var(--warning);
+    }
+  }
+
   @media (max-width: 768px) {
     padding: 20px;
     border-radius: 12px;
@@ -629,6 +693,14 @@
     .q-text {
       font-size: var(--font-size-ssm);
       margin-bottom: 16px;
+    }
+
+    .q-flag-btn {
+      padding: 6px;
+
+      span {
+        display: none;
+      }
     }
 
     .q-number {
@@ -993,21 +1065,30 @@
   color: var(--text-secondary);
 
   li {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-  }
+    position: relative;
+    padding-left: 18px;
 
-  svg {
-    flex-shrink: 0;
-    font-size: 2rem;
-    margin-top: 1px;
-    color: var(--primary);
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0.6em;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
   }
 
   strong {
     color: var(--dark-color);
   }
+}
+
+.ready-logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
 }
 
 // Dùng chung cho màn trạng thái và hộp xác nhận nộp bài.

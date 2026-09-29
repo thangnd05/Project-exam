@@ -75,6 +75,8 @@ export function useTestSession() {
   const [userTestId, setUserTestId] = useState<string | null>(null);
   const [test, setTest] = useState<ActiveTest>({ parts: [] });
   const [userAnswers, setUserAnswers] = useState<ExamUserAnswers>({});
+  // Đánh dấu câu chỉ lưu ở localStorage cùng phiên thi, nộp bài là xoá theo.
+  const [flaggedQuestionIds, setFlaggedQuestionIds] = useState<string[]>([]);
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
   const [startedAt, setStartedAt] = useState<string | null>(null);
   const [preCountdown, setPreCountdown] = useState<number | null>(null);
@@ -138,6 +140,7 @@ export function useTestSession() {
     if (savedState) {
       setUserTestId(savedState.userTestId);
       setUserAnswers(savedState.userAnswers);
+      setFlaggedQuestionIds(savedState.flaggedQuestionIds);
       flow.restoreStepState(savedState.currentStepIndex, savedState.maxStepIndex);
       savedStartedAt = savedState.startedAt;
       restored = true;
@@ -290,10 +293,12 @@ export function useTestSession() {
         startedAt,
         currentStepIndex: flow.currentStepIndex,
         maxStepIndex: flow.maxStepIndex,
+        flaggedQuestionIds,
       });
     }
   }, [
     userAnswers,
+    flaggedQuestionIds,
     startedAt,
     userTestId,
     status,
@@ -371,6 +376,12 @@ export function useTestSession() {
       return { ...prev, [questionId]: updatedAnswer };
     });
   };
+
+  const toggleFlag = useCallback((questionId: string) => {
+    setFlaggedQuestionIds((prev) =>
+      prev.includes(questionId) ? prev.filter((id) => id !== questionId) : [...prev, questionId],
+    );
+  }, []);
 
   const handleSubmit = async () => {
     if (!userTestId || submittingRef.current) return;
@@ -467,6 +478,8 @@ export function useTestSession() {
     allQuestions: flow.allQuestions,
     questionIndexMap: flow.questionIndexMap,
     handleAnswerChange,
+    flaggedQuestionIds,
+    toggleFlag,
     handleSubmit,
     handlePurchase,
     retryLoad,

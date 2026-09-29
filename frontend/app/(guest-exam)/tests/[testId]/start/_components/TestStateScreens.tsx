@@ -1,23 +1,39 @@
 'use client';
 
+import { useState } from 'react';
 import { Spinner, Button } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {
-  IoLockClosedOutline,
-  IoAlertCircleOutline,
-  IoPlayCircleOutline,
-  IoListOutline,
-  IoTimeOutline,
-  IoSaveOutline,
-  IoCheckmarkDoneOutline,
-} from 'react-icons/io5';
+import { IoLockClosedOutline, IoAlertCircleOutline, IoPlayCircleOutline } from 'react-icons/io5';
+import { useExamTypeById } from '@/app/hooks/useExamTypes';
+import { getFullMediaUrl } from '@/app/utils/mediaUrl';
 import styles from '@/app/components/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);
 
+function ExamTypeLogo({ examTypeId }: { examTypeId?: string }) {
+  const { examType } = useExamTypeById(examTypeId);
+  const [failed, setFailed] = useState(false);
+  const src = getFullMediaUrl(examType?.imageUrl);
+
+  if (!src || failed) return <IoPlayCircleOutline size={80} color="var(--primary)" />;
+  return (
+    <img
+      className={cx('ready-logo')}
+      src={src}
+      alt={examType?.name || ''}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 type TestStateScreensProps = {
   status: string;
-  test: { title?: string; durationMinutes?: number | null; costCoins?: number | null };
+  test: {
+    title?: string;
+    examTypeId?: string;
+    durationMinutes?: number | null;
+    costCoins?: number | null;
+  };
   balance: number;
   purchasing: boolean;
   preCountdown: number | null;
@@ -56,15 +72,13 @@ export default function TestStateScreens({
     const timed = (test.durationMinutes ?? 0) > 0;
     return (
       <div className={cx('state-box')}>
-        <IoPlayCircleOutline size={80} color="var(--primary)" />
+        <ExamTypeLogo examTypeId={test.examTypeId} />
         <h3>{test.title || 'Sẵn sàng làm bài'}</h3>
         <ul className={cx('ready-facts')}>
           <li>
-            <IoListOutline />
             <span><strong>{questionCount}</strong> câu hỏi{partCount > 1 ? `, chia thành ${partCount} phần` : ''}</span>
           </li>
           <li>
-            <IoTimeOutline />
             <span>
               {timed ? (
                 <>Thời gian: <strong>{test.durationMinutes} phút</strong>, tính từ lúc bấm bắt đầu</>
@@ -74,11 +88,9 @@ export default function TestStateScreens({
             </span>
           </li>
           <li>
-            <IoSaveOutline />
             <span>Câu trả lời được lưu tự động, lỡ tải lại trang vẫn làm tiếp được.</span>
           </li>
           <li>
-            <IoCheckmarkDoneOutline />
             <span>
               Làm xong bấm <strong>Nộp bài</strong> để xem điểm và đáp án.
               {timed && ' Hết giờ bài sẽ tự nộp.'}
