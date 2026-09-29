@@ -621,15 +621,17 @@ public class UserTestService {
     }
 
     @Transactional
-    public int claimGuestTests(String userId, String guestSessionId) {
-        if (userId == null || guestSessionId == null || guestSessionId.isBlank()) return 0;
+    // Chỉ nhận đúng bài khách đã chọn "Đăng nhập & lưu"; các bài khác trong phiên giữ nguyên dạng khách.
+    public int claimGuestTests(String userId, String guestSessionId, String userTestId) {
+        if (userId == null || guestSessionId == null || guestSessionId.isBlank()
+                || userTestId == null || userTestId.isBlank()) return 0;
 
         List<UserTest> guestTests = userTestRepository.findByGuestSessionId(guestSessionId);
         if (guestTests.isEmpty()) return 0;
 
         List<UserTest> toSave = new ArrayList<>();
         for (UserTest ut : guestTests) {
-            if (ut.getUserId() != null) continue;
+            if (ut.getUserId() != null || !userTestId.equals(ut.getUserTestId())) continue;
 
             if (ut.getStatus() == UserTest.Status.IN_PROGRESS
                     && findActiveUserTest(userId, ut.getTestId()).isPresent()) {

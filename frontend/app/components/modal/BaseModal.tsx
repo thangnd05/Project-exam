@@ -18,6 +18,7 @@ type BaseModalProps = {
   maxWidth?: number | string;
   closeOnOverlay?: boolean;
   closeOnEsc?: boolean;
+  showCloseButton?: boolean;
   children?: React.ReactNode;
 };
 
@@ -30,6 +31,7 @@ function BaseModal({
   maxWidth,
   closeOnOverlay = true,
   closeOnEsc = true,
+  showCloseButton = true,
   children,
 }: BaseModalProps) {
   useEffect(() => {
@@ -70,14 +72,16 @@ function BaseModal({
             <h3 className={cx('title')}>{title}</h3>
             {headerExtra}
           </div>
-          <button
-            type="button"
-            className={cx('closeBtn')}
-            onClick={onClose}
-            aria-label="Đóng"
-          >
-            <IoClose />
-          </button>
+          {showCloseButton && (
+            <button
+              type="button"
+              className={cx('closeBtn')}
+              onClick={onClose}
+              aria-label="Đóng"
+            >
+              <IoClose />
+            </button>
+          )}
         </div>
 
         <div className={cx('body')}>{children}</div>

@@ -93,10 +93,11 @@ export const submitUserTest = (userTestId: string, isGuest?: boolean, config: Ax
   return axios.post(url, null, config).then((res) => res.data);
 };
 
-export const claimGuestTests = (guestSessionId: string): Promise<ClaimGuestTestsResponse> => {
+export const claimGuestTests = (guestSessionId: string, userTestId: string): Promise<ClaimGuestTestsResponse> => {
   return axios
     .post(`${BASE_URL}/claim-guest`, null, {
       headers: { 'X-Guest-Session': guestSessionId },
+      params: { userTestId },
     })
     .then((res) => res.data);
 };

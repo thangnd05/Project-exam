@@ -10,31 +10,13 @@ import { IoArrowForward, IoExitOutline, IoTrashOutline } from 'react-icons/io5';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import { buildLoginUrl } from '@/app/utils/authRedirect';
-import { clearGuestSessionId } from '@/app/utils/guestSession';
+import { clearGuestSessionId, setGuestClaimIntent } from '@/app/utils/guestSession';
 import { buildGeneratePlanUrl, buildTargetUrl } from '@/app/utils/planFromTest';
 import promptStyles from './GuestSaveBanner.module.scss';
 
 const px = classNames.bind(promptStyles);
 
-const PROMPT_SEEN_KEY = 'guestResultPromptSeen';
 const PROMPT_DELAY_MS = 1200;
-
-// Mỗi bài chỉ tự hỏi một lần trong phiên, quay lại từ trang đáp án không bị hỏi lại.
-const hasSeenPrompt = (userTestId: string): boolean => {
-  try {
-    return window.sessionStorage.getItem(`${PROMPT_SEEN_KEY}:${userTestId}`) === '1';
-  } catch {
-    return false;
-  }
-};
-
-const markPromptSeen = (userTestId: string): void => {
-  try {
-    window.sessionStorage.setItem(`${PROMPT_SEEN_KEY}:${userTestId}`, '1');
-  } catch {
-    // Không lưu được thì lần sau hỏi lại, không sao.
-  }
-};
 
 type GuestSaveBannerProps = {
   userTestId?: string;
@@ -46,13 +28,11 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
   const [promptOpen, setPromptOpen] = useState(false);
   const [confirmExit, setConfirmExit] = useState(false);
 
-  // Cho khách nhìn thấy điểm trước rồi mới hỏi.
+  // Cho khách nhìn thấy điểm trước rồi mới hỏi. Khách bắt buộc phải chọn lưu hoặc thoát,
+  // nên mỗi lần vào trang (kể cả F5) đều hỏi lại.
   useEffect(() => {
-    if (!userTestId || hasSeenPrompt(userTestId)) return undefined;
-    const timer = window.setTimeout(() => {
-      markPromptSeen(userTestId);
-      setPromptOpen(true);
-    }, PROMPT_DELAY_MS);
+    if (!userTestId) return undefined;
+    const timer = window.setTimeout(() => setPromptOpen(true), PROMPT_DELAY_MS);
     return () => window.clearTimeout(timer);
   }, [userTestId]);
 
@@ -64,6 +44,7 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
     const next = examTypeId
       ? buildTargetUrl(examTypeId, buildGeneratePlanUrl(userTestId, examTypeId))
       : `/tests/result/${userTestId}`;
+    setGuestClaimIntent(userTestId);
     router.push(buildLoginUrl(next, {
       flash: 'Đăng nhập để lưu kết quả và xây lộ trình cá nhân hóa.',
     }));
@@ -72,6 +53,12 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
   const openExitConfirm = () => {
     setPromptOpen(false);
     setConfirmExit(true);
+  };
+
+  // "Giữ lại" thì quay về hộp chọn, không để khách thoát khỏi lựa chọn.
+  const cancelExit = () => {
+    setConfirmExit(false);
+    setPromptOpen(true);
   };
 
   // Chỉ bỏ mã phiên khách trên trình duyệt: khách không xem hay nhận lại bài này được nữa,
@@ -87,9 +74,11 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
     <>
       <BaseModal
         show={promptOpen}
-        onClose={() => setPromptOpen(false)}
         title="Bạn đã có kết quả!"
         maxWidth={520}
+        closeOnOverlay={false}
+        closeOnEsc={false}
+        showCloseButton={false}
       >
         <div className={px('body')}>
           <p className={px('lead')}>
@@ -123,16 +112,12 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
               <IoArrowForward className={px('optionArrow')} aria-hidden="true" />
             </button>
           </div>
-
-          <button type="button" className={px('later')} onClick={() => setPromptOpen(false)}>
-            Xem kết quả trước
-          </button>
         </div>
       </BaseModal>
 
       <ConfirmModal
         show={confirmExit}
-        onClose={() => setConfirmExit(false)}
+        onClose={cancelExit}
         onConfirm={handleDiscard}
         title="Xóa kết quả và thoát?"
         message="Kết quả bài làm này sẽ bị xóa vĩnh viễn, bạn không thể xem lại hay lưu vào tài khoản sau này."

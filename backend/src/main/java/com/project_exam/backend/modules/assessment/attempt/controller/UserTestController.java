@@ -281,6 +281,7 @@ public class UserTestController {
 
     @PostMapping("/claim-guest")
     public ResponseEntity<ClaimGuestTestsResponse> claimGuestTests(
+            @RequestParam String userTestId,
             HttpServletRequest httpRequest,
             HttpServletResponse response
     ) {
@@ -289,7 +290,7 @@ public class UserTestController {
         if (guestSessionId == null || guestSessionId.isBlank()) {
             return ResponseEntity.ok(ClaimGuestTestsResponse.builder().claimed(0).build());
         }
-        int claimed = userTestService.claimGuestTests(userId, guestSessionId);
+        int claimed = userTestService.claimGuestTests(userId, guestSessionId, userTestId);
         clearGuestSessionCookie(response);
         return ResponseEntity.ok(ClaimGuestTestsResponse.builder().claimed(claimed).build());
     }

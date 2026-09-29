@@ -92,19 +92,3 @@
   color: var(--text-secondary);
   font-size: 1.6rem;
 }
-
-.later {
-  align-self: center;
-  margin-top: 2px;
-  padding: 4px 8px;
-  border: 0;
-  background: none;
-  font-size: 1.3rem;
-  color: var(--text-secondary);
-  text-decoration: underline;
-  cursor: pointer;
-
-  &:hover {
-    color: var(--text-color);
-  }
-}
