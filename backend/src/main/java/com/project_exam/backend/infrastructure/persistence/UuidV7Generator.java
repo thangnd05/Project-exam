@@ -23,6 +23,11 @@ public class UuidV7Generator implements BeforeExecutionGenerator {
     }
 
     @Override
+    public boolean allowAssignedIdentifiers() {
+        return true;
+    }
+
+    @Override
     public EnumSet<EventType> getEventTypes() {
         return EnumSet.of(EventType.INSERT);
     }
