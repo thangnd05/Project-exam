@@ -128,7 +128,7 @@ function PlanDetail() {
           <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
             Tất cả lộ trình
           </Link>
-          <Link href="/learning-plans/generate" className={cx('btn', 'btnPrimary', 'btnSm')}>
+          <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
             Sinh lộ trình mới
           </Link>
         </div>

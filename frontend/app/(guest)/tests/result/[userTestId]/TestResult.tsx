@@ -41,8 +41,16 @@ const TestResult = () => {
     [isGuest],
   );
 
-  const { result, testId, enhanced, canReview, isLoading, isError } =
+  const { result, testId, enhanced, canReview, practicePartIds, isLoading, isError } =
     useTestResult(userTestId, isGuest, guestCfg, !authLoading);
+
+  const isPractice = practicePartIds !== null;
+  const practiceParts = useMemo(
+    () => (isPractice
+      ? (enhanced?.partBreakdown ?? []).filter((p) => practicePartIds!.includes(p.examPartId))
+      : null),
+    [isPractice, enhanced, practicePartIds],
+  );
 
   const loading = authLoading || isLoading;
   const error = isError ? "Không thể tải kết quả bài thi này" : "";
@@ -222,7 +230,7 @@ const TestResult = () => {
 
           {enhanced && (
             <div className={cx("diagnosis-card")}>
-              <ReadinessGauge enhanced={enhanced} />
+              <ReadinessGauge enhanced={enhanced} isPractice={isPractice} />
 
               <div className={cx("diagnosis-side")}>
                 {enhanced.percentile != null && (
@@ -239,6 +247,7 @@ const TestResult = () => {
                   readinessScore={enhanced.readinessScore}
                   readinessLevel={enhanced.readinessLevel}
                   isGuest={isGuest}
+                  practiceParts={practiceParts}
                 />
               </div>
             </div>

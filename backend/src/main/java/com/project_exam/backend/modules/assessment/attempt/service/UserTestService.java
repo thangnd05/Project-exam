@@ -196,7 +196,8 @@ public class UserTestService {
     }
 
     private void syncTargetProgressAfterSubmit(UserTest userTest, String examTypeId) {
-        if (examTypeId == null || userTest.getUserId() == null) {
+        // Bài luyện tập không phản ánh trình độ cả đề nên không cập nhật tiến độ mục tiêu.
+        if (examTypeId == null || userTest.getUserId() == null || userTest.isPractice()) {
             return;
         }
         String userId = userTest.getUserId();

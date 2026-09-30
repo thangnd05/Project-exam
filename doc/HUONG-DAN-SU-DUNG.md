@@ -36,7 +36,7 @@ WinDe hoạt động theo vòng lặp học tập **3 bước**:
 2. Vào trang chủ, chọn **loại kỳ thi** → chọn đề → **Bắt đầu**.
 3. Làm bài (chế độ **Luyện thi**) và nộp → xem điểm và chẩn đoán.
 4. **Đặt mục tiêu** cho kỳ thi đó → **Sinh lộ trình vượt ải** → **chọn bài kiểm tra** làm căn cứ lập kế hoạch.
-5. Mỗi ngày vào **Lộ trình** (*Tiếp theo nên làm gì?*) để biết việc cần làm tiếp theo.
+5. Mỗi ngày mở menu **Lộ trình** để vào ải tiếp theo của lộ trình đang học.
 
 **Thanh menu chính**
 
@@ -45,7 +45,7 @@ Sau khi đăng nhập, thanh menu trên cùng gồm:
 | Mục | Chức năng |
 |-----|-----------|
 | **Bài viết** | Đọc và viết bài chia sẻ kinh nghiệm |
-| **Lộ trình** | Trang cố vấn *Tiếp theo nên làm gì?* (cần đăng nhập) |
+| **Lộ trình** | Mở lộ trình đang học, hoặc trang sinh lộ trình nếu chưa có (cần đăng nhập) |
 | **Từ vựng** | Thẻ ghi nhớ và flashcard |
 | **Bài đã tạo** | Các đề bạn tự soạn |
 | **Lớp học** | Tham gia / Vào / Tạo lớp học |
@@ -54,7 +54,7 @@ Sau khi đăng nhập, thanh menu trên cùng gồm:
 | **Xu & nhiệm vụ** | Xem nhiệm vụ và nhận xu |
 | **Avatar** | **Hồ sơ**, **Đăng xuất** |
 
-Chưa đăng nhập chỉ thấy **Đăng nhập** và **Đăng ký**. Một số trang (làm bài, xem kết quả) cho phép **khách** làm thử không cần tài khoản; sau khi đăng nhập, bài vừa làm sẽ được **gắn vào tài khoản** và bạn **quay lại đúng trang** đang thao tác (xem mục 2).
+Chưa đăng nhập chỉ thấy **Đăng nhập** và **Đăng ký**. Một số trang (làm bài, xem kết quả) cho phép **khách** làm thử không cần tài khoản; muốn giữ bài vừa làm thì bấm **Đăng nhập & lưu** (hoặc **Đăng ký để nhận lộ trình học**) ở trang kết quả (xem mục 2).
 
 ## 2. Đăng ký & đăng nhập
 
@@ -83,14 +83,19 @@ Khi bạn vào một trang cần đăng nhập (hoặc bấm **Đăng nhập** /
 
 Bạn có thể làm **Quick Challenge** hoặc một số đề **không cần đăng nhập**. Bài làm được lưu theo **phiên khách** trên trình duyệt.
 
-Khi bạn **đăng nhập** hoặc **đăng ký** (form hoặc OAuth), hệ thống sẽ:
+Chỉ **bài bạn chọn lưu** mới được gắn vào tài khoản. Ở trang kết quả, bấm một trong các nút:
 
-1. **Gắn** mọi bài của phiên khách (đang làm dở lẫn đã nộp) vào tài khoản  câu trả lời đã lưu trên server đi theo bài đó.
-2. **Quay lại** đúng trang bạn đang thao tác (ví dụ vẫn ở màn hình làm bài).
+- **Đăng nhập & lưu** (hộp thoại hiện ra sau khi nộp bài), hoặc
+- **Đăng ký để nhận lộ trình học** / **Lập lộ trình từ bài này**.
 
-**Ví dụ:** Khách làm **Quick Challenge** → bấm **Đăng nhập** giữa chừng → sau khi login, bạn về lại trang làm bài và **tiếp tục (resume)** từ chỗ dừng.
+Sau khi đăng nhập hoặc đăng ký (form hoặc OAuth), hệ thống sẽ:
 
-**Lưu ý:** Nếu tài khoản **đã có bài đang làm dở cùng đề**, hệ thống ưu tiên bài của tài khoản; bài guest trùng đề sẽ không ghi đè để tránh xung đột khi resume.
+1. **Gắn** đúng bài đó vào tài khoản  điểm và câu trả lời đi theo bài.
+2. Đưa bạn sang **đặt mục tiêu** rồi **sinh lộ trình** từ chính bài vừa làm.
+
+**Ví dụ:** Khách làm **Quick Challenge** → nộp bài → bấm **Đăng ký để nhận lộ trình học** → tạo tài khoản → đặt mục tiêu → lộ trình được sinh từ bài Quick Challenge vừa làm.
+
+**Lưu ý:** Đăng nhập theo đường khác (bấm **Đăng nhập** trên menu, hoặc đăng nhập giữa lúc đang làm bài) thì bài khách **không** được gắn vào tài khoản. Muốn giữ kết quả, hãy làm xong bài rồi chọn lưu ở trang kết quả.
 
 **Quên mật khẩu**
 
@@ -156,6 +161,7 @@ Khi bấm **Bắt đầu** trên **thẻ đề thường** (trong danh sách đ�
 | Thời gian | **Có bấm giờ** như thi thật | **Không giới hạn giờ** |
 | Phạm vi | Toàn bộ đề | Chỉ Part đã chọn |
 | Ghi nhận thành tích | **Có** (điểm, lịch sử, bảng xếp hạng) | Không |
+| Tính vào tiến độ mục tiêu | **Có** | Không (vẫn dùng được để sinh lộ trình cho các Part đã luyện) |
 
 - **Luyện thi:** bấm **"Bắt đầu thi thử"**  hiển thị thời lượng và tổng số câu.
 - **Luyện tập:** tick Part cần luyện (hoặc **"Chọn tất cả N Part"**) → **"Bắt đầu"**.
@@ -192,7 +198,8 @@ Trước khi vào làm, hệ thống kiểm tra:
 
 - Bài **tự lưu liên tục** (local + server). Tải lại trang hoặc đăng xuất rồi vào lại → tiếp tục từ chỗ dừng, thời gian còn lại được khôi phục.
 - Chế độ Luyện thi: **hết giờ tự động nộp bài**.
-- **Khách** có thể làm một số đề (kể cả Quick Challenge) mà không cần đăng nhập; bài được lưu theo phiên khách. Khi **đăng nhập**, bài tự **gắn vào tài khoản** và bạn **quay lại đúng trang**  vào lại đề đó sẽ **resume** tiếp (xem mục 2).
+- Chế độ Luyện tập: không giới hạn giờ, không tự nộp bài. Bài luyện tập chưa nộp sau 24 giờ kể từ lúc bắt đầu sẽ bị xoá.
+- **Khách** có thể làm một số đề (kể cả Quick Challenge) mà không cần đăng nhập; bài được lưu theo phiên khách. Muốn giữ bài, nộp xong hãy chọn lưu ở trang kết quả (xem mục 2).
 
 ## 5. Kết quả & chẩn đoán
 
@@ -204,7 +211,7 @@ Sau khi nộp, hệ thống tổng hợp điểm (loading: *"Đang tổng hợp 
 
 - **Điểm số** (mock đầy đủ) hoặc **Độ chính xác %** (Quick Challenge).
 - Thống kê: **Câu đúng**, **Câu sai**, **Tổng số câu**, **Thời gian**.
-- Nút: **"Xem đáp án & giải thích"**, **"Trang chủ"**, **"Lịch sử bài thi"**.
+- Nút: **"Xem đáp án & giải thích"**, **"Trang chủ"**, **"Lịch sử bài thi"**, **"Lập lộ trình từ bài này"**.
 
 **Lưu ý:** Với đề còn hạn nộp, nút xem đáp án bị khóa: *"Đáp án sẽ hiển thị sau khi thời gian làm bài kết thúc."*
 
@@ -213,7 +220,8 @@ Sau khi nộp, hệ thống tổng hợp điểm (loading: *"Đang tổng hợp 
 - **Readiness (mức độ sẵn sàng):** vòng tròn %  *Sẵn sàng / Gần sẵn sàng / Cần cải thiện / Chưa sẵn sàng* (Quick Challenge dùng thang riêng).
 - So sánh: *"Bạn làm tốt hơn …% người đã từng làm bài này"*.
 - **Biểu đồ phân tích kỹ năng** theo Part.
-- **Việc cần làm ngay:** gợi ý **Đặt mục tiêu** hoặc **Lập kế hoạch học** (ẩn với khách).
+- **Việc cần làm ngay:** gợi ý **Đặt mục tiêu** hoặc **Lập lộ trình học**. Khách thấy nút **Đăng ký để nhận lộ trình học**.
+- Với bài **Luyện theo phần**: không so với điểm mục tiêu cả đề, mà so từng Part đã luyện với **% mục tiêu của Part đó** (ví dụ *"Part 5 (62% / cần 70%) chưa đạt mục tiêu"*). Vòng tròn hiển thị **độ sẵn sàng**.
 
 **Bảng phân tích chi tiết**
 
@@ -253,28 +261,25 @@ Vào qua nút **"Mục tiêu của tôi"** trên thẻ kỳ thi → **"Cài đ�
 
 **Tổng quan mục tiêu (Dashboard)**
 
-Vào qua **Hồ sơ** → khối **Mục tiêu của tôi** → **Dashboard** trên từng mục tiêu.
+Vào qua tab **Tổng quan** (thanh tab *Mục tiêu · Lập lộ trình · So sánh lộ trình · Tổng quan*), hoặc **Hồ sơ** → khối **Mục tiêu của tôi** → **Dashboard**.
 
 Trang **Tổng quan mục tiêu** hiển thị (lọc theo loại kỳ thi):
 
-- **Mục tiêu điểm** + thanh tiến độ so với **mock gần nhất**.
-- **Readiness** bài mock gần nhất.
-- **Plan đang học** (số ải đã pass) + **"Mở plan"** / **"Sinh plan từ mock"**.
-- Biểu đồ điểm qua các mock; **% từng Part  hiện tại vs mục tiêu**.
-- Liên kết: **Lịch sử Mock**, **So sánh Plan**, **Cài đặt target**.
-- Nút: **"Tôi nên làm gì tiếp theo?"**, **"Tất cả bài đã làm"**.
+- **Mục tiêu điểm** + thanh tiến độ so với **bài thi thử gần nhất**.
+- **Độ sẵn sàng** của bài thi thử gần nhất.
+- **Lộ trình đang học** (số ải đã vượt) + **"Mở lộ trình"** / **"Sinh lộ trình"**.
+- **% đúng từng phần: hiện tại so với mục tiêu**.
+- Khối **Tiến triển qua các bài đã làm**: biểu đồ điểm và độ sẵn sàng, bảng các bài đã hoàn thành, bấm **"Chẩn đoán"** để xem lại phân tích.
 
-**Lịch sử Mock**
+**Lưu ý:** "Bài thi thử gần nhất" chỉ tính bài **Luyện thi** (kể cả Quick Challenge), không tính bài **Luyện tập** theo Part.
 
-Trang **Lịch sử Mock**: biểu đồ xu hướng điểm và readiness (25 bài gần nhất), bảng các bài đã hoàn thành, bấm **"Chẩn đoán"** để xem lại phân tích.
+**Menu Lộ trình**
+
+Menu **Lộ trình** đưa thẳng vào lộ trình đang học gần nhất; chưa có lộ trình nào thì mở trang **Sinh lộ trình vượt ải**.
 
 **Khi đã đạt mục tiêu**
 
-Trang **"Đã đạt mục tiêu"** chúc mừng và gợi ý mục tiêu cao hơn (**"Đặt [số điểm]"**, **"Thách thức"**, hoặc tự nhập).
-
-**Lộ trình  Tiếp theo nên làm gì?**
-
-Menu **Lộ trình** (`/next-step`) là trang cố vấn: dựa vào trạng thái hiện tại (chưa có mục tiêu, chưa làm mock, đang học plan, chưa pass ải, đã đạt mục tiêu…), hệ thống chỉ **một hành động** rõ ràng kèm nút (**Đặt mục tiêu**, **Chọn đề thi**, **Làm mock**, **Xem Plan**, **Sinh lộ trình**…).
+Trang **"Đã đạt mục tiêu"** chúc mừng bạn. Mục tiêu do bạn tự đặt: muốn đặt mức mới, bấm **Vào trang mục tiêu** và tự nhập điểm.
 
 **Lưu ý:** Đánh giá trình độ chính xác nhất khi làm **Full Mock** (Luyện thi, đủ Part), không chỉ luyện lẻ từng Part.
 
@@ -284,34 +289,38 @@ WinDe phân tích bài mock để tạo các **"ải"**  nhóm luyện tập the
 
 **Ải là gì?**
 
-Mỗi ải tập trung **một dạng câu / chủ đề yếu** trong một Part. Cần đạt **ngưỡng % chính xác** (thường ≥ 70%) để **pass**. Mỗi Part có nhiều ải nhỏ, sau đó tới **ải tổng ôn (capstone)**.
+Mỗi ải tập trung **một dạng câu / chủ đề yếu** trong một Part. Cần đạt **ngưỡng % chính xác** (lấy theo mục tiêu từng Part, mặc định 70%) để **vượt ải**. Mỗi Part có nhiều ải nhỏ, sau đó tới **ải cuối chặng** ôn tổng hợp cả Part.
 
 **Sinh lộ trình**
 
-1. Vào **"Sinh lộ trình vượt ải"** (từ Dashboard mục tiêu, **Hồ sơ → Sinh lộ trình**, hoặc trang **Lộ trình** khi hệ thống gợi ý).
-2. **Chọn loại kỳ thi** ở ô *Loại kỳ thi (lọc bài nguồn)*  danh sách bài bên dưới chỉ hiện các bài **đã hoàn thành** thuộc kỳ thi đó.
-3. **Chọn bài kiểm tra** bạn muốn dùng làm căn cứ lập kế hoạch học ở ô *Bài thi nguồn*:
-   - Mỗi dòng hiển thị **ngày nộp** và **điểm** (ví dụ: `05/07/2026 14:30 · Score 650`).
-   - Có thể chọn **Full Mock** hoặc **Quick Challenge**  miễn là bài đã **hoàn thành**.
-   - Nên chọn bài **gần nhất** hoặc bài phản ánh đúng trình độ hiện tại; hệ thống phân tích điểm yếu từ bài đó để tạo các ải.
-4. Bấm **"Sinh lộ trình"** (có thể mất vài giây  *"Đang sinh lộ trình..."*).
+1. Vào **"Sinh lộ trình vượt ải"** (tab **Lập lộ trình** hoặc nút **Lập lộ trình từ bài này** ở trang kết quả).
+2. Chọn **Loại kỳ thi**.
+3. Chọn **Lộ trình dựa trên**:
+   - **Kết quả một bài thi**  chẩn đoán điểm yếu từ một bài đã hoàn thành (cần đặt mục tiêu trước).
+   - **Chương trình học**  cho người mới, chưa làm bài nào; đi tuần tự các chủ điểm của từng phần. Chưa đặt mục tiêu vẫn sinh được, ngưỡng vượt ải tạm dùng mức mặc định.
+4. Nếu dựa trên bài thi: chọn bài ở ô **Chọn bài thi muốn lập lộ trình**. Mỗi dòng hiển thị tên đề, **ngày nộp** và **điểm**; bài luyện theo Part có ghi chú **"Luyện theo phần"** (lộ trình chỉ phủ các Part đã luyện).
+5. Bấm **"Sinh lộ trình"** (có thể mất vài giây  *"Đang sinh lộ trình..."*). Xong sẽ tự chuyển vào lộ trình mới.
 
-**Lưu ý:** Cần **đã đặt mục tiêu** và có **ít nhất một bài hoàn thành** cho kỳ thi đã chọn. Nếu chưa có bài nào, hãy làm **Quick Challenge** hoặc **Full Mock** trước rồi quay lại chọn bài nguồn.
+**Lưu ý:**
 
-**Học theo plan  Kế hoạch học #N**
+- Mỗi kỳ thi chỉ có **một lộ trình đang học**. Nếu đang có, hệ thống hỏi lại trước khi sinh lộ trình mới; lộ trình cũ chuyển sang **Đã thay** và vẫn chuyển lại được.
+- Ải chỉ được tạo cho chủ điểm **có câu hỏi luyện tập** trong kho. Phần thi nào chưa có câu luyện sẽ được liệt kê riêng trên trang lộ trình.
+- Nếu bài chọn đã đạt mục tiêu, hệ thống không sinh lộ trình mới và báo bạn đã đạt mục tiêu.
 
-Trang chi tiết plan hiển thị:
+**Học theo lộ trình  Lộ trình N**
 
-- Trạng thái plan: **Đang học**, **Hoàn thành**, **Đã thay bằng plan mới**, **Đã bỏ**.
-- Giai đoạn: **Đang ôn theo Part**, **Xong ải  làm Mock**.
-- Tiến độ: *X/Y ải đã pass*.
+Trang chi tiết lộ trình hiển thị:
 
-Với mỗi Part, mỗi ải:
+- Trạng thái: **Đang học**, **Hoàn thành** (đã đạt mục tiêu), **Đã thay** (bị lộ trình mới thay thế).
+- Giai đoạn: **Nền tảng** (đang vượt ải), **Thi thử** (đã vượt hết ải).
+- Tiến độ: *X/Y ải đã xong* và nút **Vào ải ngay** tới ải được đề xuất.
 
-- **Bước 1:** **"Xem tài liệu"**  ôn lý thuyết (có thể link tài nguyên phục hồi).
-- **Bước 2:** **"Học ải"**  làm bài luyện.
+Lộ trình chia thành các **chặng**, mỗi chặng là một phần thi. Trong mỗi chặng:
 
-Thông tin ải: ưu tiên (**Nên học trước / Ưu tiên vừa / Tùy chọn**), số câu sai lúc chẩn đoán, ngưỡng cần đạt, trạng thái (**Đã đạt / Chưa đạt / Chưa mở**).
+- Các ải theo chủ điểm, mỗi ải có **Tài liệu nên đọc trước** (nếu có) và nút **Bắt đầu**.
+- Sau đó là **Ải cuối chặng  lần 1** và **lần 2**, chỉ mở khi đã vượt hết ải chủ điểm của chặng.
+
+Trạng thái ải: **Đã vượt**, **Chưa vượt**, **Chưa mở**, **Bỏ qua** (ải không còn câu hỏi trong kho).
 
 **Làm bài luyện ải**
 
@@ -325,9 +334,9 @@ Mỗi lần **pass ải** cập nhật **chuỗi streak**. Có trang **lịch s�
 
 **Vòng lặp tiến bộ**
 
-Sau khi vượt hết ải → làm **mock mới** → **sinh plan mới** → **So sánh các Plan** (readiness tăng/giảm qua từng lần). Lặp đến khi đạt mục tiêu.
+Sau khi vượt hết ải → làm **bài thi thử mới** → **sinh lộ trình mới** từ bài đó → **So sánh lộ trình** (độ sẵn sàng tăng/giảm qua từng lần). Lặp đến khi đạt mục tiêu; khi đạt, lộ trình đang học chuyển sang **Hoàn thành**.
 
-Không biết bước tiếp theo? Vào **Lộ trình** (*Tiếp theo nên làm gì?*).
+Không biết bước tiếp theo? Mở menu **Lộ trình**: trang lộ trình luôn hiện việc cần làm (**Vào ải ngay** khi còn ải, **Làm bài thi thử** khi đã vượt hết ải).
 
 ## 8. Tự tạo bài kiểm tra & kho câu hỏi
 

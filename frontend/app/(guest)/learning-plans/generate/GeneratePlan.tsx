@@ -13,9 +13,11 @@ import { getLearnerLevel } from '@/app/utils/learnerLevel';
 import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
 import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
+import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import type { PlanResponse } from '@/app/types';
 import {
+  useActivePlan,
   useCompletedUserTests,
   useExamTypes,
   useGeneratePlanMutation,
@@ -63,6 +65,7 @@ function GeneratePlan() {
   const {
     userTests,
     isLoading: loadingList,
+    isFetching: fetchingList,
     error: userTestsError,
   } = useCompletedUserTests(isAuthenticated);
 
@@ -73,9 +76,15 @@ function GeneratePlan() {
     refetch: refetchTarget,
   } = useUserTarget(sourceExamTypeId, isAuthenticated);
 
+  const { activePlan } = useActivePlan(sourceExamTypeId, isAuthenticated);
+  const [confirmReplaceOpen, setConfirmReplaceOpen] = useState(false);
+
   const generatePlanMutation = useGeneratePlanMutation();
   const generateSyllabusMutation = useGenerateSyllabusPlanMutation();
-  const submitting = generatePlanMutation.isPending || generateSyllabusMutation.isPending;
+  // Giữ nút khoá cả lúc đang chuyển sang lộ trình mới, tránh bấm lần hai sinh thêm một lộ trình nữa.
+  const [navigating, setNavigating] = useState(false);
+  const submitting =
+    generatePlanMutation.isPending || generateSyllabusMutation.isPending || navigating;
 
   useEffect(() => {
     if (!sourceExamTypeId && examTypes.length > 0) {
@@ -107,12 +116,13 @@ function GeneratePlan() {
 
   // Đổi kỳ thi thủ công đã tự bỏ chọn bài; ở đây chỉ bỏ khi bài không còn tồn tại, để bài
   // truyền từ trang kết quả không bị xoá trước khi kỳ thi kịp đồng bộ theo bài đó.
+  // Chờ cả lượt tải lại xong: bài vừa nộp có thể chưa có trong bản cache cũ.
   useEffect(() => {
-    if (!userTestId || loadingList) return;
+    if (!userTestId || loadingList || fetchingList) return;
     if (!userTests.some((t) => t.userTestId === userTestId)) {
       setUserTestId('');
     }
-  }, [userTests, userTestId, loadingList]);
+  }, [userTests, userTestId, loadingList, fetchingList]);
 
   const selectedTest = useMemo(
     () => userTests.find((t) => t.userTestId === userTestId),
@@ -149,6 +159,16 @@ function GeneratePlan() {
       requireLogin();
       return;
     }
+    // Sinh mới sẽ thay lộ trình đang học, nên hỏi lại trước.
+    if (activePlan) {
+      setConfirmReplaceOpen(true);
+      return;
+    }
+    runGenerate();
+  };
+
+  const runGenerate = () => {
+    setConfirmReplaceOpen(false);
     setError(null);
     setResult(null);
 
@@ -156,6 +176,7 @@ function GeneratePlan() {
       onSuccess: (data: PlanResponse) => {
         // Sinh xong thì đưa thẳng vào lộ trình mới, người mới không phải tự tìm trong danh sách.
         if (!data?.targetAchieved && data?.learningPlanId) {
+          setNavigating(true);
           router.push(`/learning-plans/${data.learningPlanId}`);
           return;
         }
@@ -407,6 +428,19 @@ function GeneratePlan() {
           </span>
         </div>
       )}
+
+      <ConfirmModal
+        show={confirmReplaceOpen}
+        onClose={() => setConfirmReplaceOpen(false)}
+        onConfirm={runGenerate}
+        title="Thay lộ trình đang học?"
+        confirmText="Sinh lộ trình mới"
+        message={
+          activePlan
+            ? `Bạn đang học Lộ trình ${activePlan.planSequence ?? ''} (${activePlan.passedTasks ?? 0}/${activePlan.totalTasks ?? 0} ải đã vượt). Sinh lộ trình mới sẽ thay thế lộ trình này; lộ trình cũ vẫn được lưu với trạng thái "Đã thay" và có thể chuyển lại sau.`
+            : ''
+        }
+      />
 
       {isGuest && (
         <div className={cx('alert', 'alertInfo')}>

@@ -8,6 +8,7 @@ import { getUserTarget } from '@/app/apis/userTargetApi';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import { getEnhancedResult } from '@/app/apis/enhancedResultApi';
 import { sortByPartOrder } from '@/app/utils/partOrder';
+import { isMockAttempt } from '@/app/utils/planLabels';
 import type {
   EnhancedResultResponse,
   PlanResponse,
@@ -42,14 +43,14 @@ async function fetchDashboard(examTypeId: string): Promise<DashboardData> {
   const target = await getUserTarget(examTypeId).catch(() => null);
   const plans = (await listPlans(examTypeId).catch(() => [])) || [];
 
-  const completed = await getMyCompletedUserTests(examTypeId);
-  const latestMock = completed[0] || null;
-  const recentMocks = completed.slice(0, 5);
+  const mocks = (await getMyCompletedUserTests(examTypeId)).filter(isMockAttempt);
+  const latestMock = mocks[0] || null;
+  const recentMocks = mocks.slice(0, 5);
 
   let latestEnhanced: EnhancedResultResponse | null = null;
-  if (completed[0]?.userTestId) {
+  if (latestMock?.userTestId) {
     try {
-      const r = await getEnhancedResult(completed[0].userTestId);
+      const r = await getEnhancedResult(latestMock.userTestId);
       latestEnhanced = r.data;
     } catch {
       latestEnhanced = null;

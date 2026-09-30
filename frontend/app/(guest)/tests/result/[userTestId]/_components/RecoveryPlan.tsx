@@ -3,7 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { IoCalendarOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
-import { buildRecoveryMessage } from '@/app/utils/readiness-label';
+import { buildPracticeRecoveryMessage, buildRecoveryMessage } from '@/app/utils/readiness-label';
+import type { PartBreakdownResponse } from '@/app/types';
 import { buildPlanFromTestUrl, buildGeneratePlanUrl } from '@/app/utils/planFromTest';
 import styles from './Result.module.scss';
 
@@ -17,6 +18,8 @@ type RecoveryPlanProps = {
   readinessScore?: number | null;
   readinessLevel?: string | null;
   isGuest?: boolean;
+  // Có giá trị khi là bài luyện theo phần: các Part đã luyện kèm % mục tiêu từng Part.
+  practiceParts?: PartBreakdownResponse[] | null;
 };
 
 function RecoveryPlan({
@@ -27,15 +30,20 @@ function RecoveryPlan({
   readinessScore,
   readinessLevel,
   isGuest,
+  practiceParts,
 }: RecoveryPlanProps) {
   const router = useRouter();
 
-  const recoveryMessage = buildRecoveryMessage({
-    hasTarget, isTargetMet, readinessScore, readinessLevel,
-  });
+  const practiceWithTarget = hasTarget && practiceParts ? practiceParts : null;
+  const practiceResult = practiceWithTarget ? buildPracticeRecoveryMessage(practiceWithTarget) : null;
+  const recoveryMessage = practiceWithTarget
+    ? practiceResult?.message ?? 'Bài luyện theo phần không tính vào mục tiêu điểm.'
+    : buildRecoveryMessage({ hasTarget, isTargetMet, readinessScore, readinessLevel });
 
   const canCreateTarget = !isGuest && !hasTarget && Boolean(examTypeId);
-  const canCreatePlan = !isGuest && hasTarget && !isTargetMet;
+  const canCreatePlan = !isGuest && hasTarget && (practiceWithTarget
+    ? practiceResult?.allMet === false
+    : !isTargetMet);
 
   const canSignUp = Boolean(isGuest && userTestId);
 

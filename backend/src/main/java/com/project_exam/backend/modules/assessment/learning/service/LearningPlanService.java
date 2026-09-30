@@ -170,11 +170,14 @@ public class LearningPlanService {
             throw new BadRequestException("Bài thi không có dữ liệu phân tích phần, không thể sinh kế hoạch");
         }
 
-        userTargetProgressService.syncPartScoresFromMock(
-                userId, examTypeId, request.getUserTestId(), userTest.getFinishedAt(), result);
+        // Bài luyện theo phần vẫn dùng để lập lộ trình, nhưng không cập nhật tiến độ mục tiêu.
+        if (!userTest.isPractice()) {
+            userTargetProgressService.syncPartScoresFromMock(
+                    userId, examTypeId, request.getUserTestId(), userTest.getFinishedAt(), result);
 
-        if (userTargetProgressService.markTargetAchievedIfMet(userId, examTypeId, result)) {
-            return Blueprint.targetAchieved(examTypeId, result);
+            if (userTargetProgressService.markTargetAchievedIfMet(userId, examTypeId, result)) {
+                return Blueprint.targetAchieved(examTypeId, result);
+            }
         }
 
         UserTarget userTarget = userTargetRepository.findByUserIdAndExamTypeId(userId, examTypeId)
@@ -203,7 +206,8 @@ public class LearningPlanService {
             String detail = partsWithoutTasks.isEmpty()
                     ? "Các phần trong bài này đều đã đạt ngưỡng riêng  hãy làm một bài thi thử đầy đủ để nâng đều điểm."
                     : "Các phần cần cải thiện (" + String.join(", ", partsWithoutTasks)
-                        + ") chưa có ải vì câu hỏi chưa được gắn tag. Gắn tag (admin) rồi sinh lại.";
+                        + ") chưa có ải vì chưa có câu hỏi luyện tập được gắn tag. "
+                        + "Thêm câu luyện tập và gắn tag (admin) rồi sinh lại.";
             throw new BadRequestException("Chưa tạo được lộ trình từ bài này. " + detail);
         }
 
@@ -265,7 +269,13 @@ public class LearningPlanService {
     private PlanResponse createPlanFromBlueprint(
             String userId, String sourceUserTestId, Integer deadlineDays, Blueprint blueprint) {
         String examTypeId = blueprint.examTypeId();
-        int planSequence = (int) planRepository.countByUserIdAndExamTypeId(userId, examTypeId) + 1;
+        planRepository.lockPlansOf(userId, examTypeId);
+        int planSequence = planRepository.findMaxPlanSequenceIncludingDeleted(userId, examTypeId) + 1;
+
+        // Đóng lộ trình cũ và ghi xuống DB trước khi thêm cái mới: mỗi kỳ thi chỉ được một lộ trình ACTIVE.
+        List<LearningPlan> replacedPlans =
+                closeActivePlans(userId, examTypeId, LearningPlan.Status.REPLACED, null);
+        planRepository.flush();
 
         LearningPlan plan = new LearningPlan();
         plan.setUserId(userId);
@@ -283,7 +293,10 @@ public class LearningPlanService {
         plan.setPartsWithoutTasks(joinPartsWithoutTasks(blueprint.partsWithoutTasks()));
         plan = planRepository.save(plan);
 
-        closeActivePlans(userId, examTypeId, LearningPlan.Status.REPLACED, plan.getLearningPlanId());
+        for (LearningPlan old : replacedPlans) {
+            old.setReplacedByPlanId(plan.getLearningPlanId());
+        }
+        planRepository.saveAll(replacedPlans);
 
         List<LearningPlanTask> savedTasks = new ArrayList<>();
         int order = 1;
@@ -413,13 +426,9 @@ public class LearningPlanService {
         if (plan.getStatus() == LearningPlan.Status.ACTIVE) {
             throw new BadRequestException("Plan này đang là plan hiện tại rồi");
         }
-        List<LearningPlan> activePlans = planRepository.findByUserIdAndExamTypeIdAndStatus(
-                userId, plan.getExamTypeId(), LearningPlan.Status.ACTIVE);
-        for (LearningPlan old : activePlans) {
-            old.setStatus(LearningPlan.Status.REPLACED);
-            old.setReplacedByPlanId(learningPlanId);
-            planRepository.save(old);
-        }
+        planRepository.lockPlansOf(userId, plan.getExamTypeId());
+        closeActivePlans(userId, plan.getExamTypeId(), LearningPlan.Status.REPLACED, learningPlanId);
+        planRepository.flush();
         plan.setStatus(LearningPlan.Status.ACTIVE);
         plan.setReplacedByPlanId(null);
         plan = planRepository.save(plan);
@@ -537,12 +546,13 @@ public class LearningPlanService {
             Supplier<Map<String, List<String>>> questionIdsByPart) {
         List<TaskCandidate> partTasks = new ArrayList<>();
         Set<String> usedTagIds = new HashSet<>();
+        // Chỉ lấy tag thật sự có câu luyện, tránh sinh ải mà phiên học không rút được câu nào
+        // (ải như vậy sẽ bị tự bỏ qua và tính là đã vượt dù chưa học gì).
+        List<String> practiceTagIds = questionTagRepository.findDistinctTagIdsByExamPartIdAndUsageScopeIn(
+                examPartId, Question.UsageScope.FOR_PRACTICE);
 
         if (breakdown == null) {
-            // Chỉ lấy tag thật sự có câu luyện, tránh sinh ải mà phiên học không rút được câu nào.
-            List<String> tagIds = questionTagRepository.findDistinctTagIdsByExamPartIdAndUsageScopeIn(
-                    examPartId, Question.UsageScope.FOR_PRACTICE);
-            for (String tagId : tagIds) {
+            for (String tagId : practiceTagIds) {
                 addTaskIfNew(partTasks, usedTagIds, new TaskCandidate(
                         tagId,
                         examPartId,
@@ -552,12 +562,12 @@ public class LearningPlanService {
                         passAccuracy,
                         null));
             }
-            if (partTasks.isEmpty()) {
-                return List.of();
-            }
         } else {
-            collectDiagnosedTagTasks(
-                    partTasks, usedTagIds, breakdown, threshold, passAccuracy, questionIdsByPart);
+            collectDiagnosedTagTasks(partTasks, usedTagIds, breakdown, threshold, passAccuracy,
+                    questionIdsByPart, new HashSet<>(practiceTagIds));
+        }
+        if (partTasks.isEmpty()) {
+            return List.of();
         }
 
         Map<String, Integer> sortOrderByTag = loadTagSortOrders(partTasks);
@@ -582,10 +592,12 @@ public class LearningPlanService {
             PartBreakdownResponse part,
             double threshold,
             int passAccuracy,
-            Supplier<Map<String, List<String>>> questionIdsByPart) {
+            Supplier<Map<String, List<String>>> questionIdsByPart,
+            Set<String> practiceTagIds) {
         if (part.getTags() != null) {
             for (TagBreakdownResponse tag : part.getTags()) {
-                if (tag.getTagId() == null || tag.getPercentage() >= threshold) {
+                if (tag.getTagId() == null || tag.getPercentage() >= threshold
+                        || !practiceTagIds.contains(tag.getTagId())) {
                     continue;
                 }
                 addTaskIfNew(partTasks, usedTagIds,
@@ -595,7 +607,7 @@ public class LearningPlanService {
 
         if (partTasks.isEmpty() && part.getTags() != null) {
             part.getTags().stream()
-                    .filter(t -> t.getTagId() != null)
+                    .filter(t -> t.getTagId() != null && practiceTagIds.contains(t.getTagId()))
                     .forEach(tag -> addTaskIfNew(partTasks, usedTagIds,
                             buildTaskCandidate(tag.getTagId(), tag, part, passAccuracy)));
         }
@@ -606,6 +618,9 @@ public class LearningPlanService {
             if (!questionIdsInPart.isEmpty()) {
                 List<String> tagIds = questionTagRepository.findDistinctTagIdsByQuestionIdIn(questionIdsInPart);
                 for (String tagId : tagIds) {
+                    if (!practiceTagIds.contains(tagId)) {
+                        continue;
+                    }
                     addTaskIfNew(partTasks, usedTagIds,
                             buildTaskCandidate(tagId, null, part, passAccuracy));
                 }
@@ -614,7 +629,7 @@ public class LearningPlanService {
 
         if (partTasks.isEmpty()) {
             String fallbackTagId = resolveTagIdForExamPart(part.getExamPartId());
-            if (fallbackTagId != null) {
+            if (fallbackTagId != null && practiceTagIds.contains(fallbackTagId)) {
                 addTaskIfNew(partTasks, usedTagIds,
                         buildTaskCandidate(fallbackTagId, null, part, passAccuracy));
             }
@@ -925,13 +940,14 @@ public class LearningPlanService {
                 ReadinessThresholds.levelFromScore(readiness));
     }
 
-    private void closeActivePlans(
+    private List<LearningPlan> closeActivePlans(
             String userId,
             String examTypeId,
             LearningPlan.Status newStatus,
             String replacedByPlanId) {
         List<LearningPlan> activePlans = planRepository.findByUserIdAndExamTypeIdAndStatus(
                 userId, examTypeId, LearningPlan.Status.ACTIVE);
+        List<LearningPlan> closed = new ArrayList<>();
         for (LearningPlan old : activePlans) {
             if (replacedByPlanId != null && Objects.equals(old.getLearningPlanId(), replacedByPlanId)) {
                 continue;
@@ -940,8 +956,9 @@ public class LearningPlanService {
             if (newStatus == LearningPlan.Status.REPLACED && replacedByPlanId != null) {
                 old.setReplacedByPlanId(replacedByPlanId);
             }
-            planRepository.save(old);
+            closed.add(planRepository.save(old));
         }
+        return closed;
     }
 
     private String pickRecommendedTaskId(

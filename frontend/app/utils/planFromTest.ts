@@ -1,5 +1,6 @@
 import routes from '@/app/configs/Routes';
 import { buildGuestSignupUrl } from '@/app/utils/authRedirect';
+import { setGuestClaimIntent } from '@/app/utils/guestSession';
 
 type PlanFromTestOptions = {
   userTestId?: string;
@@ -25,6 +26,7 @@ export const buildTargetUrl = (examTypeId?: string, next?: string): string => {
 };
 
 // Giữ userTestId suốt luồng: khách đăng ký → đặt mục tiêu → sinh lộ trình từ đúng bài vừa làm.
+// Với khách, hàm này ghi luôn ý định lưu bài để đăng nhập xong bài được gắn vào tài khoản.
 export const buildPlanFromTestUrl = ({
   userTestId,
   examTypeId,
@@ -32,7 +34,10 @@ export const buildPlanFromTestUrl = ({
   isGuest,
 }: PlanFromTestOptions): string => {
   const generateUrl = buildGeneratePlanUrl(userTestId, examTypeId);
-  if (isGuest) return buildGuestSignupUrl(buildTargetUrl(examTypeId, generateUrl));
+  if (isGuest) {
+    if (userTestId) setGuestClaimIntent(userTestId);
+    return buildGuestSignupUrl(buildTargetUrl(examTypeId, generateUrl));
+  }
   // Chưa biết có mục tiêu hay chưa thì cứ sang trang sinh lộ trình, trang đó tự nhắc đặt mục tiêu.
   if (hasTarget !== false) return generateUrl;
   return buildTargetUrl(examTypeId, generateUrl);

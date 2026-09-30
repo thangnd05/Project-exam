@@ -1,4 +1,4 @@
-import type { EnhancedResultResponse } from '@/app/types';
+import type { EnhancedResultResponse, PartBreakdownResponse } from '@/app/types';
 
 type ReadinessCopy = { label: string; message: string };
 
@@ -79,7 +79,7 @@ export function buildGaugeView(
     | 'readinessScore'
     | 'readinessLevel'
   >,
-  options?: { isBeginner?: boolean },
+  options?: { isBeginner?: boolean; isPractice?: boolean },
 ): GaugeView {
   const {
     examCategoryCode, percentage, hasTarget, targetScore,
@@ -111,7 +111,8 @@ export function buildGaugeView(
     };
   }
 
-  if (hasTarget && targetScore != null) {
+  // Bài luyện theo phần chỉ chấm vài Part nên không so với điểm mục tiêu cả đề.
+  if (hasTarget && targetScore != null && !options?.isPractice) {
     const ts = totalScore ?? 0;
     const targetMet = ts >= targetScore;
     return {
@@ -160,4 +161,26 @@ export function buildRecoveryMessage({
       + 'Hãy đặt điểm mục tiêu để WinDe lập lộ trình học phù hợp với bạn.';
   }
   return null;
+}
+
+// Bài luyện theo phần: so từng Part đã luyện với mục tiêu % của chính Part đó.
+export function buildPracticeRecoveryMessage(
+  parts: Pick<PartBreakdownResponse, 'partName' | 'percentage' | 'targetPercentage' | 'isTargetMet'>[],
+): { message: string; allMet: boolean } | null {
+  const withTarget = parts.filter((p) => p.targetPercentage != null);
+  if (withTarget.length === 0) return null;
+  const missed = withTarget.filter((p) => p.isTargetMet !== true);
+  if (missed.length === 0) {
+    return {
+      message: 'Các phần đã luyện đều đạt mục tiêu. Làm bài thi thử trọn đề để kiểm tra điểm tổng.',
+      allMet: true,
+    };
+  }
+  const detail = missed
+    .map((p) => `${p.partName} (${Math.round(p.percentage)}% / cần ${Math.round(p.targetPercentage!)}%)`)
+    .join(', ');
+  return {
+    message: `${detail} chưa đạt mục tiêu. Hãy lập lộ trình để luyện đúng phần này.`,
+    allMet: false,
+  };
 }

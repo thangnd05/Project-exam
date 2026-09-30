@@ -2,23 +2,14 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import { useTargetAchieved } from '@/app/hooks/useTargetAchieved';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import { getScoreScale } from '@/app/utils/scoreScale';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
-
-function suggestNextTarget(current: number | null | undefined, maxScore: number): number | null {
-  if (current == null) return null;
-  if (current >= maxScore) return null;
-  const step = 50;
-  const next = Math.min(maxScore, Math.round((current + step) / 10) * 10);
-  return next > current ? next : Math.min(maxScore, current + 10);
-}
 
 function TargetAchieved() {
   const searchParams = useSearchParams();
@@ -35,17 +26,6 @@ function TargetAchieved() {
     enhanced && (!enhanced.examTypeId || enhanced.examTypeId === examTypeId);
   const isAchieved = Boolean(target?.achievedAt)
     || (enhancedMatches && enhanced?.isTargetMet === true);
-  const scoreScale = useMemo(
-    () => getScoreScale(examTypes.find((et) => et.examTypeId === examTypeId)?.scoringMethod),
-    [examTypes, examTypeId],
-  );
-  const nextSuggestion = useMemo(() => {
-    if (!target?.targetScore) return null;
-    return suggestNextTarget(target.targetScore, scoreScale.max);
-  }, [target, scoreScale]);
-  const stretchSuggestion = nextSuggestion != null
-    ? Math.min(scoreScale.max, nextSuggestion + 50)
-    : null;
 
   return (
     <div className={cx('wrapper')}>
@@ -125,50 +105,18 @@ function TargetAchieved() {
           <div className={cx('card')}>
             <div className={cx('cardHeader')}>Mục tiêu tiếp theo</div>
             <div className={cx('cardBody')}>
+              {/* Mục tiêu do người dùng tự đặt nên không gợi ý mức điểm. */}
               <p className={cx('muted')} style={{ marginBottom: '1.6rem' }}>
-                Bạn vừa hoàn thành chặng <strong>{target.targetScore}</strong>. Hãy đặt mục tiêu cao hơn để duy trì phong độ và mở khoá ngưỡng mới.
+                Bạn vừa hoàn thành chặng <strong>{target.targetScore}</strong>. Muốn đặt mức mới, hãy vào trang Mục tiêu và tự nhập điểm.
               </p>
-
-              {nextSuggestion && (
-                <div className={cx('suggestGrid')}>
-                  <div className={cx('suggestCard')}>
-                    <div className={cx('suggestLabel')}>Gợi ý</div>
-                    <div className={cx('suggestValue')}>{nextSuggestion}</div>
-                    <ButtonPrime
-                      as="link"
-                      href={`/my-target?examTypeId=${examTypeId}&suggest=${nextSuggestion}`}
-                      variant="success"
-                      size="sm"
-                    >
-                      Đặt {nextSuggestion}
-                    </ButtonPrime>
-                  </div>
-                  <div className={cx('suggestCard')}>
-                    <div className={cx('suggestLabel')}>Vượt xa hơn</div>
-                    <div className={cx('suggestValue')}>{stretchSuggestion}</div>
-                    <ButtonPrime
-                      as="link"
-                      href={`/my-target?examTypeId=${examTypeId}&suggest=${stretchSuggestion}`}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Thách thức
-                    </ButtonPrime>
-                  </div>
-                  <div className={cx('suggestCard')}>
-                    <div className={cx('suggestLabel')}>Tự nhập</div>
-                    <div className={cx('suggestValue')} style={{ fontSize: 'var(--font-size-lg)' }}>-</div>
-                    <ButtonPrime
-                      as="link"
-                      href={`/my-target?examTypeId=${examTypeId}`}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Vào trang mục tiêu
-                    </ButtonPrime>
-                  </div>
-                </div>
-              )}
+              <ButtonPrime
+                as="link"
+                href={`/my-target?examTypeId=${examTypeId}`}
+                variant="outline"
+                size="sm"
+              >
+                Vào trang mục tiêu
+              </ButtonPrime>
             </div>
           </div>
 

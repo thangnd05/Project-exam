@@ -2,7 +2,9 @@
 
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { generatePlanKeys } from '@/app/hooks/useGeneratePlan';
+import { invalidatePlanQueries } from '@/app/hooks/plan-cache';
 import { toast } from 'react-toastify';
 import { checkActiveUserTest, startUserTest, submitUserTest } from '@/app/apis/userTestApi';
 import { getAnswersByUserTest, batchSaveAnswers, sendAnswersOnExit } from '@/app/apis/userAnswerApi';
@@ -42,6 +44,12 @@ const AUTOSAVE_INTERVAL_MS = 60000;
 export function useTestSession() {
   const { testId } = useParams<{ testId: string }>();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  // Bài vừa nộp phải hiện ngay ở trang sinh lộ trình và dashboard mục tiêu.
+  const invalidateAfterSubmit = () => {
+    queryClient.invalidateQueries({ queryKey: generatePlanKeys.userTests });
+    invalidatePlanQueries(queryClient);
+  };
   const searchParams = useSearchParams();
 
   const isPractice = searchParams.get('mode') === 'practice';
@@ -394,10 +402,12 @@ export function useTestSession() {
       const result = await submitUserTest(userTestId, isGuest, guestCfg);
       clearExamSession(sessionKey);
       if (!isGuest) refreshStreak();
+      invalidateAfterSubmit();
       router.push(`/tests/result/${userTestId}`);
     } catch (err: any) {
       if (err?.response?.status === 409) {
         clearExamSession(sessionKey);
+        invalidateAfterSubmit();
         router.push(`/tests/result/${userTestId}`);
         return;
       }

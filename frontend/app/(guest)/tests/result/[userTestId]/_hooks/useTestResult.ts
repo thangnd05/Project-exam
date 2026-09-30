@@ -6,6 +6,7 @@ import { getUserTestMeta } from '@/app/apis/userTestApi';
 import { getResultByUserTest } from '@/app/apis/userAnswerApi';
 import { getUserTestInfo } from '@/app/apis/testApi';
 import { getEnhancedResult, getGuestEnhancedResult } from '@/app/apis/enhancedResultApi';
+import { isMockAttempt } from '@/app/utils/planLabels';
 import type { EnhancedResultResponse, ResultSummaryResponse } from '@/app/types';
 
 export type TestResultSummary = ResultSummaryResponse & {
@@ -48,7 +49,10 @@ const fetchTestResult = async (
     console.warn('Enhanced result not available:', enhErr);
   }
 
-  return { result, testId: metaData.testId ?? null, canReview, enhanced };
+  // Bài luyện theo phần: danh sách Part đã luyện; null với bài thi thử.
+  const practicePartIds = isMockAttempt(metaData) ? null : (metaData.practicePartIds ?? []);
+
+  return { result, testId: metaData.testId ?? null, canReview, enhanced, practicePartIds };
 };
 
 export function useTestResult(
@@ -68,6 +72,7 @@ export function useTestResult(
     testId: query.data?.testId ?? null,
     canReview: query.data?.canReview ?? false,
     enhanced: query.data?.enhanced ?? null,
+    practicePartIds: query.data?.practicePartIds ?? null,
     isLoading: query.isLoading,
     isError: query.isError,
   };

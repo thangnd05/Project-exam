@@ -1,5 +1,5 @@
 
-import { PlanTaskType } from '@/app/enums';
+import { PlanTaskType, UserTestMode } from '@/app/enums';
 import type { PlanResponse, PlanTaskResponse } from '@/app/types';
 
 export const PLAN_STATUS_LABEL: Record<string, string> = {
@@ -39,6 +39,11 @@ export const planNoticeText = (code?: string | null): string | null =>
 export const isPracticeAttempt = (
   userTest?: { practicePartIds?: string[] | null } | null,
 ): boolean => (userTest?.practicePartIds?.length ?? 0) > 0;
+
+// Bài luyện tập (theo Part, không giới hạn giờ) không phản ánh trình độ thật nên không tính là thi thử.
+export const isMockAttempt = (
+  userTest?: { mode?: UserTestMode; practicePartIds?: string[] | null } | null,
+): boolean => Boolean(userTest) && userTest!.mode !== UserTestMode.PRACTICE && !isPracticeAttempt(userTest);
 
 export const taskStatusLabel = (status?: string | null): string =>
   TASK_STATUS[status as string]?.text || status || '-';

@@ -233,8 +233,9 @@ public class EnhancedResultService {
         Long totalScoreVal = isQuickChallenge ? null
                 : (userTest.getTotalScore() != null ? (long) userTest.getTotalScore() : 0L);
 
+        // Bài luyện theo phần chỉ chấm vài Part nên không so với mục tiêu điểm của cả đề.
         Boolean isTargetMetResult = null;
-        if (hasTarget && targetScore != null && totalScoreVal != null) {
+        if (hasTarget && targetScore != null && totalScoreVal != null && !userTest.isPractice()) {
             isTargetMetResult = totalScoreVal >= targetScore;
         }
 

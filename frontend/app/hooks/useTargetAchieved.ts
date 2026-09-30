@@ -5,6 +5,7 @@ import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import { getEnhancedResult } from '@/app/apis/enhancedResultApi';
+import { isMockAttempt } from '@/app/utils/planLabels';
 import type {
   EnhancedResultResponse,
   ExamTypeResponse,
@@ -31,7 +32,7 @@ async function fetchTargetAchieved(examTypeId: string): Promise<TargetAchievedDa
   const target = await getUserTarget(examTypeId).catch(() => null);
 
   const completed = await getMyCompletedUserTests(examTypeId);
-  const latestMock = completed[0] || null;
+  const latestMock = completed.find(isMockAttempt) || null;
 
   let enhanced: EnhancedResultResponse | null = null;
   if (latestMock?.userTestId) {

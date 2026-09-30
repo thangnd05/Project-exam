@@ -511,42 +511,6 @@
   font-size: var(--font-size-ssm);
 }
 
-.suggestGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-  gap: 1.2rem;
-  margin-top: 1.2rem;
-}
-
-.suggestCard {
-  background: var(--bg-white);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 1.6rem;
-  text-align: center;
-  transition: all 0.2s;
-
-  &:hover {
-    border-color: var(--success-text);
-    transform: translateY(-2px);
-  }
-}
-
-.suggestLabel {
-  font-size: var(--font-size-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-semibold);
-}
-
-.suggestValue {
-  font-size: var(--font-size-3xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-color);
-  margin: 0.6rem 0;
-}
-
 .dashboardFooterActions {
   margin-top: 2rem;
 }

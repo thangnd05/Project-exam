@@ -32,9 +32,10 @@ const COLOR_MAP: Record<string, GaugeColor> = {
 
 type ReadinessGaugeProps = {
   enhanced: EnhancedResultResponse;
+  isPractice?: boolean;
 };
 
-function ReadinessGauge({ enhanced }: ReadinessGaugeProps) {
+function ReadinessGauge({ enhanced, isPractice = false }: ReadinessGaugeProps) {
   const router = useRouter();
   const { examCategoryCode, examTypeId, readinessLevel, hasTarget, correct, total } = enhanced;
 
@@ -47,16 +48,16 @@ function ReadinessGauge({ enhanced }: ReadinessGaugeProps) {
   }, [isQuickChallenge, examTypeId]);
 
   const { gaugePercentage, displayValue, gaugeLabel, gaugeTitle, gaugeMessage, gaugeLevel } =
-    buildGaugeView(enhanced, { isBeginner });
+    buildGaugeView(enhanced, { isBeginner, isPractice });
 
   const { color, bg } = isQuickChallenge
     ? ((gaugeLevel && COLOR_MAP[gaugeLevel]) || COLOR_MAP.WEAK)
     : ((readinessLevel && COLOR_MAP[readinessLevel]) || COLOR_MAP.NOT_READY);
 
-  const effectiveColor = (!isQuickChallenge && hasTarget)
+  const effectiveColor = (!isQuickChallenge && !isPractice && hasTarget)
     ? (enhanced.isTargetMet ? COLOR_MAP.READY.color : COLOR_MAP.NEEDS_IMPROVEMENT.color)
     : color;
-  const effectiveBg = (!isQuickChallenge && hasTarget)
+  const effectiveBg = (!isQuickChallenge && !isPractice && hasTarget)
     ? (enhanced.isTargetMet ? COLOR_MAP.READY.bg : COLOR_MAP.NEEDS_IMPROVEMENT.bg)
     : bg;
 

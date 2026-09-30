@@ -256,7 +256,9 @@ public class TestPaperQueryService {
 
     private void handleAutoSubmit(Test test, UserTest latest) {
         Integer duration = test.getDurationMinutes();
-        if (latest != null && latest.getStatus() == UserTest.Status.IN_PROGRESS && duration != null && duration > 0) {
+        // Luyện tập không giới hạn giờ nên không tự nộp theo thời lượng đề.
+        if (latest != null && latest.getStatus() == UserTest.Status.IN_PROGRESS && !latest.isPractice()
+                && duration != null && duration > 0) {
             Instant endTime = latest.getStartedAt().plus(Duration.ofMinutes(duration));
             if (test.getAvailableTo() != null && test.getAvailableTo().isBefore(endTime)) endTime = test.getAvailableTo();
 
