@@ -19,6 +19,7 @@ import routes from '@/app/configs/Routes';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import { FcGoogle } from "react-icons/fc";
+import { FaFacebook } from "react-icons/fa";
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { name } from '@/app/assets/images';
 import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/components/Recaptcha/RecaptchaCheckbox';
@@ -60,6 +61,7 @@ function Login() {
 
   const backendBaseUrl = getApiBaseUrl();
   const GOOGLE_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/google`;
+  const FACEBOOK_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/facebook`;
 
   useEffect(() => {
     const mode = searchParams.get('mode');
@@ -177,6 +179,7 @@ function Login() {
             <div className={cx('social-login')}>
               <div className={cx('social-btns')}>
                 <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(searchParams))}><FcGoogle size={24} /></a>
+                <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(searchParams))}><FaFacebook size={24} color="#1877F2" /></a>
               </div>
             </div>
 
@@ -281,6 +284,7 @@ function Login() {
             <div className={cx('social-login')}>
               <div className={cx('social-btns')}>
                 <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(searchParams))}><FcGoogle size={24} /></a>
+                <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(searchParams))}><FaFacebook size={24} color="#1877F2" /></a>
               </div>
             </div>
             <div className={cx('input-box')}>
