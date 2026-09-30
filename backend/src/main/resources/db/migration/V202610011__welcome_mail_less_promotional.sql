@@ -26,13 +26,7 @@ WHERE code = 'LAYOUT_BASE';
 UPDATE system.emails
 SET subject = 'Tài khoản {{userName}} trên {{siteName}} đã được tạo',
     body_html = $html$<p>Xin chào {{fullName}},</p>
-<p>Tài khoản của bạn trên {{siteName}} đã được tạo và có thể dùng ngay.</p>
-<p>Thông tin đăng nhập:</p>
-<ul>
-  <li>Tên đăng nhập: <b>{{userName}}</b></li>
-  <li>Email: {{email}}</li>
-</ul>
-<p>Bạn đăng nhập lại bằng chính email này trên trang vừa dùng để đăng ký.</p>
+<p>Tài khoản <b>{{userName}}</b> với email {{email}} đã được tạo. Bạn đăng nhập lại bằng chính email này.</p>
 <p>Nếu bạn không tạo tài khoản này, hãy bỏ qua email.</p>$html$,
     description = 'Gửi ngay sau khi người dùng đăng ký tài khoản thành công.',
     updated_at = NOW()

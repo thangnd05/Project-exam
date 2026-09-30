@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict a6eS3bCwRndnFhyxKE8YslaBX8IAGG2A11D6M4CaqlAyQzr01c4jwmClyPZjd2j
+\restrict Qym9z9Y0QUxfZfQUBsKOJuyq1nVbqRkGaLGwBbYhjsgymBQUwiZ3eUiA7K5Ot5I
 
 -- Dumped from database version 18.4 (Debian 18.4-1.pgdg13+1)
 -- Dumped by pg_dump version 18.4 (Debian 18.4-1.pgdg13+1)
@@ -53172,6 +53172,8 @@ COPY public.flyway_schema_history (installed_rank, version, description, type, s
 33	202609272	onboarding quests	SQL	V202609272__onboarding_quests.sql	-452835902	root	2026-09-27 21:53:39.702014	38	t
 34	202609301	soft delete	SQL	V202609301__soft_delete.sql	-2038638045	root	2026-09-30 00:04:45.036937	92	t
 35	202609302	learning plans one active	SQL	V202609302__learning_plans_one_active.sql	-887088006	root	2026-09-30 22:28:15.848116	40	t
+36	202610011	welcome mail less promotional	SQL	V202610011__welcome_mail_less_promotional.sql	-205516196	root	2026-10-01 00:50:35.494038	20	t
+37	202610012	welcome mail account details	SQL	V202610012__welcome_mail_account_details.sql	1547690234	root	2026-10-01 01:02:59.593486	26	t
 \.
 
 
@@ -53180,6 +53182,12 @@ COPY public.flyway_schema_history (installed_rank, version, description, type, s
 --
 
 COPY system.audit_logs (audit_log_id, action, created_at, endpoint, http_method, ip_address, resource, resource_id, status_code, success, user_agent, user_id, details) FROM stdin;
+01a0f367-8f40-78ad-b932-734ff07db901	DELETE	2026-09-30 17:40:45.508291+00	/api/users/01a0f31b-b13a-711f-8b3f-c7a680771780	DELETE	0:0:0:0:0:0:0:1	users	01a0f31b-b13a-711f-8b3f-c7a680771780	204	t	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0	db7b9178-e89f-40f6-a927-ffbad8114857	\N
+01a0f368-d837-7c59-a342-47cce4aac1aa	LOGOUT	2026-09-30 17:42:09.720871+00	/api/auth/logout	POST	0:0:0:0:0:0:0:1	auth	logout	200	t	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0	\N	\N
+01a0f369-511c-7a0b-90e3-2af351ae1239	CREATE	2026-09-30 17:42:40.668532+00	/api/auth/register	POST	0:0:0:0:0:0:0:1	auth	register	201	t	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0	\N	\N
+01a0f369-5298-73f3-8952-421f3f7764f6	LOGIN	2026-09-30 17:42:41.048365+00	/api/auth/login	POST	0:0:0:0:0:0:0:1	auth	login	200	t	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0	\N	\N
+01a0f36a-329d-7e93-858f-aadbf787e607	LOGOUT	2026-09-30 17:43:38.39707+00	/api/auth/logout	POST	0:0:0:0:0:0:0:1	auth	logout	200	t	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0	\N	\N
+01a0f373-20a0-771a-a630-30a2ee85fe53	CREATE	2026-09-30 17:53:23.616964+00	/api/admin/emails/preview	POST	0:0:0:0:0:0:0:1	admin	emails	200	t	Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36 Edg/154.0.0.0	db7b9178-e89f-40f6-a927-ffbad8114857	\N
 \.
 
 
@@ -53191,6 +53199,9 @@ COPY system.email_recipients (recipient_id, email_id, user_id, to_email, status,
 01a0e849-ca26-7060-9d12-cccdaeac904c	019853a0-0000-7000-8000-000000000002	01a0e849-c9cc-741c-b5ac-2d3877b8b7fc	winde.contact@gmail.com	SENT	\N	2026-09-28 13:52:25.125893+00	2026-09-28 13:52:28.769935+00
 01a0f341-c10d-7611-a23e-fa9bfdd870b1	019853a0-0000-7000-8000-000000000002	01a0f341-c0a4-7370-b335-d67c73d7e427	h@gmail.com	SENT	\N	2026-09-30 16:59:27.885222+00	2026-09-30 16:59:31.839446+00
 01a0f357-9a56-7259-8783-068965fc2625	019853a0-0000-7000-8000-000000000002	01a0f357-9a4e-7b2c-a3a2-3f4874884875	a@gmail.com	SENT	\N	2026-09-30 17:23:19.765921+00	2026-09-30 17:23:23.323991+00
+01a0f368-1171-7091-a1ed-a8116208787e	019853a0-0000-7000-8000-000000000002	\N	thangnd.contact@gmail.com	SENT	\N	2026-09-30 17:41:18.8333+00	2026-09-30 17:41:22.517468+00
+01a0f369-5112-7410-9fdf-264ce6df54c1	019853a0-0000-7000-8000-000000000002	\N	thangnd.contact@gmail.com	SENT	\N	2026-09-30 17:42:40.658852+00	2026-09-30 17:42:43.693266+00
+01a0f372-0336-76b4-b685-a79baec6b5d6	019853a0-0000-7000-8000-000000000002	01a0f372-031c-7091-91e2-1aa48ee4e018	thangnd.contact@gmail.com	SENT	\N	2026-09-30 17:52:10.549758+00	2026-09-30 17:52:13.721415+00
 \.
 
 
@@ -53199,11 +53210,11 @@ COPY system.email_recipients (recipient_id, email_id, user_id, to_email, status,
 --
 
 COPY system.emails (email_id, type, code, name, description, subject, body_html, available_vars, active, created_by, created_at, updated_at, updated_by, deleted_at) FROM stdin;
-019853a0-0000-7000-8000-000000000002	AUTO	WELCOME_REGISTER	Chào mừng khi đăng ký	Gửi ngay sau khi người dùng đăng ký tài khoản thành công.	Chào mừng bạn đến với {{siteName}}!	<h2 style="color:#0f766e;margin:0 0 12px;">Xin chào {{fullName}}!</h2>\n<p>Tài khoản <b>{{userName}}</b> đã được tạo thành công và có thể sử dụng ngay, bạn không cần xác thực thêm bước nào.</p>\n<div style="margin:24px 0;">\n  <a href="{{loginUrl}}" style="background:#0d9488;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;display:inline-block;">Bắt đầu học ngay</a>\n</div>\n<p style="color:#6b7280;font-size:13px;">Nếu bạn không thực hiện đăng ký này, vui lòng bỏ qua email.</p>	fullName, userName, email, loginUrl, siteName, siteUrl, year	t	\N	2026-08-09 07:14:34.827172+00	2026-08-09 07:14:34.827172+00	\N	\N
 019853a0-0000-7000-8000-000000000003	AUTO	RESET_PASSWORD	Đặt lại mật khẩu	Gửi khi người dùng bấm quên mật khẩu. Bắt buộc giữ {{actionUrl}}, thiếu là người dùng không đặt lại được.	Đặt lại mật khẩu {{siteName}}	<h2 style="color:#0f766e;margin:0 0 12px;">Yêu cầu đặt lại mật khẩu</h2>\n<p>Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Bấm nút bên dưới để tiếp tục:</p>\n<div style="margin:24px 0;">\n  <a href="{{actionUrl}}" style="background:#0d9488;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:bold;display:inline-block;">Đặt lại mật khẩu</a>\n</div>\n<p style="color:#6b7280;font-size:13px;">Liên kết có hiệu lực trong {{expireMinutes}} phút. Nếu bạn không yêu cầu thao tác này, hãy bỏ qua email.</p>	fullName, actionUrl, expireMinutes, siteName, siteUrl, year	t	\N	2026-08-09 07:14:34.827172+00	2026-08-09 07:14:34.827172+00	\N	\N
 019853a0-0000-7000-8000-000000000004	AUTO	PASSWORD_CHANGED	Cảnh báo đổi mật khẩu	Gửi sau khi mật khẩu đổi thành công (tự đổi hoặc qua quên mật khẩu).	Mật khẩu {{siteName}} của bạn vừa được thay đổi	<h2 style="color:#0f766e;margin:0 0 12px;">Mật khẩu vừa được thay đổi</h2>\n<p>Xin chào {{fullName}}, mật khẩu tài khoản của bạn đã được thay đổi lúc <b>{{changedAt}}</b>.</p>\n<p>Mọi phiên đăng nhập cũ đã bị đăng xuất.</p>\n<p style="color:#b91c1c;font-size:13px;">Nếu không phải bạn thực hiện, hãy dùng chức năng quên mật khẩu để lấy lại tài khoản ngay.</p>	fullName, changedAt, siteName, siteUrl, year	t	\N	2026-08-09 07:14:34.827172+00	2026-08-09 07:14:34.827172+00	\N	\N
 019853a0-0000-7000-8000-000000000005	AUTO	EMAIL_CHANGED	Cảnh báo đổi email	Gửi tới CẢ email cũ lẫn email mới khi người dùng đổi địa chỉ email.	Email đăng nhập {{siteName}} vừa được thay đổi	<h2 style="color:#0f766e;margin:0 0 12px;">Email đăng nhập vừa được thay đổi</h2>\n<p>Xin chào {{fullName}}, email tài khoản của bạn đã đổi lúc <b>{{changedAt}}</b>:</p>\n<p style="background:#f3f4f6;padding:12px 16px;border-radius:8px;">\n  Email cũ: <b>{{oldEmail}}</b><br>\n  Email mới: <b>{{newEmail}}</b>\n</p>\n<p style="color:#b91c1c;font-size:13px;">Nếu không phải bạn thực hiện, hãy liên hệ quản trị viên ngay.</p>	fullName, oldEmail, newEmail, changedAt, siteName, siteUrl, year	t	\N	2026-08-09 07:14:34.827172+00	2026-08-09 07:14:34.827172+00	\N	\N
-019853a0-0000-7000-8000-000000000001	AUTO	LAYOUT_BASE	Khung email chung	Header + footer bọc ngoài mọi email. Vị trí {{content}} là nơi nội dung từng email được chèn vào.	{{siteName}}	<div style="background:#ffffff;font-family:Arial,Helvetica,sans-serif;">\n  <div style="max-width:600px;margin:0 auto;background:#ffffff;">\n    <div style="background:#0d9488;padding:20px 24px;">\n      <a href="{{siteUrl}}" style="color:#ffffff;font-size:20px;font-weight:bold;text-decoration:none;">{{siteName}}</a>\n    </div>\n    <div style="padding:24px;color:#111827;font-size:15px;line-height:1.6;">\n      {{content}}\n    </div>\n    <div style="padding:16px 24px;color:#6b7280;font-size:12px;line-height:1.5;border-top:1px solid #e5e7eb;">\n      Email này được gửi tự động từ {{siteName}}, vui lòng không trả lời.<br>\n      &copy; {{year}} {{siteName}}\n    </div>\n  </div>\n</div>	content, siteName, siteUrl, year	t	\N	2026-08-09 07:14:34.827172+00	2026-08-09 07:32:28.937633+00	\N	\N
+019853a0-0000-7000-8000-000000000002	AUTO	WELCOME_REGISTER	Chào mừng khi đăng ký	Gửi ngay sau khi người dùng đăng ký tài khoản thành công.	Tài khoản {{userName}} trên {{siteName}} đã được tạo	<p>Xin chào {{fullName}},</p>\r\n<p>Tài khoản của bạn trên {{siteName}} đã được tạo và có thể dùng ngay.</p>\r\n<p>Thông tin đăng nhập:</p>\r\n<ul>\r\n  <li>Tên đăng nhập: <b>{{userName}}</b></li>\r\n  <li>Email: {{email}}</li>\r\n</ul>\r\n<p>Bạn đăng nhập lại bằng chính email này trên trang vừa dùng để đăng ký.</p>\r\n<p>Nếu bạn không tạo tài khoản này, hãy bỏ qua email.</p>	fullName, userName, email, loginUrl, siteName, siteUrl, year	t	\N	2026-08-09 07:14:34.827172+00	2026-09-30 18:02:59.622677+00	\N	\N
+019853a0-0000-7000-8000-000000000001	AUTO	LAYOUT_BASE	Khung email chung	Header + footer bọc ngoài mọi email. Vị trí {{content}} là nơi nội dung từng email được chèn vào.	{{siteName}}	<div style="background:#ffffff;font-family:Arial,Helvetica,sans-serif;">\r\n  <div style="max-width:600px;margin:0 auto;background:#ffffff;">\r\n    <div style="background:#0d9488;padding:20px 24px;">\r\n      <span style="color:#ffffff;font-size:20px;font-weight:bold;">{{siteName}}</span>\r\n    </div>\r\n    <div style="padding:24px;color:#111827;font-size:15px;line-height:1.6;">\r\n      {{content}}\r\n    </div>\r\n    <div style="padding:16px 24px;color:#6b7280;font-size:12px;line-height:1.5;border-top:1px solid #e5e7eb;">\r\n      Bạn nhận email này vì vừa có hoạt động với tài khoản trên {{siteName}}.<br>\r\n      &copy; {{year}} {{siteName}}\r\n    </div>\r\n  </div>\r\n</div>	content, siteName, siteUrl, year	t	\N	2026-08-09 07:14:34.827172+00	2026-09-30 17:50:35.517484+00	\N	\N
 \.
 
 
@@ -53348,11 +53359,11 @@ ffa9991b-fc52-4510-8dea-5e53f1dd3fc2	Quyền quản trị viên	ADMIN	\N
 COPY users.users (user_id, avatar_url, created_at, email, full_name, password, role_id, user_name, verification_token, verified, is_premium, deleted_at) FROM stdin;
 01a0f341-c0a4-7370-b335-d67c73d7e427	https://ui-avatars.com/api/?name=winde123&background=random&color=fff	2026-09-30 16:59:27.775559+00	h@gmail.com	Nguyễn Đức Thắng	$2a$10$0YKYc60/X4jKrw/F7JRsyOFE5uZ/dqhZOF5AxE5AsSC6abwKFXrCu	9ea7a29b-bf9d-4fa7-8452-1d86c30f0082	winde123	\N	t	f	\N
 01a0f357-9a4e-7b2c-a3a2-3f4874884875	https://ui-avatars.com/api/?name=a@gmail.com&background=random&color=fff	2026-09-30 17:23:19.756488+00	a@gmail.com	Nguyễn Đức Thắng	$2a$10$QOMNhlkw13cMWvfdmArX7.C8MthrQJ.SBEnzh.jyfSkJIzkbZciEa	9ea7a29b-bf9d-4fa7-8452-1d86c30f0082	a@gmail.com	\N	t	f	\N
+01a0f372-031c-7091-91e2-1aa48ee4e018	https://lh3.googleusercontent.com/a/ACg8ocIuAQlvauBCpYKLuYMrL_kGEWuOakEVJUjYxqEPMwDnEFVu-Q=s96-c	2026-09-30 17:52:10.366188+00	thangnd.contact@gmail.com	Nguyễn Đức Thắng	$2a$10$Q0BqSJcgA8tUvmbNF0y5we3A0aQUuxfFhHx20Us94gmBFg8/O3VKm	9ea7a29b-bf9d-4fa7-8452-1d86c30f0082	thangnd.contact	\N	t	f	\N
 9c2e3cb1-5e13-47b6-b592-3a8b62733e43	https://lh3.googleusercontent.com/a/ACg8ocJku24PW_s8Sr7XB0DeD6zNbDx4Wt60h8UQhra-XJLenGz9wIxR=s96-c	2026-05-24 15:56:00.176511+00	hau250184@gmail.com	Nguyễn Đức Thắng	$2a$10$40BUzpO/ZuwxU9w8Cmmc8eF3gaZd011wmT0oiHTi0wroFWKn0Fmou	9ea7a29b-bf9d-4fa7-8452-1d86c30f0082	hau250184	\N	t	f	\N
 db7b9178-e89f-40f6-a927-ffbad8114857	https://ui-avatars.com/api/?name=WinDe&background=random&color=fff	2026-05-20 08:27:34.716733+00	winde	Nguyễn Đức Thắng	$2a$10$8QYLvMHafBprUowiMwRRn./dH1ZawMPpCeyCIfHrGDAOgcDVyzgDa	ffa9991b-fc52-4510-8dea-5e53f1dd3fc2	WinDe	\N	t	f	\N
 01a0e3b7-1903-7476-9bda-8c3f2df14bfe	https://ui-avatars.com/api/?name=Administrator&background=random&color=fff	2026-09-27 16:33:42.658157+00	Thang10072005@gmail.com	Administrator	$2a$10$7UPfPeMJiG96efitQ8xZD.xAWkzeOsbJhtRyXYTWE0jClfzFdPl/O	ffa9991b-fc52-4510-8dea-5e53f1dd3fc2	admin	\N	t	f	\N
 01a0e849-c9cc-741c-b5ac-2d3877b8b7fc	https://ui-avatars.com/api/?name=winde.contact@gmail.com&background=random&color=fff	2026-09-28 13:52:25.032191+00	winde.contact@gmail.com	Nguyễn Đức Thắng	$2a$10$js0YQE5YTgz.HhHr31.MweIjpnRmy0gsyuJzUW0H3kLirV2wWHF7u	9ea7a29b-bf9d-4fa7-8452-1d86c30f0082	winde.contact@gmail.com	\N	t	f	\N
-01a0f31b-b13a-711f-8b3f-c7a680771780	https://ui-avatars.com/api/?name=Thắng+Nguyễn&background=random&color=fff	2026-09-30 16:17:53.393323+00	thangnd.contact@gmail.com	Thắng Nguyễn	$2a$10$47phkSc0FK2EGvvxJo5crOeWx/.Uz1/w06ZkIr5k2E7YVa5C8uING	9ea7a29b-bf9d-4fa7-8452-1d86c30f0082	thangnd.contact	\N	t	f	\N
 \.
 
 
@@ -55671,5 +55682,5 @@ ALTER TABLE ONLY vocabulary.vocabulary_album
 -- PostgreSQL database dump complete
 --
 
-\unrestrict a6eS3bCwRndnFhyxKE8YslaBX8IAGG2A11D6M4CaqlAyQzr01c4jwmClyPZjd2j
+\unrestrict Qym9z9Y0QUxfZfQUBsKOJuyq1nVbqRkGaLGwBbYhjsgymBQUwiZ3eUiA7K5Ot5I
 
