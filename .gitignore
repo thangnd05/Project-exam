@@ -21,11 +21,9 @@ backend/*.ipr
 backend/.vscode/
 
 # Sensitive files
-backend/src/main/resources/application.properties
 backend/.env
 backend/.env.local
 backend/.env.*.local
-backend/.env.example
 
 # ==========================================
 # FRONTEND (Node/React/Vue)
@@ -34,7 +32,6 @@ frontend/node_modules/
 frontend/.env
 frontend/.env.local
 frontend/.env.*.local
-frontend/.env.example
 frontend/build/
 frontend/dist/
 frontend/*.log
@@ -50,6 +47,7 @@ frontend/.pnpm-store/
 # GENERAL (Root & OS)
 # ==========================================
 .pnpm-store/
+/.env
 .DS_Store
 *.log
 .idea/

@@ -1,0 +1,98 @@
+# Môi trường dev: container chỉ cung cấp JDK/Maven/Node/pnpm + Postgres/Redis,
+# code vẫn nằm trên máy và được gắn vào container, sửa code là tự reload.
+#   docker compose up -d        -> Web http://localhost:3000, API http://localhost:8081
+#   docker compose logs -f      -> xem log
+
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: project_exam
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "15432:5432" # để kết nối bằng DBeaver/pgAdmin từ máy host
+    volumes:
+      - pgdata:/var/lib/postgresql
+      # Chỉ nạp database/*.sql khi DB còn trống (lần đầu). Muốn nạp lại: docker compose down -v
+      - ./database:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d project_exam"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "16379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    image: maven:3.9-eclipse-temurin-17
+    working_dir: /app
+    # Compile lần đầu, sau đó cứ 2s kiểm tra src/main + pom.xml, có thay đổi thì compile lại
+    # để spring-boot-devtools restart app. ($$ = ký tự $ thật, tránh docker compose tự thay biến)
+    command:
+      - sh
+      - -c
+      - |
+        mvn -B -q compile && touch target/.last-compile
+        while true; do
+          sleep 2
+          if [ -n "$$(find src/main pom.xml -newer target/.last-compile -type f | head -1)" ]; then
+            touch target/.last-compile
+            echo "[dev] Phát hiện thay đổi, đang compile lại..."
+            mvn -B -q -o compile || echo "[dev] Compile lỗi, sửa code rồi lưu lại."
+          fi
+        done &
+        exec mvn -B spring-boot:run
+    volumes:
+      - ./backend:/app
+      - m2:/root/.m2
+      - backend-target:/app/target # tách khỏi target/ của IDE trên máy
+    # Secrets đọc từ backend/.env (đã nằm trong thư mục gắn vào), các dòng dưới ghi đè để trỏ vào container
+    environment:
+      SERVER_PORT: "8081"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/project_exam
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: "6379"
+    ports:
+      - "${BACKEND_PORT:-8081}:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    image: node:22-bookworm-slim
+    working_dir: /app
+    command: ["sh", "-c", "npm install -g pnpm@11.1.3 --silent && pnpm install --frozen-lockfile && pnpm dev --webpack"]
+    volumes:
+      - ./frontend:/app
+      - frontend-node-modules:/app/node_modules # node_modules bản Linux, không đụng bản Windows trên máy
+      - frontend-next:/app/.next
+      - pnpm-store:/root/.local/share/pnpm/store
+    environment:
+      API_ORIGIN: http://backend:8081
+      WATCHPACK_POLLING: "true" # ổ Windows gắn vào container không bắn sự kiện đổi file, Turbopack không có polling nên dùng --webpack
+      NEXT_TELEMETRY_DISABLED: "1"
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  m2:
+  backend-target:
+  frontend-node-modules:
+  frontend-next:
+  pnpm-store:
