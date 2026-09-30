@@ -14,8 +14,8 @@ services:
       - "15432:5432" # để kết nối bằng DBeaver/pgAdmin từ máy host
     volumes:
       - pgdata:/var/lib/postgresql
-      # Chỉ nạp database/*.sql khi DB còn trống (lần đầu). Muốn nạp lại: docker compose down -v
-      - ./database:/docker-entrypoint-initdb.d:ro
+      # Chỉ nạp database/project_exam.sql khi DB còn trống (lần đầu). Muốn nạp lại: docker compose down -v
+      - ./database/project_exam.sql:/docker-entrypoint-initdb.d/project_exam.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d project_exam"]
       interval: 5s
