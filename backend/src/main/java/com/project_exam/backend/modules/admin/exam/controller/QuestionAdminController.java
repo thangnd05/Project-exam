@@ -36,6 +36,7 @@ public class QuestionAdminController {
             @RequestParam(required = false) String examTypeId,
             @RequestParam(required = false) String examPartId,
             @RequestParam(required = false) String collectionId,
+            @RequestParam(required = false) String tagId,
             @RequestParam(required = false) Question.UsageScope usageScope,
             @RequestParam(required = false) Question.QuestionType questionType,
             @RequestParam(required = false) Boolean isBank,
@@ -45,7 +46,7 @@ public class QuestionAdminController {
     ) {
         authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         return ResponseEntity.ok(adminQuestionService.search(
-                examTypeId, examPartId, collectionId, usageScope, questionType, isBank,
+                examTypeId, examPartId, collectionId, tagId, usageScope, questionType, isBank,
                 keyword, page, size));
     }
 

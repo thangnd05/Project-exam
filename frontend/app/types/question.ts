@@ -199,6 +199,7 @@ export interface AdminQuestionSearchParams {
   examTypeId?: string;
   examPartId?: string;
   collectionId?: string;
+  tagId?: string;
   usageScope?: QuestionUsageScope;
   questionType?: QuestionType;
   isBank?: boolean;

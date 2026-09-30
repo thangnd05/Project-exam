@@ -17,6 +17,8 @@ import com.project_exam.backend.modules.assessment.exam.repository.QuestionTagRe
 import com.project_exam.backend.modules.assessment.exam.repository.TagRepository;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.exception.BadRequestException;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,6 +57,7 @@ public class AdminQuestionService {
             String examTypeId,
             String examPartId,
             String collectionId,
+            String tagId,
             Question.UsageScope usageScope,
             Question.QuestionType questionType,
             Boolean isBank,
@@ -72,7 +75,7 @@ public class AdminQuestionService {
         }
 
         Specification<Question> spec = buildSpec(
-                partIdScope, collectionId, usageScope, questionType, isBank, keyword);
+                partIdScope, collectionId, tagId, usageScope, questionType, isBank, keyword);
 
         Pageable pageable = PageRequest.of(safePage, safeSize,
                 Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "questionId")));
@@ -96,6 +99,7 @@ public class AdminQuestionService {
     private Specification<Question> buildSpec(
             Set<String> partIdScope,
             String collectionId,
+            String tagId,
             Question.UsageScope usageScope,
             Question.QuestionType questionType,
             Boolean isBank,
@@ -112,6 +116,14 @@ public class AdminQuestionService {
 
             Set<String> scope = collectionWithChildrenIds(collectionId);
             spec = spec.and((root, query, cb) -> root.get("collectionId").in(scope));
+        }
+        if (!isBlank(tagId)) {
+            spec = spec.and((root, query, cb) -> {
+                Subquery<String> tagged = query.subquery(String.class);
+                Root<QuestionTag> link = tagged.from(QuestionTag.class);
+                tagged.select(link.get("questionId")).where(cb.equal(link.get("tagId"), tagId));
+                return root.get("questionId").in(tagged);
+            });
         }
         if (usageScope != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("usageScope"), usageScope));

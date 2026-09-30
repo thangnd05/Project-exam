@@ -54,6 +54,7 @@ function QuestionsManagement() {
   const [examTypeId, setExamTypeId] = useState('');
   const [examPartId, setExamPartId] = useState('');
   const [collectionId, setCollectionId] = useState('');
+  const [tagId, setTagId] = useState('');
   const [usageScope, setUsageScope] = useState('');
   const [questionType, setQuestionType] = useState('');
 
@@ -63,7 +64,10 @@ function QuestionsManagement() {
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [deletingQuestion, setDeletingQuestion] = useState<AdminQuestionListItem | null>(null);
 
-  const { examTypes, examParts } = useQuestionFilterOptions(examTypeId);
+  const { examTypes, examParts, tags } = useQuestionFilterOptions(examTypeId);
+  const visibleTags = tags.filter(
+    (tag) => !examPartId || !tag.examPartId || tag.examPartId === examPartId,
+  );
   const { questionCollections } = useQuestionCollections();
 
   const params = useMemo<AdminQuestionSearchParams>(
@@ -74,10 +78,11 @@ function QuestionsManagement() {
       examTypeId: examTypeId || undefined,
       examPartId: examPartId || undefined,
       collectionId: collectionId || undefined,
+      tagId: tagId || undefined,
       usageScope: (usageScope as QuestionUsageScope) || undefined,
       questionType: (questionType as QuestionType) || undefined,
     }),
-    [page, keyword, examTypeId, examPartId, collectionId, usageScope, questionType],
+    [page, keyword, examTypeId, examPartId, collectionId, tagId, usageScope, questionType],
   );
 
   const {
@@ -283,6 +288,7 @@ function QuestionsManagement() {
           onChange={(e) => {
             setExamTypeId(e.target.value);
             setExamPartId('');
+            setTagId('');
             resetToFirstPage();
           }}
         >
@@ -299,7 +305,12 @@ function QuestionsManagement() {
           value={examPartId}
           disabled={!examTypeId}
           onChange={(e) => {
-            setExamPartId(e.target.value);
+            const nextPartId = e.target.value;
+            setExamPartId(nextPartId);
+            const selectedTag = tags.find((tag) => tag.tagId === tagId);
+            if (nextPartId && selectedTag?.examPartId && selectedTag.examPartId !== nextPartId) {
+              setTagId('');
+            }
             resetToFirstPage();
           }}
         >
@@ -307,6 +318,23 @@ function QuestionsManagement() {
           {examParts.map((part) => (
             <option key={part.examPartId} value={part.examPartId}>
               {part.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className={cx('filterInput')}
+          value={tagId}
+          disabled={!examTypeId}
+          onChange={(e) => {
+            setTagId(e.target.value);
+            resetToFirstPage();
+          }}
+        >
+          <option value="">{examTypeId ? 'Tất cả tag' : 'Chọn loại đề để lọc tag'}</option>
+          {visibleTags.map((tag) => (
+            <option key={tag.tagId} value={tag.tagId}>
+              {!examPartId && tag.examPartName ? `${tag.name} (${tag.examPartName})` : tag.name}
             </option>
           ))}
         </select>

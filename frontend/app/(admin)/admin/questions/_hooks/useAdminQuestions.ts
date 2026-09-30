@@ -9,12 +9,14 @@ import {
 } from '@/app/apis/questionApi';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getExamPartsByExamType } from '@/app/apis/examPartApi';
+import { getTagsFlatByExamType } from '@/app/apis/tagApi';
 import type {
   AdminQuestionListItem,
   AdminQuestionSearchParams,
   BulkUpdateQuestionsRequest,
   ExamPartResponse,
   ExamTypeResponse,
+  TagResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
@@ -23,6 +25,7 @@ export const adminQuestionKeys = {
   list: (params: AdminQuestionSearchParams) => ['admin-questions', 'list', params] as const,
   examTypes: ['admin-questions', 'exam-types'] as const,
   parts: (examTypeId: string) => ['admin-questions', 'parts', examTypeId] as const,
+  tags: (examTypeId: string) => ['admin-questions', 'tags', examTypeId] as const,
 };
 
 const normalizeArray = <T,>(data: T[] | { content?: T[] } | null | undefined): T[] =>
@@ -77,9 +80,17 @@ export function useQuestionFilterOptions(examTypeId: string) {
     select: normalizeArray,
   });
 
+  const tagsQuery = useQuery({
+    queryKey: adminQuestionKeys.tags(examTypeId),
+    queryFn: () => getTagsFlatByExamType(examTypeId),
+    enabled: !!examTypeId,
+    select: normalizeArray,
+  });
+
   return {
     examTypes: (examTypesQuery.data ?? EMPTY_LIST) as ExamTypeResponse[],
     examParts: (examTypeId ? partsQuery.data ?? EMPTY_LIST : EMPTY_LIST) as ExamPartResponse[],
+    tags: (examTypeId ? tagsQuery.data ?? EMPTY_LIST : EMPTY_LIST) as TagResponse[],
     isLoading: examTypesQuery.isLoading,
   };
 }
