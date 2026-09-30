@@ -505,6 +505,7 @@ function PlanStudy() {
                   allQuestions={orderedQuestions}
                   userAnswers={navAnswers}
                   onScrollToQuestion={scrollToQuestion}
+                  columns={5}
                   gridMaxHeight="calc(100vh - 24rem)"
                 />
               </div>
