@@ -22,6 +22,7 @@ public class MailDispatcher {
 
     private final JavaMailSender javaMailSender;
     private final EmailRecipientRepository emailRecipientRepository;
+    private final EmailHtmlNormalizer htmlNormalizer;
 
     @Value("${app.mail.from-address}")
     private String fromAddress;
@@ -45,8 +46,14 @@ public class MailDispatcher {
                 helper.setFrom(fromAddress);
             }
             helper.setTo(toEmail);
+            helper.setReplyTo(fromAddress);
             helper.setSubject(subject);
-            helper.setText(bodyHtml, true);
+            String plainText = htmlNormalizer.toPlainText(bodyHtml);
+            if (plainText.isBlank()) {
+                helper.setText(bodyHtml, true);
+            } else {
+                helper.setText(plainText, bodyHtml);
+            }
             javaMailSender.send(message);
         } catch (Exception e) {
             error = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();

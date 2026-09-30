@@ -45,6 +45,28 @@ public class EmailHtmlNormalizer {
     private static final String INDENT_CLASS_PREFIX = "ql-indent-";
     private static final int INDENT_STEP_PX = 24;
 
+    public String toPlainText(String html) {
+        if (html == null || html.isBlank()) {
+            return "";
+        }
+        Document document = Jsoup.parse(html);
+        for (Element anchor : document.select("a[href]")) {
+            String href = anchor.attr("href").trim();
+            if (href.isEmpty() || href.toLowerCase().startsWith("javascript:")) {
+                continue;
+            }
+            if (!anchor.text().contains(href)) {
+                anchor.after(" (" + href + ")");
+            }
+        }
+        document.select("br").after("\n");
+        document.select("p,div,h1,h2,h3,h4,li,tr").before("\n");
+        String text = document.body().wholeText().replace('\u00a0', ' ');
+        text = text.replaceAll("[ \\t]+\\n", "\n");
+        text = text.replaceAll("\\n{3,}", "\n\n");
+        return text.trim();
+    }
+
     public String toEmailHtml(String html) {
         if (html == null || html.isBlank()) {
             return "";

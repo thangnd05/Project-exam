@@ -11,6 +11,15 @@ class EmailHtmlNormalizerTest {
     private final EmailHtmlNormalizer normalizer = new EmailHtmlNormalizer();
 
     @Test
+    void chuyenHtmlSangChuThuongVaGiuDiaChiLink() {
+        String text = normalizer.toPlainText(
+                "<p>Xin chào</p><p><a href=\"https://example.com/login\">Đăng nhập</a></p>");
+
+        assertTrue(text.contains("Xin chào"));
+        assertTrue(text.contains("Đăng nhập (https://example.com/login)"));
+    }
+
+    @Test
     void themStyleInlineChoTheDoTrinhSoanThaoXuatRa() {
         String result = normalizer.toEmailHtml("<h2>Xin chào</h2><p>Nội dung</p>");
 
