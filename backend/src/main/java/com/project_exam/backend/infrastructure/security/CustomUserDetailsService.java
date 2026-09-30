@@ -7,9 +7,12 @@ import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.rbac.service.RoleAuthorityCache;
 import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
+import com.project_exam.backend.modules.system.mail.domain.MailTemplateCode;
+import com.project_exam.backend.modules.system.mail.service.MailService;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,14 +36,20 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final RoleRepository roleRepository;
     private final RoleAuthorityCache roleAuthorityCache;
     private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
+
+    @Value("${app.frontend.origin}")
+    private String frontendOrigin;
 
     public CustomUserDetailsService(UserRepository userRepository, RoleRepository roleRepository,
                                     RoleAuthorityCache roleAuthorityCache,
-                                    @Lazy PasswordEncoder passwordEncoder) {
+                                    @Lazy PasswordEncoder passwordEncoder,
+                                    MailService mailService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.roleAuthorityCache = roleAuthorityCache;
         this.passwordEncoder = passwordEncoder;
+        this.mailService = mailService;
     }
 
     @Override
@@ -102,6 +112,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             newUser.setAvatarUrl(resolveOAuthAvatar(name, pictureUrl));
 
             userRepository.save(newUser);
+            sendWelcome(newUser);
         } else {
 
             User user = existUser.get();
@@ -110,6 +121,20 @@ public class CustomUserDetailsService implements UserDetailsService {
             user.setAvatarUrl(resolveOAuthAvatar(name, pictureUrl));
             userRepository.save(user);
         }
+    }
+
+    private void sendWelcome(User user) {
+        String fullName = user.getFullName();
+        if (fullName == null || fullName.isBlank()) {
+            fullName = user.getUserName();
+        }
+        mailService.sendAuto(MailTemplateCode.WELCOME_REGISTER, user.getEmail(), user.getUserId(),
+                Map.of(
+                        "fullName", fullName,
+                        "userName", user.getUserName(),
+                        "email", user.getEmail(),
+                        "loginUrl", frontendOrigin + "/login"
+                ));
     }
 
     private String resolveOAuthAvatar(String name, String pictureUrl) {
