@@ -1,0 +1,414 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A museum's mobile app lets visitors download audio guides from a private Amazon S3 bucket without creating an account. The app must not contain long-term AWS credentials. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Khách tham quan không tạo tài khoản, cần đọc S3 private, không có long-term key => Identity Pool guest (unauthenticated) role.\n(A) SAI: Vi phạm trực tiếp yêu cầu không nhúng long-term credentials; key trích xuất được từ app và không hết hạn.\n(B) SAI: IAM Identity Center dành cho nhân viên đăng nhập vào AWS account, không phục vụ khách ẩn danh của app mobile.\n(C) ĐÚNG: Identity Pool bật unauthenticated identities cấp temporary credentials cho người dùng ẩn danh; role guest chỉ được s3:GetObject trên prefix audio guide nên phạm vi tối thiểu.\n(D) SAI: Tài khoản dùng chung là anti-pattern, lộ ra là ai cũng dùng được, và User Pool một mình không cấp quyền đọc S3.\nĐáp án đúng: C\nĐiểm cần nhớ: Người dùng không đăng nhập vẫn cần quyền AWS hạn chế => Identity Pool unauthenticated role, cấp quyền tối thiểu.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Embed the access keys of an IAM user that has read-only S3 permissions in the mobile app.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Keep the bucket private and create an IAM Identity Center permission set for museum visitors.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Use an identity pool with guest access and allow the guest role s3:GetObject on the guides.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Use a Cognito user pool and publish one shared username and password for every museum visitor.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A streaming service plans to onboard 2 million subscribers who sign in to its mobile app. An engineer proposes creating an IAM user for each subscriber. Why should a solutions architect recommend an Amazon Cognito user pool instead?",
+    "explanation": "Phân tích đề: Đề hỏi lý do không dùng IAM user cho end-user: sai đối tượng và không mở rộng được.\n(A) SAI: IAM là dịch vụ toàn cục, không bị giới hạn tạo trong một Region; lý do này không đúng.\n(B) ĐÚNG: IAM user dành cho người và workload làm việc với tài nguyên AWS, mỗi account tối đa 5.000 IAM user; User Pool được thiết kế cho hàng triệu end-user với sign-up, MFA, federation.\n(C) SAI: IAM user có thể có mật khẩu console; vấn đề thực sự là sai mục đích sử dụng và giới hạn số lượng, không phải thiếu mật khẩu.\n(D) SAI: User Pool không cấp quyền vào console; đây là điều không mong muốn và cũng không phải tính năng của Cognito.\nĐáp án đúng: B\nĐiểm cần nhớ: Đừng tạo IAM user cho end-user của app: không mở rộng được (quota 5.000) và sai mục đích => Cognito.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "IAM users can only be created in the us-east-1 Region, which adds latency for global subscribers.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "IAM users are meant for identities that work with AWS itself, while user pools manage app users.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "IAM users cannot have passwords, so the subscribers would be unable to sign in to the mobile app.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Cognito user pools automatically give every subscriber access to the AWS Management Console.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company wants the verification and password-reset emails sent by its Amazon Cognito user pool to include dynamic content, such as the user's preferred language and a deep link into its mobile app. Which Cognito feature should the company use?",
+    "explanation": "Phân tích đề: Tùy biến nội dung email/SMS do Cognito gửi theo từng user => Custom message Lambda trigger.\n(A) ĐÚNG: Custom message trigger được gọi trước khi Cognito gửi mã xác minh, mã MFA hay email quên mật khẩu; Lambda trả về subject và nội dung động theo ngôn ngữ, chèn deep link, vẫn giữ placeholder mã.\n(B) SAI: Pre authentication dùng để cho phép hoặc từ chối đăng nhập, không liên quan tới nội dung email xác minh hay reset mật khẩu.\n(C) SAI: Role mapping chỉ quyết định quyền AWS, không ảnh hưởng tới email Cognito gửi cho người dùng.\n(D) SAI: Tùy biến giao diện trang đăng nhập không thay đổi nội dung email xác minh hay email đặt lại mật khẩu.\nĐáp án đúng: A\nĐiểm cần nhớ: Cá nhân hóa email/SMS xác minh, MFA, reset => Custom message trigger; kênh gửi email production => SES.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "A Custom message Lambda trigger that builds the message content before Cognito sends it.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "A Pre authentication Lambda trigger that emails each user before every sign-in attempt.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "An identity pool rule that selects a different IAM role based on the user's locale claim.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "The hosted UI CSS customization settings that change the appearance of the sign-in page.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A developer is new to Amazon Cognito. Which TWO statements correctly describe a Cognito identity pool? (Select TWO.)",
+    "explanation": "Phân tích đề: Nắm chức năng của Identity Pool (authorization vào AWS) để phân biệt với User Pool.\n(A) ĐÚNG: Mỗi Identity Pool có authenticated role và (nếu bật) unauthenticated role, cộng thêm role mapping theo rule hoặc token.\n(B) SAI: Lưu mật khẩu và password policy là việc của User Pool; Identity Pool không có thư mục người dùng.\n(C) SAI: Hosted UI thuộc User Pool; Identity Pool không có giao diện đăng nhập.\n(D) SAI: JWT do User Pool phát hành; Identity Pool trả AWS credentials, không phải access token cho authorizer.\n(E) ĐÚNG: Identity Pool nhận token từ User Pool, social IdP, SAML/OIDC rồi gọi STS để trả temporary AWS credentials.\nĐáp án đúng: A và E\nĐiểm cần nhớ: Identity Pool = đổi danh tính lấy AWS credentials, có authenticated/unauthenticated role. Không lưu user, không phát JWT cho app.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "It can assign separate IAM roles to authenticated users and to unauthenticated guests.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "It stores user passwords and enforces password complexity and account lockout rules.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "It provides hosted sign-in pages for email, password, and social provider login.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "It issues the JWT access tokens that an API Gateway Cognito authorizer validates.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "It exchanges tokens from trusted identity providers for temporary AWS credentials.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A healthcare company runs a patient portal and a clinician portal on the same Amazon Cognito user pool. Clinicians must sign in with the hospital's existing Okta tenant through OpenID Connect, and the portal needs each clinician's department from Okta to appear as a claim in the Cognito ID token. Patients sign in with email and password. What should a solutions architect configure?",
+    "explanation": "Phân tích đề: Một User Pool, clinician đăng nhập qua Okta (OIDC), cần thuộc tính department từ IdP xuất hiện trong ID token => OIDC IdP trong User Pool + attribute mapping.\n(A) SAI: AWS credentials không chứa thuộc tính người dùng như department; portal cần claim trong ID token.\n(B) SAI: IAM Identity Center hướng tới workforce và tách clinician ra khỏi User Pool, portal phải xử lý hai nguồn token khác nhau.\n(C) ĐÚNG: User Pool federate Okta qua OIDC; attribute mapping chuyển claim department của Okta vào custom:department mỗi lần đăng nhập, nên ID token Cognito phát hành có claim này cho portal.\n(D) SAI: Cách này trả AWS credentials, không phải ID token Cognito, và bỏ qua User Pool dùng chung với bệnh nhân.\nĐáp án đúng: C\nĐiểm cần nhớ: Thuộc tính từ SAML/OIDC IdP muốn có trong token Cognito => attribute mapping trên identity provider của User Pool.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a Cognito identity pool with Okta as a provider and read the department from the credentials.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Configure IAM Identity Center with Okta as the identity source and add the portal as an application.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Add Okta as an OIDC provider in the user pool and map its department claim to a custom attribute.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Add Okta as an IAM OIDC identity provider and let clinicians call AssumeRoleWithWebIdentity.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company's Amazon Cognito user pool is the target of credential-stuffing attacks. Thousands of sign-in requests per minute arrive from a small set of IP addresses against the hosted UI and the public user pool API endpoints. The company wants to block abusive IP addresses automatically in front of the user pool without changing application code. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Chặn IP gửi quá nhiều request tới hosted UI và API của User Pool, tự động, không sửa code => AWS WAF web ACL gắn trực tiếp vào User Pool với rate-based rule.\n(A) SAI: Trigger này chỉ chạy sau khi xác thực thành công, không ngăn được việc thử mật khẩu hàng loạt và vẫn tốn tài nguyên xử lý.\n(B) ĐÚNG: User Pool hỗ trợ gắn AWS WAF web ACL; rate-based rule tự chặn IP vượt ngưỡng request trên hosted UI và các API công khai, có thể thêm managed rule về IP reputation.\n(C) SAI: Endpoint của Cognito không nằm trong VPC của công ty, network ACL không thấy lưu lượng này; danh sách IP thủ công cũng không tự động.\n(D) SAI: Identity Pool không phải nơi nhận request đăng nhập, và Shield Advanced không phải cơ chế rate limit theo IP cho User Pool.\nĐáp án đúng: B\nĐiểm cần nhớ: Bảo vệ User Pool khỏi brute force/credential stuffing ở tầng request => gắn AWS WAF web ACL; rủi ro theo người dùng => threat protection (advanced security).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Add a Pre token generation trigger that returns an error for requests from the attacking IPs.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Associate an AWS WAF web ACL with the user pool and add a rate-based rule for abusive IP addresses.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Add network ACL entries to the application's VPC subnets that deny the attacking IP addresses.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable AWS Shield Advanced on the identity pool to rate limit the sign-in attempts per user.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A mobile banking app uses an Amazon Cognito user pool. Security requires that a stolen access token be usable for no more than 15 minutes, but customers must stay signed in on their devices for up to 30 days without re-entering their credentials. Which configuration meets these requirements?",
+    "explanation": "Phân tích đề: Access token sống ngắn, phiên đăng nhập dài => cấu hình thời hạn token trên app client: access/ID ngắn, refresh dài.\n(A) ĐÚNG: Thời hạn token cấu hình theo app client: access/ID token có thể từ 5 phút tới 1 ngày, refresh token từ 60 phút tới 10 năm; app dùng refresh token để lấy token mới âm thầm trong 30 ngày.\n(B) SAI: Đảo ngược: access token sống 30 ngày làm token bị đánh cắp dùng được lâu, và access token cũng không được phép dài quá 1 ngày.\n(C) SAI: MFA chỉ áp dụng lúc đăng nhập, không ngăn việc dùng lại access token đã bị đánh cắp; thời hạn 30 ngày cũng vượt giới hạn.\n(D) SAI: Lưu mật khẩu trên thiết bị là rủi ro bảo mật nghiêm trọng; refresh token được thiết kế chính để giữ phiên mà không lưu mật khẩu.\nĐáp án đúng: A\nĐiểm cần nhớ: Giữ đăng nhập lâu nhưng giảm rủi ro token bị lộ => access token ngắn + refresh token dài (cấu hình trên app client).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Set the access and ID token validity to 15 minutes and the refresh token validity to 30 days.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Set the refresh token validity to 15 minutes and the access token validity to 30 days.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Set the access token validity to 30 days and require MFA so that stolen tokens cannot be reused.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Keep the default token settings and cache the user's password on the device to renew tokens.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A team protects an Amazon API Gateway REST API with an Amazon Cognito user pool authorizer. They recently configured the OAuth scope orders/read as an authorization scope on the GET /orders method. Users still sign in successfully, but every call to the method is now rejected. The client sends the ID token in the Authorization header. What should the team change?",
+    "explanation": "Phân tích đề: Method có authorization scopes => authorizer kiểm scope trong token; ID token không chứa scope => phải gửi access token.\n(A) SAI: API Gateway không đổi refresh token; refresh token chỉ gửi tới endpoint token của Cognito và không bao giờ nên gửi tới API.\n(B) SAI: AWS_IAM yêu cầu request ký SigV4 bằng AWS credentials; ID token không thể dùng làm chữ ký.\n(C) SAI: Custom attribute thành claim custom:..., không phải claim scope; authorizer kiểm scope trên access token chứ không đọc attribute.\n(D) ĐÚNG: Khi method có OAuth scopes, Cognito authorizer yêu cầu access token và kiểm claim scope; ID token không có claim scope nên bị từ chối. App client phải được phép scope này và yêu cầu nó khi đăng nhập.\nĐáp án đúng: D\nĐiểm cần nhớ: Có method authorization scopes => bắt buộc access token. Không có scopes => Cognito authorizer chấp nhận ID token.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Send the refresh token so that API Gateway can exchange it for an ID token that contains scopes.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Remove the Cognito authorizer and use AWS_IAM authorization with the ID token as the signature.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Add orders/read as a custom attribute on each user so that the ID token includes the scope.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Send the access token that was issued with the orders/read scope instead of the ID token.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A Cognito user pool has two groups: Editors with precedence 1 and IAM role EditorRole, and Viewers with precedence 5 and IAM role ViewerRole. An identity pool uses token-based role mapping, and the app does not request a specific role. A user belongs to both groups. Which TWO statements are correct? (Select TWO.)",
+    "explanation": "Phân tích đề: Token-based role mapping đọc cognito:roles và cognito:preferred_role; precedence càng nhỏ càng ưu tiên.\n(A) ĐÚNG: Không có CustomRoleArn được yêu cầu, token-based mapping dùng cognito:preferred_role, tức là EditorRole (precedence 1).\n(B) SAI: Một phiên STS chỉ assume một role; Cognito không gộp quyền nhiều role.\n(C) SAI: Role mặc định chỉ dùng khi không có role từ token hoặc khi cấu hình ambiguous resolution; ở đây preferred_role đã xác định.\n(D) SAI: Hosted UI không có bước chọn group; việc chọn role dựa trên precedence hoặc tham số CustomRoleArn từ app.\n(E) ĐÚNG: Khi user thuộc nhiều group có role, token chứa danh sách cognito:roles và cognito:preferred_role là role của group có precedence nhỏ nhất.\nĐáp án đúng: A và E\nĐiểm cần nhớ: User thuộc nhiều group: precedence nhỏ nhất thắng => cognito:preferred_role; app có thể chọn role khác trong cognito:roles bằng CustomRoleArn.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "The identity pool assigns EditorRole because the Editors group has the lower precedence value.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "The identity pool merges the permissions of EditorRole and ViewerRole into a single session.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "The identity pool always falls back to the default authenticated role for users in two groups.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "The user must choose a group on the hosted UI page each time the user signs in to the app.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "The ID token includes cognito:roles and a cognito:preferred_role from the lowest precedence value.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A subscription service stores account status in a billing platform run by a third party. The platform cannot emit events or call AWS APIs, but it exposes a status lookup API. When a subscription is suspended, the user must be prevented from signing in to the app, which uses an Amazon Cognito user pool, and the user's profile must be kept. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Không nhận được sự kiện từ billing, chỉ có API tra cứu; phải chặn tại thời điểm đăng nhập và giữ hồ sơ => kiểm tra trong Pre authentication trigger.\n(A) SAI: User vẫn đăng nhập được vào app qua User Pool; role mapping chỉ ảnh hưởng quyền AWS, và Identity Pool không biết trạng thái billing.\n(B) ĐÚNG: Pre authentication chạy trước khi Cognito hoàn tất đăng nhập; Lambda tra trạng thái và ném lỗi để từ chối, user vẫn còn nguyên trong pool để kích hoạt lại khi thanh toán.\n(C) SAI: Nền tảng billing không phát sự kiện được, nên rule này không bao giờ được kích hoạt.\n(D) SAI: Xóa user làm mất hồ sơ, vi phạm yêu cầu giữ profile; hơn nữa post authentication chạy sau khi đăng nhập đã thành công.\nĐáp án đúng: B\nĐiểm cần nhớ: Chặn hoặc cho phép đăng nhập theo logic riêng => Pre authentication trigger; xử lý sau đăng nhập (ghi log) => Post authentication.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Add an identity pool rule that maps suspended users to an IAM role without any permissions.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Add a Pre authentication Lambda trigger that calls the status API and rejects suspended users.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Create an EventBridge rule that calls AdminDisableUser when the platform emits a suspension event.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Add a Post authentication Lambda trigger that deletes the user from the pool when suspended.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company serves a private documentation website from an Amazon S3 bucket through Amazon CloudFront with origin access control. Only customers who sign in through the company's Amazon Cognito user pool may view the pages. The site is static, has no web servers, and must remain cached at edge locations for global performance. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Nội dung tĩnh trên S3 + CloudFront, không có server, vẫn cache ở edge, chỉ user đăng nhập Cognito được xem => kiểm tra JWT ngay tại edge bằng Lambda@Edge.\n(A) ĐÚNG: Lambda@Edge ở viewer request kiểm chữ ký JWT (RS256, khóa JWKS của User Pool), chưa hợp lệ thì chuyển hướng tới hosted UI; hợp lệ thì CloudFront trả nội dung từ cache hoặc S3 qua OAC.\n(B) SAI: ALB không dùng S3 bucket làm target trực tiếp, và bỏ CloudFront làm mất cache toàn cầu; phải thêm server làm proxy.\n(C) SAI: S3 bucket policy không thể xác minh JWT của Cognito; không có condition key nào cho việc này.\n(D) SAI: Thêm API Gateway vào đường đi của mọi trang làm tăng chi phí và độ trễ, không tận dụng cache nội dung tĩnh, và phải tự dựng tích hợp S3.\nĐáp án đúng: A\nĐiểm cần nhớ: CloudFront không có Cognito authorizer sẵn; xác thực tại edge => Lambda@Edge kiểm JWT (hoặc signed cookies do backend cấp sau đăng nhập).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Add a Lambda@Edge viewer request function that validates the Cognito JWT in a cookie.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Put an Application Load Balancer with authenticate-cognito in front of the bucket and drop CloudFront.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Set the S3 bucket policy to allow GetObject only when the request contains a valid Cognito ID token.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Route every page request through API Gateway with a Cognito authorizer between CloudFront and S3.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company must add a custom sign-in step to its Amazon Cognito user pool in which users prove possession of a hardware token by answering a challenge generated by the company's own verification service. The built-in MFA methods cannot validate this token. Which THREE Lambda triggers must be implemented? (Select THREE.)",
+    "explanation": "Phân tích đề: Luồng thử thách tùy biến (custom authentication flow) của User Pool gồm bộ ba trigger điều phối, tạo, kiểm tra thử thách.\n(A) SAI: Chạy sau khi user xác nhận tài khoản, không liên quan tới luồng đăng nhập bằng thử thách.\n(B) ĐÚNG: Điều phối luồng: quyết định thử thách tiếp theo, khi nào cấp token (issueTokens) hoặc báo thất bại.\n(C) ĐÚNG: Tạo thử thách, ví dụ gọi dịch vụ xác minh để sinh challenge và trả tham số công khai/bí mật cho bước kiểm tra.\n(D) ĐÚNG: Kiểm tra câu trả lời của người dùng so với giá trị mong đợi và trả answerCorrect.\n(E) SAI: Chỉ tùy biến claim khi phát hành token, không tham gia vào việc tạo hay kiểm thử thách.\n(F) SAI: Dùng để di chuyển user từ hệ thống cũ khi user chưa tồn tại trong pool, không phải luồng thử thách tùy biến.\nĐáp án đúng: B, C và D\nĐiểm cần nhớ: Custom authentication flow = Define + Create + Verify auth challenge (CUSTOM_AUTH).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Post confirmation",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Define auth challenge",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Create auth challenge",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Verify auth challenge response",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Pre token generation",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "F",
+        "answerText": "User migration",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A smart home mobile app signs users in with an Amazon Cognito user pool and gets temporary credentials from a Cognito identity pool to connect to AWS IoT Core over MQTT. Each user may publish only to topics under home/<identity-id>/. The authenticated IAM role allows the required iot:Connect and iot:Publish actions, but connections are still refused. The solution must keep using temporary credentials. What should the solutions architect do?",
+    "explanation": "Phân tích đề: Kết nối IoT Core bằng credentials của Cognito authenticated identity: ngoài IAM policy của role, IoT còn cần AWS IoT policy gắn với identity ID.\n(A) SAI: IoT Core không có kiểu Cognito user pool authorizer như API Gateway; tự xác thực token phải dùng custom authorizer và viết Lambda.\n(B) SAI: Chứng chỉ X.509 là cơ chế xác thực khác, không gắn vào IAM role; kết nối SigV4 bằng Cognito credentials không cần chứng chỉ.\n(C) ĐÚNG: Với authenticated Cognito identity, AWS IoT Core đánh giá cả IAM policy của role lẫn IoT policy gắn vào identity ID (AttachPolicy); IoT policy có thể dùng biến identity ID để giới hạn topic.\n(D) SAI: Bật guest mở quyền cho người chưa đăng nhập, không làm authenticated identity kết nối được và làm rộng bề mặt tấn công.\nĐáp án đúng: C\nĐiểm cần nhớ: Cognito authenticated identity + AWS IoT Core: cần cả IAM role policy và IoT policy gắn vào identity ID.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Configure a Cognito user pool authorizer directly on the AWS IoT Core endpoint for MQTT sessions.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Attach an X.509 client certificate to the IAM role so that AWS IoT Core accepts SigV4 connections.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Attach an AWS IoT policy to each user's Cognito identity ID in addition to the IAM role policy.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable guest access so that the unauthenticated role is also evaluated during MQTT connections.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A SaaS provider uses Amazon Cognito for its B2B application. Most tenants accept the default settings, but three regulated tenants require a minimum password length of 16 characters and MFA required for every user, while other tenants must keep a shorter password policy and optional MFA. Tenants must stay isolated, and the provider wants the least custom code. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Password policy và MFA required cấu hình ở mức User Pool, không phải app client => tenant cần chính sách khác phải có pool riêng.\n(A) SAI: Identity Pool không quản lý mật khẩu hay MFA; nó chỉ cấp AWS credentials.\n(B) ĐÚNG: Password policy và chế độ MFA (off/optional/required) là cài đặt của từng User Pool; pool riêng cho ba tenant quy định cho phép chính sách chặt hơn mà không cần code, các tenant còn lại giữ pool chung.\n(C) SAI: App client chỉ cấu hình luồng OAuth, thời hạn token, quyền đọc ghi attribute; không có password policy riêng theo app client.\n(D) SAI: Có thể kiểm độ dài lúc sign-up nhưng không áp dụng khi đổi hoặc reset mật khẩu, và không bắt MFA required; đòi hỏi nhiều code tùy biến.\nĐáp án đúng: B\nĐiểm cần nhớ: Cần password policy/MFA mode khác nhau => User Pool riêng (pool-per-tenant); cùng chính sách => một pool với attribute/group/app client theo tenant.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a separate identity pool for each regulated tenant and configure the password policy there.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create a dedicated user pool for each regulated tenant, and keep the other tenants in a shared pool.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Keep all tenants in one pool and create an app client per regulated tenant with its own password policy.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Keep all tenants in one pool and use a Pre sign-up trigger to apply a stricter policy for regulated tenants.",
+        "isCorrect": false
+      }
+    ]
+  }
+]

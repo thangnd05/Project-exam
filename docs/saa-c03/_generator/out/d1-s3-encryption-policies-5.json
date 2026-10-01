@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company stores millions of files across many Amazon S3 buckets. The security team must automatically discover objects that contain personally identifiable information (PII), such as passport numbers, and must also see an inventory of each bucket's encryption settings and public access status. Which AWS service should the team use?",
+    "explanation": "Phân tích đề: Cần phát hiện tự động dữ liệu nhạy cảm (PII) bên trong nội dung object S3, kèm cái nhìn tổng quan về cấu hình mã hóa và trạng thái public của từng bucket.\n(A) SAI: GuardDuty S3 Protection phân tích CloudTrail data events để phát hiện hành vi đáng ngờ (truy cập bất thường, exfiltration), không quét nội dung object để tìm PII.\n(B) SAI: Amazon Inspector quét lỗ hổng phần mềm trên EC2, container image trong ECR và Lambda; nó không quét dữ liệu trong S3.\n(C) ĐÚNG: Amazon Macie dùng machine learning và pattern matching để phát hiện dữ liệu nhạy cảm (PII, thông tin tài chính) trong object S3, đồng thời cung cấp bucket inventory cho biết cấu hình mã hóa mặc định, trạng thái public và chia sẻ của từng bucket.\n(D) SAI: Security Hub tổng hợp findings và kiểm tra cấu hình theo chuẩn best practice, nhưng tự nó không đọc nội dung object để tìm PII.\nĐáp án đúng: C\nĐiểm cần nhớ: Tìm PII/dữ liệu nhạy cảm trong S3 => Amazon Macie; phát hiện mối đe dọa => GuardDuty; quét lỗ hổng phần mềm => Inspector.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Amazon GuardDuty with S3 Protection enabled to analyze CloudTrail data events for the buckets.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Amazon Inspector with continuous scanning enabled for the S3 buckets in the account.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Amazon Macie with automated sensitive data discovery enabled for the account.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "AWS Security Hub with the AWS Foundational Security Best Practices standard enabled.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An administrator accidentally scheduled deletion of the customer managed AWS KMS key that protects SSE-KMS objects in a critical S3 bucket, using a 30-day waiting period. Applications immediately started failing to read objects. The deletion was scheduled two days ago. What should a solutions architect do to restore access?",
+    "explanation": "Phân tích đề: Key ở trạng thái Pending deletion nên không dùng được để giải mã; vẫn còn trong waiting period (mới 2/30 ngày).\n(A) ĐÚNG: Trong waiting period có thể hủy lịch xóa key. Sau khi cancel, key chuyển sang trạng thái Disabled, cần enable lại thì S3 mới gọi Decrypt được và ứng dụng đọc object bình thường.\n(B) SAI: AWS KMS không có cơ chế backup/khôi phục key sau khi đã xóa; key bị xóa thì mọi dữ liệu mã hóa bằng nó không thể giải mã.\n(C) SAI: Đổi default encryption sang key mới chỉ áp dụng cho object mới; object hiện có vẫn cần key cũ để giải mã, và key cũ sẽ bị xóa.\n(D) SAI: AWS không export key material của KMS key cho khách hàng; AWS Support cũng không thể khôi phục key.\nĐáp án đúng: A\nĐiểm cần nhớ: Xóa KMS key luôn có waiting period 7–30 ngày; trong thời gian này có thể cancel deletion rồi enable lại key.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Cancel the scheduled key deletion, and then enable the key again.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Let the deletion finish, and then restore the key from the automatic AWS KMS key backup.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a new customer managed key and set it as the default encryption key for the bucket.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Open an AWS Support case to export the key material so that it can be imported into a new key.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An IAM user in the same account as an S3 bucket can download objects that are encrypted with SSE-S3 but receives AccessDenied for objects encrypted with SSE-KMS using a customer managed key. The key policy contains the default statement that lets IAM policies grant access to the key. The user's IAM policy allows s3:GetObject and s3:ListBucket on the bucket. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Object SSE-S3 đọc được, object SSE-KMS bị từ chối => quyền S3 đã đủ, thiếu quyền dùng KMS key. Key policy đã ủy quyền cho IAM (statement mặc định cho root account).\n(A) SAI: S3 Bucket Keys chỉ giảm số lần S3 gọi KMS; người đọc vẫn phải có kms:Decrypt trên key.\n(B) SAI: s3:GetObjectVersion và s3:GetEncryptionConfiguration là quyền S3, không cấp quyền giải mã bằng KMS key.\n(C) SAI: Key rotation chỉ tạo key material mới cho các lần mã hóa sau, không liên quan tới việc user thiếu quyền giải mã.\n(D) ĐÚNG: Khi đọc object SSE-KMS, S3 gọi KMS Decrypt thay mặt user, nên user phải có kms:Decrypt. Vì key policy đã cho phép IAM policy cấp quyền, chỉ cần thêm kms:Decrypt cho key ARN vào IAM policy của user.\nĐáp án đúng: D\nĐiểm cần nhớ: Đọc object SSE-KMS cần cả s3:GetObject và kms:Decrypt; với CMK, quyền phải được cả IAM policy và key policy cho phép.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable S3 Bucket Keys on the bucket so that the user no longer needs to call AWS KMS.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add s3:GetObjectVersion and s3:GetEncryptionConfiguration to the user's IAM policy.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Turn on automatic key rotation so that S3 can decrypt the objects with new key material.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add kms:Decrypt on the key ARN to the IAM policy of the user.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A startup is reviewing the encryption that Amazon S3 applies to new objects when no encryption settings are configured on a bucket. Which TWO statements about server-side encryption with Amazon S3 managed keys (SSE-S3) are correct?",
+    "explanation": "Phân tích đề: Từ 1/2023, object mới mặc định được mã hóa SSE-S3. Cần nắm đặc tính của SSE-S3 so với SSE-KMS và SSE-C.\n(A) SAI: SSE-S3 không dùng KMS key của khách hàng, nên không có sự kiện KMS Decrypt trong CloudTrail để audit việc dùng key; đây là ưu điểm của SSE-KMS.\n(B) ĐÚNG: SSE-S3 mã hóa bằng AES-256, S3 tự tạo, lưu và xoay key; khách hàng không chạm vào key.\n(C) SAI: Khách hàng không thể gắn key policy cho key của SSE-S3; muốn kiểm soát ai dùng key thì phải dùng SSE-KMS với customer managed key.\n(D) SAI: Gửi key trong header của mỗi request là đặc điểm của SSE-C.\n(E) ĐÚNG: SSE-S3 không tính phí thêm ngoài chi phí S3 thông thường, khác với SSE-KMS có phí request KMS.\nĐáp án đúng: B và E\nĐiểm cần nhớ: SSE-S3 = AES-256, AWS quản lý hoàn toàn, miễn phí, không audit được việc dùng key và không có key policy.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Each use of the key is recorded as a KMS Decrypt event in AWS CloudTrail for auditing.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Objects are encrypted with 256-bit AES, and Amazon S3 manages the keys.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "The customer can attach a key policy that restricts which principals can use the key.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "The client must include the encryption key in the headers of every request.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "There is no additional charge for this encryption beyond normal S3 costs.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A media company has an S3 bucket with about 500 million objects that many applications uploaded over 8 years. Some applications explicitly requested SSE-KMS, while others relied on bucket default encryption settings that changed several times. Auditors need a list that shows the server-side encryption type of every object. Which solution meets this requirement with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần trạng thái mã hóa ở cấp từng object cho 500 triệu object, ít công vận hành nhất.\n(A) SAI: Rule AWS Config về S3 encryption đánh giá cấu hình default encryption ở cấp bucket, không cho biết từng object hiện đang được mã hóa bằng loại nào.\n(B) ĐÚNG: S3 Inventory tạo báo cáo định kỳ (CSV/ORC/Parquet) liệt kê mọi object kèm trường Encryption status (SSE-S3, SSE-KMS, SSE-C...). Truy vấn báo cáo bằng Athena là cách managed, không phải gọi API cho từng object.\n(C) SAI: Script gọi HeadObject cho 500 triệu object vẫn ra kết quả nhưng tốn rất nhiều request, thời gian và công viết/vận hành; S3 Inventory làm việc này sẵn.\n(D) SAI: CloudTrail data events chỉ ghi lại request từ thời điểm bật trở đi, không có dữ liệu cho object đã upload trong 8 năm qua.\nĐáp án đúng: B\nĐiểm cần nhớ: Cần liệt kê thuộc tính (encryption, storage class, replication status) của hàng triệu object => S3 Inventory + Athena.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable the AWS Config managed rule that checks S3 bucket server-side encryption and share the compliance results.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Configure an S3 Inventory report that includes the encryption status field, and query it with Amazon Athena.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Run a script on Amazon EC2 that lists every key and calls HeadObject to read the server-side encryption header of each object.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable CloudTrail data events for the bucket and query the PutObject events with Amazon Athena to find the encryption type.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Storage administrators in a company have s3:* permissions on all buckets so that they can manage lifecycle rules, replication, and bucket policies. A new rule states that these administrators must not be able to read the contents of objects in the hr-records bucket, while the HR application role must keep read access. The administrators must keep their existing S3 permissions. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Người có s3:* (bao gồm sửa bucket policy) không được đọc nội dung, nhưng vẫn giữ quyền S3. Cần một lớp bảo vệ nằm ngoài S3 => tách quyền qua KMS key policy.\n(A) SAI: Bucket policy Deny có tác dụng tức thời, nhưng administrator có s3:PutBucketPolicy nên có thể tự sửa hoặc xóa statement Deny rồi đọc dữ liệu; kiểm soát này không đứng vững.\n(B) SAI: Key policy của AWS managed key aws/s3 do AWS quản lý, cho phép mọi principal trong account được S3 ủy quyền dùng key; administrator có s3:GetObject vẫn đọc được.\n(C) SAI: Object Lock chỉ ngăn xóa/ghi đè object version, không ngăn đọc nội dung.\n(D) ĐÚNG: Với SSE-KMS dùng customer managed key, đọc object cần thêm kms:Decrypt. Key policy chỉ cấp kms:Decrypt cho role ứng dụng HR, nên administrator dù có s3:* vẫn không giải mã được, và họ không có quyền sửa key policy.\nĐáp án đúng: D\nĐiểm cần nhớ: Tách quyền quản trị lưu trữ và quyền đọc dữ liệu => SSE-KMS với CMK, key policy là lớp kiểm soát độc lập với quyền S3.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Keep SSE-S3 and add a bucket policy statement that explicitly denies s3:GetObject on the bucket to the storage administrator role.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Switch the bucket to SSE-KMS with the AWS managed key aws/s3 so that every object read requires kms:Decrypt.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable S3 Object Lock in governance mode on the bucket so that the administrators cannot access object versions.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use SSE-KMS with a customer managed key whose key policy grants kms:Decrypt only to the HR application role.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An application on Amazon EC2 instances in private subnets uses the AWS Encryption SDK with an AWS KMS key to encrypt files before uploading them to Amazon S3 through an existing S3 gateway VPC endpoint. Compliance requires that data be encrypted before it leaves the instances, and the VPC must have no internet path. Uploads fail because calls to AWS KMS time out. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Client-side encryption gọi KMS trực tiếp từ instance (GenerateDataKey/Decrypt). Subnet private, cấm Internet, S3 đi qua gateway endpoint nhưng KMS thì chưa có đường đi.\n(A) ĐÚNG: Interface VPC endpoint (AWS PrivateLink) cho AWS KMS cho phép instance gọi KMS bằng IP private; bật private DNS để SDK dùng endpoint mặc định của KMS mà không đổi code.\n(B) SAI: NAT gateway giải quyết được timeout nhưng tạo đường ra Internet, vi phạm yêu cầu không có internet path.\n(C) SAI: Gateway endpoint chỉ hỗ trợ S3 và DynamoDB; thêm action KMS vào endpoint policy không tạo được đường tới dịch vụ KMS.\n(D) SAI: Với SSE-KMS, S3 tự gọi KMS nên không cần endpoint KMS, nhưng dữ liệu rời instance ở dạng plaintext (chỉ được mã hóa trên S3), vi phạm yêu cầu mã hóa trước khi rời instance.\nĐáp án đúng: A\nĐiểm cần nhớ: Ứng dụng gọi KMS trực tiếp từ subnet private không Internet => cần interface VPC endpoint cho KMS; gateway endpoint chỉ dành cho S3 và DynamoDB.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an interface VPC endpoint for AWS KMS in the VPC and enable private DNS for it.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add a NAT gateway in a public subnet and route the private subnets' traffic for AWS KMS through it.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Update the S3 gateway endpoint policy to allow kms:GenerateDataKey and kms:Decrypt on the key ARN.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Switch to SSE-KMS so that Amazon S3 calls AWS KMS on behalf of the application through the gateway endpoint.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses S3 Cross-Region Replication from a bucket in us-east-1 to a bucket in us-west-2. Objects encrypted with SSE-S3 replicate successfully. Objects encrypted with SSE-KMS using a customer managed key in us-east-1 are never replicated, no replication failures are reported, and CloudTrail shows that the replication role has never called AWS KMS. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Object SSE-KMS bị bỏ qua hoàn toàn (không fail, không gọi KMS) => replication rule chưa được cấu hình để chọn object mã hóa KMS, chứ không phải lỗi quyền.\n(A) SAI: S3 Batch Replication dùng chính replication configuration hiện có; khi rule vẫn loại trừ object SSE-KMS thì job cũng không sao chép chúng.\n(B) SAI: Bucket Keys ở bucket đích chỉ giảm số request KMS; không làm rule nguồn bắt đầu chọn object SSE-KMS.\n(C) ĐÚNG: Mặc định S3 không replicate object SSE-KMS. Phải bật lựa chọn replicate object mã hóa bằng AWS KMS (SseKmsEncryptedObjects) trong rule, chỉ định KMS key ở us-west-2 cho replica, và cấp cho replication role kms:Decrypt trên key nguồn cùng kms:Encrypt/GenerateDataKey trên key đích.\n(D) SAI: Multi-Region key replica và đặt default encryption ở bucket đích không thay đổi việc rule nguồn đang loại trừ object SSE-KMS, nên chúng vẫn không được sao chép.\nĐáp án đúng: C\nĐiểm cần nhớ: Replicate object SSE-KMS cần bật rõ ràng trong rule + khai báo key ở Region đích + role có quyền trên cả key nguồn lẫn key đích.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Run an S3 Batch Replication job on a schedule so that the SSE-KMS objects are copied to the destination bucket in us-west-2.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable S3 Bucket Keys on the destination bucket so that replicas can be encrypted with fewer AWS KMS requests.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Update the rule to replicate KMS-encrypted objects, set a us-west-2 key for replicas, and grant the role access to both keys.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Create a multi-Region replica of the key in us-west-2 and set it as the default encryption key on the destination bucket only.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company uses SSE-KMS with a customer managed key for an S3 bucket that holds legal documents. The compliance team asks how AWS CloudTrail will provide evidence of who accessed the documents. The account has a multi-Region trail that logs management events only, and S3 Bucket Keys are not enabled. Which TWO statements are correct?",
+    "explanation": "Phân tích đề: Phân biệt sự kiện KMS (management event) và sự kiện đọc object S3 (data event); trail hiện chỉ ghi management events.\n(A) ĐÚNG: Khi principal đọc object SSE-KMS, S3 gọi KMS Decrypt thay mặt principal đó. Lời gọi KMS là management event nên trail hiện tại đã ghi lại, kèm thông tin principal và encryption context chứa ARN object.\n(B) SAI: GetObject là S3 data event, không phải management event; trail chỉ ghi management events sẽ không có các sự kiện này.\n(C) SAI: Khi bật Bucket Keys, S3 dùng data key cấp bucket nên số lời gọi KMS giảm mạnh; CloudTrail không còn một sự kiện Decrypt cho mỗi lần đọc object.\n(D) ĐÚNG: Muốn có bản ghi principal nào gọi GetObject trên từng document thì phải bật S3 data events cho bucket trong trail.\n(E) SAI: SSE-S3 không dùng KMS key của khách hàng nên không phát sinh sự kiện KMS Decrypt cho mỗi lần đọc object.\nĐáp án đúng: A và D\nĐiểm cần nhớ: KMS Decrypt = management event (ghi mặc định); S3 GetObject/PutObject = data event (phải bật riêng). Bucket Keys làm giảm số sự kiện KMS.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Decrypt calls that Amazon S3 makes to AWS KMS when a principal reads an object are logged by the existing trail.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "S3 GetObject requests are already captured by the existing trail because object reads are management events.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "If S3 Bucket Keys are later enabled, the trail will still record one KMS Decrypt event for every object read.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "To record which principal called GetObject on each document, S3 data events must be enabled in the trail.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "If the bucket used SSE-S3 instead, the trail would still record a KMS Decrypt event for each object read.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has about 300 S3 buckets in one AWS account, and different teams create new buckets every week. Company policy requires every bucket's default encryption to use SSE-KMS, but some teams forget to configure it. The security team wants buckets that do not use SSE-KMS default encryption to be detected and corrected automatically. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần vừa phát hiện vừa tự động sửa cấu hình default encryption của mọi bucket (kể cả bucket mới), ít công vận hành nhất.\n(A) SAI: Lambda chạy theo lịch quét và sửa bucket vẫn hoạt động, nhưng phải tự viết, bảo trì code, xử lý lỗi và có độ trễ giữa các lần quét; tốn công hơn dịch vụ managed.\n(B) ĐÚNG: AWS Config đánh giá liên tục mọi bucket (kể cả bucket mới tạo) bằng managed rule kiểm tra default encryption dùng KMS, và automatic remediation gọi Systems Manager Automation runbook để đặt lại default encryption. Không cần tự viết code quét.\n(C) SAI: Macie cho thấy cấu hình mã hóa trong bucket inventory nhưng chỉ phát hiện; vẫn phải sửa thủ công.\n(D) SAI: Bucket policy Deny phải thêm tay vào từng bucket (bucket mới bị bỏ sót), không thay đổi default encryption, và còn làm hỏng client không gửi header.\nĐáp án đúng: B\nĐiểm cần nhớ: Phát hiện cấu hình sai + tự sửa, ít công nhất => AWS Config rule + automatic remediation (SSM Automation).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a scheduled AWS Lambda function that lists all buckets every hour and calls PutBucketEncryption on any bucket without SSE-KMS.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use an AWS Config managed rule for KMS default encryption with automatic remediation through a Systems Manager runbook.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Enable Amazon Macie for the account and review its bucket inventory to identify buckets without SSE-KMS default encryption.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add a bucket policy to each bucket that denies s3:PutObject unless the x-amz-server-side-encryption header is aws:kms.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A financial institution stores trade data in Amazon S3 with SSE-KMS. A new regulation requires that the key material be generated and stored in single-tenant hardware security modules (HSMs) that are under the institution's exclusive control and located in AWS. The institution must keep the native SSE-KMS integration with Amazon S3, retain AWS CloudTrail logging of key use, and avoid any application changes. Its security team is willing to manage the HSM cluster. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Key material phải nằm trong HSM single-tenant do tổ chức kiểm soát, đặt trong AWS; vẫn dùng SSE-KMS, có CloudTrail, không đổi ứng dụng.\n(A) SAI: Imported key material vẫn được lưu và dùng trong HSM multi-tenant của AWS KMS, không phải HSM single-tenant của tổ chức; ngoài ra key được tạo on-premises chứ không trong AWS.\n(B) SAI: SSE-C với key lấy từ CloudHSM buộc ứng dụng phải gửi key trong mỗi request (đổi code), mất tích hợp SSE-KMS và không có audit ở tầng KMS.\n(C) SAI: External key store giữ key material trong HSM ngoài AWS (thường on-premises) qua proxy, vi phạm yêu cầu đặt trong AWS và thêm phụ thuộc vào kết nối, proxy bên ngoài.\n(D) ĐÚNG: AWS KMS custom key store gắn với cluster AWS CloudHSM: key material được tạo và lưu trong HSM single-tenant do khách hàng kiểm soát, nhưng key vẫn là KMS key nên S3 dùng SSE-KMS như bình thường và CloudTrail vẫn ghi lại việc dùng key.\nĐáp án đúng: D\nĐiểm cần nhớ: Cần HSM single-tenant nhưng vẫn giữ tích hợp KMS => KMS custom key store dựa trên CloudHSM; key ngoài AWS => external key store.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Generate key material in an on-premises HSM, import it into a new KMS key with external origin, and keep using SSE-KMS.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an AWS CloudHSM cluster, generate keys in it, and have the applications upload objects with SSE-C using those keys.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a KMS key in an external key store that uses the institution's own HSMs through an external key store proxy.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a KMS key in a custom key store backed by an AWS CloudHSM cluster, and use it for SSE-KMS.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company has 80 AWS accounts in AWS Organizations, and new accounts are added every month. Every bucket uses default encryption with SSE-KMS and a customer managed key that is managed by a SecurityAdmin role deployed in every account. Account administrators who have AdministratorAccess must keep managing bucket policies, lifecycle rules, and replication, but they must not be able to change or remove the default encryption configuration of any bucket. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Chặn ngay cả admin có AdministratorAccess, áp dụng cho mọi account hiện tại và tương lai, ít công nhất. Đổi hoặc xóa default encryption (PutBucketEncryption, DeleteBucketEncryption) đều cần quyền s3:PutEncryptionConfiguration.\n(A) ĐÚNG: SCP gắn ở root của Organization tự áp dụng cho mọi account, kể cả account mới; admin trong member account không sửa được SCP. Deny s3:PutEncryptionConfiguration với điều kiện aws:PrincipalArn khác SecurityAdmin role chặn mọi thay đổi default encryption mà không ảnh hưởng các quyền S3 khác.\n(B) SAI: Bucket policy phải thêm vào từng bucket ở từng account (bucket mới dễ bị bỏ sót), và admin vẫn có quyền sửa bucket policy nên có thể gỡ statement Deny.\n(C) SAI: Admin có AdministratorAccess có thể gỡ hoặc sửa permissions boundary trên role của chính họ; phải triển khai ở từng account nên tốn công.\n(D) SAI: AWS Config chỉ phát hiện và thông báo sau khi thay đổi đã xảy ra, không ngăn chặn.\nĐáp án đúng: A\nĐiểm cần nhớ: Cần guardrail phòng ngừa mà admin trong account không vượt qua được, cho cả account mới => SCP ở cấp Organization.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Attach an SCP to the organization root that denies s3:PutEncryptionConfiguration unless the principal is the SecurityAdmin role.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add a bucket policy statement to every bucket that denies s3:PutEncryptionConfiguration to all principals except the SecurityAdmin role.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Attach a permissions boundary that excludes s3:PutEncryptionConfiguration to every administrator role in each member account.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Deploy an AWS Config rule in every account that detects changes to bucket default encryption and notifies the security team.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company encrypts an S3 bucket with SSE-KMS using customer managed key K1. After a security review, the company must retire K1 and use a new customer managed key, K2. The bucket default encryption has already been changed to K2, the bucket does not have versioning enabled, and about 20 million existing objects are still encrypted with K1. No data may become unreadable, and K1 must eventually be deleted. Which THREE actions should a solutions architect take?",
+    "explanation": "Phân tích đề: Phải mã hóa lại object cũ sang K2, xác nhận không còn ai dùng K1, rồi mới xóa K1 một cách an toàn (có đường lùi).\n(A) SAI: Automatic rotation chỉ tạo key material mới trong cùng K1, giữ key material cũ để giải mã object cũ; không chuyển object sang K2 và không giúp xóa K1.\n(B) ĐÚNG: S3 Batch Operations Copy job sao chép đè từng object tại chỗ với SSE-KMS dùng K2, mã hóa lại 20 triệu object mà không cần tự viết script. Bucket không bật versioning nên không còn bản cũ mã hóa bằng K1.\n(C) SAI: KMS không cho xóa key ngay lập tức; waiting period tối thiểu là 7 ngày (tối đa 30 ngày).\n(D) ĐÚNG: Disable K1 trước là bước có thể đảo ngược; theo dõi CloudTrail các request lỗi cố dùng K1 giúp phát hiện object hoặc ứng dụng còn phụ thuộc vào K1.\n(E) SAI: Job copy phải giải mã object cũ bằng K1 và mã hóa bằng K2, nên role cần kms:Decrypt trên K1 và kms:GenerateDataKey trên K2; chỉ cấp Decrypt trên K2 làm job thất bại.\n(F) ĐÚNG: Lên lịch xóa với waiting period 30 ngày cho thêm thời gian an toàn; nếu phát hiện vẫn còn dùng K1 thì cancel deletion trong thời gian chờ.\nĐáp án đúng: B, D và F\nĐiểm cần nhớ: Thay KMS key cho object S3 => re-encrypt bằng Batch Operations Copy, disable key cũ và theo dõi, rồi schedule deletion (7–30 ngày) có thể cancel.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable automatic key rotation on K1 so that existing objects are re-encrypted under new key material.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use an S3 Batch Operations Copy job that copies the existing objects in place with SSE-KMS and K2.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Delete K1 immediately with no waiting period after the copy job finishes so that it cannot be used.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Disable K1 and monitor CloudTrail for failed requests that try to use K1 before scheduling deletion.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Grant the Batch Operations role kms:Decrypt only on K2 so that the job can read the existing objects.", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "Schedule deletion of K1 with a 30-day waiting period, and cancel it if any use of K1 is detected.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "After reading about attackers who use stolen credentials to rewrite S3 objects with SSE-C and keys that only the attackers hold, a company wants to block every new write that uses SSE-C on its data bucket. The bucket uses default encryption with SSE-KMS. Several legacy applications upload without any encryption headers and cannot be modified, while newer applications explicitly send the aws:kms header. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Chặn mọi request ghi dùng SSE-C nhưng không làm hỏng ứng dụng cũ không gửi header (dựa vào default encryption) và ứng dụng mới gửi aws:kms.\n(A) SAI: Policy StringNotEquals aws:kms cũng chặn được SSE-C, nhưng khi header vắng mặt thì điều kiện vẫn đúng nên upload của ứng dụng cũ (không gửi header) bị Deny, vi phạm yêu cầu không sửa ứng dụng cũ.\n(B) SAI: Default encryption chỉ áp dụng khi request không chỉ định mã hóa; request có header SSE-C được ưu tiên, nên object vẫn bị mã hóa bằng key của kẻ tấn công.\n(C) ĐÚNG: Request SSE-C luôn mang header customer algorithm. Deny s3:PutObject khi condition key s3:x-amz-server-side-encryption-customer-algorithm tồn tại (Null = false) chặn đúng SSE-C, còn request không header và request aws:kms vẫn được phép.\n(D) SAI: Versioning và Object Lock giúp giữ lại bản cũ để khôi phục, nhưng không chặn request ghi SSE-C; kẻ tấn công vẫn tạo được version mới bị mã hóa bằng key của họ.\nĐáp án đúng: C\nĐiểm cần nhớ: Chặn riêng SSE-C => bucket policy Deny khi có s3:x-amz-server-side-encryption-customer-algorithm; header mã hóa trong request luôn ghi đè default encryption.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a bucket policy that denies s3:PutObject when s3:x-amz-server-side-encryption does not equal aws:kms.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Rely on SSE-KMS default encryption, because Amazon S3 replaces any SSE-C request with the bucket default key.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a bucket policy that denies s3:PutObject when the SSE-C customer-algorithm condition key is present.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable versioning and S3 Object Lock in governance mode so that SSE-C writes cannot replace any object versions.", "isCorrect": false }
+    ]
+  }
+]

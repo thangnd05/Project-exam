@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company has 15 IAM roles for different microservices. All of them need the same permissions to write to Amazon CloudWatch Logs and to read one parameter path in AWS Systems Manager Parameter Store. The security team wants to update these permissions in one place, review every change, and be able to revert to an earlier version. What should a solutions architect use?",
+    "explanation": "Phân tích đề: Cùng một bộ quyền cho 15 role, sửa một chỗ, có lịch sử thay đổi và quay lại version cũ.\n(A) SAI: Inline policy gắn 1-1 với từng role, không tái sử dụng được và không có versioning; sửa phải lặp lại 15 lần.\n(B) SAI: AWS managed policy rộng hơn nhu cầu (quyền full trên CloudWatch Logs, đọc mọi parameter), khách hàng không sửa được nội dung, trái least privilege.\n(C) ĐÚNG: Customer managed policy được gắn cho nhiều danh tính, sửa một lần là áp cho cả 15 role, có versioning (tối đa 5 version) để xem lại và đặt lại version mặc định khi cần.\n(D) SAI: Permissions boundary chỉ đặt trần, không cấp quyền; role vẫn cần một policy cho phép.\nĐáp án đúng: C\nĐiểm cần nhớ: Quyền dùng chung, cần tái sử dụng và versioning => customer managed policy; quyền gắn chặt 1-1 với một danh tính => inline policy.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "An inline policy embedded in each of the 15 roles, kept in sync by a script.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "The AWS managed policies for CloudWatch Logs and Systems Manager read access.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "One customer managed policy that is attached to all 15 roles.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "A permissions boundary that contains the permissions and is set on every role.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "While reviewing an AWS account, a security engineer finds a role named AWSServiceRoleForElasticLoadBalancing that nobody on the team remembers creating. The engineer wants to edit its permissions policy to reduce its access. What should the engineer know about this role?",
+    "explanation": "Phân tích đề: Role có tiền tố AWSServiceRoleFor... là service-linked role, được tạo tự động khi dùng dịch vụ.\n(A) SAI: Đây không phải role do CloudFormation tạo; tên và path của service-linked role do dịch vụ định nghĩa.\n(B) SAI: Instance profile gắn role cho EC2; role này thuộc về dịch vụ Elastic Load Balancing, không phải role cho instance phía sau load balancer.\n(C) SAI: Service-linked role vẫn được IAM đánh giá bình thường; điều đặc biệt là SCP không giới hạn service-linked role, chứ không phải được miễn đánh giá.\n(D) ĐÚNG: Service-linked role do dịch vụ tạo, trust policy chỉ cho dịch vụ đó assume, permissions do dịch vụ định nghĩa nên không sửa được; chỉ xóa được khi không còn tài nguyên nào của dịch vụ phụ thuộc vào nó.\nĐáp án đúng: D\nĐiểm cần nhớ: Service-linked role = role định sẵn của dịch vụ AWS, quyền do dịch vụ quyết định, không chỉnh sửa policy được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "It is a customer managed role created by AWS CloudFormation and can be edited like any other role.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "It is the instance profile role that EC2 instances behind the load balancer use to call AWS APIs.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "It is exempt from IAM policy evaluation, so its permissions never need to be reviewed or audited.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "It is a service-linked role whose permissions are set by the service and cannot be edited.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An application in the ap-southeast-2 Region calls AWS STS AssumeRole thousands of times per hour through the global endpoint sts.amazonaws.com. The team wants to reduce latency and follow AWS recommendations for calling AWS STS. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Ứng dụng ở ap-southeast-2 gọi STS rất nhiều qua global endpoint; cần giảm độ trễ theo khuyến nghị của AWS.\n(A) SAI: IAM là dịch vụ global; role không thuộc về một Region nên không có chuyện chuyển role sang Region khác.\n(B) ĐÚNG: AWS khuyến nghị gọi STS qua regional endpoint (ví dụ sts.ap-southeast-2.amazonaws.com) gần workload để giảm độ trễ, tăng khả dụng; cấu hình SDK dùng regional endpoint là đủ.\n(C) SAI: Response của STS chứa credential riêng cho từng lần gọi, không thể và không được cache qua CloudFront.\n(D) SAI: GetSessionToken cấp credential cho IAM user, không cấp quyền của role, và vẫn gọi qua global endpoint nên không giải quyết độ trễ.\nĐáp án đúng: B\nĐiểm cần nhớ: STS là dịch vụ global nhưng nên gọi regional endpoint gần workload để giảm độ trễ và tăng khả dụng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Move the IAM role to ap-southeast-2, because IAM roles are resources that belong to a Region.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Configure the SDK to call the AWS STS regional endpoint in ap-southeast-2.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Put an Amazon CloudFront distribution in front of the global STS endpoint to cache responses.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Replace the AssumeRole calls with GetSessionToken calls that are sent to the global endpoint.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A company is removing long-term access keys from its workloads that run on AWS. Which TWO approaches provide applications with temporary credentials that AWS rotates automatically? (Select TWO.)",
+    "explanation": "Phân tích đề: Workload chạy trên AWS, cần credential tạm thời do AWS tự xoay, không dùng access key dài hạn.\n(A) ĐÚNG: Gắn IAM role cho EC2 qua instance profile; SDK lấy credential tạm thời từ instance metadata và credential được làm mới tự động trước khi hết hạn.\n(B) SAI: Access key của IAM user vẫn là credential dài hạn dù được lưu trong Secrets Manager; phải tự viết logic xoay và vẫn tồn tại key cố định.\n(C) ĐÚNG: Execution role của Lambda cung cấp credential tạm thời cho function qua biến môi trường của runtime, AWS tự cấp và tự làm mới.\n(D) SAI: Nhúng access key vào AMI, dù mã hóa, vẫn là key dài hạn bị nhân bản ra mọi instance.\n(E) SAI: IAM group chỉ chứa IAM user; không thể gắn group cho Auto Scaling group hay instance.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Workload trên AWS => role (instance profile, Lambda execution role, ECS task role); không bao giờ nhúng access key.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Attach an IAM role to the EC2 instances through an instance profile.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Keep IAM user access keys in AWS Secrets Manager and read them at startup.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Assign an execution role with scoped permissions to each Lambda function.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Bake encrypted access keys into the AMI and decrypt them with AWS KMS at boot.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Attach an IAM group to the Auto Scaling group so instances inherit its policies.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses AWS Organizations with separate OUs for Production and Development accounts. An Amazon SNS topic in the Shared Services account must accept Publish requests only from principals in accounts that belong to the Production OU, including accounts that will be added to that OU in the future. What should a solutions architect add to the topic policy?",
+    "explanation": "Phân tích đề: Giới hạn theo OU (không phải cả tổ chức) và phải tự áp cho account thêm vào OU sau này.\n(A) SAI: Liệt kê account ID hiện tại không tự bao gồm account mới, phải sửa policy mỗi lần thêm account.\n(B) SAI: aws:PrincipalOrgID khớp mọi account trong tổ chức, kể cả OU Development, rộng hơn yêu cầu.\n(C) ĐÚNG: aws:PrincipalOrgPaths chứa đường dẫn tổ chức (o-xxx/r-xxx/ou-xxx/) của account của principal; dùng ForAnyValue:StringLike với path của OU Production cho phép mọi account hiện tại và tương lai trong OU đó.\n(D) SAI: aws:SourceAccount dùng cho request do service principal thay mặt tài nguyên gửi tới, không phải để lọc principal IAM theo OU.\nĐáp án đúng: C\nĐiểm cần nhớ: Cả tổ chức => aws:PrincipalOrgID; một OU cụ thể => aws:PrincipalOrgPaths.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "List the account IDs of all current Production accounts as principals in the topic policy.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a condition that aws:PrincipalOrgID must equal the ID of the organization.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a condition that aws:PrincipalOrgPaths must match the path of the Production OU.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Add a condition that aws:SourceAccount must belong to one of the Production accounts.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Data analysts query an Amazon S3 data lake by using Amazon Athena. Security requires that the analysts can read the underlying S3 objects only through Athena queries and can never download the objects directly through the S3 API or console. Which policy approach meets this requirement?",
+    "explanation": "Phân tích đề: Cho phép đọc S3 chỉ khi request do Athena thay mặt analyst gửi đi, chặn đọc trực tiếp.\n(A) ĐÚNG: Athena gọi S3 bằng chính danh tính của analyst (forward access session) và ghi athena.amazonaws.com vào aws:CalledVia. Chỉ cho phép s3:GetObject khi aws:CalledVia chứa athena.amazonaws.com thì request trực tiếp bị từ chối.\n(B) SAI: AWS không công bố dải IP riêng cho Athena để làm điều kiện, và aws:SourceIp không phải cách xác định dịch vụ trung gian.\n(C) SAI: aws:ViaAWSService false nghĩa là chỉ cho request trực tiếp, ngược với yêu cầu.\n(D) SAI: Athena dùng quyền của người gọi chứ không dùng service principal để đọc S3; analyst không có quyền S3 thì truy vấn sẽ thất bại.\nĐáp án đúng: A\nĐiểm cần nhớ: aws:CalledVia cho biết dịch vụ nào đã gửi request thay mặt principal (Athena, CloudFormation, DynamoDB, KMS); dùng để chỉ cho phép truy cập qua dịch vụ đó.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Allow s3:GetObject only when aws:CalledVia contains athena.amazonaws.com.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Allow s3:GetObject only when aws:SourceIp matches the published Athena IP ranges.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Allow s3:GetObject only when the aws:ViaAWSService condition key is false.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Allow the Athena service principal in the bucket policy and remove analysts' S3 access.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Employees federate into AWS through a SAML 2.0 identity provider and assume a shared role named DataEngineer. Some workflows then use that session to assume a second role in another account. Auditors require AWS CloudTrail entries in both accounts to identify the individual employee, and employees must not be able to change that value after they assume the first role. What should a solutions architect configure?",
+    "explanation": "Phân tích đề: Role dùng chung, có role chaining sang account khác; CloudTrail ở cả hai account phải thấy đúng cá nhân và giá trị không bị sửa.\n(A) SAI: RoleSessionName do bên gọi đặt ở mỗi lần AssumeRole; khi chaining, nhân viên có thể đặt tên phiên khác nên không bảo đảm được.\n(B) ĐÚNG: IdP truyền thuộc tính SAML SourceIdentity (ví dụ user name), trust policy cho phép sts:SetSourceIdentity. Source identity được ghi trong CloudTrail cho mọi action, được giữ nguyên qua role chaining và không thể thay đổi sau khi đặt.\n(C) SAI: Mỗi nhân viên một role làm số role bùng nổ, mất lợi ích của role dùng chung và vẫn không tự giải quyết vấn đề chaining.\n(D) SAI: Đối chiếu log của IdP với CloudTrail bằng tay tốn vận hành và không chứng minh được ai thực hiện action sau khi chaining.\nĐáp án đúng: B\nĐiểm cần nhớ: Cần truy vết cá nhân qua role dùng chung và role chaining => source identity (sts:SetSourceIdentity), không dựa vào RoleSessionName.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Require employees to set the role session name to their user name on every AssumeRole call.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Have the IdP send a SourceIdentity attribute and allow sts:SetSourceIdentity in trust policies.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Create a dedicated IAM role for each employee in both accounts instead of the shared role.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Export the identity provider sign-in logs and correlate them with CloudTrail events by timestamp.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A retail company's mobile app lets visitors browse a product catalog stored in Amazon S3 and Amazon DynamoDB before they sign in. After signing in, users can also post reviews. The app must not embed AWS credentials, and permissions for visitors who have not signed in must be read-only. What should a solutions architect configure?",
+    "explanation": "Phân tích đề: Hai nhóm người dùng cuối: khách chưa đăng nhập (chỉ đọc) và người đã đăng nhập (đọc và ghi review), không nhúng credential.\n(A) SAI: Cognito user pool chỉ xác thực và phát JWT, không tự cấp credential AWS để gọi S3 và DynamoDB; tài khoản demo dùng chung còn cho khách quyền ghi review.\n(B) SAI: IAM user với key nhúng trong app là credential dài hạn bị lộ cho mọi người tải app.\n(C) ĐÚNG: Cognito identity pool hỗ trợ unauthenticated identities: khách nhận credential tạm thời của guest role chỉ đọc; người đã đăng nhập nhận authenticated role có thêm quyền ghi review. Tất cả là credential tạm thời qua STS.\n(D) SAI: IAM Identity Center dành cho nhân viên truy cập account và ứng dụng doanh nghiệp, không dành cho khách vãng lai của app mobile.\nĐáp án đúng: C\nĐiểm cần nhớ: Cognito identity pool có hai role: unauthenticated (guest) và authenticated; guest role phải có quyền tối thiểu.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use only a Cognito user pool and let visitors sign in with a shared demo account.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Ship read-only IAM user access keys in the app for visitors who have not signed in.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use a Cognito identity pool with a read-only guest role and a separate authenticated role.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable guest access in IAM Identity Center and assign visitors a read-only permission set.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "Developers must be able to launch Amazon EC2 instances that use an existing IAM role named AppServerRole. They must not be able to launch instances with any other role, including administrator roles. Which TWO configurations are required? (Select TWO.)",
+    "explanation": "Phân tích đề: Gán role cho EC2 cần quyền iam:PassRole bên người launch và trust policy của role cho EC2; phải giới hạn đúng một role.\n(A) SAI: Người launch không assume role; họ chỉ truyền (pass) role cho dịch vụ EC2, nên sts:AssumeRole là sai cơ chế và cấp thêm quyền không cần.\n(B) ĐÚNG: iam:PassRole chỉ trên ARN của AppServerRole, kèm điều kiện iam:PassedToService là ec2.amazonaws.com, bảo đảm developer không truyền được role admin nào khác.\n(C) SAI: iam:CreateRole cho phép tự tạo role mới với quyền tùy ý, mở rộng quyền thay vì giới hạn.\n(D) ĐÚNG: Trust policy của AppServerRole phải cho ec2.amazonaws.com assume, nếu không instance không lấy được credential của role.\n(E) SAI: AdministratorAccess quá rộng, và SCP áp cho cả account, không phải cách chuẩn để giới hạn role được pass cho từng nhóm người.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Gán role cho dịch vụ = iam:PassRole trên đúng ARN role (người gán) + trust policy cho service principal (role).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Allow the developers to call sts:AssumeRole on AppServerRole so they can attach it.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Allow iam:PassRole only on the AppServerRole ARN, passed only to the EC2 service.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Allow iam:CreateRole so developers can create an instance role for each launch.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Make sure the AppServerRole trust policy lets ec2.amazonaws.com assume the role.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Give developers AdministratorAccess and use an SCP to deny passing other roles.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A security team finds that an IAM role used by a long-running application on Amazon EC2 has an unnecessary s3:DeleteObject permission. The team removes the permission from the role's identity-based policy. The application's current temporary credentials were issued 20 minutes ago and remain valid for several more hours. What happens to the application's ability to delete objects?",
+    "explanation": "Phân tích đề: Sửa identity policy của role trong khi phiên hiện tại vẫn còn hạn; cần xác định thay đổi có hiệu lực với phiên đang chạy không.\n(A) SAI: Credential tạm thời không nhúng bản sao permission policy của role; chỉ session policy truyền lúc assume mới gắn theo phiên.\n(B) SAI: Khởi động lại instance không liên quan; quyền không được lưu trên instance.\n(C) SAI: Revoke active sessions dùng để vô hiệu hóa toàn bộ credential cũ, không cần thiết khi chỉ muốn gỡ một quyền.\n(D) ĐÚNG: IAM đánh giá policy hiện hành của role ở mỗi request, nên sau khi thay đổi lan truyền (eventual consistency, thường rất nhanh) phiên đang chạy cũng mất quyền s3:DeleteObject.\nĐáp án đúng: D\nĐiểm cần nhớ: Thay đổi permission policy của role áp dụng ngay cho cả phiên đã phát hành; muốn cắt toàn bộ phiên cũ thì dùng Revoke active sessions.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Deletes keep working until the current credentials expire, because permissions are fixed in the token.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Deletes keep working until the EC2 instance is rebooted and retrieves a new instance profile.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Deletes keep working until an administrator uses Revoke active sessions on the role.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Deletes stop shortly after the change, because policies are evaluated on every request.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A SaaS company stores data for thousands of tenants in one Amazon DynamoDB table that uses the tenant ID as the partition key. A backend service assumes an IAM role for each incoming request. Each request's credentials must access only the items of that request's tenant. The authorization rule must be a single static policy that is reviewed centrally, the application must not generate policy documents at runtime, and the number of IAM roles must not grow with the number of tenants. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Cô lập tenant ở mức item; bốn ràng buộc: policy tĩnh duy nhất, không sinh policy lúc chạy, số role không tăng theo tenant.\n(A) SAI: Mỗi tenant một role làm số role tăng theo tenant và sẽ chạm quota IAM role.\n(B) SAI: Session policy sinh động cho từng request thỏa cô lập nhưng vi phạm ràng buộc không tạo policy document lúc chạy.\n(C) ĐÚNG: Truyền tenant ID làm session tag khi AssumeRole; policy tĩnh của role cho phép DynamoDB khi dynamodb:LeadingKeys bằng ${aws:PrincipalTag/TenantID}. Mỗi phiên chỉ truy cập item có partition key của tenant mình, một role và một policy cho mọi tenant.\n(D) SAI: Mỗi tenant một bảng làm số tài nguyên và vận hành tăng theo tenant, và vẫn phải có cơ chế giới hạn bảng theo phiên.\nĐáp án đúng: C\nĐiểm cần nhớ: Session tag + aws:PrincipalTag cho ABAC theo từng phiên với policy tĩnh; session policy thu hẹp quyền nhưng phải sinh policy cho từng lần assume.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create one IAM role per tenant with a policy that limits access to the tenant's partition key.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Pass a session policy built per request that limits dynamodb:LeadingKeys to the tenant ID.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Pass the tenant ID as a session tag and match dynamodb:LeadingKeys to that principal tag.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Create a separate DynamoDB table for each tenant and grant table-level permissions per request.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An application on Amazon EC2 in the Orders account uses an instance profile and must send messages to an Amazon SQS queue in the Integration account. The application relies on the AWS SDK default credential chain, and the team cannot change the application code to call AWS STS. The solution must follow the principle of least privilege and must not introduce long-term credentials. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Cross-account SQS, không được sửa code để gọi STS, least privilege, không credential dài hạn => resource-based policy của queue.\n(A) SAI: Sửa ứng dụng để gọi AssumeRole vi phạm ràng buộc không thay đổi code.\n(B) SAI: Cho mọi principal trong tổ chức gửi message rộng hơn nhiều so với một role cần dùng, trái least privilege.\n(C) SAI: Access key của IAM user trong biến môi trường là credential dài hạn, bị cấm.\n(D) ĐÚNG: Queue policy cho phép đúng ARN instance role của Orders gọi sqs:SendMessage, đồng thời identity policy của instance role cho phép action đó trên ARN queue. Ứng dụng giữ nguyên credential từ instance profile, không cần STS.\nĐáp án đúng: D\nĐiểm cần nhớ: Tài nguyên có resource-based policy (SQS, SNS, S3, Lambda, KMS) cho phép cross-account mà không cần assume role; cần cả hai phía cho phép.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a role in Integration that trusts the instance role, and update the app to assume it before sending.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a queue policy that allows sqs:SendMessage from any principal whose aws:PrincipalOrgID matches.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an IAM user in Integration that can send messages and set its keys as instance environment variables.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Allow the instance role ARN in the queue policy and allow sqs:SendMessage on the queue in the role's policy.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A DeployRole in the Prod account must be assumed by a CIRole in the Build account. Both accounts are members of the same organization. The CI job receives an AccessDenied error when it calls sts:AssumeRole on DeployRole. Which THREE issues could cause this error? (Select THREE.)",
+    "explanation": "Phân tích đề: Lỗi ngay ở bước AssumeRole cross-account, nên chỉ xét những gì quyết định việc assume: trust policy phía đích, quyền sts:AssumeRole phía gọi, và SCP áp lên bên gọi.\n(A) ĐÚNG: Trust policy của DeployRole không liệt kê CIRole (hoặc account Build) làm principal thì mọi lời gọi AssumeRole đều bị từ chối.\n(B) ĐÚNG: Cross-account cần cả phía gọi cho phép; identity policy của CIRole không có sts:AssumeRole trên ARN DeployRole thì bị từ chối.\n(C) SAI: Permission policy của DeployRole quy định role làm được gì sau khi assume, không cần chứa sts:AssumeRole để được assume.\n(D) ĐÚNG: SCP áp lên account Build giới hạn principal của account đó; SCP Deny sts:AssumeRole là explicit Deny không gì vượt qua.\n(E) SAI: Thiếu quyền triển khai trong permission policy của DeployRole chỉ gây lỗi ở các lệnh gọi sau khi assume, không làm AssumeRole thất bại.\n(F) SAI: Permissions boundary là tùy chọn; role không có boundary vẫn assume được bình thường.\nĐáp án đúng: A, B và D\nĐiểm cần nhớ: AssumeRole cross-account cần trust policy đích cho phép + identity policy bên gọi có sts:AssumeRole + không có explicit Deny (kể cả SCP của account bên gọi).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "The DeployRole trust policy does not list CIRole or the Build account as a principal.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "The CIRole identity policy does not allow sts:AssumeRole on the DeployRole ARN.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "The DeployRole permissions policy does not include the sts:AssumeRole action.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "An SCP that applies to the Build account denies sts:AssumeRole on DeployRole.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "The DeployRole permissions policy lacks the deployment permissions that the CI job needs.", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "DeployRole has no permissions boundary attached to limit its maximum permissions.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company attached an SCP at the organization root that denies ec2:RunInstances for GPU instance types. Engineers in member accounts are blocked as expected, but some engineers can still launch GPU instances. They work in the management account, where the company also runs a few legacy production workloads. The company wants the restriction to apply to all workloads with the least ongoing effort. What should a solutions architect do?",
+    "explanation": "Phân tích đề: SCP gắn ở root nhưng management account vẫn launch được; cần áp hạn chế cho mọi workload với ít công duy trì.\n(A) SAI: SCP không bao giờ ảnh hưởng tới user và role trong management account, dù gắn trực tiếp hay gắn ở root.\n(B) SAI: Permissions boundary cho từng engineer phải duy trì liên tục cho mỗi người mới, và admin của management account vẫn có thể gỡ boundary.\n(C) ĐÚNG: Chuyển workload ra member account nằm dưới OU có SCP, và chỉ dùng management account cho quản trị tổ chức; từ đó SCP tự áp cho mọi workload, đúng khuyến nghị của AWS.\n(D) SAI: Tag policy chỉ chuẩn hóa tag, không chặn được loại instance khi RunInstances.\nĐáp án đúng: C\nĐiểm cần nhớ: SCP không áp cho management account; best practice là không chạy workload trong management account.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Attach the same SCP directly to the management account in addition to the organization root.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Attach a permissions boundary that denies GPU instance types to every engineer in the management account.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Move the workloads into member accounts under the governed OU and reserve the management account.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Create a tag policy in AWS Organizations that prohibits GPU instance types in the management account.", "isCorrect": false }
+    ]
+  }
+]

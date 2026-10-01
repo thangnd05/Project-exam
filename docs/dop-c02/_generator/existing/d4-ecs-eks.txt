@@ -1,0 +1,52 @@
+1. An Amazon ECS service on Fargate runs 12 tasks in a Region with three Availability Zones, but most tasks end up in a single AZ. A DevOps engineer must spread the tasks so that losing one AZ removes roughly a third of capacity. What is the correct configuration
+2. A rolling deployment of an Amazon ECS service repeatedly pushes a broken image to production, and the team must manually roll back each time. What ECS feature automates detection and rollback?
+3. A DevOps engineer must run an Amazon EKS workload so that a single Availability Zone failure does not take all replicas of a Deployment offline. Which TWO configurations achieve this?
+4. During Amazon EKS node group upgrades, a stateless web Deployment briefly drops below the number of replicas needed to serve traffic. What Kubernetes object should the DevOps engineer add?
+5. An Amazon ECS service behind an Application Load Balancer drops in-flight requests whenever tasks are replaced during a deployment. Which change preserves those requests?
+6. A DevOps engineer wants Amazon ECS on EC2 to add and remove container instances automatically as task demand changes, without writing custom scaling logic. What should be used?
+7. An Amazon EKS cluster must survive the loss of nodes running Spot capacity without user-facing impact. Which TWO measures are most effective?
+8. An Amazon ECS service scales out slowly because new tasks take several minutes to pull a large container image. What change reduces task start time most directly?
+9. A DevOps engineer must give an Amazon EKS pod permission to read a specific Amazon S3 bucket without sharing node-level credentials with every pod on the node. What should be configured?
+10. An Amazon ECS task definition runs a sidecar that must be healthy before the application container starts accepting traffic. Which task definition feature expresses this requirement?
+11. A DevOps engineer must perform blue/green deployments for an Amazon ECS service with an automated rollback if error rates rise during the cutover. What is the appropriate approach?
+12. An Amazon EKS cluster autoscaler cannot add nodes because the subnets have run out of available IP addresses. What should the DevOps engineer investigate first?
+13. A DevOps engineer must ensure an Amazon ECS service recovers automatically when individual tasks become unhealthy. Which TWO mechanisms contribute?
+14. A Kubernetes Deployment on Amazon EKS reports pods as Ready before the application can serve requests, causing failed requests after each rollout. What should be configured?
+15. A DevOps engineer must scale an Amazon ECS service based on the number of messages waiting in a queue rather than on CPU usage. What should be configured?
+16. An Amazon EKS upgrade must be performed with minimal risk to a production workload. What is the recommended sequence?
+17. A DevOps engineer must make an Amazon ECS batch workload resilient to occasional task failures. Which TWO designs help?
+18. Pods on Amazon EKS occasionally fail to start because a required ConfigMap changes while a rollout is in progress. What practice avoids this class of problem?
+19. A DevOps engineer must collect application logs from Amazon ECS tasks on Fargate into a central log group with minimal custom code. What is the simplest approach?
+20. An Amazon EKS workload must keep running when a single node fails, but the application currently stores session state on local node storage. What is the correct remediation?
+21. A DevOps engineer must ensure that an Amazon ECS cluster keeps serving traffic when one Availability Zone loses all container instances. What capacity planning rule should be applied?
+22. A DevOps engineer investigates why an Amazon ECS service stays in a degraded state with tasks repeatedly stopping. Which TWO sources give the most direct diagnostic information?
+23. A DevOps engineer must run a stateful workload on Amazon EKS where each replica needs its own durable volume that survives pod rescheduling within an Availability Zone. What should be used?
+24. An Amazon EKS stateful workload uses block volumes that exist in one Availability Zone. After an AZ failure, pods cannot be rescheduled. What design change addresses this?
+25. A DevOps engineer must prevent a single misbehaving pod from consuming all node memory and causing unrelated pods to be evicted on Amazon EKS. What should be configured?
+26. A DevOps engineer must reduce the blast radius of a bad container image reaching an Amazon ECS production cluster. Which TWO controls help before the image runs in production?
+27. An Amazon ECS service must call a downstream service that occasionally becomes slow, and the calling tasks currently exhaust their connection pool and stop responding. What resiliency pattern should be applied?
+28. A DevOps engineer must allow Amazon ECS services to discover each other without hard-coding load balancer endpoints. What is the appropriate mechanism?
+29. A DevOps engineer must verify that an Amazon EKS workload actually tolerates node loss before relying on it in production. What is the strongest verification?
+30. An Amazon ECS deployment on Fargate fails with an error indicating the task cannot pull the image from a private registry in a private subnet. What is the most likely cause?
+31. A DevOps engineer must roll out a new version of an Amazon EKS Deployment to a small share of users first, with the ability to stop instantly if error rates rise. What approach fits?
+32. A DevOps engineer must make an Amazon EKS cluster recoverable if the cluster itself is lost. Which TWO practices are essential?
+33. An Amazon ECS service has a minimum healthy percent of 100 and a maximum percent of 100. Deployments never complete on a cluster with no spare capacity. What explains this?
+34. A DevOps engineer must reduce the time Amazon EKS takes to replace a failed node so that capacity recovers quickly. What has the greatest effect?
+35. A DevOps engineer must prevent an Amazon ECS deployment from proceeding if the new task definition references a container image tag that no longer exists. What control catches this earliest?
+36. An Amazon EKS platform team must give application teams safe self-service deployment without allowing them to affect other tenants. Which TWO controls support this?
+37. A DevOps engineer needs Amazon ECS tasks to retrieve database credentials at start-up without storing them in the task definition as plain text. What is the correct approach?
+38. An Amazon EKS cluster autoscaler adds nodes but pods remain pending with a message about unschedulable resources. What should the DevOps engineer check?
+39. A company wants container workloads to fail over to a second Region. Which combination gives the shortest recovery time for an Amazon ECS service?
+40. A DevOps engineer sees Amazon ECS tasks being replaced constantly even though the application logs show no errors. What is the most likely cause?
+41. A DevOps engineer must choose between Amazon ECS on Fargate and on EC2 for a workload that has unpredictable traffic and a small operations team. What consideration is decisive?
+42. A DevOps engineer must detect degradation of an Amazon EKS workload before users report problems. Which TWO signals are most useful as alarm sources?
+43. An Amazon ECS service scales out during traffic spikes, but the downstream relational database reaches its connection limit and the whole application fails. What is the correct fix?
+44. A DevOps engineer must ensure Kubernetes manifests applied to an Amazon EKS cluster always match what is committed in Git, including changes made manually in the cluster. What approach achieves this?
+45. An Amazon ECS task must write large amounts of temporary data during processing and currently fails with a storage error on Fargate. What is the appropriate remedy?
+46. A DevOps engineer must reduce the risk that a single namespace on a shared Amazon EKS cluster exhausts cluster networking resources. Which TWO measures help?
+47. A DevOps engineer must run a scheduled containerised job reliably on Amazon ECS, ensuring it is not skipped if the cluster is briefly short of capacity. What design is appropriate?
+48. An Amazon EKS Deployment rollout hangs because the new pods never become Ready, and the old pods keep serving traffic. What is the correct interpretation?
+49. A DevOps engineer must ensure container workloads keep running when the shared services account that hosts the container registry is unavailable. What mitigation is most effective?
+50. A DevOps engineer must decide how to size Amazon EKS node groups for a workload with a few very large pods and many small ones. What approach avoids wasted capacity and unschedulable pods?
+51. An Amazon ECS service running on AWS Fargate is configured with 12 tasks across a Region with three Availability Zones. After an AZ impairment the team discovered that 9 of the 12 tasks had been placed in the affected AZ. A DevOps engineer must ensure tasks ar
+52. During Amazon EKS managed node group upgrades, a stateless Deployment briefly drops below the number of replicas required to serve traffic because several pods are evicted at the same time. Which Kubernetes object should a DevOps engineer add to prevent this?

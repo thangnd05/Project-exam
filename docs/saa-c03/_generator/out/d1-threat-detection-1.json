@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company plans to enable Amazon GuardDuty in its production account. The account does not have VPC Flow Logs enabled, and no AWS CloudTrail trail has been created. The security team asks what must be set up first so that GuardDuty can analyze network and API activity. What should a solutions architect tell the team?",
+    "explanation": "Phân tích đề: Account chưa bật VPC Flow Logs và chưa có trail CloudTrail; hỏi GuardDuty cần gì để phân tích hoạt động mạng và API.\n(A) SAI: GuardDuty không đọc Flow Logs do bạn tạo; tự tạo Flow Logs gửi vào CloudWatch Logs chỉ tốn thêm chi phí mà GuardDuty vẫn không dùng tới.\n(B) ĐÚNG: GuardDuty lấy dữ liệu từ luồng độc lập, trùng lặp của VPC Flow Logs, DNS logs và CloudTrail management events ngay khi được bật; không cần bật Flow Logs hay tạo trail, không cần agent.\n(C) SAI: Trail CloudTrail vẫn hữu ích cho audit, nhưng GuardDuty không cần trail hay quyền đọc bucket của trail để phân tích management events.\n(D) SAI: GuardDuty không nhận DNS log qua CloudWatch agent; nguồn DNS lõi đến từ Route 53 Resolver mà GuardDuty tự thu thập.\nĐáp án đúng: B\nĐiểm cần nhớ: GuardDuty là dịch vụ managed, bật một click là chạy: ba nguồn lõi (Flow Logs, DNS, CloudTrail management events) được thu thập độc lập, bạn không cần tự bật hay trả tiền lưu các log đó.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create VPC Flow Logs for every VPC and publish them to CloudWatch Logs before enabling GuardDuty.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable GuardDuty only, because it consumes independent streams of flow log, DNS, and CloudTrail data.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Create a multi-Region CloudTrail trail and grant GuardDuty read access to the trail's S3 bucket.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Install the CloudWatch agent on every EC2 instance so that GuardDuty can receive DNS query logs.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "Amazon GuardDuty reports that an IAM role is making API calls from an unfamiliar IP address. A security analyst needs to see which other resources and IP addresses interacted with that role over the past several weeks, presented as a visual timeline, without writing any queries. Which AWS service should the analyst use?",
+    "explanation": "Phân tích đề: Đã có finding của GuardDuty, cần điều tra phạm vi, quan hệ giữa role với IP và tài nguyên khác theo thời gian, dạng trực quan, không viết truy vấn.\n(A) SAI: Security Hub insight chỉ nhóm và đếm finding theo thuộc tính; nó không dựng đồ thị quan hệ hay timeline hoạt động API của role.\n(B) SAI: Athena trên log CloudTrail làm được nhưng phải tự viết SQL và tự dựng timeline, trái yêu cầu không viết truy vấn.\n(C) ĐÚNG: Amazon Detective tự thu thập CloudTrail, VPC Flow Logs và finding GuardDuty vào behavior graph; trang profile của role hiển thị các IP, tài nguyên liên quan và timeline hoạt động để điều tra nguyên nhân gốc.\n(D) SAI: Timeline của AWS Config cho thấy thay đổi cấu hình của role (policy gắn vào), không cho thấy role đã gọi API nào từ IP nào.\nĐáp án đúng: C\nĐiểm cần nhớ: GuardDuty báo có chuyện; Detective trả lời chuyện đó lan tới đâu, liên quan tới ai, bắt đầu từ lúc nào.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS Security Hub, by creating a custom insight that groups findings by the role ARN", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Amazon Athena, by querying the CloudTrail log files that are stored in Amazon S3", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Amazon Detective, by opening the role's profile page in the behavior graph", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "AWS Config, by reviewing the configuration timeline recorded for the IAM role", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A security team needs a list of Amazon EC2 instances that have ports reachable from the internet. The analysis must evaluate security groups, network ACLs, route tables, and internet gateways together instead of checking only security group rules. Which solution meets this requirement?",
+    "explanation": "Phân tích đề: Cần biết cổng nào thực sự reachable từ Internet, phải xét tổng hợp nhiều thành phần mạng chứ không chỉ security group.\n(A) SAI: Rule restricted-ssh của Config chỉ kiểm tra security group có mở cổng 22 cho 0.0.0.0/0 hay không, không xét route table, NACL hay internet gateway.\n(B) SAI: GuardDuty phát hiện hành vi như bị quét cổng (Recon), không phân tích cấu hình để liệt kê cổng nào đang phơi ra Internet.\n(C) SAI: Flow Logs chỉ ghi traffic đã xảy ra; cổng mở nhưng chưa ai kết nối sẽ không xuất hiện, và phải tự viết truy vấn.\n(D) ĐÚNG: Inspector network reachability phân tích đường đi mạng qua VPC, subnet, security group, NACL, route table và internet gateway để tạo finding cho cổng reachable từ Internet; loại finding này không cần agent.\nĐáp án đúng: D\nĐiểm cần nhớ: Cổng mở ra Internet ngoài ý muốn trên EC2, xét toàn bộ đường mạng => Amazon Inspector network reachability.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use the AWS Config managed rule restricted-ssh to evaluate every security group.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable Amazon GuardDuty and review Recon findings that report port probing activity.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable VPC Flow Logs and query accepted traffic with CloudWatch Logs Insights.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable Amazon Inspector and review its network reachability findings for EC2.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company enabled AWS Security Hub and the AWS Foundational Security Best Practices standard. Several days later, most controls still show no data and no control findings have been generated. What must the company enable so that Security Hub can evaluate these controls?",
+    "explanation": "Phân tích đề: Security Hub đã bật standard nhưng control không có dữ liệu; hỏi điều kiện tiên quyết.\n(A) ĐÚNG: Phần lớn control của Security Hub chạy dưới dạng Config rule do Security Hub quản lý, nên AWS Config phải bật và ghi nhận (record) các loại tài nguyên mà control cần; thiếu Config thì control không có dữ liệu để đánh giá.\n(B) SAI: GuardDuty gửi finding về Security Hub nhưng không cung cấp dữ liệu cấu hình để chấm các control của standard.\n(C) SAI: CloudTrail data events ghi hoạt động đọc/ghi object và invoke hàm, không phải nguồn đánh giá control cấu hình.\n(D) SAI: Inspector gửi finding lỗ hổng về Security Hub, không phải engine kiểm tra cấu hình cho standard.\nĐáp án đúng: A\nĐiểm cần nhớ: Config là engine kiểm tra cấu hình, Security Hub là lớp gom và chấm điểm; bật Security Hub standard mà quên bật Config recording thì control không chạy.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS Config with resource recording for the resource types that the controls evaluate", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Amazon GuardDuty in the same account and the same Region as Security Hub", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "AWS CloudTrail data events for all Amazon S3 buckets and AWS Lambda functions", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Amazon Inspector so that it can supply resource configuration data to Security Hub", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has 40 AWS accounts in AWS Organizations and creates new accounts every month. The security team wants Amazon GuardDuty enabled in every existing and future account and wants to review all findings from a dedicated security account. The management account must not be used for daily security operations. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Nhiều account, account mới liên tục, xem tập trung ở security account, không dùng management account, vận hành ít nhất.\n(A) SAI: Dùng management account làm nơi vận hành trái yêu cầu, và mời thủ công từng account mới là việc lặp lại, dễ sót.\n(B) ĐÚNG: Từ management account chỉ định security account làm GuardDuty delegated administrator; admin này bật auto-enable để mọi account hiện có và account mới gia nhập tổ chức tự trở thành member, finding của member hiển thị tập trung ở admin. Lưu ý thiết lập theo từng Region.\n(C) SAI: StackSet bật GuardDuty rời rạc từng account thì không có quan hệ administrator/member, còn phải tự dựng đường SNS để gom finding, nhiều việc hơn.\n(D) SAI: Tự chép finding qua EventBridge ở mỗi account chạy được nhưng phải bảo trì rule ở từng account và không có quản lý tập trung cấu hình detector.\nĐáp án đúng: B\nĐiểm cần nhớ: Đa account với GuardDuty, Inspector, Macie hay Security Hub => delegated administrator trong Organizations kèm auto-enable cho account mới.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable GuardDuty in the management account and invite each new member account manually as it is created", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Designate the security account as the GuardDuty delegated administrator and turn on auto-enable for members", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Deploy a CloudFormation StackSet that enables GuardDuty separately in each account and forwards findings with SNS", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable GuardDuty in each account and create an EventBridge rule in every account to copy findings centrally", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company activated Amazon Inspector for EC2 scanning. The Inspector coverage view shows several instances with a status indicating that they are not managed by AWS Systems Manager, so no package vulnerability findings are produced for them. The company wants to use agent-based scanning for these instances. Which TWO actions should a solutions architect take?",
+    "explanation": "Phân tích đề: Inspector báo instance chưa được Systems Manager quản lý nên không có finding CVE; muốn dùng quét dựa trên agent.\n(A) ĐÚNG: Inspector v2 quét EC2 theo kiểu agent-based bằng SSM Agent để thu thập software inventory; agent phải được cài và đang chạy (có sẵn trên nhiều AMI hiện đại).\n(B) SAI: Inspector Classic agent thuộc phiên bản cũ với assessment target; Inspector hiện hành không dùng agent riêng này.\n(C) SAI: Flow Logs ghi traffic mạng, không liên quan tới việc lấy danh sách package cài trên instance.\n(D) ĐÚNG: Instance chỉ thành managed instance khi có quyền gọi Systems Manager, thường qua instance profile có policy AmazonSSMManagedInstanceCore (kèm đường mạng tới endpoint SSM, ví dụ qua NAT hoặc VPC endpoint).\n(E) SAI: Config ghi cấu hình tài nguyên, không cung cấp software inventory cho Inspector.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Inspector quét EC2 agent-based cần instance là SSM managed instance: SSM Agent chạy + IAM instance profile + đường mạng tới SSM. Không đáp ứng được thì cân nhắc agentless scanning.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Ensure that the SSM Agent is installed and running on each affected instance", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Install the Amazon Inspector Classic agent and register each instance in an assessment target", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable VPC Flow Logs on the subnets so that Inspector can inventory installed packages", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Attach an instance profile that includes the AmazonSSMManagedInstanceCore managed policy", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Enable AWS Config recording for EC2 so that Inspector can read the software inventory", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A financial company must run a weekly audit that analyzes every new or modified object in the Amazon S3 buckets tagged DataClass=Restricted for credit card numbers and bank account numbers. Other buckets must not be analyzed by this audit in order to control cost. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Chạy hàng tuần, phải phân tích mọi object mới hoặc đã sửa, chỉ các bucket có tag cụ thể, kiểm soát chi phí.\n(A) SAI: Automated sensitive data discovery chọn mẫu object để ước lượng rủi ro từng bucket, không đảm bảo phân tích mọi object mới; nó cũng không phải lịch audit hàng tuần theo tag.\n(B) SAI: GuardDuty S3 Protection phát hiện truy cập bất thường vào S3, không đọc nội dung object để tìm số thẻ hay số tài khoản.\n(C) SAI: Job một lần cho mọi bucket vượt phạm vi (tốn tiền) và chạy lại thủ công mỗi tuần sẽ quét lại cả object cũ.\n(D) ĐÚNG: Macie sensitive data discovery job theo lịch weekly, bucket criteria lọc theo tag DataClass=Restricted; job định kỳ sau lần chạy đầu chỉ phân tích object mới tạo hoặc thay đổi kể từ lần chạy trước, dùng managed data identifier cho số thẻ và tài khoản ngân hàng.\nĐáp án đúng: D\nĐiểm cần nhớ: Audit định kỳ trên bucket xác định => Macie scheduled discovery job (lọc bucket theo tag, prefix); giám sát liên tục ước lượng rủi ro toàn bộ bucket => automated sensitive data discovery.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable Macie automated sensitive data discovery and exclude untagged buckets from it", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable GuardDuty S3 Protection and add a suppression rule for buckets without the tag", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a one-time Macie job for all buckets and start it again manually every week", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a scheduled weekly Macie discovery job that uses bucket criteria on the tag", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs workloads on Amazon EC2 and uses Amazon GuardDuty. When GuardDuty reports a high-severity finding about an EC2 instance, the instance must be isolated from the network within minutes, and its EBS volumes must be preserved for forensic analysis. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Phản ứng tự động trong vài phút với finding mức cao, cô lập mạng nhưng giữ bằng chứng trên EBS.\n(A) ĐÚNG: GuardDuty tự đẩy finding vào EventBridge; rule lọc severity cao và resource type Instance gọi Lambda để tạo snapshot EBS rồi thay security group bằng isolation security group không có rule cho phép, instance bị cô lập nhưng dữ liệu vẫn còn.\n(B) SAI: GuardDuty không có chế độ tự khắc phục; nó chỉ tạo finding, mọi hành động phải do EventBridge và Lambda hoặc SSM thực hiện.\n(C) SAI: Config đánh giá cấu hình, không phải kênh phản ứng với finding GuardDuty; terminate instance cũng làm mất bằng chứng pháp y.\n(D) SAI: Gửi SNS để kỹ sư xử lý tay không đảm bảo vài phút, và stop instance làm mất dữ liệu trong bộ nhớ.\nĐáp án đúng: A\nĐiểm cần nhớ: GuardDuty chỉ phát hiện; tự động phản ứng = EventBridge rule lọc finding => Lambda hoặc SSM Automation (snapshot, đổi security group, thu hồi credential).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an EventBridge rule for high-severity EC2 findings that invokes a Lambda function to snapshot volumes and attach an isolation security group", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Turn on the GuardDuty automatic remediation setting so that GuardDuty itself moves each affected instance into a dedicated quarantine subnet", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an AWS Config rule for the instance with an automatic Systems Manager remediation action that terminates the instance and its volumes", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Subscribe the security team to GuardDuty findings through an SNS topic so that an on-call engineer can stop the instance manually", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company aggregates findings in AWS Security Hub from 25 accounts. Findings from three sandbox accounts overwhelm the analysts. The security team wants findings from those accounts to be automatically set to LOW severity with an explanatory note as soon as they are ingested, without writing or maintaining any code. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Tự động đổi severity và thêm note ngay khi finding vào Security Hub, theo account, không viết code.\n(A) SAI: EventBridge + Lambda gọi BatchUpdateFindings làm được nhưng phải viết và bảo trì code, trái yêu cầu.\n(B) SAI: Tắt Security Hub ở sandbox làm mất khả năng giám sát các account đó, không phải hạ mức ưu tiên.\n(C) ĐÚNG: Security Hub automation rules cho phép định nghĩa tiêu chí (ví dụ AwsAccountId thuộc ba sandbox) và hành động cập nhật trường như Severity, Note, Workflow status; rule áp dụng gần như ngay khi finding được nhập hoặc cập nhật, không cần code.\n(D) SAI: Custom insight chỉ là một góc nhìn lọc finding; nó không thay đổi severity nên các dashboard và luồng cảnh báo khác vẫn bị nhiễu.\nĐáp án đúng: C\nĐiểm cần nhớ: Muốn tự động sửa trường của finding (severity, note, suppressed) mà không code => Security Hub automation rules; muốn gọi hành động bên ngoài => EventBridge.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an EventBridge rule for sandbox findings that invokes a Lambda function to call BatchUpdateFindings", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Disable Security Hub in the three sandbox accounts and review their findings in each account separately", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a Security Hub automation rule that matches the sandbox account IDs and updates severity and note", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Create a Security Hub custom insight that filters the sandbox account IDs out of the main dashboard view", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "An Amazon Macie sensitive data discovery job completes, but its results show that many objects in one bucket were skipped and not analyzed. The bucket uses SSE-KMS with a customer managed key, and a lifecycle rule transitions older objects to the S3 Glacier Deep Archive storage class. Which TWO reasons explain why Macie could not analyze those objects?",
+    "explanation": "Phân tích đề: Job Macie bỏ qua nhiều object; bucket dùng SSE-KMS customer managed key và lifecycle chuyển object sang Glacier Deep Archive.\n(A) SAI: Macie phân tích được object mã hóa SSE-KMS, miễn là được phép dùng key; chỉ SSE-C là loại Macie không đọc được.\n(B) ĐÚNG: Với customer managed key, key policy phải cho phép service-linked role của Macie dùng key để giải mã; thiếu quyền này object bị bỏ qua.\n(C) SAI: Macie không yêu cầu bật S3 Versioning để phân tích object.\n(D) SAI: Macie hoạt động độc lập với GuardDuty; S3 Protection phục vụ phát hiện truy cập bất thường, không liên quan tới việc Macie đọc object.\n(E) ĐÚNG: Macie không phân tích object ở lớp lưu trữ lạnh cần restore như S3 Glacier Flexible Retrieval hay Glacier Deep Archive; muốn quét phải restore trước hoặc quét trước khi chuyển lớp.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Object bị Macie bỏ qua thường do: key KMS chưa cho Macie dùng, SSE-C, lớp lưu trữ archive cần restore, hoặc định dạng file không hỗ trợ.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Macie analyzes only objects encrypted with SSE-S3 and never analyzes objects encrypted with SSE-KMS", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "The key policy of the customer managed key does not allow the Macie service-linked role to use the key", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "The bucket does not have S3 Versioning enabled, which Macie requires before it can analyze any object", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "GuardDuty S3 Protection is not enabled, and Macie depends on it to read the contents of the objects", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Macie does not analyze objects that are stored in the S3 Glacier Deep Archive storage class", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company enabled Amazon GuardDuty in a VPC where EC2 instances use a self-managed DNS server that runs on EC2. That DNS server forwards all queries directly to on-premises DNS servers over AWS Direct Connect. During a test, an instance queried a known cryptocurrency mining domain, but GuardDuty did not generate a DNS-based finding. The company must continue to resolve on-premises domain names. What should a solutions architect do so that GuardDuty can detect malicious DNS queries from these instances?",
+    "explanation": "Phân tích đề: Instance dùng DNS server tự quản gửi thẳng về on-premises, GuardDuty không ra finding DNS; vẫn phải phân giải tên miền on-premises.\n(A) SAI: GuardDuty không đọc Flow Logs do khách hàng xuất ra S3, và Flow Logs không chứa tên miền được truy vấn.\n(B) ĐÚNG: GuardDuty chỉ thấy DNS log khi truy vấn đi qua Route 53 Resolver (AmazonProvidedDNS). Cho instance dùng Route 53 Resolver, tạo outbound endpoint và forwarding rule cho domain on-premises: GuardDuty thấy mọi truy vấn mà tên miền nội bộ vẫn phân giải được.\n(C) SAI: CloudTrail ghi API call của AWS, không nhận log truy vấn DNS từ máy chủ tự quản, nên GuardDuty không có dữ liệu này.\n(D) SAI: Bật query logging của Route 53 Resolver không có tác dụng vì truy vấn không đi qua Resolver khi instance vẫn trỏ vào DNS server tự quản.\nĐáp án đúng: B\nĐiểm cần nhớ: Nguồn DNS của GuardDuty phụ thuộc vào việc dùng Route 53 Resolver; dùng DNS bên thứ ba hoặc tự quản thì GuardDuty mất nguồn DNS. Kết hợp hybrid dùng Resolver endpoint + forwarding rule.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable VPC Flow Logs on the subnets and publish them to Amazon S3 so that GuardDuty can read the DNS queries", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Point the instances to Route 53 Resolver and use outbound endpoint forwarding rules for on-premises domains", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Send the query logs of the self-managed DNS server to AWS CloudTrail so that GuardDuty can analyze them", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable Route 53 Resolver query logging to Amazon S3 while keeping the self-managed DNS server as the resolver", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company stores customer records in an Amazon Aurora PostgreSQL DB cluster. Auditors require the company to identify which tables contain personal data such as names, email addresses, and passport numbers. The company wants to use managed AWS sensitive data detection, must not affect the performance of the production database, and wants the LEAST operational overhead. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Dữ liệu nằm trong Aurora, cần phát hiện PII theo bảng bằng dịch vụ managed, không ảnh hưởng hiệu năng production, vận hành ít nhất.\n(A) SAI: Macie chỉ phân tích object trong Amazon S3; nó không kết nối trực tiếp vào endpoint của Aurora hay bất kỳ database nào.\n(B) SAI: GuardDuty RDS Protection phân tích hoạt động đăng nhập để phát hiện truy cập đáng ngờ, không đọc nội dung bảng để tìm PII.\n(C) SAI: Inspector quét lỗ hổng phần mềm trên EC2, image ECR và Lambda; nó không có finding dữ liệu nhạy cảm cho bảng database.\n(D) ĐÚNG: Export snapshot của DB cluster sang S3 chạy từ snapshot nên không tải lên cluster production; dữ liệu ra dạng Parquet theo từng bảng, Macie hỗ trợ Parquet nên job Macie cho biết bảng nào chứa PII.\nĐáp án đúng: D\nĐiểm cần nhớ: Macie chỉ quét S3. Dữ liệu ở RDS, Aurora hay DynamoDB muốn dùng Macie thì phải export sang S3 trước (snapshot export, DynamoDB export to S3).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable Amazon Macie and create a sensitive data discovery job that connects directly to the Aurora cluster endpoint", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable GuardDuty RDS Protection and review the findings that identify tables containing personal data", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Activate Amazon Inspector for the DB cluster and review the sensitive data findings reported for each table", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Export a DB cluster snapshot to Amazon S3 in Parquet format and run a Macie discovery job on the export", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company is building a multi-account landing zone with AWS Organizations. Threat detection must cover every account, including any activity in AWS Regions that the company does not currently use. The security team must review findings from all accounts and Regions in one place from a dedicated Security Tooling account, and the management account must not be used for daily operations. Which THREE actions should a solutions architect take?",
+    "explanation": "Phân tích đề: Phủ mọi account và cả Region không dùng, xem tập trung ở Security Tooling account, không vận hành bằng management account.\n(A) ĐÚNG: Chỉ định Security Tooling account làm GuardDuty delegated administrator để quản lý detector và xem finding của mọi member mà không cần dùng management account.\n(B) SAI: Chỉ bật ở Region đang dùng thì kẻ tấn công dùng credential bị lộ để chạy instance đào coin ở Region bỏ trống sẽ không bị phát hiện; đây là bẫy tiết kiệm chi phí.\n(C) ĐÚNG: GuardDuty là dịch vụ theo Region; bật ở mọi Region với auto-enable cho member để phát hiện hoạt động ở cả Region không dùng (chi phí thấp vì gần như không có log).\n(D) SAI: Tạo IAM user ở từng account phân tán quyền truy cập và không tạo được góc nhìn tập trung.\n(E) ĐÚNG: Security Hub delegated administrator tại Security Tooling account kết hợp cross-Region aggregation gom finding của mọi account và mọi Region về một Region chính.\n(F) SAI: GuardDuty không cần CloudWatch agent; nguồn lõi thu thập không cần agent.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: Mô hình chuẩn: Security Tooling account làm delegated admin cho GuardDuty và Security Hub, bật GuardDuty ở mọi Region, gom finding bằng cross-Region aggregation.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Designate the Security Tooling account as the delegated administrator for Amazon GuardDuty", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Enable GuardDuty only in the Regions where workloads run to avoid unnecessary charges", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable GuardDuty with auto-enable for member accounts in every available Region", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Create IAM users for analysts in each member account so that they can review local findings", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Make the Security Tooling account the Security Hub administrator with cross-Region aggregation", "isCorrect": true },
+      { "answerLabel": "F", "answerText": "Install the CloudWatch agent on all EC2 instances so that GuardDuty can analyze host activity", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company builds container images in AWS CodeBuild. A new policy states that an image with any critical vulnerability must never be pushed to Amazon ECR, and the build must fail immediately with a list of the affected packages. The company wants to use AWS managed vulnerability intelligence and does not want to operate its own vulnerability database. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Image có CVE Critical không bao giờ được push lên ECR; build phải fail ngay; dùng dữ liệu lỗ hổng do AWS quản lý.\n(A) SAI: Enhanced scanning quét sau khi image đã nằm trong ECR; xóa image sau đó vi phạm yêu cầu không bao giờ được push, và build không fail.\n(B) SAI: GuardDuty Runtime Monitoring phát hiện hành vi lúc chạy, không đánh giá CVE của image trước khi push.\n(C) ĐÚNG: Tích hợp CI/CD của Inspector: bước build tạo SBOM của image (Inspector SBOM Generator) rồi gọi Inspector ScanSbom API; kết quả CVE trả về ngay trong pipeline để fail build trước bước push.\n(D) SAI: Basic scanning cũng chạy sau khi push, và repository policy của ECR không có điều kiện chặn theo kết quả scan.\nĐáp án đúng: C\nĐiểm cần nhớ: Chặn trước khi push => quét trong pipeline (Inspector ScanSbom); giám sát image đã nằm trong registry và cả CVE mới công bố sau này => ECR enhanced scanning bằng Inspector.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable ECR enhanced scanning on push and use EventBridge to delete any image that has critical findings", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable GuardDuty Runtime Monitoring for the ECS cluster and stop tasks that run vulnerable images", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a CodeBuild step that generates an SBOM and calls the Inspector ScanSbom API to fail on critical CVEs", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable ECR basic scanning on push and add a repository policy that blocks images with critical findings", "isCorrect": false }
+    ]
+  }
+]

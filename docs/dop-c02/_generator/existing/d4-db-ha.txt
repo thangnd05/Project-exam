@@ -1,0 +1,54 @@
+1. A DevOps engineer must explain what happens to application connections during an Amazon RDS Multi-AZ failover. What is accurate?
+2. A DevOps engineer must reduce the impact of database failovers on a connection heavy application. Which TWO measures help?
+3. A DevOps engineer must scale read capacity for a reporting workload without affecting the primary database. What is the appropriate approach?
+4. A DevOps engineer must distinguish between a Multi-AZ deployment and a read replica for availability purposes. What is accurate?
+5. A DevOps engineer must design cross-Region disaster recovery for a relational database with an RPO of one minute. Which TWO options are realistic?
+6. A DevOps engineer must monitor whether a replica can satisfy the RPO. Which metric is the most important?
+7. A DevOps engineer must prevent two Regions from accepting writes at the same time during a failover. What concept must the plan address?
+8. A DevOps engineer must design for a globally distributed application that needs low latency reads and writes in several Regions. Which TWO considerations are essential?
+9. A DevOps engineer must recover a database to the state it was in just before an accidental bulk delete. What capability is appropriate?
+10. A DevOps engineer must test a database failover without waiting for a real failure. What is the appropriate method?
+11. A DevOps engineer must apply a major database engine upgrade with minimal downtime and a safe rollback. What approach fits?
+12. A DevOps engineer must ensure that a read replica does not serve stale data to a flow that requires read after write consistency. Which TWO approaches work?
+13. A DevOps engineer must decide how to protect an in-memory cache tier from a node failure. What configuration is appropriate?
+14. A DevOps engineer must plan for the database load that follows a cache tier failure. What design consideration matters most?
+15. A DevOps engineer must decide the failover priority among Aurora replicas. Which TWO considerations apply?
+16. A DevOps engineer must create a copy of a production database for testing without affecting production performance. What approach is most efficient for Aurora?
+17. A DevOps engineer must decide how to handle database credentials so that rotation does not cause outages. What design is appropriate?
+18. A DevOps engineer must ensure schema changes do not break a high availability database deployment. Which TWO practices apply?
+19. A DevOps engineer must decide what to monitor to detect a degraded database before users are affected. Which signal is the most useful early indicator?
+20. A DevOps engineer must choose between synchronous and asynchronous replication for a workload that cannot lose committed transactions. What is the trade-off?
+21. A DevOps engineer must protect a DynamoDB table against accidental deletion of items by application code. What capability is appropriate?
+22. A DevOps engineer must design a DynamoDB global table deployment. Which TWO characteristics must the application handle?
+23. A DevOps engineer must ensure a database is not a single point of failure for a Region wide event. What must the design include?
+24. A DevOps engineer must reduce the time to promote a cross-Region replica during a disaster. What preparation helps most?
+25. A DevOps engineer must handle the application side of a database failover. Which TWO behaviours should the application implement?
+26. A DevOps engineer must choose storage settings that avoid an outage when a database grows unexpectedly. What configuration helps?
+27. A DevOps engineer must understand the impact of a maintenance window on a Multi-AZ database. What is accurate?
+28. A DevOps engineer must decide how to test the database disaster recovery plan. Which TWO activities give real confidence?
+29. A DevOps engineer must decide how to handle long running transactions during a planned failover. What practice reduces impact?
+30. A DevOps engineer must measure whether the database tier meets its availability objective. Which measure is the most meaningful?
+31. A DevOps engineer must reduce the connection storm that hits the database when many application instances start at once. What design helps?
+32. A DevOps engineer must decide what belongs in a database runbook for on-call engineers. Which TWO items are essential?
+33. A DevOps engineer must handle the case where replication has stopped and the replica is far behind. What is the correct operational response?
+34. A DevOps engineer must design the database tier for a workload with unpredictable, spiky traffic and long idle periods. What option is worth considering?
+35. A DevOps engineer must ensure data is protected when a database is deleted by mistake. Which TWO controls help?
+36. A DevOps engineer must explain why a read replica in another Region did not have the last few seconds of data after a failure. What is the accurate explanation?
+37. A DevOps engineer must decide how to route database traffic after a Regional failover so applications reach the new writer. What design is cleanest?
+38. A DevOps engineer must design monitoring that distinguishes a database problem from an application problem. Which TWO signal pairs help?
+39. A DevOps engineer must decide whether to place a read replica in the same Availability Zone as the primary. What consideration applies?
+40. A DevOps engineer must summarise the database resilience posture for an architecture review. What framing is most useful?
+41. A DevOps engineer must minimise the impact of a noisy analytical query on transactional workloads sharing one database. What is the most effective approach?
+42. A DevOps engineer must prepare a database for a large expected traffic event. Which TWO preparations are most valuable?
+43. A DevOps engineer must decide how to handle a database that must remain available during Region level maintenance by the provider. What is accurate?
+44. A DevOps engineer must decide how to validate that backups of a database are usable after an engine upgrade. What practice applies?
+45. A DevOps engineer must reduce recovery risk for a database whose restore has never been tested. Which TWO first steps are appropriate?
+46. A DevOps engineer must explain why adding read replicas did not improve write performance. What is the accurate explanation?
+47. A DevOps engineer must decide what to do when a failover leaves the application connected to a replica that is now read only. What design prevents this problem?
+48. A DevOps engineer must design alerting for the database tier. Which TWO alerts are the most actionable?
+49. A DevOps engineer must choose where to run database schema migrations in a highly available deployment. What is the sound practice?
+50. A DevOps engineer must explain the main risk of relying solely on automated failover without rehearsals. What is the strongest point?
+51. A global application uses Amazon Aurora PostgreSQL in us-east-1. The business requires that if the entire Region fails, the database in eu-west-1 can serve writes within a few minutes, with a recovery point objective of under one second under normal conditions
+52. A company runs Amazon RDS for MySQL in a single Availability Zone. During a recent AZ impairment the database was unavailable for three hours. The company must reduce downtime for a similar event to a few minutes, with no application code changes and automatic
+53. A company needs a data store for user session data that must accept writes in both us-east-1 and ap-southeast-1 with single-digit millisecond latency in each Region, and must continue accepting writes locally if either Region becomes unavailable. Which solutio
+54. An Aurora cluster has one writer and three readers of different instance sizes. During a failover test, Aurora promoted a small reader that could not handle production write traffic. A DevOps engineer must ensure a specific large reader is promoted first in fu

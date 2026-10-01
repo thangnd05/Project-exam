@@ -1,0 +1,54 @@
+1. A security operations team must detect three different things: unusual API call patterns that suggest credential misuse, cryptocurrency mining behaviour on EC2 instances, and known CVEs present in the operating system packages and language libraries of EC2 ins
+2. GuardDuty reports that a production EC2 instance is repeatedly querying a domain associated with a known command and control server. The company's incident response policy requires that the instance stop communicating with the outside world immediately, that v
+3. Container images pushed to Amazon ECR by the build pipeline must not reach production if they contain a critical CVE, and the pipeline must fail in that case. GuardDuty is already enabled for runtime threat detection, and the team does not want to introduce a 
+4. When GuardDuty reports that an IAM access key is being used from an unusual location in a way consistent with compromise, the company requires that the key be deactivated automatically within minutes and that the security team receive the finding details for f
+5. Amazon Inspector reports a critical CVE on a group of EC2 instances. The fix requires a kernel update that can only be applied during next week's maintenance window, and the security team has accepted that risk in writing. Until then, the finding floods the da
+6. A security operations team wants GuardDuty findings from 120 accounts to be visible in one place, wants new accounts to be protected automatically, and wants a high severity finding to create an incident ticket within one minute without anyone watching a conso
+7. A container platform team must detect operating system and language package vulnerabilities in images stored in Amazon ECR before they are deployed, and must also detect newly disclosed vulnerabilities in images that were pushed months ago. Which TWO configura
+8. GuardDuty raised a finding of type UnauthorizedAccess:EC2/MaliciousIPCaller.Custom for a production EC2 instance. The security policy requires that the instance be isolated for forensics without terminating it, that its memory and disk state be preserved, and 
+9. A DevOps team receives dozens of GuardDuty findings every week caused by an approved vulnerability scanning service whose traffic is recognized as port scanning. The team must stop these specific findings without reducing detection for any other source, and th
+10. A company wants a single pane of glass that combines GuardDuty findings, Inspector vulnerabilities, Config rule violations, and third-party security tool findings across 120 accounts, with a consistent finding format and the ability to route critical items to 
+11. A DevOps engineer must ensure threat detection is enabled automatically for every new account joining the organization. What configuration achieves this?
+12. A DevOps engineer must route high-severity threat findings to the on-call responder within minutes. What design achieves this?
+13. A DevOps engineer must contain an EC2 instance that threat detection reports as communicating with a known malicious endpoint. Which TWO containment actions are appropriate first steps?
+14. A DevOps engineer must prevent repeated findings caused by an approved internal scanning tool without losing detection for genuine threats. What is the correct approach?
+15. A DevOps engineer must ensure container images are scanned for vulnerabilities continuously, not only when they are first pushed. What configuration provides this?
+16. A DevOps engineer must prioritise a long list of vulnerability findings across a large fleet. What prioritisation signal is most useful?
+17. A DevOps engineer must reduce the time between a vulnerability being published and it being fixed in running workloads. Which TWO practices deliver this?
+18. A DevOps engineer must scan EC2 instances for vulnerabilities without installing and maintaining an agent on every instance. What capability supports this?
+19. A DevOps engineer must ensure that vulnerability findings reach the team that owns the affected workload. What makes this routing reliable?
+20. A DevOps engineer must decide what a finding about anomalous API activity from an access key implies. What is the correct immediate interpretation?
+21. A DevOps engineer must extend threat detection to cover suspicious activity inside EKS clusters. What should be enabled?
+22. A DevOps engineer must detect malware on instances after a suspicious finding, without disrupting the running workload. What capability fits?
+23. A DevOps engineer must design an automated first response to a high-severity threat finding. Which TWO automated steps are safe and useful?
+24. A DevOps engineer must ensure vulnerability scanning results block promotion of container images in the pipeline. Where should the gate be placed?
+25. A DevOps engineer must decide how to treat a vulnerability finding for a package that is present in an image but never loaded at runtime. What is the balanced approach?
+26. A DevOps engineer must measure whether the vulnerability management programme is working. Which TWO metrics are meaningful?
+27. A DevOps engineer must ensure serverless function code and dependencies are assessed for vulnerabilities. What approach covers this?
+28. A DevOps engineer must explain why threat detection findings should be centralised in a dedicated security account. What is the main reason?
+29. A DevOps engineer must decide how to handle findings in an account scheduled for decommissioning next month. What is the correct approach?
+30. A DevOps engineer must decide what data sources threat detection relies on and what this implies for coverage. What is the correct understanding?
+31. A DevOps engineer must reduce the number of instances requiring patching by changing how the fleet is managed. What approach reduces vulnerability exposure structurally?
+32. A DevOps engineer investigates a finding about cryptocurrency mining activity on an instance. Which TWO investigation steps are most informative?
+33. A DevOps engineer must ensure the findings from vulnerability assessment appear alongside other security signals for the response team. What integration is appropriate?
+34. A DevOps engineer must decide what to do when threat detection produces a finding for a resource in an account no team claims. What is the right course of action?
+35. A DevOps engineer must reduce false positives from threat detection caused by a legitimate partner integration connecting from a fixed address range. What is the correct configuration?
+36. A DevOps engineer must build a repeatable response runbook for credential compromise findings. Which TWO elements belong in it?
+37. A DevOps engineer must ensure that vulnerability data is available for a workload running on instances that are launched and terminated within minutes. What consideration applies?
+38. A DevOps engineer must decide how threat detection findings and configuration compliance findings differ in what they tell the team. What is the accurate distinction?
+39. A DevOps engineer must ensure that disabling threat detection in a member account is not possible for the account team. What control is required?
+40. A DevOps engineer must decide whether to act on a low-severity finding that has appeared hundreds of times across the estate. What is the appropriate judgement?
+41. A DevOps engineer must ensure that security scanning does not become a bottleneck that teams route around. What practice keeps the gate effective and accepted?
+42. A DevOps engineer must decide what to include in the evidence package when a threat finding escalates to a formal incident. Which TWO items are essential?
+43. A DevOps engineer must decide how to handle vulnerability findings in a base image maintained by a platform team but used by many application teams. Who should act and how?
+44. A DevOps engineer must explain the risk of leaving vulnerability scanning enabled but never acting on results. What is the main consequence?
+45. A DevOps engineer must design detection coverage for a workload that runs entirely in one account with no internet exposure. What is the correct assessment?
+46. A DevOps engineer must improve the signal-to-noise ratio of security alerting. Which TWO adjustments help without reducing coverage?
+47. A DevOps engineer must decide how long to retain security findings and related logs. What consideration should drive the decision?
+48. A DevOps engineer must validate that the detection and response process actually works before a real incident occurs. What is the appropriate method?
+49. A DevOps engineer must reduce the attack surface that vulnerability scanning keeps reporting on application containers. What change has the largest structural effect?
+50. A DevOps engineer must decide what to do immediately when detection reports that a resource in a production account was accessed by a principal from an unknown external account. What is the correct first step?
+51. Amazon GuardDuty reports a finding indicating that an EC2 instance in a production account is communicating with a command and control server. The instance is part of a running application. What should the incident response team do FIRST?
+52. A company must ensure that container images pushed to Amazon ECR are assessed for operating system and language package vulnerabilities, that images already stored are reassessed when new vulnerabilities are published, and that the build pipeline blocks promot
+53. A security team must ensure Amazon GuardDuty is enabled in all 120 accounts of an AWS Organization, that findings from every account are visible in one place, and that accounts created next year are protected without manual action. Which solution meets these r
+54. An approved internal penetration testing tool runs weekly from a fixed set of IP addresses and generates dozens of GuardDuty findings each time. The security team must stop these specific findings from reaching the on-call responder while keeping detection for

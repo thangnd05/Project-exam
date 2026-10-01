@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company deploys Amazon EC2 instances with AWS CloudFormation. The templates hardcode Amazon Linux 2023 AMI IDs for each Region, and the IDs become outdated every month. The company wants every stack deployment to use the latest Amazon Linux 2023 AMI automatically. Which solution meets this requirement with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần luôn lấy AMI Amazon Linux 2023 mới nhất khi deploy CloudFormation, không muốn tự duy trì danh sách AMI ID theo Region; từ khóa LEAST operational overhead.\n(A) SAI: Mappings theo Region cộng Lambda cập nhật hằng tháng vẫn là tự duy trì dữ liệu AMI, thêm code và pipeline commit template, tốn công vận hành.\n(B) SAI: Secrets Manager dành cho dữ liệu bí mật cần bảo vệ/rotate; AMI ID không phải bí mật và AWS không công bố AMI mới nhất vào Secrets Manager, nên vẫn phải tự cập nhật secret.\n(C) ĐÚNG: AWS công bố public parameter trong Parameter Store (ví dụ /aws/service/ami-amazon-linux-latest/...) luôn trỏ tới AMI mới nhất. Tham số template kiểu AWS::SSM::Parameter::Value<AWS::EC2::Image::Id> được CloudFormation resolve lúc tạo/cập nhật stack, không cần code hay dữ liệu tự quản.\n(D) SAI: Custom resource gọi DescribeImages chạy được nhưng phải viết, bảo trì và phân quyền cho Lambda, nhiều công hơn so với dùng public parameter có sẵn.\nĐáp án đúng: C\nĐiểm cần nhớ: Muốn AMI mới nhất trong CloudFormation hãy dùng public parameter của Parameter Store với kiểu tham số AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Maintain a Mappings section for each Region and update it monthly with a scheduled AWS Lambda function that commits the new AMI IDs.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Store the AMI IDs in AWS Secrets Manager and reference the secret with a dynamic reference that resolves during stack creation.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use a parameter of type AWS::SSM::Parameter::Value<AWS::EC2::Image::Id> set to the Amazon Linux 2023 public parameter.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Create a Lambda-backed custom resource that calls DescribeImages on every deployment and returns the newest matching image ID to the template.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An application on Amazon EC2 reads a database connection string that is stored as a SecureString parameter in AWS Systems Manager Parameter Store and encrypted with a customer managed AWS KMS key. The application receives an AccessDeniedException when it calls GetParameter with decryption enabled, although the instance role allows ssm:GetParameter on the parameter. What is the MOST likely cause?",
+    "explanation": "Phân tích đề: SecureString mã hóa bằng customer managed key; role đã có ssm:GetParameter nhưng vẫn AccessDenied khi WithDecryption=true, tức là vấn đề nằm ở quyền giải mã.\n(A) SAI: SecureString có ở cả Standard và Advanced tier; tier không quyết định việc giải mã được hay không.\n(B) SAI: Parameter Store tự làm việc với KMS để giải mã, không cần đẩy dữ liệu sang Secrets Manager.\n(C) SAI: Khi gọi GetParameter, chính dịch vụ Parameter Store gọi KMS thay cho caller; lỗi mạng tới KMS từ instance không tạo ra AccessDeniedException, và kết nối tới SSM đã thành công.\n(D) ĐÚNG: Đọc SecureString với decryption yêu cầu caller có cả ssm:GetParameter lẫn kms:Decrypt trên key đã mã hóa tham số (qua IAM policy và key policy cho phép). Thiếu kms:Decrypt thì trả AccessDenied.\nĐáp án đúng: D\nĐiểm cần nhớ: SecureString = Parameter Store + KMS; role đọc cần ssm:GetParameter* và kms:Decrypt trên đúng key (với customer managed key thì key policy cũng phải cho phép).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "SecureString parameters can be decrypted only in the Advanced tier, which must be enabled for the parameter first.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "The parameter must be replicated to AWS Secrets Manager before an EC2 instance role can decrypt its value.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "The instance security group must allow outbound port 443 traffic directly to AWS KMS for the call to succeed.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "The instance role lacks kms:Decrypt permission for the customer managed key that encrypts the parameter.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A security policy states that security groups for Linux Amazon EC2 instances must not contain any inbound rules. Administrators still need interactive shell access to the instances, and all access must be authorized through IAM. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Security group không được có bất kỳ inbound rule nào nhưng vẫn cần shell tương tác, xác thực bằng IAM.\n(A) SAI: EC2 Instance Connect chỉ đẩy public key tạm thời, kết nối vẫn là SSH vào port 22 nên security group phải có inbound rule cho port 22.\n(B) ĐÚNG: Session Manager dùng SSM Agent mở kết nối outbound HTTPS tới dịch vụ; người dùng được ủy quyền bằng IAM (ssm:StartSession) và không cần bất kỳ inbound port nào trên instance.\n(C) SAI: EC2 Instance Connect Endpoint giúp SSH tới instance private không cần public IP, nhưng security group của instance vẫn phải cho phép port 22 từ security group của endpoint.\n(D) SAI: Bastion host yêu cầu inbound SSH trên cả bastion và instance đích, trái với yêu cầu không có inbound rule.\nĐáp án đúng: B\nĐiểm cần nhớ: Không inbound rule nào + shell + IAM => Session Manager. Instance Connect (kể cả Endpoint) vẫn là SSH port 22.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use EC2 Instance Connect to push a temporary SSH public key and connect from the administrators' workstations.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use AWS Systems Manager Session Manager with the SSM Agent and an instance profile on each instance.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Deploy an EC2 Instance Connect Endpoint in the VPC and connect through it with the existing SSH clients.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Place a hardened bastion host in a public subnet and allow SSH from the bastion to the instances only.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect launches a new Amazon EC2 instance from a custom Linux AMI in a private subnet that has a route to a NAT gateway. The instance does not appear as a managed node in AWS Systems Manager. Which THREE conditions must be met for the instance to register as a managed node? (Choose three.)",
+    "explanation": "Phân tích đề: AMI tự build (có thể thiếu agent), subnet private có NAT. Cần biết 3 điều kiện để thành managed node.\n(A) ĐÚNG: SSM Agent phải được cài và chạy; AMI Amazon Linux/Windows chuẩn có sẵn agent nhưng AMI custom có thể không có.\n(B) SAI: Kết nối do agent khởi tạo theo chiều outbound, Systems Manager không gọi ngược vào instance nên không cần inbound 443.\n(C) ĐÚNG: Agent cần credential IAM để gọi API Systems Manager, thường là instance profile có AmazonSSMManagedInstanceCore (hoặc cấp qua Default Host Management Configuration).\n(D) SAI: Instance private đi ra qua NAT gateway hoặc VPC endpoint, không cần public IP hay Elastic IP.\n(E) ĐÚNG: Agent phải kết nối outbound HTTPS 443 tới endpoint ssm, ssmmessages, ec2messages (qua NAT, internet gateway hoặc interface endpoint).\n(F) SAI: Key pair chỉ dùng cho SSH; Systems Manager không dùng key pair để đăng ký node.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: Managed node = SSM Agent + quyền IAM (AmazonSSMManagedInstanceCore) + outbound 443 tới endpoint SSM. Không cần inbound, public IP hay key pair.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "The SSM Agent is installed and running on the instance.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "The security group allows inbound HTTPS on port 443 from the Systems Manager service.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "The instance has Systems Manager permissions, such as an instance profile with AmazonSSMManagedInstanceCore.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "The instance has a public IPv4 address or an Elastic IP address associated with it.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "The instance can make outbound HTTPS connections on port 443 to the Systems Manager endpoints.", "isCorrect": true },
+      { "answerLabel": "F", "answerText": "The instance was launched with an EC2 key pair that is registered in Systems Manager.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs 400 Amazon EC2 instances that are managed by AWS Systems Manager and tagged Role=web. After a configuration change, operations must restart the web server service on all of these instances today. No more than 10% of the instances may restart at the same time, and the operation must stop automatically if more than 5 instances fail. The command output must be kept for review. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Thao tác một lần (hôm nay) trên fleet theo tag, cần rate control (concurrency 10%, dừng khi lỗi vượt 5) và lưu output.\n(A) SAI: State Manager association dùng để duy trì trạng thái lặp lại theo lịch; chạy restart mỗi 30 phút sẽ khởi động lại dịch vụ liên tục, không phải thao tác một lần.\n(B) SAI: Lambda SSH vào từng instance phải quản lý key, mở port 22, tự viết logic batch và dừng khi lỗi, tốn công hơn nhiều.\n(C) SAI: Instance refresh thay thế toàn bộ instance, nặng hơn nhiều so với restart một service và không đáp ứng yêu cầu dừng theo số lỗi của lệnh.\n(D) ĐÚNG: Run Command nhắm target bằng tag, hỗ trợ rate control gồm concurrency (số hoặc %) và error threshold; khi số lỗi vượt ngưỡng thì ngừng gửi lệnh tới target mới. Output có thể ghi vào S3 để lưu trữ.\nĐáp án đúng: D\nĐiểm cần nhớ: Chạy lệnh ad hoc trên nhiều instance, có concurrency/error threshold và output S3 => Run Command. Duy trì trạng thái theo lịch => State Manager.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a State Manager association that runs the restart command on the tagged instances every 30 minutes with high compliance severity.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Write an AWS Lambda function that connects to each instance over SSH in batches and writes the output to Amazon CloudWatch Logs.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Start an instance refresh on the Auto Scaling group with a minimum healthy percentage of 90% so that every web instance is replaced.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use Run Command with AWS-RunShellScript on the tag, with 10% concurrency, an error threshold of 5, and output sent to Amazon S3.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses AWS Systems Manager Session Manager for all shell access to Amazon EC2 instances. The security team must receive an alert within minutes whenever any user runs a command that contains the string 'iptables -F' during a session. Which solution meets this requirement?",
+    "explanation": "Phân tích đề: Cần phát hiện nội dung lệnh gõ trong session gần thời gian thực (trong vài phút) và cảnh báo.\n(A) SAI: CloudTrail chỉ ghi lời gọi API StartSession (ai, lúc nào, instance nào), không chứa các lệnh gõ bên trong session.\n(B) SAI: Log lên S3 có nội dung session nhưng truy vấn Athena hằng ngày không đáp ứng yêu cầu cảnh báo trong vài phút.\n(C) ĐÚNG: Session Manager có thể stream session log liên tục tới CloudWatch Logs; metric filter khớp chuỗi 'iptables -F' tạo metric, CloudWatch alarm trên metric đó gửi thông báo qua SNS gần như tức thì.\n(D) SAI: VPC Flow Logs chỉ ghi metadata luồng mạng (IP, port, bytes), không biết lệnh nào được chạy trong hệ điều hành.\nĐáp án đúng: C\nĐiểm cần nhớ: Cần cảnh báo theo nội dung session => stream session log vào CloudWatch Logs + metric filter + alarm. CloudTrail chỉ biết ai mở session.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an Amazon EventBridge rule for StartSession calls recorded by AWS CloudTrail and inspect the request parameters for the command string.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable session logging to Amazon S3 and run a daily Amazon Athena query that searches the session transcripts for the command string.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Stream session logs to Amazon CloudWatch Logs and create a metric filter with a CloudWatch alarm that notifies an SNS topic.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable VPC Flow Logs for the instance subnets and create an alert when traffic patterns change after firewall rules are flushed.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company's Amazon EC2 instances run in private subnets of a VPC that has no internet gateway and no NAT gateway. The company wants to use Session Manager and must upload session logs to an Amazon S3 bucket in the same Region. The instances already have the required instance profile permissions. Which set of VPC endpoints should a solutions architect create?",
+    "explanation": "Phân tích đề: VPC hoàn toàn không có đường ra internet; cần Session Manager hoạt động và agent ghi log lên S3 cùng Region.\n(A) SAI: Chỉ có endpoint ssm là không đủ; kênh session cần ssmmessages và agent còn dùng ec2messages. STS không phải thành phần bắt buộc ở đây.\n(B) ĐÚNG: Interface endpoint cho ssm, ssmmessages, ec2messages giúp agent đăng ký và mở kênh session riêng tư; gateway endpoint cho S3 (gắn vào route table) cho phép agent upload session log lên bucket mà không cần internet.\n(C) SAI: Endpoint ec2 và sts không thay thế được ssmmessages/ec2messages; endpoint CloudWatch Logs chỉ cần khi ghi log vào CloudWatch Logs, còn yêu cầu là S3.\n(D) SAI: Systems Manager không có gateway endpoint, chỉ S3 và DynamoDB mới có gateway endpoint; thiếu endpoint ssm thì agent không đăng ký được.\nĐáp án đúng: B\nĐiểm cần nhớ: Session Manager trong VPC private: interface endpoint ssm + ssmmessages + ec2messages; ghi log S3 thêm S3 gateway endpoint, ghi CloudWatch Logs thêm logs endpoint, dùng KMS thêm kms endpoint.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "An interface endpoint for ssm only, plus a gateway endpoint for Amazon S3 and an interface endpoint for AWS STS.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Interface endpoints for ssm, ssmmessages, and ec2messages, plus a gateway endpoint for Amazon S3.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Interface endpoints for ec2, sts, and ssm, plus an interface endpoint for Amazon CloudWatch Logs.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "A gateway endpoint for Systems Manager, plus interface endpoints for ssmmessages and Amazon S3.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company patches Amazon Linux 2023 instances with AWS Systems Manager Patch Manager. The security team requires that security patches with Critical, Important, or Medium severity be installed only after they have been available for 14 days. A specific kernel package version that breaks a legacy driver must never be installed. Patch compliance must be visible in Systems Manager. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Cần kiểm soát thời gian chờ 14 ngày theo mức severity, chặn vĩnh viễn một gói kernel cụ thể và có báo cáo compliance.\n(A) ĐÚNG: Custom patch baseline cho phép định nghĩa auto-approval rule (classification Security, severity Critical/Important/Medium, approval delay 14 ngày) và danh sách rejected patches để không bao giờ cài gói kernel đó. AWS-RunPatchBaseline dùng baseline này và báo compliance về Systems Manager.\n(B) SAI: Predefined baseline không sửa được, không thêm được rejected patch; dời lịch maintenance window không đảm bảo mỗi bản vá đã ra đủ 14 ngày.\n(C) SAI: Inspector phát hiện lỗ hổng chứ không quản lý approval theo tuổi bản vá; tự ghép Run Command sẽ không có patch compliance theo baseline.\n(D) SAI: Chạy dnf upgrade trong State Manager bỏ qua cơ chế baseline, không có delay theo ngày phát hành và không tạo báo cáo patch compliance.\nĐáp án đúng: A\nĐiểm cần nhớ: Cần delay phê duyệt, lọc severity, chặn gói cụ thể => custom patch baseline (auto-approval rule + rejected patches).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a custom patch baseline with a 14-day auto-approval delay for those severities and add the kernel package to the rejected patches list.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Use the predefined AWS patch baseline for Amazon Linux 2023 and schedule the maintenance window 14 days after each monthly release date.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use Amazon Inspector to identify packages older than 14 days and invoke Run Command to install them while excluding the kernel package.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use a State Manager association that runs dnf upgrade with an exclude option for the kernel package every 14 days on all instances.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company operates managed Amazon EC2 instances in 20 AWS accounts and three AWS Regions. The security team must be able to run SQL queries to find every instance that has a particular version of an application package installed, and must build dashboards in Amazon QuickSight from the results. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần dữ liệu phần mềm đã cài trên instance, gom nhiều account/Region, truy vấn SQL và làm dashboard QuickSight, ít vận hành.\n(A) SAI: Run Command hằng đêm chạy lệnh liệt kê gói là tự xây cơ chế thu thập; dữ liệu dạng text trong CloudWatch Logs không phù hợp truy vấn SQL/QuickSight.\n(B) SAI: CloudTrail Lake ghi sự kiện API; RunInstances không chứa thông tin gói phần mềm bên trong hệ điều hành.\n(C) SAI: Trusted Advisor kiểm tra best practice ở mức tài khoản, không thu thập danh sách phần mềm trong instance.\n(D) ĐÚNG: Systems Manager Inventory thu thập metadata trong instance (applications, phiên bản, file, network...). Resource data sync gom inventory từ nhiều account/Region vào một bucket S3 trung tâm, Athena truy vấn SQL và QuickSight dựng dashboard.\nĐáp án đúng: D\nĐiểm cần nhớ: Phần mềm đã cài trên fleet, đa account/Region, truy vấn SQL => Inventory + resource data sync (S3) + Athena/QuickSight.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use Run Command each night to run a package listing command on all instances and send the output to a central CloudWatch Logs log group.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an AWS CloudTrail Lake event data store for all accounts and query RunInstances events to determine the installed packages.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable AWS Trusted Advisor in every account and export the operational excellence checks to Amazon S3 for querying with Athena.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable Systems Manager Inventory with a resource data sync from all accounts and Regions to a central S3 bucket for Athena.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A team stores application settings in AWS Systems Manager Parameter Store as Standard parameters. Which TWO new requirements would require the team to use Advanced parameters? (Choose two.)",
+    "explanation": "Phân tích đề: Cần biết tính năng nào chỉ có ở Advanced tier (kích thước giá trị lớn hơn, parameter policies, số lượng lớn hơn).\n(A) SAI: Tổ chức theo hierarchy và GetParametersByPath có ở cả Standard lẫn Advanced.\n(B) ĐÚNG: Standard giới hạn giá trị 4 KB; giá trị khoảng 6 KB cần Advanced (tối đa 8 KB).\n(C) SAI: SecureString với customer managed key dùng được ở Standard tier.\n(D) ĐÚNG: Parameter policies (Expiration, ExpirationNotification, NoChangeNotification) chỉ gắn được cho Advanced parameter.\n(E) SAI: Lịch sử phiên bản (GetParameterHistory) có ở cả hai tier.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Advanced = giá trị tới 8 KB, parameter policies, tối đa 100.000 tham số, có phí; Standard = 4 KB, 10.000 tham số, miễn phí lưu trữ.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Parameters must be organized into hierarchies such as /app/prod/db and retrieved by path.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "A certificate bundle of about 6 KB must be stored as a single parameter value.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "A parameter must be encrypted at rest with an AWS KMS customer managed key.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "A token parameter must expire automatically and send a notification before it expires.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Previous values of a parameter must be retained so the team can review its change history.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company keeps shared configuration in a central AWS account. A SecureString Advanced parameter in that account is shared with a workload account through AWS Resource Access Manager (AWS RAM). The parameter was created with the AWS managed key aws/ssm. Applications in the workload account have permission to call GetParameter on the shared parameter ARN but fail to retrieve the decrypted value. The company wants to keep a single source of truth for the value. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Tham số được share qua RAM, mã hóa bằng AWS managed key aws/ssm; account khác không giải mã được; phải giữ một nguồn dữ liệu duy nhất.\n(A) SAI: Key policy của AWS managed key do AWS quản lý, không chỉnh sửa được để cấp quyền cho account khác.\n(B) ĐÚNG: Để account khác giải mã SecureString được share, tham số phải được mã hóa bằng customer managed key; key policy cho phép principal của workload account dùng kms:Decrypt và role trong workload account cũng được cấp kms:Decrypt trên key đó. Tham số vẫn chỉ nằm ở account trung tâm.\n(C) SAI: Chỉ Advanced parameter mới share qua RAM được; chuyển về Standard (vốn cũng không hạ tier được) không giải quyết quyền KMS.\n(D) SAI: Sao chép định kỳ tạo nhiều bản dữ liệu, vi phạm yêu cầu single source of truth và thêm code vận hành.\nĐáp án đúng: B\nĐiểm cần nhớ: Chia sẻ dữ liệu mã hóa KMS cross-account luôn cần customer managed key, vì key policy của AWS managed key không sửa được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Modify the key policy of the aws/ssm AWS managed key to allow kms:Decrypt for the application role in the workload account.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Re-encrypt the parameter with a customer managed key whose key policy allows the workload account to use kms:Decrypt.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Convert the parameter to the Standard tier so that AWS RAM shares the decryption permissions together with the parameter.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Copy the parameter into the workload account with a scheduled AWS Lambda function that writes a new SecureString every hour.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company uses Session Manager for access to hundreds of Amazon EC2 instances. Developers must be able to start sessions only on instances tagged Environment=dev. Developers must be able to end their own sessions but must not be able to terminate sessions that other users started. The company wants to enforce these rules without changing any security groups. Which IAM policy design meets these requirements?",
+    "explanation": "Phân tích đề: Hai ràng buộc bằng IAM: chỉ mở session trên instance có tag dev, chỉ được terminate session của chính mình; không đụng security group.\n(A) SAI: SCP chặn toàn bộ TerminateSession khiến developer không kết thúc được cả session của mình, và vẫn cho phép mở session trên mọi instance.\n(B) SAI: ssm:SendCommand là quyền Run Command, không phải quyền mở session; cho TerminateSession trên mọi session vi phạm yêu cầu thứ hai.\n(C) ĐÚNG: Cho phép ssm:StartSession trên instance với điều kiện ssm:resourceTag/Environment = dev giới hạn phạm vi truy cập; session ID bắt đầu bằng định danh của người tạo, nên giới hạn ssm:TerminateSession/ResumeSession vào resource session/${aws:userid}-* (hoặc ${aws:username}-* với IAM user) chỉ cho phép thao tác trên session của chính mình.\n(D) SAI: Tag do người dùng tự khai báo khi kết nối không phải điều kiện ủy quyền; cho StartSession trên mọi instance là vi phạm yêu cầu.\nĐáp án đúng: C\nĐiểm cần nhớ: Giới hạn Session Manager theo tag bằng ssm:resourceTag trong IAM; giới hạn session của chính mình bằng resource session/${aws:userid}-*.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Allow ssm:StartSession on all instances and use a service control policy that denies ssm:TerminateSession for all developer principals.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Allow ssm:SendCommand on instances tagged Environment=dev and allow ssm:TerminateSession on all session resources in the account.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Allow ssm:StartSession where ssm:resourceTag/Environment is dev, and allow ssm:TerminateSession only on sessions prefixed with the caller's ID.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Allow ssm:StartSession on all instances and require developers to supply the Environment tag as a session parameter when connecting.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company must patch 600 Amazon EC2 instances every Saturday between 02:00 and 06:00. Before patches are applied, each instance must have an EBS snapshot. Patching must proceed in batches of no more than 20% of the instances and must halt if more than 10 instances fail. No new patching task may begin during the final hour of the window. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần khung giờ cố định, thứ tự task (snapshot trước, patch sau), rate control (20%, lỗi > 10 thì dừng) và không bắt đầu task mới trong giờ cuối (cutoff).\n(A) SAI: EventBridge Scheduler + Lambda phải tự code thứ tự, vòng lặp batch, dừng theo lỗi và khung giờ, nhiều công vận hành.\n(B) SAI: State Manager association chạy theo cron nhưng không có khái niệm duration/cutoff của cửa sổ và không xếp thứ tự snapshot trước khi patch.\n(C) SAI: AWS Backup chụp snapshot được, nhưng Patch now là thao tác thủ công, không có cutoff và dùng rate control mặc định chứ không theo ngưỡng yêu cầu.\n(D) ĐÚNG: Maintenance window có duration 4 giờ và cutoff 1 giờ (không bắt đầu task mới trong giờ cuối). Task được chạy theo priority: Automation tạo snapshot trước, rồi AWS-RunPatchBaseline với max concurrency 20% và max errors 10.\nĐáp án đúng: D\nĐiểm cần nhớ: Maintenance window = schedule + duration + cutoff + task priority + concurrency/error threshold cho từng task.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an EventBridge Scheduler schedule that invokes a Lambda function to snapshot volumes and then call Run Command with AWS-RunPatchBaseline in loops.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a State Manager association with a cron expression for Saturday at 02:00 that runs AWS-RunPatchBaseline with 20% concurrency and an error threshold of 10.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an AWS Backup plan that takes snapshots on Saturday at 01:00 and use the Patch Manager Patch now option at 02:00 with the default rate control settings.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a 4-hour maintenance window with a 1-hour cutoff, a first-priority snapshot task, and a patch task with 20% concurrency and 10 max errors.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company has 300 on-premises Linux servers connected to a VPC through AWS Direct Connect with a private virtual interface. The company wants to manage the servers with Patch Manager and Session Manager. Security policy forbids the servers from sending any traffic to the internet, including traffic to public AWS service endpoints. Which TWO actions should a solutions architect take? (Choose two.)",
+    "explanation": "Phân tích đề: Server on-prem (không phải EC2) cần trở thành managed node, và mọi lưu lượng tới Systems Manager phải đi riêng tư qua Direct Connect private VIF vào VPC.\n(A) ĐÚNG: Hybrid activation (kèm IAM service role cho Systems Manager) tạo activation code và ID; cài SSM Agent trên từng server và đăng ký bằng cặp này để server thành managed node (ID dạng mi-).\n(B) SAI: Lưu access key IAM user dài hạn trên từng server là anti-pattern bảo mật; hybrid activation đã cấp credential tạm thời qua service role.\n(C) SAI: Instance profile chỉ gắn được cho EC2, không gắn được cho server on-prem.\n(D) ĐÚNG: Interface endpoint cho ssm, ssmmessages, ec2messages có IP private trong VPC, truy cập được qua private VIF. Route 53 Resolver inbound endpoint cho phép DNS on-prem phân giải tên endpoint ra IP private, giúp agent không đi ra public endpoint.\n(E) SAI: Không tồn tại gateway endpoint cho Systems Manager, và gateway endpoint cũng không dùng được từ on-prem.\nĐáp án đúng: A và D\nĐiểm cần nhớ: On-prem + Systems Manager = hybrid activation. Muốn đi riêng tư qua DX/VPN thì dùng interface endpoint + Route 53 Resolver inbound endpoint để phân giải DNS.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a hybrid activation with an IAM service role, then install the SSM Agent on each server and register it with the activation code and ID.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create an IAM user with access keys for each server and store the keys in the SSM Agent configuration so the agent can authenticate.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Attach an instance profile with AmazonSSMManagedInstanceCore to each server through the EC2 API after the SSM Agent is installed.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create interface endpoints for ssm, ssmmessages, and ec2messages, and resolve them from on premises through a Route 53 Resolver inbound endpoint.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Create a gateway VPC endpoint for Systems Manager and advertise its route to the on-premises router over the private virtual interface.", "isCorrect": false }
+    ]
+  }
+]

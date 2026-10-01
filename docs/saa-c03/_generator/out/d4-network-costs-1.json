@@ -1,0 +1,414 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company runs an application on an Amazon EC2 instance and an Amazon RDS for MySQL Single-AZ DB instance. Both resources are in the same Availability Zone and communicate by using private IP addresses. A finance analyst asks how the traffic between them is billed. What should a solutions architect tell the analyst?",
+    "explanation": "Phân tích đề: EC2 và RDS cùng một AZ, giao tiếp bằng private IP. Từ khóa: cùng AZ + private IP.\n(A) SAI: Phí inter-AZ chỉ áp dụng khi dữ liệu đi qua hai AZ khác nhau; RDS là dịch vụ managed không làm thay đổi quy tắc tính phí theo vị trí.\n(B) ĐÚNG: Dữ liệu giữa EC2 và RDS trong cùng AZ qua private IP được miễn phí truyền dữ liệu. Chỉ khi hai tài nguyên nằm ở AZ khác nhau hoặc đi qua public IP thì mới phát sinh phí.\n(C) SAI: Traffic này không đi ra Internet nên không thể tính theo đơn giá data transfer out ra Internet; trong cùng AZ qua private IP cả hai chiều đều miễn phí.\n(D) SAI: Endpoint RDS có tên DNS public nhưng từ trong VPC phân giải ra private IP; hơn nữa hai tài nguyên cùng Region nên không có phí inter-Region.\nĐáp án đúng: B\nĐiểm cần nhớ: Cùng AZ + private IP = miễn phí. Khác AZ = tính phí mỗi chiều. Khác Region = đắt hơn nữa.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "The traffic is billed at the inter-Availability Zone rate in each direction because RDS is a managed service.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "There is no data transfer charge for this traffic because both resources are in the same Availability Zone.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Only the traffic from the DB instance back to the EC2 instance is billed, at the internet data transfer out rate.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "The traffic is billed at the inter-Region rate because RDS endpoints are resolved through public DNS.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "Amazon EC2 instances in private subnets write session data to an Amazon DynamoDB table in the same AWS Region. Today the traffic flows through a NAT gateway. The company wants a private path to DynamoDB that adds no hourly endpoint charge and no per-GB processing charge. What should a solutions architect create?",
+    "explanation": "Phân tích đề: Private subnet gọi DynamoDB cùng Region, yêu cầu đường riêng không có phí theo giờ và theo GB.\n(A) SAI: DynamoDB có hỗ trợ interface endpoint (PrivateLink), nhưng interface endpoint tính phí theo giờ cho mỗi AZ và theo GB xử lý, vi phạm yêu cầu không phát sinh phí endpoint.\n(B) SAI: Thêm NAT Gateway chỉ tránh traffic khác AZ, còn phí theo giờ và phí xử lý mỗi GB của NAT vẫn nguyên, thậm chí tăng thêm một NAT.\n(C) SAI: DAX là bộ nhớ đệm cho đọc, tính phí theo node, không thay thế đường mạng tới DynamoDB và không giúp ghi dữ liệu đi đường riêng.\n(D) ĐÚNG: Gateway endpoint cho DynamoDB thêm một route tới prefix list của DynamoDB vào route table của private subnet. Nó hoàn toàn miễn phí, không phí giờ, không phí GB, và traffic không còn đi qua NAT.\nĐáp án đúng: D\nĐiểm cần nhớ: Gateway endpoint chỉ có cho S3 và DynamoDB và miễn phí. Muốn bỏ phí NAT cho hai dịch vụ này thì luôn nghĩ tới gateway endpoint trước.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "An interface VPC endpoint for DynamoDB in each Availability Zone that the private subnets use.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "A second NAT gateway so that each Availability Zone sends DynamoDB traffic through its own NAT gateway.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "A DynamoDB Accelerator (DAX) cluster in the private subnets to serve the writes locally.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "A gateway VPC endpoint for DynamoDB that is associated with the private subnet route tables.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A retail company serves product images from an Amazon S3 bucket to shoppers around the world. A team member proposes AWS Global Accelerator to lower the monthly data transfer bill for these images. Which service should a solutions architect recommend instead to reduce cost for this workload?",
+    "explanation": "Phân tích đề: Nội dung tĩnh (ảnh), người dùng toàn cầu, mục tiêu giảm chi phí truyền dữ liệu.\n(A) ĐÚNG: CloudFront cache ảnh tại edge, lấy dữ liệu từ origin S3 không tính phí transfer, và đơn giá CloudFront tới người dùng thường rẻ hơn S3 ra Internet trực tiếp. Cache còn giảm số request về S3.\n(B) SAI: Transfer Acceleration có phí cộng thêm trên mỗi GB và chủ yếu tăng tốc upload đường dài; nó không cache và không bao giờ làm hóa đơn rẻ hơn.\n(C) SAI: Direct Connect nối trung tâm dữ liệu của công ty với AWS, không phục vụ người mua hàng trên Internet và có phí port theo giờ rất lớn.\n(D) SAI: NLB không thể đặt trước S3 như một origin tĩnh theo cách này, không cache, và thêm phí giờ cùng LCU mà không giảm data transfer out.\nĐáp án đúng: A\nĐiểm cần nhớ: Global Accelerator không cache và có phí cố định theo giờ cộng phí DT-Premium. Nội dung HTTP tĩnh cho người dùng toàn cầu => CloudFront.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Amazon CloudFront with the S3 bucket as the origin, so images are cached at edge locations.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "S3 Transfer Acceleration on the bucket, so downloads use the AWS global network.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "An AWS Direct Connect connection from each shopper region to the Region that hosts the bucket.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "A Network Load Balancer with static IP addresses in front of the S3 bucket.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A startup deploys a NAT gateway so that instances in private subnets can reach the internet. The founders want to understand the NAT gateway line on their bill. Which TWO charges apply to a NAT gateway? (Select TWO.)",
+    "explanation": "Phân tích đề: Hỏi cấu trúc phí của NAT Gateway.\n(A) ĐÚNG: NAT Gateway tính phí theo giờ cho mỗi gateway tồn tại, kể cả khi ít traffic.\n(B) SAI: Không có phí theo số route table trỏ tới NAT Gateway; route table là miễn phí.\n(C) ĐÚNG: Mọi GB đi qua NAT Gateway đều chịu phí xử lý, kể cả traffic tới S3 hay DynamoDB cùng Region. Đây là chi phí ẩn lớn nhất của NAT.\n(D) SAI: Sai: traffic tới S3 hay DynamoDB đi qua NAT vẫn bị tính phí xử lý mỗi GB. Muốn miễn phí phải dùng gateway endpoint.\n(E) SAI: NAT Gateway không tính theo số kết nối; nó chỉ có phí theo giờ và phí xử lý theo GB (cộng phí data transfer thông thường nếu có).\nĐáp án đúng: A và C\nĐiểm cần nhớ: NAT Gateway = phí theo giờ + phí xử lý mỗi GB, không có ngoại lệ cho dịch vụ AWS cùng Region.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "An hourly charge for each hour that the NAT gateway is provisioned and available.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "A charge for each route table that has a route pointing to the NAT gateway.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "A data processing charge for each gigabyte that passes through the NAT gateway.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "No charge for traffic that goes to AWS services in the same Region, such as Amazon S3.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "A per-connection charge for each new TCP session that the NAT gateway translates.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs a TCP-based market data service on a custom port behind a Network Load Balancer (NLB) in three Availability Zones. Clients require the NLB's static IP addresses. Cross-zone load balancing is enabled on the NLB, and each Availability Zone has an equal number of healthy targets. The bill shows a large regional data transfer line caused by the NLB forwarding traffic across Availability Zones. What should a solutions architect do to reduce this cost?",
+    "explanation": "Phân tích đề: NLB bật cross-zone, target phân bố đều ở mỗi AZ, phí data transfer khác AZ lớn. Bắt buộc giữ TCP port tùy chỉnh và IP tĩnh.\n(A) SAI: ALB chỉ hỗ trợ HTTP/HTTPS nên không phục vụ được dịch vụ TCP port tùy chỉnh, và ALB cũng không cung cấp IP tĩnh; hơn nữa ALB vẫn phân phối request sang target ở AZ khác.\n(B) SAI: Global Accelerator thêm phí cố định và phí DT-Premium; nó không thay đổi việc NLB chuyển traffic sang AZ khác.\n(C) ĐÚNG: Khi tắt cross-zone, mỗi node NLB chỉ chuyển traffic tới target trong AZ của nó, nên không còn phí regional data transfer giữa các AZ. Vì mỗi AZ có số target bằng nhau, tải vẫn cân bằng.\n(D) SAI: Proxy protocol chỉ truyền thông tin IP client tới target, không ảnh hưởng tới đường đi giữa các AZ nên không giảm phí.\nĐáp án đúng: C\nĐiểm cần nhớ: NLB bật cross-zone thì phát sinh phí inter-AZ; khi target đã đều giữa các AZ, tắt cross-zone là cách giảm phí.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Replace the NLB with an Application Load Balancer, because an Application Load Balancer never forwards traffic across zones.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Place AWS Global Accelerator in front of the NLB so that traffic enters the AWS network closer to the clients.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Disable cross-zone load balancing on the NLB so that each load balancer node sends traffic only to targets in its own zone.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable proxy protocol version 2 on the target group so that client IP addresses are preserved across zones.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A data provider sells a 400 TB historical dataset to subscribers. Every subscriber has its own AWS account and downloads the objects directly from the provider's Amazon S3 bucket. The provider wants subscribers to pay the request and data transfer charges for their downloads, while the provider continues to pay for storage. The solution must require minimal ongoing operations. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Người đăng ký có tài khoản AWS riêng, tải trực tiếp từ bucket; muốn người tải trả phí request và data transfer; chủ bucket chỉ trả phí lưu trữ; ít vận hành.\n(A) SAI: Với CloudFront, phí data transfer ra người xem vẫn tính vào tài khoản sở hữu distribution là nhà cung cấp, không chuyển được cho subscriber.\n(B) ĐÚNG: Requester Pays chuyển phí request và phí tải dữ liệu sang tài khoản người yêu cầu, còn chủ bucket vẫn trả phí lưu trữ. Chỉ cần bật trên bucket và cấp quyền cho các tài khoản subscriber, rất ít vận hành.\n(C) SAI: Presigned URL được ký bằng credential của nhà cung cấp, nên phí tải dữ liệu vẫn tính cho nhà cung cấp, lại phải vận hành cơ chế cấp URL.\n(D) SAI: DataSync tốn phí theo GB và phí truyền dữ liệu phía nhà cung cấp, lại nhân bản dữ liệu cho mỗi subscriber, tốn vận hành và chi phí hơn nhiều.\nĐáp án đúng: B\nĐiểm cần nhớ: Muốn người tải trả phí truyền dữ liệu và họ có tài khoản AWS => S3 Requester Pays. CloudFront hay presigned URL không chuyển được phí cho người tải.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Put an Amazon CloudFront distribution in front of the bucket and issue CloudFront signed URLs to each subscriber.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable Requester Pays on the bucket and grant each subscriber account access through the bucket policy.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Generate S3 presigned URLs from the provider account for every object that a subscriber requests.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Use AWS DataSync to copy the dataset into a bucket owned by each subscriber after every monthly update.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses S3 Cross-Region Replication to copy an entire 500 TB bucket to a second Region for disaster recovery. Most of the objects are temporary processing files. Only objects under the finance/ prefix must be recoverable in the second Region, and a retrieval time of up to 48 hours is acceptable for those copies. Which change will reduce replication and storage costs the MOST while meeting the requirements?",
+    "explanation": "Phân tích đề: CRR toàn bộ bucket, nhưng chỉ prefix finance/ cần DR; chấp nhận lấy lại trong 48 giờ. Cần giảm cả phí truyền dữ liệu inter-Region và phí lưu trữ đích.\n(A) SAI: SRR bỏ được phí inter-Region nhưng bản sao nằm cùng Region nên không đáp ứng yêu cầu DR ở Region thứ hai.\n(B) SAI: Replication Time Control thêm phí mỗi GB để cam kết thời gian sao chép; nó làm tăng chi phí và không giảm lượng dữ liệu truyền.\n(C) SAI: Batch Replication hằng đêm trên cả bucket vẫn chuyển toàn bộ dữ liệu không cần thiết sang Region khác, còn cộng phí job Batch Operations.\n(D) ĐÚNG: Bộ lọc prefix chỉ sao chép dữ liệu thực sự cần cho DR, cắt phần lớn phí inter-Region. Đặt storage class đích là Glacier Deep Archive giảm mạnh phí lưu bản sao, vẫn trong giới hạn lấy lại 48 giờ.\nĐáp án đúng: D\nĐiểm cần nhớ: CRR tính phí truyền inter-Region cộng phí lưu bản sao. Giảm bằng cách lọc prefix/tag chỉ cho dữ liệu cần theo RPO và chọn storage class rẻ ở Region đích.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Switch to S3 Same-Region Replication and keep replicating the whole bucket to reduce transfer charges.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable S3 Replication Time Control on the existing rule so that replication finishes predictably.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Run S3 Batch Replication for the whole bucket every night instead of using the live replication rules that exist today.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Filter the replication rule to the finance/ prefix and set the destination storage class to S3 Glacier Deep Archive.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An analytics platform in AWS sends about 300 TB of processed results each month to a company's data center over an AWS Site-to-Site VPN connection. The volume is steady and predictable, and it is expected to grow. Finance identifies data transfer out as the largest cost line. Which solution will MOST reduce this cost?",
+    "explanation": "Phân tích đề: 300 TB mỗi tháng từ AWS về on-premises, ổn định và tăng dần, đang dùng VPN qua Internet. Chi phí lớn nhất là data transfer out.\n(A) SAI: Accelerated VPN chạy qua Global Accelerator, thêm phí accelerator và DT-Premium, còn data transfer out vẫn theo đơn giá Internet.\n(B) ĐÚNG: Với khối lượng lớn và ổn định, Direct Connect có đơn giá data transfer out thấp hơn đáng kể so với Internet; phí port theo giờ được bù lại nhờ 300 TB mỗi tháng.\n(C) SAI: ECMP qua nhiều tunnel chỉ tăng băng thông; đơn giá data transfer out Internet giữ nguyên, lại cộng phí xử lý của transit gateway.\n(D) SAI: Transfer Acceleration cộng thêm phí mỗi GB trên data transfer out, chỉ làm hóa đơn đắt hơn.\nĐáp án đúng: B\nĐiểm cần nhớ: Khối lượng lớn, ổn định giữa on-premises và AWS => Direct Connect, đơn giá egress thấp hơn VPN qua Internet.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Convert the connection to an Accelerated Site-to-Site VPN so that the traffic travels over the AWS global network instead of the public internet.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Establish an AWS Direct Connect connection and send the results over it at the lower Direct Connect data transfer out rate.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Add more VPN tunnels behind a transit gateway and use ECMP to spread the traffic across them.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable S3 Transfer Acceleration on the result bucket and let the data center download the objects through it.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs an Amazon MSK cluster with brokers in three Availability Zones. Consumer applications run on Amazon EC2 in all three Availability Zones. Consumers always fetch from partition leaders, so most reads cross Availability Zones, and the inter-AZ data transfer bill is high. The cluster must remain highly available across three Availability Zones. What should a solutions architect do?",
+    "explanation": "Phân tích đề: MSK 3 AZ, consumer đọc từ leader ở AZ khác nên phí inter-AZ cao. Phải giữ HA 3 AZ.\n(A) SAI: Dồn broker vào một AZ phá vỡ yêu cầu HA ba AZ; một sự cố AZ sẽ làm cả cluster ngừng hoạt động.\n(B) SAI: Tiered storage giảm chi phí lưu trữ dữ liệu cũ nhưng không thay đổi việc consumer đọc từ broker ở AZ khác.\n(C) SAI: Tăng partition chỉ rải leader đều hơn; về xác suất consumer vẫn đọc từ leader ở AZ khác nên phí inter-AZ gần như không đổi.\n(D) ĐÚNG: Với RackAwareReplicaSelector và client.rack, consumer đọc từ replica nằm cùng AZ thay vì leader ở AZ khác, nên traffic đọc ở lại trong AZ. Cluster vẫn giữ replica ở cả ba AZ.\nĐáp án đúng: D\nĐiểm cần nhớ: Consumer Kafka đọc cross-AZ => follower fetching theo rack (client.rack = AZ ID) để đọc từ replica cùng AZ mà không hy sinh HA.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Move all brokers into a single Availability Zone next to the largest group of consumers.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable MSK tiered storage so that older segments are read from a lower-cost storage tier.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Double the partition count of each topic so that partition leaders are spread more evenly across all brokers in the cluster.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Configure rack-aware follower fetching so that each consumer reads from a replica in its own Availability Zone.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company's AWS bill shows a sudden increase in regional data transfer charges in one Region. The operations team must find which resources are sending traffic between Availability Zones so that the architecture can be corrected. Which TWO actions should a solutions architect take? (Select TWO.)",
+    "explanation": "Phân tích đề: Phí regional data transfer tăng, cần xác định tài nguyên gây traffic khác AZ.\n(A) ĐÚNG: Cost Explorer lọc và nhóm theo usage type (ví dụ DataTransfer-Regional-Bytes) cho thấy chính xác dòng phí nào tăng và từ khi nào.\n(B) SAI: CloudTrail ghi lại lời gọi API quản lý, không ghi luồng dữ liệu mạng giữa các instance nên không chỉ ra được traffic khác AZ.\n(C) ĐÚNG: Flow Logs ghi lại từng luồng theo ENI, IP nguồn đích và số byte; đối chiếu với subnet của từng AZ sẽ tìm ra cặp tài nguyên nói chuyện khác AZ nhiều nhất.\n(D) SAI: Compute Optimizer đề xuất kích thước tài nguyên dựa trên mức sử dụng CPU và bộ nhớ, không phân tích luồng mạng giữa các AZ.\n(E) SAI: X-Ray theo dõi độ trễ và đường đi request ở tầng ứng dụng, không đo chi phí data transfer và không bao phủ các luồng không được instrument.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Tìm nguồn phí mạng: Cost Explorer/CUR theo usage type để biết loại phí, VPC Flow Logs để biết luồng nào gây ra.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Use AWS Cost Explorer grouped by usage type to confirm that the increase comes from the regional data transfer usage type.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Review AWS CloudTrail management events to see which API calls transferred the data.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable VPC Flow Logs and analyze source and destination addresses and subnets to identify the heavy cross-AZ flows.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Run AWS Compute Optimizer to find over-provisioned instances that generate network traffic.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Enable AWS X-Ray on every application to measure the data transfer cost of each request.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company has five VPCs in one Region connected through an AWS Transit Gateway. Four of the VPCs exchange only small amounts of traffic. An analytics VPC and a data lake VPC exchange about 200 TB each month, and the transit gateway data processing charge for this pair dominates the network bill. Both VPCs have non-overlapping CIDR ranges. The company wants to keep the transit gateway for the other VPCs and minimize changes. What should a solutions architect do to reduce cost?",
+    "explanation": "Phân tích đề: TGW nối 5 VPC; một cặp VPC trao đổi 200 TB/tháng, phí xử lý TGW chiếm phần lớn. CIDR không trùng. Giữ TGW cho phần còn lại, ít thay đổi.\n(A) ĐÚNG: VPC peering không có phí theo giờ và không có phí xử lý mỗi GB như TGW; chỉ còn phí data transfer thông thường (miễn phí nếu cùng AZ). Route cụ thể qua peering chỉ áp dụng cho cặp này, các VPC khác vẫn dùng TGW.\n(B) SAI: Full mesh cũng giảm phí xử lý nhưng thay đổi toàn bộ kiến trúc, tăng số kết nối và route phải quản lý, trái với yêu cầu ít thay đổi và giữ TGW.\n(C) SAI: PrivateLink tính phí theo giờ mỗi AZ và phí xử lý mỗi GB; với 200 TB mỗi tháng chi phí vẫn cao, lại cần dựng NLB và endpoint service.\n(D) SAI: Transit gateway thứ hai vẫn tính phí attachment theo giờ và phí xử lý mỗi GB như cũ, còn tăng thêm chi phí attachment.\nĐáp án đúng: A\nĐiểm cần nhớ: TGW tiện quản lý nhưng có phí attachment theo giờ và phí xử lý mỗi GB. Cặp VPC có lưu lượng rất lớn => thêm VPC peering riêng cho cặp đó.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a VPC peering connection between the analytics VPC and the data lake VPC, and route their traffic over it.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Replace the transit gateway with a full mesh of VPC peering connections between all five VPCs.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Create interface VPC endpoints through AWS PrivateLink so that analytics services reach the data lake through an endpoint service.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Move the analytics VPC and data lake VPC attachments to a second transit gateway that is dedicated only to the traffic between that pair.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "Account A runs an application tier in us-east-1a. Account B runs the database tier, which the application reaches over VPC peering, and the database team deployed it in us-east-1a of its own account to keep traffic in one Availability Zone. After launch, inter-AZ data transfer charges appear for this traffic. The company wants to keep the accounts separate and minimize cost. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Hai tài khoản, cả hai chọn tên AZ us-east-1a nhưng vẫn có phí inter-AZ. Giữ tách tài khoản, giảm chi phí.\n(A) SAI: Phí data transfer phụ thuộc vị trí vật lý của AZ, không phụ thuộc tài khoản; gộp tài khoản vừa trái yêu cầu vừa không tự giải quyết vấn đề AZ.\n(B) SAI: Transit gateway thêm phí attachment và phí xử lý mỗi GB, và nếu tài nguyên vẫn ở hai AZ vật lý khác nhau thì còn phí inter-AZ.\n(C) ĐÚNG: Tên AZ như us-east-1a được ánh xạ ngẫu nhiên khác nhau giữa các tài khoản. AZ ID là định danh vật lý giống nhau trên mọi tài khoản, nên đặt hai tầng theo cùng AZ ID mới thực sự cùng AZ và traffic qua peering trong cùng AZ được miễn phí.\n(D) SAI: Bật DNS resolution qua peering chỉ giúp tên DNS public phân giải ra private IP; nó không đổi AZ vật lý của database nên không bỏ được phí inter-AZ.\nĐáp án đúng: C\nĐiểm cần nhớ: Tên AZ (us-east-1a) khác nhau giữa các tài khoản; muốn đặt cùng AZ vật lý giữa nhiều tài khoản phải dùng AZ ID (use1-az1).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Move the database into Account A so that both tiers are billed in the same account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Replace the VPC peering connection with a transit gateway so that same-AZ traffic between accounts is free.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Use the Availability Zone IDs, such as use1-az1, to place both tiers in the same physical Availability Zone.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable DNS resolution support on the peering connection so that the database endpoint resolves to a same-AZ address.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company runs a web application on Amazon EC2 instances in private subnets across three Availability Zones. A single NAT gateway in one Availability Zone handles heavy internet-bound traffic from all three Availability Zones. The instances also read large objects from Amazon S3 in the same Region through that NAT gateway. Customers around the world download static reports that the instances serve directly. The application must remain deployed across three Availability Zones. Which THREE actions will reduce data transfer costs? (Select THREE.)",
+    "explanation": "Phân tích đề: Một NAT duy nhất gánh traffic của 3 AZ (phí inter-AZ + phí NAT), đọc S3 qua NAT, người dùng toàn cầu tải báo cáo tĩnh trực tiếp từ EC2. Bắt buộc giữ 3 AZ.\n(A) ĐÚNG: Traffic S3 chuyển sang gateway endpoint miễn phí, bỏ phí xử lý NAT mỗi GB cho phần đọc S3 lớn.\n(B) SAI: Dồn về một AZ bỏ được phí inter-AZ nhưng vi phạm yêu cầu giữ ứng dụng trải trên ba AZ.\n(C) ĐÚNG: Với traffic Internet lớn, mỗi AZ một NAT giúp bỏ phí inter-AZ khi instance phải gửi dữ liệu sang NAT ở AZ khác, đồng thời tăng tính sẵn sàng.\n(D) SAI: Global Accelerator không cache nội dung, lại thêm phí cố định và DT-Premium, không giảm phí tải báo cáo.\n(E) ĐÚNG: CloudFront cache báo cáo tĩnh tại edge, origin fetch từ AWS origin không tính phí transfer và đơn giá CloudFront ra người dùng thường thấp hơn, đồng thời giảm tải cho EC2.\n(F) SAI: Transfer Acceleration dành cho truyền dữ liệu đường dài qua edge và luôn có phí cộng thêm; EC2 cùng Region đọc S3 không hưởng lợi gì.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: Bộ ba giảm phí mạng hay gặp: gateway endpoint cho S3/DynamoDB, mỗi AZ một NAT để tránh inter-AZ, CloudFront cho nội dung tải xuống toàn cầu.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a gateway VPC endpoint for Amazon S3 and associate it with the private subnet route tables.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Consolidate all instances into the Availability Zone that hosts the NAT gateway.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Deploy a NAT gateway in each Availability Zone and route each private subnet to the NAT gateway in its own zone.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Put AWS Global Accelerator in front of the web tier to reduce data transfer for report downloads.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Serve the static reports through Amazon CloudFront so that repeated downloads come from edge caches.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "F",
+        "answerText": "Enable S3 Transfer Acceleration so that the instances read objects from Amazon S3 faster.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A media company hosts its video library on storage servers in its own data center, and it pays its ISP a high per-GB price for outbound traffic. Amazon CloudFront already serves the library to viewers on several continents, with the data center as a custom origin. Many edge locations request the same objects from the origin, so origin egress remains high. The company cannot move the library to AWS this year. Which solution will MOST reduce origin egress cost?",
+    "explanation": "Phân tích đề: Origin nằm on-premises, ISP tính phí egress cao. CloudFront đã dùng nhưng nhiều edge cùng lấy một object từ origin. Chưa thể chuyển dữ liệu lên AWS.\n(A) SAI: Chuyển lên S3 sẽ bỏ được phí origin, nhưng đề nói rõ năm nay không thể chuyển thư viện lên AWS.\n(B) ĐÚNG: Origin Shield thêm một tầng cache tập trung trước origin; các regional edge cache lấy dữ liệu qua Origin Shield nên cùng một object chỉ được lấy từ data center một lần, cắt mạnh egress ISP. Phí request của Origin Shield nhỏ hơn nhiều so với phí egress tiết kiệm được.\n(C) SAI: Global Accelerator chỉ tối ưu định tuyến, không cache, nên số lần tải object từ origin không giảm; còn cộng phí accelerator.\n(D) SAI: Price class giảm đơn giá phía viewer bằng cách loại bớt edge, nhưng làm giảm chất lượng cho người xem ở châu lục khác và không cơ bản giảm số lần lấy object từ origin.\nĐáp án đúng: B\nĐiểm cần nhớ: Origin bị nhiều edge gọi lặp lại (đặc biệt origin ngoài AWS có egress đắt) => CloudFront Origin Shield để gom request về một tầng cache.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Move the library to Amazon S3 and use it as the CloudFront origin.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable CloudFront Origin Shield in the Region closest to the data center to add a central caching layer.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Add AWS Global Accelerator in front of the data center origin so that the edge locations reuse their connections to the origin more efficiently.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Change the CloudFront price class to use only edge locations in North America and Europe.",
+        "isCorrect": false
+      }
+    ]
+  }
+]

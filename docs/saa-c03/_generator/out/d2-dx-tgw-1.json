@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company has ordered an AWS Direct Connect dedicated connection, but the provider says the cross-connect will take several weeks. The company needs private connectivity from its data center to a VPC within the next two days to start a migration. Which solution meets this requirement?",
+    "explanation": "Phân tích đề: Direct Connect cần hàng tuần để kéo cáp, nhưng cần kết nối trong 2 ngày => cần giải pháp dựng trong vài phút, dùng tạm trong lúc chờ DX.\n(A) ĐÚNG: Site-to-Site VPN dựng trong vài phút qua Internet, có 2 tunnel IPsec tới Virtual Private Gateway hoặc Transit Gateway, dùng làm đường tạm và sau này giữ làm backup cho DX.\n(B) SAI: AWS Client VPN dành cho từng người dùng cá nhân kết nối bằng phần mềm client, không phải kết nối site-to-site giữa cả data center với VPC.\n(C) SAI: Transit Gateway chỉ là router logic trong AWS; tạo Transit Gateway không tạo ra đường truyền từ data center, vẫn cần VPN hoặc DX gắn vào.\n(D) SAI: VPC peering chỉ nối hai VPC với nhau trong mạng AWS, không thể peering với mạng on-premises.\nĐáp án đúng: A\nĐiểm cần nhớ: Cần kết nối ngay trong vài phút => Site-to-Site VPN; Direct Connect mất hàng tuần tới hàng tháng để cung cấp.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an AWS Site-to-Site VPN connection to the VPC as an interim link.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Deploy an AWS Client VPN endpoint in the VPC and connect the data center router to it.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a transit gateway, attach the VPC, and route the data center prefixes to the attachment.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a VPC peering connection between the VPC and the data center network range.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company uses a 10 Gbps AWS Direct Connect dedicated connection. A new security policy requires the link to be encrypted at Layer 2 at line rate between the company router and the AWS Direct Connect device. Which feature should the company use?",
+    "explanation": "Phân tích đề: Yêu cầu mã hóa Layer 2, line rate, giữa router khách hàng và thiết bị DX => MACsec.\n(A) SAI: AWS KMS quản lý khóa để mã hóa dữ liệu at rest hoặc ở tầng ứng dụng; KMS không mã hóa frame trên đường truyền vật lý.\n(B) ĐÚNG: MACsec (IEEE 802.1AE) mã hóa ở Layer 2 giữa router của khách hàng và thiết bị Direct Connect, hỗ trợ trên dedicated connection 10 Gbps và 100 Gbps ở các location có hỗ trợ, đạt tốc độ line rate.\n(C) SAI: Site-to-Site VPN over public VIF mã hóa ở Layer 3 bằng IPsec, giới hạn khoảng 1,25 Gbps mỗi tunnel nên không đạt line rate 10 Gbps và không phải Layer 2.\n(D) SAI: Certificate từ ACM dùng cho TLS trên load balancer hoặc CloudFront, không gắn vào cổng Direct Connect.\nĐáp án đúng: B\nĐiểm cần nhớ: Direct Connect mặc định không mã hóa; cần mã hóa Layer 2 line rate trên dedicated connection => MACsec, cần IPsec => VPN chạy trên DX.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable AWS KMS encryption on the Direct Connect connection using a customer managed key.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable MACsec on the dedicated connection.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Run an AWS Site-to-Site VPN over a public virtual interface on the connection.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Associate an AWS Certificate Manager certificate with the Direct Connect port.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company has branch offices in South America that connect to a VPC in us-east-1 by using AWS Site-to-Site VPN over the internet. Users report inconsistent latency because traffic crosses many public internet hops. Which solution improves VPN performance by using the AWS global network?",
+    "explanation": "Phân tích đề: VPN qua Internet bị trễ không ổn định, muốn đi vào mạng toàn cầu của AWS sớm hơn => Accelerated Site-to-Site VPN.\n(A) SAI: Accelerated VPN không hỗ trợ khi VPN gắn vào Virtual Private Gateway; đây là bẫy tính năng có thật nhưng sai ngữ cảnh.\n(B) SAI: CloudFront là CDN cho nội dung HTTP/HTTPS, không làm đường đi cho tunnel IPsec site-to-site.\n(C) ĐÚNG: Accelerated Site-to-Site VPN dùng AWS Global Accelerator để traffic VPN vào edge location gần nhất rồi đi trên mạng AWS; tính năng này chỉ hỗ trợ cho VPN gắn vào Transit Gateway.\n(D) SAI: Direct Connect SiteLink chuyển traffic giữa các Direct Connect location, cần có đường DX; văn phòng đang chỉ dùng VPN qua Internet.\nĐáp án đúng: C\nĐiểm cần nhớ: Accelerated Site-to-Site VPN = VPN + Global Accelerator, chỉ dùng được khi VPN attach vào Transit Gateway.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable acceleration on the existing VPN connections that terminate on the virtual private gateway.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Place an Amazon CloudFront distribution in front of the VPN endpoints of the VPC.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create accelerated Site-to-Site VPN connections attached to a transit gateway.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable AWS Direct Connect SiteLink for the branch offices to reach us-east-1.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect is evaluating VPC peering to connect several VPCs. Which TWO statements describe limitations of VPC peering? (Choose two.)",
+    "explanation": "Phân tích đề: Hỏi giới hạn có thật của VPC peering.\n(A) ĐÚNG: VPC peering không bắc cầu: VPC thứ nhất peering với VPC thứ hai, VPC thứ hai peering với VPC thứ ba thì VPC thứ nhất vẫn không tới được VPC thứ ba.\n(B) SAI: VPC peering hỗ trợ inter-Region, traffic đi trên backbone AWS và được mã hóa.\n(C) SAI: VPC peering hỗ trợ giữa các account khác nhau, account nhận chỉ cần chấp nhận yêu cầu.\n(D) ĐÚNG: Hai VPC có CIDR trùng hoặc chồng lấn không thể tạo peering.\n(E) SAI: VPC peering không cần Virtual Private Gateway; chỉ cần tạo peering connection và thêm route trong route table.\nĐáp án đúng: A và D\nĐiểm cần nhớ: VPC peering: một-một, không bắc cầu, không cho CIDR chồng lấn, nhưng được cross-account và cross-Region.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Traffic cannot transit through one peered VPC to reach a third VPC.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Peering connections can be created only between VPCs in the same AWS Region.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Peering connections can be created only between VPCs in the same AWS account.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Peering connections cannot be created between VPCs with overlapping CIDR blocks.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Each VPC must have a virtual private gateway attached before peering is created.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company connects its data center to AWS with an AWS Direct Connect private virtual interface and a Site-to-Site VPN as backup. During a fiber cut test, traffic took more than a minute to fail over to the VPN because the BGP session waited for the hold timer to expire. The company wants failure detection in less than a second with the least operational overhead. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Failover chậm vì chờ BGP hold timer; cần phát hiện lỗi dưới 1 giây, ít vận hành nhất => BFD.\n(A) SAI: CloudWatch alarm trên ConnectionState rồi gọi Lambda sửa route vẫn chậm (chu kỳ metric tính bằng phút) và thêm code phải duy trì.\n(B) SAI: Thêm LAG tăng băng thông và chịu lỗi một cổng trong cùng location, nhưng không rút ngắn thời gian phát hiện khi cả đường fiber bị cắt.\n(C) SAI: Chuyển VPN sang static routing làm mất khả năng BGP tự rút route, failover còn kém hơn và không giải quyết thời gian phát hiện lỗi trên DX.\n(D) ĐÚNG: Bidirectional Forwarding Detection phát hiện mất liên kết trong mili giây. Phía AWS đã bật sẵn asynchronous BFD cho virtual interface, khách hàng chỉ cần cấu hình BFD trên router của mình để BGP rút route nhanh và chuyển sang VPN.\nĐáp án đúng: D\nĐiểm cần nhớ: Failover DX chậm vì BGP hold timer => bật BFD trên router on-premises (AWS đã bật sẵn phía mình).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a CloudWatch alarm on the ConnectionState metric that invokes a Lambda function to update the VPC route tables.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a second port to the connection and group both ports into a link aggregation group.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Change the backup VPN to static routing so the VPN routes are installed before the outage.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Configure Bidirectional Forwarding Detection on the on-premises router.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has 30 VPCs in one AWS Region that are attached to a transit gateway. Each VPC has its own NAT gateways for outbound internet access, and the monthly NAT gateway cost is high. The company wants to reduce cost and centrally control internet egress. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: 30 VPC đã gắn Transit Gateway, mỗi VPC tự có NAT gateway => tốn chi phí; muốn gom egress về một chỗ.\n(A) ĐÚNG: Tạo egress VPC chứa NAT gateway (mỗi AZ một cái), trong route table của Transit Gateway thêm route 0.0.0.0/0 tới attachment của egress VPC, spoke VPC trỏ default route về Transit Gateway. Giảm từ hàng chục bộ NAT gateway xuống một bộ và kiểm soát tập trung.\n(B) SAI: VPC peering không hỗ trợ edge-to-edge routing: spoke VPC không thể dùng NAT gateway hay internet gateway của VPC peer.\n(C) SAI: Gateway endpoint chỉ phục vụ S3 và DynamoDB, không thay thế đường Internet chung cho mọi đích.\n(D) SAI: PrivateLink dùng để truy cập một dịch vụ cụ thể sau NLB, không làm đường egress Internet; đặt NAT sau NLB không phải kiến trúc được hỗ trợ.\nĐáp án đúng: A\nĐiểm cần nhớ: Centralized egress = Transit Gateway + egress VPC có NAT gateway; VPC peering không cho mượn NAT/IGW của VPC kia.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an egress VPC with NAT gateways and route 0.0.0.0/0 from the transit gateway to it.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Peer every VPC with a single egress VPC and point each default route at the peering connection to its NAT gateways.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Replace the NAT gateways in each VPC with gateway VPC endpoints for outbound internet traffic.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Expose the NAT gateways of one VPC as an AWS PrivateLink endpoint service behind a Network Load Balancer.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has offices in London and Frankfurt. Each office has an AWS Direct Connect connection at a nearby Direct Connect location, and both connections use transit virtual interfaces to the same Direct Connect gateway. The company now wants office-to-office traffic to use the AWS network instead of a leased line, without routing the traffic through a VPC. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Hai văn phòng đã có DX, VIF cùng gắn một Direct Connect gateway; muốn nối văn phòng với văn phòng qua mạng AWS, không đi vòng qua VPC, ít vận hành.\n(A) SAI: Đi vòng qua VPC và peering hai Transit Gateway giữa hai Region chạy được nhưng vi phạm yêu cầu không đi qua VPC/Region, tốn thêm phí xử lý dữ liệu Transit Gateway và route tĩnh trên peering.\n(B) ĐÚNG: Direct Connect SiteLink bật trên các VIF gắn cùng Direct Connect gateway, cho phép gửi dữ liệu trực tiếp giữa các Direct Connect location trên backbone AWS mà không đi qua AWS Region.\n(C) SAI: AWS VPN CloudHub nối nhiều site qua VPN tới Virtual Private Gateway, traffic đi qua Internet chứ không dùng đường DX sẵn có.\n(D) SAI: Global Accelerator tăng tốc traffic từ người dùng tới endpoint ứng dụng trên AWS, không định tuyến traffic giữa hai mạng on-premises.\nĐáp án đúng: B\nĐiểm cần nhớ: Nối các site on-premises với nhau qua backbone AWS bằng DX, không đi qua Region => Direct Connect SiteLink.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Attach a transit gateway in each Region to the Direct Connect gateway, peer the transit gateways, and route office prefixes through a shared VPC.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable Direct Connect SiteLink on both virtual interfaces.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Configure AWS VPN CloudHub with a Site-to-Site VPN from each office to one virtual private gateway.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create an AWS Global Accelerator with the two office router addresses as endpoints.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A SaaS provider runs an API in its own VPC. More than 100 customer VPCs in different AWS accounts must reach the API privately. Many customer VPCs use the same CIDR range as the provider VPC, and customers must not be able to reach any other resource in the provider VPC. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Hơn 100 VPC khách hàng, CIDR trùng nhau và trùng VPC nhà cung cấp, chỉ được thấy đúng API => cần kết nối một chiều, chịu được CIDR chồng lấn.\n(A) SAI: Transit Gateway định tuyến theo prefix nên không xử lý được CIDR trùng nhau; route table riêng không giải quyết việc hai đích có cùng địa chỉ.\n(B) SAI: VPC peering không tạo được giữa VPC có CIDR chồng lấn và mở quyền định tuyến tới cả VPC, không chỉ API.\n(C) ĐÚNG: PrivateLink: nhà cung cấp đặt API sau Network Load Balancer và tạo endpoint service; khách hàng tạo interface endpoint trong VPC của mình. Traffic một chiều, chỉ tới dịch vụ đó, và không quan tâm CIDR chồng lấn.\n(D) SAI: Direct Connect gateway dùng để nối on-premises qua DX tới VPC, không làm đường giữa các VPC, và Direct Connect gateway không chuyển traffic VPC sang VPC.\nĐáp án đúng: C\nĐiểm cần nhớ: Expose một dịch vụ cho nhiều VPC, CIDR có thể trùng, chỉ một chiều => PrivateLink, không phải Transit Gateway hay peering.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Share a transit gateway with the customer accounts and use a separate transit gateway route table for each customer.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a VPC peering connection with each customer VPC and restrict access with security groups on the API instances.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Publish the API as an AWS PrivateLink endpoint service behind a Network Load Balancer.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Associate every customer virtual private gateway with a Direct Connect gateway owned by the provider.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company connects its data center to a transit gateway by using AWS Site-to-Site VPN. A single VPN tunnel cannot carry the required 4 Gbps of traffic, and the company cannot wait for AWS Direct Connect. Which TWO actions should a solutions architect take to aggregate VPN bandwidth? (Choose two.)",
+    "explanation": "Phân tích đề: Một tunnel VPN giới hạn khoảng 1,25 Gbps, cần 4 Gbps, VPN đang gắn Transit Gateway => cộng dồn băng thông bằng ECMP qua nhiều tunnel.\n(A) SAI: ECMP trên Transit Gateway yêu cầu dynamic routing (BGP); VPN static routing không cân tải ECMP qua nhiều tunnel.\n(B) ĐÚNG: Tạo nhiều Site-to-Site VPN connection gắn vào Transit Gateway, dùng BGP để quảng bá cùng prefix trên mọi tunnel.\n(C) SAI: Virtual Private Gateway không hỗ trợ ECMP cho VPN; chuyển về VGW làm mất khả năng cộng dồn băng thông.\n(D) SAI: Accelerated VPN cải thiện đường đi qua Global Accelerator, không nâng giới hạn băng thông của từng tunnel.\n(E) ĐÚNG: Bật tùy chọn VPN ECMP support trên Transit Gateway để chia traffic qua nhiều tunnel có cùng prefix BGP.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Vượt giới hạn băng thông một tunnel VPN => nhiều VPN gắn Transit Gateway + BGP + ECMP; VGW không làm được ECMP.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Configure the VPN connections with static routing so that all tunnels share the same routes.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create multiple Site-to-Site VPN connections to the transit gateway that use BGP dynamic routing.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Move the VPN connections to a virtual private gateway and enable ECMP on the gateway.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable acceleration on the VPN connections to raise the bandwidth limit of each tunnel.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Enable equal-cost multi-path (ECMP) routing support on the transit gateway.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A VPC uses a virtual private gateway with route propagation enabled. The company has an AWS Direct Connect private virtual interface and a Site-to-Site VPN with BGP to the same virtual private gateway. Both advertise the same on-premises prefix 10.20.0.0/16. The company wants traffic from the VPC to use Direct Connect and to use the VPN only if Direct Connect fails. What should a solutions architect do with the LEAST effort?",
+    "explanation": "Phân tích đề: Cùng prefix 10.20.0.0/16 quảng bá qua DX (BGP) và VPN (BGP) tới cùng VGW; muốn DX là chính, VPN là dự phòng, ít công nhất.\n(A) SAI: Quảng bá prefix cụ thể hơn qua VPN sẽ khiến longest prefix match luôn chọn VPN, ngược với yêu cầu.\n(B) SAI: Route tĩnh trong VPC route table được ưu tiên hơn route propagated, và không tự rút khi DX hỏng, nên failover không tự động.\n(C) SAI: Thêm AS_PATH prepend trên VPN chạy được nhưng thừa: với cùng prefix, VGW đã ưu tiên route Direct Connect hơn route VPN nên đây là việc không cần thiết.\n(D) ĐÚNG: Giữ nguyên quảng bá cùng prefix qua cả hai đường. Khi prefix giống nhau, VGW ưu tiên route học từ Direct Connect hơn VPN; khi DX mất BGP, route DX bị rút và VPN tự động được dùng.\nĐáp án đúng: D\nĐiểm cần nhớ: Thứ tự chọn route ở VGW: longest prefix trước, rồi static, rồi DX BGP, rồi VPN static, rồi VPN BGP; cùng prefix thì DX thắng VPN.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Advertise more specific /24 prefixes over the VPN so that the VPN routes are kept as backup routes.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a static route for 10.20.0.0/16 to the virtual private gateway in each VPC route table.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Prepend the AS_PATH on the VPN BGP advertisements so the virtual private gateway prefers the Direct Connect path.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Keep advertising the same prefix over both paths and make no other change.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company has a VPC in us-east-1 and a VPC in eu-west-1. Each VPC has a virtual private gateway, and both gateways are associated with the same Direct Connect gateway. The data center reaches both VPCs over one private virtual interface. The developers now need the two VPCs to communicate with each other privately, but tests show the traffic does not flow. No other VPCs will be added. Which solution meets this requirement MOST cost-effectively?",
+    "explanation": "Phân tích đề: Hai VPC khác Region cùng gắn một Direct Connect gateway nhưng không thông nhau; chỉ hai VPC, cần rẻ nhất.\n(A) ĐÚNG: Direct Connect gateway không cho traffic VPC tới VPC giữa các VGW gắn vào nó. Với đúng hai VPC, inter-Region VPC peering là cách rẻ và đơn giản nhất: không phí giờ, chỉ trả data transfer.\n(B) SAI: Hai Transit Gateway peering liên Region chạy được nhưng thừa cho hai VPC: thêm phí attachment theo giờ và phí xử lý dữ liệu.\n(C) SAI: Định tuyến hairpin qua router on-premises đi ra vào DX hai lần, tăng độ trễ, tốn data transfer và phụ thuộc vào data center.\n(D) SAI: Thêm prefix của VPC kia vào allowed prefixes không làm thay đổi hành vi: Direct Connect gateway vẫn không chuyển traffic giữa các VPC.\nĐáp án đúng: A\nĐiểm cần nhớ: Direct Connect gateway chỉ nối on-premises với VPC, không nối VPC với VPC; hai VPC cần nói chuyện => VPC peering.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an inter-Region VPC peering connection between the two VPCs and update their route tables.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create a transit gateway in each Region, attach each VPC, and create a transit gateway peering attachment between them.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Configure the on-premises router to reflect routes so that traffic between the VPCs hairpins over the private VIF.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add the CIDR block of each VPC to the allowed prefixes of the other association on the Direct Connect gateway.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A financial services company runs a trading platform that depends on AWS Direct Connect. Today it has two dedicated connections on separate devices at a single Direct Connect location. The regulator now requires the connectivity to survive the loss of an entire Direct Connect location without reducing bandwidth, and the company wants the highest availability SLA that AWS offers for Direct Connect. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Phải chịu được mất cả một Direct Connect location, không giảm băng thông, và muốn SLA cao nhất => mô hình Maximum Resiliency.\n(A) SAI: Gộp hai cổng thành LAG vẫn nằm trong một location, mất location là mất hết kết nối.\n(B) ĐÚNG: Maximum Resiliency trong Direct Connect Resiliency Toolkit: hai location, mỗi location hai connection trên thiết bị riêng. Mất một location vẫn còn đủ cổng ở location kia và đây là mô hình có SLA cao nhất.\n(C) SAI: Một connection ở mỗi trong hai location là mô hình High Resiliency: chịu được mất location nhưng SLA thấp hơn và khi mất một location chỉ còn một connection, không phải mô hình có SLA cao nhất.\n(D) SAI: VPN dự phòng rẻ nhưng băng thông qua Internet thấp và dao động, vi phạm yêu cầu không giảm băng thông.\nĐáp án đúng: B\nĐiểm cần nhớ: Development and Test = 1 location 2 thiết bị; High Resiliency = 2 location 1 connection mỗi bên; Maximum Resiliency = 2 location, mỗi bên 2 connection trên thiết bị riêng, SLA cao nhất.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Combine the two existing connections into a link aggregation group with the minimum links attribute set to one.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use the Maximum Resiliency model with two connections at each of two locations.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Move one existing connection to a second Direct Connect location so that each location terminates one connection.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Keep both connections and add a Site-to-Site VPN on a transit gateway as a backup path for location failures.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company has 60 VPCs in 12 AWS accounts in one Region, all in AWS Organizations. A central network account must provide connectivity between the VPCs and the data center over an existing AWS Direct Connect connection. Production VPCs must not route to development VPCs, but both must reach a shared services VPC and the data center. The solution must scale without per-VPC circuits. Which THREE actions should a solutions architect take? (Choose three.)",
+    "explanation": "Phân tích đề: 60 VPC, 12 account, một Region; account mạng trung tâm; DX sẵn có; prod tách dev nhưng cùng tới shared services và on-premises; không làm VIF cho từng VPC.\n(A) ĐÚNG: Tạo Transit Gateway trong account mạng và chia sẻ cho Organization qua AWS RAM để các account gắn VPC của mình vào cùng một hub.\n(B) SAI: Private VIF riêng cho từng VPC chính là cách làm theo từng VPC mà đề muốn tránh, và không quản lý tập trung.\n(C) ĐÚNG: Dùng route table riêng cho prod và dev trên Transit Gateway; mỗi bảng chỉ nhận propagation từ shared services và on-premises, không nhận propagation của môi trường kia, nên prod và dev bị cô lập.\n(D) SAI: Một route table chung rồi chặn bằng security group vẫn để routing phẳng; security group không phân đoạn mạng ở tầng hub và dễ rò rỉ khi cấu hình sai.\n(E) SAI: Mỗi account một Transit Gateway rồi peering lẫn nhau làm tăng số hub, route tĩnh trên peering và chi phí, trái với mục tiêu hub tập trung.\n(F) ĐÚNG: Tạo transit VIF trên đường DX tới Direct Connect gateway, liên kết Direct Connect gateway với Transit Gateway để một đường DX phục vụ mọi VPC.\nĐáp án đúng: A, C và F\nĐiểm cần nhớ: Mẫu chuẩn multi-account hybrid: Transit Gateway chia sẻ qua RAM + route table tách môi trường + transit VIF qua Direct Connect gateway.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a transit gateway in the network account and share it with the organization by using AWS RAM.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create a private virtual interface for each VPC and attach it to that VPC's virtual private gateway.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use separate transit gateway route tables for production and development with selective propagation.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Use one transit gateway route table for all attachments and block development traffic with security groups.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Create a transit gateway in each account and peer every transit gateway with the network account.", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "Create a transit VIF to a Direct Connect gateway that is associated with the transit gateway.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company connects its data center to a transit gateway through AWS Direct Connect by using a transit virtual interface and a Direct Connect gateway. A new compliance rule requires all traffic between the data center and the VPCs to be encrypted with IPsec. The security team does not allow public IP addresses or a public virtual interface on the connection. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Đã có transit VIF + Direct Connect gateway + Transit Gateway; cần IPsec; cấm public IP và public VIF.\n(A) SAI: VPN over public VIF là cách mã hóa DX kinh điển nhưng dùng public VIF và địa chỉ public cho endpoint VPN, vi phạm ràng buộc bảo mật.\n(B) SAI: MACsec mã hóa ở Layer 2 giữa router và thiết bị DX, không phải IPsec end-to-end; đề yêu cầu rõ IPsec.\n(C) ĐÚNG: Private IP VPN: tạo Site-to-Site VPN dùng địa chỉ IP private, chạy qua transit VIF và Direct Connect gateway tới Transit Gateway. Vừa có IPsec vừa không cần public IP hay public VIF.\n(D) SAI: VPN qua Internet thì có IPsec nhưng bỏ đường DX, mất hiệu năng ổn định và vẫn dùng public IP.\nĐáp án đúng: C\nĐiểm cần nhớ: Cần IPsec trên DX mà cấm public IP => Private IP VPN qua transit VIF tới Transit Gateway; có thể dùng public IP => VPN over public VIF.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a public virtual interface and build Site-to-Site VPN tunnels to the transit gateway over it.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable MACsec on the Direct Connect connection and rotate the connectivity association keys every month.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a private IP Site-to-Site VPN to the transit gateway over the transit VIF.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Replace Direct Connect with a Site-to-Site VPN over the internet that terminates on the transit gateway.", "isCorrect": false }
+    ]
+  }
+]

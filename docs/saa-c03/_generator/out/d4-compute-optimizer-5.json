@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company runs containerized services on Amazon Elastic Container Service (Amazon ECS) and wants AWS Compute Optimizer to recommend smaller task CPU and memory sizes for over-provisioned services. For which ECS deployment option does Compute Optimizer generate task-size recommendations?",
+    "explanation": "Phân tích đề: Hỏi Compute Optimizer đưa ra khuyến nghị kích thước task (CPU/memory) cho loại triển khai ECS nào.\n(A) SAI: Với ECS trên EC2 launch type, Compute Optimizer không đưa ra khuyến nghị task size cho service; nó chỉ có thể khuyến nghị cho chính các EC2 instance/Auto Scaling group làm container instance.\n(B) ĐÚNG: Compute Optimizer hỗ trợ khuyến nghị cho Amazon ECS services chạy trên AWS Fargate, phân tích CPU và memory utilization từ CloudWatch để đề xuất task size và container size phù hợp.\n(C) SAI: ECS Anywhere chạy task trên máy chủ on-premises hoặc VM bên ngoài AWS; Compute Optimizer không phân tích các tài nguyên này.\n(D) SAI: Amazon ECS trên AWS Outposts dùng EC2 capacity tại chỗ của Outposts, không phải loại tài nguyên mà Compute Optimizer khuyến nghị task size.\nĐáp án đúng: B\nĐiểm cần nhớ: Compute Optimizer với ECS = chỉ ECS services trên Fargate. ECS trên EC2 thì rightsizing ở tầng EC2 instance/ASG.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Amazon ECS services that use the EC2 launch type with an Auto Scaling group capacity provider", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Amazon ECS services that run on AWS Fargate", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Amazon ECS Anywhere tasks that run on registered on-premises servers", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Amazon ECS tasks that run on EC2 capacity in an AWS Outposts rack", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A solutions architect explains to a new team how AWS Compute Optimizer evaluates Amazon EC2 instances. From which source does Compute Optimizer read the utilization data, such as CPU utilization and network throughput, that it analyzes to produce rightsizing recommendations?",
+    "explanation": "Phân tích đề: Hỏi nguồn dữ liệu utilization (CPU, network...) mà Compute Optimizer phân tích.\n(A) SAI: AWS CloudTrail ghi lại API call (ai làm gì, khi nào), không chứa số liệu CPU hay network utilization của instance.\n(B) SAI: AWS Config lưu lịch sử cấu hình tài nguyên (instance type, security group...), không phải metric hiệu năng theo thời gian.\n(C) SAI: Cost and Usage Report chứa dữ liệu chi phí và số giờ sử dụng, không có CPU utilization hay network throughput.\n(D) ĐÚNG: Compute Optimizer đọc metric lịch sử từ Amazon CloudWatch (CPU, network in/out, disk/EBS I/O, và memory nếu có CloudWatch agent) rồi dùng machine learning để phân tích và đưa ra khuyến nghị.\nĐáp án đúng: D\nĐiểm cần nhớ: Compute Optimizer = ML trên metric CloudWatch. Thiếu metric nào trong CloudWatch (vd memory) thì khuyến nghị thiếu yếu tố đó.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS CloudTrail management events recorded for the instances", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "AWS Config configuration history items for each instance", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Hourly line items in the AWS Cost and Usage Report", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Amazon CloudWatch metrics for the instances", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "AWS Compute Optimizer classifies a production Amazon EC2 instance as Under-provisioned. What does this finding mean, and what does Compute Optimizer typically recommend?",
+    "explanation": "Phân tích đề: Cần hiểu đúng nhãn Under-provisioned và hướng khuyến nghị đi kèm.\n(A) ĐÚNG: Under-provisioned nghĩa là ít nhất một thông số của instance (CPU, memory, network, EBS...) không đáp ứng nhu cầu hiệu năng của workload; Compute Optimizer đề xuất instance type có năng lực lớn hơn ở thông số đó để giảm rủi ro hiệu năng.\n(B) SAI: Đây là mô tả của Over-provisioned (thừa tài nguyên), hướng khuyến nghị là downsize để tiết kiệm.\n(C) SAI: Instance không chạy hoặc gần như không có tải là trường hợp Idle; Compute Optimizer không gắn nhãn Under-provisioned cho tình huống này.\n(D) SAI: Compute Optimizer không đánh giá mức độ phủ Reserved Instances hay Savings Plans; đó là việc của Cost Explorer (coverage/utilization reports).\nĐáp án đúng: A\nĐiểm cần nhớ: Under-provisioned = nghẽn, cần upsize vì hiệu năng; Over-provisioned = thừa, downsize vì chi phí; Optimized = cân bằng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "At least one resource specification does not meet the workload's needs, so a larger option is recommended", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Several resource specifications exceed the workload's needs, so a smaller and cheaper instance type is recommended", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "The instance had almost no CPU or network activity, so stopping or terminating it is recommended", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "The instance is not covered by a Reserved Instance or Savings Plan, so a commitment purchase is recommended", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "An Amazon EC2 instance publishes memory utilization to Amazon CloudWatch through the CloudWatch agent. AWS Compute Optimizer classifies the instance as Over-provisioned and lists the finding reasons. Which TWO finding reasons could Compute Optimizer report for this instance? (Choose TWO.)",
+    "explanation": "Phân tích đề: Finding reason của Compute Optimizer luôn gắn với một thông số năng lực của instance (CPU, memory, EBS, network, disk) so với mức sử dụng thực tế.\n(A) SAI: Mức quyền của IAM role là chủ đề bảo mật (IAM Access Analyzer), không phải lý do rightsizing của Compute Optimizer.\n(B) SAI: Elastic IP chưa gắn là một check chi phí của Trusted Advisor, không phải finding reason của EC2 instance trong Compute Optimizer.\n(C) ĐÚNG: CPU over-provisioned là finding reason khi vCPU của instance vượt xa mức CPU utilization thực tế trong lookback period.\n(D) SAI: Rule không dùng tới trong security group không liên quan tới kích thước instance; Compute Optimizer không phân tích security group.\n(E) ĐÚNG: Vì instance đã gửi memory metric qua CloudWatch agent, Compute Optimizer có thể báo memory over-provisioned khi RAM cấp phát vượt xa mức dùng thực tế.\nĐáp án đúng: C và E\nĐiểm cần nhớ: Finding reasons của EC2 xoay quanh CPU, memory, EBS IOPS/throughput, network bandwidth/PPS, disk; memory chỉ xuất hiện khi có dữ liệu memory.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "The instance profile role grants more IAM permissions than the workload uses", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "An Elastic IP address allocated to the account is not associated with the instance", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "The instance's vCPU capacity is higher than the workload's CPU utilization requires", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "The instance's security group contains inbound rules that receive no traffic", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "The instance's memory capacity is higher than the workload's memory utilization requires", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs 25 Amazon ECS services on the EC2 launch type. The container instances belong to an Auto Scaling group. AWS Compute Optimizer is opted in and shows EC2 and Auto Scaling group recommendations, but it shows no ECS service recommendations. The company wants to rightsize the task definitions and the underlying instances with the LEAST operational overhead. What should a solutions architect do?",
+    "explanation": "Phân tích đề: ECS chạy trên EC2 launch type; Compute Optimizer không có khuyến nghị ECS service; cần rightsize cả task definition lẫn instance với ít vận hành nhất.\n(A) SAI: Enhanced infrastructure metrics chỉ kéo dài lookback period cho EC2/ASG; nó không làm Compute Optimizer hỗ trợ ECS service trên EC2 launch type.\n(B) SAI: Tự xây pipeline Lambda + DynamoDB để tính toán task size là giải pháp tự chế, tốn công phát triển và bảo trì hơn hẳn so với dùng metric có sẵn.\n(C) ĐÚNG: Compute Optimizer chỉ khuyến nghị ECS services trên Fargate. Với EC2 launch type, dùng CloudWatch Container Insights để có CPU/memory theo task và service rồi chỉnh task definition, đồng thời áp dụng khuyến nghị Compute Optimizer cho Auto Scaling group của container instances.\n(D) SAI: Cài CloudWatch agent lên container instance chỉ bổ sung memory metric ở mức instance, giúp khuyến nghị EC2/ASG chính xác hơn, nhưng vẫn không tạo ra khuyến nghị task size cho ECS service trên EC2.\nĐáp án đúng: C\nĐiểm cần nhớ: ECS trên Fargate -> Compute Optimizer gợi ý task/container size; ECS trên EC2 -> Container Insights cho task, Compute Optimizer cho instance/ASG.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Activate enhanced infrastructure metrics for the Auto Scaling group so that Compute Optimizer generates task-size recommendations for the ECS services", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Build an AWS Lambda function that samples task utilization every minute into Amazon DynamoDB and calculates new task sizes for each service", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use CloudWatch Container Insights task metrics to resize task definitions, and apply Compute Optimizer recommendations to the Auto Scaling group", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Install the CloudWatch agent on the container instances so that Compute Optimizer adds ECS service recommendations for the EC2 launch type", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has about 300 AWS Lambda functions in production. Many functions were deployed with memory settings copied from a template, and the company suspects that it is paying for unused memory. The company does not want to invoke production functions with synthetic test payloads, and it wants memory size recommendations for all functions with the LEAST operational overhead. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: 300 hàm Lambda, nghi cấp thừa memory; cấm gọi hàm bằng payload giả; cần khuyến nghị memory cho toàn bộ với ít vận hành nhất.\n(A) ĐÚNG: Compute Optimizer phân tích thụ động lịch sử invocation (duration, memory utilization) của các hàm đã chạy thật và đưa ra memory size khuyến nghị kèm chi phí ước tính, không cần gọi thêm hàm hay cài đặt gì ngoài opt-in.\n(B) SAI: AWS Lambda Power Tuning chạy state machine Step Functions gọi hàm nhiều lần với các mức memory khác nhau bằng payload mẫu; vi phạm yêu cầu không dùng payload giả và phải cấu hình cho từng hàm.\n(C) SAI: Lambda Insights cung cấp metric chi tiết nhưng chỉ là dữ liệu; đội vận hành vẫn phải tự xem dashboard và tự tính memory phù hợp cho 300 hàm, tốn công hơn nhiều.\n(D) SAI: AWS X-Ray trace cho thấy độ trễ và các segment, không cho biết lượng memory đã dùng so với cấu hình; phân tích thủ công không tạo ra khuyến nghị memory.\nĐáp án đúng: A\nĐiểm cần nhớ: Khuyến nghị memory Lambda dựa trên lịch sử chạy thật, ở quy mô lớn, không tốn công = Compute Optimizer. Power Tuning là công cụ thử nghiệm chủ động cho từng hàm.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Opt in to AWS Compute Optimizer and review the recommendations for every Lambda function", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Deploy the AWS Lambda Power Tuning state machine and run it against each function with sample events", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable CloudWatch Lambda Insights on every function and review the memory dashboards for each one", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable AWS X-Ray active tracing on every function and analyze the trace segments for each memory size", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A FinOps analyst uses rightsizing recommendations in AWS Cost Explorer. The recommendations cover only Amazon EC2 instances and suggest smaller sizes within the same instance family. The company now also wants recommendations for Auto Scaling groups, Amazon EBS volume types and IOPS, and AWS Lambda memory, including options in other instance families. What should the analyst do?",
+    "explanation": "Phân tích đề: Cost Explorer rightsizing đang chỉ cho EC2 trong cùng family; cần thêm ASG, EBS, Lambda và các family khác.\n(A) SAI: Đổi cài đặt Cost Explorer sang 'across instance families' giúp có khuyến nghị khác family cho EC2, nhưng Cost Explorer rightsizing vẫn chỉ áp dụng cho EC2 instance, không có ASG, EBS hay Lambda. Đây là đáp án gần đúng.\n(B) SAI: Trusted Advisor cost checks phát hiện tài nguyên nhàn rỗi/thấp tải theo ngưỡng đơn giản, không đưa ra loại EBS hay instance type thay thế chi tiết; Priority chỉ ưu tiên hóa các check.\n(C) SAI: Hourly granularity chỉ làm dữ liệu chi phí chi tiết hơn; không bổ sung loại tài nguyên nào vào khuyến nghị rightsizing.\n(D) ĐÚNG: Compute Optimizer dùng ML trên metric CloudWatch để khuyến nghị EC2 (kể cả khác family, Graviton), Auto Scaling groups, EBS volumes, Lambda, ECS on Fargate; Cost Explorer rightsizing thực chất cũng dựa trên engine của Compute Optimizer nhưng phạm vi hẹp hơn.\nĐáp án đúng: D\nĐiểm cần nhớ: Cost Explorer rightsizing = chỉ EC2; muốn EBS/ASG/Lambda/Fargate/RDS thì mở Compute Optimizer.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Change the Cost Explorer rightsizing preference to generate recommendations across instance families", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable AWS Trusted Advisor Priority and review the cost optimization checks for each account", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Turn on hourly and resource-level granularity in Cost Explorer for all compute services", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Opt in to AWS Compute Optimizer and use its recommendations", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company opted in to AWS Compute Optimizer but has not installed the CloudWatch agent or any third-party observability agent anywhere. The company wants to know which recommendations already take memory utilization into account. For which TWO resource types does Compute Optimizer analyze memory utilization without any additional agent? (Choose TWO.)",
+    "explanation": "Phân tích đề: Không có agent nào; hỏi loại tài nguyên mà Compute Optimizer vẫn có dữ liệu memory.\n(A) ĐÚNG: Với Lambda, Compute Optimizer phân tích memory utilization và duration của các lần invocation do dịch vụ Lambda cung cấp, không cần cài thêm gì.\n(B) SAI: EC2 Linux trong Auto Scaling group không gửi memory lên CloudWatch mặc định vì hypervisor không nhìn thấy RAM bên trong OS; cần CloudWatch agent.\n(C) SAI: EC2 Windows cũng vậy; không có agent thì CloudWatch không có memory metric của instance.\n(D) ĐÚNG: ECS services trên Fargate có metric CPUUtilization và MemoryUtilization ở mức service trong CloudWatch theo mặc định, nên Compute Optimizer dùng được cả memory để khuyến nghị task size.\n(E) SAI: Detailed monitoring chỉ tăng tần suất metric lên 1 phút; nó không thêm memory metric. Đây là bẫy phổ biến.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Memory của EC2 luôn cần CloudWatch agent (hoặc tích hợp observability bên ngoài); Lambda và Fargate đã có dữ liệu memory sẵn.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS Lambda functions", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Amazon EC2 Linux instances in an Auto Scaling group", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Standalone Amazon EC2 instances running Windows Server", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Amazon ECS services on AWS Fargate", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Amazon EC2 instances with detailed monitoring enabled", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A reporting server runs on an m5.xlarge Amazon EC2 instance with several gp3 Amazon EBS volumes. Each volume is provisioned with throughput well above what the workload drives, yet queries slow down during nightly loads. AWS Compute Optimizer classifies the instance as Under-provisioned with the finding reason EBS throughput under-provisioned. Which action resolves the bottleneck MOST cost-effectively?",
+    "explanation": "Phân tích đề: Volume gp3 đã thừa throughput; finding nằm ở instance (EBS throughput under-provisioned) nghĩa là giới hạn EBS bandwidth của instance type mới là nút thắt.\n(A) SAI: Tăng thêm throughput cho từng gp3 volume tốn thêm tiền nhưng không giúp gì vì tổng băng thông EBS bị chặn ở giới hạn của instance type.\n(B) ĐÚNG: Mỗi instance type có giới hạn EBS bandwidth/IOPS riêng. Finding ở cấp instance cho thấy cần instance type có EBS bandwidth cao hơn; chọn đúng option Compute Optimizer đề xuất và có thể giảm throughput thừa trên volume để bù chi phí.\n(C) SAI: Chuyển sang io2 Block Express đắt hơn nhiều và vẫn bị giới hạn bởi EBS bandwidth của m5.xlarge.\n(D) SAI: Gộp volume bằng RAID 0 tăng throughput tổng ở tầng volume nhưng vẫn đi qua cùng đường EBS của instance, nên không vượt được giới hạn của instance type.\nĐáp án đúng: B\nĐiểm cần nhớ: Finding EBS IOPS/throughput nằm trên EC2 instance = giới hạn của instance type; finding trên EBS volume = cấu hình volume.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Raise the provisioned throughput on every gp3 volume to the maximum that gp3 supports", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Change the instance to the recommended type that offers higher dedicated EBS bandwidth", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Migrate the gp3 volumes to io2 Block Express volumes with higher provisioned IOPS", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Stripe the existing gp3 volumes into a RAID 0 array inside the operating system", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has 30 accounts in AWS Organizations and has opted in to AWS Compute Optimizer for the whole organization. Leadership wants a monthly view, per account, of both the estimated percentage of compute spend that could be saved and the share of resources that are at risk of poor performance because they are under-provisioned. The company wants to avoid building custom reports. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Cần cả hai chỉ số theo account: phần trăm tiết kiệm tiềm năng và tỷ lệ tài nguyên có rủi ro hiệu năng (under-provisioned), không tự xây báo cáo.\n(A) SAI: Cost Optimization Hub tổng hợp cơ hội tiết kiệm (rightsizing, idle, Savings Plans...) rất tốt nhưng tập trung vào savings; nó không hiển thị tài nguyên under-provisioned cần upsize vì hiệu năng. Đáp án gần đúng.\n(B) SAI: Cost Explorer cho thấy chi phí theo account, không đánh giá tài nguyên nào thiếu năng lực.\n(C) ĐÚNG: Dashboard của Compute Optimizer (xem ở management account hoặc delegated administrator) hiển thị savings opportunity và performance improvement opportunity theo account và theo loại tài nguyên, đáp ứng cả hai chỉ số mà không phải tự xây báo cáo.\n(D) SAI: AWS Budgets theo dõi chi phí thực tế/dự báo so với ngân sách, không đo mức độ under-provisioned của tài nguyên.\nĐáp án đúng: C\nĐiểm cần nhớ: Compute Optimizer có hai góc nhìn: savings opportunity (thừa) và performance improvement opportunity (thiếu); Cost Optimization Hub chỉ xoay quanh tiết kiệm.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable Cost Optimization Hub and group its estimated savings by member account", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a Cost Explorer report that groups monthly compute cost by linked account", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use the Compute Optimizer dashboard, viewed at the organization level for all accounts", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Configure AWS Budgets reports for each member account with forecasted compute spend", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs a stateless, interruption-tolerant image processing workload in an Amazon EC2 Auto Scaling group of On-Demand m5.4xlarge instances. AWS Compute Optimizer reports the group as Over-provisioned and recommends m5.2xlarge with very low performance risk. The workload can run on several similar general purpose instance types. The company wants the largest cost reduction it can achieve within a month and does not want to sign any long-term commitment. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: ASG stateless, chịu được gián đoạn, đang thừa tài nguyên; muốn giảm chi phí tối đa trong một tháng; không cam kết dài hạn; chạy được trên nhiều instance type.\n(A) SAI: Compute Savings Plan là cam kết 1 hoặc 3 năm, vi phạm ràng buộc không cam kết; mua theo size hiện tại khi chưa rightsizing còn khóa chi phí cho tài nguyên thừa.\n(B) ĐÚNG: Áp dụng khuyến nghị m5.2xlarge trong launch template để bỏ phần thừa, rồi dùng mixed instances policy chạy Spot trên nhiều instance type tương đương với chiến lược price-capacity-optimized. Workload chịu gián đoạn nên Spot cho mức giảm lớn nhất mà không cần cam kết; đa dạng type giảm rủi ro thiếu capacity.\n(C) SAI: Chỉ rightsizing sang m5.2xlarge On-Demand có tiết kiệm nhưng bỏ lỡ mức giảm lớn từ Spot với workload chịu gián đoạn, nên không phải mức giảm lớn nhất.\n(D) SAI: Chạy Spot nhưng giữ m5.4xlarge với một instance type duy nhất vẫn trả cho tài nguyên thừa và dễ bị thiếu Spot capacity vì không đa dạng hóa.\nĐáp án đúng: B\nĐiểm cần nhớ: Thứ tự tối ưu: rightsizing trước, rồi chọn purchase option (Spot cho workload chịu gián đoạn, Savings Plans cho tải ổn định khi chấp nhận cam kết).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Keep m5.4xlarge for now and purchase a 1-year No Upfront Compute Savings Plan that covers the current hourly On-Demand spend of the group", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use m5.2xlarge in the launch template with a mixed instances policy that runs Spot capacity across several similar instance types", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Change the launch template to m5.2xlarge On-Demand and start an instance refresh to replace the existing instances gradually", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Keep m5.4xlarge in the launch template and switch the Auto Scaling group to request only Spot capacity for that single instance type", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company has Amazon RDS for PostgreSQL Reserved DB Instances for four db.r6g.2xlarge Multi-AZ deployments, with 2 years left on the term. AWS Compute Optimizer recommends db.r6g.xlarge for all four DB instances with low performance risk. The company plans to launch new db.r6g-based PostgreSQL databases in the same Region next quarter. The company wants to reduce cost without wasting the reservation. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Đang có RDS Reserved DB Instance (PostgreSQL, db.r6g.2xlarge, Multi-AZ) còn 2 năm; Compute Optimizer khuyên db.r6g.xlarge cùng family; sắp có DB mới cùng family, cùng Region; không muốn lãng phí reservation.\n(A) ĐÚNG: RDS Reserved Instances cho PostgreSQL có size flexibility trong cùng instance family và Region. Sau khi downsize sang db.r6g.xlarge, discount vẫn áp dụng theo normalized units cho các instance nhỏ hơn, và phần đơn vị còn dư sẽ phủ các DB db.r6g mới, nên không lãng phí reservation.\n(B) SAI: Graviton thế hệ mới r7g có thể rẻ hơn theo giờ, nhưng reservation db.r6g không áp dụng cho family khác; công ty phải trả On-Demand cho r7g trong khi vẫn trả tiền RI r6g.\n(C) SAI: Reserved Instance Marketplace chỉ cho phép bán EC2 Standard Reserved Instances; không thể bán RDS Reserved DB Instances.\n(D) SAI: Giữ size lớn tới khi hết hạn bỏ lỡ cơ hội tiết kiệm suốt 2 năm, trong khi size flexibility cho phép downsize mà không mất discount.\nĐáp án đúng: A\nĐiểm cần nhớ: RDS RI size flexibility (MySQL, MariaDB, PostgreSQL, Aurora, Oracle BYOL) áp dụng trong cùng family + Region; đổi family thì mất discount; RDS RI không bán lại được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Downsize to db.r6g.xlarge and rely on size flexibility so that the remaining reservation covers the new db.r6g databases", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Move all four databases to Graviton-based db.r7g.xlarge, which has a lower hourly price than the current db.r6g instance class", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Sell the reservations in the Reserved Instance Marketplace, then downsize the four databases to db.r6g.xlarge On-Demand", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Keep db.r6g.2xlarge until the reservations expire, and then apply the Compute Optimizer recommendation to all four databases", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs 200 Amazon Linux Amazon EC2 instances in private subnets of a VPC that has no internet gateway and no NAT gateway. A security policy prohibits any path to the internet. The instances are managed by AWS Systems Manager through interface VPC endpoints. The company wants AWS Compute Optimizer recommendations to include memory utilization and wants to roll out the solution with the LEAST operational overhead. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Instance trong private subnet, cấm mọi đường ra internet, đã quản lý bằng Systems Manager qua interface endpoint; cần memory metric cho Compute Optimizer với ít vận hành nhất.\n(A) SAI: Thêm NAT gateway tạo đường ra internet, vi phạm trực tiếp chính sách bảo mật dù giúp agent gọi được CloudWatch.\n(B) SAI: Enhanced infrastructure metrics chỉ kéo dài lookback period (tới khoảng 3 tháng), không giúp Compute Optimizer đọc RAM bên trong OS; vẫn cần agent.\n(C) SAI: CloudWatch không có gateway VPC endpoint; gateway endpoint chỉ dành cho Amazon S3 và DynamoDB.\n(D) ĐÚNG: Dùng Systems Manager (Distributor/Run Command hoặc State Manager) cài và cấu hình CloudWatch agent hàng loạt, và tạo interface VPC endpoint cho CloudWatch (monitoring) để agent gửi PutMetricData qua PrivateLink. Compute Optimizer sau đó tự đọc memory metric.\nĐáp án đúng: D\nĐiểm cần nhớ: Memory cho Compute Optimizer = CloudWatch agent; trong VPC không có internet cần interface endpoint com.amazonaws.<region>.monitoring; chỉ S3 và DynamoDB có gateway endpoint.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Install the CloudWatch agent with Systems Manager, and add a NAT gateway so the agent can reach the CloudWatch public endpoint", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Activate enhanced infrastructure metrics so that Compute Optimizer collects memory utilization from the Nitro hypervisor", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Install the CloudWatch agent with Systems Manager, and create a gateway VPC endpoint for CloudWatch in each route table", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Install the CloudWatch agent with Systems Manager, and create an interface VPC endpoint for CloudWatch monitoring", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company uses AWS Compute Optimizer for an Auto Scaling group of Amazon Linux Amazon EC2 instances that runs a memory-heavy application. The application reaches its peak load once each quarter. The company has an Enterprise Discount Program and Savings Plans. Current recommendations ignore memory, are based only on the last 14 days, and show savings at public On-Demand prices. The company wants the recommendations to reflect memory use, the quarterly peak, and its real discounted savings. Which THREE actions should a solutions architect take? (Choose THREE.)",
+    "explanation": "Phân tích đề: Ba khoảng trống cần lấp: thiếu memory, lookback 14 ngày không thấy đỉnh theo quý, savings tính theo giá On-Demand công khai.\n(A) SAI: Detailed monitoring chỉ tăng độ phân giải metric lên 1 phút; không thêm memory và không kéo dài lookback period.\n(B) ĐÚNG: Đưa CloudWatch agent vào launch template (user data) hoặc Systems Manager để mọi instance mới trong ASG đều gửi memory metric; Compute Optimizer tự dùng dữ liệu này.\n(C) ĐÚNG: Enhanced infrastructure metrics (tính phí) kéo dài lookback period tới khoảng 3 tháng, đủ để bao trọn chu kỳ đỉnh theo quý.\n(D) SAI: Ngưỡng CPU P90 làm khuyến nghị tiết kiệm mạnh hơn, không giúp phản ánh memory, đỉnh theo quý hay giá chiết khấu; còn tăng rủi ro hiệu năng.\n(E) SAI: Lambda Insights chỉ áp dụng cho AWS Lambda, không liên quan đến EC2 Auto Scaling group.\n(F) ĐÚNG: Recommendation preference savings estimation mode 'after discounts' tính savings dựa trên giá thực tế sau Savings Plans/RI và các mức chiết khấu đã thỏa thuận, thay vì giá On-Demand công khai.\nĐáp án đúng: B, C và F\nĐiểm cần nhớ: Memory -> CloudWatch agent; lookback dài -> enhanced infrastructure metrics; savings sát thực tế -> savings estimation mode after discounts.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable detailed monitoring on the launch template so that metrics are published every minute", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add the CloudWatch agent to the launch template so that every instance publishes memory metrics", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Activate enhanced infrastructure metrics for the Auto Scaling group", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Set the CPU utilization threshold preference to P90 for the Auto Scaling group", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Enable CloudWatch Lambda Insights so that memory usage is reported to Compute Optimizer", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "Set the savings estimation mode preference to after discounts", "isCorrect": true }
+    ]
+  }
+]

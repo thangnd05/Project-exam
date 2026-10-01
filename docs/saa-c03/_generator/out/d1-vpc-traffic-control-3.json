@@ -1,0 +1,173 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An engineer creates a custom network ACL and associates it with a subnet that is currently associated with the VPC's default network ACL. What happens to the subnet's network ACL association?",
+    "explanation": "Phân tích đề: Hỏi quan hệ subnet và network ACL khi gắn NACL mới cho subnet đang dùng default NACL.\n(A) SAI: Subnet không thể giữ đồng thời hai NACL; không có cơ chế gộp rule từ hai NACL.\n(B) SAI: Default NACL không xóa được và cũng không cần xóa; việc gắn NACL khác cho subnet vẫn thực hiện bình thường.\n(C) ĐÚNG: Mỗi subnet chỉ gắn với đúng một network ACL tại một thời điểm. Gắn custom NACL sẽ thay thế liên kết cũ; default NACL vẫn tồn tại và có thể phục vụ các subnet khác.\n(D) SAI: Không có mô hình hai NACL cùng đánh giá độc lập trên một subnet; lớp lọc thứ hai của subnet là security group ở cấp ENI, không phải NACL thứ hai.\nĐáp án đúng: C\nĐiểm cần nhớ: Subnet : NACL = N : 1 (một subnet đúng một NACL, một NACL nhiều subnet). ENI : security group = nhiều : nhiều.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "The subnet keeps both network ACLs, and their rules are merged and evaluated in rule number order.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "The association fails until the default network ACL is deleted from the VPC by the engineer.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "The custom network ACL replaces the previous association, because a subnet can have only one.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "The subnet keeps both network ACLs, and traffic must be allowed by each of them independently.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An EC2 instance was launched in a subnet whose route table sends 0.0.0.0/0 to an internet gateway. The subnet does not auto-assign public IPv4 addresses, so the instance has only a private IP address. The security group and the default network ACL allow the required traffic. The instance cannot reach the internet. What is the simplest fix?",
+    "explanation": "Phân tích đề: Subnet đã public (route tới IGW), rule lọc đã cho phép, nhưng instance chỉ có IP private.\n(A) ĐÚNG: Internet Gateway chỉ thực hiện NAT 1-1 cho instance có public IPv4 hoặc Elastic IP. Gắn Elastic IP cho instance là cách nhanh nhất để nó giao tiếp với Internet qua IGW.\n(B) SAI: Route table đã có 0.0.0.0/0 tới IGW, không thể thêm route thứ hai cùng đích; và NAT Gateway dành cho private subnet.\n(C) SAI: Mỗi VPC chỉ gắn được một Internet Gateway; IGW hiện có vẫn hoạt động bình thường.\n(D) SAI: Default NACL đã cho phép mọi traffic, thêm rule ephemeral không thay đổi gì.\nĐáp án đúng: A\nĐiểm cần nhớ: Ra Internet qua IGW cần đủ 2 điều kiện: route 0.0.0.0/0 -> IGW và instance có public IP/Elastic IP.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Allocate an Elastic IP address and associate it with the instance's network interface.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add a 0.0.0.0/0 route to a NAT gateway in the same route table as the internet gateway route.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Attach a second internet gateway to the VPC that is dedicated to the instance's subnet.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add an outbound rule for TCP 1024-65535 to the network ACL that is associated with the subnet.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A company created a VPC peering connection between the Web VPC (10.10.0.0/16) and the Reports VPC (10.20.0.0/16) in the same account, and the peering request was accepted. Instances in the two VPCs still cannot communicate. Which TWO actions are required? (Select TWO.)",
+    "explanation": "Phân tích đề: Peering đã active nhưng chưa có đường đi và chưa có rule cho phép.\n(A) SAI: Traffic peering đi trên mạng AWS nội bộ, không cần Internet Gateway.\n(B) ĐÚNG: Peering không tự thêm route. Mỗi VPC phải có route trỏ CIDR của VPC bên kia tới peering connection (pcx-...) trong các route table liên quan, theo cả hai chiều.\n(C) SAI: VPC peering không có tùy chọn transitive routing; và ở đây cũng không cần bắc cầu.\n(D) ĐÚNG: Security group (và NACL nếu là custom) phải cho phép traffic từ CIDR của VPC peer hoặc tham chiếu security group của peer (cùng Region).\n(E) SAI: Hai VPC không trùng CIDR nên không cần NAT; NAT Gateway cũng không dùng để dịch địa chỉ cho traffic peering thông thường.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Peering chạy được cần 3 thứ: peering accepted, route hai chiều, security group/NACL cho phép.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Attach an internet gateway to both VPCs so that peered traffic can be routed between them.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add routes in both VPCs that send the other VPC's CIDR block to the peering connection.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Enable transitive routing on the peering connection in the settings of both VPCs.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Update the security groups to allow the required traffic from the peer VPC.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Create a NAT gateway in each VPC to translate addresses for traffic from the peer VPC.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A team creates a subnet with the CIDR block 10.0.5.0/28 to host interface VPC endpoints and a few EC2 instances. How many IPv4 addresses in this subnet can be assigned to resources?",
+    "explanation": "Phân tích đề: Subnet /28 có 16 địa chỉ; cần trừ số địa chỉ AWS dành riêng trong mỗi subnet.\n(A) SAI: AWS dành riêng địa chỉ trong mọi subnet bất kể kích thước.\n(B) SAI: AWS dành riêng nhiều hơn hai địa chỉ network và broadcast.\n(C) SAI: Ngoài network address, VPC router và broadcast, AWS còn giữ địa chỉ DNS và một địa chỉ dự trữ cho tương lai.\n(D) ĐÚNG: AWS giữ 5 địa chỉ mỗi subnet: 4 địa chỉ đầu (network, VPC router, DNS, dự phòng) và địa chỉ cuối (broadcast). 16 - 5 = 11 địa chỉ khả dụng.\nĐáp án đúng: D\nĐiểm cần nhớ: Mỗi subnet mất 5 IP (4 đầu + 1 cuối). Subnet nhỏ nhất /28 (11 IP dùng được), lớn nhất /16.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "16, because AWS does not reserve addresses in subnets smaller than /24.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "14, because only the network and broadcast addresses are reserved.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "13, because the network, VPC router, and broadcast addresses are reserved.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "11, because AWS reserves the first four addresses and the last address.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has 40 AWS accounts in AWS Organizations. Security groups in every account must allow SSH and RDP only from the corporate office CIDR ranges, which change a few times per year. The network team wants to update the ranges in one place and have every referencing security group pick up the change automatically. What should the solutions architect do?",
+    "explanation": "Phân tích đề: Nhiều account, danh sách CIDR dùng chung, cập nhật một nơi và tự áp cho mọi security group.\n(A) SAI: Network ACL không chia sẻ qua AWS RAM được và NACL áp ở cấp subnet, không thay thế rule security group.\n(B) ĐÚNG: Customer managed prefix list chứa các CIDR văn phòng, chia sẻ cho cả Organization qua AWS RAM, rồi tham chiếu trong rule SSH/RDP của security group ở mọi account. Khi sửa prefix list, mọi rule tham chiếu tự động dùng dữ liệu mới.\n(C) SAI: Security group không đọc giá trị từ Parameter Store; rule phải chứa CIDR, security group hoặc prefix list.\n(D) SAI: SCP kiểm soát quyền gọi API của IAM principal, không lọc traffic mạng.\nĐáp án đúng: B\nĐiểm cần nhớ: Danh sách CIDR dùng lại ở nhiều security group/account => customer managed prefix list + chia sẻ qua AWS RAM.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a network ACL in the network account and share it through AWS RAM for association in every account.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a customer managed prefix list, share it through AWS RAM, and reference it in the security groups.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Store the ranges in Parameter Store and have security group rules resolve the parameter during evaluation.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Attach an SCP that denies SSH and RDP connections originating from outside the corporate CIDR ranges.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company must allow RDP (TCP 3389) into a subnet only from the administrator network 192.0.2.0/24. All other inbound traffic that is currently allowed must continue to work. The subnet's custom network ACL has inbound rule 200, which allows all traffic from 0.0.0.0/0, followed by the default asterisk deny rule. Which inbound rules should be added to the network ACL?",
+    "explanation": "Phân tích đề: NACL đánh giá theo rule number tăng dần, rule khớp đầu tiên thắng. Rule 200 hiện cho phép tất cả.\n(A) SAI: Rule 100 deny 3389 từ 0.0.0.0/0 khớp trước với cả mạng admin, nên admin cũng bị chặn; rule 110 không bao giờ được xét.\n(B) SAI: Rule 300 và 310 nằm sau rule 200; mọi traffic 3389 đã khớp rule 200 allow nên không bị chặn.\n(C) SAI: Rule 210 deny nằm sau rule 200 nên không bao giờ được áp dụng; RDP từ mọi nơi vẫn được phép.\n(D) ĐÚNG: Rule 100 cho phép 3389 từ 192.0.2.0/24 khớp đầu tiên với admin. Traffic 3389 từ nơi khác không khớp rule 100 nhưng khớp rule 110 deny. Các traffic khác không khớp hai rule này nên rơi xuống rule 200 allow như cũ.\nĐáp án đúng: D\nĐiểm cần nhớ: NACL: allow ngoại lệ hẹp trước (số nhỏ), deny rộng sau, rồi mới tới allow chung. Số rule quyết định tất cả.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Rule 100 denying TCP 3389 from 0.0.0.0/0 and rule 110 allowing TCP 3389 from 192.0.2.0/24.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Rule 300 allowing TCP 3389 from 192.0.2.0/24 and rule 310 denying TCP 3389 from 0.0.0.0/0.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Rule 100 allowing all traffic from 192.0.2.0/24 and rule 210 denying TCP 3389 from 0.0.0.0/0.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Rule 100 allowing TCP 3389 from 192.0.2.0/24 and rule 110 denying TCP 3389 from 0.0.0.0/0.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company stores regulated data in Amazon RDS in dedicated database subnets. Compliance requires a subnet-level control that prevents the database subnets from exchanging traffic with anything other than the application subnets (10.0.10.0/24 and 10.0.11.0/24), even if someone later misconfigures a security group. What should the solutions architect implement?",
+    "explanation": "Phân tích đề: Yêu cầu kiểm soát ở cấp subnet, vẫn đứng vững khi security group bị cấu hình sai (defense in depth).\n(A) SAI: Security group chỉ cho phép từ app security group là cấu hình tốt nhưng chính là lớp có thể bị cấu hình sai; nó không phải kiểm soát cấp subnet.\n(B) ĐÚNG: Custom network ACL gắn vào subnet database, chỉ cho inbound port DB và outbound ephemeral port với CIDR hai subnet ứng dụng, còn lại rơi vào deny mặc định. NACL áp cho mọi ENI trong subnet bất kể security group.\n(C) SAI: Route table luôn có local route cho toàn CIDR VPC, không xóa hay thu hẹp được; route cũng không phải cơ chế lọc.\n(D) SAI: AWS WAF không gắn được vào RDS; WAF bảo vệ ALB, CloudFront, API Gateway, AppSync và một số dịch vụ HTTP khác.\nĐáp án đúng: B\nĐiểm cần nhớ: Luật chung cho cả subnet, làm lớp phòng thủ thứ hai khi security group sai => network ACL (nhớ mở ephemeral chiều về).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "A security group on the DB instances that allows the database port only from the application security group.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "A network ACL on the database subnets that allows the DB port and return ports only for the application CIDRs.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "A route table for the database subnets that contains routes only to the two application subnet CIDR blocks.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "An AWS WAF web ACL associated with the DB instances that allows requests only from the application CIDRs.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Private subnets in a VPC use a route table with a 0.0.0.0/0 route to a NAT gateway. A solutions architect creates an Amazon S3 gateway endpoint and associates it with the same route table, which adds a route whose destination is the S3 prefix list. How is traffic from the instances to Amazon S3 in the same Region routed afterward?",
+    "explanation": "Phân tích đề: Route table có cả route mặc định tới NAT và route prefix list S3 tới gateway endpoint. Cần biết quy tắc chọn route.\n(A) ĐÚNG: Route table chọn route khớp cụ thể nhất (longest prefix match). Các CIDR của S3 trong prefix list cụ thể hơn 0.0.0.0/0 nên traffic tới S3 cùng Region đi qua gateway endpoint, không tốn phí xử lý của NAT Gateway.\n(B) SAI: Không có ưu tiên theo loại target; quyết định dựa trên độ cụ thể của đích.\n(C) SAI: Không cần xóa route 0.0.0.0/0; route prefix list đã được ưu tiên ngay, và route mặc định vẫn cần cho traffic Internet khác.\n(D) SAI: Route table của VPC không chia tải ECMP giữa NAT Gateway và gateway endpoint.\nĐáp án đúng: A\nĐiểm cần nhớ: Route table luôn chọn route cụ thể nhất. Gateway endpoint S3/DynamoDB thêm route prefix list, thắng route 0.0.0.0/0 tới NAT.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Through the gateway endpoint, because the prefix list route is more specific than the default route.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Through the NAT gateway, because routes that target NAT gateways take priority over endpoint routes.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Through the NAT gateway until the 0.0.0.0/0 route is removed from the private subnet route table.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Across both the NAT gateway and the endpoint, because the route table uses equal-cost multipath.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A Lambda function must read data from an Amazon RDS DB instance in private subnets of a VPC and also call a public third-party REST API on the internet over IPv4. Which TWO configuration steps are required? (Select TWO.)",
+    "explanation": "Phân tích đề: Lambda cần vừa vào VPC (tới RDS private) vừa ra Internet IPv4.\n(A) ĐÚNG: Gắn function vào private subnet của VPC với security group được security group của RDS cho phép, để Lambda tạo ENI trong VPC và truy cập RDS bằng IP private.\n(B) SAI: ENI của Lambda không bao giờ được cấp public IP, kể cả khi đặt trong public subnet, nên không ra Internet qua IGW được.\n(C) SAI: Không thể gắn Elastic IP cho ENI do Lambda quản lý.\n(D) ĐÚNG: Private subnet của Lambda phải có route 0.0.0.0/0 tới NAT Gateway nằm trong public subnet; NAT Gateway dịch địa chỉ và đưa traffic ra IGW.\n(E) SAI: Egress-only Internet Gateway chỉ dành cho IPv6, không phục vụ traffic IPv4.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Lambda trong VPC ra Internet => private subnet + NAT Gateway. Đặt Lambda ở public subnet không giúp vì ENI của Lambda không có public IP.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Attach the function to private subnets with a security group that the database security group allows.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Attach the function to public subnets so that its network interfaces receive public IP addresses.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Associate an Elastic IP address with each network interface that Lambda creates in the private subnets.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Route 0.0.0.0/0 from the function's subnets to a NAT gateway that runs in a public subnet.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Create an egress-only internet gateway and route 0.0.0.0/0 from the function's subnets to it.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "EC2 instances in private subnets must upload objects to Amazon S3 in the same Region without sending the traffic through the NAT gateway. The instances' security group no longer has the default outbound rule and allows only TCP 5432 to the database security group. Which TWO actions allow the uploads while keeping outbound access as restrictive as possible? (Select TWO.)",
+    "explanation": "Phân tích đề: Cần đường đi không qua NAT và rule outbound hẹp nhất cho S3.\n(A) ĐÚNG: Tạo S3 gateway endpoint và gắn vào route table của private subnet; traffic S3 đi theo route prefix list tới endpoint thay vì NAT Gateway.\n(B) SAI: Mở 443 tới 0.0.0.0/0 chạy được nhưng cho phép mọi đích HTTPS, trái yêu cầu hạn chế nhất có thể.\n(C) ĐÚNG: Outbound rule TCP 443 với đích là AWS-managed prefix list của S3 (pl-xxxx) chỉ cho phép gọi ra các dải IP của S3 trong Region.\n(D) SAI: Security group stateful nên response từ S3 tự được phép; không cần inbound rule.\n(E) SAI: Gateway endpoint không hỗ trợ gắn security group; chỉ interface endpoint mới có security group.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Gateway endpoint = route + endpoint policy, không có security group. Khi siết outbound SG, dùng prefix list của S3 làm đích.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an S3 gateway endpoint and associate it with the private subnets' route tables.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add an outbound rule for TCP 443 to 0.0.0.0/0 so that all S3 addresses are covered.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add an outbound rule for TCP 443 to the AWS-managed prefix list for Amazon S3.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Add an inbound rule for TCP 443 from the S3 prefix list so that responses are accepted.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Attach a security group to the gateway endpoint that allows HTTPS from the instances.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs a vendor-hardened Linux appliance on EC2 instances in private subnets. The vendor prohibits installing additional agents, including the SSM Agent. Administrators must connect by using standard SSH clients. Access must be controlled by IAM policies and recorded in AWS CloudTrail, the instances must not have public IP addresses, and the company does not want to operate bastion hosts. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Không được cài agent (loại Session Manager), SSH chuẩn, IAM + CloudTrail, không public IP, không bastion.\n(A) SAI: Port forwarding của Session Manager cần SSM Agent chạy trên instance đích, vi phạm ràng buộc của vendor.\n(B) SAI: Nhóm bastion sau NLB vẫn là bastion phải vận hành, vá lỗi và quản lý SSH key, trái yêu cầu.\n(C) ĐÚNG: EC2 Instance Connect Endpoint tạo đường hầm riêng từ người dùng tới IP private của instance mà không cần public IP, bastion hay agent. Quyền mở tunnel được kiểm soát bằng IAM và ghi log trong CloudTrail; security group của instance chỉ cần cho phép SSH từ security group của endpoint.\n(D) SAI: Egress-only Internet Gateway chặn mọi kết nối khởi tạo từ Internet vào, nên không thể SSH vào qua nó.\nĐáp án đúng: C\nĐiểm cần nhớ: Không cài được SSM Agent nhưng cần SSH tới instance private, không bastion => EC2 Instance Connect Endpoint.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use Session Manager port forwarding to tunnel the SSH sessions through Systems Manager to the appliances.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Deploy an Auto Scaling group of hardened bastion hosts in public subnets behind a Network Load Balancer.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an EC2 Instance Connect Endpoint and allow SSH from its security group on the appliances.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Attach an egress-only internet gateway and allow SSH from the administrators' IPv6 addresses only.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company's production account contains dozens of VPCs. The security team must regularly verify that no EC2 instance is reachable from an internet gateway except through Application Load Balancers, and must identify any unintended network paths in the existing configuration without sending test traffic. Which solution meets this requirement with the LEAST operational effort?",
+    "explanation": "Phân tích đề: Kiểm tra định kỳ trên toàn bộ cấu hình, tìm mọi đường truy cập ngoài ý muốn từ IGW tới EC2 trừ qua ALB, không gửi traffic.\n(A) ĐÚNG: Network Access Analyzer cho phép định nghĩa Network Access Scope (ví dụ: nguồn là Internet Gateway, đích là EC2 instance, loại trừ đường đi qua ALB) và phân tích toàn bộ cấu hình để liệt kê mọi đường thỏa điều kiện, không cần sinh traffic.\n(B) SAI: Reachability Analyzer kiểm tra từng cặp nguồn-đích cụ thể; chạy cho mọi cặp instance/IGW là khối lượng công việc rất lớn và dễ sót.\n(C) SAI: Flow Logs chỉ ghi traffic đã thực sự xảy ra; một đường truy cập mở nhưng chưa bị khai thác sẽ không xuất hiện.\n(D) SAI: Traffic Mirroring sao chép gói tin thực tế, tốn kém và không phát hiện được đường truy cập tiềm năng chưa có traffic.\nĐáp án đúng: A\nĐiểm cần nhớ: Reachability Analyzer = kiểm tra một đường nguồn-đích cụ thể. Network Access Analyzer = tìm mọi đường truy cập ngoài ý muốn theo điều kiện chung.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Define a Network Access Analyzer scope for paths from internet gateways to instances that bypass ALBs.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Run VPC Reachability Analyzer for every instance and internet gateway pair after each deployment.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable VPC Flow Logs in all VPCs and query for ACCEPT records whose sources are public addresses.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Mirror traffic from all production interfaces to an IDS that flags flows arriving from the internet.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "Instances in private subnets reach the internet through a NAT gateway. To limit log volume, company policy allows VPC Flow Logs only on the NAT gateway's network interface. A security analyst must identify which private instance generated each flow to a suspicious external IP address, but the default-format records for the translated traffic show the NAT gateway's private IP address as the source. What should the solutions architect do?",
+    "explanation": "Phân tích đề: Chỉ được bật Flow Logs trên ENI của NAT Gateway; bản ghi mặc định hiển thị địa chỉ của NAT thay vì instance gốc.\n(A) SAI: Bật Flow Logs trên ENI của instance sẽ thấy IP gốc nhưng vi phạm chính sách chỉ ghi log trên ENI của NAT Gateway.\n(B) ĐÚNG: Flow Logs custom format hỗ trợ trường pkt-srcaddr và pkt-dstaddr, ghi địa chỉ nguồn/đích gốc của gói tin khi đi qua thiết bị trung gian như NAT Gateway. Tạo flow log mới với custom format chứa các trường này trên ENI của NAT Gateway để thấy IP instance gốc.\n(C) SAI: ENI do NAT Gateway quản lý không thể làm nguồn Traffic Mirroring; hơn nữa mirroring tốn kém, không cần thiết để có địa chỉ gốc.\n(D) SAI: CloudTrail ghi lại lời gọi API, không ghi từng kết nối mạng đi qua NAT Gateway.\nĐáp án đúng: B\nĐiểm cần nhớ: Traffic qua NAT Gateway/thiết bị trung gian: srcaddr là địa chỉ interface, pkt-srcaddr là địa chỉ gốc của gói. Cần trường này thì dùng custom format.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable flow logs on every private instance's network interface and correlate them with the NAT records.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a flow log with a custom format that includes pkt-srcaddr and pkt-dstaddr on the NAT interface.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Enable Traffic Mirroring on the NAT gateway's network interface to capture the original packet headers.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Query AWS CloudTrail for NAT gateway data events that record the private source of each connection.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs containers in Docker bridge network mode on EC2 instances. Host-level agents on the instances must continue to retrieve instance role credentials from the instance metadata service. The containers must not be able to obtain those credentials, and the team wants the solution with the least effort. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Host vẫn dùng IMDS, container ở bridge mode không được lấy credential, ít công sức nhất.\n(A) SAI: Hop limit 2 là giá trị AWS khuyến nghị khi container CẦN truy cập IMDS; với hop limit 2, container lấy được token và credential.\n(B) ĐÚNG: Với IMDSv2 bắt buộc, response PUT chứa token có hop limit (TTL IP). Container bridge mode đi thêm một hop mạng qua host, nên hop limit 1 khiến token không tới được container, trong khi agent chạy trực tiếp trên host vẫn dùng bình thường.\n(C) SAI: Security group không có deny rule và không lọc traffic tới IMDS.\n(D) SAI: Tắt hẳn metadata endpoint làm agent trên host mất credential của instance role; lưu credential tĩnh trong Secrets Manager trái best practice.\nĐáp án đúng: B\nĐiểm cần nhớ: Chặn container (bridge mode) lấy credential của instance => IMDSv2 required + hop limit 1. Cần cho container dùng IMDS => hop limit 2.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Require IMDSv2 and set the metadata response hop limit to 2 so that containers must present a token.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Require IMDSv2 and set the metadata response hop limit to 1 on the instances.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Add a security group rule that denies traffic from the container network to 169.254.169.254.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Disable the metadata endpoint and store credentials for the host agents in AWS Secrets Manager.", "isCorrect": false }
+    ]
+  }
+]

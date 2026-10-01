@@ -1,0 +1,54 @@
+1. A DevOps engineer must automatically re-encrypt or quarantine an S3 bucket the moment it is detected without default encryption, with no human involvement. What design implements this?
+2. An automation document that remediates security groups begins failing with an access denied error after being deployed to a new account. What should a DevOps engineer check first?
+3. A DevOps engineer must prevent an automated remediation from causing a wider outage than the problem it fixes. Which TWO safeguards apply?
+4. A remediation runs successfully but the configuration rule reports the resource as non-compliant again within minutes, repeatedly. What is the most likely cause?
+5. A DevOps engineer must require human approval before an automation document performs a destructive step, while the earlier diagnostic steps run automatically. What construct supports this?
+6. A DevOps engineer must run the same remediation automation across 200 member accounts from a central account. What execution model fits?
+7. A DevOps engineer must decide which findings are suitable for fully automatic remediation. Which TWO characteristics indicate a good candidate?
+8. A DevOps engineer must stop automated remediation from firing during a planned maintenance window when configurations are intentionally changed. What approach works?
+9. A DevOps engineer must ensure an EC2 instance that fails a system status check is recovered automatically without losing its instance identity. What mechanism fits?
+10. A DevOps engineer must make a remediation automation safe to run twice if the same event is delivered more than once. What property is required?
+11. A DevOps engineer must patch a fleet of EC2 instances on a schedule with the ability to stop the rollout if failures rise. What capability provides this?
+12. A DevOps engineer must track whether automated remediation is actually improving the environment. Which TWO metrics are meaningful?
+13. A DevOps engineer must ensure that when automated remediation cannot fix a resource, the problem is not silently forgotten. What handling is correct?
+14. A DevOps engineer must decide where remediation automation should live so that a compromised workload account cannot disable it. What design is correct?
+15. A DevOps engineer must decide how to version and release automation documents used for remediation. What practice applies?
+16. A DevOps engineer must build self-healing behaviour for a stateless web tier. Which TWO mechanisms deliver it without custom code?
+17. A DevOps engineer must collect diagnostic data from an instance automatically before it is terminated for being unhealthy. What approach preserves the evidence?
+18. A DevOps engineer must decide the relationship between preventive guardrails and automated remediation. What is the correct framing?
+19. A DevOps engineer must run a remediation on instances that have no inbound network access and no public IP address. What prerequisite makes this possible?
+20. A DevOps engineer must decide what to do when a team disputes an automated remediation that reverted their intentional change. What is the constructive response?
+21. A DevOps engineer must build an automation that responds to an alarm by scaling a service, but only if the alarm has been in breach for a sustained period. What design achieves this?
+22. A DevOps engineer reviews an automated remediation implementation. Which TWO findings are genuine problems?
+23. A DevOps engineer must decide how to handle a resource that automated remediation would break, such as a legacy system that requires an otherwise prohibited configuration. What approach fits?
+24. A DevOps engineer must ensure that a remediation action is recorded for audit, including what changed and who or what triggered it. What provides this?
+25. A DevOps engineer must roll out automated remediation for a rule that currently has 4,000 violations across the estate. What rollout approach is safest?
+26. A DevOps engineer must design the trigger path from a security finding to an automated containment action. Which TWO components belong in that path?
+27. A DevOps engineer must decide whether a remediation should fix the resource or roll back the change that caused it. What consideration decides?
+28. A DevOps engineer must ensure automated remediation does not conflict with an active incident response where engineers are making manual changes. What safeguard applies?
+29. A DevOps engineer must schedule a recurring automation that enforces a baseline across instances. What consideration keeps it from causing load spikes?
+30. A DevOps engineer must decide the first remediation to automate in an environment with many recurring manual fixes. What selection criterion is most useful?
+31. A DevOps engineer must ensure a remediation that restarts a service does not mask a recurring underlying defect. What practice addresses this?
+32. A DevOps engineer must decide what an automation document should do before making a change to a production resource. Which TWO preliminary steps are valuable?
+33. A DevOps engineer must respond automatically to an event indicating that an IAM access key has been exposed publicly. What automated action is appropriate as the first step?
+34. A DevOps engineer must decide how to express remediation logic that needs several conditional branches and calls to multiple services. What is the better choice than a single automation document?
+35. A DevOps engineer must ensure that a remediation which detaches a public IP address does not disconnect an operator who is actively investigating the instance. What practice reduces this risk?
+36. A DevOps engineer must decide how automated remediation interacts with infrastructure defined as code. Which TWO statements are accurate?
+37. A DevOps engineer must give operators a way to run a remediation on demand for a specific resource without granting them the underlying permissions. What design fits?
+38. A DevOps engineer must decide how to handle remediation for resources spread across Regions where only some Regions are approved for use. What approach is correct?
+39. A DevOps engineer must determine why an automatic remediation configured on a rule never executes, although the rule reports non-compliant resources. What should be checked?
+40. A DevOps engineer must justify investing in automated remediation to leadership. What argument is strongest?
+41. A DevOps engineer must ensure that a remediation targeting tagged resources still works when a resource is missing the expected tag. What handling is correct?
+42. A DevOps engineer must decide how to test an automation document that performs a destructive action. Which TWO testing practices apply?
+43. A DevOps engineer must decide how long to wait before automatically remediating a newly created resource that is non-compliant. What consideration applies?
+44. A DevOps engineer must design remediation for a rule that flags overly permissive security groups, where the correct fix differs by workload. What approach is appropriate?
+45. A DevOps engineer must ensure remediation automation keeps working as the environment changes over time. What practice prevents silent decay?
+46. A DevOps engineer must reduce the volume of repetitive operational toil handled by the on-call rota. Which TWO approaches address it at the source?
+47. A DevOps engineer must decide what happens when two different remediations target the same resource at the same time. What design avoids conflict?
+48. A DevOps engineer must respond automatically when an alarm indicates a disk is nearly full on a managed instance. What is a sound automated action?
+49. A DevOps engineer must decide how remediation results should reach the team that owns the affected resource. What makes routing reliable?
+50. A DevOps engineer must decide the correct scope for the execution role used by a remediation that only needs to modify bucket encryption settings. What scope is right?
+51. A company requires that any Amazon S3 bucket created without default encryption is corrected automatically within minutes, in all accounts of the organization, with no human involvement. Which solution meets these requirements?
+52. A DevOps engineer is enabling automatic remediation for a rule that currently reports 4,000 non-compliant resources across production accounts. The engineer must avoid causing a large-scale outage if the remediation document contains a defect. Which TWO precau
+53. A security requirement states that if an IAM access key is detected as publicly exposed, it must be deactivated within one minute without waiting for a human decision, and the security team must receive the details afterwards. Which solution meets these requir
+54. AWS notifies a company that 40 EC2 instances are scheduled for retirement in two weeks. The instances belong to several Auto Scaling groups running stateless workloads. The company wants the replacement to happen automatically during its change window rather t

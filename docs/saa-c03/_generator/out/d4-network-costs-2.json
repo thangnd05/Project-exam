@@ -1,0 +1,409 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company enables S3 Transfer Acceleration on a bucket that receives uploads from offices worldwide. Some offices are close to the bucket's Region, and finance worries about paying the acceleration fee for uploads that are not faster. How is Transfer Acceleration billed?",
+    "explanation": "Phân tích đề: Hỏi cơ chế tính phí của S3 Transfer Acceleration khi một số upload không được tăng tốc.\n(A) SAI: AWS không tính phí acceleration cho mọi byte; nếu đường truyền không được tăng tốc thì không bị tính phí đó.\n(B) SAI: Transfer Acceleration tính theo GB được tăng tốc, không phải phí cố định theo tháng cho mỗi bucket.\n(C) ĐÚNG: S3 chỉ tính phí Transfer Acceleration khi transfer thực sự được tăng tốc so với đường thường; upload không nhanh hơn thì chỉ trả phí S3 thông thường. Có thể dùng công cụ Speed Comparison để kiểm tra trước.\n(D) SAI: Phí acceleration được cộng thêm vào phí data transfer thông thường chứ không thay thế; Transfer Acceleration không bao giờ làm rẻ hơn.\nĐáp án đúng: C\nĐiểm cần nhớ: Transfer Acceleration: phí cộng thêm, chỉ tính khi thực sự được tăng tốc; dùng để upload nhanh hơn, không để tiết kiệm.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "The acceleration fee is charged for every byte uploaded to the bucket once the feature is turned on.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "The acceleration fee is charged as a fixed monthly amount per bucket, regardless of the uploaded volume.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "The acceleration fee is charged only for transfers that are actually accelerated.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "The acceleration fee replaces the standard data transfer charges, so uploads become cheaper overall.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A research lab enables Requester Pays on an Amazon S3 bucket that holds a public-interest dataset. A student without AWS credentials tries to download an object anonymously by using the object URL. What happens?",
+    "explanation": "Phân tích đề: Bucket bật Requester Pays, người dùng ẩn danh (không có credential AWS) tải object.\n(A) SAI: Khi bật Requester Pays, bucket không cho phép truy cập ẩn danh; request không được phục vụ rồi tính cho chủ bucket.\n(B) ĐÚNG: Requester Pays cần xác định được tài khoản sẽ trả phí, nên mọi request phải được xác thực bằng tài khoản AWS và kèm tham số request-payer. Request ẩn danh bị từ chối.\n(C) SAI: Không có tài khoản chung nào gánh phí cho request ẩn danh; khái niệm này không tồn tại trong S3.\n(D) SAI: S3 không hiển thị trang chấp nhận phí; người yêu cầu phải dùng credential AWS và gửi header x-amz-request-payer hoặc tham số tương đương trong CLI, SDK.\nĐáp án đúng: B\nĐiểm cần nhớ: Requester Pays = người tải phải là tài khoản AWS đã xác thực; không hỗ trợ truy cập ẩn danh.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "The download succeeds, and the bucket owner pays the data transfer because the requester is anonymous.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "The request fails, because Requester Pays buckets do not allow anonymous access.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "The download succeeds, and the charges are added to the Region's shared public dataset account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "The download succeeds after the student accepts the charges on a web page that S3 displays for the bucket.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An EC2 instance in us-east-1a sends 10 TB of data each month to another EC2 instance in us-east-1b by using private IP addresses in the same VPC. How is this traffic billed?",
+    "explanation": "Phân tích đề: Traffic giữa hai AZ khác nhau trong cùng Region, dùng private IP.\n(A) SAI: Cùng VPC, cùng Region không có nghĩa là miễn phí; chỉ traffic cùng AZ qua private IP mới miễn phí.\n(B) SAI: Traffic không đi ra Internet nên không áp đơn giá data transfer out Internet.\n(C) SAI: Hai AZ thuộc cùng Region nên áp đơn giá inter-AZ thấp hơn nhiều, không phải inter-Region.\n(D) ĐÚNG: Phí inter-AZ (regional data transfer) tính mỗi chiều: phần data out ở AZ gửi và data in ở AZ nhận đều bị tính, nên thực tế trả gấp đôi đơn giá cho mỗi GB.\nĐáp án đúng: D\nĐiểm cần nhớ: Khác AZ, cùng Region: tính khoảng $0.01/GB mỗi chiều, bị tính cả ở phía gửi và phía nhận.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "It is free because both instances are in the same VPC and Region.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "It is billed once at the internet data transfer out rate on the sending instance.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "It is billed at the inter-Region rate because the Availability Zones are separate data centers.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "It is billed at the inter-AZ rate in each direction, on both the sending and receiving side.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect is comparing interface VPC endpoints with gateway VPC endpoints for a new workload. Which TWO statements about interface VPC endpoints are correct? (Select TWO.)",
+    "explanation": "Phân tích đề: So sánh interface endpoint với gateway endpoint về phí và khả năng truy cập.\n(A) ĐÚNG: Interface endpoint đặt một ENI trong mỗi subnet/AZ được chọn; mỗi ENI tính phí theo giờ, cộng phí xử lý theo GB.\n(B) SAI: Đây là cơ chế của gateway endpoint. Interface endpoint là ENI có private IP, dùng DNS để trỏ tới, không thêm route.\n(C) SAI: Chỉ gateway endpoint mới miễn phí; interface endpoint luôn có phí theo giờ và theo GB.\n(D) ĐÚNG: Vì là ENI có private IP trong VPC, interface endpoint truy cập được từ on-premises qua Direct Connect hoặc VPN, điều mà gateway endpoint không làm được.\n(E) SAI: S3 và DynamoDB là hai dịch vụ duy nhất của gateway endpoint; interface endpoint hỗ trợ hầu hết dịch vụ AWS và dịch vụ PrivateLink.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Interface endpoint = ENI, có Security Group, có phí giờ theo AZ và phí GB, dùng được từ on-premises. Gateway endpoint = route, miễn phí, chỉ trong VPC.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "They are billed per hour for each Availability Zone where the endpoint is deployed, plus a per-GB processing charge.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "They work by adding a prefix list route to the subnet route tables, similar to gateway endpoints.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "They are free of charge, like the gateway endpoints for Amazon S3 and Amazon DynamoDB.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "They can be reached from an on-premises network over AWS Direct Connect or Site-to-Site VPN.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "They support only Amazon S3 and Amazon DynamoDB as target services.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Amazon EC2 instances in private subnets of a dual-stack VPC download about 30 TB of packages each month from public repositories that support IPv6. The traffic currently leaves through a NAT gateway over IPv4. The instances must not accept connections that are initiated from the internet. Which solution will reduce the cost of this traffic the MOST?",
+    "explanation": "Phân tích đề: Instance private cần tải gói từ repo hỗ trợ IPv6, hiện qua NAT (phí giờ + GB). Không được nhận kết nối khởi tạo từ Internet.\n(A) SAI: Public IPv4 bị tính phí theo giờ và cho phép Internet khởi tạo kết nối vào instance nếu Security Group mở, trái yêu cầu; kiến trúc private subnet bị phá vỡ.\n(B) SAI: NAT instance bỏ được phí xử lý GB nhưng thêm chi phí instance, giới hạn băng thông của instance nhỏ và gánh nặng vận hành, vá lỗi, HA.\n(C) ĐÚNG: Egress-only internet gateway chỉ cho phép kết nối IPv6 đi ra, chặn kết nối từ Internet vào. Nó không có phí theo giờ hay phí xử lý mỗi GB như NAT, chỉ còn phí data transfer thông thường.\n(D) SAI: DNS64 kết hợp NAT64 trên NAT gateway giúp host chỉ có IPv6 gọi đích IPv4; traffic vẫn đi qua NAT nên vẫn chịu phí xử lý mỗi GB.\nĐáp án đúng: C\nĐiểm cần nhớ: IPv6 outbound-only => egress-only internet gateway: không phí giờ, không phí xử lý, vẫn chặn inbound.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Assign public IPv4 addresses to the instances and route their traffic through the internet gateway.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Replace the NAT gateway with a NAT instance on a small burstable instance type in each Availability Zone.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Route IPv6 traffic through an egress-only internet gateway and download the packages over IPv6.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable DNS64 on the subnets and keep the NAT gateway so that it translates IPv6 requests into IPv4 requests.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has 60 VPCs in one Region, all attached to an AWS Transit Gateway. Each VPC has its own interface VPC endpoints for eight AWS services in three Availability Zones. Traffic through the endpoints is very low, and the hourly endpoint charges now exceed the value they provide. The workloads must keep private access to these services without a NAT gateway. What should a solutions architect do to reduce cost with the LEAST impact?",
+    "explanation": "Phân tích đề: 60 VPC, mỗi VPC 8 interface endpoint x 3 AZ, traffic rất thấp, phí giờ lớn. Đã có TGW. Phải giữ truy cập riêng tư, không NAT.\n(A) SAI: Gateway endpoint chỉ tồn tại cho S3 và DynamoDB; các dịch vụ khác như KMS, SSM, Secrets Manager không có gateway endpoint.\n(B) ĐÚNG: Tập trung endpoint trong một VPC dịch vụ chung giảm từ 60 bộ endpoint xuống một bộ. Tắt Private DNS ở endpoint trung tâm, tạo private hosted zone cho tên dịch vụ trỏ tới endpoint và associate với các VPC spoke; traffic đi qua TGW có phí xử lý GB nhưng với lưu lượng thấp thì rẻ hơn nhiều so với phí giờ đang trả.\n(C) SAI: Đề cấm dùng NAT; ngoài ra 60 NAT gateway theo giờ còn đắt hơn phí endpoint hiện tại.\n(D) SAI: Giảm AZ chỉ cắt khoảng hai phần ba số ENI, vẫn còn 480 endpoint theo giờ, lại tạo điểm lỗi đơn và traffic khác AZ.\nĐáp án đúng: B\nĐiểm cần nhớ: Nhiều VPC, lưu lượng endpoint thấp => tập trung interface endpoint ở VPC dịch vụ chung + Route 53 private hosted zone qua TGW.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Replace every interface endpoint with a gateway endpoint for the same service in each VPC.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Centralize the endpoints in a shared services VPC and resolve them from all VPCs with Route 53 private hosted zones.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Remove the endpoints and deploy a NAT gateway in each VPC so that the workloads reach the services over their public endpoints instead.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Keep the endpoints in every VPC but deploy each one in a single Availability Zone to cut the number of network interfaces.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses an Amazon DynamoDB global table with replicas in five AWS Regions. After a reorganization, the application serves users only in two of those Regions, and no disaster recovery requirement exists for the other three. The workload is write-heavy, and the replication cost is growing. What should a solutions architect do to reduce cost?",
+    "explanation": "Phân tích đề: Global table 5 Region, người dùng chỉ còn ở 2 Region, không cần DR cho 3 Region còn lại; ghi nhiều, phí replication tăng.\n(A) SAI: Đổi capacity mode không thay đổi việc mỗi lần ghi phải được sao chép sang 4 Region khác cùng phí truyền dữ liệu inter-Region.\n(B) SAI: DAX chỉ cache đọc, không làm giảm số lần ghi được sao chép giữa các Region.\n(C) ĐÚNG: Mỗi lần ghi vào global table bị tính phí replicated write và phí data transfer inter-Region cho từng replica. Bỏ 3 replica không dùng cắt trực tiếp phần lớn chi phí này mà vẫn giữ đa Region cho hai Region cần thiết.\n(D) SAI: Global table dùng cơ chế sao chép của nó; tăng thời gian lưu stream không gom được replication và không giảm phí.\nĐáp án đúng: C\nĐiểm cần nhớ: Global tables: mỗi replica cộng phí ghi sao chép và phí truyền dữ liệu inter-Region. Chỉ giữ replica ở Region thực sự cần.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Switch the table from provisioned capacity to on-demand capacity mode in every Region.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Add a DynamoDB Accelerator (DAX) cluster in each Region to reduce the number of replicated writes.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Remove the replicas in the three Regions that no longer serve users.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable DynamoDB Streams with a longer retention period so that replication can be batched.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A reporting application runs on Amazon EC2 instances in one Availability Zone of the same Region as an Amazon RDS for PostgreSQL primary DB instance. Heavy reporting queries slow down the primary. The company wants to offload the reports while keeping data transfer charges as low as possible. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Cần offload báo cáo khỏi primary, giảm phí truyền dữ liệu thấp nhất; app báo cáo nằm một AZ trong cùng Region.\n(A) ĐÚNG: RDS không tính phí data transfer cho việc sao chép tới read replica trong cùng Region. Đặt replica cùng AZ với app báo cáo thì các truy vấn đọc qua private IP cũng miễn phí.\n(B) SAI: Replica khác Region phải trả phí truyền dữ liệu inter-Region cho toàn bộ dòng sao chép, lại thêm phí truy vấn quay về từ Region khác.\n(C) SAI: Standby của Multi-AZ DB instance không phục vụ truy vấn đọc, nên không offload được báo cáo.\n(D) SAI: Export snapshot tính phí theo dung lượng mỗi lần xuất và dữ liệu cũ tới một giờ; truy vấn từ Region khác còn phát sinh phí inter-Region.\nĐáp án đúng: A\nĐiểm cần nhớ: Replication RDS tới read replica cùng Region không tính phí transfer; khác Region thì tính. Đặt replica cùng AZ với consumer để miễn phí cả chiều đọc.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a read replica in the same Region and Availability Zone as the reporting instances and point the reports at it.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create a cross-Region read replica in a nearby Region and run the reports against it.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Convert the instance to a Multi-AZ DB instance deployment and send the reports to the standby.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Export a snapshot to Amazon S3 every hour and run the reports with Amazon Athena from a separate analytics account in another Region.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs Amazon ECS clusters in four Regions. All clusters pull large container images from a single Amazon ECR repository in us-east-1. Frequent scale-out events cause the same images to be pulled across Regions many times each day, and inter-Region data transfer charges are high. What should a solutions architect do to reduce cost with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: ECS ở 4 Region kéo image từ một repo ECR ở us-east-1 nhiều lần mỗi ngày => phí inter-Region. Ít vận hành.\n(A) SAI: Interface endpoint là tài nguyên theo Region, chỉ phục vụ ECR của Region đó; pull từ us-east-1 vẫn đi inter-Region và vẫn bị tính phí.\n(B) ĐÚNG: ECR replication sao chép mỗi image một lần sang các Region đích; các task sau đó pull từ registry cùng Region, không còn phí inter-Region cho mỗi lần scale-out. Cấu hình một lần ở cấp registry, ít vận hành.\n(C) SAI: Gateway endpoint chỉ phục vụ bucket trong cùng Region; layer image nằm ở us-east-1 nên traffic vẫn là inter-Region.\n(D) SAI: Nướng image vào AMI và copy AMI sau mỗi build tốn vận hành nhiều, copy snapshot inter-Region vẫn có phí và không khớp với cách ECS pull image.\nĐáp án đúng: B\nĐiểm cần nhớ: Pull image lặp lại từ Region khác => ECR cross-Region replication để trả phí transfer một lần rồi pull tại chỗ.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create ECR interface VPC endpoints in each Region that point to the repository in us-east-1.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Configure ECR cross-Region replication so that images are copied once to each Region and pulled locally.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Create S3 gateway endpoints in each Region so that image layers are downloaded from Amazon S3 at no charge.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Bake the container images into custom AMIs and copy the AMIs to every Region after each build pipeline run.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company runs microservices on Amazon EKS across three Availability Zones. Services call each other through Kubernetes Services, and requests are spread evenly across pods in all zones, which generates large inter-AZ data transfer charges. Each service must keep replicas in all three Availability Zones. Which TWO actions will reduce inter-AZ traffic? (Select TWO.)",
+    "explanation": "Phân tích đề: EKS 3 AZ, gọi service-to-service rải đều mọi AZ => phí inter-AZ. Mỗi service phải giữ replica ở cả 3 AZ.\n(A) ĐÚNG: Topology Aware Routing (annotation topology-mode Auto) cấp hint theo zone cho EndpointSlice, kube-proxy ưu tiên pod cùng AZ với client nên phần lớn traffic ở lại trong AZ.\n(B) SAI: Bật cross-zone trên NLB còn làm tăng traffic khác AZ và phí regional data transfer.\n(C) SAI: Fargate vẫn chạy trong subnet của VPC; traffic giữa pod ở các AZ khác nhau vẫn bị tính phí inter-AZ.\n(D) ĐÚNG: Pod affinity theo topology.kubernetes.io/zone đặt các pod gọi nhau nhiều cùng AZ; kết hợp phân bổ replica ở mọi AZ, dịch vụ vẫn HA mà traffic nội bộ không vượt AZ.\n(E) SAI: VPC peering nối hai VPC, không thể dùng giữa các subnet của cùng một VPC, và không thay đổi AZ nơi traffic đi qua.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Giảm inter-AZ trong Kubernetes: Topology Aware Routing và affinity theo zone, vẫn giữ replica ở mọi AZ để HA.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Enable Topology Aware Routing on the Kubernetes Services so that traffic prefers endpoints in the caller's zone.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable cross-zone load balancing on the Network Load Balancers that expose the services externally.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Move the workloads from EC2 nodes to AWS Fargate so that pod-to-pod traffic is not billed.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Use pod affinity with the zone topology key so that tightly coupled pods are scheduled together in each zone.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Replace the cluster VPC CNI with a VPC peering connection between the zone subnets.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company is connecting a small branch office to a VPC. The branch sends about 150 GB each month to AWS and receives about 50 GB. The traffic must be encrypted, a one-week setup time is acceptable, and short internet-related latency spikes are acceptable. A network engineer proposes a 1 Gbps dedicated AWS Direct Connect connection because Direct Connect has a lower data transfer out rate. Which solution is the MOST cost-effective?",
+    "explanation": "Phân tích đề: Lưu lượng rất nhỏ (150 GB vào, 50 GB ra), cần mã hóa, chấp nhận jitter Internet. Đề xuất dùng DX vì đơn giá egress thấp.\n(A) SAI: Direct Connect có phí port theo giờ cố định cùng phí cross-connect hoặc đối tác; với 50 GB egress mỗi tháng, phần tiết kiệm từ đơn giá egress thấp hơn không bù nổi phí cố định.\n(B) ĐÚNG: Site-to-Site VPN chỉ tính phí theo giờ kết nối cộng data transfer out theo đơn giá Internet; với 50 GB mỗi tháng tổng chi phí rất thấp, có mã hóa IPsec và dựng nhanh.\n(C) SAI: Hosted connection vẫn có phí port theo giờ và phí đối tác, lại cộng thêm phí VPN; đắt hơn nhiều so với chỉ dùng VPN cho lưu lượng nhỏ.\n(D) SAI: Client VPN tính phí theo giờ cho mỗi subnet associate và theo giờ cho mỗi kết nối người dùng; dùng cho người dùng từ xa, không phải để nối cả mạng chi nhánh, và đắt hơn khi nhiều người dùng.\nĐáp án đúng: B\nĐiểm cần nhớ: Direct Connect chỉ rẻ hơn khi lưu lượng đủ lớn để bù phí port; lưu lượng nhỏ, chấp nhận Internet => Site-to-Site VPN.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "A 1 Gbps dedicated Direct Connect connection with MACsec encryption on the link.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "An AWS Site-to-Site VPN connection to a virtual private gateway on the VPC.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "A hosted Direct Connect connection from a partner with a Site-to-Site VPN running over it for encryption.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "An AWS Client VPN endpoint that each branch user connects to from their workstation.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A SaaS provider exposes an API that runs in its own VPC. More than 400 customer VPCs, many with overlapping CIDR ranges, need private access to the API. Connections are always initiated by the customers. The provider does not want to pay a per-customer hourly connectivity charge or manage routing for each customer. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: 400+ VPC khách hàng, CIDR trùng nhau, khách luôn khởi tạo kết nối. Nhà cung cấp không muốn trả phí kết nối theo giờ cho từng khách và không quản lý routing.\n(A) SAI: VPC peering không hỗ trợ CIDR trùng nhau và giới hạn số peering trên mỗi VPC thấp hơn nhiều so với 400; nhà cung cấp phải quản lý route cho từng khách.\n(B) SAI: Transit gateway tính phí attachment theo giờ cho mỗi VPC khách vào tài khoản sở hữu attachment, còn phải xử lý CIDR trùng và routing, trái yêu cầu.\n(C) SAI: Mỗi VPN tính phí theo giờ và phải quản lý routing, vẫn vướng CIDR trùng; không mở rộng tốt tới 400 khách.\n(D) ĐÚNG: PrivateLink cho phép khách tạo interface endpoint trong VPC của họ; phí giờ và phí GB của endpoint tính cho tài khoản khách. Traffic một chiều khởi tạo từ khách, không cần routing giữa các VPC nên CIDR trùng không thành vấn đề.\nĐáp án đúng: D\nĐiểm cần nhớ: Dịch vụ cho nhiều khách, CIDR trùng, chỉ khách gọi vào => PrivateLink endpoint service; phí endpoint do bên tiêu thụ trả.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a VPC peering connection with each customer VPC and update the route tables on both sides.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Attach every customer VPC to a transit gateway that the provider owns and shares with the customer accounts through AWS RAM.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Establish an AWS Site-to-Site VPN connection from each customer VPC to the provider VPC.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Publish the API as a VPC endpoint service behind a Network Load Balancer and let customers create interface endpoints.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "An analytics team runs Amazon EMR jobs in us-west-2. Each month, the jobs scan the same 50 TB of datasets several times from an Amazon S3 bucket in eu-west-1, which results in about 200 TB of inter-Region data transfer. There is no data residency restriction, and the team can change where the jobs or data run. Which TWO options will reduce the inter-Region data transfer cost? (Select TWO.)",
+    "explanation": "Phân tích đề: Job ở us-west-2 đọc lặp lại 50 TB từ bucket eu-west-1 => 200 TB inter-Region mỗi tháng. Không ràng buộc lưu trú dữ liệu.\n(A) ĐÚNG: Đưa compute về cùng Region với dữ liệu thì S3 tới EC2 cùng Region miễn phí transfer, bỏ hoàn toàn 200 TB inter-Region.\n(B) SAI: Gateway endpoint chỉ phục vụ bucket trong cùng Region với VPC; bucket ở eu-west-1 không đi qua endpoint này được.\n(C) ĐÚNG: CRR chỉ trả phí inter-Region một lần cho mỗi object (khoảng 50 TB cộng dữ liệu mới) thay vì mỗi lần quét; các lần đọc sau từ bucket cùng Region miễn phí transfer.\n(D) SAI: Transfer Acceleration thêm phí mỗi GB trên dòng inter-Region hiện có, chỉ làm đắt hơn.\n(E) SAI: Đường qua TGW vẫn chịu phí inter-Region, cộng thêm phí xử lý và attachment của transit gateway.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Đọc lặp lại dữ liệu khác Region => đưa compute tới gần dữ liệu, hoặc sao chép một lần rồi đọc tại chỗ.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Run the EMR jobs in eu-west-1 so that they read the data in the same Region as the bucket.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create an S3 gateway endpoint in the us-west-2 VPC for the bucket in eu-west-1.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Replicate the datasets once to a bucket in us-west-2 with S3 Cross-Region Replication and read them locally.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable S3 Transfer Acceleration on the eu-west-1 bucket for the EMR reads.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Connect the Regions with inter-Region transit gateway peering and route the reads through it.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An application runs on Amazon EC2 instances in three Availability Zones behind an Application Load Balancer. It is read-heavy and uses an Amazon Aurora PostgreSQL cluster that has one Aurora Replica in each of the same three Availability Zones. The application connects through the cluster reader endpoint, so about two-thirds of read traffic crosses Availability Zones, and inter-AZ data transfer charges are high. The company must keep a replica in every Availability Zone and must keep reads available if one replica fails. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Aurora có replica ở mỗi AZ, nhưng reader endpoint rải kết nối sang mọi replica nên 2/3 lượt đọc đi khác AZ. Phải giữ replica ở cả 3 AZ và đọc vẫn sẵn sàng khi một replica lỗi.\n(A) SAI: Bỏ replica vi phạm yêu cầu giữ replica ở mọi AZ, và instance ở hai AZ còn lại vẫn đọc khác AZ.\n(B) ĐÚNG: Custom endpoint gom đúng replica cùng AZ nên instance đọc qua private IP trong cùng AZ, không phát sinh phí inter-AZ. Khi replica đó lỗi, ứng dụng chuyển sang cluster reader endpoint nên vẫn đọc được.\n(C) SAI: ALB chỉ phân phối request tới EC2; nó không quyết định instance kết nối replica ở AZ nào nên phí inter-AZ phía cơ sở dữ liệu không đổi.\n(D) SAI: Serverless v2 thay đổi cách tính compute, không thay đổi việc reader endpoint gửi kết nối tới replica ở AZ khác.\nĐáp án đúng: B\nĐiểm cần nhớ: Muốn đọc cùng AZ với Aurora: custom endpoint theo AZ (hoặc instance endpoint) cho từng nhóm ứng dụng, giữ reader endpoint làm dự phòng.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Remove two of the replicas and keep a single larger replica in the Availability Zone that hosts the most application instances.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create an Aurora custom endpoint for each zone's replica, point each zone's instances at it, and fall back to the reader endpoint.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable cross-zone load balancing on the Application Load Balancer so that requests are routed to the zone that hosts the healthiest replica.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Convert the cluster to Aurora Serverless v2 so that the replicas scale down when read traffic drops.",
+        "isCorrect": false
+      }
+    ]
+  }
+]

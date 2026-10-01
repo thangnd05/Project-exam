@@ -1,0 +1,173 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company finds that objects in an S3 bucket encrypted with SSE-S3 were downloaded by anonymous users on the internet. A developer had added a bucket policy statement that allows s3:GetObject for all principals. What should a solutions architect do to stop the exposure?",
+    "explanation": "Phân tích đề: Dữ liệu bị lộ ra Internet do bucket policy cho phép mọi principal. Đây là vấn đề kiểm soát truy cập, không phải mã hóa.\n(A) SAI: Mã hóa lại bằng SSE-S3 không thay đổi việc ai được gọi GetObject; S3 vẫn giải mã trong suốt cho request được policy cho phép.\n(B) SAI: Versioning và MFA Delete bảo vệ khỏi xóa nhầm, không ngăn người ngoài đọc object.\n(C) ĐÚNG: Xóa statement public trong bucket policy và bật S3 Block Public Access để chặn mọi policy/ACL public trong tương lai; đây là trục access control.\n(D) SAI: aws:SecureTransport chỉ buộc dùng HTTPS; người ẩn danh vẫn đọc được qua HTTPS.\nĐáp án đúng: C\nĐiểm cần nhớ: Mã hóa at rest không ngăn rò rỉ do policy sai. Dữ liệu lộ ra Internet => sửa access control (bucket policy, Block Public Access).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Re-encrypt every object with a new SSE-S3 key by running an S3 Batch Operations copy job.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable S3 Versioning with MFA Delete so that anonymous users can no longer retrieve objects.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Remove the public statement from the bucket policy and enable S3 Block Public Access.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Add a bucket policy statement that denies all requests when aws:SecureTransport is false.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A developer uses the AWS SDK with long-term IAM user credentials and Signature Version 4 to create an S3 presigned URL that should remain valid for 30 days. The SDK rejects the requested expiration. What is the maximum validity period for this type of presigned URL?",
+    "explanation": "Phân tích đề: Presigned URL tạo bằng SDK, SigV4, credential dài hạn của IAM user; hỏi thời hạn tối đa.\n(A) SAI: 12 giờ là giới hạn khi tạo presigned URL từ S3 console, không phải giới hạn của SDK với SigV4.\n(B) SAI: 36 giờ không phải giới hạn nào của presigned URL S3.\n(C) ĐÚNG: Với SigV4, tham số expiration tối đa là 7 ngày (604800 giây); cần lâu hơn thì phải tạo lại URL hoặc dùng cơ chế khác.\n(D) SAI: 30 ngày vượt quá giới hạn của SigV4 nên SDK từ chối.\nĐáp án đúng: C\nĐiểm cần nhớ: Presigned URL SigV4 tối đa 7 ngày; nếu ký bằng credential tạm thời thì hết hiệu lực sớm hơn khi credential hết hạn.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "12 hours", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "36 hours", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "7 days", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "30 days", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An application stores its Amazon RDS database password in a configuration file in an S3 bucket encrypted with SSE-KMS. The security team wants the password stored in a dedicated service that encrypts it and rotates it automatically on a schedule. Which AWS service should be used?",
+    "explanation": "Phân tích đề: Cần lưu mật khẩu database và tự động xoay theo lịch.\n(A) SAI: AWS KMS quản lý key mã hóa, không lưu và không xoay mật khẩu database.\n(B) ĐÚNG: AWS Secrets Manager lưu secret đã mã hóa (dùng KMS) và hỗ trợ xoay tự động theo lịch, có tích hợp sẵn với Amazon RDS.\n(C) SAI: SSE-C chỉ là kiểu mã hóa object S3; vẫn phải tự xoay mật khẩu và tự quản lý key.\n(D) SAI: SecureString của Parameter Store lưu giá trị mã hóa nhưng không có tính năng xoay tự động tích hợp như Secrets Manager.\nĐáp án đúng: B\nĐiểm cần nhớ: KMS quản lý key; Secrets Manager quản lý secret (mật khẩu, API key) và tự động xoay.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS Key Management Service with automatic key rotation enabled", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "AWS Secrets Manager with automatic rotation configured", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Amazon S3 with SSE-C and a new customer key for each upload", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "AWS Systems Manager Parameter Store with a SecureString parameter", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company creates an S3 bucket in eu-west-1 and wants to set default encryption to SSE-KMS with an existing customer managed key that lives in us-east-1. The key does not appear as a choice and the configuration fails. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Bucket ở eu-west-1, KMS key ở us-east-1. KMS key là tài nguyên theo Region.\n(A) SAI: Key policy không thể làm cho key ở Region khác được dùng cho SSE-KMS; S3 yêu cầu key cùng Region với bucket.\n(B) SAI: Bucket Keys là data key cấp bucket sinh từ KMS key hợp lệ; không cho phép dùng key khác Region.\n(C) SAI: DSSE-KMS cũng dùng KMS key và có cùng yêu cầu key phải ở cùng Region với bucket.\n(D) ĐÚNG: SSE-KMS yêu cầu KMS key nằm cùng Region với bucket; dùng (hoặc tạo) một customer managed key ở eu-west-1.\nĐáp án đúng: D\nĐiểm cần nhớ: KMS key là tài nguyên theo Region; bucket nào thì dùng key ở đúng Region của bucket đó (replication sang Region khác cũng cần key ở Region đích).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a key policy statement that allows Amazon S3 in eu-west-1 to use the us-east-1 key.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable S3 Bucket Keys so that the us-east-1 key can be cached for use in eu-west-1.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use DSSE-KMS instead, because dual-layer encryption accepts keys from any Region.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use a customer managed KMS key that is created in the eu-west-1 Region.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An Application Load Balancer delivers access logs to an S3 bucket. To meet a new standard, a security engineer changed the bucket's default encryption to SSE-KMS with a customer managed key. Since then, no new access logs have been delivered. The logs must be encrypted at rest and delivery must resume. What should a solutions architect do?",
+    "explanation": "Phân tích đề: ALB access logs ngừng ghi sau khi bucket chuyển sang SSE-KMS; vẫn cần mã hóa at rest.\n(A) SAI: ALB access logs không hỗ trợ bucket SSE-KMS; thêm quyền trong key policy không làm tính năng này hoạt động.\n(B) ĐÚNG: Tùy chọn mã hóa phía server duy nhất được hỗ trợ cho bucket nhận ALB access logs là SSE-S3; đổi default encryption về SSE-S3 thì log vẫn được mã hóa at rest và giao lại bình thường.\n(C) SAI: Key aws/s3 vẫn là SSE-KMS nên vẫn không được hỗ trợ.\n(D) SAI: Bucket Keys không đổi bản chất SSE-KMS của bucket, nên không khắc phục được.\nĐáp án đúng: B\nĐiểm cần nhớ: Bucket nhận access logs của ELB chỉ hỗ trợ SSE-S3. Trước khi ép SSE-KMS cho mọi bucket, kiểm tra dịch vụ ghi log có hỗ trợ không.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add the Elastic Load Balancing service principal to the key policy with kms:GenerateDataKey.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Change the log bucket's default encryption to SSE-S3.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Change the log bucket's default encryption to SSE-KMS with the AWS managed key aws/s3.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable S3 Bucket Keys so that the load balancer no longer needs to call AWS KMS for each log.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A backup bucket has a policy that denies s3:PutObject unless the request header x-amz-server-side-encryption equals aws:kms. The company has bought a third-party backup tool that is the only writer to this bucket, but the tool cannot send custom headers, so its uploads are denied. All new objects must still be encrypted with the company's customer managed key. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Công cụ ghi duy nhất không gửi được header mã hóa; vẫn phải mã hóa bằng CMK; ít vận hành nhất.\n(A) SAI: Lambda mã hóa lại sau khi upload tạo thêm thành phần vận hành, tốn chi phí ghi hai lần và có khoảng thời gian object chưa dùng CMK.\n(B) SAI: Proxy EC2 thêm header là hạ tầng phải vận hành, mở rộng và vá lỗi, trái với yêu cầu ít vận hành.\n(C) ĐÚNG: Default encryption SSE-KMS với CMK khiến S3 tự mã hóa mọi object không kèm header bằng đúng key đó; bỏ statement Deny theo header để công cụ upload được.\n(D) SAI: Client-side encryption đòi hỏi công cụ hỗ trợ mã hóa trước khi gửi và quản lý key phía client; không phải là SSE-KMS với CMK như yêu cầu.\nĐáp án đúng: C\nĐiểm cần nhớ: Đảm bảo luôn mã hóa bằng KMS với ít công nhất => default encryption; Bucket Policy Deny theo header chỉ dùng khi cần từ chối thẳng request sai chuẩn.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Invoke an AWS Lambda function on each upload event to copy the object in place with SSE-KMS.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Place an Amazon EC2 proxy in front of the bucket that adds the encryption header to each request.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Set default encryption to SSE-KMS with the key and remove the header-based Deny statement.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Configure the tool to use client-side encryption with a key exported from the company's KMS key.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A marketing team intentionally hosts a public static website by using the S3 website endpoint. The team added a bucket policy that grants s3:GetObject to all principals, but visitors receive 403 Forbidden errors. The objects are uploaded by a pipeline that encrypts them with SSE-KMS using a customer managed key. Which TWO changes are required for the website to work?",
+    "explanation": "Phân tích đề: Website public qua S3 website endpoint, bucket policy đã public nhưng vẫn 403; object mã hóa SSE-KMS.\n(A) ĐÚNG: Block Public Access (ở bucket và/hoặc account) chặn bucket policy public; phải tắt các thiết lập chặn public policy thì policy mới có hiệu lực.\n(B) SAI: Bật ACL và gán public-read không cần thiết khi đã có bucket policy, và cũng bị Block Public Access chặn.\n(C) SAI: CORS chỉ liên quan tới request cross-origin từ trình duyệt, không gây 403 cho truy cập trực tiếp.\n(D) ĐÚNG: Request ẩn danh không thể dùng KMS để giải mã, nên object SSE-KMS không phục vụ được cho khách truy cập ẩn danh; cần mã hóa object bằng SSE-S3.\n(E) SAI: Không thể cấp quyền KMS cho request ẩn danh; KMS yêu cầu request đã xác thực.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Nội dung public ẩn danh không dùng được SSE-KMS. Cách được khuyến nghị cho website là CloudFront + OAC, giữ bucket private và vẫn dùng được SSE-KMS.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Turn off the Block Public Access settings that block public bucket policies for this bucket.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Enable ACLs on the bucket and apply the public-read canned ACL to every uploaded object.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a CORS configuration to the bucket that allows GET requests from any origin.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Change the pipeline and the existing objects to use SSE-S3 instead of SSE-KMS encryption.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Add a key policy statement that grants kms:Decrypt to all principals for anonymous visitors.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Employees access a bucket from the corporate network, whose internet egress uses the public range 203.0.113.0/24. An application on Amazon EC2 also accesses the bucket through a gateway VPC endpoint. The bucket must reject every request that comes neither from the corporate range nor through that endpoint. Which bucket policy statement meets these requirements?",
+    "explanation": "Phân tích đề: Hai đường hợp lệ: IP public của công ty, hoặc qua gateway endpoint. Phải chặn request không thuộc đường nào.\n(A) SAI: Deny khi aws:SourceIp không thuộc dải công ty sẽ chặn luôn ứng dụng EC2, vì request qua endpoint không mang IP public.\n(B) SAI: Hai statement Deny riêng biệt: request từ văn phòng bị statement endpoint chặn, request qua endpoint bị statement IP chặn, nên mọi người đều bị từ chối.\n(C) ĐÚNG: Trong một statement, các điều kiện được AND. Deny chỉ áp dụng khi request vừa không đến từ 203.0.113.0/24 vừa không đi qua endpoint, nên cả hai đường hợp lệ đều được giữ.\n(D) SAI: Điều kiện s3:TlsVersion chỉ kiểm tra phiên bản TLS, không giới hạn nguồn truy cập.\nĐáp án đúng: C\nĐiểm cần nhớ: Nhiều điều kiện trong một statement là AND; nhiều statement Deny độc lập thì bất kỳ statement nào khớp cũng chặn. Kết hợp aws:SourceIp (IP public) với aws:SourceVpce (endpoint) trong cùng statement.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "One Deny statement that applies when aws:SourceIp is not within the corporate range.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Two separate Deny statements, one for aws:SourceIp and one for aws:SourceVpce mismatches.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "One Deny statement that requires both an aws:SourceIp and an aws:SourceVpce mismatch.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "One Deny statement that applies when s3:TlsVersion is lower than the corporate standard.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company encrypts objects in Amazon S3 with SSE-KMS and a customer managed key. A new compliance rule requires the key material to be rotated every 180 days. Existing objects must stay readable without being re-encrypted, and applications must not change. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Xoay key material mỗi 180 ngày, object cũ vẫn đọc được, không đổi ứng dụng, ít vận hành nhất.\n(A) ĐÚNG: KMS hỗ trợ xoay tự động cho customer managed key với chu kỳ tùy chỉnh (từ 90 ngày trở lên). Key ID và ARN giữ nguyên; KMS giữ các key material cũ để giải mã object cũ, nên không cần mã hóa lại hay đổi ứng dụng.\n(B) SAI: Tạo key mới và chạy Batch Operations mỗi chu kỳ tốn công và chi phí, và ứng dụng tham chiếu key cũ có thể phải thay đổi.\n(C) SAI: Key với key material import không hỗ trợ xoay tự động; phải xoay thủ công, tốn vận hành hơn.\n(D) SAI: Chuyển sang SSE-S3 làm mất kiểm soát key và audit; công ty không thể chứng minh chu kỳ xoay 180 ngày.\nĐáp án đúng: A\nĐiểm cần nhớ: Automatic rotation giữ nguyên key ID và key material cũ, object cũ không cần mã hóa lại. Key rotation (bảo mật) khác S3 Bucket Keys (chi phí/throttle).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable automatic key rotation on the key with a rotation period of 180 days.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create a new key every 180 days and re-encrypt all objects with S3 Batch Operations.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Import new key material into the key every 180 days by using an external key source.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Switch the bucket to SSE-S3 because Amazon S3 rotates its managed keys automatically.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A developer in a partner AWS account must read objects from a bucket in the company's AWS account. The objects are encrypted with SSE-S3. The company's bucket policy grants s3:GetObject to the partner account's root ARN, but the developer, whose IAM user has no S3 permissions, still receives AccessDenied. Which TWO conditions must both be true for the developer's request to succeed?",
+    "explanation": "Phân tích đề: Truy cập cross-account cần được cho phép ở cả hai phía: resource policy của account chủ bucket và identity policy ở account của người gọi. Object dùng SSE-S3 nên không liên quan tới KMS.\n(A) ĐÚNG: Bucket policy của account chủ bucket phải cho phép account (hoặc user) của partner; điều này đã được cấu hình và cần giữ nguyên.\n(B) SAI: Object dùng SSE-S3 nên không cần quyền KMS nào; key do S3 quản lý hoàn toàn.\n(C) ĐÚNG: Cấp quyền cho root ARN của account partner nghĩa là ủy quyền cho account đó; admin phía partner còn phải gắn IAM policy cho developer cho phép s3:GetObject trên bucket thì request mới thành công.\n(D) SAI: Cấp quyền cho một account cụ thể không phải truy cập public, nên Block Public Access không chặn và không cần tắt.\n(E) SAI: ACL không cần thiết (và thường đã bị tắt); bucket policy là cơ chế được khuyến nghị.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Cross-account = resource policy phía chủ tài nguyên cho phép + identity policy phía người gọi cho phép. Thiếu một phía là AccessDenied.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "The bucket policy in the company's account allows the partner account to call s3:GetObject.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "The developer has kms:Decrypt permission on the company's AWS managed key for Amazon S3.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "An IAM policy in the partner account allows the developer to call s3:GetObject on the bucket.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "S3 Block Public Access is turned off on the bucket so that another account can read objects.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Each object ACL grants READ permission to the canonical user ID of the partner account.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A security account owns a central log bucket whose default encryption uses a customer managed KMS key in the same account. Workloads in more than 120 accounts in the company's AWS Organization write logs directly to the bucket, and new accounts are added every week. Only principals from the organization may write, and the security team does not want to update any policy when accounts are added. The workload roles already have the needed IAM permissions. Which TWO actions meet these requirements?",
+    "explanation": "Phân tích đề: Nhiều account trong Organization ghi trực tiếp vào bucket SSE-KMS dùng CMK của account security; account tăng liên tục; không muốn sửa policy khi thêm account.\n(A) ĐÚNG: Bucket policy cho phép s3:PutObject với điều kiện aws:PrincipalOrgID bằng ID của Organization, tự động bao gồm mọi account mới.\n(B) SAI: Tạo KMS grant cho từng account phải làm mỗi khi có account mới, trái yêu cầu không cập nhật khi thêm account.\n(C) ĐÚNG: Key policy cũng hỗ trợ aws:PrincipalOrgID; cho phép kms:GenerateDataKey (và kms:Decrypt cho multipart upload) với điều kiện này để mọi principal trong Organization dùng được key khi ghi.\n(D) SAI: Liệt kê từng account ID trong key policy phải cập nhật liên tục và dễ chạm giới hạn kích thước key policy.\n(E) SAI: AWS managed key aws/s3 không thể chỉnh key policy nên không cấp được cho account khác.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Chia sẻ cả bucket lẫn CMK cho toàn Organization => dùng aws:PrincipalOrgID ở cả bucket policy và KMS key policy.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Allow s3:PutObject in the bucket policy when aws:PrincipalOrgID equals the organization ID.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create a KMS grant for each workload account's role that allows kms:GenerateDataKey on the key.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Allow the key's data key actions in the key policy when aws:PrincipalOrgID equals the organization ID.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "List every workload account ID in the key policy and update it through an AWS Lambda automation.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Switch the bucket's default encryption to the AWS managed key aws/s3 in the security account.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company has an existing versioned S3 bucket that contains 80 million objects. A new regulation requires every existing and future object to be protected from deletion and overwrite for 3 years, with no possibility of early removal by any user. The company does not want to migrate the data to a new bucket. Which solution meets these requirements with the LEAST effort?",
+    "explanation": "Phân tích đề: Bucket đã có, versioned, 80 triệu object; cần WORM tuyệt đối 3 năm cho cả object cũ và mới; không muốn di chuyển dữ liệu.\n(A) SAI: Default retention chỉ áp dụng cho object version được ghi sau khi cấu hình; 80 triệu object cũ vẫn không được bảo vệ.\n(B) SAI: Tạo bucket mới và copy toàn bộ là việc di chuyển dữ liệu mà công ty muốn tránh, tốn chi phí và công sức hơn.\n(C) SAI: S3 Glacier Vault Lock áp dụng cho vault của S3 Glacier (API cũ), không áp dụng cho object trong bucket S3; lifecycle transition cũng không tạo khóa WORM.\n(D) ĐÚNG: Object Lock có thể bật trên bucket versioned hiện có; default retention compliance 3 năm bảo vệ object mới, và một job S3 Batch Operations (thao tác Object Lock retention) áp retention compliance cho các version hiện có.\nĐáp án đúng: D\nĐiểm cần nhớ: Default retention của Object Lock không hồi tố. Áp retention cho hàng loạt object cũ => S3 Batch Operations.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable Object Lock on the bucket with a 3-year compliance-mode default retention period only.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a new bucket with Object Lock enabled and copy every object into it with S3 Batch Operations.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a lifecycle rule that transitions the objects to S3 Glacier Flexible Retrieval and apply Vault Lock.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable Object Lock with a compliance default, then apply retention to existing objects with Batch Operations.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A central S3 bucket receives logs from an AWS CloudTrail organization trail. To enforce a data perimeter, the security team added a bucket policy statement that denies s3:PutObject when aws:PrincipalOrgID does not equal the organization ID. Immediately afterward, CloudTrail stopped delivering logs. The perimeter must stay in place for all IAM principals, log delivery must resume, and the team does not want to maintain a list of service principals inside the Deny statement. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Deny theo aws:PrincipalOrgID chặn luôn CloudTrail, vì CloudTrail ghi log bằng service principal (không thuộc Organization). Cần giữ perimeter cho IAM principal, khôi phục log, không liệt kê từng service principal.\n(A) SAI: Explicit Deny luôn thắng; thêm Allow cho cloudtrail.amazonaws.com không vượt qua được statement Deny hiện có.\n(B) ĐÚNG: Thêm điều kiện BoolIfExists aws:PrincipalIsAWSService = false (và dùng StringNotEqualsIfExists cho aws:PrincipalOrgID) để Deny không áp dụng khi request do service principal của AWS thực hiện; Allow cho CloudTrail kèm aws:SourceArn vẫn giữ nguyên.\n(C) SAI: SCP chỉ giới hạn principal trong Organization, không ngăn được principal bên ngoài truy cập bucket; bỏ Deny làm mất perimeter.\n(D) SAI: CloudTrail không ghi log từ một dải IP cố định do khách hàng kiểm soát, và aws:SourceIp không phải cách xác định service principal.\nĐáp án đúng: B\nĐiểm cần nhớ: Data perimeter bằng aws:PrincipalOrgID phải miễn trừ dịch vụ AWS bằng aws:PrincipalIsAWSService, nếu không sẽ chặn CloudTrail, Config, log delivery...",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a separate Allow statement for the CloudTrail service principal with the trail's ARN as aws:SourceArn.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add an aws:PrincipalIsAWSService condition to the Deny so that it applies only to non-service callers.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Remove the Deny statement and attach an SCP that denies S3 access to principals outside the organization.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add an aws:SourceIp exception to the Deny statement for the IP ranges that CloudTrail uses to deliver logs.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "Developers generate presigned URLs for internal reports stored in an S3 bucket, sometimes with the full 7-day expiration. Security discovers that URLs are being forwarded outside the company. New rules state that presigned URLs for this bucket must work only from the corporate network's public IP ranges and must stop working 10 minutes after they are signed, regardless of the expiration that developers set. Developer code must not change. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Không sửa code của developer; presigned URL chỉ dùng được từ IP công ty và tối đa 10 phút kể từ lúc ký, bất kể expiration.\n(A) SAI: Geo restriction của CloudFront chỉ áp dụng cho request qua CloudFront theo quốc gia, không ảnh hưởng presigned URL gọi thẳng S3 và không giới hạn theo thời gian.\n(B) ĐÚNG: Request dùng presigned URL vẫn được bucket policy đánh giá: Deny khi aws:SourceIp không thuộc dải IP công ty và Deny khi s3:signatureAge lớn hơn 600000 mili giây. Không cần sửa code tạo URL.\n(C) SAI: Xoay access key mỗi 10 phút vừa tốn vận hành, vừa không giới hạn theo IP, và chỉ vô hiệu URL ký bằng key cũ khi key bị xóa hoặc vô hiệu hóa.\n(D) SAI: Block Public Access không ảnh hưởng presigned URL vì đó là request đã được xác thực bằng chữ ký.\nĐáp án đúng: B\nĐiểm cần nhớ: Giới hạn presigned URL từ phía bucket => bucket policy với aws:SourceIp và s3:signatureAge (tính bằng mili giây).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Serve the reports through CloudFront with geo restriction set to the countries of the corporate offices.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add bucket policy Deny statements based on aws:SourceIp and on s3:signatureAge above 10 minutes.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Rotate the developers' IAM access keys every 10 minutes by using AWS Secrets Manager rotation.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable S3 Block Public Access on the bucket so that presigned URLs cannot be used from outside.", "isCorrect": false }
+    ]
+  }
+]

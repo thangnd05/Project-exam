@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company runs an Amazon RDS for MySQL database that supports an order-entry application. The company needs a synchronously replicated copy of the database in a different Availability Zone that RDS promotes automatically if the primary DB instance fails. Which RDS feature meets this requirement?",
+    "explanation": "Phân tích đề: Từ khóa 'synchronously replicated', 'different Availability Zone', 'promotes automatically' là định nghĩa của Multi-AZ DB instance deployment.\n(A) SAI: Read replica trong AZ khác dùng replication asynchronous và không tự failover; muốn dùng phải promote thủ công và có thể mất các giao dịch chưa kịp replicate.\n(B) ĐÚNG: Multi-AZ DB instance deployment tạo một standby ở AZ khác, mọi lần ghi được replicate synchronous sang standby; khi primary hỏng, RDS tự chuyển DNS endpoint sang standby.\n(C) SAI: Automated backups cho phép point-in-time restore nhưng restore tạo một instance mới, mất nhiều thời gian và không phải bản sao đồng bộ sẵn sàng thay thế.\n(D) SAI: Copy snapshot sang Region khác là bản chụp tại một thời điểm phục vụ DR, không replicate liên tục và không tự failover.\nĐáp án đúng: B\nĐiểm cần nhớ: Synchronous + standby + automatic failover = Multi-AZ. Asynchronous + đọc được + promote thủ công = read replica.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "A read replica created in a second Availability Zone of the same Region", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "A Multi-AZ DB instance deployment", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Automated backups with a 35-day retention period and point-in-time restore", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Scheduled manual snapshots that are copied to another AWS Region each hour", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A retail company's Amazon RDS for PostgreSQL database is slowing down because analysts run large SELECT queries against it during business hours. The analysts can accept results that are a few seconds behind the production data. What should a solutions architect recommend to reduce the load on the production DB instance?",
+    "explanation": "Phân tích đề: Vấn đề là tải đọc (SELECT nặng), dữ liệu trễ vài giây chấp nhận được => chuyển tải đọc sang read replica.\n(A) SAI: Bật Multi-AZ trên Multi-AZ DB instance tạo standby không phục vụ traffic đọc, nên không giảm tải cho primary.\n(B) SAI: Tăng backup retention chỉ kéo dài thời gian giữ bản sao lưu, không liên quan đến hiệu năng truy vấn.\n(C) SAI: RDS Proxy gom kết nối (connection pooling) nhưng mọi truy vấn vẫn chạy trên cùng instance, không chia tải đọc.\n(D) ĐÚNG: Read replica nhận dữ liệu asynchronous từ primary và phục vụ truy vấn đọc thật sự; trỏ công cụ phân tích vào endpoint của replica để primary chỉ lo OLTP. Độ trễ vài giây phù hợp với replication lag.\nĐáp án đúng: D\nĐiểm cần nhớ: Tải đọc lớn, chấp nhận dữ liệu hơi cũ => read replica. Standby của Multi-AZ DB instance không đọc được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable Multi-AZ and point the analysts at the standby DB instance in the second Availability Zone", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Increase the automated backup retention period so that queries can use backup storage", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Place Amazon RDS Proxy in front of the database and send the analysts' queries through it", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a read replica and point the analysts' queries at its endpoint", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An application connects to an Amazon RDS Multi-AZ DB instance by using the DB instance endpoint. The primary DB instance experiences a hardware failure and RDS completes a failover. What must the application team do so that the application can write to the database again?",
+    "explanation": "Phân tích đề: Hỏi hành vi của endpoint sau failover Multi-AZ.\n(A) ĐÚNG: Khi failover, RDS cập nhật bản ghi DNS của endpoint để trỏ tới standby vừa được nâng lên làm primary. Ứng dụng giữ nguyên connection string, chỉ cần mở lại kết nối (cơ chế retry/reconnect) sau khoảng gián đoạn ngắn.\n(B) SAI: Endpoint không đổi sau failover, nên không cần sửa connection string sang hostname mới.\n(C) SAI: Standby đã được RDS nâng thành primary tự động; không có thao tác promote thủ công như với read replica.\n(D) SAI: Không cần restore từ snapshot; dữ liệu đã được replicate synchronous sang standby nên không mất giao dịch đã commit.\nĐáp án đúng: A\nĐiểm cần nhớ: Failover Multi-AZ giữ nguyên DNS endpoint; ứng dụng chỉ cần reconnect và không nên cache địa chỉ IP của database.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Reconnect by using the same DB instance endpoint, which now resolves to the new primary", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Update the connection string to use the hostname of the standby DB instance", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Promote the standby DB instance manually from the RDS console", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Restore the latest automated snapshot to a new DB instance and update DNS", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect is explaining Amazon RDS read replicas to a development team that plans to scale a read-heavy MySQL workload. Which TWO statements about RDS read replicas are correct?",
+    "explanation": "Phân tích đề: Cần nắm đặc tính cốt lõi của read replica: asynchronous, phục vụ đọc, có thể cross-Region, promote thủ công.\n(A) SAI: Read replica không tự failover; khi primary hỏng phải promote replica thủ công (hoặc bằng script) và replica trở thành DB độc lập.\n(B) ĐÚNG: Dữ liệu được replicate asynchronous từ source, nên replica có thể chậm hơn primary (replication lag) và đọc ra dữ liệu chưa mới nhất.\n(C) SAI: Replica chỉ đọc; các lệnh ghi phải gửi tới primary. Muốn ghi vào replica phải promote nó thành instance độc lập.\n(D) SAI: Replication của read replica là asynchronous, không phải synchronous; synchronous là đặc tính của standby trong Multi-AZ DB instance.\n(E) ĐÚNG: RDS hỗ trợ tạo read replica ở một AWS Region khác (cross-Region read replica) để phục vụ người dùng gần đó hoặc làm nền cho DR.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Read replica = asynchronous, read-only, có thể cross-Region, promote thủ công; không thay thế Multi-AZ cho HA.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "A read replica automatically takes over writes if the source DB instance fails", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Replication to a read replica is asynchronous, so reads can return slightly stale data", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Applications can send INSERT and UPDATE statements to any read replica", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Each read replica is kept synchronously consistent with the source DB instance", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "A read replica can be created in a different AWS Region from the source", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs a production Amazon RDS for MariaDB database as a Single-AZ DB instance. Leadership wants the database to tolerate an Availability Zone failure. The change must not require an outage, and the application must keep using its current endpoint. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Chuyển Single-AZ sang Multi-AZ, không downtime, giữ endpoint, ít vận hành nhất.\n(A) SAI: Restore snapshot thành instance Multi-AZ mới tạo endpoint mới, phải dừng ghi để không mất dữ liệu và đổi cấu hình ứng dụng.\n(B) SAI: Read replica ở AZ khác không tự failover và phải promote thủ công, nên không đáp ứng yêu cầu chịu lỗi AZ một cách tự động.\n(C) ĐÚNG: Modify DB instance để bật Multi-AZ; RDS chụp snapshot của primary, restore thành standby ở AZ khác rồi bật replication synchronous. Thao tác diễn ra không cần downtime và endpoint giữ nguyên (nên làm lúc tải thấp vì có thể ảnh hưởng hiệu năng tạm thời).\n(D) SAI: Blue/Green Deployments dùng cho nâng cấp và thay đổi có switchover; dựng cả môi trường green chỉ để bật Multi-AZ là thừa, trong khi bật Multi-AZ trực tiếp đã không gây downtime.\nĐáp án đúng: C\nĐiểm cần nhớ: Bật Multi-AZ trên instance đang chạy là thao tác modify, không downtime, không đổi endpoint.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Take a snapshot and restore it as a new Multi-AZ DB instance, then repoint the application", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a read replica in a second Availability Zone and promote it if the primary Availability Zone fails", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Modify the existing DB instance to enable Multi-AZ", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Create an RDS Blue/Green Deployment with Multi-AZ on the green environment and then switch over", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A developer accidentally deleted thousands of rows from an Amazon RDS for PostgreSQL production database at 14:05. Automated backups are enabled with a 7-day retention period. The company must recover the data as it existed at 14:04 and wants the application to keep using the same endpoint name after recovery. Which approach meets these requirements?",
+    "explanation": "Phân tích đề: Lỗi logic (xóa dữ liệu) cần point-in-time restore; điểm bẫy là PITR luôn tạo DB instance mới với endpoint mới.\n(A) ĐÚNG: Restore to point in time tạo một instance mới tại thời điểm 14:04. Sau đó đổi tên (rename) instance cũ, rồi rename instance mới thành identifier cũ; endpoint DNS dựa trên identifier nên ứng dụng tiếp tục dùng cùng tên endpoint.\n(B) SAI: Failover Multi-AZ không giúp được vì standby nhận thao tác xóa synchronous, nên dữ liệu trên standby cũng đã mất.\n(C) SAI: RDS không có tùy chọn restore ghi đè lên instance hiện có; PITR luôn tạo DB instance mới.\n(D) SAI: Promote read replica cũng vô ích vì lệnh xóa đã được replicate sang replica, đồng thời replica sau promote có endpoint khác.\nĐáp án đúng: A\nĐiểm cần nhớ: Multi-AZ và read replica không bảo vệ khỏi lỗi logic; dùng PITR, và nhớ rằng restore luôn tạo instance mới (đổi tên identifier nếu muốn giữ endpoint).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Restore to 14:04 as a new DB instance, then swap the DB instance identifiers by renaming both instances", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Reboot the DB instance with failover so the Multi-AZ standby, which still holds the deleted rows, becomes primary", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Run a point-in-time restore to 14:04 that overwrites the existing DB instance in place", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Promote the existing read replica, which still contains the rows, to become the new primary", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A social media application writes profile updates to an Amazon RDS for MySQL primary DB instance and sends all reads to a read replica. Users report that right after saving a profile change, the page sometimes still shows the old values. The company wants to fix this while keeping most read traffic off the primary. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Hiện tượng read-after-write đọc ra dữ liệu cũ do replication lag của read replica; vẫn muốn giữ phần lớn tải đọc trên replica.\n(A) SAI: Bật Multi-AZ cho replica chỉ tăng độ sẵn sàng của replica, replication từ primary vẫn asynchronous nên vẫn có lag.\n(B) ĐÚNG: Định tuyến các lần đọc cần dữ liệu vừa ghi (ví dụ trang hồ sơ ngay sau khi lưu) tới primary endpoint, các lần đọc khác vẫn dùng replica. Cách này loại bỏ dữ liệu cũ cho đúng luồng cần nhất quán mà vẫn giảm tải cho primary.\n(C) SAI: Tăng cỡ instance có thể giảm lag nhưng không loại bỏ được bản chất asynchronous, dữ liệu cũ vẫn có thể xuất hiện.\n(D) SAI: RDS for MySQL read replica không có chế độ replication synchronous; synchronous chỉ có ở standby Multi-AZ.\nĐáp án đúng: B\nĐiểm cần nhớ: Đọc ngay sau khi ghi (read-after-write) phải đọc từ primary; read replica luôn có thể trễ.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable Multi-AZ on the read replica so that it receives each profile update before the write commits", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Send reads that follow a user's own write to the primary endpoint", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Change the read replica to a larger DB instance class so that it applies changes immediately", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Switch the read replica to synchronous replication mode in the DB parameter group", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company's Amazon RDS for PostgreSQL database runs in us-east-1 with Multi-AZ. For regional disaster recovery, the company must be able to restore the database in us-west-2 to any point within the last few days with an RPO of less than 1 hour. The company does not want to pay for a running DB instance in us-west-2. Which solution meets these requirements MOST cost-effectively?",
+    "explanation": "Phân tích đề: Cần PITR ở Region khác, RPO dưới 1 giờ, không muốn chạy instance thường trực ở Region DR.\n(A) SAI: Cross-Region read replica đáp ứng RPO nhưng là một instance chạy liên tục ở us-west-2, vi phạm yêu cầu chi phí.\n(B) SAI: Copy snapshot thủ công hằng ngày chỉ cho RPO tới 24 giờ và không hỗ trợ restore tới một thời điểm bất kỳ.\n(C) SAI: Export snapshot sang S3 tạo file Parquet để phân tích, không thể restore trực tiếp thành DB instance.\n(D) ĐÚNG: Cross-Region automated backup replication sao chép snapshot và transaction log sang Region đích, cho phép point-in-time restore ở us-west-2 trong khoảng retention mà không cần instance chạy sẵn; chỉ trả phí lưu trữ và truyền dữ liệu.\nĐáp án đúng: D\nĐiểm cần nhớ: Muốn PITR ở Region khác mà không có instance thường trực => bật cross-Region automated backups replication.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a cross-Region read replica in us-west-2 and promote it during a disaster", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Copy a manual snapshot to us-west-2 each night by using an Amazon EventBridge schedule", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Export daily snapshots to an Amazon S3 bucket in us-west-2 that uses Cross-Region Replication", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable replication of automated backups to us-west-2", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company runs its billing database on an Amazon RDS for MySQL Multi-AZ DB instance deployment. The operations team is writing a runbook and needs to know which events RDS handles by failing over to the standby automatically. Which TWO events cause an automatic failover?",
+    "explanation": "Phân tích đề: Phân biệt sự cố hạ tầng (Multi-AZ tự failover) với lỗi dữ liệu hoặc vấn đề hiệu năng (không failover).\n(A) ĐÚNG: Mất kết nối hoặc sự cố cả Availability Zone của primary là tình huống điển hình khiến RDS chuyển sang standby ở AZ khác.\n(B) SAI: Lệnh DROP TABLE là thao tác hợp lệ, được replicate synchronous sang standby; không có failover và cần PITR để khôi phục.\n(C) ĐÚNG: Lỗi phần cứng hoặc host bên dưới primary DB instance làm RDS tự động failover sang standby.\n(D) SAI: Replication lag của read replica không ảnh hưởng tới primary, không kích hoạt failover Multi-AZ.\n(E) SAI: CPU cao kéo dài là vấn đề hiệu năng, RDS không failover vì tải; cần tối ưu truy vấn, scale instance hoặc thêm read replica.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Multi-AZ chống sự cố hạ tầng (AZ, host, storage, network), không chống lỗi logic và không xử lý quá tải.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "An outage that affects the Availability Zone of the primary DB instance", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "An application user runs DROP TABLE on a critical table by mistake", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "A failure of the underlying host of the primary DB instance", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Replica lag on an attached read replica exceeds several minutes", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "CPU utilization on the primary DB instance stays above 90% for an hour", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An Amazon RDS for SQL Server database that stores scanned insurance documents unexpectedly ran out of storage overnight, which caused a production outage. Data growth is unpredictable. The company wants storage to grow automatically without downtime, but finance requires a hard upper limit on how large the storage can become. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Storage tăng tự động, không downtime, có giới hạn trên, ít vận hành.\n(A) SAI: Alarm FreeStorageSpace + Lambda gọi ModifyDBInstance làm được nhưng phải tự viết và bảo trì code, xử lý cooldown giữa các lần modify, tốn vận hành hơn tính năng có sẵn.\n(B) SAI: Read replica có storage riêng, không giải quyết việc primary hết dung lượng.\n(C) ĐÚNG: RDS storage autoscaling tự tăng dung lượng khi free space xuống thấp, không downtime, và tham số maximum storage threshold đặt giới hạn trên để kiểm soát chi phí.\n(D) SAI: Cấp phát dư gấp nhiều lần ngay từ đầu tốn chi phí lâu dài và vẫn có thể hết nếu tăng trưởng vượt dự đoán.\nĐáp án đúng: C\nĐiểm cần nhớ: Chống hết dung lượng không cần tự động hóa thủ công => storage autoscaling với maximum storage threshold.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a CloudWatch alarm on FreeStorageSpace that invokes a Lambda function to increase allocated storage", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a read replica so that new documents can be written to the replica when storage is low", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable storage autoscaling and set a maximum storage threshold", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Provision four times the current allocated storage and review usage at each quarterly planning meeting", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A travel company runs Amazon RDS for MySQL with Multi-AZ in us-east-1. The company is expanding in Europe and needs low-latency reads for European users from eu-west-1. The eu-west-1 copy must also serve as the regional disaster recovery target with an RPO of a few minutes. If a single Availability Zone in eu-west-1 fails, European reads must continue without manual action. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Ba ràng buộc: đọc nhanh tại eu-west-1, làm DR với RPO vài phút, và bản sao ở eu-west-1 phải chịu được lỗi một AZ mà không thao tác thủ công.\n(A) SAI: Cross-Region automated backups cho phép restore ở eu-west-1 nhưng không có instance phục vụ đọc cho người dùng châu Âu.\n(B) SAI: Cross-Region read replica Single-AZ đáp ứng đọc nhanh và DR, nhưng nếu AZ chứa replica sập thì việc đọc ở châu Âu dừng lại, vi phạm yêu cầu chịu lỗi AZ.\n(C) ĐÚNG: Cross-Region read replica ở eu-west-1 phục vụ đọc gần người dùng và có thể promote khi us-east-1 gặp sự cố (RPO bằng replication lag, thường vài giây đến vài phút). Bật Multi-AZ trên chính replica để replica có standby riêng và tự failover khi một AZ ở eu-west-1 hỏng.\n(D) SAI: Multi-AZ DB cluster chỉ nằm trong một Region; standby đọc được ở us-east-1 không giảm độ trễ cho người dùng châu Âu và không bảo vệ khỏi sự cố Region.\nĐáp án đúng: C\nĐiểm cần nhớ: Read replica cũng có thể bật Multi-AZ; cross-Region replica vừa phục vụ đọc địa phương vừa là đích promote cho DR.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable cross-Region automated backup replication to eu-west-1 and restore a DB instance there when needed", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a Single-AZ cross-Region read replica in eu-west-1 and promote it if us-east-1 fails", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a cross-Region read replica in eu-west-1 and enable Multi-AZ on the replica", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Convert the primary to a Multi-AZ DB cluster and point European users at the readable standby instances", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company has a 3 TB unencrypted Amazon RDS for PostgreSQL Multi-AZ DB instance. A new compliance rule requires encryption at rest with an AWS KMS customer managed key. The database supports a 24/7 payment service, so the write outage during the cutover must be limited to a few minutes. Which approach meets these requirements?",
+    "explanation": "Phân tích đề: Không thể bật mã hóa trên instance chưa mã hóa đang chạy; DB lớn 3 TB nên restore mất nhiều giờ; downtime ghi chỉ vài phút => cần đồng bộ thay đổi sau khi restore.\n(A) ĐÚNG: Chụp snapshot, copy snapshot có bật mã hóa bằng customer managed key, restore thành instance mã hóa, sau đó dùng AWS DMS ongoing replication (CDC) để bắt kịp các thay đổi phát sinh; khi lag gần bằng 0 thì dừng ghi vài phút và chuyển ứng dụng sang instance mới.\n(B) SAI: RDS không cho bật encryption at rest bằng modify trên instance chưa mã hóa; mã hóa chỉ chọn được khi tạo instance.\n(C) SAI: Không thể tạo read replica mã hóa từ source chưa mã hóa; replica phải cùng trạng thái mã hóa với source.\n(D) SAI: Snapshot, copy mã hóa rồi restore là đúng hướng nhưng phải dừng ghi suốt quá trình với 3 TB dữ liệu, gây downtime nhiều giờ, vi phạm yêu cầu vài phút.\nĐáp án đúng: A\nĐiểm cần nhớ: Mã hóa RDS có sẵn = snapshot => copy encrypted => restore; muốn downtime nhỏ thì kết hợp DMS CDC để đồng bộ phần chênh lệch.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Restore an encrypted copy of a snapshot, keep it in sync with AWS DMS ongoing replication, and then cut over", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Modify the DB instance to enable encryption with the customer managed key during the next maintenance window", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an encrypted read replica that uses the customer managed key, then promote the replica and cut over", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Stop application writes, copy a snapshot with encryption enabled, restore it, and repoint the application", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A logistics company is redesigning its Amazon RDS for PostgreSQL tier. Requirements: committed writes must survive an Availability Zone failure with automatic failover, nightly reporting queries must not run on the database that handles writes, and the company must be able to bring up a writable database in another Region with an RPO of a few minutes. The company wants to stay on RDS for PostgreSQL. Which THREE actions should a solutions architect take?",
+    "explanation": "Phân tích đề: Ba yêu cầu riêng biệt ánh xạ tới ba cơ chế: HA trong Region, tách tải đọc, DR khác Region với RPO vài phút.\n(A) ĐÚNG: Multi-AZ trên primary cho replication synchronous và automatic failover, nên giao dịch đã commit không mất khi một AZ sập.\n(B) SAI: Standby của Multi-AZ DB instance không phục vụ đọc; không thể trỏ báo cáo vào đó.\n(C) ĐÚNG: Read replica trong cùng Region nhận tải báo cáo, primary chỉ còn lo ghi.\n(D) SAI: Automated backups giữ 35 ngày chỉ phục vụ restore trong cùng Region; không cung cấp DR khác Region với RPO vài phút.\n(E) ĐÚNG: Cross-Region read replica có thể promote thành DB ghi được ở Region khác; RPO tương đương replication lag, thường vài phút trở xuống.\n(F) SAI: RDS Proxy gom kết nối và giảm thời gian failover, nhưng không chia tải đọc sang instance khác và không tạo bản sao ở Region khác.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: HA = Multi-AZ; tải đọc = read replica; DR Region = cross-Region read replica (promote). Ba cơ chế bổ sung, không thay thế nhau.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable Multi-AZ on the primary DB instance", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Point the nightly reporting tool at the Multi-AZ standby DB instance", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an in-Region read replica for the nightly reporting queries", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Set the automated backup retention period to 35 days for regional recovery", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Create a cross-Region read replica that can be promoted during a disaster", "isCorrect": true },
+      { "answerLabel": "F", "answerText": "Place Amazon RDS Proxy in front of the database to offload the reporting reads", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs Amazon RDS for MySQL as a Multi-AZ DB instance deployment. Last month, a scheduled minor engine version upgrade caused several minutes of write downtime, even though the team expected Multi-AZ to upgrade the standby first and then fail over. The company needs future engine upgrades to cause less than a minute of write downtime and to be testable before production traffic moves. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Với Multi-AZ DB instance, nâng cấp engine áp dụng cho primary và standby cùng lúc nên có downtime; cần cách nâng cấp kiểm thử trước và switchover dưới một phút.\n(A) SAI: Không có tùy chọn rolling upgrade cho Multi-AZ DB instance; nâng cấp engine luôn áp dụng đồng thời cho cả primary và standby.\n(B) ĐÚNG: RDS Blue/Green Deployments tạo môi trường green (bản sao đồng bộ bằng logical replication), nâng cấp và kiểm thử trên green, rồi switchover thường dưới một phút; endpoint được đổi tên để ứng dụng không phải sửa cấu hình.\n(C) SAI: RDS Proxy giúp giảm thời gian gián đoạn khi failover, nhưng trong quá trình nâng cấp cả hai instance đều không sẵn sàng, Proxy không thể che phần downtime đó và không cung cấp môi trường kiểm thử.\n(D) SAI: Nâng cấp read replica rồi promote làm được nhưng replica sau promote có endpoint mới, phải đổi cấu hình ứng dụng và dựng lại Multi-AZ, replication bị cắt vĩnh viễn; tốn vận hành và rủi ro hơn Blue/Green.\nĐáp án đúng: B\nĐiểm cần nhớ: Multi-AZ DB instance không giảm downtime khi nâng cấp engine; cần kiểm thử trước và switchover nhanh => Blue/Green Deployments.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable the rolling upgrade setting so that RDS upgrades the standby first and then fails over to it", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use RDS Blue/Green Deployments to upgrade and test the green environment, then switch over", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Place Amazon RDS Proxy in front of the DB instance so that connections are held during the engine upgrade", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Upgrade an in-Region read replica first, promote it, and then update the application connection string", "isCorrect": false }
+    ]
+  }
+]

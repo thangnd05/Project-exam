@@ -1,0 +1,173 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company stores the master password for an Amazon RDS for MySQL database. The password must be rotated automatically every 30 days without custom scheduling code, and applications must always retrieve the current value. Which AWS service should the company use to store the password?",
+    "explanation": "Phân tích đề: Từ khóa quyết định là rotate tự động định kỳ cho mật khẩu RDS mà không tự viết cơ chế lập lịch.\n(A) SAI: Parameter Store SecureString mã hóa được nhưng không có rotation tự động; parameter policy chỉ hỗ trợ hết hạn và thông báo, không đổi mật khẩu trên database.\n(B) ĐÚNG: Secrets Manager có managed rotation cho thông tin đăng nhập RDS theo lịch (ví dụ 30 ngày), cập nhật cả mật khẩu trên database lẫn giá trị secret; ứng dụng gọi GetSecretValue luôn nhận giá trị hiện hành.\n(C) SAI: Automatic key rotation của KMS xoay vật liệu khóa mã hóa, không đổi mật khẩu database.\n(D) SAI: Advanced tier và higher throughput tăng giới hạn/throughput của Parameter Store, không thêm khả năng rotate secret.\nĐáp án đúng: B\nĐiểm cần nhớ: Secret cần rotate tự động => Secrets Manager. Config hoặc secret không cần rotate => Parameter Store (rẻ hơn).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS Systems Manager Parameter Store with a SecureString parameter and a parameter policy", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "AWS Secrets Manager with managed rotation for the Amazon RDS database credentials", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "AWS Key Management Service with automatic key rotation on a customer managed key", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "AWS Systems Manager Parameter Store with an Advanced parameter and higher throughput", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company must install a third-party security agent on Amazon EC2 instances and on-premises servers that are managed by AWS Systems Manager. The agent has separate installers for Windows and Linux. The company wants to publish new agent versions centrally and install them on managed nodes on demand or on a schedule. Which Systems Manager capability should the company use?",
+    "explanation": "Phân tích đề: Cần đóng gói phần mềm theo nhiều hệ điều hành, quản lý phiên bản tập trung và cài lên managed node theo yêu cầu hoặc lịch.\n(A) SAI: Parameter Store lưu cấu hình dạng chuỗi (tối đa 8 KB), không dùng để đóng gói và phân phối bộ cài.\n(B) SAI: Inventory chỉ thu thập thông tin phần mềm đã cài, không cài đặt phần mềm.\n(C) ĐÚNG: Distributor cho phép tạo package chứa installer cho từng nền tảng, quản lý version và cài/gỡ trên managed node (EC2 và on-prem) một lần qua Run Command hoặc theo lịch qua State Manager.\n(D) SAI: Session Manager cung cấp shell tương tác; cài tay từng máy không đáp ứng yêu cầu phân phối tập trung.\nĐáp án đúng: C\nĐiểm cần nhớ: Đóng gói và phân phối agent/phần mềm có version tới managed node => Systems Manager Distributor.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Parameter Store", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Inventory", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Distributor", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Session Manager", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "Administrators need graphical Remote Desktop access to Windows Server Amazon EC2 instances in private subnets. The security team does not allow inbound port 3389 in any security group and does not want to operate jump hosts. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Cần giao diện RDP đồ họa cho Windows, không mở inbound 3389, không dùng jump host.\n(A) ĐÚNG: Fleet Manager Remote Desktop mở phiên RDP ngay trong console, lưu lượng đi qua kênh Session Manager do SSM Agent khởi tạo outbound nên không cần inbound 3389 hay jump host.\n(B) SAI: Windows bastion chính là jump host và cần mở RDP inbound, trái với cả hai yêu cầu.\n(C) SAI: EC2 Instance Connect dùng để đẩy SSH key tạm cho Linux, không cung cấp RDP đồ họa cho Windows.\n(D) SAI: WorkSpaces thêm hạ tầng desktop và vẫn phải cho phép RDP inbound 3389 từ subnet WorkSpaces tới instance.\nĐáp án đúng: A\nĐiểm cần nhớ: RDP tới Windows không mở 3389 => Fleet Manager Remote Desktop (dựa trên Session Manager).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use Fleet Manager Remote Desktop in the Systems Manager console, which connects through Session Manager.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Deploy a Windows bastion host in a public subnet and allow RDP only from the bastion's security group.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use EC2 Instance Connect to send a temporary key and open an RDP connection from the EC2 console.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Provision Amazon WorkSpaces for the administrators and allow RDP to the instances from the WorkSpaces subnet.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect is designing an AWS Systems Manager maintenance window. Besides Run Command and Automation tasks, which TWO task types can be registered directly with a maintenance window? (Choose two.)",
+    "explanation": "Phân tích đề: Maintenance window hỗ trợ bốn loại task: Run Command, Automation, AWS Lambda và AWS Step Functions.\n(A) SAI: AWS Batch job không phải loại task của maintenance window; muốn chạy phải gọi gián tiếp qua Lambda hoặc Step Functions.\n(B) SAI: AWS Glue job không được đăng ký trực tiếp làm task của maintenance window.\n(C) ĐÚNG: Lambda function là một loại task hợp lệ của maintenance window.\n(D) SAI: CodeBuild project không phải loại task được hỗ trợ trực tiếp.\n(E) ĐÚNG: Step Functions state machine là một loại task hợp lệ của maintenance window.\nĐáp án đúng: C và E\nĐiểm cần nhớ: Task của maintenance window: Run Command, Automation, Lambda, Step Functions.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS Batch job", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "AWS Glue job", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "AWS Lambda function", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "AWS CodeBuild project", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "AWS Step Functions state machine", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses AWS Config in a single account. An audit found that engineers sometimes add security group rules that allow SSH from 0.0.0.0/0. The company wants such rules to be removed automatically within minutes of detection, without writing or maintaining custom code. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Đã có AWS Config; cần tự động gỡ rule SSH mở ra 0.0.0.0/0 trong vài phút và không viết code.\n(A) SAI: GuardDuty phát hiện hành vi đe dọa, không đánh giá cấu hình security group; lưu trữ finding không sửa được rule.\n(B) ĐÚNG: Managed rule restricted-ssh đánh giá security group khi cấu hình thay đổi; automatic remediation gọi Automation runbook AWS-DisablePublicAccessForSecurityGroup để gỡ quyền truy cập SSH/RDP công khai, không cần tự viết code.\n(C) SAI: Lambda định kỳ mỗi giờ là code tự viết phải bảo trì và có độ trễ tới một giờ.\n(D) SAI: Review Trusted Advisor hằng tuần là thủ công, không đáp ứng yêu cầu tự động trong vài phút.\nĐáp án đúng: B\nĐiểm cần nhớ: Config rule + automatic remediation bằng Systems Manager Automation runbook là mẫu tự sửa cấu hình không cần code.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable Amazon GuardDuty and create an EventBridge rule that archives findings about port scanning on the affected instances.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable the restricted-ssh managed rule with automatic remediation that runs the AWS-DisablePublicAccessForSecurityGroup runbook.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Schedule an AWS Lambda function every hour that describes all security groups and revokes inbound rules that allow SSH from anywhere.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Review the AWS Trusted Advisor security groups check every week and ask the owners to delete unrestricted inbound rules manually.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An application writes large log files to the root volume of Amazon EC2 instances. An Amazon CloudWatch alarm for each instance enters the ALARM state when disk usage exceeds 90%. The company wants the affected instance to run an approved cleanup script that compresses and archives old logs automatically, without human intervention and without custom code outside AWS Systems Manager. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Sự kiện alarm cần kích hoạt tự động một script đã phê duyệt chạy trên đúng instance bị ảnh hưởng, không dùng code ngoài Systems Manager.\n(A) SAI: Reboot không xóa log trên root volume; alarm action EC2 chỉ có stop/terminate/reboot/recover, không chạy script.\n(B) SAI: Gửi email cho đội vận hành cần con người can thiệp, trái yêu cầu tự động.\n(C) SAI: Scaling policy của Auto Scaling thay đổi số lượng instance, không tăng kích thước EBS; tăng dung lượng cũng không phải chạy script dọn log đã phê duyệt.\n(D) ĐÚNG: EventBridge nhận sự kiện CloudWatch Alarm State Change và có thể target trực tiếp một Automation runbook, truyền InstanceId qua input transformer; runbook dùng bước aws:runCommand để chạy script dọn log trên instance.\nĐáp án đúng: D\nĐiểm cần nhớ: Sự kiện AWS (alarm, finding, state change) => EventBridge rule => Systems Manager Automation runbook là mẫu tự khắc phục không cần Lambda.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Configure the CloudWatch alarm action to reboot the instance so that temporary files are removed when the operating system restarts.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Configure the alarm to publish to an Amazon SNS topic that emails the operations team with instructions to run the cleanup script.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Increase the EBS volume size whenever the alarm fires by using an EC2 Auto Scaling scaling policy that is linked to the alarm.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create an Amazon EventBridge rule for the alarm state change that starts an Automation runbook to run the cleanup script.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company stores configuration for all environments in Parameter Store under paths such as /payments/dev/ and /payments/prod/. Developers must be able to read and update parameters under /payments/dev/ but must not be able to read any parameter under /payments/prod/. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Phân quyền theo đường dẫn hierarchy của Parameter Store, ít vận hành nhất.\n(A) ĐÚNG: ARN tham số chứa đường dẫn (arn:aws:ssm:region:account:parameter/payments/dev/*), nên IAM policy chỉ cho phép ssm:GetParameter*, ssm:PutParameter trên path dev; tham số prod mới tạo cũng tự động không đọc được vì không khớp resource.\n(B) SAI: Parameter Store không hỗ trợ resource-based policy gắn trên từng tham số để kiểm soát IAM như vậy; và cập nhật từng tham số là nhiều công vận hành.\n(C) SAI: Tách account prod là mô hình tốt về lâu dài nhưng phải xây dựng account mới và cơ chế đồng bộ, không phải cách ít vận hành nhất cho yêu cầu này.\n(D) SAI: Chỉ SecureString mới được mã hóa bằng KMS; tham số String/StringList của prod vẫn đọc được nếu IAM cho phép.\nĐáp án đúng: A\nĐiểm cần nhớ: Thiết kế hierarchy theo môi trường rồi phân quyền IAM theo path parameter/<path>/* là cách chuẩn để cô lập config trong Parameter Store.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Attach an IAM policy that allows ssm:GetParameter* and ssm:PutParameter only on parameter ARNs that match /payments/dev/*.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add a resource-based policy to each production parameter that denies the developer role, and update it for every new parameter.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Move all production parameters into a separate AWS account and replicate development changes with a scheduled Lambda function.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Encrypt production parameters with a separate KMS key and rely on the key policy to block developers from reading any of them.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An Amazon ECS task definition for an AWS Fargate service injects a database password into a container environment variable by referencing a SecureString parameter in Parameter Store. The parameter is encrypted with a customer managed AWS KMS key. New tasks fail to start with an error stating that the secret cannot be retrieved. Which change will resolve the issue?",
+    "explanation": "Phân tích đề: Secret được inject lúc khởi động task qua mục secrets của container definition; task không start được, tức lỗi xảy ra trước khi code ứng dụng chạy.\n(A) SAI: Task role là quyền cho code ứng dụng khi đang chạy; việc lấy secret để inject vào biến môi trường do ECS agent thực hiện bằng task execution role.\n(B) SAI: ECS tham chiếu được cả Standard và Advanced parameter; tier không phải nguyên nhân.\n(C) ĐÚNG: Task execution role cần ssm:GetParameters trên tham số và kms:Decrypt trên customer managed key để ECS lấy và giải mã giá trị trước khi khởi động container.\n(D) SAI: ECS hỗ trợ SecureString; đổi sang String làm mất mã hóa, giảm bảo mật không cần thiết.\nĐáp án đúng: C\nĐiểm cần nhớ: Secret inject vào container (Parameter Store hoặc Secrets Manager) cần quyền trên task execution role, không phải task role.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Grant the task role ssm:GetParameters and kms:Decrypt, because the application container reads the value at runtime.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Convert the parameter to the Advanced tier because Amazon ECS can reference only Advanced parameters in task definitions.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Grant the task execution role ssm:GetParameters on the parameter and kms:Decrypt on the customer managed key.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Replace the SecureString parameter with a String parameter because Amazon ECS cannot decrypt KMS-encrypted parameters.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Developers need to connect a local SQL client to an Amazon RDS for PostgreSQL DB instance in a private subnet. The company already manages a small Amazon EC2 instance in the same VPC with Session Manager. Security policy prohibits public database endpoints, inbound SSH, and additional VPN infrastructure. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần kết nối từ máy developer tới RDS private; cấm DB public, cấm SSH inbound, cấm thêm VPN; đã có EC2 managed bởi Session Manager.\n(A) SAI: Bật publicly accessible cho DB vi phạm trực tiếp chính sách cấm endpoint database công khai.\n(B) ĐÚNG: Document AWS-StartPortForwardingSessionToRemoteHost tạo tunnel từ cổng local trên máy developer, qua SSM Agent trên EC2 đã có, tới host:port của RDS. Không cần inbound port, không cần VPN, quyền kiểm soát bằng IAM.\n(C) SAI: Client VPN là hạ tầng VPN bổ sung, bị chính sách cấm và tốn chi phí, vận hành hơn.\n(D) SAI: SSH tunnel cần mở inbound port 22 trên EC2, vi phạm chính sách.\nĐáp án đúng: B\nĐiểm cần nhớ: Truy cập RDS/dịch vụ private từ máy local mà không mở port => Session Manager port forwarding tới remote host qua một managed instance.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Modify the DB instance to be publicly accessible and restrict its security group to the office's public IP address range.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Start a session with AWS-StartPortForwardingSessionToRemoteHost through the managed instance to the DB endpoint and port.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Deploy AWS Client VPN in the VPC and authorize the developers' identity provider group to reach the database subnet.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Open inbound SSH on the EC2 instance from the office range and create an SSH tunnel with local port forwarding to the DB.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company configured Session Manager preferences to upload session logs to an Amazon S3 bucket that uses SSE-S3 encryption. The instances run in private subnets that have interface endpoints for ssm, ssmmessages, and ec2messages and no NAT gateway. Users can start sessions, but no session logs appear in the bucket. Which TWO changes are required? (Choose two.)",
+    "explanation": "Phân tích đề: Session chạy được nhưng log không lên S3. Log do SSM Agent trên instance upload, nên cần xét quyền của instance và đường mạng tới S3.\n(A) ĐÚNG: Instance profile phải có s3:PutObject trên bucket (và s3:GetEncryptionConfiguration khi bật tùy chọn yêu cầu bucket mã hóa) vì agent dùng credential của instance để ghi log.\n(B) SAI: Người dùng mở session không trực tiếp ghi log; cấp s3:PutObject cho role của họ không giúp agent upload.\n(C) SAI: CloudTrail data events ghi lại API trên object S3, không tạo ra nội dung session.\n(D) SAI: Upload lên S3 là kết nối outbound từ instance; thêm inbound rule không có tác dụng.\n(E) ĐÚNG: Không có NAT gateway, agent cần gateway endpoint cho S3 gắn vào route table của subnet private để tới được bucket.\nĐáp án đúng: A và E\nĐiểm cần nhớ: Session log do SSM Agent ghi bằng quyền instance profile; trong VPC private cần endpoint tới đích log (S3 gateway endpoint hoặc logs interface endpoint).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add s3:PutObject and s3:GetEncryptionConfiguration permissions for the bucket to the instance profile role.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add s3:PutObject permission for the bucket to the IAM role that users assume when they start sessions.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable AWS CloudTrail S3 data events for the bucket so that session transcripts are written as objects.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add an inbound HTTPS rule to the instance security group from the Amazon S3 prefix list for the Region.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Create a gateway VPC endpoint for Amazon S3 and associate it with the private subnets' route tables.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company uses AWS Organizations with 50 member accounts across four AWS Regions. All Amazon EC2 instances must be scanned for missing patches daily and patched weekly according to company patch baselines. Accounts that are added to specific OUs later must be covered automatically. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Nhiều account, nhiều Region, lịch scan hằng ngày và install hằng tuần, account mới trong OU phải tự được áp dụng; ưu tiên ít vận hành nhất.\n(A) SAI: StackSets triển khai được maintenance window và baseline, nhưng phải tự thiết kế template, target, và cập nhật khi có account mới; nhiều công hơn giải pháp dựng sẵn.\n(B) SAI: Lambda trong từng account là code tự viết, phải triển khai và bảo trì ở 50 account x 4 Region, lưu kết quả ngoài hệ thống compliance chuẩn.\n(C) ĐÚNG: Quick Setup patch policy tạo từ management account hoặc delegated administrator, target theo OU và Region, định nghĩa lịch scan và install cùng baseline; Quick Setup tự triển khai cấu hình cho account mới trong OU và báo compliance tập trung.\n(D) SAI: Inspector phát hiện lỗ hổng, không có chức năng tự cài bản vá theo baseline của công ty.\nĐáp án đúng: C\nĐiểm cần nhớ: Patching toàn tổ chức, nhiều account/Region, ít vận hành => Quick Setup patch policy trong Organizations.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use CloudFormation StackSets to deploy maintenance windows, patch baselines, and targets into every account and Region, and update them for new accounts.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an AWS Lambda function in each account that runs daily, calls Run Command with AWS-RunPatchBaseline, and stores the results in DynamoDB.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a Quick Setup patch policy from a delegated administrator account that targets the OUs and Regions with scan and install schedules.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable Amazon Inspector for the organization and configure it to install missing patches automatically on instances with critical findings.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A serverless application runs thousands of concurrent AWS Lambda invocations during peak hours. Each invocation calls GetParameter for the same 10 Standard parameters, which change about once a month. The application now receives ThrottlingException errors from Parameter Store. The company wants to resolve the errors while keeping costs as low as possible and without adding per-API-call charges. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Throttling do gọi lặp lại cùng tham số ít thay đổi; ràng buộc: chi phí thấp nhất và không phát sinh phí theo mỗi API call.\n(A) SAI: Higher throughput tăng hạn mức GetParameter nhưng tính phí theo từng lần tương tác API, vi phạm ràng buộc chi phí.\n(B) SAI: Chuyển sang Secrets Manager phát sinh phí theo secret mỗi tháng và phí theo API call, trong khi dữ liệu không cần rotation.\n(C) ĐÚNG: AWS Parameters and Secrets Lambda Extension cache giá trị trong execution environment với TTL; các invocation dùng lại cache nên số lời gọi tới Parameter Store giảm mạnh, hết throttling mà không phát sinh phí API mới.\n(D) SAI: Advanced tier tăng kích thước/số lượng tham số và hỗ trợ policy, không phải kho riêng throughput cao; thêm phí mà không giải quyết throttling.\nĐáp án đúng: C\nĐiểm cần nhớ: Giá trị ít thay đổi bị đọc liên tục từ Lambda => cache (Parameters and Secrets Lambda Extension) trước khi nghĩ tới higher throughput có phí.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable the higher throughput setting for Parameter Store in the account and Region.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Move the parameters to AWS Secrets Manager, which has a higher quota for GetSecretValue.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add the AWS Parameters and Secrets Lambda Extension to cache values with a TTL.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Convert every parameter to the Advanced tier so that they use a high-throughput store.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A financial company uses Session Manager. Compliance requires that session data be encrypted with a customer managed AWS KMS key in addition to TLS, that only principals allowed to use that key can start sessions, and that session logs streamed to Amazon CloudWatch Logs are encrypted with the same key. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Ba yêu cầu: mã hóa dữ liệu session bằng customer managed key ngoài TLS, chỉ người có quyền dùng key mới mở session, log trên CloudWatch Logs mã hóa bằng cùng key.\n(A) SAI: Session Manager có hỗ trợ mã hóa dữ liệu session bằng KMS, nên nhận định chỉ dựa vào TLS là sai và không đáp ứng yêu cầu.\n(B) SAI: Tự dựng mutual TLS bằng AWS Private CA không phải cơ chế của Session Manager, vừa phức tạp vừa không gắn quyền mở session với key KMS.\n(C) SAI: AWS managed key aws/ssm không phải customer managed key; SCP chỉ giới hạn quyền, không cấp quyền kms:Decrypt.\n(D) ĐÚNG: Bật KMS encryption trong Session Manager preferences với customer managed key; người dùng cần kms:GenerateDataKey để mở session, instance profile cần kms:Decrypt; gắn cùng key cho log group (key policy cho phép CloudWatch Logs) để mã hóa log.\nĐáp án đúng: D\nĐiểm cần nhớ: Session Manager KMS encryption: user cần kms:GenerateDataKey, instance cần kms:Decrypt; không có quyền key thì không mở được session.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Encrypt the CloudWatch Logs log group with the key and rely on TLS 1.2 for sessions, because Session Manager cannot use KMS for session data.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Configure the SSM Agent to use a certificate issued by AWS Private CA and require mutual TLS authentication for every session.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable KMS encryption in Session Manager preferences with the aws/ssm key and grant users kms:Decrypt through a service control policy.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable KMS encryption in Session Manager preferences with the key, grant the required KMS permissions, and use the key for the log group.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A retailer enforces a change freeze from late November to early January. During the freeze, State Manager associations that reconfigure software and Automation runbooks started by operators must not make changes, but Session Manager access for troubleshooting must keep working. Outside the freeze, everything must run normally without manual steps. Which TWO actions meet these requirements? (Choose two.)",
+    "explanation": "Phân tích đề: Cần chặn thay đổi tự động (State Manager, Automation) theo khoảng thời gian, nhưng không ảnh hưởng Session Manager và không thao tác tay khi vào/ra đợt freeze.\n(A) SAI: SCP với aws:CurrentTime chặn mọi hành động ssm, làm hỏng cả Session Manager trong thời gian freeze.\n(B) ĐÚNG: Change Calendar kiểu DEFAULT_OPEN với một sự kiện closed phủ đợt freeze định nghĩa khi nào được phép thay đổi; ngoài sự kiện, lịch tự trở lại OPEN.\n(C) SAI: Xóa rồi tạo lại association là thao tác thủ công dễ sai sót, trái yêu cầu không bước thủ công.\n(D) ĐÚNG: State Manager association có thể gắn Change Calendar để chỉ chạy khi lịch OPEN; runbook Automation có thể kiểm tra trạng thái lịch (GetCalendarState) trước khi thực hiện thay đổi. Session Manager không bị ảnh hưởng.\n(E) SAI: Tắt SSM Agent làm mất luôn Session Manager và toàn bộ khả năng quản lý instance.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Change freeze có lịch => Systems Manager Change Calendar, gắn vào association và runbook; không dùng SCP chặn toàn bộ ssm.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Attach a service control policy with an aws:CurrentTime condition that denies all ssm actions during the freeze.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a Change Calendar of type DEFAULT_OPEN with a closed event that covers the freeze period.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Delete the State Manager associations at the start of the freeze and re-create them from templates in January.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add the calendar to the State Manager associations and make the runbooks check the calendar state first.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Create an EventBridge Scheduler schedule that disables the SSM Agent on all instances when the freeze starts.", "isCorrect": false }
+    ]
+  }
+]

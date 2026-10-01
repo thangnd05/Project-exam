@@ -1,0 +1,52 @@
+1. A company runs its primary application in us-east-1 and a warm standby with reduced capacity in ap-southeast-1. During normal operation every request must be served by the primary, and no traffic at all may reach the standby. If the primary becomes unhealthy, 
+2. A globally distributed API is deployed in four Regions. Users must always be served by the Region that gives them the lowest network latency, but a Region whose application is failing must be removed from DNS answers automatically, even when its load balancer 
+3. A company is opening a new Region for its API. The rollout plan is to send 10 percent of global traffic there for a week, then 25 percent, then 50 percent, adjusting the share without redeploying anything, and to stop sending any traffic to the new Region auto
+4. Route 53 health checks for an HTTPS API behind an Application Load Balancer currently pass even when the application returns HTTP 500 for every request, because the load balancer still terminates the TLS connection. The team must make the health check reflect 
+5. A data protection regulation requires that personal data of European users is processed only in eu-west-1 and data of United States users only in us-east-1. Traffic must never be served from the other Region even if it would respond faster, and requests from a
+6. A company runs an active-passive architecture with the primary stack in us-east-1 and a scaled-down standby in eu-west-1. Requirements state that clients must be redirected to the standby within about one minute of the primary becoming unhealthy, that the redi
+7. A global API is deployed in four Regions behind Route 53 latency-based routing. During a partial outage, the Region in ap-southeast-1 returned HTTP 200 on the load balancer health check path but the application was failing business transactions, so Route 53 ke
+8. A company must comply with data residency rules requiring that users in Germany are always served by the Frankfurt deployment, users in Brazil by the Sao Paulo deployment, and everyone else by the Virginia deployment. Requests must never be served by a Region 
+9. During a failover test, a DevOps engineer updated the Route 53 record to point to the secondary Region, but a significant share of clients continued to reach the primary for more than 30 minutes. The record TTL was 60 seconds. What is the MOST likely explanati
+10. A DevOps team is preparing a Region-level disaster recovery runbook. They want the decision to fail over to be a single, reliable control that does not depend on making many DNS edits under pressure, and they want to verify that the standby Region has enough c
+11. A DevOps engineer must point a domain apex such as example.com at an Application Load Balancer. What record type should be used and why?
+12. A DevOps engineer must ensure DNS failover to a standby Region happens quickly. Which TWO settings have the greatest effect on failover time?
+13. A DevOps engineer must health check an endpoint that is only reachable inside a VPC, so Route 53 public health checkers cannot reach it. What approach works?
+14. A DevOps engineer must send users to the Region with the lowest latency, but keep a Region out of rotation when its stack is unhealthy. What configuration achieves both?
+15. A DevOps engineer must roll out a new Region gradually, sending a small share of traffic first and increasing it over days. Which TWO elements support this?
+16. A DevOps engineer must ensure users in Germany are always served by the EU deployment for data residency reasons, even if another Region is closer in latency. Which routing policy applies?
+17. A DevOps engineer must distribute traffic across several independent endpoints and have unhealthy ones removed automatically, without a load balancer. What routing policy fits?
+18. A DevOps engineer must design an active passive DR setup with Route 53. Which TWO configuration elements are required?
+19. During a failover test the DNS change was made but many clients kept using the old endpoint for a long time. What is the most likely cause?
+20. A DevOps engineer must make failover decisions deterministic during a Regional event, rather than depending on health check behaviour. What AWS capability supports this?
+21. A DevOps engineer must resolve internal service names inside a VPC without exposing them publicly. What should be used?
+22. A DevOps engineer must allow on-premises servers to resolve names in a private hosted zone, and AWS workloads to resolve on-premises names. Which TWO components are needed?
+23. A DevOps engineer must verify that a Route 53 health check reflects application health rather than just connectivity. What configuration improves the signal?
+24. A DevOps engineer must combine several health signals so that failover happens only if both the application and its database are unhealthy. What feature supports this?
+25. A DevOps engineer must reduce the risk that a DNS based failover sends traffic to a standby Region that is not actually ready. Which TWO practices help?
+26. A DevOps engineer must serve users from the nearest Region but shift a portion of traffic away from one Region during a capacity constraint. Which routing capability provides this bias?
+27. A DevOps engineer must decide the TTL strategy for records involved in planned migrations. What approach is recommended?
+28. A DevOps engineer must protect a hosted zone from accidental or malicious changes. Which TWO controls are appropriate?
+29. A DevOps engineer must explain why an alias record to an Application Load Balancer keeps returning the load balancer even though its targets are unhealthy. What setting should be reviewed?
+30. A DevOps engineer must decide how DNS fits into a recovery plan with an RTO of 15 minutes. What is the realistic assessment?
+31. A DevOps engineer must shift traffic away from a single impaired Availability Zone for a zonal application without changing DNS records manually. What AWS capability helps?
+32. A DevOps engineer must design health checks that do not cause unnecessary failovers during brief load spikes. Which TWO settings help?
+33. A DevOps engineer must ensure DNS responses for a company domain cannot be forged. What capability addresses this?
+34. A DevOps engineer must decide whether Route 53 failover alone is sufficient for a workload whose database is only writable in one Region. What is the accurate assessment?
+35. A DevOps engineer must manage DNS for many services across teams. Which TWO practices keep this maintainable?
+36. A DevOps engineer must understand why a weighted record with weight zero still receives traffic. What is the correct explanation to check?
+37. A DevOps engineer must publish a service to internal consumers with a stable name while the underlying endpoint changes frequently. What is the appropriate design?
+38. A DevOps engineer must test a DNS failover plan without affecting production users. Which TWO approaches are workable?
+39. A DevOps engineer must decide where to terminate global traffic for an application that needs fast failover and static anycast IP addresses. What service complements Route 53?
+40. A DevOps engineer must decide what to monitor for the DNS layer of a critical service. Which signal is the most valuable?
+41. A DevOps engineer must ensure that a failover record does not flap between primary and secondary when the primary is intermittently slow. What configuration reduces flapping?
+42. A DevOps engineer must design DNS for a service deployed in three Regions with strict data residency in one of them. Which TWO elements are needed?
+43. A DevOps engineer must explain the operational risk of relying on health check driven failover for a Region wide event. What is the main concern?
+44. A DevOps engineer must reduce the number of DNS lookups performed by a high traffic client application. What guidance applies?
+45. A DevOps engineer must prepare DNS aspects of a Region evacuation runbook. Which TWO items belong in the runbook?
+46. A DevOps engineer must choose between CloudFront and Route 53 latency routing for improving global user experience. What is the key distinction?
+47. A DevOps engineer must ensure a newly created record is correct before users rely on it. What verification step is most useful?
+48. A DevOps engineer must reduce the blast radius of a DNS change that affects many services. Which TWO practices help?
+49. A DevOps engineer must decide how to handle DNS for a service being migrated between AWS accounts. What approach avoids downtime?
+50. A DevOps engineer must measure whether the DNS layer supports the resilience goals of the platform. Which measure is the most meaningful?
+51. A company runs an active-passive workload in us-east-1 and eu-west-1. Clients use a single domain name. If the primary Region becomes unhealthy, traffic must move to the secondary Region automatically, and clients must not be sent to the primary while it is fa
+52. A company serves an application from three Regions in an active-active configuration. Clients must be directed to the Region that gives them the lowest latency, but must never be sent to a Region whose application is failing. Which Amazon Route 53 configuratio

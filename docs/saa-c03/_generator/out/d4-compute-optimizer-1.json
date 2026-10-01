@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company wants a service that recommends specific alternative Amazon EC2 instance types for each running instance and shows the projected CPU utilization and a performance risk rating for every recommended option. Which AWS service provides this information?",
+    "explanation": "Phân tích đề: Cần gợi ý instance type thay thế cụ thể cho từng EC2, kèm projected utilization và performance risk cho mỗi lựa chọn.\n(A) SAI: AWS Trusted Advisor chỉ gắn cờ các instance có mức sử dụng thấp dựa trên ngưỡng CPU/network đơn giản, không đề xuất instance type cụ thể kèm projected utilization.\n(B) ĐÚNG: AWS Compute Optimizer dùng machine learning phân tích lịch sử metric CloudWatch, đưa ra tối đa vài recommendation option cho mỗi instance, mỗi lựa chọn đều có projected utilization, estimated savings và performance risk.\n(C) SAI: Amazon CloudWatch Application Insights giúp giám sát và chẩn đoán sự cố ứng dụng (SQL Server, .NET…), không phải công cụ rightsizing.\n(D) SAI: AWS Cost Anomaly Detection phát hiện chi tiêu bất thường bằng ML, không phân tích utilization để đề xuất instance type.\nĐáp án đúng: B\nĐiểm cần nhớ: Recommendation option + projected utilization + performance risk là dấu hiệu nhận biết AWS Compute Optimizer.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS Trusted Advisor with its Low Utilization Amazon EC2 Instances check", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "AWS Compute Optimizer", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Amazon CloudWatch Application Insights for the instance fleet", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "AWS Cost Anomaly Detection with a service-level monitor for Amazon EC2", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company runs Windows Server on Amazon EC2 and has opted in to AWS Compute Optimizer. The recommendations are based only on CPU, network, and disk metrics, and the operations team wants memory utilization to be considered as well. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Compute Optimizer đang thiếu metric memory cho EC2 Windows; cần bổ sung dữ liệu RAM.\n(A) SAI: Detailed monitoring chỉ tăng độ phân giải metric lên 1 phút; CloudWatch vẫn không thấy RAM bên trong hệ điều hành.\n(B) SAI: Enhanced infrastructure metrics chỉ kéo dài lookback period (tới khoảng 3 tháng), không tự thu thập memory.\n(C) ĐÚNG: Cài CloudWatch agent trong hệ điều hành và cấu hình thu thập memory (trên Windows là counter Memory % Committed Bytes In Use) đẩy lên CloudWatch; Compute Optimizer tự nạp metric này để đưa ra recommendation có tính đến RAM.\n(D) SAI: SSM Agent dùng để quản lý instance (Run Command, Patch Manager…), bản thân nó không publish memory metric lên CloudWatch.\nĐáp án đúng: C\nĐiểm cần nhớ: Hypervisor không nhìn thấy RAM trong OS; muốn Compute Optimizer tính cả memory thì phải có CloudWatch agent (hoặc nguồn metric bên ngoài được hỗ trợ).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable detailed monitoring on the instances so that memory metrics are published every minute", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Activate enhanced infrastructure metrics for the account in Compute Optimizer", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Install the CloudWatch agent on the instances and configure it to collect memory utilization", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Install the AWS Systems Manager Agent (SSM Agent) on every instance and register them as managed nodes", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company runs several Amazon RDS for PostgreSQL DB instances that were sized generously at launch. The company wants machine learning-based recommendations for smaller DB instance classes and for more cost-effective storage configurations. Which AWS service should the company use?",
+    "explanation": "Phân tích đề: Cần recommendation rightsizing cho DB instance class và storage của RDS for PostgreSQL.\n(A) SAI: Performance Insights phân tích DB load, wait event và câu SQL tốn tài nguyên để tuning, không đưa ra khuyến nghị đổi instance class để tiết kiệm chi phí.\n(B) SAI: DevOps Guru for RDS phát hiện bất thường hiệu năng và gợi ý nguyên nhân, không phải công cụ rightsizing chi phí.\n(C) SAI: Check idle DB instance của Trusted Advisor chỉ gắn cờ DB không có kết nối trong nhiều ngày, không gợi ý instance class nhỏ hơn hay cấu hình storage.\n(D) ĐÚNG: AWS Compute Optimizer hỗ trợ Amazon RDS for MySQL và PostgreSQL: phân tích metric CloudWatch để đề xuất DB instance class (kể cả Graviton) và cấu hình storage phù hợp hơn.\nĐáp án đúng: D\nĐiểm cần nhớ: Phạm vi Compute Optimizer ngày nay gồm EC2, Auto Scaling group, EBS, Lambda, ECS on Fargate và RDS (MySQL/PostgreSQL).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Amazon RDS Performance Insights", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Amazon DevOps Guru for RDS", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "The AWS Trusted Advisor idle DB instances check", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "AWS Compute Optimizer", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A startup wants to use AWS Compute Optimizer to reduce waste across its AWS environment. The startup runs Amazon EBS volumes, AWS Lambda functions, Amazon S3 buckets, Amazon DynamoDB tables, and an Amazon Redshift cluster. Which TWO of these resource types can Compute Optimizer generate rightsizing recommendations for? (Choose TWO.)",
+    "explanation": "Phân tích đề: Hỏi resource nào thuộc phạm vi rightsizing của Compute Optimizer.\n(A) ĐÚNG: Với EBS volume, Compute Optimizer đề xuất volume type (ví dụ io1 sang gp3), size, IOPS và throughput dựa trên mức sử dụng thực tế.\n(B) SAI: Tối ưu chi phí S3 dựa trên storage class, S3 Storage Lens và S3 Intelligent-Tiering; Compute Optimizer không phân tích bucket.\n(C) SAI: DynamoDB tối ưu bằng lựa chọn capacity mode (on-demand/provisioned) và auto scaling, không nằm trong Compute Optimizer.\n(D) ĐÚNG: Với Lambda, Compute Optimizer đề xuất memory size phù hợp dựa trên memory utilization và duration.\n(E) SAI: Amazon Redshift không được Compute Optimizer hỗ trợ; việc chọn node type/số node dựa vào công cụ riêng của Redshift.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Compute Optimizer = compute và block storage (EC2, ASG, EBS, Lambda, ECS on Fargate, RDS), không bao gồm S3, DynamoDB hay Redshift.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Amazon EBS volumes", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Amazon S3 buckets", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Amazon DynamoDB tables", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "AWS Lambda functions", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Amazon Redshift clusters", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses AWS Organizations with more than 100 member accounts. The FinOps team works from a dedicated tooling account, not the management account. The team wants every account to receive AWS Compute Optimizer recommendations and wants to review all findings from the tooling account. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Nhiều account, cần opt-in toàn bộ và xem tập trung từ account không phải management account, vận hành ít nhất.\n(A) ĐÚNG: Từ management account opt in Compute Optimizer cho toàn bộ member account trong organization (dùng trusted access), sau đó đăng ký tooling account làm delegated administrator để FinOps xem và quản lý recommendation của cả tổ chức từ đó.\n(B) SAI: StackSets opt in từng account cộng với role cross-account và script gom dữ liệu vẫn chạy được nhưng tốn nhiều công xây dựng và bảo trì hơn tính năng organization có sẵn.\n(C) SAI: Organizational view của Trusted Advisor tổng hợp kết quả các check của Trusted Advisor, không phải recommendation rightsizing của Compute Optimizer.\n(D) SAI: Rightsizing recommendations trong Cost Explorer chỉ bao phủ EC2 và xem ở management account, không đáp ứng yêu cầu xem mọi finding từ tooling account.\nĐáp án đúng: A\nĐiểm cần nhớ: Compute Optimizer tích hợp AWS Organizations: management account opt in cả tổ chức, có thể giao delegated administrator cho một member account.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Opt in all member accounts from the management account and register the tooling account as the Compute Optimizer delegated administrator", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Use CloudFormation StackSets to opt in each account and deploy cross-account roles that a script in the tooling account assumes to collect recommendations", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable the AWS Trusted Advisor organizational view and generate the report from the tooling account each week", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable rightsizing recommendations in AWS Cost Explorer in the management account and share the results with the FinOps team", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs web servers based on NGINX and several self-managed PostgreSQL databases on x86-based Amazon EC2 instances. Leadership wants to know which of these workloads could move to AWS Graviton instances with little effort before the company commits engineering time. Which approach provides this information with the LEAST effort?",
+    "explanation": "Phân tích đề: Cần biết workload nào chuyển sang Graviton dễ, trước khi bỏ công engineering.\n(A) SAI: AWS Application Discovery Service thu thập thông tin server on-premises để lập kế hoạch migrate lên AWS, không đánh giá khả năng chuyển kiến trúc sang Arm.\n(B) SAI: Enhanced infrastructure metrics chỉ kéo dài lookback period, không cho biết mức độ khó khi chuyển sang Graviton.\n(C) ĐÚNG: Giữ preference inferred workload types được bật để Compute Optimizer nhận diện ứng dụng như NGINX, PostgreSQL; khi xem recommendation với CPU architecture preference là Graviton, mỗi option hiển thị migration effort (ví dụ Very low, Low, Medium) giúp ưu tiên workload dễ chuyển.\n(D) SAI: Tự dựng môi trường benchmark song song cho tất cả workload tốn nhiều công sức, trái với yêu cầu biết trước khi bỏ công engineering.\nĐáp án đúng: C\nĐiểm cần nhớ: Inferred workload types + Graviton recommendation cho ra migration effort, giúp xác định workload nào chuyển sang Arm dễ nhất.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Run AWS Application Discovery Service agents on the instances to assess compatibility with Arm", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Activate enhanced infrastructure metrics so Compute Optimizer analyzes three months of data", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Keep inferred workload types active and review Graviton recommendations and their migration effort in Compute Optimizer", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Build a parallel Graviton test environment for every workload and compare benchmark results against the x86 fleet", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "AWS Compute Optimizer reports that an io1 Amazon EBS volume attached to a production database is provisioned with 20,000 IOPS but rarely exceeds 3,000 IOPS, and it recommends gp3. The database must stay online during the change. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Áp dụng recommendation io1 -> gp3 cho volume production, không được dừng database.\n(A) SAI: Snapshot rồi restore sang volume gp3 mới cần detach/attach và thường phải dừng ứng dụng, tốn công và gây downtime.\n(B) ĐÚNG: Elastic Volumes cho phép sửa volume type, IOPS, throughput trong khi volume vẫn attach và đang dùng; đổi io1 sang gp3 với IOPS phù hợp mà không cần dừng instance.\n(C) SAI: io2 Block Express là volume hiệu năng cao, chi phí theo IOPS provisioned; chuyển sang đó không giảm chi phí theo khuyến nghị.\n(D) SAI: Compute Optimizer chỉ đưa ra recommendation, không có chức năng tự thay đổi volume; và việc stop instance vi phạm yêu cầu online.\nĐáp án đúng: B\nĐiểm cần nhớ: Recommendation EBS của Compute Optimizer thường được áp dụng bằng Elastic Volumes (ModifyVolume) mà không gây downtime.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a snapshot, restore it to a new gp3 volume, and swap the volumes on the instance", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use Elastic Volumes to change the volume type to gp3 while the volume stays attached", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Change the volume to io2 Block Express and keep the same provisioned IOPS for headroom", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Stop the instance and let Compute Optimizer apply the recommended volume configuration", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A CPU-intensive AWS Lambda function is configured with 128 MB of memory and often runs for several seconds. AWS Compute Optimizer marks the function as not optimized because memory is under-provisioned and recommends a larger memory size with a similar or lower estimated cost. A developer does not understand how more memory can cost the same or less. Which explanation is correct?",
+    "explanation": "Phân tích đề: Lambda CPU-bound, memory thấp, Compute Optimizer khuyên tăng memory nhưng chi phí không tăng.\n(A) SAI: Provisioned concurrency giải quyết cold start và tính thêm phí, không liên quan đến việc tăng memory giảm chi phí.\n(B) SAI: Tăng timeout chỉ cho phép hàm chạy lâu hơn, không làm hàm chạy nhanh hơn hay rẻ hơn.\n(C) SAI: Reserved concurrency giới hạn/đảm bảo số lượng thực thi đồng thời, không thay đổi đơn giá hay thời gian chạy.\n(D) ĐÚNG: Lambda cấp CPU tỉ lệ thuận với memory; hàm CPU-bound khi tăng memory sẽ chạy nhanh hơn đáng kể, nên tổng GB-second (memory x duration) có thể bằng hoặc thấp hơn, đồng thời giảm latency.\nĐáp án đúng: D\nĐiểm cần nhớ: Với Lambda, memory quyết định cả CPU; recommendation tăng memory không đồng nghĩa với tăng chi phí.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "More memory lets Lambda enable provisioned concurrency at no charge, which removes cold starts", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "More memory also raises the timeout limit, so fewer invocations fail and are retried", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "More memory reserves concurrency for the function, which lowers the price per request", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Lambda allocates CPU in proportion to memory, so the function finishes faster and uses fewer GB-seconds", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company holds Standard Reserved Instances for the m5 and r5 instance families that expire in 2 years. The company runs memory-intensive Java applications on those instances. AWS Compute Optimizer recommendations currently suggest many other instance families and do not reflect memory usage. The company wants recommendations that stay within the reserved families and that account for memory. Which TWO actions should a solutions architect take? (Choose TWO.)",
+    "explanation": "Phân tích đề: Hai yêu cầu: recommendation chỉ trong family m5/r5 để giữ RI coverage, và phải tính đến memory.\n(A) ĐÚNG: Recommendation preference preferred instance families (preferred instances) giới hạn các instance type mà Compute Optimizer đề xuất, giúp không làm hỏng mức sử dụng Reserved Instances hiện có.\n(B) SAI: Enhanced infrastructure metrics chỉ kéo dài lookback lên khoảng 3 tháng, không giới hạn family và không thêm memory.\n(C) ĐÚNG: Cài và cấu hình CloudWatch agent thu thập memory utilization để Compute Optimizer đưa RAM vào phân tích, tránh khuyên downsize khi ứng dụng Java đang dùng nhiều heap.\n(D) SAI: Chọn Graviton làm CPU architecture preference sẽ đưa ra các family ngoài m5/r5, đi ngược yêu cầu giữ RI coverage.\n(E) SAI: Tắt inferred workload types chỉ làm mất thông tin loại workload và migration effort, không lọc family và không liên quan memory.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Preferred instance families giữ recommendation trong phạm vi commitment hiện có; CloudWatch agent bổ sung memory cho độ chính xác.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Configure the preferred instance families recommendation preference to include only m5 and r5", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Activate enhanced infrastructure metrics for all instances that run the Java applications", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Install the CloudWatch agent on the instances and configure it to publish memory utilization", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Set the CPU architecture preference to AWS Graviton so recommendations use newer families", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Turn off the inferred workload types preference so the Java runtime is not considered", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company has 60 accounts in AWS Organizations across four AWS Regions. The FinOps team currently exports AWS Compute Optimizer recommendations from each Region and adds them to Savings Plans and Reserved Instance purchase recommendations in a spreadsheet. The totals overstate the achievable savings because the same usage is counted by more than one recommendation, and they ignore the company's existing discounts. The team wants a single, deduplicated view of savings opportunities across all accounts and Regions. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần một view duy nhất cho mọi account và Region, loại bỏ trùng lặp giữa rightsizing và commitment, tính đến discount hiện có, vận hành ít nhất.\n(A) ĐÚNG: AWS Cost Optimization Hub (bật từ management account cho cả organization) gom recommendation từ Compute Optimizer (rightsizing, idle, Graviton) cùng Savings Plans/Reserved Instances, loại trùng lặp khi tính tổng savings và có thể ước tính savings sau khi áp dụng discount của khách hàng.\n(B) SAI: Tự động export sang S3 và cộng bằng Athena vẫn phải tự viết logic loại trùng và tính discount; nhiều công vận hành và dễ sai.\n(C) SAI: Organizational view của Trusted Advisor tổng hợp kết quả check, không loại trùng lặp giữa rightsizing và commitment, không phải nguồn recommendation Compute Optimizer đầy đủ.\n(D) SAI: Rightsizing recommendations trong Cost Explorer chỉ bao phủ EC2, bỏ sót EBS, Lambda, Fargate và vẫn không gộp chung với commitment một cách loại trùng.\nĐáp án đúng: A\nĐiểm cần nhớ: Compute Optimizer tạo recommendation; Cost Optimization Hub gom, loại trùng và ưu tiên hóa savings trên toàn organization và mọi Region.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable AWS Cost Optimization Hub for the organization from the management account and review consolidated savings there", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Automate the Compute Optimizer exports to Amazon S3 in every Region and aggregate the savings with Amazon Athena queries", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable the AWS Trusted Advisor organizational view and use its cost optimization summary as the single source", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use the rightsizing recommendations in AWS Cost Explorer together with its Savings Plans purchase recommendations", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs about 2,000 Linux and Windows Amazon EC2 instances across 30 accounts in AWS Organizations. AWS Compute Optimizer is already opted in for the organization, but recommendations lack memory data. Instances are long-running and cannot be replaced during the next quarter. All instances already run the SSM Agent. The company wants memory-aware recommendations across the fleet with the LEAST operational overhead. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Hàng nghìn instance, nhiều account, không được thay instance, đã có SSM Agent, cần memory metric với ít công vận hành nhất.\n(A) SAI: Bake agent vào AMI mới chỉ có hiệu lực khi thay instance, vi phạm ràng buộc không được thay instance trong quý tới.\n(B) SAI: Detailed monitoring không cung cấp memory utilization; bật qua StackSets cũng không giải quyết vấn đề.\n(C) ĐÚNG: Dùng Systems Manager (Quick Setup hoặc State Manager association với Distributor package AmazonCloudWatchAgent) triển khai và cấu hình CloudWatch agent trên toàn organization, lưu cấu hình agent trong Parameter Store, và gắn instance profile có quyền CloudWatchAgentServerPolicy; Compute Optimizer sẽ tự dùng memory metric.\n(D) SAI: Enhanced infrastructure metrics chỉ kéo dài lookback period, không thu thập memory.\nĐáp án đúng: C\nĐiểm cần nhớ: Triển khai CloudWatch agent ở quy mô lớn = Systems Manager (Distributor/State Manager/Quick Setup) + IAM role có CloudWatchAgentServerPolicy.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Bake the CloudWatch agent into new golden AMIs and replace the instances through a rolling process", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use CloudFormation StackSets to enable detailed monitoring on every instance in all accounts", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use Systems Manager to install and configure the CloudWatch agent organization-wide with a role that allows publishing metrics", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Activate enhanced infrastructure metrics at the organization level so Compute Optimizer collects memory data", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has 3,000 Amazon EC2 instances in one account. Only 12 production Auto Scaling groups have usage patterns that repeat over several months, and AWS Compute Optimizer recommendations for them are unreliable with the default lookback period. The company wants longer-lookback recommendations for these groups while keeping additional Compute Optimizer charges as low as possible. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Chỉ 12 ASG cần lookback dài; muốn tối thiểu chi phí phát sinh.\n(A) SAI: Bật enhanced infrastructure metrics ở cấp account sẽ tính phí cho toàn bộ 3,000 instance, trái mục tiêu chi phí thấp.\n(B) ĐÚNG: Enhanced infrastructure metrics là tính năng trả phí có thể bật ở cấp resource; bật riêng cho 12 Auto Scaling group giúp Compute Optimizer phân tích tới khoảng 3 tháng dữ liệu chỉ cho các nhóm này.\n(C) SAI: Tăng thời gian lưu metric trên CloudWatch không thay đổi lookback mà Compute Optimizer dùng; lookback mặc định vẫn là 14 ngày.\n(D) SAI: Tự lập dashboard và phân tích thủ công tốn công, mất lợi ích recommendation tự động của Compute Optimizer.\nĐáp án đúng: B\nĐiểm cần nhớ: Enhanced infrastructure metrics có thể bật ở cấp organization, account hoặc từng resource; chọn phạm vi hẹp nhất để kiểm soát chi phí.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Activate enhanced infrastructure metrics at the account level for all resources in the account", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Activate enhanced infrastructure metrics at the resource level for only the 12 Auto Scaling groups", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Extend the CloudWatch metric retention for the Auto Scaling groups so Compute Optimizer reads more history", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Build CloudWatch dashboards covering several months and size the Auto Scaling groups manually", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A FinOps team is assigning cost and governance tasks to AWS tools. The team must get memory size recommendations for AWS Lambda functions and volume type recommendations for Amazon EBS, a single deduplicated list of savings opportunities across all accounts and Regions, and checks for service quota usage and security best practices. Which THREE tool assignments are correct? (Choose THREE.)",
+    "explanation": "Phân tích đề: Ghép đúng công cụ với từng nhiệm vụ: rightsizing Lambda/EBS, tổng hợp savings loại trùng, kiểm tra quota và bảo mật.\n(A) ĐÚNG: Compute Optimizer đưa ra recommendation memory cho Lambda và volume type/IOPS/throughput cho EBS.\n(B) SAI: Rightsizing recommendations trong Cost Explorer chỉ dành cho EC2, không có kích thước task ECS on Fargate.\n(C) ĐÚNG: Cost Optimization Hub gom recommendation từ nhiều nguồn trên mọi account và Region, loại trùng lặp khi ước tính tổng savings.\n(D) SAI: AWS Budgets theo dõi chi tiêu so với ngân sách và gửi cảnh báo/action, không tạo recommendation rightsizing.\n(E) ĐÚNG: Trusted Advisor có các check service limits (quota) và security (security group mở, MFA root…), ngoài các check chi phí.\n(F) SAI: Compute Optimizer không phân tích S3; lựa chọn storage class dựa vào S3 Storage Lens, S3 Intelligent-Tiering hoặc lifecycle policy.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: Compute Optimizer = rightsizing compute; Cost Optimization Hub = gom và loại trùng savings; Trusted Advisor = check tổng quát cost, security, fault tolerance, performance, service limits.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use AWS Compute Optimizer for Lambda memory and EBS volume type recommendations", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Use AWS Cost Explorer rightsizing recommendations for ECS on Fargate task sizes", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use AWS Cost Optimization Hub for the deduplicated cross-account savings view", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Use AWS Budgets to generate rightsizing recommendations for over-provisioned resources", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Use AWS Trusted Advisor for service quota and security best practice checks", "isCorrect": true },
+      { "answerLabel": "F", "answerText": "Use AWS Compute Optimizer for Amazon S3 storage class recommendations on buckets", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company already sends Amazon EC2 memory metrics to Datadog through the Datadog agent. A security policy prohibits installing any additional monitoring agents on production instances, and the company does not want to write or maintain custom metric publishing code. The company wants AWS Compute Optimizer EC2 recommendations to account for memory utilization. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Memory đã có ở Datadog, cấm cài thêm agent, không muốn viết code tùy biến; cần Compute Optimizer dùng memory.\n(A) SAI: Cài CloudWatch agent là cài thêm agent trên production, vi phạm chính sách bảo mật.\n(B) ĐÚNG: Compute Optimizer hỗ trợ external metrics ingestion từ một số nhà cung cấp observability (Datadog, Dynatrace, Instana, New Relic); bật preference này và cấu hình tích hợp để Compute Optimizer dùng memory metric từ Datadog.\n(C) SAI: Script gọi PutMetricData là code tùy biến phải viết và bảo trì, trái yêu cầu.\n(D) SAI: Enhanced infrastructure metrics chỉ kéo dài lookback, không đem memory từ Datadog vào.\nĐáp án đúng: B\nĐiểm cần nhớ: Nguồn memory cho Compute Optimizer: CloudWatch agent hoặc external metrics ingestion từ các APM partner được hỗ trợ.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Install the CloudWatch agent alongside the Datadog agent and configure it to collect memory utilization", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Configure the external metrics ingestion preference in Compute Optimizer to use Datadog", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Schedule a script on each instance that reads memory usage and calls the CloudWatch PutMetricData API", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Activate enhanced infrastructure metrics so that Compute Optimizer pulls third-party metrics automatically", "isCorrect": false }
+    ]
+  }
+]

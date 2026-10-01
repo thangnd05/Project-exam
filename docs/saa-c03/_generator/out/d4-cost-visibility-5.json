@@ -1,0 +1,173 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company runs a steady fleet of Amazon RDS for PostgreSQL DB instances across several accounts. The finance team wants an AWS-generated recommendation of how many RDS Reserved Instances to purchase, based on the company's recent usage. Which AWS feature provides this recommendation?",
+    "explanation": "Phân tích đề: Cần khuyến nghị MUA bao nhiêu Reserved Instances cho Amazon RDS dựa trên mức dùng gần đây. Từ khóa: purchase recommendation cho cam kết.\n(A) SAI: Compute Optimizer đưa ra khuyến nghị right-size (đổi loại instance, cấu hình) chứ không tính số lượng Reserved Instances nên mua; khuyến nghị mua cam kết nằm ở Cost Explorer.\n(B) ĐÚNG: Cost Explorer có mục Reservations > Recommendations cho EC2, RDS, ElastiCache, OpenSearch Service, Redshift. Nó phân tích usage trong 7, 30 hoặc 60 ngày gần nhất và gợi ý số lượng, loại instance, kỳ hạn, phương thức thanh toán cùng mức tiết kiệm ước tính.\n(C) SAI: Performance Insights phân tích tải truy vấn và wait events của database để tối ưu hiệu năng, không có chức năng tính toán mua Reserved Instances.\n(D) SAI: Budget loại RI Coverage chỉ cảnh báo khi tỷ lệ usage được RI phủ thấp hơn ngưỡng; nó không gợi ý cần mua thêm bao nhiêu RI.\nĐáp án đúng: B\nĐiểm cần nhớ: Nên mua bao nhiêu RI hoặc Savings Plans => khuyến nghị trong Cost Explorer. Right-size instance => Compute Optimizer. Cảnh báo coverage/utilization => AWS Budgets.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use AWS Compute Optimizer for Amazon RDS, which lists how many Reserved Instances to buy for each DB instance class.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use the Reserved Instance purchase recommendations in AWS Cost Explorer for Amazon RDS.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Use Amazon RDS Performance Insights to analyze database load and calculate the number of Reserved Instances needed.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create an AWS Budgets RI coverage budget for Amazon RDS that reports how many more Reserved Instances to buy.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A small company uses the AWS Basic Support plan. A cost analyst opens AWS Trusted Advisor and finds that cost optimization checks such as Low Utilization Amazon EC2 Instances and Idle Load Balancers are not available. What must the company do to access the full set of Trusted Advisor checks?",
+    "explanation": "Phân tích đề: Trusted Advisor đã mở được nhưng thiếu các check chi phí. Từ khóa: Basic Support plan và full set of checks.\n(A) ĐÚNG: Với Basic (và Developer) Support, Trusted Advisor chỉ cung cấp nhóm check cơ bản về bảo mật và service quotas. Toàn bộ check, gồm nhóm cost optimization như Low Utilization EC2 Instances và Idle Load Balancers, chỉ có khi account dùng Business Support trở lên.\n(B) SAI: Organizational view chỉ gom kết quả check của nhiều account trong AWS Organizations vào một báo cáo; nó không mở khóa thêm check cho account đang dùng Basic Support.\n(C) SAI: Compute Optimizer là dịch vụ riêng cho khuyến nghị right-size; bật nó không làm Trusted Advisor hiện thêm check.\n(D) SAI: Cost allocation tags phục vụ phân bổ chi phí trong Cost Explorer, Budgets và CUR; Trusted Advisor không phụ thuộc vào việc Activate tag để chạy check.\nĐáp án đúng: A\nĐiểm cần nhớ: Full Trusted Advisor checks gắn với gói support (Business trở lên). Trusted Advisor chấm nhiều trụ cột (chi phí, bảo mật, chịu lỗi, hiệu năng, service limits) nhưng không đặt được ngân sách.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Upgrade the account to AWS Business Support or a higher plan that includes all checks.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Enable Trusted Advisor organizational view from the AWS Organizations management account.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Opt in to AWS Compute Optimizer so that Trusted Advisor can import EC2 utilization data.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Activate cost allocation tags in the Billing console so Trusted Advisor can evaluate tagged resources.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company runs Amazon EC2 workloads on a mix of On-Demand Instances, Spot Instances, and Reserved Instances. A manager wants a chart that shows how monthly EC2 instance spend is split among these pricing models over the last 6 months. Which solution provides this view with the LEAST effort?",
+    "explanation": "Phân tích đề: Cần biểu đồ chi phí EC2 theo từng mô hình giá (On-Demand, Spot, Reserved) trong 6 tháng, ít công sức nhất.\n(A) SAI: Budget RI Coverage chỉ cho biết tỷ lệ phần trăm usage được RI phủ so với ngưỡng, không tách chi phí Spot và On-Demand thành biểu đồ.\n(B) SAI: Trusted Advisor đưa ra check tối ưu chi phí (ví dụ tài nguyên nhàn rỗi, RI optimization), không vẽ biểu đồ chi phí theo purchase option qua nhiều tháng.\n(C) ĐÚNG: Cost Explorer có sẵn dimension Purchase Option (On-Demand, Spot, Reserved, Savings Plans). Lọc Service = EC2-Instances, Group by Purchase Option, granularity Monthly là có ngay biểu đồ 6 tháng, không cần code.\n(D) SAI: CUR kết hợp Athena và QuickSight làm được nhưng phải dựng pipeline và dashboard, tốn công hơn nhiều so với một biểu đồ có sẵn.\nĐáp án đúng: C\nĐiểm cần nhớ: Biểu đồ, xu hướng, nhóm theo dimension có sẵn (Service, Region, Linked account, Purchase Option, Usage type, Tag) => Cost Explorer. CUR chỉ cần khi phải truy vấn dữ liệu thô.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an AWS Budgets Reserved Instance coverage budget for Amazon EC2 and read its monthly coverage history.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Review the AWS Trusted Advisor cost optimization checks for Amazon EC2 Reserved Instance usage.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "In AWS Cost Explorer, filter on Amazon EC2 instance costs and group the monthly view by Purchase Option.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Export the Cost and Usage Report to Amazon S3 and build an Amazon QuickSight dashboard on Amazon Athena.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A company is setting up AWS Cost Anomaly Detection for its AWS Organizations environment. The FinOps team wants to understand which scopes a cost monitor can track. Which TWO monitor types can the company create? (Choose TWO.)",
+    "explanation": "Phân tích đề: Hỏi các loại monitor hợp lệ của Cost Anomaly Detection.\n(A) SAI: Không có loại monitor theo từng EC2 instance ID. Monitor làm việc ở mức dịch vụ, account, cost category hoặc tag; chi tiết instance chỉ xuất hiện trong phần root cause của alert.\n(B) ĐÚNG: Linked account monitor theo dõi chi tiêu của một hoặc một nhóm member account được chọn, phù hợp khi mỗi team sở hữu account riêng.\n(C) SAI: Cost Anomaly Detection không có monitor theo IAM principal; để biết ai tạo tài nguyên phải dùng tag AWS-generated aws:createdBy hoặc CloudTrail.\n(D) SAI: Không có monitor theo VPC; VPC không phải một dimension chi phí trong Cost Anomaly Detection.\n(E) ĐÚNG: Cost allocation tag monitor theo dõi chi tiêu theo các giá trị của một tag đã Activate (ví dụ CostCenter), giúp phát hiện đột biến của từng team hay dự án.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Bốn loại monitor của Cost Anomaly Detection: AWS services, Linked account, Cost category và Cost allocation tag. Monitor theo tag chỉ dùng được tag đã Activate.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "A monitor that evaluates each Amazon EC2 instance ID separately.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "A linked account monitor for a selected group of member accounts.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "A monitor that tracks spend generated by each IAM principal.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "A monitor that tracks spend inside each VPC of the organization.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "A cost allocation tag monitor for the values of an activated tag key.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A development account normally spends about $150 per day. The team lead wants an email within the same day whenever the account's actual spend for a single day exceeds $300, so that a runaway test is caught without waiting for monthly totals. The threshold must be a fixed dollar amount, and the solution must require minimal maintenance. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Ngưỡng cố định $300 cho chi phí MỖI NGÀY, cảnh báo trong ngày, ít bảo trì.\n(A) SAI: Budget tháng $4,500 với cảnh báo forecasted chỉ báo khi dự báo cả tháng vượt hạn mức; một ngày tiêu $300 có thể không đẩy dự báo tháng vượt 100%, nên không bắt được đúng ngưỡng theo ngày.\n(B) SAI: Cost Anomaly Detection dùng máy học để quyết định thế nào là bất thường, không phải ngưỡng cố định $300/ngày như đề yêu cầu; threshold của nó lọc theo mức tác động của anomaly.\n(C) SAI: Metric EstimatedCharges là tổng cộng dồn từ đầu tháng, nên alarm $300 sẽ kêu ngay từ ngày thứ hai và không còn ý nghĩa cho các ngày sau; muốn tính theo ngày phải tự dựng metric math phức tạp.\n(D) ĐÚNG: AWS Budgets hỗ trợ chu kỳ Daily cho cost budget. Đặt mức $300 với cảnh báo Actual ở 100% gửi email, budget tự reset mỗi ngày nên không cần bảo trì.\nĐáp án đúng: D\nĐiểm cần nhớ: Ngưỡng cố định theo ngày => Budgets với period Daily. Billing Alarm dùng tổng month-to-date. Không có ngưỡng cố định, muốn bắt bất thường => Cost Anomaly Detection.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a monthly AWS Budgets cost budget of $4,500 with a forecasted alert at 100% that sends an email.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an AWS Cost Anomaly Detection monitor for the account with individual email alerts above $150 of impact.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a CloudWatch billing alarm on EstimatedCharges for the account with a static threshold of $300.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create an AWS Budgets cost budget with a Daily period of $300 and an actual-cost alert at 100%.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "The finance team reviews a 12-month AWS Cost Explorer chart of monthly spend. Several months show large jumps caused by tax, AWS Support fees, and one-time Reserved Instance upfront fees, which hide the real trend of resource consumption. Analysts want the chart to exclude these charges without building any data pipeline. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Cần loại bỏ ba loại phí (tax, support fee, upfront reservation fee) khỏi biểu đồ Cost Explorer, không dựng pipeline.\n(A) SAI: Amortized costs dàn đều phí upfront của RI ra suốt kỳ hạn nên xử lý được phần RI, nhưng tax và support fee vẫn nằm trong biểu đồ; chỉ giải quyết một phần yêu cầu.\n(B) ĐÚNG: Cost Explorer có filter Charge type (Usage, Tax, Support fee, Upfront reservation fee, Recurring reservation fee, Credit, Refund...). Exclude Tax, Support fee và Upfront reservation fee là biểu đồ chỉ còn chi phí sử dụng tài nguyên, làm ngay trên giao diện.\n(C) SAI: Truy vấn CUR bằng Athena lọc được line item usage nhưng phải thiết lập export, bảng Athena và truy vấn, trái ràng buộc không dựng pipeline.\n(D) SAI: Net unblended costs chỉ trừ thêm các khoản discount (ví dụ private pricing, volume discount) chứ không loại tax hay phí one-time khỏi tổng.\nĐáp án đúng: B\nĐiểm cần nhớ: Muốn bỏ tax, support, credits, refund hay phí upfront khỏi biểu đồ => filter Charge type trong Cost Explorer. Amortized chỉ dàn phí cam kết, không loại các khoản phí khác.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Switch the chart to Amortized costs so that the upfront fees are spread across the term of each reservation.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a Charge type filter in Cost Explorer that excludes Tax, Support fee, and Upfront reservation fee.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Export the Cost and Usage Report to Amazon S3 and query only the usage line items with Amazon Athena.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Switch the chart to Net unblended costs so that one-time fees and taxes are netted out of each month.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A media company's largest cost risk is data transfer out to the internet from Amazon EC2 in one account. Finance wants an email when the forecasted monthly cost of only that data transfer exceeds $8,000. Other EC2 charges, such as instance hours and EBS, must not count toward the threshold. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cảnh báo theo DỰ BÁO, chỉ tính riêng chi phí data transfer ra internet của EC2, ngưỡng $8,000, ít vận hành.\n(A) SAI: Billing alarm trên EstimatedCharges với dimension ServiceName = AmazonEC2 gộp toàn bộ chi phí EC2 (gồm cả instance hours) và chỉ dựa trên số thực tế, không có dự báo.\n(B) SAI: Cost Anomaly Detection phát hiện mức tăng bất thường so với lịch sử; threshold $8,000 là mức tác động của một anomaly chứ không phải ngưỡng tổng chi phí dự báo cả tháng.\n(C) ĐÚNG: AWS Budgets lọc được theo Usage type group như EC2: Data Transfer - Internet (Out). Cost budget $8,000 với cảnh báo Forecasted 100% sẽ báo sớm khi dự báo cuối tháng của riêng khoản này vượt hạn mức, không cần vận hành thêm.\n(D) SAI: Saved report trong Cost Explorer hiển thị đúng dữ liệu nhưng không tự gửi cảnh báo; phụ thuộc người xem hằng ngày là tốn công và dễ sót.\nĐáp án đúng: C\nĐiểm cần nhớ: AWS Budgets lọc được theo service, account, Region, tag, usage type và usage type group, kèm cảnh báo forecasted. Cost Explorer xem được nhưng không cảnh báo.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a CloudWatch billing alarm on EstimatedCharges with the ServiceName dimension set to Amazon EC2 and a threshold of $8,000.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an AWS Cost Anomaly Detection monitor for Amazon EC2 with an individual alert threshold of $8,000.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a cost budget filtered to the EC2 internet data transfer out usage type group with a forecasted alert at $8,000.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Save a Cost Explorer report filtered to the data transfer usage type group and have an analyst review it every morning.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company created a new member account for a product launch 2 weeks ago. A solutions architect configured an AWS Budgets cost budget in that account with a forecasted alert at 100% and an actual alert at 100%. Spend is clearly trending above the budget, but no forecasted alert has been sent. What is the MOST likely reason, and what should the solutions architect do?",
+    "explanation": "Phân tích đề: Account mới 2 tuần, cảnh báo forecasted không bắn dù chi tiêu rõ ràng vượt xu hướng.\n(A) ĐÚNG: AWS Budgets cần khoảng 5 tuần dữ liệu usage để tạo forecast; trước đó cảnh báo forecasted không được kích hoạt. Trong giai đoạn đầu nên thêm các ngưỡng Actual thấp hơn (ví dụ 50%, 80%) để vẫn được báo kịp thời.\n(B) SAI: Forecast của Budgets không phụ thuộc granularity hourly của Cost Explorer; hourly là tùy chọn trả phí chỉ cho việc xem dữ liệu.\n(C) SAI: Cảnh báo của Budgets, cả actual và forecasted, gửi được trực tiếp tới email lẫn SNS topic; kênh nhận không phải nguyên nhân.\n(D) SAI: Member account vẫn tạo được budget có cảnh báo forecasted cho chi tiêu của chính nó; chuyển sang management account không giải quyết việc thiếu lịch sử dữ liệu.\nĐáp án đúng: A\nĐiểm cần nhớ: Forecasted alert cần đủ lịch sử usage (khoảng 5 tuần). Với account hoặc workload mới, dùng thêm ngưỡng Actual thấp để bù.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Budgets needs about five weeks of usage history to forecast, so add lower actual-cost thresholds for now.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Forecasted alerts need hourly granularity in Cost Explorer, so enable hourly data in Cost Management preferences.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Forecasted alerts are delivered only to Amazon SNS topics, so add an SNS topic with an email subscription.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Member accounts cannot use forecasted alerts, so recreate the budget in the organization's management account.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company has 300 Amazon S3 buckets in one AWS account, and each bucket belongs to a single internal project. Finance wants the monthly S3 storage and request cost of each bucket for chargeback. AWS Cost Explorer grouped by service shows only the total S3 cost. Which TWO approaches will provide the cost of each bucket? (Choose TWO.)",
+    "explanation": "Phân tích đề: Cần chi phí (tiền) của TỪNG bucket, gồm storage và request. Cost Explorer theo service chỉ ra tổng.\n(A) ĐÚNG: Bucket là tài nguyên tag được. Gắn một tag key cho từng bucket, Activate tag đó trong Billing Console mục Cost Allocation Tags, sau khoảng 24 giờ có thể Group by tag trong Cost Explorer để thấy chi phí theo bucket hoặc theo dự án.\n(B) SAI: S3 Storage Lens cung cấp metric về dung lượng, số object, request và gợi ý tối ưu, nhưng không hiển thị chi phí bằng tiền cho từng bucket.\n(C) SAI: BucketSizeBytes chỉ là dung lượng; không phản ánh storage class, phí request hay data transfer nên không phải số tiền chargeback.\n(D) ĐÚNG: Data export của Cost and Usage Report có cột resource ID; với S3, resource ID là tên bucket. Truy vấn bằng Athena theo line_item_resource_id cho ra chi phí storage và request của từng bucket.\n(E) SAI: S3 Inventory liệt kê object và metadata (kích thước, storage class) để quản lý dữ liệu, không chứa chi phí; tự cộng dung lượng vẫn thiếu phí request.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Chi phí theo từng tài nguyên => tag đã Activate (xem bằng Cost Explorer) hoặc CUR có resource ID (truy vấn Athena). Storage Lens, CloudWatch, Inventory cho số liệu dung lượng chứ không phải tiền.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Tag each bucket with a project key, activate that key as a cost allocation tag, and group Cost Explorer by that tag.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Open the Amazon S3 Storage Lens dashboard and read the monthly cost in dollars for each bucket.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use the CloudWatch BucketSizeBytes metric of each bucket as the monthly chargeback amount.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a Cost and Usage Report data export that includes resource IDs and query S3 costs by resource ID in Athena.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Turn on Amazon S3 Inventory reports for each bucket and sum the object sizes listed in the reports.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A European company's policy allows workloads only in eu-west-1 and eu-central-1. Service control policies that block other Regions will be rolled out next quarter. Until then, the compliance team wants an email whenever any cost appears in any other Region in any account of the organization. Which solution meets this requirement with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cảnh báo tự động khi có BẤT KỲ chi phí nào ở Region ngoài hai Region được phép, phạm vi toàn tổ chức, ít vận hành.\n(A) SAI: Cost Anomaly Detection chỉ báo khi chi tiêu lệch khỏi hành vi đã học; một khoản nhỏ ở Region lạ có thể không được coi là anomaly, và monitor AWS services không tập trung vào Region.\n(B) SAI: Metric EstimatedCharges chỉ có dimension ServiceName, LinkedAccount và Currency; không có dimension Region nên không lọc được Region không được phép.\n(C) SAI: Báo cáo Cost Explorer theo Region cho đúng dữ liệu nhưng phụ thuộc người xem mỗi tuần, chậm và không phải cảnh báo tự động.\n(D) ĐÚNG: Budget tạo ở management account bao phủ chi tiêu của mọi member account. Filter Region loại trừ eu-west-1 và eu-central-1, đặt mức $1 với cảnh báo Actual là bất kỳ chi phí nào xuất hiện ở Region khác sẽ được báo qua email.\nĐáp án đúng: D\nĐiểm cần nhớ: Budgets lọc được theo Region (include/exclude) nên dùng làm cảnh báo phát hiện; SCP mới là kiểm soát ngăn chặn. Billing Alarm không chia theo Region hay tag.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an AWS Cost Anomaly Detection monitor for AWS services with alerts sent to the compliance team's email.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a CloudWatch billing alarm on EstimatedCharges that uses a Region dimension to watch the other Regions.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Share a Cost Explorer report grouped by Region with the compliance team and ask them to check it every Monday.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a $1 cost budget in the management account that excludes the approved Regions, with an actual alert.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A research sandbox account runs Amazon EC2 instances tagged Env=sandbox and Amazon SageMaker notebook instances. When actual monthly spend reaches 100% of a $10,000 budget, all running sandbox EC2 instances and all SageMaker notebook instances must be stopped automatically without human approval. Data on EBS volumes and notebook storage must be kept, and developers must still be able to sign in to read logs. Instances are created and deleted every day. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Tự động DỪNG (không xóa) cả EC2 có tag lẫn SageMaker notebook khi Actual đạt 100%, danh sách instance thay đổi hằng ngày, không được khóa quyền đăng nhập.\n(A) SAI: Budgets action áp SCP chặn ec2:RunInstances và SageMaker chỉ ngăn tạo hoặc gọi API mới; các instance và notebook đang chạy vẫn tiếp tục tính tiền, và SCP chặn mọi hành động SageMaker còn cản cả việc xem log liên quan.\n(B) SAI: Budgets action chỉ hỗ trợ ba loại: áp IAM policy, áp SCP, và dừng EC2 hoặc RDS instance được chọn. SageMaker notebook không phải target hợp lệ, và danh sách EC2 chọn sẵn sẽ lỗi thời khi instance được tạo mới hằng ngày.\n(C) ĐÚNG: Cảnh báo Actual 100% của budget gửi tới SNS topic, kích hoạt Lambda. Lambda tìm tại thời điểm chạy các EC2 có tag Env=sandbox và mọi notebook instance rồi gọi lệnh stop, nên bao được tài nguyên mới tạo, giữ nguyên dữ liệu và không đụng tới quyền đăng nhập.\n(D) SAI: Cost Anomaly Detection không có ngưỡng cố định 100% của $10,000; nó có thể bắn sớm hoặc không bắn khi chi tiêu tăng đều, nên không đảm bảo hành động đúng mốc ngân sách.\nĐáp án đúng: C\nĐiểm cần nhớ: Budgets actions chỉ làm được IAM policy, SCP, stop EC2/RDS. Cần tác động dịch vụ khác hoặc logic động => Budgets alert -> SNS -> Lambda.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Configure a Budgets action at 100% that applies an SCP denying ec2:RunInstances and all SageMaker actions in the account.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Configure a Budgets action at 100% whose targets are the sandbox EC2 instances and the SageMaker notebook instances.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Send the 100% actual alert to an SNS topic that invokes a Lambda function to stop tagged EC2 and notebook instances.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Send AWS Cost Anomaly Detection alerts to an SNS topic that invokes a Lambda function to stop tagged EC2 and notebook instances.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A product account has a $25,000 monthly AWS Budgets cost budget with actual-cost alerts at 80% and 100%. Every January, the team buys a 1-year All Upfront Compute Savings Plan, and the budget alerts immediately that month. Later in the year, promotional credits applied to the account make actual spend look far lower than real consumption, so genuine overruns are missed. Finance wants the alerts to reflect monthly consumption with the commitment spread evenly and credits ignored, without building a data pipeline. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Hai vấn đề: phí upfront dồn vào tháng mua (cần dàn đều) và credits che chi phí thật (cần loại bỏ). Vẫn phải có cảnh báo tự động, không dựng pipeline.\n(A) SAI: Saved report của Cost Explorer dùng amortized và loại credit cho số liệu đúng, nhưng không gửi cảnh báo; review hằng tuần là thủ công và trễ.\n(B) ĐÚNG: Trong advanced options của budget có thể chọn cách tổng hợp chi phí (unblended, amortized, blended) và chọn các loại charge được tính. Chọn Amortized dàn phí upfront của Savings Plan ra từng tháng, bỏ chọn Credits giúp số liệu phản ánh mức tiêu thụ thật; cảnh báo 80%/100% vẫn hoạt động như cũ.\n(C) SAI: Planned budget amounts nâng hạn mức tháng Giêng tránh được báo động giả lúc mua, nhưng vẫn dùng unblended có credit nên vẫn bỏ sót overrun bị credit che, và không dàn đều cam kết.\n(D) SAI: Cost Anomaly Detection không có ngưỡng cố định $25,000 và vẫn coi khoản upfront là đột biến; không đáp ứng yêu cầu cảnh báo theo hạn mức.\nĐáp án đúng: B\nĐiểm cần nhớ: AWS Budgets cho chọn amortized và loại trừ credits, refunds, upfront fees, tax, support... ngay trong cấu hình budget. Phí cam kết làm budget nhảy vọt => chuyển budget sang amortized.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a Cost Explorer saved report that uses amortized costs with credits excluded and review it every week.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Edit the budget advanced options to aggregate costs as amortized and clear the option that includes credits.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Use planned budget amounts to raise the January limit and keep the budget on unblended costs with credits included.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Replace the budget with an AWS Cost Anomaly Detection monitor for the account that alerts on spend above $25,000.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "Four business units share one AWS account. Finance needs an exact monthly chargeback for each unit, not proportional estimates. About 30% of the bill cannot be attributed by tags because it comes from AWS Marketplace subscriptions, AWS Support charges, and services that do not support cost allocation tags. Each unit must keep administrative control of its own resources, and the company must keep a single invoice with combined volume pricing. Which solution meets these requirements with the LEAST ongoing effort?",
+    "explanation": "Phân tích đề: Chargeback CHÍNH XÁC 100%, có phần chi phí không tag được, mỗi đơn vị tự quản trị, vẫn một hóa đơn và hưởng volume pricing gộp, ít công sức lâu dài.\n(A) ĐÚNG: Đặt mỗi đơn vị vào member account riêng trong AWS Organizations. Mọi line item, kể cả Marketplace, Support và dịch vụ không hỗ trợ tag, đều gắn với linked account nên Cost Explorer group by Linked account cho chargeback chính xác. Consolidated billing vẫn giữ một hóa đơn và cộng dồn usage để hưởng volume pricing.\n(B) SAI: Split charge rules của Cost Categories chia phần chi phí chung theo tỷ lệ (proportional, even hoặc fixed); kết quả là ước lượng, vi phạm yêu cầu chargeback chính xác.\n(C) SAI: Tag policy và Tag Editor cải thiện việc gắn tag cho tài nguyên, nhưng không thể gắn tag cho các khoản như Support hay dịch vụ không hỗ trợ cost allocation tags, nên vẫn còn phần chưa phân bổ.\n(D) SAI: Account độc lập có hóa đơn riêng thì phân chi phí chính xác nhưng mất một hóa đơn duy nhất và mất lợi ích cộng dồn volume pricing của consolidated billing.\nĐáp án đúng: A\nĐiểm cần nhớ: Ranh giới account là cách phân bổ chi phí mạnh nhất, bao cả các khoản không tag được. Organizations với consolidated billing giữ một hóa đơn và volume discount.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Move each business unit into its own member account in AWS Organizations and report costs by linked account.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Use AWS Cost Categories split charge rules to allocate the untagged costs proportionally to each unit's tagged spend.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Attach a tag policy that enforces a BusinessUnit key and use Tag Editor to tag all existing resources in the account.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a standalone AWS account for each business unit, each with its own payment method and its own invoice.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company runs 40 microservices on Amazon ECS with AWS Fargate in one member account. Each ECS service resource is tagged with Team. Finance cannot select Team in AWS Cost Explorer from the management account, and the Cost and Usage Report shows no tags on the Fargate task line items. Tasks are replaced several times a day by deployments and scaling. Which TWO actions will make future Fargate costs appear by Team with the LEAST operational overhead? (Choose TWO.)",
+    "explanation": "Phân tích đề: Hai lỗi cùng lúc: (1) tag Team chưa được Activate nên không chọn được trong Cost Explorer, (2) line item Fargate tính theo task nhưng task không mang tag. Task thay liên tục nên cách xử lý phải tự động.\n(A) SAI: Tag trên ECS cluster không tự kế thừa xuống task; chi phí Fargate được tính trên từng task nên tag của cluster không xuất hiện trên các line item đó.\n(B) SAI: Script gắn tag hằng đêm luôn bỏ sót các task sinh ra và kết thúc trong ngày, lại thêm việc vận hành; không đáp ứng least operational overhead.\n(C) ĐÚNG: Đặt propagateTags = SERVICE trên mỗi ECS service để mọi task mới tự nhận tag của service. Chi phí Fargate tính theo task nên từ đó line item sẽ mang tag Team, kể cả khi task được thay liên tục.\n(D) SAI: Container Insights cung cấp metric hiệu năng (CPU, memory, network) của cluster, service và task, không đưa chi phí theo service vào Cost Explorer.\n(E) ĐÚNG: User-defined tag phải được Activate trong Billing Console mục Cost Allocation Tags ở management account thì mới xuất hiện trong Cost Explorer, Budgets và CUR của tổ chức (dữ liệu hiện sau khoảng 24 giờ).\nĐáp án đúng: C và E\nĐiểm cần nhớ: Chi phí được tính trên tài nguyên nào thì tag phải nằm trên tài nguyên đó (với Fargate là task, cần propagateTags). Tag chỉ thành cost allocation tag sau khi Activate ở management account.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Tag the ECS cluster with Team so that every task launched in the cluster inherits the tag.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Run a nightly script that calls the tagging APIs to copy the Team tag onto all running tasks.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Set propagateTags to SERVICE on each ECS service so that new tasks carry the service's Team tag.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable CloudWatch Container Insights so that Fargate cost is reported per service in Cost Explorer.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Activate Team as a user-defined cost allocation tag in the Billing console of the management account.", "isCorrect": true }
+    ]
+  }
+]

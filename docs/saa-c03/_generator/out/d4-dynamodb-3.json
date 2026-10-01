@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company is retiring a legacy application. Its 900 GB Amazon DynamoDB table will no longer receive any traffic, but the data must be kept for 5 years in case a regulator requests it, which is unlikely. A retrieval time of up to two days is acceptable. What is the MOST cost-effective way to retain the data?",
+    "explanation": "Phân tích đề: Bảng ngừng dùng, chỉ cần giữ dữ liệu 5 năm, gần như không truy xuất, chấp nhận lấy lại trong 2 ngày.\n(A) SAI: Giữ bảng ở Standard-IA vẫn trả phí lưu trữ DynamoDB, đắt hơn nhiều lần so với lớp lưu trữ lạnh của S3.\n(B) SAI: Giữ backup on-demand của DynamoDB 5 năm vẫn tính phí warm backup storage theo GB-tháng, cao hơn S3 Glacier Deep Archive.\n(C) ĐÚNG: Export to S3 (không tốn RCU), đặt S3 Lifecycle chuyển file export sang S3 Glacier Deep Archive, sau đó xóa bảng. Deep Archive là lớp rẻ nhất, thời gian lấy lại trong vòng 12 đến 48 giờ phù hợp giới hạn 2 ngày; nếu cần có thể Import from S3 thành bảng mới.\n(D) SAI: Chuyển bảng sang provisioned với 1 RCU/1 WCU chỉ giảm phí throughput; phí lưu trữ 900 GB trên DynamoDB vẫn còn nguyên.\nĐáp án đúng: C\nĐiểm cần nhớ: Dữ liệu DynamoDB không còn truy cập: Export to S3 + lifecycle sang Glacier rồi xóa bảng là cách lưu trữ rẻ nhất.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Keep the table and change it to the Standard-Infrequent Access table class for the 5 years.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an on-demand DynamoDB backup, delete the table, and retain the backup for 5 years.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Export the table to Amazon S3, transition the export to S3 Glacier Deep Archive, and delete the table.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Switch the table to provisioned mode with 1 RCU and 1 WCU and keep it for the full retention period.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "Developers run thousands of unit and integration tests against Amazon DynamoDB on their laptops and in a CI pipeline every day. Each test run creates and deletes tables in a shared AWS account, which generates request charges and occasional conflicts between developers. Which solution reduces cost and isolates developers from each other?",
+    "explanation": "Phân tích đề: Test cục bộ và CI tạo/xóa bảng thật trên AWS mỗi ngày, gây phí request và xung đột giữa các developer.\n(A) SAI: Mỗi developer một tài khoản AWS vẫn trả phí request thật, còn thêm chi phí quản trị nhiều tài khoản.\n(B) ĐÚNG: DynamoDB local (bản tải về hoặc Docker image) chạy trên máy developer và trong CI, tương thích API DynamoDB, không phát sinh phí AWS; mỗi developer có instance riêng nên không xung đột.\n(C) SAI: Reserved capacity chỉ áp dụng cho provisioned capacity chạy liên tục; bảng test tạo/xóa liên tục không tận dụng được.\n(D) SAI: DAX là cache cho bảng trên AWS, vẫn cần bảng thật và thêm phí node; không cách ly được developer.\nĐáp án đúng: B\nĐiểm cần nhớ: DynamoDB local dùng cho phát triển và kiểm thử cục bộ, miễn phí, không cần kết nối AWS.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a separate AWS account for each developer and run the tests against on-demand tables in each account.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Run the tests against DynamoDB local on each laptop and in the CI pipeline containers.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Purchase reserved capacity for the shared account so that the test traffic is billed at a discounted rate.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Place a DynamoDB Accelerator (DAX) cluster in front of the shared tables to serve test requests from cache.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "Five product teams share one AWS account, and each team owns several Amazon DynamoDB tables. Finance wants a monthly report of DynamoDB costs per team, including throughput, storage, and backups. What should a solutions architect do with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Nhiều team dùng chung một account, cần báo cáo chi phí DynamoDB theo team (throughput, lưu trữ, backup), ít vận hành nhất.\n(A) SAI: Tự tính từ CloudWatch ConsumedCapacity tốn công, không bao gồm chi phí lưu trữ, backup và phải tự áp đơn giá.\n(B) SAI: CloudWatch Contributor Insights cho biết partition key nào được truy cập nhiều, không phải phân bổ chi phí; còn thêm phí.\n(C) ĐÚNG: Gắn tag (ví dụ team=payments) cho từng bảng DynamoDB, kích hoạt tag đó là cost allocation tag trong Billing and Cost Management, rồi lọc/nhóm theo tag trong Cost Explorer hoặc Cost and Usage Report.\n(D) SAI: Đặt mỗi team ở một Region khác nhau là thay đổi kiến trúc không hợp lý, ảnh hưởng độ trễ và không phân tách được trong cùng Region về sau.\nĐáp án đúng: C\nĐiểm cần nhớ: Phân bổ chi phí theo nhóm/dự án trong cùng account dùng cost allocation tags; DynamoDB table hỗ trợ tag.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Export CloudWatch ConsumedCapacity metrics per table and calculate each team's cost in a spreadsheet.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable CloudWatch Contributor Insights on every table and group the results by the owning team.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Tag each table with its team name, activate the tag for cost allocation, and use Cost Explorer.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Move each team's tables to a different AWS Region so that the bill shows DynamoDB costs by Region.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect is forecasting the backup cost of Amazon DynamoDB tables before enabling data protection features. Which TWO statements about DynamoDB backup charges are correct? (Choose TWO.)",
+    "explanation": "Phân tích đề: Cần nắm cách tính phí PITR và on-demand backup của DynamoDB.\n(A) SAI: PITR không miễn phí; nó bị tính phí liên tục khi được bật.\n(B) ĐÚNG: PITR tính phí theo GB-tháng dựa trên kích thước bảng (bao gồm LSI) trong suốt thời gian bật.\n(C) SAI: Tạo backup on-demand không tiêu tốn provisioned RCU của bảng và không ảnh hưởng hiệu năng.\n(D) ĐÚNG: Backup on-demand được giữ (và tính phí lưu trữ) cho tới khi bị xóa rõ ràng, kể cả sau khi bảng gốc đã bị xóa.\n(E) SAI: Restore từ backup hay PITR có tính phí theo GB dữ liệu được khôi phục, không miễn phí.\nĐáp án đúng: B và D\nĐiểm cần nhớ: PITR tính theo kích thước bảng liên tục; on-demand backup tính cho tới khi xóa; restore tính theo GB; backup không tốn RCU.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Point-in-time recovery is free for the first 35 days of each table's retention window.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Point-in-time recovery is billed continuously based on the size of the table.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Creating an on-demand backup consumes the table's provisioned read capacity units.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "On-demand backups are billed until they are deleted, even after the table is deleted.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Restoring a table from a backup is free because only backup storage is billed.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company needs to send an email whenever a new customer item is inserted into an Amazon DynamoDB table. A single AWS Lambda function will process the changes within a few minutes, and there is no need to keep change records for more than a day or to replay older changes. Which change data capture option is MOST cost-effective?",
+    "explanation": "Phân tích đề: Một consumer Lambda duy nhất, xử lý trong vài phút, không cần giữ bản ghi quá 1 ngày hay replay lâu. Chọn cơ chế CDC rẻ nhất.\n(A) ĐÚNG: DynamoDB Streams giữ bản ghi thay đổi 24 giờ, đủ cho yêu cầu. Bật Streams không tính phí riêng, và Lambda trigger đọc Streams không bị tính phí read request; chỉ trả phí Lambda.\n(B) SAI: Kinesis Data Streams for DynamoDB phù hợp khi cần giữ lâu (tới 365 ngày) hoặc nhiều consumer, nhưng tính phí change data capture unit cộng phí shard/stream; đắt hơn cho nhu cầu đơn giản này.\n(C) SAI: Lambda chạy theo lịch Scan bảng để tìm item mới tốn RCU cho toàn bộ bảng mỗi lần chạy và dễ bỏ sót thay đổi.\n(D) SAI: Export to S3 định kỳ rồi so sánh file là quá phức tạp, chậm và tốn phí export cho mỗi lần chạy.\nĐáp án đúng: A\nĐiểm cần nhớ: Cần CDC đơn giản cho 1 đến 2 consumer, giữ 24 giờ là đủ: DynamoDB Streams + Lambda. Cần giữ lâu hoặc fan-out nhiều consumer: Kinesis Data Streams for DynamoDB.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable DynamoDB Streams with the NEW_IMAGE view type and configure the function as a trigger.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Enable Kinesis Data Streams for DynamoDB and configure the function as the stream consumer.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Schedule the function every minute to Scan the table for items created since the last run.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Export the table to Amazon S3 every hour and have the function compare consecutive exports.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A retailer stores orders in Amazon DynamoDB. Analysts need to join order data with other warehouse data in Amazon Redshift using SQL, with data refreshed within minutes. Today, a nightly AWS Glue job scans the table, which consumes large amounts of read capacity and requires custom code maintenance. The company wants the LEAST operational overhead and no impact on the table's read capacity. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Cần dữ liệu DynamoDB trong Redshift gần real-time (vài phút), join bằng SQL; bỏ Glue scan tốn RCU; ít vận hành nhất.\n(A) SAI: Chạy Glue job nhiều lần hơn làm tăng RCU tiêu thụ và công vận hành, ngược với yêu cầu.\n(B) SAI: Amazon Athena DynamoDB connector (federated query) đọc trực tiếp bảng bằng Scan/Query, tiêu tốn RCU và thêm phí Lambda cho mỗi truy vấn; không đưa dữ liệu vào Redshift.\n(C) ĐÚNG: Amazon DynamoDB zero-ETL integration với Amazon Redshift tự động sao chép và cập nhật dữ liệu vào Redshift mà không phải viết pipeline; tích hợp dựa trên export (yêu cầu bật PITR) nên không tiêu tốn RCU của bảng.\n(D) SAI: Streams + Lambda + Amazon Data Firehose tới Redshift khả thi nhưng phải tự xây và bảo trì pipeline, xử lý update/delete; nhiều vận hành hơn zero-ETL.\nĐáp án đúng: C\nĐiểm cần nhớ: Cần phân tích dữ liệu DynamoDB bằng SQL trong Redshift mà không ảnh hưởng RCU: zero-ETL integration. Tránh Scan bảng production cho analytics.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Run the existing AWS Glue job every 15 minutes with a lower read percentage setting on the table.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Query the table from Redshift through the Amazon Athena DynamoDB connector with federated queries.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an Amazon DynamoDB zero-ETL integration with Amazon Redshift for the orders table.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Stream changes with DynamoDB Streams and Lambda into Amazon Data Firehose that loads Redshift.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A small internal web application needs a durable session store. There are about 3,000 active users, sessions are 2 KB, total traffic averages 20 requests per second, and sessions must survive application restarts and expire after 8 hours. The team is comparing a two-node Multi-AZ Amazon ElastiCache for Redis OSS cluster with other options. Which solution is MOST cost-effective?",
+    "explanation": "Phân tích đề: Lưu lượng rất nhỏ (20 req/s), dữ liệu nhỏ (khoảng 6 MB), cần bền vững qua restart và hết hạn sau 8 giờ. So sánh chi phí với cụm ElastiCache 2 node chạy 24/7.\n(A) SAI: Cụm ElastiCache Multi-AZ 2 node tính tiền theo giờ cho từng node bất kể lưu lượng; với 20 req/s thì phần lớn chi phí là trả cho tài nguyên nhàn rỗi.\n(B) SAI: Amazon RDS Multi-AZ cũng trả tiền instance 24/7 và phải tự viết job xóa session hết hạn.\n(C) SAI: Lưu session trên đĩa EBS của từng instance không bền vững khi instance bị thay thế và không chia sẻ được giữa nhiều instance.\n(D) ĐÚNG: DynamoDB on-demand với TTL 8 giờ: trả theo request (20 req/s rất rẻ), lưu trữ vài MB gần như không đáng kể, dữ liệu bền vững trên nhiều AZ, TTL xóa session hết hạn miễn phí.\nĐáp án đúng: D\nĐiểm cần nhớ: Session store lưu lượng thấp cần bền vững: DynamoDB on-demand + TTL thường rẻ hơn cụm cache chạy 24/7. ElastiCache phù hợp khi cần độ trễ sub-millisecond ở lưu lượng rất cao.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use the two-node Multi-AZ ElastiCache for Redis OSS cluster with key expiration set to 8 hours.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Store sessions in an Amazon RDS for MySQL Multi-AZ DB instance with an hourly cleanup job.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Store sessions on the Amazon EBS volumes of the application instances with a cleanup cron job.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Store sessions in a DynamoDB on-demand table and expire them with Time to Live.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A finance team runs ad hoc SQL reports that join 12 normalized tables on an Amazon Aurora MySQL provisioned cluster. The cluster is used heavily during business hours and is almost idle at night and on weekends. A manager proposes migrating the reports to Amazon DynamoDB to cut costs. The analysts cannot predict which joins they will need. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Báo cáo ad hoc, join 12 bảng chuẩn hóa, không đoán trước được mẫu truy vấn; tải chỉ trong giờ hành chính. Đề xuất chuyển sang DynamoDB để giảm chi phí.\n(A) SAI: DynamoDB không hỗ trợ JOIN; các truy vấn ad hoc không biết trước sẽ phải Scan và ghép dữ liệu trong ứng dụng, tốn RCU và công sức, thường đắt hơn.\n(B) SAI: Thêm GSI cho mọi tổ hợp truy vấn là bất khả thi khi truy vấn ad hoc, và mỗi GSI làm tăng chi phí ghi và lưu trữ.\n(C) ĐÚNG: Giữ mô hình quan hệ và chuyển sang Aurora Serverless v2: capacity tự co giãn theo tải, giảm mạnh ngoài giờ hành chính (có thể tự tạm dừng khi không có kết nối), nên trả ít hơn cụm provisioned chạy cố định, vẫn giữ SQL join.\n(D) SAI: Thêm Aurora Replica tăng chi phí; vấn đề là trả tiền cho capacity nhàn rỗi ngoài giờ.\nĐáp án đúng: C\nĐiểm cần nhớ: Workload SQL quan hệ, join ad hoc thì không chuyển sang DynamoDB để tiết kiệm; dùng Aurora Serverless v2 để trả theo tải thực tế.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Migrate the tables to DynamoDB on-demand tables and perform the joins in the reporting application code.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Migrate to a single DynamoDB table and add a global secondary index for each report's join pattern.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Keep the relational schema and move the cluster to Aurora Serverless v2 so capacity scales with load.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Keep the provisioned Aurora cluster and add an Aurora Replica dedicated to the finance reports.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A ticketing service reserves seats with a conditional UpdateItem on an Amazon DynamoDB table. During popular on-sales, about 30% of the conditional updates fail. After each failure, the application issues a strongly consistent GetItem to fetch the current item so it can show the user the latest seat availability. Read capacity consumption spikes during on-sales. Which change reduces read cost without showing stale data?",
+    "explanation": "Phân tích đề: Mỗi lần update có điều kiện thất bại, ứng dụng đọc thêm một lần strongly consistent để lấy trạng thái hiện tại; cần giảm RCU mà không hiển thị dữ liệu cũ.\n(A) SAI: Chuyển GetItem sang eventually consistent giảm nửa RCU nhưng có thể trả về dữ liệu cũ, vi phạm yêu cầu.\n(B) SAI: DAX không cache strongly consistent read, nên các lần đọc này vẫn đi thẳng xuống bảng; lại thêm phí cụm DAX.\n(C) ĐÚNG: Đặt ReturnValuesOnConditionCheckFailure = ALL_OLD trên UpdateItem. Khi điều kiện thất bại, DynamoDB trả về luôn item hiện tại trong lỗi, nên ứng dụng không cần gửi thêm GetItem riêng, loại bỏ lần đọc bổ sung mà vẫn có dữ liệu mới nhất.\n(D) SAI: TransactWriteItems tốn gấp đôi WCU và không trả về item hiện tại khi thất bại; chi phí tăng.\nĐáp án đúng: C\nĐiểm cần nhớ: ReturnValuesOnConditionCheckFailure giúp lấy item hiện tại khi ghi có điều kiện thất bại mà không cần đọc lại riêng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Change the follow-up GetItem requests to eventually consistent reads to halve their cost.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Serve the follow-up strongly consistent GetItem requests from a DynamoDB Accelerator (DAX) cluster.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Set ReturnValuesOnConditionCheckFailure to ALL_OLD on the conditional UpdateItem requests.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Replace the conditional UpdateItem with TransactWriteItems that includes a ConditionCheck.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company is adding change processing to several Amazon DynamoDB tables and wants to forecast the cost of DynamoDB Streams. One consumer will be an AWS Lambda trigger, and another will be a Java application on Amazon EC2 that uses the DynamoDB Streams Kinesis Adapter. Which TWO statements about DynamoDB Streams pricing are correct? (Choose TWO.)",
+    "explanation": "Phân tích đề: Hai loại consumer: Lambda trigger và ứng dụng EC2 dùng Kinesis Adapter (gọi GetRecords). Cần biết phần nào tính phí.\n(A) ĐÚNG: GetRecords do Lambda trigger (event source mapping) thực hiện không bị tính phí streams read request.\n(B) SAI: Ghi bản ghi vào stream không tiêu tốn thêm WCU của bảng; bật Streams không làm tăng WCU.\n(C) ĐÚNG: Consumer tự viết (như ứng dụng dùng DynamoDB Streams Kinesis Adapter trên EC2) bị tính phí theo streams read request unit cho các lời gọi GetRecords (sau phần miễn phí hằng tháng nếu có).\n(D) SAI: Thời gian lưu bản ghi của DynamoDB Streams cố định 24 giờ, không mua thêm được; cần giữ lâu hơn thì dùng Kinesis Data Streams for DynamoDB.\n(E) SAI: DynamoDB Streams không tính phí theo GB bản ghi lưu trong stream.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Streams: Lambda trigger đọc miễn phí; consumer khác trả theo read request unit; retention cố định 24 giờ.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "GetRecords calls made by the Lambda trigger are not billed as stream read requests.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Every stream record consumes an extra write capacity unit on the source table.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "GetRecords calls made by the EC2 application are billed as stream read request units.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Stream retention can be extended from 24 hours to 7 days for an additional hourly fee.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Stream records are billed per GB-month for as long as they remain in the stream.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A fleet of 200,000 sensors each sends a 60-byte reading every second. An ingestion service writes every reading as its own item in an Amazon DynamoDB table with provisioned capacity, which requires about 200,000 WCUs. Readings are queried only by device and minute. Storage is also growing quickly because of per-item overhead. Seconds of extra latency before data becomes queryable are acceptable. Which solution will MOST reduce DynamoDB cost?",
+    "explanation": "Phân tích đề: Mỗi reading 60 byte nhưng mỗi lần ghi tối thiểu 1 WCU (làm tròn lên 1 KB), và DynamoDB tính thêm overhead khoảng 100 byte mỗi item vào lưu trữ. Truy vấn theo thiết bị và phút; chấp nhận trễ vài giây.\n(A) SAI: BatchWriteItem chỉ gộp lời gọi API; mỗi item vẫn tính tối thiểu 1 WCU nên tổng WCU không đổi.\n(B) SAI: On-demand vẫn tính mỗi lần ghi item nhỏ là 1 write request unit; không giải quyết lãng phí do làm tròn, và ở tải cao ổn định thường đắt hơn provisioned.\n(C) ĐÚNG: Đệm dữ liệu (ví dụ qua Kinesis Data Streams hoặc trong ingestion service) và ghi một item cho mỗi thiết bị mỗi phút chứa 60 reading (khoảng 3.6 KB, 4 WCU). Mỗi phút mỗi thiết bị tốn 4 WCU thay vì 60 WCU, WCU giảm khoảng 15 lần, số item và overhead lưu trữ giảm 60 lần, vẫn khớp mẫu truy vấn theo thiết bị và phút.\n(D) SAI: Standard-IA giảm giá lưu trữ nhưng tăng đơn giá ghi; với workload ghi cực nặng thì tổng chi phí tăng.\nĐáp án đúng: C\nĐiểm cần nhớ: Mỗi lần ghi tối thiểu 1 WCU và mỗi item có overhead lưu trữ; với nhiều bản ghi rất nhỏ, gộp chúng thành item gần 1 KB (hoặc bội số) để giảm chi phí.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Send the readings with BatchWriteItem in groups of 25 so each group is billed as one write.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Switch the table to on-demand capacity mode so that small writes are billed by the byte.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Buffer readings and write one item per device per minute that contains that minute's readings.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Change the table to the Standard-Infrequent Access table class to lower the per-item storage cost.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "Every night, an Amazon EMR cluster runs Apache Hive queries directly against a 3 TB Amazon DynamoDB table by using the DynamoDB connector. To keep the job within its window, the team raises the table's provisioned RCUs each night, which is expensive and occasionally throttles the production application. Results are also inconsistent because items change while the scan runs. The analytics team needs a consistent view of the data as of midnight. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Job EMR quét trực tiếp 3 TB, phải tăng RCU hằng đêm, làm throttle ứng dụng; kết quả không nhất quán vì dữ liệu thay đổi trong lúc quét. Cần snapshot nhất quán tại nửa đêm.\n(A) SAI: Parallel scan với nhiều segment chạy nhanh hơn nhưng tổng RCU không đổi, vẫn tranh chấp capacity với production và vẫn không nhất quán tại một thời điểm.\n(B) ĐÚNG: Bật PITR và dùng Export to S3 tại thời điểm nửa đêm. Export đọc từ bản backup liên tục nên không tiêu tốn RCU, không ảnh hưởng production, và cho snapshot nhất quán tại đúng thời điểm chỉ định; EMR/Hive đọc dữ liệu từ S3.\n(C) SAI: Chuyển sang on-demand ban đêm tránh throttle nhưng mỗi lần quét 3 TB vẫn bị tính read request unit, và vẫn không nhất quán.\n(D) SAI: DAX không hiệu quả cho Scan toàn bảng (dữ liệu ít lặp lại), và không cung cấp snapshot nhất quán.\nĐáp án đúng: B\nĐiểm cần nhớ: Analytics trên DynamoDB: Export to S3 (dựa trên PITR) cho snapshot tại một thời điểm, không tốn RCU, không làm phiền production.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Configure the Hive job to use a parallel scan with more segments so that it finishes faster each night.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable point-in-time recovery, export the table to Amazon S3 as of midnight, and query the export.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Switch the table to on-demand capacity mode every night so the scan no longer throttles production.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Route the Hive job through a DynamoDB Accelerator (DAX) cluster so that the scan reads come from cache.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An Orders table in Amazon DynamoDB is 10 TB. Orders from the last 12 months are read and written heavily, and throughput accounts for about 60% of the table's cost. Orders older than 12 months make up 85% of the storage and are read only occasionally by support agents with GetItem calls, which must remain on the DynamoDB API with millisecond latency. Changing the whole table to Standard-Infrequent Access was rejected because it would raise the cost of the heavy recent traffic. Which solution is MOST cost-effective?",
+    "explanation": "Phân tích đề: Một bảng lẫn dữ liệu nóng (throughput lớn) và dữ liệu lạnh (85% lưu trữ). Dữ liệu cũ vẫn phải GetItem được qua DynamoDB API với độ trễ ms. Đổi cả bảng sang Standard-IA bị loại.\n(A) SAI: Export dữ liệu cũ sang S3 rồi truy vấn bằng Athena vi phạm yêu cầu dùng DynamoDB API với độ trễ mili-giây.\n(B) SAI: DAX không giảm chi phí lưu trữ, vốn là vấn đề của dữ liệu cũ, và thêm phí node.\n(C) ĐÚNG: Tạo bảng archive dùng table class Standard-IA. Đặt TTL 12 tháng trên bảng chính; Lambda trên DynamoDB Streams nhận bản ghi xóa do TTL (userIdentity là dịch vụ DynamoDB) và ghi item sang bảng archive. Bảng nóng giữ Standard cho throughput rẻ, dữ liệu lạnh hưởng giá lưu trữ thấp của Standard-IA mà vẫn GetItem được với độ trễ ms.\n(D) SAI: Global table với replica Standard-IA vẫn giữ toàn bộ dữ liệu trong bảng chính (Standard) và thêm replicated write cho mọi thay đổi, làm tăng chi phí.\nĐáp án đúng: C\nĐiểm cần nhớ: Khi một bảng vừa nóng vừa lạnh, tách thành bảng hot (Standard) và bảng archive (Standard-IA), di chuyển bằng TTL + Streams + Lambda.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Export orders older than 12 months to Amazon S3, delete them from the table, and query them with Amazon Athena.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a DynamoDB Accelerator (DAX) cluster so that support agents read older orders from the cache.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Move orders older than 12 months to a Standard-IA archive table by using TTL, Streams, and Lambda.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Convert the table to a global table and create a Standard-IA replica in a second Region for older orders.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A cost review of a company's Amazon DynamoDB usage finds three issues. First, a nightly report scans a 2 TB production table with strongly consistent reads, and the report can use data that is up to one day old. Second, 25 development tables are provisioned at 1,000 WCUs each around the clock but are used only a few hours per week. Third, a cron job scans a shopping cart table every hour and deletes carts that were abandoned more than 7 days ago. Which THREE changes should a solutions architect recommend to reduce cost? (Choose THREE.)",
+    "explanation": "Phân tích đề: Ba vấn đề riêng: Scan báo cáo hằng đêm (chấp nhận dữ liệu cũ 1 ngày), bảng dev cấp dư 24/7, cron Scan + delete giỏ hàng bỏ dở.\n(A) ĐÚNG: Export to S3 hằng ngày rồi chạy báo cáo bằng Amazon Athena: export không tiêu tốn RCU, loại bỏ Scan strongly consistent 2 TB mỗi đêm.\n(B) SAI: DAX không hiệu quả cho Scan toàn bảng hằng đêm và không cache strongly consistent read; chỉ thêm phí.\n(C) ĐÚNG: Bảng dev dùng vài giờ mỗi tuần chuyển sang on-demand, thời gian nhàn rỗi không phải trả phí throughput.\n(D) SAI: Reserved capacity cho bảng dev nhàn rỗi là cam kết 1 đến 3 năm cho capacity không dùng.\n(E) ĐÚNG: Ghi thuộc tính hết hạn (thời điểm cập nhật cuối + 7 ngày, epoch seconds) và bật TTL; DynamoDB tự xóa miễn phí, bỏ được cron Scan (RCU) và DeleteItem (WCU).\n(F) SAI: Standard-IA cho bảng dev không giảm phí capacity provisioned, lại tăng đơn giá request.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: Báo cáo trên DynamoDB: Export to S3 + Athena. Bảng ít dùng: on-demand. Dọn dữ liệu hết hạn: TTL thay cho Scan-delete.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Export the production table to Amazon S3 daily and run the report with Amazon Athena.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Place a DynamoDB Accelerator (DAX) cluster in front of the table for the nightly report.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Switch the development tables to on-demand capacity mode.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Purchase 1-year reserved capacity to cover the development tables.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Set an expiration attribute on each cart and enable Time to Live on the table.", "isCorrect": true },
+      { "answerLabel": "F", "answerText": "Change the development tables to the Standard-Infrequent Access table class.", "isCorrect": false }
+    ]
+  }
+]

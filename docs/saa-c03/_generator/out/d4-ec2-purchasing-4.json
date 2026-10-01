@@ -1,0 +1,173 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company purchased several hundred Amazon EC2 Reserved Instances across multiple accounts. The finance team wants to receive an email notification when the utilization of these reservations falls below 80% so that it can investigate unused commitments. Which solution meets this requirement?",
+    "explanation": "Phân tích đề: Cần cảnh báo khi mức sử dụng (utilization) của Reserved Instances xuống dưới 80%, gửi email cho finance.\n(A) SAI: Cost Anomaly Detection phát hiện chi tiêu tăng bất thường so với mẫu lịch sử, không đo tỷ lệ RI bị bỏ phí.\n(B) SAI: Billing alarm trên EstimatedCharges theo dõi tổng tiền ước tính, không biết bao nhiêu giờ RI đã mua mà không có instance khớp.\n(C) ĐÚNG: AWS Budgets có loại reservation budget theo dõi RI Utilization (hoặc Coverage); đặt ngưỡng 80% và gắn email hoặc SNS để báo khi RI mua xong bị bỏ phí.\n(D) SAI: Compute Optimizer đưa khuyến nghị right-size instance dựa trên CPU, memory, không theo dõi việc dùng reservation.\nĐáp án đúng: C\nĐiểm cần nhớ: Phát hiện RI hoặc Savings Plans bị bỏ phí => AWS Budgets loại RI/Savings Plans Utilization; chi tiêu tăng bất thường => Cost Anomaly Detection.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable AWS Cost Anomaly Detection with an Amazon EC2 service monitor and an email alert subscription for finance", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an Amazon CloudWatch billing alarm on the EstimatedCharges metric for Amazon EC2 with an 80% threshold", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an AWS Budgets reservation budget that tracks RI utilization with an 80% alert threshold", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable AWS Compute Optimizer for all member accounts and review the EC2 instance recommendations weekly", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A ticketing company expects a traffic surge during a four-day concert sale. It must be certain that it can launch 30 additional m6i.2xlarge instances in eu-west-1b during the sale, and it wants the reserved capacity to be released automatically when the sale ends. Which option should the company use?",
+    "explanation": "Phân tích đề: Cần chắc chắn có 30 máy m6i.2xlarge tại một AZ trong 4 ngày, không muốn cam kết dài hạn và muốn tự giải phóng khi hết sự kiện.\n(A) SAI: Zonal Standard RI cũng giữ chỗ tại AZ, nhưng buộc cam kết tối thiểu 1 năm, quá đắt cho sự kiện 4 ngày.\n(B) SAI: Compute Savings Plan chỉ giảm giá theo số tiền cam kết mỗi giờ, không giữ chỗ capacity tại AZ nào, lại cam kết 1 năm.\n(C) SAI: Capacity Blocks for ML chỉ dành cho instance tăng tốc GPU hoặc Trainium phục vụ ML, không áp dụng cho m6i.\n(D) ĐÚNG: On-Demand Capacity Reservation giữ chỗ đúng số lượng instance type tại một AZ, không cam kết; khi đặt end date, reservation tự kết thúc và ngừng tính tiền sau mốc đó.\nĐáp án đúng: D\nĐiểm cần nhớ: Giữ chỗ ngắn hạn tại một AZ => ODCR, có thể đặt end date để tự giải phóng; ODCR tính giá On-Demand cho mọi chỗ đã giữ dù có chạy máy hay không.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Purchase one-year zonal Standard Reserved Instances for 30 m6i.2xlarge instances in eu-west-1b", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Purchase a one-year Compute Savings Plan sized to cover 30 m6i.2xlarge instances during the sale", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Book Amazon EC2 Capacity Blocks for ML for 30 m6i.2xlarge instances for the four-day window", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create an On-Demand Capacity Reservation in eu-west-1b with an end date after the sale", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company runs a fault-tolerant batch workload that needs 2,000 vCPUs of Spot capacity and can run in any of several AWS Regions. Before it launches the fleet, the company wants AWS to indicate which Regions or Availability Zones are most likely to fulfill that Spot capacity request. Which feature should the company use?",
+    "explanation": "Phân tích đề: Muốn biết trước Region hoặc AZ nào có khả năng cao nhất đáp ứng một yêu cầu Spot với lượng capacity cụ thể.\n(A) SAI: Spot Instance Advisor cho thấy tần suất bị ngắt trong quá khứ theo instance type và Region, nhưng không chấm điểm khả năng đáp ứng một yêu cầu 2.000 vCPU cụ thể.\n(B) ĐÚNG: Spot placement score nhận vào target capacity và danh sách instance type, trả điểm 1-10 cho từng Region hoặc AZ thể hiện khả năng yêu cầu Spot được đáp ứng thành công.\n(C) SAI: Spot price history chỉ cho biết giá Spot gần đây; giá rẻ không đồng nghĩa với pool còn nhiều capacity.\n(D) SAI: Compute Optimizer khuyến nghị instance type phù hợp mức sử dụng tài nguyên, không đánh giá capacity Spot theo Region.\nĐáp án đúng: B\nĐiểm cần nhớ: Chọn Region/AZ có khả năng đáp ứng Spot cao => Spot placement score; xem instance type nào ít bị ngắt => Spot Instance Advisor.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Amazon EC2 Spot Instance Advisor, which shows the historical frequency of interruption per instance type", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Spot placement score, which rates how likely a Spot request is to succeed in each Region or AZ", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Spot price history in the Amazon EC2 console, which shows the lowest recent Spot price in each AZ", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "AWS Compute Optimizer, which recommends instance types that best fit the measured workload utilization", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A company runs worker processes on Amazon EC2 Spot Instances. The application must detect the two-minute Spot Instance interruption notice so that it can save its progress before the instance is reclaimed. Which TWO methods can the company use to receive this notice?",
+    "explanation": "Phân tích đề: Cần nhận cảnh báo ngắt Spot 2 phút trước khi bị thu hồi để lưu tiến độ.\n(A) SAI: CloudTrail ghi lại API call sau khi đã xảy ra; sự kiện TerminateInstances đến khi instance đã bị thu hồi, quá muộn để lưu tiến độ.\n(B) SAI: AWS Health Dashboard báo các sự kiện bảo trì theo lịch (scheduled events), không phát cảnh báo ngắt Spot.\n(C) ĐÚNG: Instance metadata service cung cấp mục spot/instance-action khi instance được đánh dấu bị ngắt; tiến trình trong máy poll mục này để bắt đầu dọn dẹp.\n(D) SAI: StatusCheckFailed phản ánh lỗi phần cứng hoặc hệ điều hành, không liên quan tới việc AWS thu hồi capacity Spot.\n(E) ĐÚNG: EventBridge phát sự kiện EC2 Spot Instance Interruption Warning 2 phút trước khi thu hồi; rule có thể gọi Lambda, SNS hoặc Systems Manager để xử lý.\nĐáp án đúng: C và E\nĐiểm cần nhớ: Interruption Notice 2 phút đọc qua instance metadata (spot/instance-action) hoặc EventBridge; Rebalance Recommendation là tín hiệu sớm hơn nhưng không chắc chắn.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Subscribe to AWS CloudTrail TerminateInstances events that are delivered to an Amazon S3 bucket", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Query the AWS Health Dashboard for scheduled maintenance events that affect the instance", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Poll the instance metadata service for the spot/instance-action item from inside the instance", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Configure an Amazon CloudWatch alarm on the StatusCheckFailed metric of each Spot Instance", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Create an Amazon EventBridge rule for the EC2 Spot Instance Interruption Warning event", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company creates an On-Demand Capacity Reservation for 20 r6i.xlarge Linux instances in us-east-1a for a critical trading application that will be deployed next month. Other teams in the same account often launch r6i.xlarge Linux instances in us-east-1a for testing. The company must ensure that only the trading application can use the reserved capacity, and testing must not be blocked. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Chỗ đã giữ chỉ được dùng cho ứng dụng trading; các team khác vẫn được launch cùng instance type tại cùng AZ.\n(A) SAI: Với tiêu chí khớp open, mọi instance cùng type, platform, AZ, tenancy đều tự động chiếm chỗ; gắn tag không ngăn được máy test dùng reservation.\n(B) SAI: Zonal RI cũng giữ chỗ nhưng chỗ giữ áp cho mọi instance khớp cấu hình, không lọc theo tag, lại phải cam kết 1 hoặc 3 năm.\n(C) SAI: Chặn RunInstances bằng IAM giữ được capacity nhưng làm hỏng ràng buộc không được cản trở việc test.\n(D) ĐÚNG: ODCR với tiêu chí khớp targeted chỉ phục vụ instance launch có chỉ định CapacityReservationId (hoặc resource group chứa nó), nên máy test cùng cấu hình vẫn chạy On-Demand bình thường bên ngoài reservation.\nĐáp án đúng: D\nĐiểm cần nhớ: ODCR open => mọi instance khớp cấu hình tự dùng chỗ; targeted => chỉ instance chỉ định reservation mới dùng được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Keep open instance matching criteria on the reservation and tag the trading instances with the reservation ID", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Purchase zonal Reserved Instances for the trading application, because zonal reservations apply only to tagged instances", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Attach an IAM policy that denies other teams ec2:RunInstances for r6i.xlarge in us-east-1a during the reservation", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use targeted instance matching criteria and launch the trading instances by specifying the reservation", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs a fault-tolerant rendering workload on an Auto Scaling group of Spot Instances. The application performs best on c7i instances, runs acceptably on c6i instances, and runs slowly on c5 instances. The company wants to minimize Spot interruptions while having the group honor that order of preference whenever capacity allows. Which allocation strategy should the company configure?",
+    "explanation": "Phân tích đề: Hai ràng buộc cùng lúc: giảm tối đa tỷ lệ bị ngắt và tôn trọng thứ tự ưu tiên instance type.\n(A) SAI: lowest-price chọn các pool rẻ nhất, bỏ qua thứ tự ưu tiên và thường bị ngắt nhiều hơn.\n(B) SAI: price-capacity-optimized là mặc định khuyến nghị, cân bằng giá và capacity, nhưng không tôn trọng thứ tự ưu tiên instance type nên có thể launch nhiều c5.\n(C) ĐÚNG: capacity-optimized-prioritized vẫn ưu tiên pool dư capacity để giảm ngắt, đồng thời cố gắng theo thứ tự ưu tiên khai báo trong overrides của mixed instances policy.\n(D) SAI: Weighted capacity quy định mỗi instance type đóng góp bao nhiêu đơn vị capacity, không phải thứ tự ưu tiên; capacity-optimized thuần không xét thứ tự.\nĐáp án đúng: C\nĐiểm cần nhớ: Ít bị ngắt + có thứ tự ưu tiên instance type => capacity-optimized-prioritized; cân bằng giá và capacity => price-capacity-optimized.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "lowest-price, with the three instance types listed in order of preference in the launch template overrides", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "price-capacity-optimized, with c7i, c6i, and c5 listed in the mixed instances policy of the group", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "capacity-optimized-prioritized, with c7i, c6i, and c5 ordered by priority in the launch template overrides", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "capacity-optimized, with weighted capacity set higher for c7i than for the c6i and c5 instance types", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs a data-processing fleet in an Auto Scaling group of Spot Instances. Each instance writes partial results to a secondary Amazon EBS data volume that is defined in the launch template. When AWS interrupts an instance, the data volume is deleted, and a separate recovery job cannot read the partial results. The company wants to keep these volumes after an interruption with the least change to the architecture. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Volume EBS phụ bị xóa khi Spot bị terminate; muốn giữ volume cho job khôi phục, thay đổi ít nhất.\n(A) ĐÚNG: Khi instance bị terminate, EBS volume bị xóa hay giữ phụ thuộc cờ DeleteOnTermination; đặt false cho data volume trong block device mapping của launch template thì volume tồn tại ở trạng thái available để job khôi phục attach và đọc.\n(B) SAI: Auto Scaling group xử lý Spot bị ngắt bằng cách terminate và thay máy mới, không giữ instance ở trạng thái hibernate; kể cả khi hibernate, volume vẫn gắn vào instance cũ nên job khôi phục không dùng được.\n(C) SAI: Snapshot 12 giờ một lần bằng Data Lifecycle Manager làm mất tới 12 giờ kết quả và thêm bước restore, không phải thay đổi nhỏ nhất.\n(D) SAI: Instance store là ổ tạm, dữ liệu mất khi instance stop hoặc terminate, nên còn tệ hơn EBS.\nĐáp án đúng: A\nĐiểm cần nhớ: Spot bị terminate => EBS phụ giữ hay xóa theo DeleteOnTermination; instance store luôn mất dữ liệu.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Set DeleteOnTermination to false for the data volume in the launch template block device mapping", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Change the Spot interruption behavior of the group to hibernate so the data volumes remain after an interruption", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use Amazon Data Lifecycle Manager to snapshot the data volumes every 12 hours and restore them after interruptions", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Store the partial results on instance store volumes, which persist after the Spot Instance is interrupted", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs fault-tolerant batch pods on Amazon EKS and uses the Kubernetes Cluster Autoscaler. The company wants to move these pods to Spot capacity to reduce cost, keep Spot interruptions low, and ensure that the Cluster Autoscaler scales nodes correctly. Which approach meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Pod batch chịu lỗi trên EKS, muốn dùng Spot, ít bị ngắt, Cluster Autoscaler scale đúng, vận hành ít nhất.\n(A) SAI: Self-managed node group tốn công vận hành hơn; Cluster Autoscaler giả định các node trong một nhóm có cùng vCPU và memory, trộn kích thước rất khác nhau làm tính toán scale sai.\n(B) SAI: Một instance type trong một AZ là một Spot pool duy nhất; pool đó cạn thì toàn bộ node bị ngắt cùng lúc.\n(C) SAI: Fargate Spot chỉ hỗ trợ Amazon ECS; Fargate profile trên EKS không có tùy chọn Spot.\n(D) ĐÚNG: Managed node group với capacity type SPOT nhận nhiều instance type cùng kích thước vCPU/memory, trải trên nhiều AZ; EKS tự dùng allocation strategy tối ưu capacity và bật Capacity Rebalancing để drain node trước khi bị thu hồi, còn Cluster Autoscaler tính đúng vì các type tương đương.\nĐáp án đúng: D\nĐiểm cần nhớ: Spot trên EKS => managed node group capacity type SPOT, đa dạng instance type cùng kích thước; Fargate Spot chỉ có ở ECS.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a self-managed node group on an Auto Scaling group that mixes Spot instance types of very different vCPU and memory sizes", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create one managed node group with the Spot capacity type that uses a single instance type in one Availability Zone", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Run the batch pods through AWS Fargate profiles and request Fargate Spot capacity for their namespace", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a managed node group with the Spot capacity type and several instance types of equal vCPU and memory", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company wants to run the web tier of an e-commerce application on Spot Instances in an Auto Scaling group behind an Application Load Balancer to reduce cost. Today each web server stores user shopping-cart sessions in local memory, and the ALB uses sticky sessions. Users must not lose their carts when an instance is interrupted. What should a solutions architect do before moving the web tier to Spot?",
+    "explanation": "Phân tích đề: Spot có thể bị thu hồi bất kỳ lúc nào; session giỏ hàng đang nằm trong RAM của từng web server nên mất khi máy bị ngắt.\n(A) SAI: Tăng thời gian sticky session chỉ giữ người dùng gắn với một máy lâu hơn; máy đó bị thu hồi thì session vẫn mất.\n(B) SAI: Interruption behavior stop tắt instance, nội dung RAM bị mất; ngoài ra Auto Scaling group thay máy Spot bị ngắt bằng máy mới chứ không chờ máy cũ khởi động lại.\n(C) ĐÚNG: Đưa session ra kho dùng chung như ElastiCache hoặc DynamoDB làm web tier thành stateless; bất kỳ instance nào, kể cả máy thay thế, đều đọc được giỏ hàng, nên tầng này chịu được việc Spot bị ngắt.\n(D) SAI: Capacity Rebalancing khởi chạy máy thay thế sớm khi có Rebalance Recommendation nhưng không sao chép dữ liệu trong RAM sang máy mới.\nĐáp án đúng: C\nĐiểm cần nhớ: Muốn dùng Spot thì tầng ứng dụng phải stateless; trạng thái đưa ra ElastiCache, DynamoDB hoặc S3.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Increase the sticky session duration on the ALB so that users remain bound to a single instance for longer", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Set the Spot interruption behavior to stop so that session data in instance memory survives the interruption", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Move the cart session data to Amazon ElastiCache or Amazon DynamoDB so that the web tier becomes stateless", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable Capacity Rebalancing on the Auto Scaling group so that replacement instances copy the sessions", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company's Auto Scaling group must be able to scale out to 40 c7i.2xlarge On-Demand Instances in us-west-2a during a three-week product launch. The reserved capacity must not be consumed by other workloads in the same account, and the company does not want a long-term commitment. Which TWO actions should a solutions architect take?",
+    "explanation": "Phân tích đề: Giữ chỗ 40 máy tại một AZ trong 3 tuần, chỉ Auto Scaling group này được dùng, không cam kết dài hạn.\n(A) ĐÚNG: ODCR targeted chỉ phục vụ instance chỉ định reservation; gom các reservation vào một Capacity Reservation resource group để Auto Scaling group tham chiếu chung.\n(B) SAI: ODCR open cũng giữ chỗ, nhưng mọi instance cùng cấu hình trong account sẽ tự chiếm chỗ, vi phạm yêu cầu không để workload khác dùng.\n(C) ĐÚNG: Launch template của Auto Scaling group đặt Capacity Reservation target là resource group đó, nên các instance scale-out launch vào chỗ đã giữ.\n(D) SAI: Zonal Standard RI cũng giữ chỗ nhưng buộc cam kết 1 hoặc 3 năm và không thể gán riêng cho một Auto Scaling group.\n(E) SAI: Spot với capacity-optimized giảm tỷ lệ bị ngắt nhưng không giữ chỗ, và đề yêu cầu On-Demand Instances.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Auto Scaling group dùng ODCR targeted => gom reservation vào Capacity Reservation resource group và trỏ launch template tới resource group đó.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create targeted On-Demand Capacity Reservations in us-west-2a and add them to a Capacity Reservation resource group", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create On-Demand Capacity Reservations in us-west-2a with open instance matching criteria for the product launch", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Configure the launch template of the group to target that Capacity Reservation resource group", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Purchase zonal Standard Reserved Instances in us-west-2a and assign them to the Auto Scaling group", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Configure the Auto Scaling group to use Spot Instances with the capacity-optimized allocation strategy", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs a nightly genomics pipeline in AWS Batch. The jobs are containerized, idempotent, and can be retried. All jobs must finish by 06:00, and the pipeline currently uses only an On-Demand compute environment. The company wants to cut compute cost as much as possible, but when Spot capacity is scarce, jobs must still start without manual intervention. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Job chịu lỗi, chạy lại được => hợp Spot; nhưng phải xong trước 06:00 nên cần đường lùi tự động sang On-Demand; vận hành ít nhất.\n(A) SAI: Compute environment Spot với SPOT_PRICE_CAPACITY_OPTIMIZED giảm chi phí và ít bị ngắt, nhưng bỏ hẳn On-Demand thì khi Spot khan hiếm job nằm chờ và có thể trễ hạn 06:00.\n(B) ĐÚNG: Job queue của AWS Batch nhận nhiều compute environment theo thứ tự; scheduler đặt job vào môi trường Spot trước, khi Spot không đủ capacity thì dùng môi trường On-Demand kế tiếp, hoàn toàn tự động.\n(C) SAI: Hàm Lambda tự viết để kiểm tra và đổi queue là logic tự xây, thêm công vận hành và có thể phản ứng chậm so với cơ chế có sẵn trong job queue.\n(D) SAI: Savings Plan cam kết số tiền mỗi giờ cho cả 24 giờ; pipeline chỉ chạy ban đêm nên phần cam kết ban ngày bị bỏ phí, và mức giảm vẫn kém Spot.\nĐáp án đúng: B\nĐiểm cần nhớ: AWS Batch => job queue gắn compute environment Spot trước, On-Demand sau để vừa rẻ vừa có đường lùi khi Spot khan hiếm.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Replace the On-Demand compute environment with a Spot compute environment that uses SPOT_PRICE_CAPACITY_OPTIMIZED", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Attach a Spot compute environment first and the On-Demand compute environment second to the job queue", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Run a scheduled AWS Lambda function at 03:00 that checks queue depth and moves pending jobs to an On-Demand queue", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Purchase a Compute Savings Plan sized to the nightly hours and keep the existing On-Demand compute environment", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs a steady 24/7 application on 60 m6i.2xlarge instances in ap-southeast-2a and expects the same level of usage for three years. The application must always be able to relaunch in that Availability Zone. Within 12 months, the company plans to move the fleet to Graviton instances and to migrate about a third of the workload to Amazon ECS on AWS Fargate. The company wants a significant discount for the full three years without managing reservation exchanges. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Bốn ràng buộc: giữ chỗ tại một AZ, giảm giá 3 năm, sẽ đổi sang Graviton, một phần chuyển sang Fargate, không muốn exchange thủ công.\n(A) SAI: Zonal Standard RI vừa giữ chỗ vừa giảm sâu nhưng khóa family m6i; sau khi chuyển Graviton và Fargate thì RI bị bỏ phí.\n(B) SAI: Zonal Convertible RI giữ chỗ và exchange được sang Graviton, nhưng phải exchange thủ công và không phủ được giờ chạy Fargate.\n(C) SAI: EC2 Instance Savings Plan khóa vào family m6i trong một Region, không áp cho Graviton hay Fargate sau khi di chuyển.\n(D) ĐÚNG: Compute Savings Plan tự áp giảm giá cho mọi family, kể cả Graviton, và cho Fargate, không cần exchange; ODCR giữ chỗ tại ap-southeast-2a, phần giảm giá của Savings Plan tự áp lên instance chạy trong reservation, có thể sửa hoặc tạo lại ODCR theo instance type mới.\nĐáp án đúng: D\nĐiểm cần nhớ: Savings Plans không giữ chỗ; cần vừa giảm giá linh hoạt vừa chắc chắn có máy => Compute Savings Plan + ODCR.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Purchase three-year zonal Standard Reserved Instances for m6i.2xlarge in ap-southeast-2a", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Purchase three-year zonal Convertible Reserved Instances and exchange them for Graviton types later", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Purchase a three-year EC2 Instance Savings Plan for the m6i family and add On-Demand Capacity Reservations in that AZ", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Buy a three-year Compute Savings Plan and hold the AZ capacity with On-Demand Capacity Reservations", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A research team runs a tightly coupled MPI simulation on 32 c6in.32xlarge instances in a cluster placement group. The simulation runs on weekdays for the next six weeks, cannot checkpoint, and fails if any node is lost. Several runs could not start because launches returned InsufficientInstanceCapacity errors. The team wants guaranteed capacity inside the placement group for the project only, without a long-term commitment. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Cần capacity chắc chắn bên trong cluster placement group, 6 tuần, không chịu được mất node, không cam kết dài hạn.\n(A) SAI: Spot capacity-optimized giảm tỷ lệ bị ngắt nhưng vẫn có thể bị thu hồi; mất một node là cả mô phỏng MPI thất bại và không có checkpoint.\n(B) ĐÚNG: ODCR có thể tạo bên trong cluster placement group, giữ chỗ đúng số instance cho nhóm đó; đặt end date sau dự án thì reservation tự kết thúc, không cam kết dài hạn.\n(C) SAI: Zonal RI giữ chỗ ở mức AZ chứ không gắn với placement group, và buộc cam kết tối thiểu 1 năm cho dự án 6 tuần.\n(D) SAI: Spread placement group giới hạn 7 instance đang chạy mỗi AZ và đặt máy trên phần cứng tách biệt, làm tăng độ trễ mạng mà MPI ghép chặt cần thấp.\nĐáp án đúng: B\nĐiểm cần nhớ: HPC trong cluster placement group cần chắc chắn có máy ngắn hạn => ODCR tạo trong cluster placement group, kèm end date.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Request Spot Instances with the capacity-optimized allocation strategy inside the cluster placement group", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create On-Demand Capacity Reservations in the cluster placement group with an end date set after the six-week project", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Purchase one-year zonal Reserved Instances in the Availability Zone of the placement group to hold the nodes", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Switch to a spread placement group across three Availability Zones so that launches find more capacity", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company will run three stable workloads for at least three more years: an Amazon RDS for MySQL Multi-AZ database with a fixed instance class, an API tier that is moving between EC2 instance families and onto AWS Fargate, and AWS Lambda functions with steady traffic. A nightly image-processing fleet already runs on Spot Instances. The company wants the largest savings with the least ongoing management. Which TWO purchases should a solutions architect recommend?",
+    "explanation": "Phân tích đề: RDS ổn định cấu hình cố định; API đổi family và chuyển sang Fargate; Lambda ổn định; phần batch đã dùng Spot.\n(A) SAI: Savings Plans không phủ Amazon RDS; tăng cam kết Compute Savings Plan chỉ làm phần cam kết dư bị bỏ phí, giờ chạy RDS vẫn tính On-Demand.\n(B) ĐÚNG: RDS Reserved Instances 3 năm cho đúng instance class Multi-AZ là cách giảm giá dài hạn cho RDS.\n(C) SAI: EC2 Instance Savings Plan khóa một family trong một Region và không áp cho Fargate, trái với lộ trình đổi family và chuyển sang Fargate.\n(D) ĐÚNG: Compute Savings Plan cam kết số tiền mỗi giờ, tự áp cho EC2 bất kể family, cho Fargate và Lambda, không cần exchange thủ công.\n(E) SAI: Reserved Instances không áp giảm giá cho giờ chạy Spot; mua RI cho fleet Spot ban đêm chỉ tạo cam kết 24/7 bị bỏ phí.\nĐáp án đúng: B và D\nĐiểm cần nhớ: RDS, ElastiCache, Redshift, OpenSearch => Reserved Instances của dịch vụ đó; EC2 + Fargate + Lambda thay đổi => Compute Savings Plan; Spot không cần cam kết.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Size a three-year Compute Savings Plan large enough to also cover the RDS for MySQL instance hours", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Purchase three-year Amazon RDS Reserved Instances for the Multi-AZ MySQL instance class", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Purchase three-year EC2 Instance Savings Plans to cover the API tier instances and the Fargate tasks", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Purchase a three-year Compute Savings Plan sized to the steady EC2, Fargate, and Lambda spend", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Purchase Standard Reserved Instances for the instance types that the nightly Spot fleet uses", "isCorrect": false }
+    ]
+  }
+]

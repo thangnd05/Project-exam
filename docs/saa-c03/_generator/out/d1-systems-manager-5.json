@@ -1,0 +1,414 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An application stores about 40 configuration values in AWS Systems Manager Parameter Store under the hierarchy /orders/prod/. At startup, the application must load the values of every parameter under that path, including nested paths, without maintaining a list of parameter names in code. Which API operation should the application use?",
+    "explanation": "Phân tích đề: Cần đọc giá trị toàn bộ parameter trong một hierarchy /orders/prod/ (kể cả cấp con) mà không liệt kê tên trong code.\n(A) SAI: DescribeParameters chỉ trả về metadata (tên, kiểu, tier, ngày sửa đổi...), không trả về giá trị của parameter, nên ứng dụng vẫn phải gọi thêm API khác để đọc giá trị.\n(B) SAI: GetParameters nhận danh sách tên parameter cụ thể (tối đa 10 tên mỗi lần gọi), không nhận một đường dẫn hierarchy; ứng dụng vẫn phải biết trước tên từng parameter.\n(C) ĐÚNG: GetParametersByPath trả về giá trị của tất cả parameter nằm dưới một path; với Recursive=true sẽ lấy cả các cấp con, có phân trang qua NextToken và hỗ trợ WithDecryption cho SecureString. Ứng dụng không cần giữ danh sách tên.\n(D) SAI: GetParameterHistory trả về lịch sử các version của một parameter cụ thể theo tên, không liệt kê các parameter dưới một path.\nĐáp án đúng: C\nĐiểm cần nhớ: Đọc cả nhánh cấu hình theo hierarchy => GetParametersByPath (Recursive). DescribeParameters chỉ có metadata; GetParameters cần tên cụ thể.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Call DescribeParameters with a filter on the /orders/prod/ path and read the parameter values from the response.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Call GetParameters once with the /orders/prod/ path as the name so that all matching parameters are returned together.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Call GetParametersByPath with the /orders/prod/ path, the Recursive option set to true, and pagination handled.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Call GetParameterHistory on the /orders/prod/ path to return the latest version of each parameter under it.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An operations manager wants a single customizable dashboard in AWS Systems Manager that summarizes operational data across multiple AWS accounts and Regions, such as counts of open OpsItems, patch compliance status, and Amazon EC2 instance details. Which Systems Manager capability should the manager use?",
+    "explanation": "Phân tích đề: Cần một dashboard tổng hợp (summary) dữ liệu vận hành từ nhiều account, nhiều Region: OpsItem, patch compliance, thông tin EC2.\n(A) ĐÚNG: Explorer là dashboard vận hành có thể tùy biến của Systems Manager, hiển thị widget tổng hợp OpsData như số OpsItem, trạng thái patch compliance, thông tin EC2; dùng resource data sync để gom dữ liệu từ nhiều account (Organizations) và nhiều Region về một chỗ.\n(B) SAI: OpsCenter là nơi quản lý từng OpsItem (work item) để điều tra và xử lý sự cố; nó là một nguồn dữ liệu của Explorer chứ không phải dashboard tổng hợp patch compliance và thông tin instance.\n(C) SAI: Fleet Manager dùng để xem và thao tác trên từng managed node (file system, log, user...), không phải dashboard tổng hợp số liệu vận hành nhiều nguồn.\n(D) SAI: CloudWatch dashboard hiển thị metric và log; trạng thái patch compliance hay số OpsItem không có sẵn dưới dạng metric, nên phải tự đẩy dữ liệu, tốn công hơn.\nĐáp án đúng: A\nĐiểm cần nhớ: Dashboard tổng hợp dữ liệu vận hành nhiều account/Region trong Systems Manager => Explorer; xử lý từng vấn đề => OpsCenter.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Systems Manager Explorer with a resource data sync that aggregates OpsData across all accounts.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Systems Manager OpsCenter with OpsItems created for every account and Region and grouped by source.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Systems Manager Fleet Manager with a node view that is filtered by account, Region, and platform.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Amazon CloudWatch cross-account dashboards that display Systems Manager metrics from each Region.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A central platform team maintains a custom AWS Systems Manager Command document that hardens Linux instances. Five other AWS accounts must be able to run the document with Run Command, and they must always use the version maintained by the platform team. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Một document do team trung tâm duy trì, nhiều account khác cần chạy và luôn dùng bản gốc; từ khóa LEAST operational overhead.\n(A) SAI: Mỗi account tự tạo lại document từ S3 tạo ra nhiều bản sao độc lập, phải đồng bộ thủ công mỗi lần thay đổi, dễ lệch version.\n(B) SAI: StackSets có thể triển khai document vào nhiều account nhưng tạo ra các bản sao riêng và phải chạy lại mỗi lần cập nhật, nhiều công vận hành hơn so với chia sẻ trực tiếp.\n(C) SAI: SSM document không được chia sẻ qua AWS RAM; RAM hỗ trợ chia sẻ Advanced parameter của Parameter Store nhưng document được chia sẻ bằng document permissions.\n(D) ĐÚNG: Systems Manager cho phép chia sẻ document private với các account ID cụ thể (ModifyDocumentPermission). Các account nhận chạy được document bằng ARN của nó, luôn dùng đúng bản do account sở hữu duy trì, không phải sao chép.\nĐáp án đúng: D\nĐiểm cần nhớ: Chia sẻ SSM document cho account khác => sửa document permissions (share với account ID), không cần copy hay RAM.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Publish the document content to an Amazon S3 bucket and have each account recreate the document from the bucket.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Deploy the document to the five accounts with AWS CloudFormation StackSets whenever the platform team changes it.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Share the document through AWS Resource Access Manager (AWS RAM) as a resource in a shared resource share.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Modify the document permissions to share the document privately with the five AWS account IDs that need it.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A company enables AWS Systems Manager Inventory on its managed Amazon EC2 instances. Which TWO types of information can Systems Manager Inventory collect from the instances? (Choose two.)",
+    "explanation": "Phân tích đề: Hỏi những loại dữ liệu mà SSM Inventory thu thập được; phân biệt với metric (CloudWatch), log và audit API (CloudTrail).\n(A) ĐÚNG: Inventory thu thập danh sách application/package đã cài cùng version (kiểu AWS:Application), là dữ liệu hay dùng để tìm instance có phần mềm cụ thể.\n(B) SAI: Mức sử dụng CPU/memory theo process là số liệu hiệu năng, thuộc về CloudWatch agent (procstat) chứ không phải Inventory.\n(C) SAI: Inventory kiểu file chỉ thu thập metadata của file (tên, kích thước, thời gian sửa đổi...), không đọc nội dung log; gom nội dung log dùng CloudWatch agent.\n(D) SAI: Lịch sử API call của role được ghi bởi AWS CloudTrail, không phải Inventory.\n(E) ĐÚNG: Inventory thu thập cấu hình mạng (AWS:Network) như địa chỉ IP, MAC, DNS, gateway, cùng nhiều loại khác như Windows update, service, registry.\nĐáp án đúng: A và E\nĐiểm cần nhớ: Inventory = metadata phần mềm và cấu hình của node (application, file metadata, network, service, Windows update/registry), không phải metric hay log.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "The names and versions of applications installed on each instance.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Per-process CPU and memory utilization sampled every minute.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "The contents of application log files stored on the instance.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "The API calls that the instance profile role has made to AWS services.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Network configuration details such as IP and MAC addresses and DNS settings.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An image pipeline produces a new hardened custom AMI every two weeks. Several Auto Scaling groups use the same launch template. Today an engineer creates a new launch template version with the new AMI ID after every build, and mistakes have caused outages. The company wants new instances to use the latest custom AMI automatically without creating launch template versions. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: AMI tùy chỉnh đổi định kỳ, nhiều ASG dùng chung launch template, không muốn tạo version mới; từ khóa LEAST operational overhead.\n(A) SAI: Dynamic reference của CloudFormation chỉ được resolve khi tạo/cập nhật stack, nên vẫn phải update stack sau mỗi lần build để launch template nhận AMI mới, không bỏ được bước thủ công.\n(B) ĐÚNG: Launch template hỗ trợ chỉ định AMI bằng resolve:ssm:<parameter>; giá trị được resolve tại thời điểm launch instance. Pipeline chỉ cần cập nhật parameter, kiểu dữ liệu aws:ec2:image giúp Parameter Store kiểm tra giá trị là AMI ID hợp lệ. Không cần tạo version mới.\n(C) SAI: Public parameter của AWS chỉ trỏ tới AMI do AWS phát hành (như Amazon Linux gốc), không trỏ tới AMI hardened tùy chỉnh của công ty.\n(D) SAI: Lambda tạo version mới tự động hóa được việc cập nhật nhưng vẫn tạo version liên tục, phải viết và bảo trì code, trái với yêu cầu không tạo version mới.\nĐáp án đúng: B\nĐiểm cần nhớ: Launch template + resolve:ssm:<parameter> = AMI được resolve lúc launch; dùng parameter kiểu aws:ec2:image để validate AMI ID.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Reference the AMI in an AWS CloudFormation template with a dynamic reference to a Parameter Store parameter and update the stack after each build.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Store the AMI ID in a Parameter Store parameter with the aws:ec2:image data type and set the launch template AMI to resolve:ssm:parameter-name.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure the launch template to use the Amazon Linux public parameter in Parameter Store so that instances always receive the newest AMI at launch.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Invoke an AWS Lambda function from the pipeline to create a launch template version with the new AMI ID and set it as the default version for every group.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "After an engineer edited network and firewall settings inside the operating system, an Amazon EBS-backed Linux EC2 instance became unreachable. SSH fails, and the instance no longer appears as online in Systems Manager. The instance holds data that is newer than its last snapshot. Security policy does not allow local operating system passwords. Which approach should a solutions architect use to repair the instance with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Instance mất kết nối (SSH và SSM đều chết) do sửa cấu hình OS, phải giữ dữ liệu, cấm mật khẩu local, LEAST operational overhead.\n(A) ĐÚNG: Runbook AWSSupport-ExecuteEC2Rescue tự động dừng instance, gắn root volume vào một helper instance tạm, chạy công cụ EC2Rescue để sửa các lỗi cấu hình phổ biến (mạng, firewall, SSH) rồi gắn lại volume và khởi động lại. Không cần SSM Agent trên instance hỏng phải online, không cần mật khẩu local, dữ liệu trên volume được giữ nguyên.\n(B) SAI: Session Manager cần SSM Agent kết nối được tới endpoint SSM; instance đã offline trong Systems Manager vì cấu hình mạng hỏng nên không mở được session.\n(C) SAI: EC2 serial console dùng được khi mạng hỏng nhưng phải đăng nhập bằng user local có mật khẩu và bật serial console ở cấp account, vi phạm chính sách cấm mật khẩu local và thao tác thủ công.\n(D) SAI: Khôi phục từ snapshot cũ phải tự gắn volume và copy dữ liệu thủ công, nhiều bước hơn, dễ mất dữ liệu mới hơn snapshot.\nĐáp án đúng: A\nĐiểm cần nhớ: Instance không truy cập được do lỗi cấu hình OS => Automation runbook AWSSupport-ExecuteEC2Rescue sửa offline qua helper instance.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Run the AWSSupport-ExecuteEC2Rescue Automation runbook against the affected instance.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Start a Session Manager session to the instance and revert the firewall configuration.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Connect through the EC2 serial console as a local user and revert the network settings.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Launch a replacement instance from the last snapshot and copy the data from the old volume.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Amazon Inspector scans the company's managed Amazon EC2 instances. When Inspector reports a critical package vulnerability on an instance that has a fix available, the company wants the fix installed on that instance within minutes instead of waiting for the weekly patch maintenance window. The solution must not require SSH access. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần tự động vá đúng instance có CVE critical do Inspector báo, trong vài phút, không SSH, LEAST operational overhead.\n(A) SAI: Chạy maintenance window mỗi giờ trên toàn fleet làm tăng reboot và gián đoạn không cần thiết, vẫn có độ trễ tới một giờ và không nhắm vào instance có finding.\n(B) SAI: Rule patch compliance của AWS Config đánh giá dựa trên dữ liệu compliance của Patch Manager (theo baseline), không phản ứng với finding CVE của Inspector; remediation hằng tuần không đáp ứng yêu cầu vài phút.\n(C) SAI: Security Hub custom action cần người vận hành bấm thủ công cho từng finding, không phải tự động trong vài phút.\n(D) ĐÚNG: Inspector phát sự kiện finding sang EventBridge; rule lọc severity CRITICAL rồi gọi Automation runbook (truyền instance ID từ sự kiện) để chạy AWS-RunPatchBaseline với Operation=Install chỉ trên instance bị ảnh hưởng. Hoàn toàn managed, không SSH.\nĐáp án đúng: D\nĐiểm cần nhớ: Inspector phát hiện (detect) => EventBridge => Systems Manager Automation/Run Command khắc phục (remediate) bằng AWS-RunPatchBaseline.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Change the weekly maintenance window to run every hour so that Patch Manager installs missing patches on all instances.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Turn on an AWS Config managed rule for patch compliance with automatic remediation that runs AWS-RunPatchBaseline weekly.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Send critical Inspector findings to AWS Security Hub and have an operator choose a custom action that starts patching.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create an Amazon EventBridge rule for critical Inspector findings that starts an Automation runbook to run AWS-RunPatchBaseline on that instance.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Auditors require a timeline that shows when each software package version was installed, upgraded, or removed on every managed Amazon EC2 instance over the past year. Systems Manager Inventory already collects application data from the instances every 30 minutes. Which solution provides this history with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần lịch sử (timeline) thay đổi package một năm; Inventory đã chạy; từ khóa LEAST operational overhead.\n(A) SAI: Inventory chỉ hiển thị trạng thái hiện tại (lần thu thập mới nhất) của mỗi node, không lưu lại toàn bộ lịch sử thay đổi theo thời gian cho kiểm toán.\n(B) SAI: CloudTrail ghi các API call tới AWS, không ghi việc cài/gỡ package bên trong hệ điều hành của instance.\n(C) ĐÚNG: AWS Config có thể ghi resource type AWS::SSM::ManagedInstanceInventory: mỗi khi Inventory phát hiện phần mềm thay đổi, Config tạo configuration item mới, nên có timeline cài đặt, nâng cấp, gỡ bỏ theo từng instance với retention cấu hình được.\n(D) SAI: Xuất SBOM hằng tháng rồi tự so sánh bằng script vừa thiếu độ chi tiết (chỉ theo tháng) vừa tốn công xây dựng và bảo trì.\nĐáp án đúng: C\nĐiểm cần nhớ: Inventory = trạng thái hiện tại; muốn lịch sử thay đổi phần mềm theo thời gian => AWS Config ghi ManagedInstanceInventory.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Use the Systems Manager Inventory console to view each instance, because Inventory keeps every previous inventory snapshot for one year.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Use AWS CloudTrail Lake to query the history of package installations that were performed on each instance during the last year.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure AWS Config to record the AWS::SSM::ManagedInstanceInventory resource type and review each configuration timeline.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Export Amazon Inspector software bill of materials (SBOM) reports every month and compare the reports with a custom script.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An AWS Lambda function is attached to private subnets so that it can reach an Amazon RDS database. The function must read String parameters from Parameter Store at startup, but the calls time out. The VPC has no internet gateway or NAT gateway, and the security team does not allow any route to the internet. Which solution should a solutions architect implement?",
+    "explanation": "Phân tích đề: Lambda trong VPC private không có IGW/NAT, cấm đường ra internet, cần gọi API Parameter Store.\n(A) SAI: Gateway endpoint chỉ tồn tại cho Amazon S3 và DynamoDB; Systems Manager không có gateway endpoint.\n(B) ĐÚNG: API Parameter Store (GetParameter...) thuộc endpoint ssm. Interface endpoint com.amazonaws.region.ssm với private DNS khiến SDK trong Lambda tự phân giải tên endpoint mặc định về IP private trong VPC, không cần internet. Security group của endpoint cần cho phép HTTPS 443 từ security group của function.\n(C) SAI: Endpoint ssmmessages phục vụ kênh dữ liệu của Session Manager (và ECS Exec), không phục vụ API GetParameter, nên lỗi timeout vẫn còn.\n(D) SAI: NAT gateway giải quyết được kết nối nhưng tạo đường ra internet, vi phạm chính sách bảo mật và tốn thêm chi phí theo giờ và theo GB.\nĐáp án đúng: B\nĐiểm cần nhớ: Đọc Parameter Store từ subnet private không internet => interface endpoint ssm; ssmmessages/ec2messages là cho Session Manager/agent.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a gateway VPC endpoint for Systems Manager and add it to the route tables of the private subnets.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create an interface VPC endpoint for com.amazonaws.region.ssm with private DNS enabled in the private subnets.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Create an interface VPC endpoint for com.amazonaws.region.ssmmessages and allow HTTPS from the function security group.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Add a NAT gateway in a new public subnet and route the private subnets through it to reach the Parameter Store endpoint.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company uses Session Manager for administrator access to Amazon EC2 Linux instances. A new support team must be able to run only a fixed set of diagnostic commands, such as viewing the last lines of an application log and checking disk usage, and must not get an interactive shell. Which TWO actions should a solutions architect take to meet these requirements? (Choose two.)",
+    "explanation": "Phân tích đề: Team support chỉ được chạy một tập lệnh chẩn đoán cố định qua Session Manager, không có shell tương tác.\n(A) SAI: Run As đổi user hệ điều hành của session nhưng người dùng vẫn có shell tương tác đầy đủ, vẫn chạy được mọi lệnh mà user đó được phép.\n(B) ĐÚNG: Session document kiểu InteractiveCommands định nghĩa sẵn lệnh được chạy (có thể tham số hóa); người dùng chỉ thấy output của lệnh đó, không nhận shell tương tác.\n(C) SAI: Shell profile chỉ chạy lệnh khi bắt đầu session; alias không ngăn người dùng gõ lệnh khác trong shell, nên không hạn chế được quyền.\n(D) SAI: Quyền SendCommand với AWS-RunShellScript cho phép chạy bất kỳ script nào, còn rộng hơn shell, trái với yêu cầu chỉ chạy lệnh cố định.\n(E) ĐÚNG: IAM policy chỉ cho phép StartSession với ARN của document tùy chỉnh và điều kiện ssm:SessionDocumentAccessCheck=true buộc kiểm tra quyền trên document; nhờ đó không mở được session mặc định SSM-SessionManagerRunShell.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Giới hạn lệnh trong Session Manager => Session document InteractiveCommands + IAM chỉ cho StartSession với document đó (SessionDocumentAccessCheck).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Configure Session Manager Run As support so that the support team sessions start as a Linux user with limited sudo rights.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create a custom Session document of type InteractiveCommands that defines only the approved diagnostic commands.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Add a Session Manager shell profile that defines aliases for the diagnostic commands and disables the bash history.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Grant the support team ssm:SendCommand permission for the AWS-RunShellScript document on the instances.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Allow ssm:StartSession only with the custom document and set the ssm:SessionDocumentAccessCheck condition to true.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A web application runs on 12 Amazon EC2 instances in an Auto Scaling group behind an Application Load Balancer. The group uses ELB health checks. The instances keep large local caches, so they must not be replaced during patching, and a separate team rebuilds the AMI only once each quarter. Patch Manager must apply OS patches every week, including reboots, without sending user requests to an instance that is rebooting. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: ASG + ALB dùng ELB health check, không được thay instance, không gửi request tới instance đang reboot, patch hằng tuần, LEAST operational overhead.\n(A) ĐÚNG: Instance ở trạng thái Standby được deregister khỏi target group của ALB (không nhận request) và không bị Auto Scaling health check thay thế; runbook chạy AWS-RunPatchBaseline, chờ reboot xong rồi exit Standby. Maintenance window với concurrency 1 đảm bảo từng instance một, vẫn là dịch vụ managed.\n(B) SAI: Patch từng instance một giảm ảnh hưởng nhưng instance vẫn ở trong target group: ALB vẫn gửi request tới instance đang reboot, và health check ELB thất bại có thể khiến Auto Scaling thay thế instance, làm mất cache.\n(C) SAI: Tạm dừng HealthCheck/ReplaceUnhealthy tránh được việc thay thế nhưng ALB vẫn định tuyến request tới instance đang reboot cho tới khi target health check báo unhealthy, người dùng nhận lỗi; patch toàn bộ cùng lúc còn có thể làm sập ứng dụng.\n(D) SAI: Instance refresh thay thế toàn bộ instance, vi phạm yêu cầu giữ cache local; ngoài ra Patch Manager không tự build AMI và AMI chỉ được rebuild theo quý.\nĐáp án đúng: A\nĐiểm cần nhớ: Patch instance trong ASG sau ALB mà không bị thay thế và không nhận traffic khi reboot => đưa instance vào Standby trước khi patch, exit Standby sau đó.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Use a maintenance window to run an Automation runbook that moves each instance to Standby, patches it, and returns it to InService, one at a time.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Use a maintenance window to run AWS-RunPatchBaseline through Run Command on the group with a concurrency of one instance and an error threshold of one.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Suspend the HealthCheck and ReplaceUnhealthy processes of the group during the maintenance window and run AWS-RunPatchBaseline on all instances.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Start an instance refresh for the Auto Scaling group every week after Patch Manager builds an updated AMI with the latest operating system patches.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company stores about 3,000 Standard parameters in Parameter Store in its primary AWS Region, including some SecureString parameters. Operators change parameters directly with the AWS CLI. For disaster recovery, the same parameters must exist in a second Region within minutes of any create, update, or delete. Applications in both Regions read parameters with GetParametersByPath and must not change code. Which solution meets these requirements MOST cost-effectively?",
+    "explanation": "Phân tích đề: Cần bản sao parameter ở Region DR trong vài phút, operator sửa trực tiếp, không đổi code, MOST cost-effectively với 3.000 parameter.\n(A) SAI: Secrets Manager có replica secret đa Region nhưng tính phí theo từng secret và từng replica, với 3.000 giá trị chi phí hằng tháng lớn hơn nhiều so với Standard parameter miễn phí; GetParametersByPath cũng không trả về secret như parameter thông thường, nên phải đổi code.\n(B) SAI: AWS RAM chia sẻ Advanced parameter giữa các account trong cùng Region, không chia sẻ sang Region khác; và dữ liệu vẫn chỉ nằm ở Region chính nên không đáp ứng DR.\n(C) SAI: StackSets triển khai được đa Region nhưng operator đang sửa trực tiếp bằng CLI nên template bị lệch, phải chạy lại thủ công; CloudFormation cũng không tạo được parameter kiểu SecureString.\n(D) ĐÚNG: Parameter Store phát sự kiện Parameter Store Change (Create, Update, Delete) sang EventBridge; Lambda đọc giá trị mới và ghi vào Region thứ hai (SecureString mã hóa lại bằng KMS key ở Region đó). Standard parameter vẫn miễn phí, ứng dụng giữ nguyên GetParametersByPath.\nĐáp án đúng: D\nĐiểm cần nhớ: Parameter Store không có replication đa Region gốc; RAM chỉ chia sẻ cùng Region. Đồng bộ gần thời gian thực => EventBridge (Parameter Store Change) + Lambda.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Move all parameters to AWS Secrets Manager, enable replica secrets in the second Region, and keep the existing GetParametersByPath calls.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Share the parameters with the second Region by using AWS Resource Access Manager so that applications in that Region read the primary copies.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Define the parameters in AWS CloudFormation and deploy them to both Regions with StackSets whenever an operator changes a value.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create an Amazon EventBridge rule for Parameter Store change events that invokes a Lambda function to apply the change in the second Region.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs a third-party network appliance on Amazon EC2 in a private subnet. The vendor does not allow any additional software, including the SSM Agent, to be installed on the appliance. Engineers must use native SSH and scp with their own key pairs. The instance must have no public IP address, the VPC has no NAT gateway, and the company does not want to operate a bastion host. Access must be authorized through IAM. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Appliance cấm cài SSM Agent, cần SSH/scp native, không public IP, không NAT, không bastion, IAM authorization.\n(A) SAI: SSH qua Session Manager vẫn cần SSM Agent chạy trên instance để mở kênh; nhà cung cấp cấm cài agent nên phương án này không khả thi dù đúng mẫu không mở port từ internet.\n(B) ĐÚNG: EC2 Instance Connect Endpoint cho phép kết nối SSH/scp native tới instance private mà không cần public IP, IGW/NAT hay bastion; IAM kiểm soát quyền qua ec2-instance-connect:OpenTunnel. Instance chỉ cần security group cho phép port 22 từ endpoint, không cần cài agent, dùng được key pair sẵn có.\n(C) SAI: Bastion host vi phạm yêu cầu không vận hành bastion, cần public IP và quản lý vá lỗi, key cho chính bastion.\n(D) SAI: Fleet Manager dựa trên SSM Agent trên node (managed node); appliance không có agent nên không xuất hiện trong Fleet Manager.\nĐáp án đúng: B\nĐiểm cần nhớ: Không cài được SSM Agent nhưng cần SSH private không bastion => EC2 Instance Connect Endpoint (vẫn dùng port 22 nội bộ từ endpoint). Có agent và cấm port 22 => Session Manager.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Use Session Manager SSH sessions with a ProxyCommand in the engineers SSH configuration and allow ssm:StartSession for the AWS-StartSSHSession document.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create an EC2 Instance Connect Endpoint in the subnet, allow port 22 from the endpoint security group, and grant ec2-instance-connect:OpenTunnel.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Launch a hardened bastion host in a public subnet with a security group that allows SSH only from the corporate IP range and authorize keys centrally.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Use Fleet Manager in the Systems Manager console to open a terminal and transfer files with the appliance key pair stored in Parameter Store.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company runs an Amazon ECS service on AWS Fargate in private subnets that have no NAT gateway. Engineers must open an interactive shell inside running containers to troubleshoot, without SSH and without opening inbound ports, and every session must be authorized through IAM. Which THREE actions are required to enable this capability? (Choose three.)",
+    "explanation": "Phân tích đề: Cần shell vào container Fargate trong subnet private không NAT, không SSH, không port inbound, IAM kiểm soát => ECS Exec.\n(A) ĐÚNG: ECS Exec phải được bật (enableExecuteCommand) trên service hoặc task; chỉ task khởi chạy sau khi bật mới có khả năng exec, nên cần deploy lại task.\n(B) SAI: Không cần tự cài SSM Agent: khi bật ECS Exec, ECS/Fargate tự bind-mount các binary agent cần thiết vào container; task cũng không đăng ký thành managed node.\n(C) ĐÚNG: Container dùng task role (không phải task execution role) để mở kênh Session Manager, nên task role cần ssmmessages:CreateControlChannel, CreateDataChannel, OpenControlChannel, OpenDataChannel.\n(D) SAI: Task execution role chỉ dùng để kéo image và ghi log khi khởi tạo task; gán quyền SSM cho role này không giúp container mở kênh ECS Exec.\n(E) ĐÚNG: ECS Exec dùng kênh Session Manager qua endpoint ssmmessages; subnet private không có NAT phải có interface endpoint ssmmessages để agent trong container kết nối ra.\n(F) SAI: Mở port 22 vi phạm yêu cầu không mở port inbound, và container Fargate không chạy SSH daemon mặc định; ECS Exec không dùng port inbound.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: ECS Exec = Session Manager cho container: bật executeCommand, task role có quyền ssmmessages, và endpoint ssmmessages khi không có NAT.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Enable the executeCommand setting on the ECS service and deploy new tasks so that the setting takes effect.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Install and register the SSM Agent in each container image so that the tasks appear as managed nodes.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Grant the ECS task role permissions for the ssmmessages channel actions that ECS Exec requires.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Grant the ECS task execution role the AmazonSSMManagedInstanceCore managed policy for the tasks.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Create an interface VPC endpoint for com.amazonaws.region.ssmmessages in the private subnets.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "F",
+        "answerText": "Allow inbound port 22 on the task security group from the security group of the engineers VPN.",
+        "isCorrect": false
+      }
+    ]
+  }
+]

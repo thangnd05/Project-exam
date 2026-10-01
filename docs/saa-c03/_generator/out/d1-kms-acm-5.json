@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company issues short-lived session tokens to its mobile clients. Backend services must generate a message authentication code for each token and later verify that the token was created by the company and not modified. The secret key must be generated inside AWS managed hardware security modules and must never leave them. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Cần tạo và kiểm tra message authentication code (MAC) cho token, key bí mật sinh trong HSM của AWS và không bao giờ rời đi. Từ khóa: 'message authentication code', 'never leave'.\n(A) SAI: Symmetric encryption key dùng để mã hóa, ciphertext của KMS mỗi lần gọi Encrypt đều khác nhau nên không thể so sánh ciphertext để xác minh; đây không phải cơ chế MAC.\n(B) ĐÚNG: KMS hỗ trợ HMAC key (ví dụ HMAC_256); GenerateMac tạo MAC cho token và VerifyMac kiểm tra lại, key material nằm trong HSM của KMS và không bao giờ rời KMS ở dạng thô.\n(C) SAI: Private key của asymmetric KMS key không tải về được, chỉ public key mới tải được; việc ký phải gọi Sign trên KMS, nên phương án tải private key về backend là không thể và vi phạm yêu cầu.\n(D) SAI: Secret lưu trong Secrets Manager sẽ được trả về cho ứng dụng và tính hash trong bộ nhớ ứng dụng, tức key đã rời HSM.\nĐáp án đúng: B\nĐiểm cần nhớ: Cần MAC (keyed hash) mà key không rời HSM => HMAC KMS key với GenerateMac/VerifyMac; cần chữ ký số public/private => asymmetric key với Sign/Verify.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a symmetric encryption KMS key, call Encrypt on each token, and compare the ciphertexts during verification.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an HMAC KMS key and call the GenerateMac and VerifyMac operations for each token.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Create an asymmetric RSA KMS key, download its private key, and compute signatures inside the backend services.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Store a random shared secret in AWS Secrets Manager and have each backend service compute the code locally.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "Applications encrypt data by calling AWS KMS with the alias alias/app-data, which points to a customer managed key. The security team created a new customer managed key with a stricter key policy and wants all new encryption operations to use it without editing application code or configuration. Data that was encrypted under the old key must remain readable. What should the team do?",
+    "explanation": "Phân tích đề: Muốn chuyển các thao tác mã hóa mới sang một KMS key mới (key policy khác) mà không sửa code hay cấu hình; dữ liệu cũ vẫn phải đọc được. Từ khóa: 'alias/app-data', 'without editing application code'.\n(A) SAI: Automatic rotation chỉ đổi backing key material bên trong cùng key cũ, Key ID và key policy giữ nguyên; nó không chuyển ứng dụng sang key mới có key policy chặt hơn.\n(B) SAI: Mã hóa lại toàn bộ dữ liệu là việc nặng không cần thiết, và ứng dụng vẫn gọi alias trỏ về key cũ nên mã hóa mới vẫn dùng key cũ; xóa key cũ còn có rủi ro mất dữ liệu.\n(C) SAI: Tạo alias thứ hai buộc phải sửa ứng dụng để tham chiếu alias mới, vi phạm yêu cầu không đổi code hay cấu hình.\n(D) ĐÚNG: Đây là manual rotation: UpdateAlias để alias/app-data trỏ sang key mới, mọi lệnh Encrypt mới dùng key mới; với symmetric ciphertext, Decrypt tự xác định key từ metadata trong ciphertext nên chỉ cần giữ key cũ ở trạng thái enabled.\nĐáp án đúng: D\nĐiểm cần nhớ: Manual rotation = tạo key mới rồi trỏ alias sang; ứng dụng nên tham chiếu key qua alias để đổi key không cần sửa code. Giữ key cũ để giải mã dữ liệu cũ.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable automatic key rotation on the old key so that its alias starts using the material of the new key.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Re-encrypt all existing data with the new key, then schedule deletion of the old key with a 7-day waiting period.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a second alias for the new key and update the applications to reference that second alias.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Update alias/app-data to point to the new key, and keep the old key enabled for decryption.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company deploys an Amazon API Gateway REST API with a Regional endpoint in ap-south-1. The company wants clients to call the API at api.example.com by using a free public certificate from AWS Certificate Manager. In which Region must the certificate be requested?",
+    "explanation": "Phân tích đề: API Gateway REST API dùng Regional endpoint ở ap-south-1, cần custom domain với cert ACM public. Từ khóa: 'Regional endpoint'.\n(A) ĐÚNG: Cert ACM là tài nguyên regional; với custom domain kiểu Regional của API Gateway, cert phải nằm cùng Region với API, tức ap-south-1.\n(B) SAI: Chỉ CloudFront và custom domain edge-optimized (đi qua CloudFront) mới bắt buộc cert ở us-east-1; Regional endpoint thì không.\n(C) SAI: ACM không tự sao chép cert sang các Region; muốn dùng ở Region khác phải request cert riêng ở Region đó.\n(D) SAI: Không export được private key của cert public ACM chuẩn để chuyển Region, và cũng không cần vì có thể request cert miễn phí ngay tại ap-south-1.\nĐáp án đúng: A\nĐiểm cần nhớ: CloudFront và API edge-optimized => cert ở us-east-1; ALB, NLB, API Regional => cert cùng Region với tài nguyên.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "In ap-south-1, the same Region where the Regional API endpoint is deployed.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "In us-east-1, because API Gateway custom domain names are global resources.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "In any Region, because ACM replicates public certificates to all Regions.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "In us-east-1 for issuance, then exported and imported into ap-south-1.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A security engineer is turning on Amazon EBS encryption by default for an AWS account and must choose the AWS KMS key that EBS will use to encrypt new volumes. Which TWO keys can be selected for this purpose? (Choose TWO.)",
+    "explanation": "Phân tích đề: Chọn KMS key dùng cho EBS encryption by default. Từ khóa: 'EBS', 'encrypt new volumes'.\n(A) SAI: EBS chỉ hỗ trợ symmetric encryption KMS key vì cần GenerateDataKey cho envelope encryption; asymmetric RSA key không tạo được data key.\n(B) ĐÚNG: AWS managed key aws/ebs là key mặc định mà EBS dùng khi bật encryption by default nếu không chỉ định key khác.\n(C) SAI: HMAC key chỉ dùng cho GenerateMac/VerifyMac, không mã hóa dữ liệu được.\n(D) SAI: Cert ACM dùng cho TLS khi dữ liệu truyền đi, không phải key mã hóa ổ đĩa; ACM quản CERT, KMS quản KEY.\n(E) ĐÚNG: Symmetric customer managed key cùng Region với volume là key hợp lệ, cho phép tự kiểm soát key policy, rotation và chia sẻ snapshot cross-account.\nĐáp án đúng: B và E\nĐiểm cần nhớ: S3, EBS, RDS chỉ dùng symmetric KMS key (aws/ebs hoặc customer managed key cùng Region); asymmetric và HMAC key không dùng cho mã hóa dữ liệu của dịch vụ.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "An asymmetric RSA_2048 customer managed key with the ENCRYPT_DECRYPT key usage", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "The AWS managed key aws/ebs that AWS creates for the account in that Region", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "An HMAC_256 customer managed key that is used to generate and verify MACs", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "A public ACM certificate that is associated with the account's load balancers", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "A symmetric encryption customer managed key in the same Region as the volumes", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An Amazon S3 bucket holds 300 million existing objects that are encrypted with SSE-S3. A new policy requires all objects, including existing ones, to be encrypted with SSE-KMS by using a customer managed key. A solutions architect changed the bucket's default encryption to the new key, but an audit shows that the existing objects are still encrypted with SSE-S3. Which solution re-encrypts the existing objects with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Đổi default encryption chỉ áp dụng cho object mới; cần mã hóa lại 300 triệu object có sẵn với ít vận hành nhất. Từ khóa: '300 million existing objects', 'LEAST operational overhead'.\n(A) SAI: S3 Bucket Keys chỉ giảm số lần gọi KMS cho các thao tác mã hóa mới, không mã hóa lại object đã tồn tại.\n(B) SAI: Script tự viết gọi CopyObject từng object làm được nhưng phải tự xử lý phân trang, retry, song song hóa và theo dõi lỗi cho 300 triệu object, tốn vận hành hơn nhiều so với dịch vụ managed.\n(C) ĐÚNG: S3 Batch Operations nhận manifest (S3 Inventory report), chạy Copy in place với SSE-KMS bằng customer managed key, tự quản lý retry và xuất completion report, là cách managed để mã hóa lại hàng loạt object.\n(D) SAI: Key rotation chỉ đổi backing material cho thao tác mới của key đó; nó không đụng tới object đang mã hóa bằng SSE-S3 và KMS không bao giờ tự mã hóa lại dữ liệu.\nĐáp án đúng: C\nĐiểm cần nhớ: Default encryption của bucket chỉ áp dụng cho object mới; muốn đổi kiểu mã hóa cho object cũ ở quy mô lớn => S3 Batch Operations Copy.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable S3 Bucket Keys on the bucket so that existing objects are re-encrypted under a bucket-level data key.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Run a script on an EC2 instance that lists the bucket and calls CopyObject on each object with the new SSE-KMS key.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Run an S3 Batch Operations Copy job from an S3 Inventory report, specifying SSE-KMS with the new key.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable automatic rotation on the new key so that AWS KMS re-encrypts every object with fresh key material.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A compliance standard requires that the cryptographic material protecting a company's SSE-KMS encrypted data be changed every 180 days. The company uses a customer managed key whose key material was generated by AWS KMS. Existing data must remain decryptable, applications must keep referencing the same key ARN, and the team does not want to build or maintain custom automation. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Đổi key material mỗi 180 ngày, giữ nguyên key ARN, dữ liệu cũ vẫn giải mã được, không tự xây automation. Từ khóa: '180 days', 'same key ARN', 'no custom automation'.\n(A) ĐÚNG: Automatic rotation của customer managed key cho phép cấu hình rotation period (từ 90 ngày đến 2560 ngày); đặt 180 ngày thì KMS tự tạo material mới, giữ nguyên Key ID và ARN, và giữ material cũ để giải mã dữ liệu cũ.\n(B) SAI: Bật rotation với cấu hình mặc định là 365 ngày, không đạt chu kỳ 180 ngày; AWS Config rule chỉ kiểm tra rotation có bật hay không chứ không đổi chu kỳ.\n(C) SAI: Lambda tạo key mới rồi trỏ alias là manual rotation, làm đổi key ARN mà ứng dụng tham chiếu và là đúng loại automation tự xây mà đề muốn tránh.\n(D) SAI: Key có material do KMS sinh ra không thể import material vào; import key material chỉ dùng cho key tạo với origin EXTERNAL, và runbook vẫn là automation tự duy trì.\nĐáp án đúng: A\nĐiểm cần nhớ: Automatic rotation giữ nguyên ARN và chu kỳ cấu hình được (mặc định 1 năm, tối thiểu 90 ngày); manual rotation qua alias thì đổi key ARN.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable automatic rotation on the existing key and configure a custom rotation period of 180 days.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Enable automatic rotation on the key with default settings and add an AWS Config rule to verify rotation.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use an EventBridge schedule that invokes a Lambda function every 180 days to create a new key and move the alias.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Import new key material into the key every 180 days by using a scheduled Systems Manager Automation runbook.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company stores application logs in an Amazon S3 bucket. Auditors require that every use of the encryption key be recorded in AWS CloudTrail. The company has no requirement to customize key policies, control the rotation schedule, or share the key with other AWS accounts, and it wants to minimize encryption costs. Which encryption option meets these requirements?",
+    "explanation": "Phân tích đề: Cần audit từng lần dùng key qua CloudTrail, không cần tùy chỉnh key policy, rotation hay cross-account, và chi phí thấp nhất. Từ khóa: 'recorded in AWS CloudTrail', 'minimize encryption costs'.\n(A) SAI: SSE-S3 rẻ nhất nhưng key do S3 quản lý nội bộ, không có sự kiện KMS trong CloudTrail cho từng lần dùng key, nên không đạt yêu cầu audit.\n(B) SAI: Customer managed key đáp ứng audit nhưng tính phí lưu trữ theo key mỗi tháng; các khả năng thêm (sửa key policy, chỉnh rotation) đề không cần, nên đắt hơn mức cần thiết.\n(C) SAI: DSSE-KMS mã hóa hai lớp, dành cho yêu cầu compliance đặc thù, có phí cao hơn SSE-KMS và vượt quá yêu cầu.\n(D) ĐÚNG: SSE-KMS với AWS managed key aws/s3 vẫn gọi KMS cho mỗi thao tác nên mọi lần dùng key được ghi vào CloudTrail; AWS managed key không tính phí lưu trữ hằng tháng, chỉ tính phí API.\nĐáp án đúng: D\nĐiểm cần nhớ: Cần audit key qua CloudTrail => SSE-KMS (SSE-S3 không đủ). Không cần sửa key policy, rotation hay cross-account => AWS managed key là rẻ nhất.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "SSE-S3 with Amazon S3 managed keys, which uses AES-256 and adds no AWS KMS charges.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "SSE-KMS with a new customer managed key that has automatic annual key rotation enabled.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Dual-layer server-side encryption (DSSE-KMS) with a new customer managed key.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "SSE-KMS with the AWS managed key aws/s3 that Amazon S3 creates in the account.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs an unencrypted Amazon RDS for PostgreSQL DB instance. A new security policy requires encryption at rest with a customer managed AWS KMS key. The company can accept a short outage during a scheduled maintenance window and wants the simplest approach with the fewest components to operate. What should a solutions architect do?",
+    "explanation": "Phân tích đề: RDS đang chạy chưa mã hóa, cần mã hóa bằng customer managed key; chấp nhận downtime ngắn, muốn cách đơn giản nhất. Từ khóa: 'unencrypted', 'short outage', 'simplest'.\n(A) SAI: RDS không cho bật encryption at rest trên DB instance đang tồn tại bằng thao tác modify, dù áp dụng ngay hay trong maintenance window.\n(B) ĐÚNG: Chụp snapshot, copy snapshot với tùy chọn mã hóa bằng customer managed key, restore ra DB instance mới đã mã hóa rồi trỏ ứng dụng sang; đây là đường chuẩn và chỉ gồm thao tác native của RDS.\n(C) SAI: Không tạo được encrypted read replica từ DB instance chưa mã hóa; replica phải cùng trạng thái mã hóa với nguồn.\n(D) SAI: AWS DMS với ongoing replication làm được và giảm downtime, nhưng phải dựng replication instance, endpoint, task và theo dõi, nhiều thành phần hơn trong khi đề đã chấp nhận downtime ngắn.\nĐáp án đúng: B\nĐiểm cần nhớ: Không bật mã hóa trực tiếp cho RDS hay EBS đang có: snapshot => copy có mã hóa => restore. DMS chỉ đáng dùng khi bắt buộc gần như không downtime.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Modify the DB instance to enable storage encryption with the customer managed key during the next maintenance window.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Take a snapshot, copy it with encryption by the customer managed key, and restore a new DB instance from the copy.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Create an encrypted read replica with the customer managed key, then promote the replica to a standalone DB instance.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use AWS DMS with ongoing replication into a new encrypted DB instance, then switch the application endpoint to it.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company enabled server-side encryption on an Amazon SNS topic by using the AWS managed key aws/sns. Since then, Amazon CloudWatch alarms that publish to the topic no longer deliver notifications, although the topic access policy still allows cloudwatch.amazonaws.com to publish. The topic must remain encrypted at rest. Which TWO actions should a solutions architect take to restore alarm notifications? (Choose TWO.)",
+    "explanation": "Phân tích đề: SNS topic mã hóa bằng aws/sns; CloudWatch alarm (một service principal) không publish được dù topic policy đã cho phép; topic vẫn phải mã hóa. Từ khóa: 'AWS managed key aws/sns', 'CloudWatch alarms'.\n(A) ĐÚNG: Key policy của AWS managed key không cho service principal như CloudWatch dùng key, và không sửa được; phải chuyển topic sang customer managed key.\n(B) SAI: Key policy của AWS managed key do AWS quản lý, không chỉnh sửa được.\n(C) SAI: CloudWatch alarm publish dưới danh nghĩa service principal cloudwatch.amazonaws.com, không phải qua một IAM role của bạn; quyền dùng key cho service principal phải nằm trong key policy.\n(D) ĐÚNG: Trong key policy của customer managed key mới, cho phép cloudwatch.amazonaws.com gọi kms:GenerateDataKey* và kms:Decrypt để mã hóa message khi publish vào topic đã mã hóa.\n(E) SAI: Tắt SSE vi phạm yêu cầu mã hóa at rest; aws:SecureTransport chỉ ép HTTPS cho dữ liệu lúc truyền, không thay thế mã hóa lưu trữ.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Dịch vụ AWS (CloudWatch, S3 event, EventBridge) gửi vào SNS/SQS đã mã hóa => cần customer managed key với key policy cho service principal đó; AWS managed key không làm được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Change the topic's server-side encryption to use a customer managed KMS key.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Edit the key policy of aws/sns to allow the CloudWatch service principal to use the key.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Attach an IAM policy that grants kms:Decrypt on aws/sns to the CloudWatch service-linked role.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Allow cloudwatch.amazonaws.com kms:GenerateDataKey* and kms:Decrypt in the new key's policy.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Disable SSE on the topic and require HTTPS-only publishing with an aws:SecureTransport condition.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has about 300 configuration values, including database connection strings and third-party license keys, that applications on Amazon EC2 read at startup through their IAM instance roles. The values must be encrypted at rest with AWS KMS. They change rarely and do not need automatic rotation. Which solution is the MOST cost-effective?",
+    "explanation": "Phân tích đề: 300 giá trị cấu hình cần mã hóa bằng KMS, đọc qua IAM role, ít thay đổi, không cần tự xoay; ưu tiên chi phí. Từ khóa: 'do not need automatic rotation', 'MOST cost-effective'.\n(A) SAI: Secrets Manager đáp ứng kỹ thuật nhưng tính phí theo từng secret mỗi tháng; với 300 giá trị không cần rotation thì đắt hơn đáng kể mà không dùng tới tính năng tự xoay.\n(B) SAI: Tự mã hóa bằng KMS Encrypt rồi lưu DynamoDB làm được nhưng phải tự viết logic mã hóa/giải mã và quản lý bảng, thêm chi phí vận hành; KMS không lưu dữ liệu nên phải tự lo nơi lưu.\n(C) ĐÚNG: Parameter Store standard tier không tính phí lưu trữ; SecureString mã hóa giá trị bằng KMS key (aws/ssm hoặc customer managed key), ứng dụng đọc qua IAM role với GetParameter có giải mã.\n(D) SAI: SSE-S3 dùng key do S3 quản lý, không phải AWS KMS nên không đạt yêu cầu mã hóa bằng KMS.\nĐáp án đúng: C\nĐiểm cần nhớ: Cần lưu và tự xoay secret => Secrets Manager. Chỉ cần lưu giá trị mã hóa bằng KMS, không xoay, rẻ nhất => Parameter Store SecureString.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Store each value as a secret in AWS Secrets Manager encrypted with the aws/secretsmanager key.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Encrypt each value with the AWS KMS Encrypt API and store the ciphertext in an Amazon DynamoDB table.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Store the values as SecureString parameters in the Systems Manager Parameter Store standard tier.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Store the values in an Amazon S3 bucket with SSE-S3 and grant the instance roles s3:GetObject.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs a public HTTPS web application on a fleet of Amazon EC2 instances that run NGINX. A regulator requires TLS to terminate on the instances themselves, so no load balancer or CDN may decrypt the traffic. The company wants publicly trusted certificates that renew automatically, and the private keys must not be readable by administrators who log in to the instances' operating system. The company prefers certificates managed by AWS over certificates bought from a commercial CA. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: TLS phải terminate trên chính EC2 (không ALB, NLB TLS hay CloudFront), cert phải được trình duyệt tin cậy, tự gia hạn, private key không lộ cho admin OS, ưu tiên cert do AWS quản lý. Từ khóa: 'terminate on the instances', 'must not be readable'.\n(A) SAI: Cert public ACM loại exportable có thể tải private key về, nhưng key sẽ nằm trên đĩa của instance nên admin đọc được, và mỗi lần gia hạn phải tự export rồi cài lại.\n(B) SAI: Cert từ AWS Private CA không được trình duyệt công cộng tin cậy, và private key export ra vẫn nằm trong OS; script gia hạn là automation tự duy trì.\n(C) SAI: NLB với TLS listener sẽ terminate TLS ở load balancer, vi phạm yêu cầu chỉ giải mã trên instance.\n(D) ĐÚNG: ACM for Nitro Enclaves cho phép dùng cert ACM public trên EC2 chạy NGINX hoặc Apache; private key được giữ trong enclave cô lập, admin OS không đọc được, và ACM tự gia hạn cert rồi cập nhật cho NGINX.\nĐáp án đúng: D\nĐiểm cần nhớ: HTTPS bằng ACM cho web thường => đặt ALB hoặc CloudFront phía trước. Bắt buộc terminate TLS trên chính EC2 mà vẫn muốn cert ACM tự gia hạn, key được bảo vệ => ACM for Nitro Enclaves.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Request exportable public ACM certificates, export them with their private keys, and install them in NGINX on each instance.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Issue certificates from AWS Private CA, export them, and configure NGINX to load them through a scheduled renewal script.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Place a Network Load Balancer with a TLS listener and a public ACM certificate in front of the EC2 instances.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use ACM for Nitro Enclaves on enclave-enabled instances to provide public ACM certificates to NGINX.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An application in Account B must read a database credential that is stored in AWS Secrets Manager in Account A, in the same Region. The secret is encrypted with the AWS managed key aws/secretsmanager and rotates automatically every 30 days. The security team does not allow a second copy of the secret to exist. A resource policy on the secret already allows the application's IAM role, and the role's identity policy allows secretsmanager:GetSecretValue on the secret ARN, but the call still fails. Which additional change meets these requirements?",
+    "explanation": "Phân tích đề: Truy cập secret cross-account; secret đang mã hóa bằng aws/secretsmanager; resource policy và IAM đã đúng; không được tạo bản sao secret. Từ khóa: 'aws/secretsmanager', 'Account B', 'no second copy'.\n(A) ĐÚNG: Secret dùng AWS managed key không chia sẻ cross-account được vì key policy của aws/secretsmanager không thể cấp cho account khác; đổi secret sang customer managed key, cho Account B quyền kms:Decrypt trong key policy và trong IAM policy của role thì GetSecretValue hoạt động, rotation vẫn chạy bình thường.\n(B) SAI: Key policy của AWS managed key không chỉnh sửa được, nên không thể thêm Account B.\n(C) SAI: Secret replication của Secrets Manager sao chép secret sang Region khác trong cùng account, không sang account khác, và tạo thêm bản sao trái yêu cầu.\n(D) SAI: Lambda copy giá trị sang secret mới ở Account B tạo bản sao bị cấm và thêm automation phải duy trì sau mỗi lần rotation.\nĐáp án đúng: A\nĐiểm cần nhớ: Chia sẻ secret cross-account cần đủ ba lớp: resource policy trên secret, IAM ở account đọc, và customer managed key có key policy cho account đó; aws/secretsmanager không dùng cross-account được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Switch the secret to a customer managed key whose key policy and the role's IAM policy allow kms:Decrypt.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add Account B as a principal in the key policy of aws/secretsmanager so the role can call kms:Decrypt.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Replicate the secret to Account B with Secrets Manager secret replication and read the replica locally.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Run a Lambda function after each rotation that copies the secret value into a new secret in Account B.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company exposes a REST API on Amazon API Gateway in eu-west-1 to about 100 partner systems. Each partner must authenticate with an X.509 client certificate that is issued by the company's own certificate authority, and requests without a valid client certificate must be rejected before they reach the backend. The API must be reachable at api.partner.example.com with a server certificate that renews automatically, and partners must not be able to bypass the client certificate check. Which THREE actions should a solutions architect take? (Choose THREE.)",
+    "explanation": "Phân tích đề: Cần mutual TLS (mTLS) cho API Gateway: client cert do CA của công ty cấp, server cert tự gia hạn cho custom domain, không cho bypass. Từ khóa: 'X.509 client certificate', 'renews automatically', 'must not be able to bypass'.\n(A) SAI: Mutual TLS của API Gateway chỉ hỗ trợ trên Regional custom domain name, không hỗ trợ edge-optimized; đặt cert ở us-east-1 cũng không dùng được cho custom domain Regional ở eu-west-1.\n(B) ĐÚNG: Cert ACM public cho custom domain Regional phải nằm cùng Region với API (eu-west-1); dùng DNS validation để ACM tự gia hạn.\n(C) ĐÚNG: API Gateway đọc truststore (chuỗi CA dạng PEM) từ Amazon S3; bật mTLS trên Regional custom domain name thì kết nối không có client cert hợp lệ bị từ chối ngay ở bước TLS handshake, trước khi tới backend.\n(D) SAI: API Gateway client certificate là cert do API Gateway sinh ra để backend xác thực request đến từ API Gateway (chiều API Gateway tới backend), không dùng để xác thực partner gọi vào.\n(E) SAI: AWS WAF lọc request theo IP, header, rate, không thực hiện kiểm tra chuỗi client certificate trong TLS handshake.\n(F) ĐÚNG: Nếu vẫn để default execute-api endpoint, partner có thể gọi thẳng endpoint đó mà không qua mTLS; phải disable default endpoint để chỉ còn đường đi qua custom domain.\nĐáp án đúng: B, C và F\nĐiểm cần nhớ: mTLS trên API Gateway = Regional custom domain + truststore trong S3 + tắt default execute-api endpoint. API Gateway client certificate là để xác thực phía backend, không phải phía client.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Deploy the API with an edge-optimized endpoint and request the server certificate in us-east-1.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Request a public ACM certificate for api.partner.example.com in eu-west-1 with DNS validation.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Upload the CA truststore to Amazon S3 and enable mutual TLS on a Regional custom domain name.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Generate an API Gateway client certificate on the stage and distribute it to every partner system.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Attach an AWS WAF web ACL with a rule that inspects and validates each client certificate chain.", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "Disable the default execute-api endpoint so that partners can reach the API only by the custom domain.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company stores tenant files in one Amazon S3 bucket that uses SSE-KMS with a customer managed key. Each tenant role's IAM policy allows s3:GetObject only on that tenant's prefix and allows kms:Decrypt only when the kms:EncryptionContext:aws:s3:arn condition matches the tenant's object prefix, such as arn:aws:s3:::tenant-files/tenant-42/*. KMS request costs have grown sharply, so the company will enable S3 Bucket Keys. Security still requires the customer managed key to be logged in AWS CloudTrail and requires that the key be usable only for this bucket. Which change must accompany enabling S3 Bucket Keys?",
+    "explanation": "Phân tích đề: Bật S3 Bucket Keys để giảm chi phí KMS; policy hiện dựa vào encryption context là ARN của object theo prefix; vẫn phải dùng customer managed key, có CloudTrail và key chỉ dùng cho bucket này. Từ khóa: 'kms:EncryptionContext:aws:s3:arn', 'S3 Bucket Keys'.\n(A) SAI: Xóa hẳn điều kiện encryption context thì tenant vẫn đọc được, nhưng role được Decrypt bằng key này cho bất kỳ ngữ cảnh nào, vi phạm yêu cầu key chỉ dùng cho bucket này.\n(B) ĐÚNG: Khi bật Bucket Keys, S3 gọi KMS với encryption context là ARN của bucket thay vì ARN của object, nên điều kiện theo prefix object sẽ không còn khớp và gây AccessDenied; đổi điều kiện sang ARN bucket vẫn giới hạn key cho bucket này, còn cách ly tenant tiếp tục do quyền s3:GetObject theo prefix đảm nhận.\n(C) SAI: Tăng quota chỉ giải quyết throttle, không giảm phí theo số lần gọi KMS; Bucket Keys cũng không xung đột với điều kiện encryption context, chỉ cần đổi giá trị điều kiện.\n(D) SAI: SSE-S3 không dùng customer managed key và không ghi lần dùng key KMS vào CloudTrail, vi phạm yêu cầu bảo mật.\nĐáp án đúng: B\nĐiểm cần nhớ: Bật S3 Bucket Keys làm encryption context đổi từ ARN object sang ARN bucket; phải cập nhật mọi IAM hoặc key policy dùng điều kiện kms:EncryptionContext theo ARN object.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Remove the encryption context condition from the tenant IAM policies and rely on the key policy alone.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Change the encryption context condition to the bucket ARN and keep the prefix-scoped s3:GetObject rules.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Request a higher KMS request quota instead, because Bucket Keys cannot be used with encryption context conditions.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Switch the bucket to SSE-S3 and use the prefix-scoped s3:GetObject permissions as the only isolation control.", "isCorrect": false }
+    ]
+  }
+]

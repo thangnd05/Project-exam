@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company runs its entire application on AWS Lambda functions and Amazon ECS tasks on AWS Fargate. Usage has been steady for a year and is expected to continue for at least three more years. Which purchasing option will reduce the compute costs of both services?",
+    "explanation": "Phân tích đề: Chỉ có Lambda và Fargate, tải ổn định dài hạn, cần một cam kết giảm giá cho cả hai.\n(A) SAI: EC2 Instance Savings Plans chỉ áp cho một EC2 instance family trong một Region, không phủ Lambda hay Fargate.\n(B) SAI: Không có Reserved Instances cho Fargate hay Lambda; RI của EC2 chỉ áp cho EC2 instance.\n(C) ĐÚNG: Compute Savings Plans cam kết $/giờ trong 1 hoặc 3 năm và tự áp giảm giá cho EC2, Fargate và Lambda, nên phủ được cả hai dịch vụ.\n(D) SAI: ODCR chỉ giữ chỗ EC2 instance tại một AZ, không giảm giá và không áp cho dịch vụ serverless.\nĐáp án đúng: C\nĐiểm cần nhớ: Có Fargate hoặc Lambda trong phần cần giảm giá => Compute Savings Plans.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "EC2 Instance Savings Plans", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Standard Reserved Instances for the Fargate and Lambda capacity", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Compute Savings Plans", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "On-Demand Capacity Reservations for the functions and tasks", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company is configuring Spot Instances in an Auto Scaling group for a fault-tolerant batch workload. It wants a balance between low Spot prices and a low chance of interruption, following AWS best practice. Which Spot allocation strategy should the company choose?",
+    "explanation": "Phân tích đề: Cần cân bằng giữa giá rẻ và khả năng bị ngắt thấp, theo khuyến nghị của AWS.\n(A) SAI: lowest-price chỉ chọn các pool rẻ nhất, bỏ qua mức capacity còn dư nên tỷ lệ bị ngắt cao; chỉ hợp cho lab hoặc test.\n(B) ĐÚNG: price-capacity-optimized chọn các pool vừa có nhiều capacity dư vừa có giá thấp; đây là chiến lược AWS khuyến nghị cho hầu hết tải Spot.\n(C) SAI: capacity-optimized-prioritized chỉ với một instance type gần như không có gì để tối ưu, và chiến lược này đặt ưu tiên thứ tự instance type lên trước giá.\n(D) SAI: capacity-optimized ưu tiên giảm ngắt tới mức thấp nhất mà không xét giá, nên không cân bằng giá như đề yêu cầu.\nĐáp án đúng: B\nĐiểm cần nhớ: Mặc định cho Spot trong ASG/EC2 Fleet => price-capacity-optimized; chỉ quan tâm giảm ngắt => capacity-optimized.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "lowest-price", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "price-capacity-optimized", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "capacity-optimized-prioritized with a single instance type", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "capacity-optimized, ignoring price completely", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company wants to launch a fleet of 100 instances in a single API request: 20 On-Demand Instances and 80 Spot Instances spread across several instance types and Availability Zones. Which AWS feature is designed for this?",
+    "explanation": "Phân tích đề: Một request duy nhất, trộn On-Demand và Spot, nhiều instance type và AZ.\n(A) ĐÚNG: EC2 Fleet cho phép chỉ định tổng target capacity, phần On-Demand và phần Spot, cùng nhiều launch template override (instance type, AZ) và allocation strategy trong một lời gọi API.\n(B) SAI: ODCR chỉ giữ chỗ cho một instance type tại một AZ; không có tùy chọn khởi chạy Spot bên trong reservation.\n(C) SAI: Spot block (defined duration) đã ngừng cung cấp và cũng không dùng để khởi chạy On-Demand.\n(D) SAI: Instance Scheduler chỉ bật/tắt instance theo lịch, không khởi chạy đội máy trộn Spot và On-Demand.\nĐáp án đúng: A\nĐiểm cần nhớ: Trộn On-Demand và Spot, nhiều instance type, một request => EC2 Fleet (hoặc Auto Scaling Group với mixed instances policy).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "An EC2 Fleet with an On-Demand target capacity and a Spot target capacity", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "An On-Demand Capacity Reservation with Spot enabled for the extra instances", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "A Spot Instance request that specifies a block duration for the On-Demand portion", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Instance Scheduler on AWS configured with separate Spot and On-Demand schedules", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A company runs containerized services on Amazon ECS with AWS Fargate. Which TWO options can lower the cost of the Fargate compute?",
+    "explanation": "Phân tích đề: Cần biết các cách giảm giá áp được cho Fargate.\n(A) ĐÚNG: Compute Savings Plans tự áp giảm giá cho vCPU và bộ nhớ của Fargate (cùng với EC2 và Lambda).\n(B) SAI: EC2 Instance Savings Plans chỉ áp cho EC2 instance thuộc một family trong một Region, không áp cho Fargate.\n(C) ĐÚNG: Fargate Spot chạy task trên capacity dư với giá thấp hơn nhiều, đổi lại task có thể bị thu hồi với cảnh báo 2 phút; hợp cho task chịu lỗi.\n(D) SAI: Không tồn tại Reserved Instances cho Fargate; RI chỉ áp cho EC2 và một số dịch vụ như RDS, ElastiCache, Redshift, OpenSearch.\n(E) SAI: ODCR chỉ giữ chỗ EC2 instance, không áp cho Fargate và tự nó không giảm giá.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Fargate giảm giá bằng Compute Savings Plans (cam kết) hoặc Fargate Spot (chịu ngắt).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Compute Savings Plans", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "EC2 Instance Savings Plans", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Fargate Spot for interruption-tolerant tasks", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Standard Reserved Instances purchased for the Fargate vCPU hours", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "On-Demand Capacity Reservations for the Fargate tasks", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company is migrating an application that uses a commercial database whose license is priced per physical processor core. The license terms require the company to prove how many physical cores the software runs on. The company wants to use its existing licenses on AWS instead of buying new ones. Which Amazon EC2 option meets these requirements?",
+    "explanation": "Phân tích đề: License BYOL tính theo core vật lý, phải chứng minh số core; từ khóa quyết định là cần thấy socket/core.\n(A) SAI: Dedicated Instances chạy trên phần cứng dành riêng cho account nhưng không cho thấy số socket/core vật lý và không cố định máy chủ, nên không đáp ứng điều khoản license.\n(B) ĐÚNG: Dedicated Host là cả máy chủ vật lý dành riêng, cho thấy số socket và core vật lý, cho phép dùng license BYOL tính theo socket/core và báo cáo tuân thủ.\n(C) SAI: Standard RI chỉ là cơ chế giảm giá, không ghim instance vào một máy chủ vật lý và instance vẫn dùng phần cứng chung.\n(D) SAI: ODCR với dedicated tenancy chỉ giữ chỗ Dedicated Instances; vẫn không cho thấy socket/core vật lý để tính license.\nĐáp án đúng: B\nĐiểm cần nhớ: License tính theo socket/core vật lý (BYOL) => Dedicated Hosts.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Dedicated Instances, because they run on hardware that is dedicated to a single customer", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Dedicated Hosts, because they expose physical sockets and cores for license counting", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Default tenancy instances with a Standard Reserved Instance that pins each instance to one server", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "On-Demand Capacity Reservations with dedicated tenancy so that instances stay on reserved hardware", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company needs to reserve compute capacity for a seasonal workload that can run on m6i, m7i, or m6a instances. It wants to reserve a total of 512 vCPUs in one Region across these instance types by using a single request, letting AWS distribute the reservations according to priorities and weights. The company does not want to create and track many individual reservations. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Cần giữ chỗ (không phải giảm giá) cho tổng vCPU trên nhiều instance type bằng một request, có ưu tiên và trọng số.\n(A) ĐÚNG: Capacity Reservation Fleet cho phép khai báo nhiều instance type kèm priority và weight cùng total target capacity; AWS tự tạo và quản lý các ODCR bên dưới như một nhóm.\n(B) SAI: EC2 Fleet loại instant khởi chạy instance ngay lập tức, không giữ chỗ; dùng Spot càng không bảo đảm capacity.\n(C) SAI: Regional RI chỉ giảm giá, không giữ chỗ capacity ở bất kỳ AZ nào.\n(D) SAI: Một ODCR chỉ áp cho đúng một instance type, platform và AZ; không thể liệt kê nhiều instance type trong một reservation.\nĐáp án đúng: A\nĐiểm cần nhớ: Giữ chỗ trên nhiều instance type bằng một request với priority/weight => On-Demand Capacity Reservation Fleet.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an On-Demand Capacity Reservation Fleet with the instance types, priorities, weights, and total target capacity", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create an EC2 Fleet of type instant that launches Spot Instances for all three instance types in the Region", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Purchase regional Reserved Instances for each instance type in the proportions that the workload requires", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create one targeted On-Demand Capacity Reservation whose configuration lists all three instance types together", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs a nightly Amazon EMR job that must finish before 06:00. The company wants to use Spot capacity for the task nodes to lower cost, but if Spot capacity is not available within a short time, the cluster must still obtain the capacity it needs. Which configuration meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Task node chạy Spot để tiết kiệm, nhưng nếu Spot không có trong thời gian ngắn thì phải tự lấy capacity khác, ít vận hành nhất.\n(A) ĐÚNG: EMR instance fleets cho phép khai báo nhiều instance type và Spot provisioning timeout; khi hết thời gian mà chưa đủ Spot, hành động SWITCH_TO_ON_DEMAND tự chuyển sang On-Demand, không cần code tùy biến.\n(B) SAI: Instance groups chỉ một instance type Spot dễ thiếu capacity; tự viết CloudWatch alarm và Lambda để thêm On-Demand là thêm công vận hành.\n(C) SAI: Primary và core node giữ dữ liệu HDFS và trạng thái cụm, chạy Spot sẽ có nguy cơ mất cả job khi bị thu hồi.\n(D) SAI: ODCR chỉ dành cho On-Demand; Spot Instances không chạy bên trong Capacity Reservation, và reservation vẫn tính giá On-Demand.\nĐáp án đúng: A\nĐiểm cần nhớ: EMR tiết kiệm bằng Spot cho task node; instance fleets có provisioning timeout chuyển sang On-Demand khi thiếu Spot.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use EMR instance fleets with several instance types and a Spot timeout action that switches to On-Demand", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Use EMR instance groups with one Spot type and a CloudWatch alarm that runs Lambda to add On-Demand nodes", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Run the primary and core nodes on Spot with lowest-price so that more budget remains for On-Demand task nodes", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create an On-Demand Capacity Reservation for all task nodes and launch them as Spot Instances inside it", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company owns one regional Standard Reserved Instance for a Linux m6i.4xlarge with default tenancy in us-west-2. The workload was right-sized and now runs as m6i.xlarge Linux instances with default tenancy in two Availability Zones of us-west-2. How many m6i.xlarge instances can the existing reservation fully cover each hour without any additional purchase?",
+    "explanation": "Phân tích đề: Regional RI, Linux, default tenancy => có Instance Size Flexibility tính theo normalization factor (xlarge = 8 đơn vị, 4xlarge = 32 đơn vị).\n(A) SAI: Nhờ Instance Size Flexibility, RI không bị bó vào một instance cùng size mà áp theo đơn vị chuẩn hóa trong cùng family.\n(B) SAI: Regional RI áp giảm giá cho mọi AZ trong Region, không giới hạn trong một AZ.\n(C) ĐÚNG: 4xlarge có 32 đơn vị chuẩn hóa, mỗi xlarge có 8 đơn vị, nên một RI m6i.4xlarge phủ đủ 4 instance m6i.xlarge mỗi giờ, bất kể chạy ở AZ nào trong us-west-2.\n(D) SAI: Ngược lại, Instance Size Flexibility chỉ áp cho Regional RI; Zonal RI không có tính năng này.\nĐáp án đúng: C\nĐiểm cần nhớ: Regional RI Linux default tenancy có Instance Size Flexibility: large=4, xlarge=8, 2xlarge=16, 4xlarge=32 đơn vị.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "One, because a Reserved Instance always covers exactly one running instance", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Two, because instance size flexibility applies only within one Availability Zone", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Four, because one 4xlarge has the normalized units of four xlarge instances", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "None, because instance size flexibility applies only to zonal Reserved Instances", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses AWS Organizations with consolidated billing. A subsidiary's member account buys its own Reserved Instances and Savings Plans, and the subsidiary's budget owner requires that those discounts benefit only that account and that the account does not receive discounts purchased by other accounts. All other member accounts should continue to share discounts with each other. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Muốn tách riêng một account khỏi việc chia sẻ giảm giá RI/Savings Plans, các account khác vẫn chia sẻ.\n(A) ĐÚNG: Trong billing preferences của management account có thể tắt RI and Savings Plans discount sharing cho từng member account; account bị tắt chỉ dùng commitment của chính nó và không nhận giảm giá từ account khác.\n(B) SAI: SCP chặn quyền mua RI chỉ ngăn account mua thêm cam kết, không thay đổi cách giảm giá được chia sẻ.\n(C) SAI: Cost allocation tag chỉ phục vụ báo cáo chi phí; giảm giá RI/Savings Plans không áp theo tag.\n(D) SAI: Giảm giá của Zonal RI vẫn được chia sẻ trong Organization; chỉ phần giữ chỗ capacity là thuộc riêng account mua.\nĐáp án đúng: A\nĐiểm cần nhớ: Kiểm soát chia sẻ giảm giá RI/Savings Plans theo từng account bằng billing preferences ở management account.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Turn off RI and Savings Plans discount sharing for that account in the management account's billing preferences", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Move the account into a separate OU and attach an SCP that denies purchasing Reserved Instance offerings", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Tag the subsidiary's Reserved Instances with a cost allocation tag so the discount applies only to tagged resources", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Buy the subsidiary's commitments as zonal Reserved Instances, because zonal discounts are never shared across accounts", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company is moving an Amazon ECS service that runs behind an Application Load Balancer to Fargate Spot to reduce cost. The tasks are stateless but need about 30 seconds to finish in-flight requests. Which TWO actions will help the service handle Fargate Spot interruptions gracefully?",
+    "explanation": "Phân tích đề: Fargate Spot báo trước 2 phút bằng cách gửi SIGTERM tới task; cần rút êm request trong 30 giây khi đứng sau ALB.\n(A) ĐÚNG: Khi task Fargate Spot sắp bị thu hồi, ECS gửi cảnh báo (task state change event) và SIGTERM tới container; ứng dụng bắt SIGTERM để ngừng nhận việc mới và hoàn tất request đang xử lý.\n(B) SAI: Task Fargate không truy cập metadata của EC2 host để đọc spot/instance-action; cơ chế báo hiệu của Fargate Spot là SIGTERM và sự kiện ECS.\n(C) ĐÚNG: Deregistration delay mặc định 300 giây dài hơn cửa sổ 2 phút; đặt nhỏ hơn 120 giây (ví dụ 60 giây) để target được rút khỏi ALB kịp trước khi task dừng hẳn.\n(D) SAI: Capacity Rebalancing là tính năng của Auto Scaling Group cho EC2 Spot, không phải thiết lập của ECS service trên Fargate.\n(E) SAI: Fargate không hỗ trợ hibernate task; task bị thu hồi thì dừng và ECS khởi chạy task mới.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Fargate Spot => xử lý SIGTERM trong cửa sổ 2 phút và đặt deregistration delay dưới 120 giây khi đứng sau ALB.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Handle the SIGTERM signal that ECS sends to the containers before the task is stopped, and finish in-flight work", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Poll the EC2 instance metadata service from inside the container for the spot/instance-action notice", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Set the target group deregistration delay to a value lower than 120 seconds, such as 60 seconds", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable Capacity Rebalancing on the ECS service so that Fargate launches replacement tasks early", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Configure the task definition to hibernate the task when AWS reclaims the capacity", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs a critical application in us-east-1 and uses a pilot light disaster recovery strategy in us-west-2. In a disaster, it must launch 50 r6i.4xlarge instances in one Availability Zone of us-west-2 within 15 minutes. A regulator requires proof that this capacity will be available even if many other customers fail over at the same time. The company has a Compute Savings Plan whose unused commitment every hour is larger than the cost of these 50 instances. Which solution meets the requirement MOST cost-effectively?",
+    "explanation": "Phân tích đề: Cần bảo đảm capacity (không chỉ giảm giá) ở Region DR; đang có Compute Savings Plan dư cam kết mỗi giờ, đủ phủ chi phí của 50 instance.\n(A) SAI: Regional RI chỉ giảm giá, không giữ chỗ, nên không chứng minh được capacity; lại thêm cam kết mới trong khi Savings Plan đang dư.\n(B) ĐÚNG: ODCR giữ chỗ 50 instance tại AZ ở us-west-2 và hủy được bất kỳ lúc nào; ODCR tính giá On-Demand nhưng Savings Plans áp giảm giá lên cả phần reservation chưa dùng, nên phần cam kết đang dư được tận dụng và gần như không tốn thêm.\n(C) SAI: Spot không bảo đảm capacity, đặc biệt khi nhiều khách hàng cùng failover; capacity-optimized chỉ giảm tỷ lệ bị ngắt.\n(D) SAI: Tăng cam kết Savings Plan chỉ tăng giảm giá, không bao giờ giữ chỗ capacity; lại lãng phí vì cam kết đang dư sẵn.\nĐáp án đúng: B\nĐiểm cần nhớ: Cần bảo đảm capacity ở Region DR => ODCR; Savings Plans hoặc Regional RI khớp cấu hình tự áp giảm giá lên ODCR.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Purchase regional Reserved Instances for 50 r6i.4xlarge instances in us-west-2", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a Capacity Reservation for 50 r6i.4xlarge instances in us-west-2 covered by the Savings Plan", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Launch Spot Instances with the capacity-optimized allocation strategy in us-west-2 during failover", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Increase the Compute Savings Plan commitment so that capacity is reserved in us-west-2 for the failover", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company is buying three-year Reserved Instances for 100 c6i Linux instances in one Region. The instance family will not change, but there is a real chance that the business unit will be divested in about 18 months, after which the company would no longer need the instances. The company wants the largest discount while keeping a way to recover value if the reservations are no longer needed. Internal policy does not allow Savings Plans. Which purchase meets these requirements?",
+    "explanation": "Phân tích đề: Cấu hình không đổi, muốn giảm sâu nhất, và cần lối thoát để thu hồi giá trị nếu không còn dùng; không được dùng Savings Plans.\n(A) SAI: Convertible RI chỉ exchange được sang Convertible RI khác có giá trị bằng hoặc lớn hơn; không có hoàn tiền phần còn lại.\n(B) ĐÚNG: Standard RI có mức giảm sâu nhất (tới 72%) và có thể bán lại trên EC2 Reserved Instance Marketplace để thu hồi một phần giá trị nếu đơn vị kinh doanh bị bán đi.\n(C) SAI: Convertible RI không được bán trên Reserved Instance Marketplace; chỉ Standard RI mới bán được. Convertible cũng giảm ít hơn Standard.\n(D) SAI: ODCR hủy được bất kỳ lúc nào nhưng tự nó không giảm giá, vẫn trả giá On-Demand cho mọi chỗ đã giữ.\nĐáp án đúng: B\nĐiểm cần nhớ: Lối thoát của Standard RI là bán trên Marketplace; lối linh hoạt của Convertible RI là exchange, nhưng không bán được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Convertible Reserved Instances, because they can be exchanged for a cash refund of the remaining term", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Standard Reserved Instances, which give the deepest discount and can be sold in the RI Marketplace", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Convertible Reserved Instances, because they can be listed in the Reserved Instance Marketplace at any time", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "On-Demand Capacity Reservations, because they can be canceled at any time without any penalty", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs Windows Server and SQL Server workloads with bring-your-own-license on Amazon EC2 Dedicated Hosts. Teams launch new instances frequently, and administrators spend a lot of time allocating hosts, choosing which host each instance lands on, and tracking license usage against core limits. The company wants hosts to be allocated and released automatically while license rules are enforced. Which solution requires the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Vẫn phải dùng Dedicated Hosts cho BYOL, nhưng muốn tự động cấp phát/giải phóng host và thực thi quy tắc license với ít công vận hành nhất.\n(A) ĐÚNG: AWS License Manager với host resource group tự cấp phát host khi launch, tự giải phóng host trống và đặt instance lên host phù hợp; license configuration theo dõi và chặn vượt giới hạn core/socket.\n(B) SAI: Dedicated Instances không cho thấy socket/core nên không đáp ứng điều khoản BYOL theo core, và không có tính năng đếm license tự động.\n(C) SAI: Tự viết Lambda và gắn tag thủ công là giải pháp tùy biến, tốn công vận hành, không thực thi quy tắc license.\n(D) SAI: Dedicated Host Reservation chỉ giảm giá cho host, không tự cấp phát host hay theo dõi license.\nĐáp án đúng: A\nĐiểm cần nhớ: BYOL trên Dedicated Hosts mà muốn tự động hóa cấp phát host và tuân thủ license => License Manager host resource groups.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use AWS License Manager with a host resource group and license configurations for automatic host management", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Switch the instances to Dedicated Instances so that AWS manages the hardware and counts licenses automatically", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Write a Lambda function that allocates a Dedicated Host whenever a launch fails and tags each instance with its cores", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Purchase Dedicated Host Reservations so that AWS allocates hosts automatically and tracks license consumption", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A FinOps team is documenting how Amazon EC2 purchasing options relate to capacity guarantees. Which THREE statements are correct?",
+    "explanation": "Phân tích đề: Phân biệt giảm giá và giữ chỗ giữa Zonal RI, Regional RI, ODCR, Savings Plans và Capacity Blocks.\n(A) ĐÚNG: Zonal RI gắn vào một AZ nên vừa giảm giá vừa giữ chỗ capacity tại AZ đó.\n(B) ĐÚNG: ODCR tính giá On-Demand cho toàn bộ số chỗ đã giữ dù có chạy máy hay không; chỉ khi có Regional RI hoặc Savings Plans khớp thì giảm giá mới tự áp lên.\n(C) SAI: Regional RI đổi việc giữ chỗ lấy sự linh hoạt AZ và Instance Size Flexibility; nó không giữ chỗ ở AZ nào.\n(D) ĐÚNG: Capacity Blocks for ML đặt trước GPU instance cho một khoảng thời gian định trước trong tương lai.\n(E) SAI: Compute Savings Plan chỉ là cam kết $/giờ để giảm giá, không giữ chỗ capacity cho instance type nào.\n(F) SAI: ODCR không có kỳ hạn tối thiểu 1 năm; tạo và hủy bất kỳ lúc nào.\nĐáp án đúng: A, B và D\nĐiểm cần nhớ: Giữ chỗ => Zonal RI, ODCR, Capacity Blocks; chỉ giảm giá => Regional RI, Savings Plans.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "A zonal Reserved Instance provides both a billing discount and a capacity reservation in its Availability Zone", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "An On-Demand Capacity Reservation is billed at On-Demand rates whether or not instances run in it, unless a matching discount applies", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "A regional Reserved Instance reserves capacity in every Availability Zone of its Region", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Capacity Blocks for ML reserve GPU instances for a defined future time window", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "A Compute Savings Plan reserves capacity for the instance types that it discounts", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "An On-Demand Capacity Reservation requires a one-year minimum term", "isCorrect": false }
+    ]
+  }
+]

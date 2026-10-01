@@ -1,0 +1,1616 @@
+{
+  "version": 1,
+  "usageScope": "PRACTICE",
+  "questions": [
+    {
+      "questionNumber": 1,
+      "questionType": "MSQ",
+      "questionText": "A media company runs a rendering API in an Auto Scaling group whose instances need 7 minutes to initialize, so the team added a warm pool of pre-initialized instances. Finance now reports that the warm pool costs almost as much as the in-service fleet, and operators see that every scale-in terminates fully initialized instances that later have to be built again from scratch. Which TWO warm pool settings address both issues?",
+      "explanation": "Phân tích đề: Hai vấn đề: warm pool quá tốn tiền (instance trong pool đang ở trạng thái Running) và scale-in hủy instance đã khởi tạo thay vì giữ lại để dùng lại.\n(A) SAI: Running là trạng thái đắt nhất vì instance trong pool vẫn tính phí compute như instance đang phục vụ; điều này làm vấn đề chi phí tệ hơn.\n(B) SAI: Scale-in protection ngăn group scale-in các instance đó, khiến fleet không thu nhỏ được khi tải giảm và chi phí tăng thêm, không phải cơ chế tái sử dụng.\n(C) ĐÚNG: Instance ở trạng thái Stopped trong warm pool không tính phí compute, chỉ tính EBS volume và Elastic IP gắn kèm, nên giảm mạnh chi phí mà vẫn giữ được phần khởi tạo đã làm sẵn.\n(D) SAI: Snapshot root volume không được launch template tự dùng lại; instance mới vẫn khởi chạy từ AMI và phải khởi tạo lại, đồng thời tăng chi phí lưu snapshot.\n(E) ĐÚNG: ReuseOnScaleIn khiến group đưa instance trở lại warm pool khi scale-in, nên lần scale-out sau dùng lại instance đã khởi tạo, không phải build lại từ đầu.\nĐáp án đúng: C và E\nĐiểm cần nhớ: Warm pool có 3 trạng thái: Stopped (rẻ nhất, chỉ trả EBS và EIP), Running (đắt, vào service nhanh nhất), Hibernated. InstanceReusePolicy ReuseOnScaleIn đưa instance về lại warm pool khi scale-in thay vì terminate.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Set the warm pool state to Running so that pre-initialized instances can move into service without waiting for an operating system boot",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Enable instance scale-in protection for new instances so that initialized instances are never removed from the group during scale in",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Set the warm pool state to Stopped so idle pre-initialized instances are charged only for attached EBS volumes and Elastic IPs",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Add a terminating lifecycle hook that snapshots each root volume before termination so that the next launch can boot from that snapshot instead",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Enable the instance reuse policy ReuseOnScaleIn so that instances are returned to the warm pool on scale in instead of being terminated",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 2,
+      "questionType": "MCQ",
+      "questionText": "An Auto Scaling group uses a warm pool in the Stopped state. The user data script downloads 20 GB of reference data, starts the application service, and registers the instance in an internal service registry. Operators notice that instances being prepared for the warm pool also register themselves and receive calls even though they are about to be stopped. How should the script decide whether to start the service and register?",
+      "explanation": "Phân tích đề: User data chạy cả khi instance được launch vào warm pool. Script cần biết instance đang hướng tới trạng thái Warmed:Stopped hay InService.\n(A) SAI: Trong lúc được khởi tạo cho warm pool, instance cũng ở trạng thái running trước khi bị stop, nên kiểm tra trạng thái EC2 không phân biệt được.\n(B) SAI: Tag aws:autoscaling:groupName có trên cả instance vào warm pool lẫn instance vào service, nên không phân biệt được hai trường hợp.\n(C) ĐÚNG: Instance metadata autoscaling/target-lifecycle-state trả về trạng thái đích như Warmed:Stopped hoặc InService, cho phép user data chỉ đăng ký dịch vụ khi instance thật sự đi vào service.\n(D) SAI: Warmed:Pending chính là trạng thái của instance đang được đưa vào warm pool, nên logic này đăng ký đúng những instance không nên đăng ký.\nĐáp án đúng: C\nĐiểm cần nhớ: Dùng instance metadata autoscaling/target-lifecycle-state để phân biệt instance đang đi vào warm pool hay vào InService, và chỉ khởi động/đăng ký dịch vụ khi giá trị là InService.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Call DescribeInstanceStatus from the user data and continue only when the EC2 instance state is reported as running",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Check whether the aws:autoscaling:groupName tag is present on the instance and skip the registration when it is missing",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Read autoscaling/target-lifecycle-state from the instance metadata service and continue only when it returns InService",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Call DescribeAutoScalingInstances from the user data and continue only when the reported lifecycle state is Warmed:Pending",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 3,
+      "questionType": "MCQ",
+      "questionText": "To shorten scale-out time, an engineer runs put-warm-pool against an Auto Scaling group that uses a mixed instances policy with an On-Demand base capacity of 4 and all remaining capacity on Spot across six instance types. The call fails with a validation error. What is the cause?",
+      "explanation": "Phân tích đề: Group có mixed instances policy và dùng Spot; cần biết giới hạn của warm pool.\n(A) SAI: Warm pool hoạt động với launch template; việc dùng launch template không phải nguyên nhân gây lỗi.\n(B) ĐÚNG: Đây là giới hạn được tài liệu hóa: không thể thêm warm pool vào group có mixed instances policy hoặc launch Spot Instances. Bẫy: nhiều người nghĩ lỗi do thiếu tham số của warm pool.\n(C) SAI: Lifecycle hook là tùy chọn khi dùng warm pool, không phải điều kiện tiên quyết để tạo warm pool.\n(D) SAI: MaxGroupPreparedCapacity là tham số tùy chọn (mặc định dựa trên max size của group); không có quy định bắt buộc theo số instance type.\nĐáp án đúng: B\nĐiểm cần nhớ: Warm pool không hỗ trợ Auto Scaling group có mixed instances policy hoặc launch Spot Instances. Muốn tăng tốc scale-out cho group Spot thì dùng cách khác như bake AMI hoặc tách group On-Demand riêng.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Warm pools can be used only with a launch configuration, and the group references a launch template",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Warm pools are not supported for groups that use a mixed instances policy or launch Spot Instances",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "A launching lifecycle hook must exist on the group before a warm pool can be created for it",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "MaxGroupPreparedCapacity is mandatory for groups with more than one instance type and was not specified",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 4,
+      "questionType": "MCQ",
+      "questionText": "Before an instance is terminated, a batch worker must finish its current job, which can run for up to 3 hours. The terminating lifecycle hook already uses the maximum heartbeat timeout of 7,200 seconds, yet some instances are terminated before their jobs finish. What should the engineer do?",
+      "explanation": "Phân tích đề: Job dài 3 giờ, vượt heartbeat timeout tối đa 7.200 giây của lifecycle hook. Cần kéo dài thời gian chờ mà không thay đổi được timeout.\n(A) ĐÚNG: Mỗi lần gọi RecordLifecycleActionHeartbeat sẽ reset heartbeat timeout, cho phép giữ instance ở Terminating:Wait lâu hơn 2 giờ; khi job xong thì gọi CompleteLifecycleAction.\n(B) SAI: DefaultResult chỉ quyết định hành động khi hết timeout; với terminating hook thì CONTINUE hay ABANDON đều để instance bị terminate, không kéo dài thời gian chờ.\n(C) SAI: Heartbeat timeout tối đa là 7.200 giây, không thể đặt 10.800 giây.\n(D) SAI: Deregistration delay chỉ điều khiển việc drain kết nối ở load balancer (tối đa 3.600 giây) và không ảnh hưởng thời gian chờ của lifecycle hook.\nĐáp án đúng: A\nĐiểm cần nhớ: Heartbeat timeout của lifecycle hook tối đa 7.200 giây; muốn chờ lâu hơn thì gọi RecordLifecycleActionHeartbeat định kỳ (tổng tối đa 48 giờ hoặc 100 lần heartbeat timeout, lấy giá trị nhỏ hơn) rồi CompleteLifecycleAction.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Have the worker call RecordLifecycleActionHeartbeat periodically, then CompleteLifecycleAction when done",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Set the DefaultResult of the lifecycle hook to CONTINUE so the instance waits until the job completes",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Raise the heartbeat timeout of the lifecycle hook to 10,800 seconds so it covers the longest job",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Increase the target group deregistration delay to 3 hours so the instance stays in Terminating:Wait longer",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 5,
+      "questionType": "MCQ",
+      "questionText": "A terminating lifecycle hook runs a script that checks whether a storage node still holds unreplicated data. When the check fails, the script calls CompleteLifecycleAction with LifecycleActionResult set to ABANDON, expecting the instance to be kept. The instance is terminated anyway. Which statement explains this behaviour?",
+      "explanation": "Phân tích đề: Kỳ vọng sai rằng ABANDON trên terminating hook sẽ giữ instance lại.\n(A) SAI: Kể cả khi hết timeout thì với terminating hook DefaultResult nào cũng dẫn đến terminate; giải thích này ngầm cho rằng ABANDON đúng hạn sẽ giữ instance, điều đó sai.\n(B) SAI: Kết quả lifecycle action không phụ thuộc vào health check type của group.\n(C) SAI: Bật scale-in protection sau khi instance đã vào Terminating:Wait không kéo nó ra khỏi quá trình terminate; protection chỉ có tác dụng trước khi instance được chọn để scale-in.\n(D) ĐÚNG: Theo tài liệu, trên terminating hook cả hai kết quả đều cho phép terminate; ABANDON chỉ khiến các lifecycle action còn lại bị bỏ qua. Bẫy: ABANDON chỉ \"hủy instance\" ở launching hook.\nĐáp án đúng: D\nĐiểm cần nhớ: Với terminating hook, CONTINUE và ABANDON đều dẫn đến terminate; khác biệt duy nhất là ABANDON bỏ qua các lifecycle hook còn lại. Muốn không bị chọn khi scale-in thì dùng scale-in protection từ trước.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "The heartbeat must have expired before the call arrived, so the hook applied its DefaultResult instead of ABANDON",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "ABANDON is honoured only when the group health check type is ELB; with EC2 health checks it is ignored",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "ABANDON keeps the instance only if instance scale-in protection is enabled on it after the hook starts",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "For terminating hooks, CONTINUE and ABANDON both let termination proceed; ABANDON just skips remaining hooks",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 6,
+      "questionType": "MSQ",
+      "questionText": "A compliance rule requires that the /var/audit directory, which exists only on local disk, be archived to Amazon S3 before any instance in an Auto Scaling group is terminated by scale in. The team wants an event-driven solution with no scheduled jobs and no changes to the application code. Which TWO steps together meet this requirement?",
+      "explanation": "Phân tích đề: Cần giữ instance lại trước khi terminate, có hành động dựa trên sự kiện để copy dữ liệu, không sửa code ứng dụng, không dùng job định kỳ.\n(A) ĐÚNG: Lifecycle hook giữ instance ở Terminating:Wait; EventBridge nhận sự kiện lifecycle action và kích hoạt Run Command chạy trên đúng instance đó, hoàn toàn theo sự kiện.\n(B) ĐÚNG: Sau khi copy xong, gọi complete-lifecycle-action để group tiếp tục terminate ngay thay vì chờ hết timeout.\n(C) SAI: User data chạy lúc khởi động, không có phần chạy khi shutdown; và không có gì giữ instance đủ lâu để đảm bảo upload hoàn tất.\n(D) SAI: S3 Lifecycle chỉ chuyển lớp lưu trữ hoặc xóa object đã có trong bucket, không thể kéo dữ liệu từ EC2.\n(E) SAI: EC2 termination protection không ngăn Auto Scaling terminate instance và cũng không kích hoạt việc copy.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Mẫu chuẩn: terminating lifecycle hook + EventBridge rule (EC2 Instance-terminate Lifecycle Action) + SSM Run Command chạy trên instance, cuối cùng gọi complete-lifecycle-action.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Add a terminating lifecycle hook and an EventBridge rule for the EC2 Instance-terminate Lifecycle Action event that runs an SSM Run Command document on the instance",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Have the Run Command document copy the directory to S3 and then call complete-lifecycle-action so that termination can continue",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Add a shutdown section to the user data so that the directory is uploaded when the operating system receives the shutdown signal",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Create an S3 Lifecycle rule on the audit bucket that pulls the directory from instances tagged with the Auto Scaling group name",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Enable EC2 termination protection in the launch template so that the instance cannot be removed until the copy has started",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 7,
+      "questionType": "MSQ",
+      "questionText": "A previous instance refresh on a 30-instance group was cancelled halfway, so 15 instances already run launch template version 8 and 15 still run version 7. For the new rollout, in-service capacity must never drop below 100 percent, and instances that already run version 8 must not be replaced again. Which TWO instance refresh preferences should be used?",
+      "explanation": "Phân tích đề: Hai yêu cầu: không bao giờ giảm dưới 100% capacity (phải launch trước, terminate sau) và không thay lại các instance đã đúng cấu hình.\n(A) SAI: MinHealthyPercentage 50 cho phép capacity giảm còn một nửa, vi phạm yêu cầu 100%.\n(B) SAI: StandbyInstances chỉ quyết định cách xử lý instance đang Standby; nó không đánh dấu hay bỏ qua instance theo version.\n(C) ĐÚNG: SkipMatching bỏ qua các instance đã khớp desired configuration, nên 15 instance chạy version 8 không bị thay lại.\n(D) ĐÚNG: Khi MaxHealthyPercentage lớn hơn 100, refresh được phép vượt desired capacity tạm thời để launch instance mới trước, giữ 100% capacity trong suốt quá trình.\n(E) SAI: ScaleInProtectedInstances chỉ áp dụng cho instance có scale-in protection; các instance version 8 không được bảo vệ nên tùy chọn này không giúp bỏ qua chúng.\nĐáp án đúng: C và D\nĐiểm cần nhớ: Instance refresh: MinHealthyPercentage 100 + MaxHealthyPercentage > 100 = launch trước rồi mới terminate; SkipMatching bỏ qua instance đã khớp desired configuration.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Set MinHealthyPercentage to 50 with a checkpoint at 50 percent so the remaining half is replaced in a single batch",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Set StandbyInstances to Wait so the refresh pauses until instances on version 8 have been moved into Standby",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Enable SkipMatching with a desired configuration that points at launch template version 8 so matching instances stay in place",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Set MinHealthyPercentage 100 and MaxHealthyPercentage 120 so replacements launch before old instances terminate",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Set ScaleInProtectedInstances to Ignore so that the instances already running launch template version 8 are skipped by the refresh",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 8,
+      "questionType": "MCQ",
+      "questionText": "An instance refresh deploys a new AMI to a production Auto Scaling group. Last month a bad build passed ELB health checks but doubled p99 latency, and nobody noticed until the refresh had finished. The team wants future refreshes to undo themselves automatically if latency degrades while the refresh is running. What should they configure?",
+      "explanation": "Phân tích đề: Build lỗi vẫn qua health check, nên cần tín hiệu khác (latency) và cơ chế rollback tự động trong chính instance refresh.\n(A) ĐÚNG: Với AutoRollback và AlarmSpecification, nếu alarm latency chuyển sang ALARM trong lúc refresh, Auto Scaling tự rollback về launch template/cấu hình trước đó.\n(B) SAI: CancelInstanceRefresh chỉ dừng refresh; các instance đã thay bằng build lỗi vẫn giữ nguyên, không hoàn tác được.\n(C) SAI: Grace period chỉ hoãn đánh giá health check; ELB health check vẫn không đo p99 latency nên build lỗi vẫn qua.\n(D) SAI: Slow start chỉ tăng dần traffic cho target mới, không phát hiện suy giảm latency và không rollback.\nĐáp án đúng: A\nĐiểm cần nhớ: Instance refresh hỗ trợ AutoRollback kèm AlarmSpecification: khi CloudWatch alarm vào ALARM trong lúc refresh, group tự quay về cấu hình trước. Cancel chỉ dừng, không hoàn tác.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Enable AutoRollback on the refresh and supply an AlarmSpecification that includes a latency alarm",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create a latency alarm whose alarm action invokes a Lambda function that calls CancelInstanceRefresh",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Lengthen the health check grace period so latency problems surface during the instance warmup",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Configure a slow start duration on the target group so new instances receive traffic gradually",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 9,
+      "questionType": "MCQ",
+      "questionText": "After an instance refresh reported Successful, a security scan shows that 6 of the 24 instances in the group still run the old, vulnerable AMI. Those 6 instances have instance scale-in protection enabled because they run a leader-election workload, and the refresh used default preferences. How should the engineer make the next instance refresh replace them?",
+      "explanation": "Phân tích đề: Refresh mặc định bỏ qua instance có scale-in protection. Cần tùy chọn để refresh xử lý cả chúng.\n(A) SAI: MinHealthyPercentage chỉ điều khiển tốc độ thay thế và capacity tối thiểu; không vượt qua được scale-in protection và còn gây mất capacity.\n(B) ĐÚNG: Mặc định là Ignore nên 6 instance được bảo vệ bị bỏ qua; đặt Refresh để refresh thay cả chúng.\n(C) SAI: StandbyInstances chỉ áp dụng cho instance ở trạng thái Standby, không liên quan scale-in protection.\n(D) SAI: SkipMatching dùng để bỏ qua instance đã khớp cấu hình; nó không làm refresh xử lý instance có scale-in protection.\nĐáp án đúng: B\nĐiểm cần nhớ: Preference ScaleInProtectedInstances có Refresh | Ignore (mặc định) | Wait. Muốn thay cả instance được bảo vệ thì dùng Refresh.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Set MinHealthyPercentage to 0 so the refresh is allowed to terminate protected instances",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Set the ScaleInProtectedInstances preference to Refresh so protected instances are replaced too",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Set the StandbyInstances preference to Terminate so that the protected instances are replaced as well",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Enable SkipMatching so the refresh compares every instance's AMI, including protected ones",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 10,
+      "questionType": "MCQ",
+      "questionText": "An operator needs about one hour to patch and troubleshoot a single instance in an Auto Scaling group. During that time the instance must receive no load balancer traffic, must not be replaced by health checks, and must rejoin the group afterwards without the group launching any additional instance. Which action should be taken?",
+      "explanation": "Phân tích đề: Cần tạm rút một instance khỏi phục vụ, không bị health check thay thế, rồi đưa lại vào group; không tăng số instance.\n(A) SAI: Scale-in protection không ngăn thay thế khi health check thất bại; khi ứng dụng bị dừng để patch, instance có thể bị thay.\n(B) SAI: Suspend process ảnh hưởng toàn bộ group, và instance vẫn đăng ký với target group nên traffic chỉ dừng khi target bị đánh dấu unhealthy.\n(C) SAI: Đánh dấu Unhealthy khiến group terminate và thay thế instance, trái với yêu cầu giữ lại instance.\n(D) ĐÚNG: Standby deregister instance khỏi load balancer và ngừng health check trên nó; giảm desired capacity để group không launch thay thế; exit-standby đưa instance quay lại InService.\nĐáp án đúng: D\nĐiểm cần nhớ: Standby: instance vẫn thuộc group nhưng bị deregister khỏi load balancer, không bị health check; chọn decrement desired capacity để group không launch thay thế, xong thì exit-standby.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Enable scale-in protection on the instance and deregister it from the target group manually for the hour",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Suspend the HealthCheck and ReplaceUnhealthy processes and stop the application on that instance",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Call SetInstanceHealth with Unhealthy so the instance is taken out of rotation for patching",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Put the instance into Standby with the option to decrement desired capacity, then run exit-standby",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 11,
+      "questionType": "MSQ",
+      "questionText": "GuardDuty reports that an instance in a production Auto Scaling group is communicating with a known command-and-control IP address. The security team must keep the instance running so memory can be captured, stop it from serving customers, and let the group restore its normal capacity automatically. Which TWO actions should be taken?",
+      "explanation": "Phân tích đề: Giữ instance chạy (để lấy memory), cô lập khỏi traffic, group phải tự khôi phục capacity.\n(A) ĐÚNG: Security group cô lập chặn liên lạc với C2 và khách hàng nhưng giữ instance chạy để capture memory; snapshot EBS bảo toàn bằng chứng đĩa.\n(B) SAI: Terminate làm mất toàn bộ memory và trạng thái đang chạy; bản dựng từ AMI không chứa dấu vết xâm nhập.\n(C) SAI: Instance bị đánh dấu Unhealthy sẽ bị terminate, mất bằng chứng memory.\n(D) ĐÚNG: Detach đưa instance ra khỏi group và deregister khỏi load balancer; không giảm desired capacity nên group tự launch instance thay thế.\n(E) SAI: Giảm desired capacity nghĩa là group không launch instance thay thế, trái yêu cầu khôi phục capacity; instance vẫn còn là thành viên của group.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Sự cố bảo mật trên instance thuộc ASG: detach (không giảm desired để có instance thay), cô lập bằng security group forensic, snapshot EBS; không terminate, không SetInstanceHealth.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Attach a restrictive forensic security group to the instance and create snapshots of all of its EBS volumes",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Terminate the instance at once and launch a copy from the most recent AMI so that it can be analysed offline",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Call SetInstanceHealth with a status of Unhealthy so that the group isolates the instance and launches a replacement",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Detach the instance from the Auto Scaling group without decrementing the desired capacity so that a replacement is launched",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Put the instance into Standby and decrement the desired capacity so that health checks stop evaluating it",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 12,
+      "questionType": "MCQ",
+      "questionText": "A legacy application runs in an Auto Scaling group that is not behind any load balancer. A local watchdog can detect when the application process is deadlocked, but EC2 status checks keep passing, so the group never replaces the instance. The group must replace deadlocked instances with the LEAST change to the architecture. What should the engineer do?",
+      "explanation": "Phân tích đề: Không có load balancer; EC2 status check không thấy lỗi ứng dụng; watchdog đã biết lỗi; cần group thay thế instance với thay đổi ít nhất.\n(A) SAI: Reboot không phải thay thế instance, và alarm action theo từng instance không quản lý được fleet động của group.\n(B) SAI: Có thể hoạt động nhưng thêm load balancer, target group và thay đổi kiến trúc, không phải thay đổi ít nhất.\n(C) ĐÚNG: SetInstanceHealth cho phép báo health tùy chỉnh; group sẽ terminate và thay instance bị đánh dấu Unhealthy. Chỉ cần quyền IAM cho watchdog.\n(D) SAI: Instance status check kiểm tra hệ điều hành và mạng của instance, không phải tiến trình ứng dụng; dừng ứng dụng không làm check thất bại.\nĐáp án đúng: C\nĐiểm cần nhớ: Custom health check: gọi SetInstanceHealth với trạng thái Unhealthy, group sẽ thay instance đó mà không cần thêm load balancer.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create a CloudWatch alarm on the watchdog metric with the EC2 reboot action for that instance",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Add a Network Load Balancer only for health checks and switch the group health check type to ELB",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Have the watchdog call SetInstanceHealth with a health status of Unhealthy for its own instance",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Have the watchdog stop the application process so that the EC2 instance status check fails",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 13,
+      "questionType": "MCQ",
+      "questionText": "A game studio runs session servers in an Auto Scaling group. On scale in, the group should remove the instances hosting the fewest active players, a value available only from the studio's matchmaking API. None of the built-in termination policies can express this rule. What should the DevOps engineer implement?",
+      "explanation": "Phân tích đề: Tiêu chí chọn instance để terminate chỉ có ở API riêng; các termination policy có sẵn không đáp ứng.\n(A) SAI: OldestInstance chọn theo tuổi instance, không theo số người chơi; lịch cố định không giải quyết tiêu chí.\n(B) SAI: Alarm của scaling policy chỉ quyết định khi nào và bao nhiêu, không quyết định instance nào bị terminate.\n(C) SAI: Với terminating hook, ABANDON vẫn để instance bị terminate, nên không thể dùng để chọn lại instance.\n(D) ĐÚNG: Auto Scaling gọi Lambda function của custom termination policy khi scale-in; function có thể gọi API matchmaking và trả về instance có ít người chơi nhất.\nĐáp án đúng: D\nĐiểm cần nhớ: Custom termination policy: chỉ định ARN Lambda function trong TerminationPolicies; function nhận danh sách ứng viên và trả về InstanceIDs cần terminate.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "The OldestInstance termination policy combined with scheduled scale-in outside peak hours",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "A step scaling policy whose CloudWatch alarm dimensions select the instances that have the fewest players",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "A terminating lifecycle hook that completes with ABANDON for instances that still host players",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "A custom termination policy backed by a Lambda function that returns the instance IDs to terminate",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 14,
+      "questionType": "MCQ",
+      "questionText": "An engineer enabled instance scale-in protection on the primary node of a clustered application running in an Auto Scaling group. Later the node's application hung, the target group marked it unhealthy, and the group terminated and replaced it, forcing a cluster failover. The engineer believed scale-in protection would prevent this. What is the explanation?",
+      "explanation": "Phân tích đề: Instance có scale-in protection vẫn bị thay thế do health check thất bại.\n(A) ĐÚNG: Theo tài liệu, scale-in protection không bảo vệ instance khỏi việc bị thay thế khi health check thất bại. Bẫy: tên \"protection\" khiến nhiều người nghĩ nó chặn mọi kiểu terminate.\n(B) SAI: Có thể bật scale-in protection cho từng instance đang chạy (SetInstanceProtection); launch template không có thiết lập này.\n(C) SAI: Việc deregister khỏi target group không tự gỡ scale-in protection.\n(D) SAI: Scale-in protection không phụ thuộc health check type; với health check EC2, instance lỗi vẫn bị thay.\nĐáp án đúng: A\nĐiểm cần nhớ: Scale-in protection chỉ bảo vệ khỏi scale-in. Nó không ngăn thay thế do health check, Spot interruption hay terminate thủ công.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Scale-in protection guards only against scale in; it does not stop replacement after a failed health check",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Scale-in protection must be set in the launch template, so enabling it on a running instance has no effect",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Scale-in protection is removed automatically whenever the instance is deregistered from its load balancer target group",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Scale-in protection is honoured only when the group health check type is EC2 rather than ELB",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 15,
+      "questionType": "MCQ",
+      "questionText": "To keep a handful of stateful instances alive, an administrator enabled EC2 termination protection (DisableApiTermination) on them. During the next scale in, the Auto Scaling group terminated two of those instances anyway. Which change prevents the group from choosing these instances during scale in?",
+      "explanation": "Phân tích đề: EC2 termination protection không có tác dụng với Auto Scaling; cần cơ chế của chính Auto Scaling.\n(A) SAI: Stop protection (DisableApiStop) cũng là thuộc tính EC2 và không ảnh hưởng quyết định scale-in của Auto Scaling.\n(B) SAI: Thuộc tính này chỉ áp dụng khi shutdown được khởi tạo từ bên trong hệ điều hành, không liên quan scale-in.\n(C) ĐÚNG: Scale-in protection là cơ chế của Auto Scaling, khiến group không chọn các instance này khi scale-in.\n(D) SAI: Default termination policy không đọc tag để loại trừ instance; không có cơ chế như vậy. Bẫy: EC2 termination protection tưởng là đủ.\nĐáp án đúng: C\nĐiểm cần nhớ: EC2 termination protection không ngăn Auto Scaling terminate instance. Dùng instance scale-in protection của Auto Scaling.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Enable stop protection as well so that both stop and terminate API calls are blocked",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Set the InstanceInitiatedShutdownBehavior attribute of these instances to stop instead of terminate",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Enable instance scale-in protection for these instances in the group",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Add an exclusion tag to these instances that the Default termination policy skips during scale in",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 16,
+      "questionType": "MCQ",
+      "questionText": "An Auto Scaling group spread across three Availability Zones runs a stateful cache cluster, and rebuilding a node takes hours. After a zonal outage ended, the group launched instances in the recovered zone and terminated healthy nodes in the other two zones, triggering expensive rebuilds. Dynamic scaling and health-check replacement must keep working. What should the engineer do?",
+      "explanation": "Phân tích đề: Hành vi cân bằng lại AZ sau sự cố gây terminate node khỏe; phải giữ scaling và thay thế instance lỗi.\n(A) SAI: Bỏ subnet làm giảm khả năng chịu lỗi AZ lâu dài; không phải cách xử lý đúng.\n(B) ĐÚNG: AZRebalance là nguyên nhân gây launch ở AZ đã phục hồi rồi terminate ở AZ khác; suspend riêng process này không ảnh hưởng Launch, Terminate, HealthCheck hay ReplaceUnhealthy.\n(C) SAI: Termination policy chỉ chọn instance nào bị terminate; group vẫn tiếp tục cân bằng lại AZ.\n(D) SAI: Suspend Launch và Terminate làm dừng cả dynamic scaling và thay thế instance lỗi, vi phạm yêu cầu.\nĐáp án đúng: B\nĐiểm cần nhớ: AZRebalance là process tự cân bằng số instance giữa các AZ (launch trước, terminate sau). Với workload stateful khó rebuild, suspend riêng AZRebalance.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Remove the recovered zone's subnet from the group permanently",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Suspend the AZRebalance process on the group",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Change the termination policy to NewestInstance so that the recovered zone is preferred",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Suspend the Launch and Terminate processes until the next maintenance window",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 17,
+      "questionType": "MCQ",
+      "questionText": "A reporting tier must scale out on CPU during the day, but finance wants scale in to happen only once, at 20:00, through a scheduled action that resets capacity. Ad-hoc scale in during business hours has been interrupting long report jobs. How should the target tracking policy be configured?",
+      "explanation": "Phân tích đề: Target tracking chỉ được scale-out; scale-in giao cho scheduled action buổi tối.\n(A) SAI: Target 100% khiến policy gần như không bao giờ scale-out, phá vỡ yêu cầu scale-out ban ngày.\n(B) ĐÚNG: DisableScaleIn khiến policy không tạo hành động scale-in, vẫn scale-out theo CPU; scheduled action lúc 20:00 lo việc thu nhỏ.\n(C) SAI: Scheduled action chỉ đặt min, max và desired, không suspend process được; và suspend Terminate còn chặn thay thế instance lỗi.\n(D) SAI: Default cooldown chỉ áp dụng cho simple scaling, không phải target tracking; và nó cũng chặn luôn scale-out.\nĐáp án đúng: B\nĐiểm cần nhớ: Target tracking có thuộc tính DisableScaleIn để chỉ scale-out; scale-in thực hiện bằng cách khác (scheduled action hoặc policy riêng).",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Set the target value to 100 percent so the policy never finds a reason to scale in",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Set DisableScaleIn to true on the policy and keep the scheduled action for the evening",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Use scheduled actions to suspend the Terminate process at 08:00 and resume it again at 20:00",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Set the group default cooldown to 12 hours so scale-in cannot happen until the evening",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 18,
+      "questionType": "MCQ",
+      "questionText": "To make a target tracking policy scale in faster, an engineer edited the low alarm that the policy created, reducing its evaluation periods from 15 to 3. A few days later, after the policy was updated, the alarm was back to its original settings. The team needs a supported way to control how aggressively the group scales in. What should they do?",
+      "explanation": "Phân tích đề: Alarm do target tracking tạo và quản lý; chỉnh tay không được hỗ trợ và bị ghi đè.\n(A) ĐÚNG: Alarm của target tracking không được chỉnh tay. Tắt scale-in trên target tracking và dùng step scaling với alarm tự quản lý cho phép đặt evaluation periods tùy ý một cách được hỗ trợ.\n(B) SAI: Alarm ở Region khác không gắn với scaling policy của group, nên không điều khiển được scale-in.\n(C) SAI: CloudWatch alarm không có resource-based policy để khóa chỉnh sửa; alarm vẫn thuộc quyền quản lý của Auto Scaling.\n(D) SAI: Không có tag nào biến alarm do Auto Scaling quản lý thành alarm của khách hàng; chỉnh sửa vẫn bị ghi đè.\nĐáp án đúng: A\nĐiểm cần nhớ: Không sửa hay xóa CloudWatch alarm mà target tracking tạo ra. Cần kiểm soát ngưỡng chi tiết thì dùng step scaling với alarm do mình quản lý.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Disable scale in on the tracking policy and add a step scaling policy with an alarm the team owns",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Recreate the alarm under the same name in another Region so it is no longer managed by Auto Scaling",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Protect the edited alarm with a resource-based policy so that later policy updates cannot overwrite it",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Edit the low alarm again and add a tag so Auto Scaling treats it as a customer managed alarm",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 19,
+      "questionType": "MCQ",
+      "questionText": "Workers in an Auto Scaling group consume messages from an Amazon SQS queue. The team wants each instance to carry roughly 50 messages of backlog, but does not want to maintain a Lambda function or cron job that publishes a custom backlog-per-instance metric. Which approach meets this requirement with the LEAST operational overhead?",
+      "explanation": "Phân tích đề: Cần scale theo backlog mỗi instance nhưng không muốn duy trì code publish metric tùy chỉnh.\n(A) SAI: Predictive scaling dự báo từ lịch sử theo chu kỳ, không duy trì backlog mỗi instance theo thời gian thực.\n(B) SAI: Tuổi message không phải backlog mỗi instance, và step scaling cần tự thiết kế nhiều ngưỡng.\n(C) ĐÚNG: Customized metric specification của target tracking hỗ trợ metric math, tính trực tiếp backlog mỗi instance mà không cần code publish metric.\n(D) SAI: Metric tổng hàng đợi không giảm tỷ lệ theo số instance; target 50 cho cả hàng đợi không phải 50 mỗi instance.\nĐáp án đúng: C\nĐiểm cần nhớ: Target tracking hỗ trợ metric math trong customized metric specification: ví dụ ApproximateNumberOfMessagesVisible / GroupInServiceInstances, không cần Lambda publish metric.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Predictive scaling that uses ApproximateNumberOfMessagesVisible as a custom load metric for the forecast",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Step scaling on ApproximateAgeOfOldestMessage, adding one instance for every additional 50 seconds of message age in the queue",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Target tracking with a metric math expression dividing ApproximateNumberOfMessagesVisible by GroupInServiceInstances, target 50",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Target tracking on the queue's ApproximateNumberOfMessagesVisible metric with a target value of 50 for the whole queue",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 20,
+      "questionType": "MCQ",
+      "questionText": "An Auto Scaling group has two target tracking policies: one keeps average CPU at 60 percent and the other keeps ALBRequestCountPerTarget at 1,000. At a given moment the CPU policy calculates that 8 instances are needed and the request policy calculates 12. The group currently has 10 instances. What does Auto Scaling do?",
+      "explanation": "Phân tích đề: Nhiều policy cho kết quả khác nhau; cần biết quy tắc chọn.\n(A) SAI: Auto Scaling không chờ các policy thống nhất; nó chọn kết quả lớn nhất.\n(B) SAI: Thứ tự tạo policy không quyết định ưu tiên.\n(C) SAI: Auto Scaling không lấy trung bình kết quả các policy.\n(D) ĐÚNG: Auto Scaling ưu tiên policy cho capacity lớn nhất để đảm bảo đủ tài nguyên, nên group lên 12.\nĐáp án đúng: D\nĐiểm cần nhớ: Khi nhiều scaling policy cùng hoạt động, Auto Scaling chọn policy cho capacity lớn nhất, cả khi scale-out lẫn scale-in.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "It stays at 10, because conflicting policies are held until both of them agree",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "It scales in to 8, because the CPU policy was created first and takes precedence",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "It moves to the average of both results and keeps adjusting as the metrics change",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "It scales out to 12, because it picks the policy that gives the largest capacity",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 21,
+      "questionType": "MCQ",
+      "questionText": "A group uses a simple scaling policy that adds 2 instances when CPU exceeds 80 percent, with the default 300-second cooldown. During a steep traffic ramp the alarm stays in ALARM, but the group adds only 2 instances every 5 minutes and falls behind. The team wants the group to keep responding to the alarm while a scaling activity is still in progress. What should they change?",
+      "explanation": "Phân tích đề: Simple scaling bị khóa bởi cooldown; cần loại policy vẫn phản ứng khi hoạt động scaling đang diễn ra.\n(A) SAI: Kích hoạt sớm hơn vẫn bị khóa bởi cooldown 300 giây sau mỗi lần thêm 2 instance.\n(B) SAI: Grace period chỉ liên quan health check, không liên quan cooldown hay tốc độ phản ứng của policy.\n(C) ĐÚNG: Step scaling tiếp tục phản ứng với alarm trong khi hoạt động scaling đang chạy và có thể thêm bước lớn hơn khi mức vượt ngưỡng cao hơn.\n(D) SAI: CPUUtilization mặc định của EC2 là metric độ phân giải chuẩn (1 hoặc 5 phút), không phải high-resolution; và cooldown vẫn khóa policy.\nĐáp án đúng: C\nĐiểm cần nhớ: Simple scaling chờ hết cooldown mới phản ứng tiếp; step scaling tiếp tục đáp ứng alarm trong lúc scaling (dùng instance warmup thay cho cooldown).",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Lower the alarm threshold to 60 percent so the simple scaling policy triggers earlier",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Increase the health check grace period so new instances are counted in the metric sooner",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Replace the simple scaling policy with a step scaling policy that uses instance warmup",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Use a 10-second alarm period on the default EC2 CPUUtilization metric for faster evaluation",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 22,
+      "questionType": "MCQ",
+      "questionText": "A company in Sydney scales a development Auto Scaling group to 0 at 19:00 and back to 4 at 07:00 local time, using scheduled actions written as UTC cron expressions. Twice a year, developers find the environment starting an hour late or stopping an hour early. What is the simplest fix?",
+      "explanation": "Phân tích đề: Lịch viết theo UTC nên lệch một giờ khi Sydney chuyển giờ mùa hè.\n(A) SAI: Có thể chạy nhưng phải duy trì hai bộ lịch và logic chuyển đổi, không phải cách đơn giản nhất.\n(B) ĐÚNG: Tham số TimeZone của scheduled action tự tính đến daylight saving time, nên 07:00 và 19:00 luôn đúng giờ địa phương.\n(C) SAI: Predictive scaling không đưa group về 0 theo giờ cố định; nó dự báo tải để tăng capacity.\n(D) SAI: Vẫn dùng cron UTC nên lệch giờ vẫn xảy ra. Bẫy: đổi công cụ nhưng không đổi múi giờ.\nĐáp án đúng: B\nĐiểm cần nhớ: Scheduled action có tham số TimeZone (tên IANA, ví dụ Australia/Sydney) và tự xử lý daylight saving time; không cần duy trì hai bộ lịch.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create a second pair of scheduled actions for daylight saving time and switch between the pairs with an EventBridge rule",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Set the TimeZone of the scheduled actions to Australia/Sydney and write the cron expressions in local time",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Replace the scheduled actions with predictive scaling so the start and stop times are learned automatically",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Move the schedule to an EventBridge Scheduler job that calls SetDesiredCapacity with the same UTC cron expressions",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 23,
+      "questionType": "MCQ",
+      "questionText": "Ahead of a televised event at 20:00, a scheduled action sets the desired capacity of a web tier to 40 instances at 19:30. The group also has a CPU target tracking policy. Within 15 minutes of the scheduled action the group was back to 12 instances, and capacity was insufficient when the event started. Which change keeps at least 40 instances in place for the event?",
+      "explanation": "Phân tích đề: Scheduled action chỉ đặt desired; dynamic scaling scale-in lại vì CPU thấp trước giờ sự kiện.\n(A) ĐÚNG: Dynamic scaling không bao giờ scale-in dưới MinSize, nên nâng min lên 40 giữ được capacity cho sự kiện.\n(B) SAI: Instance warmup ảnh hưởng cách tính metric khi scale-out, không đảm bảo policy không scale-in xuống dưới 40.\n(C) SAI: Nâng max không buộc group chạy 40 instance; target tracking vẫn giữ ở mức CPU yêu cầu.\n(D) SAI: Scheduled action chỉ đặt min, max và desired; không bật scale-in protection được.\nĐáp án đúng: A\nĐiểm cần nhớ: Muốn giữ capacity sàn khi có dynamic scaling, scheduled action phải nâng MinSize (và hạ lại sau), không chỉ đặt DesiredCapacity.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Have the scheduled action raise the group's minimum size to 40, with a later action to lower it",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Raise the instance warmup of the target tracking policy to 1 hour so the new instances are ignored",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Have the scheduled action raise the maximum size to 40 instead of the desired capacity",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Enable scale-in protection for the whole group at 19:30 using a second scheduled action",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 24,
+      "questionType": "MCQ",
+      "questionText": "A team wants to add predictive scaling to a web tier but is not sure its traffic pattern is regular enough. Capacity must not change because of the new policy until its forecast has been compared with actual load for two weeks. What should the team do?",
+      "explanation": "Phân tích đề: Cần đánh giá dự báo trước mà không để policy thay đổi capacity.\n(A) SAI: SchedulingBufferTime chỉ điều chỉnh thời điểm launch trước dự báo; policy vẫn scale.\n(B) SAI: HonorMaxCapacity chỉ giới hạn không vượt max; policy vẫn scale trong khoảng min và max.\n(C) SAI: Anomaly detection không đánh giá dự báo của predictive scaling; cách này bỏ qua chính policy cần đánh giá.\n(D) ĐÚNG: ForecastOnly tạo dự báo có thể xem trong console/CloudWatch mà không thay đổi capacity; sau khi thấy khớp thì chuyển sang ForecastAndScale.\nĐáp án đúng: D\nĐiểm cần nhớ: Predictive scaling có mode ForecastOnly (chỉ dự báo) và ForecastAndScale (dự báo và scale). Bắt đầu bằng ForecastOnly để đánh giá.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create the predictive policy with a scheduling buffer time of zero so it forecasts without launching instances",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create the predictive policy with MaxCapacityBreachBehavior set to HonorMaxCapacity at the current maximum size",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Enable CloudWatch anomaly detection on request count for two weeks and then decide which scheduled actions to create",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Create the predictive policy in ForecastOnly mode, review the forecast, then switch to ForecastAndScale",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 25,
+      "questionType": "MCQ",
+      "questionText": "Predictive scaling forecasts that a Monday morning peak will need 55 instances, but the group's maximum size is 50. The team does not want to raise the maximum permanently, because it is a safety guard against runaway dynamic scaling. How can predictive scaling exceed the maximum only when its forecast requires it?",
+      "explanation": "Phân tích đề: Chỉ predictive scaling được vượt max, và chỉ khi dự báo cần.\n(A) ĐÚNG: IncreaseMaxCapacity cho phép predictive scaling nâng max khi dự báo vượt max, giới hạn bởi MaxCapacityBuffer; max của dynamic scaling không bị thay đổi thường trực.\n(B) SAI: SchedulingBufferTime chỉ launch sớm hơn, vẫn bị giới hạn bởi max size.\n(C) SAI: Lịch cố định không theo dự báo; nếu nhu cầu thay đổi thì mức 55 có thể sai, và đây cũng là nâng max cho mọi policy trong khoảng thời gian đó.\n(D) SAI: Target tracking cũng bị giới hạn bởi max size 50, và ForecastOnly thì không scale.\nĐáp án đúng: A\nĐiểm cần nhớ: Predictive scaling: MaxCapacityBreachBehavior = IncreaseMaxCapacity (kèm MaxCapacityBuffer) cho phép vượt max size theo dự báo; mặc định HonorMaxCapacity.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Set MaxCapacityBreachBehavior to IncreaseMaxCapacity with a MaxCapacityBuffer",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Set SchedulingBufferTime to 600 seconds so that capacity above the maximum is launched ahead of time",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Add a scheduled action every Monday that raises the maximum to 55 and lowers it again at noon",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Switch the policy to ForecastOnly mode and let target tracking handle demand above 50",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 26,
+      "questionType": "MCQ",
+      "questionText": "An Auto Scaling group uses a mixed instances policy with OnDemandBaseCapacity set to 2 and OnDemandPercentageAboveBaseCapacity set to 25. The desired capacity is 10, and every instance type has a weight of 1. How is the capacity split between purchase options?",
+      "explanation": "Phân tích đề: Tính On-Demand = base + phần trăm của phần vượt base.\n(A) SAI: Base 2 được cộng riêng, không nằm trong phần 25%; 25% áp dụng cho 8 instance trên base nên có thêm 2 On-Demand, không phải 1.\n(B) ĐÚNG: 2 On-Demand base, phần còn lại 8; 25% của 8 là 2 On-Demand, 6 Spot. Tổng 4 On-Demand, 6 Spot.\n(C) SAI: Tính 25% trên toàn bộ 10 rồi cộng base (2 + 2,5 làm tròn 3) là sai công thức; phần trăm chỉ áp dụng cho phần trên base.\n(D) SAI: Chỉ tính base, bỏ quên 25% của phần vượt base.\nĐáp án đúng: B\nĐiểm cần nhớ: On-Demand = OnDemandBaseCapacity + OnDemandPercentageAboveBaseCapacity × (desired − base). Ở đây 2 + 25% × 8 = 4 On-Demand, 6 Spot.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "3 On-Demand and 7 Spot, since the base is counted inside the 25 percent share",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "4 On-Demand and 6 Spot, since 25 percent of the 8 above base is On-Demand",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "5 On-Demand and 5 Spot, since 25 percent of all 10 is added to the base",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "2 On-Demand and 8 Spot, since only the base capacity is On-Demand",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 27,
+      "questionType": "MCQ",
+      "questionText": "A CI build fleet on Spot uses the lowest-price allocation strategy across 12 instance types and suffers frequent interruptions that restart long builds. Management wants interruptions to drop significantly while price still plays a role in choosing Spot pools. Which change should be made?",
+      "explanation": "Phân tích đề: Giảm interruption đáng kể nhưng vẫn cân nhắc giá.\n(A) SAI: Capacity Rebalancing chỉ phản ứng khi có rebalance recommendation; vẫn chọn pool rẻ nhất vốn hay bị thu hồi. Bẫy: xử lý triệu chứng chứ không đổi cách chọn pool.\n(B) SAI: Giới hạn giá tối đa thấp hơn còn làm tăng khả năng bị gián đoạn hoặc không launch được.\n(C) SAI: capacity-optimized bỏ qua giá hoàn toàn, vi phạm yêu cầu giá vẫn là một yếu tố.\n(D) ĐÚNG: price-capacity-optimized ưu tiên pool ít có khả năng bị gián đoạn rồi chọn giá thấp nhất trong số đó, đáp ứng cả hai yêu cầu.\nĐáp án đúng: D\nĐiểm cần nhớ: price-capacity-optimized chọn pool có capacity sẵn cao nhất rồi chọn giá thấp trong số đó; là chiến lược AWS khuyến nghị cho đa số workload Spot. lowest-price dễ bị gián đoạn.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Keep lowest-price and enable Capacity Rebalancing so that at-risk instances are replaced early",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Keep lowest-price and set the Spot maximum price to 50 percent of the On-Demand price",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Switch to capacity-optimized, which picks the pools with the most spare capacity regardless of price",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Switch to price-capacity-optimized",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 28,
+      "questionType": "MCQ",
+      "questionText": "A rendering farm uses an Auto Scaling group with explicit instance type overrides of c6i.large, c6i.xlarge and c6i.2xlarge. Capacity planning is done in vCPUs, and the team wants a desired capacity of 64 to mean 64 vCPUs regardless of which instance types Spot availability provides. What should they configure?",
+      "explanation": "Phân tích đề: Đơn vị capacity phải là vCPU cho danh sách instance type cụ thể.\n(A) SAI: Chia nhóm cố định làm mất lợi ích đa dạng pool Spot và tăng vận hành; nếu một loại thiếu capacity thì không bù được.\n(B) SAI: Target tracking trên CPUUtilization là phần trăm sử dụng, không định nghĩa đơn vị capacity.\n(C) ĐÚNG: Với weights 2, 4, 8 tương ứng vCPU, desired capacity 64 nghĩa là 64 vCPU dù group launch tổ hợp instance type nào.\n(D) SAI: Allocation strategy không ưu tiên kích thước; 8 instance có thể là 8 c6i.large (16 vCPU).\nĐáp án đúng: C\nĐiểm cần nhớ: Instance weighting: đặt WeightedCapacity cho từng override (ví dụ theo vCPU); desired, min, max khi đó tính theo đơn vị này.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create three Auto Scaling groups, one per instance type, each sized to deliver a third of the vCPUs",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Use target tracking on CPUUtilization with a target of 64 so that vCPUs are balanced across types",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Assign WeightedCapacity values of 2, 4 and 8 to the overrides and set desired capacity to 64",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Set desired capacity to 8 and rely on the allocation strategy to launch the largest type first",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 29,
+      "questionType": "MCQ",
+      "questionText": "A company holds Reserved Instances for m6i.xlarge in us-east-1. Its Auto Scaling group uses a mixed instances policy with m6i.xlarge, m5.xlarge and m6a.xlarge, all On-Demand. The group sometimes launches m6a.xlarge because it is cheaper on demand, leaving the Reserved Instances unused. How should the group be configured so that m6i.xlarge is launched first?",
+      "explanation": "Phân tích đề: Muốn On-Demand ưu tiên đúng instance type có RI, vẫn giữ các type khác làm dự phòng.\n(A) ĐÚNG: Với prioritized, group dùng thứ tự overrides, launch m6i.xlarge trước và chỉ dùng type khác khi không có capacity.\n(B) SAI: Reserved Instances là cơ chế tính tiền; Auto Scaling không xét RI khi chọn instance type.\n(C) SAI: Spot allocation strategy chỉ áp dụng cho phần Spot; group này toàn On-Demand.\n(D) SAI: Weight chỉ thay đổi số đơn vị capacity mỗi instance đóng góp, không làm type đó được ưu tiên.\nĐáp án đúng: A\nĐiểm cần nhớ: OnDemandAllocationStrategy = prioritized dùng thứ tự overrides để chọn type On-Demand; hữu ích để tận dụng RI/Savings Plans cho một type cụ thể.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Set the On-Demand allocation strategy to prioritized and list m6i.xlarge first in the overrides",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Buy zonal Reserved Instances so that Auto Scaling automatically prefers the reserved instance type",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Set the Spot allocation strategy to capacity-optimized-prioritized with m6i.xlarge listed first",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Set WeightedCapacity of m6i.xlarge to 2 so that it counts double and is preferred",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 30,
+      "questionType": "MSQ",
+      "questionText": "An Auto Scaling group in account 222222222222 launches instances whose EBS volumes are encrypted with a customer managed KMS key owned by security account 111111111111, and the volumes must stay encrypted with that key. Instances reach Pending and are then terminated, and the scaling activity shows Client.InternalError: Client error on launch. Which TWO actions resolve this?",
+      "explanation": "Phân tích đề: Lỗi Client.InternalError khi launch với volume mã hóa bằng CMK khác account: service-linked role của Auto Scaling không có quyền dùng key.\n(A) SAI: Bẫy: volume được tạo bởi service-linked role của Auto Scaling khi launch, không phải instance role; thêm quyền cho instance role không giúp.\n(B) ĐÚNG: Không sửa được IAM policy của service-linked role, nên cần grant cho SLR để nó dùng key cross-account khi tạo volume.\n(C) SAI: Vi phạm yêu cầu volume phải được mã hóa bằng key của account bảo mật.\n(D) SAI: Cross-account cần cả key policy lẫn quyền phía principal; IAM policy của SLR không sửa được nên phải dùng grant.\n(E) ĐÚNG: Key policy của account sở hữu key phải cho phép account 222222222222 dùng key và tạo grant, nếu không thì không thể cấp quyền cross-account.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Auto Scaling dùng service-linked role AWSServiceRoleForAutoScaling để dùng KMS key khi launch, không phải instance role. Key cùng account: thêm SLR vào key policy. Key khác account: key policy cho phép account kia + create-grant cho SLR.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Attach kms:Decrypt and kms:GenerateDataKey permissions for the key to the instance profile role used by the instances",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "In account 222222222222, create a KMS grant on the key with the AWSServiceRoleForAutoScaling role as the grantee principal",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Enable EBS encryption by default in account 222222222222 with the AWS managed key and rebuild the AMI",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Add the account 222222222222 AWSServiceRoleForAutoScaling as a key policy principal and make no other change",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "In account 111111111111, update the key policy to allow account 222222222222 to use the key and create grants",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 31,
+      "questionType": "MCQ",
+      "questionText": "A developer with permissions for autoscaling:* and ec2:* tries to update an Auto Scaling group to a new launch template version that adds an IAM instance profile. The request fails with an access denied error. Which permission is missing?",
+      "explanation": "Phân tích đề: Launch template có instance profile; người thao tác cần quyền trao role cho dịch vụ.\n(A) SAI: SLR của Auto Scaling đã tồn tại khi group đã được tạo; lỗi đến từ việc truyền role của instance profile.\n(B) SAI: Người dùng không assume role của instance; EC2 mới là bên assume role.\n(C) ĐÚNG: Dùng một IAM role cho instance qua launch template đòi hỏi quyền iam:PassRole, và autoscaling:* hay ec2:* không bao gồm quyền này.\n(D) SAI: Không cần và không thể gắn policy vào service-linked role.\nĐáp án đúng: C\nĐiểm cần nhớ: Khi tạo hoặc cập nhật ASG với launch template có IAM instance profile, người gọi cần iam:PassRole trên role đó.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "iam:CreateServiceLinkedRole for the Auto Scaling service",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "sts:AssumeRole on the role inside the instance profile",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "iam:PassRole on the role inside the instance profile",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "iam:AttachRolePolicy on the Auto Scaling service-linked role",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 32,
+      "questionType": "MCQ",
+      "questionText": "Instances in an Auto Scaling group are registered with two target groups: a public target group on port 443 and an internal target group for a metrics endpoint on port 9100. The group uses ELB health checks. After a change broke the metrics exporter, the group began terminating instances even though the public site was healthy. Why?",
+      "explanation": "Phân tích đề: Group gắn nhiều target group với ELB health check; target group nội bộ báo unhealthy.\n(A) SAI: Không có ưu tiên theo thứ tự gắn; mọi target group đều phải báo healthy.\n(B) SAI: Mỗi target group tự health check theo cấu hình của nó; không có quy tắc chọn port thấp nhất.\n(C) SAI: Không có dữ kiện về CPU; EC2 status check không thất bại chỉ vì một tiến trình lỗi.\n(D) ĐÚNG: Theo tài liệu, tất cả target group phải báo healthy; chỉ một target group báo unhealthy là instance bị thay. Bẫy: target group phụ cho metrics cũng có quyền \"giết\" instance.\nĐáp án đúng: D\nĐiểm cần nhớ: Với nhiều target group, instance chỉ được coi là healthy khi tất cả target group đều báo healthy; bất kỳ target group nào báo unhealthy thì group thay instance.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "The target group attached most recently takes precedence when the health results disagree",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "ELB health checks use only the lowest registered port, so the health of port 443 was never evaluated",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "The failed exporter consumed CPU on the instances and caused the EC2 status checks to fail",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "The group considers an instance unhealthy if any attached target group reports it unhealthy",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 33,
+      "questionType": "MCQ",
+      "questionText": "For cost allocation, a CostCenter tag was added to an existing Auto Scaling group with PropagateAtLaunch set to true. A day later, the EC2 console shows that most instances in the group still have no CostCenter tag, while the two instances launched this morning do. What explains this?",
+      "explanation": "Phân tích đề: Chỉ instance mới có tag; tag của group được thêm sau khi instance cũ đã chạy.\n(A) SAI: Việc kích hoạt cost allocation tag chỉ ảnh hưởng báo cáo chi phí, không ảnh hưởng việc tag instance.\n(B) ĐÚNG: Auto Scaling chỉ gắn tag khi launch; instance có từ trước không được gắn lại.\n(C) SAI: Tag của group tự propagate khi PropagateAtLaunch là true; không cần khai báo lại trong launch template.\n(D) SAI: PropagateAtLaunch gắn tag lên instance được launch; hai instance mới đã có tag chứng minh điều đó.\nĐáp án đúng: B\nĐiểm cần nhớ: Tag của ASG với PropagateAtLaunch chỉ gắn lên instance tại thời điểm launch; instance đang chạy không được gắn lại. Cần gắn tag trực tiếp hoặc thay instance (instance refresh).",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Cost allocation tags must be activated in Billing before Auto Scaling can copy them to instances",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Propagated tags apply only to instances launched after the tag is added",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Group tags do not propagate unless the same tag is also defined in the launch template tag specifications",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "PropagateAtLaunch copies tags to the EBS volumes of the instances, not to the instances",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 34,
+      "questionType": "MSQ",
+      "questionText": "A security audit requires IMDSv2 on every instance of an Auto Scaling group, covering both the 30 instances running now and every instance launched later. The running instances hold large in-memory caches, so they must not be replaced or rebooted. Which TWO actions meet these requirements?",
+      "explanation": "Phân tích đề: Bắt buộc IMDSv2 cho instance hiện tại và tương lai; không được thay hoặc reboot instance đang chạy.\n(A) SAI: Tắt hẳn IMDS làm instance không lấy được credentials của role, phá ứng dụng; yêu cầu là bắt buộc IMDSv2, không phải tắt IMDS.\n(B) SAI: Hop limit chỉ giới hạn số hop của response token; không tắt IMDSv1.\n(C) ĐÚNG: Thay đổi metadata options có hiệu lực ngay trên instance đang chạy mà không cần reboot hay thay thế.\n(D) SAI: Instance refresh thay toàn bộ instance, làm mất cache, vi phạm yêu cầu.\n(E) ĐÚNG: Mọi instance launch sau này sẽ bắt buộc IMDSv2.\nĐáp án đúng: C và E\nĐiểm cần nhớ: IMDSv2: launch template MetadataOptions HttpTokens=required cho instance mới; modify-instance-metadata-options --http-tokens required áp dụng ngay cho instance đang chạy, không cần reboot.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Set HttpEndpoint to disabled in the launch template so that the metadata service cannot be used",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Set HttpPutResponseHopLimit to 1 in the launch template so that IMDSv1 requests are rejected",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Run modify-instance-metadata-options with the http-tokens option set to required on each running instance",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Start an instance refresh with MinHealthyPercentage 100 so every instance is relaunched with IMDSv2",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Create a launch template version with HttpTokens set to required and configure the group to use that version",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 35,
+      "questionType": "MSQ",
+      "questionText": "A Java service in an Auto Scaling group runs out of heap long before its CPU is busy, so the team wants target tracking to keep average memory utilization across the group at 70 percent. Which TWO steps are required?",
+      "explanation": "Phân tích đề: EC2 không có metric bộ nhớ mặc định; target tracking cần metric trung bình theo group.\n(A) ĐÚNG: Target tracking hỗ trợ custom metric; dùng thống kê Average trên metric cấp group với target 70.\n(B) SAI: Health check type chỉ ảnh hưởng việc thay instance lỗi, không tạo metric scaling.\n(C) SAI: Không có predefined metric bộ nhớ; predefined chỉ có ASGAverageCPUUtilization, ASGAverageNetworkIn/Out và ALBRequestCountPerTarget.\n(D) ĐÚNG: CloudWatch agent với append_dimensions và aggregation_dimensions theo AutoScalingGroupName tạo ra metric bộ nhớ ở mức group.\n(E) SAI: Detailed monitoring chỉ tăng tần suất các metric EC2 có sẵn; EC2 không đo bộ nhớ trong hệ điều hành.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Bộ nhớ cần CloudWatch agent (mem_used_percent) với dimension AutoScalingGroupName được aggregate; target tracking dùng customized metric specification. Không có predefined metric bộ nhớ.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create a target tracking policy with a customized metric specification on that metric using Average, target 70",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Switch the group health check type to ELB so that memory pressure is reflected in the scaling metric",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Create a target tracking policy on the predefined metric ASGAverageMemoryUtilization with a target value of 70",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Configure the CloudWatch agent to publish mem_used_percent with the AutoScalingGroupName dimension aggregated across instances",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Enable detailed monitoring in the launch template so that EC2 publishes memory utilization for each instance every minute",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 36,
+      "questionType": "MCQ",
+      "questionText": "Target tracking on ASGAverageCPUUtilization reacts several minutes after load increases. The launch template was created with default settings. Which change most directly lets the policy evaluate CPU data at 1-minute granularity?",
+      "explanation": "Phân tích đề: Mặc định EC2 dùng basic monitoring 5 phút.\n(A) SAI: Group metrics là metric như GroupDesiredCapacity, GroupInServiceInstances, không thay đổi độ phân giải CPU.\n(B) SAI: Default cooldown chỉ áp dụng cho simple scaling; không thay đổi tần suất dữ liệu CPU.\n(C) ĐÚNG: Detailed monitoring gửi metric EC2 mỗi phút; policy nhận dữ liệu sớm hơn thay vì chờ chu kỳ 5 phút.\n(D) SAI: Container Insights dành cho container (ECS/EKS), không đổi metric CPUUtilization của EC2.\nĐáp án đúng: C\nĐiểm cần nhớ: Bật detailed monitoring trong launch template để có metric EC2 mỗi 1 phút, giúp scaling phản ứng nhanh hơn. Group metrics collection là metric về capacity, không phải CPU.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Enable group metrics collection on the Auto Scaling group",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Reduce the group's default cooldown from 300 to 60 seconds",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Enable detailed monitoring in the group launch template",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Enable CloudWatch Container Insights for the instances in the group",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 37,
+      "questionType": "MCQ",
+      "questionText": "Scale-out activities for an Auto Scaling group have started failing with a message that the image ID does not exist. A clean-up job deregistered old AMIs yesterday, including the one referenced by the group's launch template. Which action restores scaling?",
+      "explanation": "Phân tích đề: Launch template trỏ tới AMI đã bị deregister.\n(A) ĐÚNG: Group cần một launch template version tham chiếu AMI còn tồn tại; sau đó scale-out hoạt động lại.\n(B) SAI: Health check type không liên quan đến việc launch; không có bước bỏ qua kiểm tra AMI.\n(C) SAI: Instance refresh cũng launch từ launch template đang trỏ tới AMI không tồn tại, nên cũng thất bại.\n(D) SAI: Việc AMI bị xóa không làm suspend process; resume không giải quyết AMI không tồn tại.\nĐáp án đúng: A\nĐiểm cần nhớ: Launch failure do AMI bị deregister: tạo launch template version mới với AMI hợp lệ và cập nhật group; nên có quy trình kiểm tra AMI còn được launch template dùng trước khi dọn dẹp.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create a new launch template version with a current AMI and point the group to that version",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Switch the group's health check type to EC2 so that launches skip the image validation step",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Start an instance refresh so that the group copies the AMI from one of the running instances",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Resume the Launch process, which Auto Scaling suspended automatically when the AMI was removed",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 38,
+      "questionType": "MCQ",
+      "questionText": "A golden-image pipeline publishes a new AMI every week, and an engineer then edits the launch template to paste in the new AMI ID. The team wants instances to use the latest approved AMI at launch time without creating a launch template version for every build. What should they do?",
+      "explanation": "Phân tích đề: AMI thay đổi hằng tuần; muốn giải quyết AMI tại thời điểm launch, không sửa launch template mỗi lần.\n(A) SAI: Bẫy: dynamic reference của CloudFormation chỉ được giải quyết khi stack được tạo/cập nhật, nên vẫn cần deploy stack cho mỗi AMI mới.\n(B) SAI: $Latest chỉ chọn version mới nhất của launch template, không tìm AMI mới; vẫn phải tạo version mới.\n(C) SAI: Launch template không có bộ lọc AMI theo tag.\n(D) ĐÚNG: Launch template giải quyết tham số SSM khi launch, nên pipeline chỉ cần cập nhật parameter; instance launch sau đó dùng AMI mới.\nĐáp án đúng: D\nĐiểm cần nhớ: Launch template hỗ trợ ImageId dạng resolve:ssm:parameter-name, được giải quyết khi instance launch. Dynamic reference {{resolve:ssm}} của CloudFormation chỉ giải quyết lúc deploy stack.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Reference the AMI with a {{resolve:ssm:...}} dynamic reference in the CloudFormation template that defines the launch template",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Configure the group to use the $Latest launch template version so that the newest AMI is selected automatically",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Tag the approved AMI with Latest=true and configure the launch template to filter images by that tag",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Store the AMI ID in a Parameter Store parameter and set the launch template image ID to resolve:ssm: plus that name",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 39,
+      "questionType": "MCQ",
+      "questionText": "A team wants one Auto Scaling group to run both Graviton (m7g) and x86 (m6i) instances to widen its capacity pool. The application is built for both architectures, but each architecture needs its own AMI. How should the group be configured?",
+      "explanation": "Phân tích đề: Hai kiến trúc cần hai AMI khác nhau trong cùng một group.\n(A) SAI: AMI chỉ thuộc một kiến trúc; không có AMI đa kiến trúc cho EC2.\n(B) ĐÚNG: Mỗi override trong mixed instances policy có thể chỉ định LaunchTemplateSpecification riêng, cho phép dùng AMI arm64 cho m7g.\n(C) SAI: Scaling policy thuộc về một group; không thể chia sẻ một policy cho hai group.\n(D) SAI: Launch template chỉ có một ImageId; không có cơ chế chọn theo kiến trúc.\nĐáp án đúng: B\nĐiểm cần nhớ: Mixed instances policy cho phép override launch template theo từng instance type, nên có thể dùng AMI arm64 cho Graviton và AMI x86 cho các type còn lại trong cùng group.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Use attribute-based instance type selection with both architectures and one multi-architecture AMI",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Use a mixed instances policy where the m7g override uses its own launch template with the arm64 AMI",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Create two Auto Scaling groups and attach a single shared scaling policy so that they scale together",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Create a launch template with two ImageId values and let EC2 pick the one that matches the architecture",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 40,
+      "questionType": "MCQ",
+      "questionText": "A licensing server runs on a single EC2 instance, and its license file is bound to the instance ID and private IP address. The team placed it in an Auto Scaling group with minimum, maximum and desired capacity of 1 for self-healing. After a hardware failure, the replacement instance started but the license was rejected. Which solution provides automatic recovery while keeping the license valid?",
+      "explanation": "Phân tích đề: License gắn instance ID và IP; ASG thay thế tạo instance mới có ID khác.\n(A) SAI: ENI giữ được IP nhưng instance ID vẫn đổi, license vẫn không hợp lệ.\n(B) ĐÚNG: Recovery giữ nguyên instance ID, private IP và EBS trên phần cứng mới, nên license vẫn hợp lệ. Bẫy: \"tự phục hồi\" bằng ASG thì luôn là instance mới.\n(C) SAI: Instance trong warm pool là instance khác với ID khác, không phải instance bị lỗi.\n(D) SAI: Instance ID vẫn mới; và IP cố định trong launch template sẽ xung đột khi thay thế.\nĐáp án đúng: B\nĐiểm cần nhớ: ASG với 1 instance tự phục hồi bằng instance MỚI (ID và IP khác). EC2 automatic recovery giữ nguyên instance ID, private IP, Elastic IP và metadata khi lỗi phần cứng.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Keep the group and attach a secondary ENI with a fixed private IP address to each new instance using a launching lifecycle hook",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Use EC2 automatic recovery, such as a StatusCheckFailed_System alarm with the recover action, instead of the group",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Keep the group and add a warm pool so that the replacement is the same stopped instance",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Keep the group and configure the launch template to request the same private IP address on each launch",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 41,
+      "questionType": "MSQ",
+      "questionText": "A company runs its web tier in an Auto Scaling group in eu-west-1 and wants a pilot light in eu-central-1 that can serve full traffic within 30 minutes of a regional failure, while keeping standby EC2 cost near zero. Which TWO actions should be part of the design?",
+      "explanation": "Phân tích đề: Pilot light đa Region: chi phí EC2 standby gần 0, khôi phục trong 30 phút.\n(A) SAI: Auto Scaling group chỉ trải trên các AZ của một Region; không thêm subnet Region khác được.\n(B) ĐÚNG: Group sẵn sàng nhưng không chạy instance nên chi phí EC2 gần 0; khi failover chỉ cần nâng capacity.\n(C) ĐÚNG: AMI chỉ dùng được trong Region của nó; copy sang eu-central-1 và dùng AMI ID mới trong launch template ở đó.\n(D) SAI: Bẫy: AMI ID là theo Region, launch template ở eu-central-1 không dùng được AMI của eu-west-1.\n(E) SAI: Warm pool cùng Region không giúp khi cả Region hỏng, và chạy Running sẽ tốn chi phí.\nĐáp án đúng: B và C\nĐiểm cần nhớ: Auto Scaling group và AMI là tài nguyên theo Region: cần copy AMI sang Region DR, launch template riêng, và group ở DR với capacity 0 để scale khi failover.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Extend the existing group with subnets from eu-central-1 so that it can launch there during a failover",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create an Auto Scaling group in eu-central-1 with desired capacity 0 and raise it in the failover runbook",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Copy each new AMI to eu-central-1 and reference the copied regional AMI ID in a launch template there",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Reference the eu-west-1 AMI ID in the eu-central-1 launch template so that only one AMI must be maintained",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Add a Running warm pool in eu-west-1 sized for full production traffic to absorb the regional failure",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 42,
+      "questionType": "MSQ",
+      "questionText": "An Amazon ECS cluster on EC2 uses an Auto Scaling group with a CPU target tracking policy. Scale in often terminates container instances that are still running tasks, and scale out lags because pending task placement is not reflected in CPU. Which TWO changes address both issues?",
+      "explanation": "Phân tích đề: Hai vấn đề: scale-in giết task đang chạy; scale-out không phản ánh nhu cầu đặt task.\n(A) ĐÚNG: Managed termination protection chỉ cho scale-in instance không còn task (không tính daemon); nó yêu cầu group bật scale-in protection.\n(B) ĐÚNG: Managed scaling tạo target tracking theo CapacityProviderReservation, phản ánh cả task đang chờ đặt.\n(C) SAI: OldestInstance chọn theo tuổi, không theo việc instance còn task hay không.\n(D) SAI: Service auto scaling chỉ thay đổi số task, không tự điều khiển số instance của group.\n(E) SAI: EC2 termination protection không ngăn Auto Scaling terminate instance.\nĐáp án đúng: A và B\nĐiểm cần nhớ: ECS cluster auto scaling: capacity provider với managed scaling (metric CapacityProviderReservation) và managed termination protection (yêu cầu bật scale-in protection trên ASG).",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Enable managed termination protection on the capacity provider and enable instance scale-in protection on the group",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Attach the group to a capacity provider with managed scaling so that it scales on the CapacityProviderReservation metric",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Change the termination policy of the group to OldestInstance so that empty instances are removed first",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Enable ECS service auto scaling on CPU so that the Auto Scaling group follows the task count automatically",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Enable EC2 termination protection in the launch template so that container instances with tasks are never terminated",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 43,
+      "questionType": "MSQ",
+      "questionText": "A payment function behind API Gateway suffers cold starts every weekday between 08:00 and 18:00. The team wants provisioned concurrency of 200 during those hours and 10 at other times, managed with the LEAST custom code. Which TWO steps should be taken?",
+      "explanation": "Phân tích đề: Provisioned concurrency theo lịch, ít code tùy chỉnh nhất.\n(A) SAI: Chạy được nhưng cần duy trì code tùy chỉnh, không phải ít code nhất.\n(B) SAI: Reserved concurrency chỉ giới hạn/dành chỗ, không khởi tạo sẵn môi trường nên không loại bỏ cold start; lại cần code tùy chỉnh.\n(C) SAI: Provisioned concurrency không cấu hình được trên $LATEST; phải dùng alias hoặc version.\n(D) ĐÚNG: Scheduled actions đặt capacity 200 lúc 08:00 và 10 lúc 18:00, không cần code.\n(E) ĐÚNG: Application Auto Scaling hỗ trợ provisioned concurrency của Lambda trên alias hoặc version đã publish.\nĐáp án đúng: D và E\nĐiểm cần nhớ: Application Auto Scaling quản lý provisioned concurrency của Lambda (dimension lambda:function:ProvisionedConcurrency) trên alias hoặc version, với scheduled actions hoặc target tracking; không dùng được trên $LATEST.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create an EventBridge Scheduler job that runs a Lambda function calling PutProvisionedConcurrencyConfig twice a day",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Set reserved concurrency to 200 in business hours through an EventBridge rule that invokes a Lambda function",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Register the $LATEST version as the scalable target so that every deployment keeps its provisioned concurrency",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Create Application Auto Scaling scheduled actions that set the minimum and maximum capacity for business hours and off hours",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Register the function alias as a scalable target with the lambda:function:ProvisionedConcurrency dimension",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 44,
+      "questionType": "MCQ",
+      "questionText": "A DynamoDB table in provisioned mode uses auto scaling with a 70 percent target for write capacity. Several times a day, with no predictable pattern, write traffic jumps tenfold within seconds, reaching about the same peak each time, for 3 to 5 minutes, and most of these writes are throttled before capacity catches up. What is the MOST effective change?",
+      "explanation": "Phân tích đề: Đột biến ghi không dự đoán được, tăng trong vài giây; auto scaling dựa trên CloudWatch alarm phản ứng theo phút.\n(A) SAI: Đột biến không theo lịch nên scheduled action không khớp.\n(B) SAI: DAX là cache đọc; các lệnh ghi vẫn đi thẳng xuống bảng và tiêu thụ WCU.\n(C) SAI: Headroom 5 lần vẫn không đủ cho mức tăng 10 lần và làm chi phí tăng thường trực.\n(D) ĐÚNG: On-demand đáp ứng ngay lưu lượng tới mức gấp đôi đỉnh trước đó mà không cần chờ alarm và scaling; đỉnh lặp lại nhiều lần mỗi ngày nên bảng luôn sẵn sàng cho mức đó. Bẫy: nghĩ rằng chỉnh target utilization là đủ.\nĐáp án đúng: D\nĐiểm cần nhớ: DynamoDB auto scaling (Application Auto Scaling) phản ứng chậm theo phút; với đột biến không đoán trước dùng on-demand capacity mode.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Add scheduled scaling actions that raise write capacity during the spikes",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Place DynamoDB Accelerator (DAX) in front of the table to absorb the write bursts",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Lower the auto scaling target utilization to 20 percent so that more headroom is provisioned",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Switch the table to on-demand capacity mode",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 45,
+      "questionType": "MSQ",
+      "questionText": "An Auto Scaling group of 8 instances is managed by AWS CloudFormation. When the launch template changes, the stack must replace instances 2 at a time, keep at least 6 in service, and roll back the update if new instances do not report a successful application health check within 15 minutes. Which TWO configurations are required?",
+      "explanation": "Phân tích đề: Rolling update theo lô 2, tối thiểu 6 in service, chờ tín hiệu ứng dụng và rollback nếu quá hạn.\n(A) SAI: CreationPolicy chỉ áp dụng khi tạo resource; không điều khiển cách thay instance khi update.\n(B) SAI: WillReplace false nghĩa là không dùng replacing update; không tạo ra rolling update theo lô.\n(C) ĐÚNG: WaitOnResourceSignals cần mỗi instance mới gửi tín hiệu thành công qua cfn-signal tới logical ID của group.\n(D) SAI: DeletionPolicy chỉ áp dụng khi resource bị xóa khỏi stack; không liên quan rolling update.\n(E) ĐÚNG: Đây là cấu hình rolling update theo lô, giữ tối thiểu 6 instance, chờ tín hiệu tối đa 15 phút; không đủ tín hiệu thì update thất bại và rollback.\nĐáp án đúng: C và E\nĐiểm cần nhớ: AutoScalingRollingUpdate (MaxBatchSize, MinInstancesInService, WaitOnResourceSignals, PauseTime) + cfn-signal gửi tới resource Auto Scaling group. CreationPolicy chỉ áp dụng khi tạo.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "A CreationPolicy with a ResourceSignal count of 8 and a Timeout of PT15M on the group, without any UpdatePolicy attribute",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "An UpdatePolicy with AutoScalingReplacingUpdate and WillReplace set to false on the group",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "A cfn-signal call in the user data that runs after the local health check and signals the Auto Scaling group resource",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "A DeletionPolicy of Retain on the group so that failed instances are kept for the rollback",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "An UpdatePolicy with AutoScalingRollingUpdate using MaxBatchSize 2, MinInstancesInService 6, WaitOnResourceSignals true and PauseTime PT15M",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionNumber": 46,
+      "questionType": "MCQ",
+      "questionText": "An Auto Scaling group defined in CloudFormation has scheduled actions that raise MinSize and DesiredCapacity during business hours. Whenever the team deploys a daytime stack update that changes the group's launch template version, the group drops back to the sizes in the template and customers see slow responses. How can this be prevented while still allowing the launch template update?",
+      "explanation": "Phân tích đề: Stack update ghi đè các giá trị size do scheduled action đặt.\n(A) ĐÚNG: Thuộc tính này khiến CloudFormation không reset các size đã bị scheduled action thay đổi khi template không sửa các giá trị đó.\n(B) SAI: DeletionPolicy chỉ áp dụng khi xóa resource, không ngăn update ghi đè size.\n(C) SAI: MinSize là thuộc tính bắt buộc của AWS::AutoScaling::AutoScalingGroup; không thể bỏ.\n(D) SAI: Stack policy chặn mọi cập nhật group, kể cả thay đổi launch template cần thiết.\nĐáp án đúng: A\nĐiểm cần nhớ: UpdatePolicy AutoScalingScheduledAction với IgnoreUnmodifiedGroupSizeProperties true: CloudFormation bỏ qua MinSize/MaxSize/DesiredCapacity nếu template không đổi các giá trị đó.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Add an UpdatePolicy with AutoScalingScheduledAction and IgnoreUnmodifiedGroupSizeProperties true",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Set a DeletionPolicy of Retain on the scheduled actions so that their capacity values persist",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Remove MinSize and DesiredCapacity from the template so that CloudFormation never manages them",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Set a stack policy that denies Update:Modify on the Auto Scaling group resource during business hours",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 47,
+      "questionType": "MCQ",
+      "questionText": "Instances in an Auto Scaling group call a partner API that allowlists source IP addresses. The instances currently run in public subnets with auto-assigned public IP addresses, so every replacement breaks the allowlist. Which solution gives the fleet a stable set of outbound IP addresses with the LEAST operational overhead?",
+      "explanation": "Phân tích đề: IP đi ra phải ổn định khi instance được thay thế liên tục, ít vận hành nhất.\n(A) SAI: Chạy được nhưng phải quản lý pool EIP, xử lý thu hồi khi terminate và giới hạn số EIP; nhiều vận hành.\n(B) SAI: NLB xử lý traffic đi vào; kết nối do instance khởi tạo không đi ra qua NLB.\n(C) ĐÚNG: Mọi traffic đi ra dùng Elastic IP của NAT gateway, cố định dù instance thay đổi; đối tác chỉ allowlist vài IP.\n(D) SAI: Không thể gắn Elastic IP vào Auto Scaling group; EIP gắn với ENI/instance hoặc NAT gateway.\nĐáp án đúng: C\nĐiểm cần nhớ: Muốn IP egress cố định cho ASG: đặt instance ở private subnet, đi ra qua NAT gateway có Elastic IP; không cần gắn EIP từng instance.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Use a launching lifecycle hook with a Lambda function that associates an Elastic IP from a reserved pool",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Place a Network Load Balancer with Elastic IP addresses in front of the group for the outbound calls",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Move the group to private subnets that route outbound traffic through NAT gateways with Elastic IPs",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Associate one Elastic IP address with the Auto Scaling group so that all instances share it",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 48,
+      "questionType": "MSQ",
+      "questionText": "Developers must be able to update, scale and suspend processes on Auto Scaling groups tagged Environment=dev, but must not be able to change production groups in the same account and Region. Which TWO IAM policy elements implement this?",
+      "explanation": "Phân tích đề: Phân quyền theo tag trên Auto Scaling group; phải chặn việc tự đổi tag để lách quyền.\n(A) SAI: Group dev và prod cùng Region, nên điều kiện Region không phân biệt được.\n(B) ĐÚNG: Nếu được đổi tag, developer có thể gắn Environment=dev cho group production để lách quyền.\n(C) SAI: ec2:ResourceTag áp dụng cho tài nguyên EC2, không đánh giá tag của Auto Scaling group.\n(D) ĐÚNG: Condition key autoscaling:ResourceTag giới hạn hành động chỉ trên group có tag Environment=dev.\n(E) SAI: Boundary chỉ cho Describe sẽ chặn luôn các hành động cần thiết trên group dev.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Dùng condition autoscaling:ResourceTag/<key> cho các action trên group, và chặn autoscaling:CreateOrUpdateTags/DeleteTags để người dùng không đổi tag lách kiểm soát.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Allow the actions with a condition on aws:RequestedRegion equal to the development Region",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Deny autoscaling:CreateOrUpdateTags and autoscaling:DeleteTags so developers cannot retag a production group",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Allow the actions with a condition on ec2:ResourceTag/Environment equal to dev",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Allow the autoscaling update actions with a condition on autoscaling:ResourceTag/Environment equal to dev",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Attach a permissions boundary that allows only autoscaling:Describe* on groups whose names begin with prod",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 49,
+      "questionType": "MCQ",
+      "questionText": "An Auto Scaling group with the Default termination policy has 4 instances in us-east-1a, all launched from launch template version 5, and 3 instances in us-east-1b, one of which still runs version 4. No instances are protected and there is no mixed instances policy. A scale-in event removes one instance. Which instance is terminated?",
+      "explanation": "Phân tích đề: Default termination policy: trước hết chọn AZ có nhiều instance nhất, sau đó mới xét launch template cũ.\n(A) ĐÚNG: us-east-1a có 4 instance nên được chọn trước; trong AZ này mọi instance cùng version, nên chọn tiếp theo giờ tính phí rồi ngẫu nhiên.\n(B) SAI: Tiêu chí giờ tính phí chỉ áp dụng sau khi đã chọn AZ và xét launch template.\n(C) SAI: Bẫy: tiêu chí launch template cũ chỉ được xét sau khi đã chọn AZ; us-east-1b ít instance hơn.\n(D) SAI: Default không chọn theo thời điểm launch mới nhất; đó là NewestInstance policy.\nĐáp án đúng: A\nĐiểm cần nhớ: Default termination policy: (1) AZ có nhiều instance nhất, (2) theo allocation strategy nếu có mixed instances, (3) launch template/configuration cũ nhất, (4) gần giờ tính phí tiếp theo, (5) ngẫu nhiên.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "An instance in us-east-1a, because the zone with the most instances is chosen before template age",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Whichever instance is closest to the next billing hour, regardless of its Availability Zone",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "The instance in us-east-1b that runs version 4, because the oldest launch template is evaluated first",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "The instance in us-east-1a with the most recent launch time, because Default removes the newest instance",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionNumber": 50,
+      "questionType": "MCQ",
+      "questionText": "When an instance in a small Auto Scaling group fails its health check, the group terminates it first and only then launches a replacement, so a 4-instance service briefly runs on 3 instances. Without custom code, the team wants health-check replacements to launch the new instance before the unhealthy one is terminated. What should they configure?",
+      "explanation": "Phân tích đề: Thay instance lỗi theo kiểu launch trước terminate sau, dùng tính năng có sẵn.\n(A) SAI: Preferences của instance refresh chỉ áp dụng cho instance refresh, không áp dụng cho thay thế do health check.\n(B) ĐÚNG: Instance maintenance policy với min 100 và max lớn hơn 100 khiến group launch instance thay thế trước khi terminate instance lỗi.\n(C) SAI: Grace period chỉ hoãn đánh giá health check cho instance mới, không đổi thứ tự thay thế.\n(D) SAI: Cần code tùy chỉnh, vi phạm yêu cầu không dùng code.\nĐáp án đúng: B\nĐiểm cần nhớ: Instance maintenance policy (MinHealthyPercentage/MaxHealthyPercentage) của group áp dụng cho thay thế do health check, max instance lifetime, rebalancing; min 100 + max > 100 = launch trước terminate sau.",
+      "tagNames": [
+        "Resilient Cloud Solutions > AWS Auto Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Set MinHealthyPercentage to 100 in the instance refresh preferences so replacements are staged first",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Configure an instance maintenance policy with MinHealthyPercentage 100 and MaxHealthyPercentage 125",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Set the health check grace period to 0 so the replacement launches while the old instance still runs",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Suspend the ReplaceUnhealthy process and use a Lambda function to raise desired capacity before terminating",
+          "isCorrect": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company is moving a key-value product catalog from a self-managed database on a single Amazon EC2 instance to Amazon DynamoDB. The catalog must remain available if one Availability Zone in the Region fails. What must a solutions architect configure to meet this requirement?",
+    "explanation": "Phân tích đề: Chỉ cần chịu được lỗi một AZ trong cùng Region với DynamoDB; từ khóa là tính sẵn sàng có sẵn của dịch vụ.\n(A) SAI: Global table thêm replica ở Region khác, phục vụ DR đa Region và ghi active-active; nó không cần thiết cho yêu cầu chỉ chịu lỗi một AZ và làm tăng chi phí replicated write.\n(B) SAI: DAX là cache đọc, không phải lớp lưu trữ; triển khai DAX nhiều node chỉ giữ cache sẵn sàng chứ không quyết định độ bền của bảng.\n(C) ĐÚNG: DynamoDB tự động nhân bản dữ liệu đồng bộ trên nhiều AZ trong Region ngay khi ghi, nên bảng vẫn phục vụ khi một AZ gặp sự cố mà không cần cấu hình thêm gì.\n(D) SAI: DynamoDB không có tùy chọn Multi-AZ standby hay chọn subnet như Amazon RDS; đây là khái niệm của RDS bị áp sai dịch vụ.\nĐáp án đúng: C\nĐiểm cần nhớ: DynamoDB mặc định chịu lỗi AZ (dữ liệu nằm trên nhiều AZ); chỉ khi cần chịu lỗi cả Region mới nghĩ tới global tables.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a global table and add a replica in a second AWS Region.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Deploy a DAX cluster with nodes spread across three Availability Zones.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Nothing extra, because the table data is already replicated across AZs.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable the Multi-AZ standby option and select subnets in two AZs for the table.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An online store keeps abandoned shopping cart items in an Amazon DynamoDB table. Each item stores an expiresAt attribute as a Unix epoch timestamp. The company wants expired carts removed automatically without consuming write capacity. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Xóa item hết hạn tự động, không tốn write capacity, đã có thuộc tính epoch timestamp.\n(A) ĐÚNG: TTL của DynamoDB đọc thuộc tính epoch (giây) được chỉ định và xóa item hết hạn ở nền, không tiêu tốn WCU và không tính phí xóa.\n(B) SAI: Lambda chạy theo lịch để Scan rồi DeleteItem vẫn tiêu tốn RCU cho Scan và WCU cho mỗi lệnh xóa, lại phải tự vận hành code.\n(C) SAI: S3 Lifecycle chỉ áp dụng cho object trong S3, không thể xóa item trong bảng DynamoDB.\n(D) SAI: DynamoDB Streams chỉ ghi lại thay đổi đã xảy ra, không tự xóa item; dùng Streams để kích hoạt xóa vẫn tốn WCU.\nĐáp án đúng: A\nĐiểm cần nhớ: Xóa dữ liệu hết hạn trong DynamoDB miễn phí => TTL với thuộc tính số dạng epoch giây.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable Time to Live on the table using the expiresAt attribute.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Schedule an AWS Lambda function that scans for expiresAt values and deletes old carts.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Configure an S3 Lifecycle rule that expires cart data based on the expiresAt attribute.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable DynamoDB Streams so that expired cart records are removed from the table.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An auditing team wants every change to items in an Amazon DynamoDB table to be delivered to an AWS Lambda function. The function must compare the value of each item before and after the modification. Which DynamoDB Streams view type should be configured?",
+    "explanation": "Phân tích đề: Cần cả giá trị trước và sau khi sửa để so sánh.\n(A) SAI: KEYS_ONLY chỉ gửi thuộc tính khóa, Lambda không có dữ liệu cũ hay mới để so sánh.\n(B) SAI: NEW_IMAGE chỉ có ảnh item sau khi thay đổi, thiếu giá trị trước đó.\n(C) SAI: OLD_IMAGE chỉ có ảnh item trước khi thay đổi, thiếu giá trị mới.\n(D) ĐÚNG: NEW_AND_OLD_IMAGES ghi cả ảnh trước và sau của item vào stream record, đủ để Lambda so sánh từng thuộc tính.\nĐáp án đúng: D\nĐiểm cần nhớ: Audit cần diff trước/sau => StreamViewType NEW_AND_OLD_IMAGES.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "KEYS_ONLY", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "NEW_IMAGE", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "OLD_IMAGE", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "NEW_AND_OLD_IMAGES", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A web application runs on Amazon EC2 instances in an Auto Scaling group behind an Application Load Balancer. Users are logged out whenever an instance is terminated during scale-in. The company wants durable user sessions that survive instance replacement with minimal management. Where should the session data be stored?",
+    "explanation": "Phân tích đề: Session phải sống sót khi instance bị thay, cần lưu ngoài instance, ít quản lý.\n(A) SAI: Sticky sessions chỉ gắn người dùng vào một instance; khi instance bị terminate session vẫn mất.\n(B) SAI: EBS volume gắn với một instance và một AZ, không chia sẻ được giữa các instance trong Auto Scaling group.\n(C) ĐÚNG: Lưu session trong bảng DynamoDB làm tầng web stateless; dữ liệu bền trên nhiều AZ, mọi instance đều đọc được, kết hợp TTL để tự dọn session hết hạn.\n(D) SAI: Instance store là ổ tạm thời, dữ liệu mất khi instance dừng hoặc bị terminate.\nĐáp án đúng: C\nĐiểm cần nhớ: Tách session khỏi EC2 để tầng web stateless; DynamoDB (bền, serverless) hoặc ElastiCache (cực nhanh) là hai lựa chọn kinh điển.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable sticky sessions on the Application Load Balancer target group.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Store sessions on an Amazon EBS volume attached to each instance.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Store sessions in an Amazon DynamoDB table.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Store sessions on the instance store volume of each instance.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Several administrators edit product records stored in an Amazon DynamoDB table through an internal tool. Each administrator reads an item, edits it in a form, and saves it a few minutes later. Recently, one administrator's changes silently overwrote changes saved by another administrator in the meantime. The company wants saves to fail when the item has changed since it was read. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Lỗi lost update giữa lúc đọc và lúc ghi; muốn ghi thất bại nếu item đã đổi => optimistic locking.\n(A) SAI: Strongly consistent read chỉ đảm bảo đọc bản mới nhất tại thời điểm đọc; vài phút sau người khác vẫn có thể ghi đè và lệnh PutItem không kiểm tra gì.\n(B) ĐÚNG: Thêm thuộc tính version, khi lưu dùng ConditionExpression yêu cầu version bằng giá trị đã đọc và tăng version; nếu item đã bị sửa, DynamoDB trả ConditionalCheckFailedException để tool báo người dùng tải lại.\n(C) SAI: DAX write-through chỉ ghi qua cache xuống bảng, không có cơ chế kiểm tra xung đột phiên bản.\n(D) SAI: TransactGetItems chỉ đọc nhất quán một nhóm item tại một thời điểm, không khóa item cho tới khi người dùng bấm lưu vài phút sau.\nĐáp án đúng: B\nĐiểm cần nhớ: Chống ghi đè đồng thời trong DynamoDB => optimistic locking bằng version number + conditional write.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use strongly consistent reads when the tool loads each product item.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a version attribute and save with a conditional write on it.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Route all writes through a DAX cluster configured for write-through caching.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Load the item with TransactGetItems so that it stays locked until the save.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A fleet of IoT sensors sends readings to an API that writes them to an Amazon DynamoDB table in provisioned capacity mode. Traffic is steady most of the day, but every hour the sensors flush buffered data for a few minutes and writes are throttled. The finance team requires the table's write capacity to stay at the current provisioned level. Readings may be stored up to several minutes late but must not be lost. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Burst vài phút mỗi giờ, không được tăng WCU (giữ ngân sách cố định), cho phép trễ vài phút, không mất dữ liệu => tách rời bằng hàng đợi.\n(A) SAI: Chuyển sang on-demand xử lý được burst nhưng vi phạm yêu cầu giữ capacity và chi phí cố định; đây là phương án gần đúng nhưng hỏng ràng buộc tài chính.\n(B) SAI: DAX chỉ tăng tốc đọc; ghi qua DAX vẫn đi thẳng xuống bảng và vẫn bị throttle.\n(C) SAI: Tăng provisioned WCU bằng Auto Scaling trong giờ cao điểm trái với yêu cầu giữ write capacity ở mức hiện tại, và Auto Scaling phản ứng chậm với burst vài phút.\n(D) ĐÚNG: API gửi reading vào Amazon SQS; Lambda tiêu thụ với reserved concurrency giới hạn để tốc độ ghi không vượt WCU đã cấp. Hàng đợi hấp thụ burst, dữ liệu được giữ lại và ghi trễ vài phút.\nĐáp án đúng: D\nĐiểm cần nhớ: Ghi đột biến mà không được tăng capacity => đặt SQS làm bộ đệm (decoupling) trước DynamoDB và điều tiết tốc độ consumer.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Switch the table to on-demand capacity mode so that it absorbs the hourly write bursts.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Place a DAX cluster in front of the table so that sensor writes are buffered in memory.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Configure Application Auto Scaling to raise the table's provisioned WCU during each hourly flush.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Send readings to an SQS queue and write them with a throttled Lambda consumer.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs 40 Amazon DynamoDB tables in one AWS Region. A new policy requires daily backups of every table tagged backup=critical, retention of 1 year, and a copy of each backup stored in a second Region for disaster recovery. The company wants to manage this centrally with the LEAST operational overhead. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Backup hằng ngày theo tag, giữ 1 năm, bản sao sang Region khác, quản lý tập trung, ít vận hành.\n(A) SAI: Bật PITR chỉ cho phép khôi phục trong cửa sổ tối đa 35 ngày tại Region nguồn; không đạt giữ 1 năm và không có bản sao Region thứ hai.\n(B) ĐÚNG: AWS Backup backup plan gán tài nguyên theo tag backup=critical, lịch hằng ngày, lifecycle giữ 1 năm và copy rule sang backup vault ở Region khác; toàn bộ được quản lý tập trung, không cần code.\n(C) SAI: Lambda gọi CreateBackup theo lịch phải tự viết logic chọn bảng, xóa bản cũ; on-demand backup gốc của DynamoDB cũng không có thao tác copy sang Region khác, nên còn phải tự xây thêm.\n(D) SAI: Export sang S3 rồi dùng S3 Cross-Region Replication khả thi nhưng phải tự lập lịch export, và khôi phục cần import thành bảng mới; tốn vận hành hơn một backup plan có sẵn.\nĐáp án đúng: B\nĐiểm cần nhớ: Backup DynamoDB theo chính sách, theo tag, giữ dài hạn và copy cross-Region/cross-account => AWS Backup.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable point-in-time recovery on each tagged table and set the recovery period to the maximum value.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use an AWS Backup plan that selects tables by tag and copies to another Region.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Schedule a Lambda function that calls CreateBackup for each tagged table and copies backups to another Region.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Export each tagged table to Amazon S3 daily and replicate the bucket to another Region with S3 CRR.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Five independent teams want to consume item-level changes from the same Amazon DynamoDB table. Each team runs its own consumer, and some teams need to replay changes from the previous 7 days after a deployment bug. Consumers currently read from DynamoDB Streams and are being throttled. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Nhiều consumer độc lập (5), cần replay 7 ngày; DynamoDB Streams chỉ giữ 24 giờ và khuyến nghị ít reader đồng thời mỗi shard.\n(A) SAI: Mỗi bảng chỉ có một DynamoDB stream; không thể tạo stream thứ hai cho từng nhóm.\n(B) SAI: Một Lambda đọc Streams rồi publish ra SNS giải quyết fan-out nhưng SNS không lưu trữ để replay 7 ngày; phải tự xây thêm lưu trữ.\n(C) ĐÚNG: Kinesis Data Streams for DynamoDB đưa thay đổi item vào một Kinesis data stream; retention có thể đặt 7 ngày trở lên để replay, và enhanced fan-out cho mỗi consumer throughput riêng.\n(D) SAI: Tăng batch size trên event source mapping chỉ giảm số lần gọi, không tăng số reader đồng thời được phép và không kéo dài retention 24 giờ của Streams.\nĐáp án đúng: C\nĐiểm cần nhớ: Cần nhiều consumer hoặc giữ change data lâu hơn 24 giờ => Kinesis Data Streams for DynamoDB thay cho DynamoDB Streams.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a separate DynamoDB stream on the table for each team and set a 7-day retention.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Have one Lambda function read DynamoDB Streams and publish each change to an SNS topic for the teams.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use Kinesis Data Streams for DynamoDB with 7-day retention and enhanced fan-out.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Increase the batch size on every team's event source mapping for DynamoDB Streams.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A loyalty application stores each member's point balance as an item in an Amazon DynamoDB table. Members can transfer points to other members. A transfer must debit one item and credit another item together, and a balance must never become negative. During peak periods, concurrent transfers on the same members sometimes fail. Which TWO actions should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Hai item phải thay đổi cùng nhau (atomic), số dư không âm, xung đột khi đồng thời.\n(A) ĐÚNG: TransactWriteItems gom hai Update vào một giao dịch ACID; ConditionExpression balance >= amount trên item nguồn khiến cả giao dịch bị hủy nếu không đủ điểm.\n(B) SAI: BatchWriteItem không atomic, từng thao tác có thể thành công riêng lẻ, và không hỗ trợ condition expression.\n(C) SAI: Đọc strongly consistent rồi gọi hai PutItem riêng có khoảng hở giữa đọc và ghi; một lệnh có thể thành công còn lệnh kia thất bại.\n(D) ĐÚNG: Khi hai giao dịch chạm cùng item, DynamoDB hủy một giao dịch với TransactionCanceledException do conflict; ứng dụng nên retry với exponential backoff và jitter.\n(E) SAI: Transaction của DynamoDB chỉ áp dụng trong một Region; chuyển sang global table không làm giao dịch atomic hơn mà còn thêm xung đột last-writer-wins giữa Region.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Nhiều item cần all-or-nothing => TransactWriteItems + condition; xung đột giao dịch là bình thường, xử lý bằng retry có backoff.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use TransactWriteItems with a condition that the source balance covers the amount.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Use BatchWriteItem to update both member items in a single request with a balance condition.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Read both items with strongly consistent reads, then call PutItem on each item in turn.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Retry canceled transactions caused by conflicts using exponential backoff with jitter.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Convert the table to a global table so that transfers commit atomically across Regions.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A data analytics team wants to run ad hoc SQL queries on a full copy of a 3 TB Amazon DynamoDB orders table once a week. The production table serves latency-sensitive traffic, and the analytics job must not consume the table's read capacity. Point-in-time recovery is already enabled. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Bản sao toàn bảng hằng tuần, query SQL, không được tiêu tốn RCU của bảng production, PITR đã bật.\n(A) SAI: AWS Glue crawler/ETL đọc bảng bằng Scan sẽ tiêu thụ RCU và có thể ảnh hưởng traffic production.\n(B) SAI: DynamoDB Streams chỉ chứa thay đổi mới trong 24 giờ, không có bản sao đầy đủ dữ liệu hiện có.\n(C) SAI: Restore on-demand backup tạo một bảng DynamoDB mới, không phải dữ liệu trong S3 để chạy SQL; vẫn phải scan bảng mới và trả chi phí bảng thứ hai.\n(D) ĐÚNG: Export to S3 dùng dữ liệu PITR nên không tiêu tốn RCU của bảng; kết quả nằm trong S3 dạng DynamoDB JSON hoặc Ion và có thể query bằng Amazon Athena.\nĐáp án đúng: D\nĐiểm cần nhớ: Phân tích dữ liệu DynamoDB mà không đụng RCU => Export to S3 (dựa trên PITR) + Athena.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Run an AWS Glue job each week that scans the table and writes Parquet files to Amazon S3.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Connect DynamoDB Streams to Amazon Data Firehose and query the delivered files with Athena.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Restore the latest on-demand backup each week and run SQL queries against the restored copy.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Export the table to Amazon S3 weekly and query the files with Athena.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs a customer-facing application in us-east-1 with an Amazon DynamoDB table in on-demand mode. A new DR policy requires an RPO of 1 minute and an RTO of 15 minutes if the entire Region becomes unavailable. The application stack can already be deployed in us-west-2 with infrastructure as code. The company wants the most cost-effective solution that meets the RPO and RTO. Which solution should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Mất cả Region, RPO 1 phút, RTO 15 phút, tối ưu chi phí; dữ liệu phải có sẵn và gần như liên tục ở Region DR.\n(A) SAI: Bản copy AWS Backup sang us-west-2 theo lịch (thường hằng ngày hoặc vài giờ) cho RPO tính bằng giờ, và restore bảng lớn có thể vượt 15 phút.\n(B) SAI: PITR restore sang Region khác vẫn đọc dữ liệu từ Region nguồn; khi us-east-1 không khả dụng thì không restore được, đồng thời thời gian restore không đảm bảo RTO.\n(C) ĐÚNG: Thêm replica us-west-2 vào global table; replication bất đồng bộ thường dưới một giây đáp ứng RPO 1 phút, bảng đã sẵn sàng nhận đọc ghi nên chỉ cần triển khai stack và chuyển DNS trong 15 phút. Replica on-demand chỉ tính phí theo replicated write và storage.\n(D) SAI: Incremental export sang S3 rồi import khi có sự cố có RPO tối thiểu theo chu kỳ export, và import vào bảng mới cho dữ liệu lớn có thể mất hàng giờ, vi phạm RTO.\nĐáp án đúng: C\nĐiểm cần nhớ: RPO tính bằng giây/phút cho DynamoDB cross-Region => global tables; backup/export chỉ đạt RPO giờ và RTO dài.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use AWS Backup to copy table backups to us-west-2 and restore them during a disaster.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Keep PITR enabled and perform a cross-Region point-in-time restore into us-west-2 during a disaster.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a us-west-2 replica to the table by converting it to a global table.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Run incremental exports to an S3 bucket in us-west-2 and import the data into a new table during a disaster.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A user account table in Amazon DynamoDB has TTL enabled to remove unverified sign-ups after 72 hours. An AWS Lambda function subscribed to the table's stream sends an 'account closed' email whenever an item is removed. Customers whose unverified sign-ups expire are now receiving these emails. Manual deletions by support agents must still trigger the email. The company wants the simplest fix that does not change the TTL process. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Cần phân biệt xóa do TTL và xóa thủ công trong stream; giữ TTL, giải pháp đơn giản.\n(A) ĐÚNG: Bản ghi REMOVE do TTL có userIdentity với type Service và principalId dynamodb.amazonaws.com. Thêm filter criteria trên event source mapping để loại các bản ghi này, Lambda chỉ nhận xóa thủ công và không bị tính phí cho bản ghi bị lọc.\n(B) SAI: Đổi stream view sang NEW_IMAGE không phân biệt nguồn xóa; với REMOVE thì NEW_IMAGE trống, Lambda còn mất dữ liệu cần để gửi email.\n(C) SAI: Không thể tạm tắt stream chỉ trong lúc TTL chạy vì TTL xóa ở nền liên tục theo thời điểm không xác định; tắt stream còn làm mất bản ghi xóa thủ công.\n(D) SAI: Chuyển sang Scan và xóa bằng Lambda theo lịch thay đổi quy trình TTL, tốn WCU và vẫn phải tự đánh dấu để phân biệt; phức tạp hơn và trái yêu cầu.\nĐáp án đúng: A\nĐiểm cần nhớ: Xóa do TTL xuất hiện trong Streams với userIdentity principalId dynamodb.amazonaws.com; dùng event filtering để tách TTL khỏi xóa do người dùng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Filter out stream records whose userIdentity shows the DynamoDB service principal.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Change the stream view type to NEW_IMAGE so that TTL removals are excluded from the stream.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Disable the stream while TTL deletions run and re-enable it after the expired items are removed.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Replace TTL with a scheduled Lambda function that deletes unverified items and tags them as expired.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A payments company uses an Amazon DynamoDB global table with replicas in eu-west-1 and eu-central-1. A risk review lists three threats: a full Regional outage, an application bug that corrupts items and is replicated to both Regions within seconds, and an operator accidentally deleting a replica table. Which THREE measures together address these threats?",
+    "explanation": "Phân tích đề: Ba mối đe dọa khác nhau: mất Region, lỗi logic bị nhân bản, xóa nhầm bảng. Mỗi biện pháp phải nhắm một mối đe dọa.\n(A) ĐÚNG: Global table với hai Region đang ghi active-active giúp ứng dụng chuyển sang Region còn lại khi một Region mất; chỉ cần định tuyến lại traffic.\n(B) ĐÚNG: Lỗi logic được nhân bản sang mọi replica nên replication không cứu được; PITR (bật trên từng replica) cho phép restore về giây trước khi lỗi xảy ra vào một bảng mới.\n(C) SAI: Table class Standard-Infrequent Access chỉ thay đổi cấu trúc giá lưu trữ, không phải bản sao DR hay cơ chế khôi phục.\n(D) ĐÚNG: Deletion protection trên từng replica chặn lệnh DeleteTable cho tới khi thuộc tính này được tắt, giảm rủi ro xóa nhầm.\n(E) SAI: DAX cluster nhiều node chỉ giữ cache sẵn sàng trong một Region, không bảo vệ dữ liệu khỏi lỗi logic hay xóa bảng.\n(F) SAI: Reserved capacity là cam kết giá cho provisioned capacity, không liên quan tới độ sẵn sàng hay khôi phục.\nĐáp án đúng: A, B và D\nĐiểm cần nhớ: Replication (global tables) chống mất Region nhưng nhân bản cả lỗi; cần thêm PITR/backup chống lỗi logic và deletion protection chống xóa nhầm.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Keep both global table replicas active and route traffic to the healthy Region during an outage.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Enable point-in-time recovery on each replica table.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Switch both replicas to the Standard-Infrequent Access table class for a recoverable copy.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Turn on deletion protection for each replica table.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Deploy a multi-node DAX cluster in each Region to keep a cached copy of every item.", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "Purchase reserved capacity for both Regions to guarantee that replicas remain available.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An order service writes orders to an Amazon DynamoDB table. An AWS Lambda function reads the table's stream and calls a third-party payment API to charge each new order. Because stream processing is at-least-once, the function occasionally runs twice for the same record after a timeout, and some customers are charged twice. The payment API does not support idempotency keys. The company wants to prevent duplicate charges with minimal changes. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Streams + Lambda xử lý at-least-once, API bên ngoài không có idempotency key; cần tự đảm bảo idempotency, thay đổi ít.\n(A) SAI: Batch size 1 giảm số record bị xử lý lại khi lỗi nhưng retry sau timeout vẫn gọi lại cùng record, không loại trừ trùng.\n(B) SAI: SQS FIFO chỉ khử trùng trong cửa sổ 5 phút và thêm một tầng kiến trúc; retry muộn hơn hoặc lỗi giữa chừng vẫn có thể gây trùng, nhiều thay đổi hơn.\n(C) ĐÚNG: Trước khi gọi API, Lambda ghi orderId vào một bảng idempotency bằng PutItem với điều kiện attribute_not_exists; nếu điều kiện thất bại nghĩa là đơn đã được xử lý và bỏ qua. TTL dọn các bản ghi cũ.\n(D) SAI: DynamoDB Streams không có chế độ exactly-once; không tồn tại cấu hình như vậy trên stream.\nĐáp án đúng: C\nĐiểm cần nhớ: Consumer của Streams/Lambda phải idempotent; cách chuẩn là conditional write attribute_not_exists vào bảng khóa idempotency.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Set the event source mapping batch size to 1 so that each order is processed only once by the function.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Forward stream records to an SQS FIFO queue with content-based deduplication before charging.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Record each orderId with a conditional put that fails if it already exists.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable exactly-once delivery on the DynamoDB stream so that each record reaches the function once.", "isCorrect": false }
+    ]
+  }
+]

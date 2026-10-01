@@ -1,0 +1,409 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A small company has never created an AWS CloudTrail trail and has never enabled AWS Config. Three weeks ago, someone deleted a security group in the us-east-1 Region. The company wants to find out which IAM user performed the deletion. What can the company use to get this information?",
+    "explanation": "Phân tích đề: Chưa có trail, chưa bật Config; sự kiện xảy ra 3 tuần trước (dưới 90 ngày) và DeleteSecurityGroup là management event.\n(A) SAI: CloudTrail luôn bật sẵn Event history cho mọi account mà không cần tạo trail; trail chỉ cần khi muốn lưu lâu hơn 90 ngày, có data events hoặc xuất ra S3.\n(B) ĐÚNG: Event history ghi miễn phí management events 90 ngày gần nhất theo từng Region; lọc theo EventName = DeleteSecurityGroup sẽ thấy userIdentity của người xóa.\n(C) SAI: Config chỉ ghi configuration item khi configuration recorder đang chạy; account chưa từng bật Config nên không có lịch sử nào.\n(D) SAI: CloudWatch metrics đo hiệu năng/vận hành, không ghi lại API call và không có dimension theo tên API như vậy.\nĐáp án đúng: B\nĐiểm cần nhớ: CloudTrail Event history luôn bật, giữ 90 ngày management events theo từng Region; muốn lâu hơn hoặc cần data events thì tạo trail hoặc event data store.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Nothing, because CloudTrail records API activity only after a trail has been created and is delivering log files to Amazon S3.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "The CloudTrail Event history in the us-east-1 Region, which keeps the last 90 days of management events.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "The AWS Config configuration timeline for the deleted security group in the us-east-1 Region.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Amazon CloudWatch metrics for the VPC, filtered on the DeleteSecurityGroup dimension.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An external auditor asks a company to provide the AWS SOC 2 Type II report and the PCI DSS Attestation of Compliance that cover the AWS infrastructure hosting the company's workloads. Which AWS service should the company use to obtain these documents?",
+    "explanation": "Phân tích đề: Cần báo cáo tuân thủ CỦA AWS (SOC 2, PCI DSS AoC) về hạ tầng AWS, không phải đánh giá môi trường của khách hàng.\n(A) SAI: Audit Manager thu thập evidence và tạo assessment report về môi trường của chính khách hàng, không cung cấp báo cáo kiểm toán bên thứ ba về AWS.\n(B) SAI: Security Hub chấm điểm cấu hình tài nguyên của khách hàng theo chuẩn PCI DSS; đó là findings, không phải Attestation of Compliance của AWS.\n(C) ĐÚNG: AWS Artifact là cổng tự phục vụ cho phép tải các báo cáo tuân thủ của AWS (SOC, PCI, ISO...) do kiểm toán viên bên thứ ba phát hành, đúng thứ auditor cần về phía AWS trong mô hình shared responsibility.\n(D) SAI: Conformance pack chỉ đánh giá cấu hình tài nguyên của khách hàng theo bộ rule, không tạo ra báo cáo kiểm toán về hạ tầng AWS.\nĐáp án đúng: C\nĐiểm cần nhớ: Tài liệu tuân thủ của AWS (SOC, PCI AoC, ISO) và các agreement như BAA => AWS Artifact; evidence về môi trường của bạn => Audit Manager.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "AWS Audit Manager, using the prebuilt SOC 2 framework to generate and download an assessment report.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "AWS Security Hub, exporting the latest results of the enabled PCI DSS security standard.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "AWS Artifact, downloading the reports from its self-service compliance portal.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "AWS Config, deploying the Operational Best Practices for PCI DSS conformance pack in every account.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company must keep an audit record that shows which IAM principal invoked a specific AWS Lambda function and when each invocation happened. The company already has a CloudTrail trail that logs all management events. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Cần ghi danh tính IAM của người gọi Invoke cho một function cụ thể; trail hiện chỉ có management events.\n(A) SAI: Invoke là data event của Lambda, không nằm trong management events nên trail hiện tại không ghi.\n(B) SAI: Log ứng dụng do code tự ghi, không phải bản ghi audit của AWS; context của Lambda cũng không cung cấp danh tính IAM của người gọi một cách tin cậy.\n(C) SAI: X-Ray phục vụ trace hiệu năng, có sampling và không ghi danh tính IAM principal cho mục đích audit.\n(D) ĐÚNG: Bật data events cho Lambda (có thể giới hạn theo ARN function) khiến CloudTrail ghi mỗi lần Invoke với userIdentity, eventTime, sourceIPAddress, tạo bản ghi audit chuẩn.\nĐáp án đúng: D\nĐiểm cần nhớ: Lambda Invoke, S3 object-level, DynamoDB item-level là data events: mặc định tắt, phải bật riêng và tính phí theo số event.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Rely on the existing management events, because every Lambda Invoke call is recorded as a management event.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Write the caller's identity to the function's CloudWatch Logs log group from inside the function code.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable AWS X-Ray active tracing on the function to capture a trace for every invocation request.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable Lambda data events on the existing trail for the function's ARN.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A network engineer enabled VPC Flow Logs on all subnets in a VPC. The instances use the Amazon-provided DNS server. Which TWO types of traffic will NOT appear in the flow log records?",
+    "explanation": "Phân tích đề: Hỏi các loại traffic mà VPC Flow Logs không ghi lại.\n(A) ĐÚNG: Traffic tới Amazon DNS server không được flow logs ghi; nếu dùng DNS server tự quản thì traffic đó mới được ghi. Muốn xem truy vấn DNS dùng Route 53 Resolver query logging.\n(B) SAI: Flow logs ghi cả traffic ACCEPT và REJECT, nên kết nối bị security group từ chối vẫn xuất hiện với action REJECT.\n(C) ĐÚNG: Traffic tới instance metadata (169.254.169.254) nằm trong danh sách loại trừ của flow logs, cùng với Amazon Time Sync, DHCP, Windows license activation.\n(D) SAI: Flow logs ghi ở mức ENI nên traffic giữa hai instance cùng subnet vẫn được ghi trên ENI của mỗi bên.\n(E) SAI: Traffic này đi qua ENI của instance và ENI của NAT gateway nên đều được ghi.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Flow logs không ghi traffic tới Amazon DNS, metadata 169.254.169.254, Time Sync, DHCP; và chỉ ghi metadata (IP, port, bytes, action), không có payload.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "DNS queries that instances send to the Amazon-provided DNS server (Route 53 Resolver).",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Inbound SSH connection attempts that a security group rejected.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Requests from instances to the instance metadata service at 169.254.169.254.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Traffic between two instances that are in the same subnet.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Outbound HTTPS traffic from private instances that passes through a NAT gateway.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company's security policy states that IAM user access keys must be rotated at least every 90 days. The security team wants an automatically updated compliance view that lists every IAM user whose active access keys are older than 90 days. The solution must require the LEAST operational overhead. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Kiểm tra định kỳ tuổi access key, hiển thị compliance, ít vận hành nhất => ưu tiên managed rule có sẵn.\n(A) SAI: Chạy được nhưng phải tự viết, bảo trì code và tự dựng giao diện compliance, tốn vận hành hơn managed rule.\n(B) ĐÚNG: Managed rule access-keys-rotated đánh giá định kỳ tuổi các access key đang active và đánh dấu NON_COMPLIANT user vượt maxAccessKeyAge; kết quả hiển thị ngay trong dashboard compliance của Config.\n(C) SAI: Insights phát hiện bất thường về tần suất gọi API hoặc tỉ lệ lỗi, không đánh giá tuổi access key.\n(D) SAI: External access analyzer tìm tài nguyên được chia sẻ ra ngoài vùng tin cậy, không kiểm tra tuổi access key.\nĐáp án đúng: B\nĐiểm cần nhớ: Đề hỏi về trạng thái/tuân thủ cấu hình (key quá hạn, volume chưa mã hóa...) => AWS Config managed rule; chỉ viết Lambda tùy chỉnh khi không có rule sẵn.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Schedule an Amazon EventBridge rule that runs a Lambda function daily to parse the IAM credential report and store the results in Amazon S3.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable the AWS Config managed rule access-keys-rotated with the maxAccessKeyAge parameter set to 90.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable CloudTrail Insights on the account trail to detect access keys that have not been rotated recently.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create an IAM Access Analyzer external access analyzer and review its findings for long-lived access keys.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Developers in a single AWS account sometimes add security group rules that allow SSH (port 22) from 0.0.0.0/0. The security team wants these rules to be detected and removed automatically within minutes, and it wants to see the compliance status of every security group. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần phát hiện + tự khắc phục trong vài phút + xem trạng thái compliance, ít vận hành nhất.\n(A) SAI: Chỉ gửi cảnh báo, việc gỡ rule vẫn thủ công và không có trạng thái compliance cho từng security group.\n(B) SAI: GuardDuty phát hiện mối đe dọa từ log, không đánh giá cấu hình security group; suppression rule còn làm ẩn finding đi.\n(C) ĐÚNG: Rule restricted-ssh được kích hoạt khi security group thay đổi, đánh dấu NON_COMPLIANT; automatic remediation chạy runbook như AWS-DisablePublicAccessForSecurityGroup để gỡ rule mở 22 ra 0.0.0.0/0, và dashboard Config cho thấy trạng thái từng group.\n(D) SAI: Chạy theo ngày và cần người xử lý thủ công, không đáp ứng yêu cầu tự động trong vài phút.\nĐáp án đúng: C\nĐiểm cần nhớ: Phát hiện lệch chuẩn cấu hình + tự sửa = Config rule + automatic remediation (SSM Automation runbook).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Send CloudTrail events to CloudWatch Logs and create a metric filter and alarm that emails the security team about new ingress rules.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable Amazon GuardDuty and create a suppression rule for findings about security groups with open SSH ports.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Use the AWS Config restricted-ssh managed rule with automatic remediation through an SSM Automation runbook.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Run Amazon Inspector network reachability scans every day and have an operator remove each rule that is reported as open.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company has a separate CloudTrail trail in each of its member accounts in AWS Organizations instead of an organization trail. Account administrators have sometimes called StopLogging during troubleshooting. The security team requires that member-account administrators be prevented from stopping, deleting, or changing trails. If a StopLogging call does succeed, for example from the exempted break-glass role, logging must be restarted automatically within minutes. Which TWO actions should a solutions architect take?",
+    "explanation": "Phân tích đề: Hai yêu cầu: ngăn chặn (preventive) với admin của member account, và phản ứng tự động gần như tức thì khi có StopLogging thành công.\n(A) ĐÚNG: SCP đặt giới hạn quyền tối đa trong member account nên ngay cả admin có AdministratorAccess cũng không gọi được các API này; điều kiện loại trừ break-glass role giữ lại đường khẩn cấp.\n(B) ĐÚNG: EventBridge nhận event API từ CloudTrail gần như realtime; rule khớp eventName StopLogging kích hoạt Lambda gọi StartLogging để bật lại trail trong vài giây đến vài phút.\n(C) SAI: Rule này chỉ phát hiện theo chu kỳ, không ngăn được lời gọi API và không tự bật lại logging.\n(D) SAI: Object Lock bảo vệ các file log đã ghi khỏi bị xóa/sửa, nhưng không ngăn được việc dừng trail.\n(E) SAI: Insights chỉ đánh dấu bất thường về tần suất API để người xem xét, không ngăn chặn cũng không tự khắc phục.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Preventive = SCP; phản ứng theo một event cụ thể = CloudTrail -> EventBridge -> Lambda. Tốt nhất là chuyển sang organization trail, vì member account không sửa/xóa được trail này.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Attach an SCP to the member OUs that denies cloudtrail:StopLogging, cloudtrail:DeleteTrail, and cloudtrail:UpdateTrail for all principals except the break-glass role.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create an Amazon EventBridge rule that matches StopLogging events from CloudTrail and invokes a Lambda function that calls StartLogging on the trail.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable the AWS Config managed rule cloudtrail-enabled with its default periodic evaluation in each member account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable S3 Object Lock in compliance mode on the bucket that receives the CloudTrail log files.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Enable CloudTrail Insights on each trail so that unusual StopLogging activity is flagged for review.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has 40 AWS accounts in AWS Organizations and uses AWS Config in three Regions. The security team wants a single read-only view, in its security account, of resource configurations and Config rule compliance across all accounts and Regions, including accounts that are added in the future. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Cần view tập trung (read-only) dữ liệu Config đa account, đa Region, tự bao gồm account mới, đặt ở security account.\n(A) ĐÚNG: Aggregator với organization source tự gom configuration và compliance data của mọi account/Region được chọn, kể cả account mới gia nhập; delegated admin cho phép đặt aggregator ở security account thay vì management account.\n(B) SAI: Conformance pack dùng để triển khai bộ rule xuống các account; nó không gom inventory cấu hình tài nguyên của mọi account/Region về một chỗ.\n(C) SAI: CloudTrail ghi hành động API, không có trạng thái cấu hình hay kết quả compliance của Config rule.\n(D) SAI: Audit Manager dùng Config làm nguồn evidence cho assessment, không phải view inventory/compliance cấu hình tổng hợp.\nĐáp án đúng: A\nĐiểm cần nhớ: Gom dữ liệu Config đa account/Region = Aggregator (chỉ đọc, không triển khai rule); triển khai bộ rule = Conformance Pack.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Register the security account as a Config delegated administrator and create an organization-wide aggregator in that account.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Deploy an organization conformance pack from the security account so that all account results roll up into that account automatically.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Create an organization trail that delivers events to the security account and query those events with Amazon Athena.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Use AWS Audit Manager in the security account to import Config data from every account and Region into one assessment.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company is preparing for a SOC 2 audit of its workloads on AWS. The auditor requires two kinds of evidence: documentation of the physical and environmental controls at the AWS data centers that host the workloads, and continuously collected evidence showing how the company's own AWS accounts are configured and operated against SOC 2 criteria. Which TWO AWS services should the company use?",
+    "explanation": "Phân tích đề: Hai nguồn evidence khác nhau: phía AWS (data center) và phía khách hàng (tài khoản của mình), theo shared responsibility.\n(A) SAI: Inspector quét lỗ hổng phần mềm/mạng, không tạo evidence SOC 2 và không liên quan tới kiểm soát data center.\n(B) SAI: Trusted Advisor đưa khuyến nghị tối ưu chi phí, bảo mật, hiệu năng; không ánh xạ evidence theo tiêu chí SOC 2.\n(C) ĐÚNG: Artifact cung cấp báo cáo SOC 2 của AWS, chứng minh các kiểm soát vật lý và môi trường mà AWS chịu trách nhiệm.\n(D) SAI: Macie phát hiện dữ liệu nhạy cảm trong S3, không tạo evidence tổng thể theo SOC 2.\n(E) ĐÚNG: Audit Manager tự động thu thập evidence (từ Config, CloudTrail, Security Hub...) và ánh xạ vào các control của framework SOC 2 cho phần khách hàng chịu trách nhiệm.\nĐáp án đúng: C và E\nĐiểm cần nhớ: Artifact = báo cáo tuân thủ của AWS; Audit Manager = evidence về môi trường của bạn. Hai dịch vụ bổ sung cho nhau trong một cuộc audit.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Use Amazon Inspector to generate a SOC 2 report of vulnerabilities across the company's workloads.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Use AWS Trusted Advisor to export best-practice check results as SOC 2 evidence.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Use AWS Artifact to download the AWS SOC 2 report that covers data center controls.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Use Amazon Macie to produce a SOC 2 compliance summary of the company's S3 buckets.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Use AWS Audit Manager with the SOC 2 framework to collect evidence from the company's accounts.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A security team must keep a record of the domain names that Amazon EC2 instances in a VPC look up, including which instance made each query, to investigate possible data exfiltration over DNS. The VPC uses the Amazon-provided DNS server, and VPC Flow Logs are already enabled. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Cần tên miền được truy vấn từ bên trong VPC; flow logs không đáp ứng vì không ghi traffic tới Amazon DNS và không có nội dung truy vấn.\n(A) SAI: Flow logs không có trường tên miền và không ghi traffic tới Amazon-provided DNS server.\n(B) ĐÚNG: Resolver query logging ghi mọi truy vấn DNS phát sinh trong VPC: tên miền, loại bản ghi, mã phản hồi, instance/IP nguồn, đúng thứ cần để điều tra DNS exfiltration.\n(C) SAI: Public DNS query logging chỉ ghi truy vấn từ các resolver internet tới hosted zone public của công ty, không phải truy vấn ra ngoài của EC2.\n(D) SAI: CloudTrail ghi các lời gọi API quản trị Route 53, không ghi từng lượt phân giải DNS.\nĐáp án đúng: B\nĐiểm cần nhớ: DNS queries từ VPC => Route 53 Resolver query logging; public hosted zone query logging chỉ cho truy vấn từ internet vào zone public.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a new VPC flow log that uses a custom log format including every available DNS-related field.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable Route 53 Resolver query logging for the VPC and send the logs to CloudWatch Logs or Amazon S3.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable query logging on the Route 53 public hosted zone that the company uses for its public website.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable CloudTrail data events for Amazon Route 53 so that each DNS resolution in the VPC is recorded.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An S3 bucket receives billions of GetObject requests each month from an application role. Compliance now requires an audit trail, including the IAM identity, for every object upload, overwrite, and deletion under the finance/ prefix only. The company wants to minimize CloudTrail charges and avoid storing records it does not need. The existing trail already logs management events. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Chỉ cần write data events dưới prefix finance/, có danh tính IAM, và giảm tối đa chi phí (không ghi hàng tỉ GetObject).\n(A) SAI: Ghi toàn bộ data events của bucket, bao gồm hàng tỉ GetObject, làm chi phí CloudTrail và lưu trữ tăng mạnh dù chỉ lọc về sau.\n(B) ĐÚNG: Advanced event selectors lọc ngay tại nguồn theo resources.ARN (StartsWith prefix) và readOnly = false, nên CloudTrail chỉ ghi và tính phí PutObject, DeleteObject... dưới finance/, kèm userIdentity đầy đủ.\n(C) SAI: Server access logs được giao theo kiểu best effort, không bảo đảm đầy đủ cho audit tuân thủ, và vẫn ghi mọi request của bucket.\n(D) SAI: Phải tự xây và vận hành pipeline, không phải audit trail chuẩn của AWS, và không ghi lại các yêu cầu bị từ chối.\nĐáp án đúng: B\nĐiểm cần nhớ: Advanced event selectors (eventName, resources.ARN, readOnly...) giúp chỉ ghi đúng data events cần thiết => kiểm soát chi phí data events.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Enable S3 data events for the entire bucket on the existing trail and use Amazon Athena queries to filter for write events under finance/.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Add an advanced event selector for S3 data events where resources.ARN starts with the finance/ prefix ARN and readOnly is false.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable S3 server access logging for the bucket and filter the delivered log records for PUT and DELETE operations under finance/.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Configure S3 Event Notifications for the finance/ prefix to invoke a Lambda function that writes each event to an Amazon DynamoDB table.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company with 25 AWS accounts in AWS Organizations must pass an annual PCI DSS assessment. Engineers currently spend weeks collecting screenshots and configuration exports as evidence. The company wants evidence to be collected automatically and continuously from all accounts, mapped to PCI DSS controls, reviewed by delegated control owners, and packaged into a report for the external assessor. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Từ khóa: evidence tự động, liên tục, đa account, ánh xạ control PCI DSS, giao người review, đóng gói report cho assessor.\n(A) SAI: Conformance pack chỉ đánh giá cấu hình; không có workflow giao control cho người review, không gom evidence khác và không sinh assessment report.\n(B) SAI: Security Hub cho findings bảo mật theo chuẩn, nhưng không đóng gói evidence theo control và không có quy trình delegation/assessment report.\n(C) ĐÚNG: Audit Manager tích hợp Organizations, tự thu thập evidence liên tục từ Config, CloudTrail, Security Hub..., ánh xạ vào control PCI DSS, cho phép delegate control set cho người review và tạo assessment report cho assessor.\n(D) SAI: AoC chỉ chứng minh phần AWS chịu trách nhiệm; các control thuộc phía khách hàng vẫn cần evidence riêng.\nĐáp án đúng: C\nĐiểm cần nhớ: Tự động thu thập evidence + ánh xạ control + assessment report => Audit Manager (hỗ trợ delegated admin trong Organizations).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Deploy the PCI DSS conformance pack to all accounts and export the Config compliance results to Amazon S3 before each assessment.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable the PCI DSS standard in AWS Security Hub with a delegated administrator and share the findings with the assessor.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Set up AWS Audit Manager with a delegated administrator account and create an assessment from the prebuilt PCI DSS framework.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Download the PCI DSS Attestation of Compliance from AWS Artifact and give it to the assessor as evidence for all controls.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company uses AWS Config with continuous recording of all resource types. Its Config bill has grown sharply because Auto Scaling groups launch and terminate hundreds of EC2 instances and network interfaces every hour. Compliance requires continuous change tracking for security groups, IAM resources, and S3 buckets, but only a daily view is needed for EC2 instances and network interfaces. Which solution reduces cost while meeting the compliance requirements?",
+    "explanation": "Phân tích đề: Chi phí Config chủ yếu theo số configuration item được ghi; cần giữ continuous cho tài nguyên quan trọng, chỉ cần theo ngày cho tài nguyên thay đổi liên tục.\n(A) ĐÚNG: Config cho phép đặt recording frequency theo từng resource type: periodic (daily) ghi tối đa một configuration item mỗi ngày cho tài nguyên thay đổi nhiều, trong khi security group, IAM, S3 vẫn ghi continuous.\n(B) SAI: Chi phí lớn nằm ở số configuration item được ghi; đổi trigger của rule không giảm số CI, lại làm chậm việc đánh giá các tài nguyên quan trọng.\n(C) SAI: Mất continuous change tracking bắt buộc; CloudTrail ghi hành động API chứ không cho trạng thái cấu hình kết quả.\n(D) SAI: Aggregator chỉ gom dữ liệu để xem; mỗi account vẫn tự ghi và trả tiền cho configuration item của mình.\nĐáp án đúng: A\nĐiểm cần nhớ: Giảm chi phí Config: dùng periodic (daily) recording hoặc loại trừ resource type thay đổi liên tục; aggregator không giảm chi phí ghi.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Keep continuous recording as the default and add a daily recording frequency override for the EC2 instance and network interface types.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Change every Config rule to a periodic trigger that runs every 24 hours instead of running on configuration changes.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Stop the configuration recorder and reconstruct resource history from the CloudTrail management events whenever it is needed.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create an aggregator in a separate account so that configuration items are recorded only once for all of the member accounts.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A security team stores six years of organization CloudTrail logs in Amazon S3 under the standard AWSLogs/<account-id>/CloudTrail/<region>/<yyyy>/<mm>/<dd>/ prefix structure. Analysts query the logs with Amazon Athena, but queries often scan the whole dataset, and a scheduled job must add new partitions every day. The logs must remain in place in S3. Which solution reduces query cost and removes the partition maintenance with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Dữ liệu phải giữ nguyên trong S3; cần giảm lượng dữ liệu quét và bỏ việc thêm partition hằng ngày.\n(A) SAI: Vẫn phải vận hành và trả tiền cho crawler; chỉ thay job này bằng job khác.\n(B) SAI: Phải sao chép dữ liệu sang event data store (tốn phí ingest), trái yêu cầu giữ và truy vấn log tại chỗ trong S3.\n(C) ĐÚNG: Partition projection để Athena tự tính partition từ cấu hình bảng theo cấu trúc prefix, không cần MSCK REPAIR, crawler hay ALTER TABLE; lọc WHERE theo các cột đó giúp chỉ quét prefix cần thiết.\n(D) SAI: Vẫn là code tự quản lý, bị kích hoạt hàng triệu lần cho mỗi file log, tốn vận hành hơn.\nĐáp án đúng: C\nĐiểm cần nhớ: Athena trên CloudTrail S3: partition projection = không cần bảo trì partition và giảm dữ liệu quét.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Run an AWS Glue crawler every hour to discover new partitions and update the table in the Data Catalog.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Import all existing trail logs into a CloudTrail Lake event data store and run SQL queries there instead.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Re-create the Athena table with partition projection on account, Region, and date, and filter on those columns.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Trigger an ALTER TABLE ADD PARTITION statement from S3 Event Notifications for every new CloudTrail log file.",
+        "isCorrect": false
+      }
+    ]
+  }
+]

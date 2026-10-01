@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company has 40 AWS accounts in AWS Organizations. The security team wants a single place to continuously find security groups that allow overly permissive inbound rules, such as SSH open to 0.0.0.0/0, across all accounts and to remediate them automatically. Which AWS service should the team use?",
+    "explanation": "Phân tích đề: Nhiều account, cần phát hiện và tự sửa security group quá rộng một cách tập trung.\n(A) SAI: AWS WAF lọc HTTP request tại CloudFront, ALB, API Gateway...; nó không quản lý hay kiểm tra security group.\n(B) ĐÚNG: AWS Firewall Manager có security group policy loại content audit, kiểm tra rule của security group trong mọi account thuộc Organizations theo quy tắc do admin định nghĩa và có thể tự remediation (xóa rule vi phạm).\n(C) SAI: AWS Network Firewall là tường lửa cấp VPC để lọc traffic, không kiểm tra cấu hình security group.\n(D) SAI: AWS Shield Advanced chống DDoS cho tài nguyên được bảo vệ, không đánh giá rule của security group.\nĐáp án đúng: B\nĐiểm cần nhớ: Firewall Manager không phải tường lửa mới mà là lớp quản lý tập trung cho WAF, Shield Advanced, security group, Network Firewall, DNS Firewall trên nhiều account.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS WAF with a managed rule group applied to each account", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "AWS Firewall Manager with a security group content audit policy", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "AWS Network Firewall deployed in a shared inspection VPC", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "AWS Shield Advanced with protection groups for each account", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A small team is deploying AWS WAF for the first time on an Application Load Balancer. The team has no security specialists and wants protection against common web exploits, such as those in the OWASP Top 10, without writing and maintaining rules itself. What should the team add to its web ACL?",
+    "explanation": "Phân tích đề: Muốn chống lỗ hổng web phổ biến (OWASP Top 10) mà không tự viết/duy trì rule.\n(A) SAI: Tự viết regex pattern set đòi hỏi chuyên môn và công bảo trì, trái với yêu cầu.\n(B) SAI: Rate-based rule chỉ giới hạn tần suất request; nó không phát hiện payload khai thác như XSS hay LFI.\n(C) SAI: IP set chỉ chặn danh sách IP cố định; kẻ tấn công đổi IP là vượt qua, và không nhận diện được nội dung độc hại.\n(D) ĐÚNG: AWS Managed Rules core rule set (CRS) là rule group do AWS xây dựng và cập nhật, bao phủ nhiều lỗ hổng phổ biến trong OWASP Top 10; chỉ cần thêm vào web ACL.\nĐáp án đúng: D\nĐiểm cần nhớ: Managed rule groups (AWS hoặc AWS Marketplace) là cách nhanh nhất, ít công nhất để có bảo vệ L7 cơ bản; các group phổ biến: core rule set, known bad inputs, SQL database, IP reputation.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Custom rules built from regex pattern sets that match known exploit strings", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "A rate-based rule that limits the number of requests from each client IP", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "An IP set that contains addresses reported in recent attack campaigns", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "The AWS Managed Rules core rule set managed rule group", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company wants to be alerted when any Amazon EC2 instance in its accounts starts communicating with a known command-and-control server or shows other signs of compromise. The company does not want to deploy agents or analyze logs manually. Which AWS service meets this requirement?",
+    "explanation": "Phân tích đề: Yêu cầu là PHÁT HIỆN hành vi bất thường/xâm nhập (EC2 liên lạc với máy chủ C&C), không cài agent, không tự phân tích log.\n(A) SAI: AWS WAF chặn HTTP request đi vào ứng dụng, không theo dõi kết nối đi ra từ EC2 và không đưa ra finding về instance bị xâm nhập.\n(B) SAI: Shield Advanced chống DDoS nhằm vào tài nguyên, không phân tích hành vi của instance.\n(C) ĐÚNG: Amazon GuardDuty phân tích VPC Flow Logs, DNS logs, CloudTrail... bằng threat intelligence và machine learning, sinh finding khi EC2 liên lạc với C&C, không cần agent cho các nguồn dữ liệu nền tảng này.\n(D) SAI: Firewall Manager chỉ quản lý tập trung các policy bảo vệ, không tự phát hiện hành vi xâm nhập.\nĐáp án đúng: C\nĐiểm cần nhớ: WAF/Shield/Network Firewall là NGĂN CHẶN; GuardDuty là PHÁT HIỆN. Đề hỏi 'phát hiện instance bị xâm nhập/hành vi lạ' => GuardDuty.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS WAF with the AWS managed IP reputation list", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "AWS Shield Advanced with proactive engagement", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Amazon GuardDuty", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "AWS Firewall Manager", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company notices that a single external CIDR block is sending unwanted traffic on many TCP and UDP ports to instances in one subnet. The company wants to block this CIDR block for the whole subnet immediately, at no additional cost, without inspecting application content. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Chặn một dải IP trên mọi port, ở cấp subnet, không tốn thêm phí, không cần xét nội dung. Đây là lọc L3/L4 thuần.\n(A) ĐÚNG: Network ACL là stateless, gắn ở biên subnet và hỗ trợ rule DENY theo CIDR cho mọi protocol/port; miễn phí và có hiệu lực cho toàn subnet.\n(B) SAI: Security group chỉ có rule allow, không thể viết rule deny một dải IP cụ thể.\n(C) SAI: AWS WAF chỉ xử lý HTTP(S) tại các điểm gắn như ALB/CloudFront, không chặn được traffic UDP hay TCP tùy ý tới instance, và tính phí.\n(D) SAI: Network Firewall làm được nhưng tính phí endpoint-giờ và dữ liệu xử lý, cần thay đổi routing; quá mức cho yêu cầu chặn một CIDR đơn giản.\nĐáp án đúng: A\nĐiểm cần nhớ: Chặn IP/port thuần => SG/NACL; muốn DENY rõ ràng một dải IP => NACL (security group không có deny).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a deny rule for the CIDR block to the network ACL of the subnet.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add a deny rule for the CIDR block to the security groups of the instances.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an AWS WAF IP set rule for the CIDR block and apply it to the subnet.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Deploy AWS Network Firewall with a stateless drop rule for the CIDR block.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company exposes a public API through an Amazon API Gateway HTTP API. The company chose an HTTP API for its lower cost and wants to keep it. The security team now requires AWS WAF managed rules to inspect every request to the API. The solution must require minimal changes to the API itself. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: API là HTTP API (không phải REST API) và phải giữ nguyên; bắt buộc có AWS WAF kiểm tra request.\n(A) SAI: AWS WAF không hỗ trợ gắn web ACL trực tiếp vào API Gateway HTTP API; chỉ REST API stage mới gắn được.\n(B) SAI: Network Firewall lọc traffic trong VPC; HTTP API là endpoint do AWS quản lý nằm ngoài VPC của bạn, và Network Firewall không chạy managed rule của WAF.\n(C) ĐÚNG: Đặt một CloudFront distribution trước HTTP API và gắn web ACL (scope CloudFront) vào distribution; WAF kiểm tra request tại edge trước khi chuyển tới API, không cần sửa API.\n(D) SAI: Shield Advanced không cung cấp AWS WAF managed rules cho tài nguyên mà WAF không gắn được, và bản thân HTTP API không phải loại tài nguyên được Shield Advanced bảo vệ trực tiếp.\nĐáp án đúng: C\nĐiểm cần nhớ: WAF gắn được: CloudFront, ALB, API Gateway REST API, AppSync, Cognito user pool, App Runner, Verified Access. Tài nguyên không hỗ trợ => đặt CloudFront phía trước rồi gắn WAF vào CloudFront.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Associate a regional AWS WAF web ACL directly with the default stage of the HTTP API.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Deploy AWS Network Firewall with WAF managed rules in front of the HTTP API endpoint.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Put a CloudFront distribution in front of the HTTP API and associate the web ACL with it.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Subscribe to Shield Advanced so that the HTTP API receives AWS WAF managed rules at no cost.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has 30 VPCs in multiple accounts, all attached to one AWS Transit Gateway in the same Region. Each VPC currently has its own NAT gateways. The security team must filter all outbound internet traffic by domain name and by IP address and log every blocked connection. The company wants to reduce both cost and operational overhead. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: 30 VPC đã có Transit Gateway, cần lọc toàn bộ egress theo domain và IP, ghi log, giảm chi phí và công vận hành.\n(A) SAI: Triển khai Network Firewall trong cả 30 VPC nhân số endpoint (mỗi AZ mỗi VPC) và vẫn giữ 30 bộ NAT gateway, chi phí và công quản lý cao nhất.\n(B) ĐÚNG: Egress VPC tập trung: spoke VPC có route mặc định tới Transit Gateway, Transit Gateway gửi tới inspection/egress VPC chứa Network Firewall (stateful domain list + rule IP) rồi NAT gateway và internet gateway. Chỉ một bộ firewall và NAT, có alert log cho kết nối bị chặn.\n(C) SAI: DNS Firewall chỉ lọc truy vấn DNS qua Route 53 Resolver; ứng dụng kết nối thẳng bằng địa chỉ IP sẽ không bị lọc, không đáp ứng yêu cầu lọc theo IP.\n(D) SAI: Proxy Squid tự quản trên EC2 phải tự lo patch, scale, HA và cấu hình proxy cho mọi ứng dụng; nhiều công vận hành hơn dịch vụ managed.\nĐáp án đúng: B\nĐiểm cần nhớ: Nhiều VPC đã nối Transit Gateway + cần kiểm soát egress => mô hình centralized egress/inspection VPC với Network Firewall giúp gom NAT và firewall về một chỗ.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Deploy AWS Network Firewall in every VPC and keep each VPC's NAT gateways for internet access.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Route all egress through the transit gateway to a central VPC with Network Firewall and NAT gateways.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Associate a Route 53 Resolver DNS Firewall rule group with every VPC and remove the NAT gateways.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Run an Auto Scaling group of Squid proxy instances in a shared VPC and configure every workload to use it.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses AWS Organizations with 20 accounts. Workloads in every VPC use the Amazon Route 53 Resolver for DNS. The security team wants to block DNS queries to domains on the AWS managed malware and botnet command-and-control domain lists in every VPC, including VPCs that are created later, with minimal ongoing effort. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Chặn truy vấn DNS tới domain độc hại (dùng AWS managed domain lists), áp cho mọi VPC trong 20 account, kể cả VPC mới, ít công nhất.\n(A) SAI: Chia sẻ rule group qua AWS RAM giúp tái sử dụng, nhưng mỗi account vẫn phải tự associate rule group với từng VPC; VPC mới không được áp tự động.\n(B) SAI: GuardDuty chỉ phát hiện và tạo finding khi có truy vấn tới domain độc hại, không chặn truy vấn.\n(C) SAI: Network Firewall trong mọi VPC tốn chi phí và công triển khai lớn, lại cần routing thay đổi; DNS Firewall là công cụ đúng tầng cho yêu cầu chặn DNS.\n(D) ĐÚNG: Firewall Manager DNS Firewall policy tự associate rule group (dùng AWS managed domain lists với action BLOCK) với mọi VPC trong phạm vi policy, kể cả VPC tạo sau này.\nĐáp án đúng: D\nĐiểm cần nhớ: Route 53 Resolver DNS Firewall lọc ở tầng DNS; cần áp đồng loạt cho mọi VPC trong Organizations => Firewall Manager DNS Firewall policy.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Share a DNS Firewall rule group through AWS RAM and have each account associate it with its VPCs.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable Amazon GuardDuty in all accounts to block DNS queries to malicious domains automatically.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Deploy AWS Network Firewall in every VPC with a stateful domain deny list for the malicious domains.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create an AWS Firewall Manager DNS Firewall policy that uses the AWS managed domain lists.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An engineer creates an AWS WAF web ACL in the eu-west-1 Region to protect a new Amazon CloudFront distribution whose origin is also in eu-west-1. When the engineer tries to associate the web ACL, the CloudFront distribution does not appear in the list of available resources. What should the engineer do?",
+    "explanation": "Phân tích đề: Web ACL tạo ở eu-west-1 (regional scope) không gắn được vào CloudFront.\n(A) SAI: Không có tùy chọn chuyển scope của một web ACL đã tạo; và tài nguyên regional không gắn được với CloudFront.\n(B) ĐÚNG: CloudFront là dịch vụ global, web ACL cho CloudFront phải có scope CLOUDFRONT và được tạo ở Region US East (N. Virginia) us-east-1 (qua console chọn Global/CloudFront). Tạo lại web ACL với scope đó rồi associate.\n(C) SAI: Gắn web ACL vào origin ALB vẫn có thể bảo vệ ALB, nhưng request xấu vẫn đi qua CloudFront tới origin và không đáp ứng yêu cầu bảo vệ distribution tại edge.\n(D) SAI: Shield Advanced không phải điều kiện để gắn WAF vào CloudFront.\nĐáp án đúng: B\nĐiểm cần nhớ: WAF cho CloudFront = scope CLOUDFRONT, tạo ở us-east-1; WAF cho ALB/API Gateway/AppSync/Cognito = scope REGIONAL, tạo cùng Region với tài nguyên (tương tự ACM certificate cho CloudFront cũng phải ở us-east-1).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Edit the existing web ACL and change its scope from Regional to CloudFront in eu-west-1.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Re-create the web ACL with CloudFront scope in the us-east-1 Region and associate it.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Associate the eu-west-1 web ACL with the origin load balancer so it protects the distribution.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Subscribe to AWS Shield Advanced so that regional web ACLs can be attached to distributions.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An online game uses a custom TCP protocol. Game servers run on Amazon EC2 instances that each have an Elastic IP address. The company has been targeted by large DDoS attacks and now wants enhanced detection and mitigation, 24/7 help from AWS DDoS experts during attacks, and protection against unexpected charges caused by attacks. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Giao thức TCP tự định nghĩa (không phải HTTP), EC2 có Elastic IP, cần DDoS nâng cao + chuyên gia AWS + bảo vệ chi phí.\n(A) SAI: AWS WAF chỉ kiểm tra HTTP(S) và không gắn được trực tiếp vào EC2 hay Elastic IP.\n(B) SAI: Shield Standard đã có sẵn nhưng không có SRT và không có cost protection.\n(C) SAI: Network Firewall là tường lửa IPS cấp VPC, không cung cấp đội SRT, cost protection, và không được thiết kế để hấp thụ tấn công volumetric quy mô lớn.\n(D) ĐÚNG: Shield Advanced bảo vệ được Elastic IP của EC2 như một protected resource, cung cấp phát hiện/giảm thiểu nâng cao cho L3/L4, truy cập Shield Response Team (với gói Business/Enterprise Support) và cost protection.\nĐáp án đúng: D\nĐiểm cần nhớ: Shield Advanced bảo vệ CloudFront, Route 53 hosted zone, Global Accelerator, ALB/CLB và Elastic IP (EC2, NLB); ứng dụng không phải HTTP vẫn dùng được Shield Advanced qua Elastic IP.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Associate an AWS WAF web ACL with rate-based rules with each Elastic IP address.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Rely on AWS Shield Standard and open a support case when an attack begins.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Deploy AWS Network Firewall with stateful rules in front of the game server subnets.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Subscribe to AWS Shield Advanced and add the Elastic IP addresses as protected resources.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company serves its application through Amazon CloudFront with an AWS WAF web ACL attached to the distribution. The origin is an Application Load Balancer. A penetration test showed that attackers can bypass CloudFront and AWS WAF by sending requests directly to the ALB DNS name. Which TWO solutions would each prevent this bypass? (Select TWO.)",
+    "explanation": "Phân tích đề: Cần bảo đảm chỉ traffic đi qua CloudFront (và đã qua WAF) mới tới được ALB.\n(A) ĐÚNG: CloudFront VPC origins cho phép dùng ALB internal trong private subnet làm origin; ALB không còn địa chỉ public nên không thể gọi trực tiếp từ internet.\n(B) SAI: Geo restriction chỉ áp cho request đi qua CloudFront; request gửi thẳng tới ALB không đi qua CloudFront nên không bị ảnh hưởng.\n(C) ĐÚNG: Cấu hình CloudFront thêm một custom origin header chứa giá trị bí mật, và listener rule của ALB (hoặc WAF gắn ALB) chỉ forward khi header khớp, còn lại trả về 403; request gửi thẳng không có header sẽ bị từ chối.\n(D) SAI: Shield Standard chống DDoS L3/L4, không kiểm soát việc ai được phép gọi trực tiếp vào ALB.\n(E) SAI: GuardDuty chỉ phát hiện và tạo finding, không chặn request tới ALB.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Khóa origin sau CloudFront bằng: VPC origins (ALB internal), security group theo CloudFront origin-facing prefix list, hoặc custom header bí mật kiểm tra tại ALB.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Make the ALB internal and connect it to CloudFront by using a CloudFront VPC origin.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Enable CloudFront geo restriction so that only approved countries can reach the ALB.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a secret custom origin header in CloudFront and forward only requests with it on the ALB.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Rely on AWS Shield Standard to drop requests that do not come from CloudFront edge locations.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Enable Amazon GuardDuty to detect and block direct requests to the ALB DNS name.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company routes all outbound traffic from its workloads through AWS Network Firewall. The security team imported Suricata signatures that detect malware downloads and command-and-control patterns in HTTP payloads. Almost all outbound traffic uses HTTPS, and the signatures rarely match. The company requires payload-level intrusion prevention for this encrypted egress traffic, and it controls the trust stores on all workloads. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Payload bị mã hóa TLS nên chữ ký Suricata không thấy nội dung; cần IPS ở mức payload cho egress HTTPS; công ty kiểm soát trust store của workload.\n(A) SAI: GuardDuty Malware Protection quét EBS volume/S3 object để phát hiện malware, không giải mã và chặn traffic mạng theo thời gian thực.\n(B) SAI: AWS WAF không gắn được vào NAT gateway và không xử lý traffic egress.\n(C) SAI: DNS Firewall chỉ nhìn thấy tên miền trong truy vấn DNS, không thể kiểm tra payload của kết nối HTTPS.\n(D) ĐÚNG: Network Firewall hỗ trợ TLS inspection configuration: dùng CA certificate lưu trong AWS Certificate Manager để giải mã traffic outbound, cho stateful engine áp chữ ký Suricata lên nội dung đã giải mã rồi mã hóa lại. Workload phải tin tưởng CA đó, điều công ty kiểm soát được.\nĐáp án đúng: D\nĐiểm cần nhớ: IPS không đọc được payload đã mã hóa; muốn Network Firewall kiểm tra nội dung HTTPS phải bật TLS inspection (ACM certificate). Nếu chỉ cần lọc theo domain thì SNI là đủ, không cần giải mã.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable Amazon GuardDuty Malware Protection to scan and block malicious outbound HTTPS downloads.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Associate an AWS WAF web ACL with the NAT gateways to inspect the decrypted outbound requests.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Associate a Route 53 Resolver DNS Firewall rule group that inspects the HTTPS payloads.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add a Network Firewall TLS inspection configuration that uses a CA certificate from ACM.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company uses AWS Network Firewall to restrict egress to an allow list of HTTPS domains. The firewall policy uses strict rule order with a stateful rule group that passes TLS traffic to the approved domains. When the stateful default action was set to 'Drop all', HTTPS connections to approved domains began to time out, even though the domain rules are correct. The company must keep denying everything that is not explicitly allowed. What should a solutions architect change?",
+    "explanation": "Phân tích đề: Strict order + default 'Drop all' làm kết nối tới domain hợp lệ timeout; domain rule đúng; vẫn phải chặn mọi thứ không được phép.\n(A) ĐÚNG: Với 'Drop all', các packet bắt tay TCP (chưa có dữ liệu TLS) không khớp rule domain nào nên bị drop, khiến firewall không bao giờ thấy SNI. 'Drop established' cho phép bắt tay TCP hoàn tất, sau đó drop mọi luồng đã thiết lập mà không khớp rule pass; rule domain có đủ thông tin tầng ứng dụng để pass kết nối hợp lệ.\n(B) SAI: Stateless rule pass toàn bộ port 443 sẽ bỏ qua stateful engine, mọi domain qua 443 đều được đi, vi phạm yêu cầu allow list.\n(C) SAI: Đổi default thành 'Alert established' chỉ ghi log mà không chặn, vi phạm yêu cầu từ chối mặc định.\n(D) SAI: Network ACL mở 443 không thay đổi hành vi của stateful engine; vấn đề nằm ở default action của firewall policy.\nĐáp án đúng: A\nĐiểm cần nhớ: Allow list theo domain trong strict order: dùng default action 'Drop established' (hoặc tự viết rule cho phép bắt tay TCP) để engine kịp đọc SNI/Host header.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Change the stateful default action from 'Drop all' to 'Drop established'.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add a stateless rule that passes all TCP port 443 traffic before the stateful engine.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Change the stateful default action to 'Alert established' and review the alert logs.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add network ACL rules in the firewall subnets that allow TCP port 443 in both directions.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company has 40 accounts in AWS Organizations under consolidated billing. Leadership wants every Amazon CloudFront distribution and Application Load Balancer in the organization, including resources created in the future, to be protected by AWS Shield Advanced. The company wants to pay a single Shield Advanced subscription fee and to minimize manual work. Which TWO actions should a solutions architect take? (Select TWO.)",
+    "explanation": "Phân tích đề: 40 account cùng Organizations/consolidated billing, muốn Shield Advanced cho mọi CloudFront và ALB kể cả tài nguyên tương lai, trả phí subscription một lần, ít công thủ công.\n(A) ĐÚNG: Firewall Manager Shield Advanced policy với scope là CloudFront distribution và ALB, bật auto remediation, sẽ tự thêm Shield Advanced protection cho tài nguyên hiện có và tài nguyên mới trong các account thuộc phạm vi.\n(B) SAI: StackSets có thể tạo protection cho tài nguyên có sẵn nhưng không tự bảo vệ tài nguyên được tạo sau đó, phải chạy lại liên tục.\n(C) ĐÚNG: Các account trong cùng Organizations dùng consolidated billing khi subscribe Shield Advanced chỉ chịu một phí subscription hằng tháng tính cho tổ chức (phí data transfer out theo tài nguyên vẫn tính riêng).\n(D) SAI: Shield Standard không có SRT, cost protection hay giảm thiểu L7 tự động, không đáp ứng yêu cầu Shield Advanced.\n(E) SAI: Tag tài nguyên không tự động bật protection; chỉ khi có policy (như Firewall Manager) dùng tag làm scope thì mới có tác dụng.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Shield Advanced trong Organizations: một phí subscription cho cả tổ chức; dùng Firewall Manager Shield Advanced policy để tự áp protection cho tài nguyên mới.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an AWS Firewall Manager Shield Advanced policy for distributions and ALBs with auto remediation.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Use CloudFormation StackSets to create a Shield protection for each existing resource in every account.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Subscribe the accounts to Shield Advanced so that the organization pays one monthly subscription fee.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Rely on AWS Shield Standard, which extends Shield Advanced features to consolidated billing families.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Apply a shield-protected tag to every resource so that Shield Advanced protects the resources automatically.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A healthcare company runs workloads in a VPC behind an internet-facing Application Load Balancer. A security review produced three findings: some workloads resolve domains that are known to host malware, including tools that use non-HTTP protocols; outbound connections must be inspected with intrusion prevention signatures; and the ALB is receiving cross-site scripting payloads. The company wants a preventive control for each finding. Which THREE services should a solutions architect implement? (Select THREE.)",
+    "explanation": "Phân tích đề: Ba phát hiện, mỗi cái một tầng: DNS tới domain độc hại (mọi giao thức), IPS cho egress, XSS vào ALB. Cần kiểm soát ngăn chặn, không chỉ phát hiện.\n(A) ĐÚNG: Route 53 Resolver DNS Firewall chặn truy vấn DNS tới domain độc hại cho mọi workload dùng Resolver, bất kể ứng dụng dùng giao thức gì sau đó.\n(B) SAI: GuardDuty chỉ phát hiện và tạo finding, không ngăn chặn; đề yêu cầu kiểm soát preventive.\n(C) ĐÚNG: AWS Network Firewall với stateful rule (Suricata IPS) kiểm tra và chặn kết nối outbound theo chữ ký.\n(D) SAI: Shield Advanced chống DDoS, không xử lý DNS độc hại, IPS egress hay XSS.\n(E) ĐÚNG: AWS WAF gắn vào ALB với rule XSS (cross-site scripting match statement hoặc core rule set) chặn payload XSS ở tầng 7.\n(F) SAI: Security group chỉ lọc IP/port/protocol, không phân biệt được domain độc hại, chữ ký IPS hay payload XSS.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: DNS độc hại => DNS Firewall; IPS/lọc sâu egress => Network Firewall; SQLi/XSS vào web => WAF; phát hiện => GuardDuty.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Amazon Route 53 Resolver DNS Firewall", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Amazon GuardDuty", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "AWS Network Firewall", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "AWS Shield Advanced", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "AWS WAF", "isCorrect": true },
+      { "answerLabel": "F", "answerText": "VPC security groups", "isCorrect": false }
+    ]
+  }
+]

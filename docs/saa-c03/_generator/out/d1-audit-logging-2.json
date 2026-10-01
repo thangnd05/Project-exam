@@ -1,0 +1,409 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A security team wants to send full copies of network packets, including payloads, from selected Amazon EC2 instances to an intrusion detection appliance for deep packet inspection. VPC Flow Logs are already enabled on the VPC. Which AWS feature should the team use?",
+    "explanation": "Phân tích đề: Cần bản sao đầy đủ gói tin (kể cả payload) để phân tích sâu; flow logs chỉ có metadata.\n(A) ĐÚNG: Traffic Mirroring sao chép nguyên gói tin từ ENI nguồn tới mirror target (ENI của appliance, NLB hoặc Gateway Load Balancer endpoint), cho phép IDS phân tích payload.\n(B) SAI: Dù dùng custom format, flow logs chỉ ghi metadata (IP, port, protocol, bytes, action), không bao giờ có payload.\n(C) SAI: Chỉ ghi truy vấn DNS, không phải toàn bộ gói tin.\n(D) SAI: Access logs chỉ ghi thông tin mức request HTTP đi qua load balancer, không có bản sao gói tin.\nĐáp án đúng: A\nĐiểm cần nhớ: Metadata luồng mạng => VPC Flow Logs; nội dung gói tin (payload) => VPC Traffic Mirroring.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "VPC Traffic Mirroring from the instances' elastic network interfaces to the appliance.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "A new VPC flow log that uses a custom format containing every available field.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Route 53 Resolver query logging for the VPC that contains the selected instances.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Elastic Load Balancing access logs for a load balancer placed in front of the instances.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An operations team wants to be notified when the average CPU utilization of an Amazon EC2 instance stays above 80% for 10 minutes. Which AWS service should the team use?",
+    "explanation": "Phân tích đề: Giám sát hiệu năng (metric CPU) và cảnh báo theo ngưỡng, không phải audit API hay cấu hình.\n(A) SAI: CloudTrail ghi API call, không đo CPU; thông báo SNS của trail chỉ báo có file log mới.\n(B) SAI: Config đánh giá cấu hình tài nguyên, không theo dõi metric hiệu năng.\n(C) ĐÚNG: EC2 gửi metric CPUUtilization vào CloudWatch; alarm với threshold 80% trong 2 chu kỳ 5 phút (hoặc 10 chu kỳ 1 phút) sẽ chuyển sang ALARM và gửi thông báo qua SNS.\n(D) SAI: Insights phát hiện bất thường về tần suất hoặc lỗi của API call, không liên quan tới CPU.\nĐáp án đúng: C\nĐiểm cần nhớ: CloudWatch = chạy có khỏe không (metric, alarm); CloudTrail = ai làm gì; Config = cấu hình ra sao.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "AWS CloudTrail, with a trail that sends a notification to Amazon SNS for each log file delivery.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "AWS Config, with a managed rule that evaluates the CPU utilization of each EC2 instance.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Amazon CloudWatch, with an alarm on the CPUUtilization metric that notifies an SNS topic.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "AWS CloudTrail Insights, which detects unusual activity on the instance and sends alerts.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A trail has log file integrity validation enabled. An auditor wants to confirm that none of the CloudTrail log files delivered during the last quarter were modified or deleted after delivery. How can the auditor perform this verification?",
+    "explanation": "Phân tích đề: Log file validation đã bật; cần cách kiểm chứng thực tế từng file log trong một khoảng thời gian.\n(A) SAI: Event history không lưu hash của file log; ETag cũng không phải cơ chế chứng minh toàn vẹn của CloudTrail.\n(B) ĐÚNG: CloudTrail giao digest file mỗi giờ chứa SHA-256 hash của các log file, được ký bằng SHA-256 with RSA; lệnh validate-logs kiểm tra chữ ký và hash để phát hiện file bị sửa, xóa hoặc thiếu.\n(C) SAI: Rule này chỉ xác nhận tính năng validation đang bật, không kiểm tra từng file log có bị thay đổi hay không.\n(D) SAI: Macie tìm dữ liệu nhạy cảm và rủi ro bảo mật của bucket, không xác minh tính toàn vẹn log CloudTrail.\nĐáp án đúng: B\nĐiểm cần nhớ: Log file validation = digest file mỗi giờ (SHA-256 + chữ ký RSA); kiểm chứng bằng aws cloudtrail validate-logs.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Compare the ETag of each log object with the MD5 hash that CloudTrail Event history stores for it.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Run the aws cloudtrail validate-logs command, which checks the log files against the signed digest files.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Check that the AWS Config rule cloud-trail-log-file-validation-enabled reports the trail as COMPLIANT.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable Amazon Macie on the log bucket and review its findings about objects that were modified.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company must continuously check whether every Amazon EBS volume in its account is encrypted and must be able to see which volumes are noncompliant. What is the SIMPLEST way to meet this requirement?",
+    "explanation": "Phân tích đề: Kiểm tra trạng thái (đã mã hóa hay chưa) liên tục và hiển thị tài nguyên không tuân thủ.\n(A) SAI: Chỉ thấy hành động tạo volume trong phạm vi log, không phản ánh trạng thái hiện tại của mọi volume và phải tự xây truy vấn.\n(B) SAI: Malware Protection quét mã độc trên EBS, không đánh giá tuân thủ mã hóa.\n(C) SAI: Không có metric VolumeEncrypted; CloudWatch không dùng để đánh giá cấu hình.\n(D) ĐÚNG: Managed rule encrypted-volumes đánh giá từng EBS volume được Config ghi nhận và báo COMPLIANT/NON_COMPLIANT, cập nhật mỗi khi cấu hình thay đổi.\nĐáp án đúng: D\nĐiểm cần nhớ: Có tài nguyên nào đang sai chuẩn không => Config rule. Muốn ngăn từ đầu thì bật EBS encryption by default.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a CloudTrail trail and search its logs for CreateVolume calls that do not include the Encrypted parameter.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable Amazon GuardDuty Malware Protection so that it reports the encryption status of EBS volumes.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Create a CloudWatch alarm on the VolumeEncrypted metric of each EBS volume in the account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable AWS Config and turn on the encrypted-volumes managed rule.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company runs a web application behind an Application Load Balancer (ALB). For troubleshooting and security reviews, the team needs a record of every request, including the client IP address, request path, response status code, and target processing time. The records must be stored at low cost for one year. Which TWO steps should a solutions architect take?",
+    "explanation": "Phân tích đề: Cần log từng request HTTP của ALB, lưu rẻ trong một năm.\n(A) SAI: CloudTrail ghi các API quản trị ELB, không ghi các request HTTP của người dùng đi qua ALB.\n(B) ĐÚNG: ALB access logs (mặc định tắt) ghi từng request với client IP:port, request line, status code, request/target/response processing time... và giao định kỳ vào S3 cùng Region.\n(C) SAI: Flow logs hoạt động ở lớp 3/4, không có trường HTTP path hay status code.\n(D) ĐÚNG: ELB cần quyền ghi vào bucket thông qua bucket policy; kết hợp với S3 Lifecycle rule để xóa log sau một năm giúp chi phí thấp.\n(E) SAI: Metric chỉ là số liệu tổng hợp, không có bản ghi từng request.\nĐáp án đúng: B và D\nĐiểm cần nhớ: ELB access logs mặc định tắt, ghi vào S3 cùng Region và cần bucket policy cho phép ELB ghi; CloudTrail không ghi request HTTP.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Enable CloudTrail data events for Elastic Load Balancing on the account's existing trail.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable access logs on the ALB and specify an S3 bucket in the same Region as the load balancer.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable VPC Flow Logs on the ALB's network interfaces with a custom format that includes the request path.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Add a bucket policy that allows Elastic Load Balancing log delivery to write objects to the bucket prefix.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Create CloudWatch alarms on the RequestCount and TargetResponseTime metrics of the ALB.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company delivers its CloudTrail management events to a CloudWatch Logs log group. The security team wants an alert when more than five failed AWS Management Console sign-in attempts occur within 5 minutes. Which solution meets this requirement with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cảnh báo theo ngưỡng đếm trong một khoảng thời gian, dữ liệu đã có sẵn trong CloudWatch Logs.\n(A) SAI: Làm được nhưng phải tự viết và bảo trì logic đếm theo cửa sổ thời gian.\n(B) ĐÚNG: Metric filter khớp eventName ConsoleLogin với kết quả thất bại, tăng metric cho mỗi lần; alarm dạng Sum trong chu kỳ 5 phút với ngưỡng lớn hơn 5 gửi cảnh báo qua SNS mà không cần code.\n(C) SAI: Insights so với baseline tự học, không cho đặt ngưỡng cụ thể như 5 lần trong 5 phút.\n(D) SAI: Rule này chỉ kiểm tra root có MFA, không đếm số lần đăng nhập thất bại.\nĐáp án đúng: B\nĐiểm cần nhớ: Đếm/ngưỡng trên event CloudTrail => CloudWatch Logs metric filter + alarm; phản ứng theo một event cụ thể => EventBridge.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create an EventBridge rule that matches failed ConsoleLogin events and invokes a Lambda function that counts them in an Amazon DynamoDB table.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create a metric filter for failed ConsoleLogin events on the log group and a CloudWatch alarm with a threshold greater than 5 in 5 minutes.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable CloudTrail Insights for the API error rate and subscribe the security team to the resulting Insights events.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable the AWS Config managed rule root-account-mfa-enabled and send its notifications through Amazon SNS.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company has five AWS accounts that, for legal reasons, cannot join AWS Organizations. The security team wants CloudTrail log files from all five accounts to be delivered directly to one S3 bucket in a dedicated audit account. Which TWO actions meet this requirement with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Không có Organizations nên không dùng được organization trail; cần gom log nhiều account vào một bucket.\n(A) SAI: Organization trail yêu cầu các account thuộc cùng AWS Organizations.\n(B) ĐÚNG: Mỗi account tự tạo trail nhưng chỉ định bucket ở audit account; CloudTrail ghi log vào prefix AWSLogs/<account-id>/ riêng cho từng account.\n(C) SAI: Làm được nhưng phải duy trì thêm năm bucket nguồn và cấu hình replication, tốn vận hành và chi phí hơn giao trực tiếp.\n(D) SAI: Cần tự viết job sao chép, có độ trễ và dễ lỗi.\n(E) ĐÚNG: Bucket policy phải cho phép service principal CloudTrail ghi vào prefix của từng account (nên kèm điều kiện aws:SourceArn của trail) thì CloudTrail mới giao log cross-account được.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Gom log nhiều account không có Organizations: trail ở từng account + bucket policy cho cloudtrail.amazonaws.com theo prefix của từng account.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create an organization trail in the audit account that includes the five accounts.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create a multi-Region trail in each of the five accounts that uses the audit account's bucket as its destination.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure S3 replication from a log bucket in each account to the bucket in the audit account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create an IAM role in each account that the audit account assumes every hour to copy the log files.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Update the audit bucket policy to allow cloudtrail.amazonaws.com to put objects under each account's AWSLogs/<account-id>/ prefix.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A security team has an AWS Config aggregator that covers every account in the organization. The team needs to quickly list all EC2 instances of the t2 family that currently exist across every account and Region by using a SQL-like query, without exporting data or building additional infrastructure. What should the team use?",
+    "explanation": "Phân tích đề: Truy vấn trạng thái hiện tại, kiểu SQL, đa account/Region, không dựng thêm hạ tầng; đã có aggregator.\n(A) SAI: Chỉ thấy instance được launch trong thời gian lưu giữ event và không biết instance nào còn tồn tại, tức không phải trạng thái hiện tại.\n(B) SAI: Phải xuất snapshot và dựng bảng Athena, trái yêu cầu không xuất dữ liệu và không thêm hạ tầng.\n(C) ĐÚNG: Advanced query dùng cú pháp SELECT kiểu SQL trên thuộc tính cấu hình hiện tại (ví dụ configuration.instanceType LIKE 't2.%') và chạy trực tiếp trên aggregator để bao trùm mọi account/Region.\n(D) SAI: Chỉ gồm instance được SSM quản lý (có agent), và cần cấu hình data sync, thêm hạ tầng.\nĐáp án đúng: C\nĐiểm cần nhớ: Truy vấn kiểu SQL trạng thái cấu hình hiện tại, kể cả đa account => Config advanced query (chạy trên aggregator).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "A CloudTrail Lake query that searches for RunInstances events that specify a t2 instance type.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Amazon Athena queries on Config snapshot files after each account delivers snapshots to Amazon S3.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "AWS Config advanced query, run against the organization aggregator.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "AWS Systems Manager Inventory with a resource data sync to a central S3 bucket.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A security team configured its CloudTrail trail to encrypt log files with a customer managed AWS KMS key. Since the change, analysts whose IAM policies allow s3:GetObject on the log bucket receive AccessDenied errors when they download log files. CloudTrail continues to deliver logs successfully. What should a solutions architect do to fix the issue?",
+    "explanation": "Phân tích đề: Log giờ được mã hóa SSE-KMS bằng customer managed key; người đọc có quyền S3 nhưng vẫn bị từ chối.\n(A) SAI: Quyền S3 không phải nguyên nhân; thiếu quyền KMS thì vẫn bị AccessDenied khi giải mã.\n(B) SAI: Digest file và chữ ký không liên quan đến việc tải và giải mã log file.\n(C) ĐÚNG: Với SSE-KMS, đọc object cần cả s3:GetObject và kms:Decrypt trên key; key policy phải cho phép trực tiếp hoặc ủy quyền cho IAM policy trong account.\n(D) SAI: Cấu hình KMS của trail được ưu tiên hơn default encryption của bucket, và làm vậy cũng phá vỡ yêu cầu dùng customer managed key.\nĐáp án đúng: C\nĐiểm cần nhớ: Log CloudTrail mã hóa bằng KMS: key policy cho CloudTrail GenerateDataKey để ghi, và cho người đọc kms:Decrypt.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Add s3:GetObjectVersion and s3:ListBucket permissions for the analysts on the log bucket.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Disable log file integrity validation, because the digest files are signed with a key that the analysts cannot use.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Grant the analysts kms:Decrypt on the key through the key policy or through IAM policies that the key policy allows.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Change the bucket's default encryption to SSE-S3 so that CloudTrail stops using the KMS key.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company sends CloudTrail management events to a CloudWatch Logs log group with 30-day retention. During an incident, responders must run ad hoc queries, such as finding every API call made by a specific IAM role in the last 6 hours grouped by event name. They need results within minutes and do not want to set up new resources. What should they use?",
+    "explanation": "Phân tích đề: Dữ liệu đã nằm trong CloudWatch Logs; cần truy vấn ad hoc nhanh, không dựng thêm gì.\n(A) SAI: Athena truy vấn dữ liệu trong S3 (hoặc cần triển khai connector federated riêng), không đọc trực tiếp log group mà không dựng thêm tài nguyên.\n(B) SAI: Metric filter chỉ áp dụng cho log mới từ lúc tạo, không truy vấn được dữ liệu 6 giờ trước và phải tạo trước.\n(C) SAI: Insights phát hiện bất thường theo baseline, không phải công cụ truy vấn ad hoc.\n(D) ĐÚNG: Logs Insights truy vấn tương tác ngay trên log group, tự nhận diện trường JSON của CloudTrail; lọc theo userIdentity.arn và dùng stats count(*) by eventName trả kết quả trong vài giây.\nĐáp án đúng: D\nĐiểm cần nhớ: Log CloudTrail trong CloudWatch Logs => truy vấn ad hoc bằng Logs Insights; log trong S3 => Athena hoặc CloudTrail Lake.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Amazon Athena with a new table that points directly at the CloudWatch Logs log group.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "CloudWatch metric filters that create a separate metric for each event name the role uses.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "CloudTrail Insights, selecting the IAM role as the dimension to analyze for the incident window.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "CloudWatch Logs Insights queries against the existing log group.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company must retain audit events for 7 years and run SQL queries across them from a single place. The events include AWS API activity from all accounts in its organization and user activity logs from an on-premises identity application that can call an AWS API to submit events. The company wants a managed solution without building ETL pipelines or maintaining Athena tables. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Hai nguồn: CloudTrail của cả tổ chức và event từ ứng dụng on-premises; cần lưu 7 năm, truy vấn SQL, managed, không ETL/Athena.\n(A) ĐÚNG: CloudTrail Lake lưu event trong event data store được quản lý với retention nhiều năm; integration cho phép nguồn ngoài AWS gửi event qua PutAuditEvents vào event data store riêng, và SQL của Lake truy vấn được cả hai.\n(B) SAI: Phải dựng pipeline Firehose, định nghĩa và duy trì bảng Athena cho hai schema khác nhau, trái yêu cầu.\n(C) SAI: Phải xây pipeline ingest và vận hành domain OpenSearch trong 7 năm, không phải giải pháp ít vận hành.\n(D) SAI: Config ghi trạng thái cấu hình tài nguyên AWS, không lưu API event hay event từ ứng dụng on-premises.\nĐáp án đúng: A\nĐiểm cần nhớ: CloudTrail Lake: event data store được quản lý, SQL, retention dài hạn, nhận được cả event ngoài AWS qua integration.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a CloudTrail Lake organization event data store and a Lake integration for the on-premises events, then query both with SQL.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Deliver an organization trail to S3, ship the on-premises logs to the same bucket with Amazon Data Firehose, and query everything with Athena.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Send all events to Amazon OpenSearch Service with UltraWarm storage and query them with OpenSearch SQL for seven years.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable an AWS Config aggregator and use advanced queries to search both the AWS and on-premises events.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company's security account has an AWS Config aggregator with an organization source. The company acquired a business that owns three AWS accounts, which will remain outside AWS Organizations for at least a year. The security team must be able to view the Config data of those three accounts from the security account. Which TWO actions should a solutions architect take?",
+    "explanation": "Phân tích đề: Ba account không thuộc Organizations; aggregator hiện dùng organization source.\n(A) SAI: Một aggregator dùng hoặc organization source hoặc danh sách account riêng lẻ, không thể thêm account ngoài tổ chức vào aggregator dạng organization.\n(B) ĐÚNG: Aggregator với nguồn là các account riêng lẻ gom được dữ liệu từ account ngoài Organizations.\n(C) SAI: Organization conformance pack chỉ áp dụng cho member account của tổ chức, và nó triển khai rule chứ không gom dữ liệu.\n(D) ĐÚNG: Với account riêng lẻ, mỗi source account phải cấp authorization cho account và Region của aggregator thì dữ liệu mới được gom.\n(E) SAI: Account ngoài tổ chức không nằm trong organization trail, và CloudTrail không cung cấp trạng thái cấu hình.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Aggregator với account ngoài Organizations: thêm account riêng lẻ và mỗi source account phải authorize aggregator; organization source thì tự động, không cần authorize.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Add the three account IDs to the source list of the existing organization aggregator.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create an additional aggregator in the security account that specifies the three account IDs as individual source accounts.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Deploy an organization conformance pack that includes the three acquired accounts.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "In each acquired account, create an aggregation authorization for the security account and the aggregator's Region.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Create an organization trail that includes the acquired accounts and query their configurations with Amazon Athena.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company has 30 member accounts in AWS Organizations. The security team must run a remediation Lambda function in a central security account within seconds whenever any principal in a member account calls DeleteFlowLogs. Remediation logic must run only in the security account, and no Lambda functions may be deployed in member accounts. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Phản ứng trong vài giây theo một API cụ thể, xuyên account, logic chỉ nằm ở security account.\n(A) ĐÚNG: EventBridge trong mỗi member account nhận event DeleteFlowLogs từ CloudTrail gần realtime và chuyển sang custom event bus ở security account (resource policy cho phép tổ chức); rule ở đó gọi Lambda, nên không có Lambda ở member account.\n(B) SAI: Log CloudTrail vào S3 có độ trễ vài phút cộng thêm chu kỳ polling, không đáp ứng yêu cầu vài giây.\n(C) SAI: Rule này đánh giá theo chu kỳ, và SSM remediation của Config chạy trong từng member account, không phải trong vài giây.\n(D) SAI: Insights chỉ sinh event khi tần suất API bất thường so với baseline, một lần DeleteFlowLogs không tạo Insights event.\nĐáp án đúng: A\nĐiểm cần nhớ: Phản ứng realtime xuyên account: EventBridge ở account nguồn -> event bus trung tâm -> Lambda. Log trong S3 hay Athena thì có độ trễ tính bằng phút.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Use CloudFormation StackSets to deploy EventBridge rules in all member accounts that forward matching CloudTrail events to an event bus in the security account, where a rule invokes the Lambda function.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Have a scheduled Lambda function in the security account query the organization trail logs in S3 with Athena every 5 minutes and remediate any DeleteFlowLogs calls it finds.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable the AWS Config managed rule vpc-flow-logs-enabled in every account with automatic remediation that re-creates the flow logs from the security account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable CloudTrail Insights on the organization trail and route the resulting Insights events to the remediation Lambda function in the security account.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "Users report that they cannot reach a web server on an EC2 instance over HTTPS. VPC Flow Logs for the instance's network interface show an ACCEPT record for inbound traffic from the client to port 443, followed by a REJECT record for the outbound response from port 443 to the client's ephemeral port. The security group allows inbound 443 from 0.0.0.0/0 and has the default outbound rule. What is the MOST likely cause?",
+    "explanation": "Phân tích đề: Inbound ACCEPT nhưng response outbound REJECT; security group là stateful còn network ACL là stateless.\n(A) SAI: Security group là stateful: response của kết nối đã được cho phép vào sẽ tự được phép ra, và outbound mặc định đã cho phép tất cả.\n(B) SAI: Nếu firewall trong OS chặn thì gói tin không rời instance nên sẽ không có bản ghi REJECT ở ENI cho traffic ra.\n(C) ĐÚNG: Network ACL stateless đánh giá riêng traffic ra; nếu thiếu rule outbound cho ephemeral ports thì response bị chặn và flow log ghi REJECT cho chiều ra dù chiều vào được ACCEPT.\n(D) SAI: Thiếu route không tạo bản ghi REJECT kiểu này, và inbound từ internet đã đến được instance nên đường đi qua internet gateway vẫn tồn tại.\nĐáp án đúng: C\nĐiểm cần nhớ: Flow logs: inbound ACCEPT + outbound REJECT => network ACL (stateless) thiếu rule ephemeral port; security group stateful không gây ra mẫu này.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "The security group needs an outbound rule that allows traffic to the client's ephemeral ports.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "The instance's operating system firewall is dropping the response packets before they leave the instance.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "The subnet's network ACL does not allow outbound traffic to the ephemeral port range 1024-65535.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "The route table has no route back to the client, so the VPC router rejects the outbound packets.",
+        "isCorrect": false
+      }
+    ]
+  }
+]

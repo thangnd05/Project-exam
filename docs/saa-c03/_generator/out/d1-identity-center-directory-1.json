@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company with no existing identity provider wants its 300 employees to sign in once and then open the AWS Management Console for any of its 15 AWS accounts, as well as Salesforce and Microsoft 365, from a single web portal. Which AWS service should the company use?",
+    "explanation": "Phân tích đề: Nhân viên (workforce), đăng nhập một lần, vào nhiều AWS account và cả ứng dụng SaaS từ một portal, chưa có IdP nào.\n(A) SAI: Cognito user pool dành cho người dùng cuối của ứng dụng do công ty tự xây, không cấp quyền vào AWS Console đa account qua permission set.\n(B) SAI: Simple AD chỉ là thư mục kiểu AD cơ bản, không phải cổng SSO đa account và không dùng được làm identity source cho IAM Identity Center.\n(C) ĐÚNG: IAM Identity Center dùng Identity Center directory làm kho người dùng, cấp quyền vào từng account qua permission set và account assignment, đồng thời có application assignment SAML cho Salesforce và Microsoft 365; tất cả hiện trên AWS access portal.\n(D) SAI: IAM User ở từng account tạo ra credential dài hạn rải rác, không có SSO và không phủ được ứng dụng SaaS.\nĐáp án đúng: C\nĐiểm cần nhớ: Workforce cần SSO vào nhiều AWS account và ứng dụng SaaS từ một portal => IAM Identity Center; chưa có IdP thì dùng Identity Center directory mặc định.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Amazon Cognito user pools with a hosted UI and an app client for each application", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "AWS Directory Service Simple AD with the directory access URL enabled for employees", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "IAM Identity Center with its built-in directory and SAML application assignments", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "IAM users in every account, organized with IAM groups for each job function", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company runs Active Directory in its on-premises data center and has a Site-to-Site VPN to a VPC. New Windows EC2 instances must join the existing on-premises domain by using seamless domain join. The security team does not want any copy of directory data stored in AWS. Which AWS Directory Service option should be used?",
+    "explanation": "Phân tích đề: Đã có AD on-prem, EC2 join thẳng vào domain on-prem, không được lưu bất kỳ bản sao directory nào trên AWS.\n(A) ĐÚNG: AD Connector là proxy chuyển tiếp yêu cầu xác thực và domain join về domain controller on-prem thông qua một service account, không lưu hay cache dữ liệu directory trên AWS, và hỗ trợ seamless domain join cho EC2.\n(B) SAI: AWS Managed Microsoft AD là một directory thật chạy trên AWS; kèm trust thì EC2 sẽ join vào domain trên AWS chứ không phải domain on-prem, và vi phạm yêu cầu không lưu directory trên AWS.\n(C) SAI: Simple AD không có cơ chế đồng bộ với AD on-prem và bản thân nó lưu dữ liệu directory trên AWS.\n(D) SAI: Cognito user pool không làm domain join cho EC2 Windows; nó dành cho người dùng cuối của ứng dụng.\nĐáp án đúng: A\nĐiểm cần nhớ: Có AD on-prem, không muốn nhân bản danh tính lên cloud => AD Connector (proxy, không lưu dữ liệu).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AD Connector configured with a service account in the on-premises domain", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "AWS Managed Microsoft AD with a one-way trust to the on-premises forest", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Simple AD configured to synchronize users from the on-premises domain", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "An Amazon Cognito user pool federated with the on-premises AD FS server", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A small company has about 40 employees and no on-premises directory. It needs a low-cost managed directory so that a few Linux and Windows EC2 instances can join a domain and use Kerberos-based sign-in. No trusts, MFA, or schema changes are required. Which solution is the MOST cost-effective?",
+    "explanation": "Phân tích đề: Ít user, nhu cầu AD cơ bản (domain join, Kerberos), không cần trust, MFA hay schema, ưu tiên chi phí thấp nhất.\n(A) SAI: Managed Microsoft AD Enterprise Edition là AD thật đầy đủ tính năng, hướng tới directory lớn, chi phí cao hơn nhiều so với nhu cầu cơ bản này.\n(B) SAI: AD Connector không phải là directory; nó cần một AD có sẵn phía sau, nên công ty vẫn phải tự dựng và vận hành domain controller trên EC2.\n(C) SAI: Identity Center directory chỉ phục vụ SSO vào AWS account và ứng dụng, không cung cấp domain để EC2 join hay Kerberos.\n(D) ĐÚNG: Simple AD là directory tương thích AD dựa trên Samba 4, bản Small phù hợp số lượng user nhỏ, hỗ trợ domain join Windows và Linux, Kerberos SSO với chi phí thấp.\nĐáp án đúng: D\nĐiểm cần nhớ: Ít user, AD cơ bản, không trust/MFA/schema, cần rẻ => Simple AD.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS Managed Microsoft AD Enterprise Edition deployed across two Availability Zones", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "AD Connector pointing to a domain controller installed on an EC2 instance", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "IAM Identity Center with its built-in identity store acting as the domain", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Simple AD in the Small size deployed in the company's VPC", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company uses IAM Identity Center to give a developer group access to three member accounts with a permission set named DevAccess. What does IAM Identity Center create in each assigned account to deliver these permissions?",
+    "explanation": "Phân tích đề: Hỏi cơ chế phía sau của permission set khi được gán vào account.\n(A) SAI: Identity Center không tạo IAM User hay access key dài hạn; mục tiêu của nó chính là loại bỏ IAM User rải rác.\n(B) ĐÚNG: Khi provision permission set vào account, Identity Center tạo một IAM role (tên dạng AWSReservedSSO_DevAccess_...) chứa các policy của permission set; người dùng chọn account trên access portal và nhận credential tạm thời qua STS khi assume role này.\n(C) SAI: IAM Group chỉ gắn policy cho IAM User trong account, không liên quan tới cơ chế SSO của permission set.\n(D) SAI: SCP chỉ đặt giới hạn tối đa cho account, không cấp quyền, và permission set không được chuyển thành SCP.\nĐáp án đúng: B\nĐiểm cần nhớ: Permission set = khuôn mẫu policy; Identity Center tạo IAM role AWSReservedSSO_* trong mỗi account được gán, người dùng nhận credential tạm qua STS.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "An IAM user for each developer with a console password and access keys", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "An IAM role that users assume from the access portal with temporary credentials", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "An IAM group that contains the policies copied from the permission set definition", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "A service control policy attached to each account with the permission set rules", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company is building a new .NET application entirely on AWS and has no on-premises infrastructure. The application uses Amazon RDS for SQL Server and requires Windows Authentication for database logins. Windows EC2 application servers must also be joined to the same domain. The company wants the LEAST operational overhead. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Không có AD on-prem, cần RDS for SQL Server Windows Authentication và EC2 join cùng domain, vận hành ít nhất.\n(A) SAI: Amazon RDS for SQL Server không hỗ trợ Simple AD cho Windows Authentication.\n(B) SAI: AD Connector chỉ là proxy tới một AD có sẵn và RDS for SQL Server không hỗ trợ join qua AD Connector; công ty còn phải tự vận hành domain controller trên EC2.\n(C) ĐÚNG: AWS Managed Microsoft AD là AD thật do AWS quản lý (hai domain controller ở hai AZ, vá lỗi, snapshot tự động); RDS for SQL Server join trực tiếp vào directory này để dùng Windows Authentication, EC2 dùng seamless domain join.\n(D) SAI: Tự cài AD DS trên EC2 về mặt kỹ thuật có thể dùng cho RDS, nhưng công ty phải tự lo HA, vá lỗi, backup domain controller, trái với yêu cầu vận hành ít nhất.\nĐáp án đúng: C\nĐiểm cần nhớ: RDS for SQL Server Windows Authentication trong môi trường AWS thuần => AWS Managed Microsoft AD; AD Connector và Simple AD đều không dùng được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Deploy Simple AD and configure RDS for SQL Server to join the Simple AD domain", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Deploy AD Connector and point it to a domain controller that runs on Amazon EC2", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Deploy AWS Managed Microsoft AD and join both RDS and EC2 instances to it", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Install AD Domain Services on EC2 instances in two AZs and join RDS to that domain", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company changed the IAM Identity Center identity source to its external identity provider by exchanging SAML 2.0 metadata. Employees authenticate successfully at the IdP, but IAM Identity Center rejects the sign-in because the users are not found, and the groups used for account assignments are empty. The company wants the fix that requires the LEAST ongoing effort. What should a solutions architect do?",
+    "explanation": "Phân tích đề: SAML chỉ lo xác thực; người dùng và group phải tồn tại sẵn trong Identity Center thì mới đăng nhập và nhận assignment được. Cần cách ít công sức lâu dài.\n(A) SAI: Tạo tay user trong Identity Center có thể chạy được nhưng mỗi lần onboarding/offboarding đều phải làm thủ công, dễ lệch với IdP.\n(B) ĐÚNG: SCIM automatic provisioning cho IdP tự động tạo, cập nhật, vô hiệu hóa user và group trong Identity Center; SAML 2.0 lo xác thực, SCIM lo đồng bộ danh tính, nên group assignment luôn phản ánh đúng IdP.\n(C) SAI: Tạo IAM SAML identity provider trong từng account là mô hình federation trực tiếp vào IAM, bỏ qua Identity Center và tăng công vận hành.\n(D) SAI: Đổi sang inline policy không giải quyết việc user chưa tồn tại trong Identity Center; kiểu policy không liên quan tới provisioning.\nĐáp án đúng: B\nĐiểm cần nhớ: External IdP với Identity Center = SAML 2.0 để xác thực + SCIM để tự động provisioning user và group.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Recreate the users manually in IAM Identity Center each time HR onboards someone", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable SCIM automatic provisioning from the IdP to IAM Identity Center", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Add an IAM SAML identity provider for the same IdP in every member account", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Change the permission sets to use inline policies instead of group assignments", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company manages 60 accounts with AWS Organizations and IAM Identity Center. Several teams have an AdministratorAccess permission set in their own accounts, and Identity Center administrators can edit permission sets. The security team must guarantee that no principal in any member account can stop or delete CloudTrail trails or AWS Config recorders. Which solution meets this requirement with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Phải chặn mọi principal trong member account, kể cả người có AdministratorAccess và kể cả khi permission set bị chỉnh sửa; vận hành ít nhất.\n(A) SAI: Thêm deny vào từng permission set chỉ tác động tới người dùng SSO, không chặn IAM role hay user khác, và admin Identity Center có thể gỡ statement đó.\n(B) SAI: Permissions boundary trên permission set cũng chỉ áp dụng cho role do Identity Center tạo, không phủ được các principal khác trong account.\n(C) SAI: Gắn policy deny cho mọi role trong 60 account là khối lượng lớn, dễ sót role mới tạo và có thể bị admin trong account gỡ bỏ.\n(D) ĐÚNG: SCP gắn ở root của organization đặt giới hạn tối đa cho mọi principal trong mọi member account; deny trong SCP thắng cả AdministratorAccess của permission set và người trong account không thể sửa SCP.\nĐáp án đúng: D\nĐiểm cần nhớ: SCP vẫn áp dụng sau khi người dùng assume role qua permission set; guardrail toàn tổ chức => SCP, không phải sửa từng permission set.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add an inline deny statement for the CloudTrail and Config actions to every permission set", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Attach a permissions boundary to each permission set that excludes those actions", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an IAM policy with an explicit deny in each account and attach it to all roles", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Attach an SCP to the organization root that denies those CloudTrail and Config actions", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs AWS Managed Microsoft AD for the domain corp.example.com in a shared services VPC. Workloads in 20 other VPCs, connected through a transit gateway, must resolve the domain so that EC2 instances can join it. The VPCs must continue to use the Amazon Route 53 Resolver for all other names. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: 20 VPC cần phân giải riêng tên miền AD, các tên khác vẫn qua Route 53 Resolver, vận hành ít nhất.\n(A) ĐÚNG: Route 53 Resolver outbound endpoint kèm forwarding rule cho corp.example.com trỏ tới IP DNS của directory chỉ chuyển tiếp đúng tên miền AD; chia sẻ rule qua AWS RAM và gắn vào các VPC là xong, mọi tên khác vẫn do Resolver xử lý.\n(B) SAI: Private hosted zone chép tay bản ghi domain controller (SRV, A) sẽ lỗi thời khi directory thay đổi và phải bảo trì thủ công.\n(C) SAI: Đổi DHCP options set để mọi truy vấn đi qua DNS của directory vi phạm yêu cầu giữ Route 53 Resolver cho các tên khác và phải sửa ở từng VPC.\n(D) SAI: Inbound endpoint dùng để nhận truy vấn từ bên ngoài vào Resolver, sai chiều so với nhu cầu VPC workload hỏi tên miền AD.\nĐáp án đúng: A\nĐiểm cần nhớ: Cho nhiều VPC phân giải tên miền của Managed AD => Resolver outbound endpoint + forwarding rule chia sẻ qua RAM.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a Resolver outbound endpoint and a forwarding rule for the domain to the directory DNS IPs, and share the rule with AWS RAM", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create a Route 53 private hosted zone for the domain, copy the domain controller records into it, and associate it with all VPCs", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Change the DHCP options set in every VPC so that the directory DNS servers answer all DNS queries for the instances", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a Resolver inbound endpoint in each workload VPC and point the directory's conditional forwarders to those endpoints", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses IAM Identity Center with an external IdP. There are more than 200 projects, and each developer should manage only the EC2 instances and S3 objects that are tagged with that developer's project. Project assignments change often in the IdP. The company wants to avoid creating a permission set for every project. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Hơn 200 project, thay đổi thường xuyên, không muốn một permission set mỗi project => cần ABAC.\n(A) SAI: Một permission set cho mỗi project là đúng thứ công ty muốn tránh; hơn 200 permission set và assignment rất khó quản lý.\n(B) ĐÚNG: Bật attributes for access control trong Identity Center, lấy thuộc tính project từ IdP làm session tag; một permission set duy nhất so sánh aws:PrincipalTag/project với aws:ResourceTag/project. Khi IdP đổi project, quyền đổi theo mà không cần sửa policy.\n(C) SAI: IAM Group chỉ áp dụng cho IAM User trong từng account, không áp dụng cho người dùng SSO và nhân bản quản lý ra nhiều account.\n(D) SAI: SCP không cấp quyền và không biết developer thuộc project nào nếu không có principal tag; nó chỉ đặt giới hạn tối đa.\nĐáp án đúng: B\nĐiểm cần nhớ: Quyền theo thuộc tính người dùng với quy mô lớn => ABAC trong Identity Center: attribute từ IdP thành aws:PrincipalTag, so với aws:ResourceTag.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a separate permission set for each project and assign it to a matching IdP group", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Map the IdP project attribute as an access control attribute in one tag-based permission set", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Create IAM groups per project in every account and add developers through automation", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Attach SCPs to each account that allow access only to resources carrying project tags", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company provides Amazon WorkSpaces to its employees. WorkSpaces users authenticate through AD Connector against the on-premises Active Directory. The company already operates a RADIUS-based MFA server on premises and now requires MFA for every WorkSpaces sign-in. Which solution meets this requirement?",
+    "explanation": "Phân tích đề: WorkSpaces xác thực qua AD Connector, đã có RADIUS MFA on-prem, cần MFA cho mỗi lần đăng nhập WorkSpaces.\n(A) SAI: Người dùng WorkSpaces đăng nhập bằng tài khoản AD, không phải IAM User; MFA của IAM không tham gia luồng này.\n(B) SAI: Người dùng WorkSpaces trong kịch bản xác thực qua directory của AD Connector, không đi qua IAM Identity Center, nên cài đặt MFA của Identity Center không tác động.\n(C) ĐÚNG: AD Connector hỗ trợ MFA qua RADIUS; bật MFA trên directory và trỏ tới RADIUS server on-prem thì mỗi lần đăng nhập WorkSpaces phải nhập thêm mã OTP.\n(D) SAI: Cognito user pool không nằm trong luồng xác thực của WorkSpaces client, không thể chèn vào trước directory.\nĐáp án đúng: C\nĐiểm cần nhớ: MFA cho WorkSpaces dùng AD Connector hoặc Managed AD => bật RADIUS MFA trên directory.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create IAM users for the employees and require a virtual MFA device for each user", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable MFA in IAM Identity Center settings and assign the WorkSpaces to the users", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable multi-factor authentication on the AD Connector and point it to the RADIUS server", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Configure an Amazon Cognito user pool with MFA in front of the WorkSpaces client sign-in", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company uses AWS Organizations with 120 accounts. The security policy states that the management account must be used only for billing and organization-level tasks, and only two senior administrators may hold access to it. An identity team must manage IAM Identity Center permission sets and account assignments for all member accounts without signing in to the management account. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Giảm tối đa việc dùng management account, chỉ hai người có quyền vào đó; team identity vẫn phải quản lý permission set và assignment cho mọi member account từ nơi khác.\n(A) ĐÚNG: Đăng ký account của team identity làm delegated administrator cho IAM Identity Center; từ đó team quản lý permission set và assignment cho các member account mà không cần vào management account. Delegated admin không quản lý được assignment vào chính management account, điều này lại khớp yêu cầu chỉ hai admin cấp cao kiểm soát account đó.\n(B) SAI: Cho team identity assume role trong management account nghĩa là họ vẫn hoạt động trong management account, vi phạm chính sách hạn chế truy cập.\n(C) SAI: Account instance của Identity Center chỉ phục vụ một số ứng dụng AWS được quản lý trong account đó, không cấp được quyền truy cập AWS account bằng permission set.\n(D) SAI: StackSets triển khai IAM role và SAML provider là quay về federation trực tiếp vào IAM từng account, bỏ Identity Center và tốn vận hành hơn nhiều.\nĐáp án đúng: A\nĐiểm cần nhớ: Muốn quản lý Identity Center ngoài management account => delegated administrator; quyền vào management account vẫn chỉ quản lý được từ management account.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Register the identity team's account as the delegated administrator for IAM Identity Center", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create a cross-account IAM role in the management account with Identity Center admin permissions for the team", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an account instance of IAM Identity Center in the team's account and assign permission sets from it", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use CloudFormation StackSets from the team's account to deploy IAM roles and SAML providers everywhere", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company has an on-premises Active Directory and a Site-to-Site VPN to AWS. It prefers AD Connector because it keeps identities on premises, but it will deploy AWS Managed Microsoft AD if any requirement cannot be met otherwise. Which TWO requirements can be met ONLY by AWS Managed Microsoft AD and not by AD Connector?",
+    "explanation": "Phân tích đề: Cần biết giới hạn của AD Connector so với Managed Microsoft AD; chỉ chọn yêu cầu mà AD Connector không làm được.\n(A) SAI: AD Connector hỗ trợ seamless domain join cho EC2 Windows vào domain on-prem.\n(B) ĐÚNG: Amazon RDS for SQL Server không hỗ trợ AD Connector cho Windows Authentication; trên AWS Directory Service thì phải dùng AWS Managed Microsoft AD.\n(C) SAI: Amazon WorkSpaces dùng được AD Connector để người dùng đăng nhập bằng tài khoản AD on-prem.\n(D) ĐÚNG: Directory sharing sang các account khác trong organization chỉ có ở AWS Managed Microsoft AD; AD Connector không chia sẻ được.\n(E) SAI: Cả AD Connector và Managed Microsoft AD đều dùng được làm identity source cho IAM Identity Center.\nĐáp án đúng: B và D\nĐiểm cần nhớ: AD Connector làm được domain join, WorkSpaces, identity source cho Identity Center; nhưng RDS SQL Server Windows Authentication, trust và directory sharing cần Managed Microsoft AD.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Seamlessly joining Windows EC2 instances to the domain during launch", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Using Windows Authentication with Amazon RDS for SQL Server", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Authenticating Amazon WorkSpaces users with their AD credentials", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Sharing the directory with other AWS accounts in the organization", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Serving as the identity source for IAM Identity Center", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company operates a single AWS account and has no plans to adopt AWS Organizations. It uses Microsoft AD FS on premises. Employees must sign in to the AWS Management Console with their AD credentials and receive a role based on their AD group membership. The company does not want long-term AWS credentials for employees and prefers not to deploy any AWS directory service. Which TWO actions should the solutions architect take?",
+    "explanation": "Phân tích đề: Một account duy nhất, đã có AD FS (SAML 2.0 IdP), không muốn credential dài hạn, không muốn thêm Directory Service => federation SAML trực tiếp vào IAM.\n(A) ĐÚNG: Tạo IAM SAML identity provider trong account bằng federation metadata của AD FS để IAM tin cậy assertion do AD FS ký.\n(B) SAI: IAM User cho mỗi nhân viên tạo credential dài hạn, trái yêu cầu và không có SSO.\n(C) SAI: AD Connector là một dịch vụ Directory Service, công ty không muốn triển khai thêm; AD FS có sẵn đã đủ làm IdP.\n(D) SAI: OIDC provider và AssumeRoleWithWebIdentity dành cho IdP kiểu OpenID Connect (web identity), trong khi AD FS ở đây dùng SAML 2.0.\n(E) ĐÚNG: Tạo IAM role có trust policy cho phép sts:AssumeRoleWithSAML từ provider đó, và cấu hình claim rule trong AD FS để ánh xạ group AD sang ARN của role; người dùng nhận credential tạm thời khi vào Console.\nĐáp án đúng: A và E\nĐiểm cần nhớ: Một hoặc vài account với IdP SAML có sẵn => IAM SAML provider + role tin cậy AssumeRoleWithSAML; nhiều account thì chuyển sang IAM Identity Center.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an IAM SAML identity provider in the account by using the AD FS federation metadata", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create an IAM user for each employee and map each AD group to a matching IAM group", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Deploy AD Connector and enable AWS Management Console access for the directory users", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create an IAM OIDC identity provider and roles that trust sts:AssumeRoleWithWebIdentity", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Create IAM roles that trust sts:AssumeRoleWithSAML from that provider and map AD groups to them in AD FS", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company wants to create a two-way forest trust between AWS Managed Microsoft AD in a VPC and its on-premises Active Directory forest. Users in each forest must be able to access resources in the other forest. Which THREE actions are required?",
+    "explanation": "Phân tích đề: Thiết lập trust giữa Managed Microsoft AD và AD on-prem cần ba điều kiện nền: mạng thông, DNS phân giải chéo, và cổng AD được mở.\n(A) ĐÚNG: Domain controller hai bên phải liên lạc được với nhau qua mạng riêng như Site-to-Site VPN hoặc Direct Connect.\n(B) SAI: AD Connector là proxy xác thực độc lập, không tham gia hay chuyển tiếp lưu lượng trust giữa hai forest.\n(C) ĐÚNG: Mỗi bên cần conditional forwarder để phân giải tên domain của bên kia; thiếu DNS thì không tạo và xác minh được trust.\n(D) SAI: Directory sharing dùng để chia sẻ Managed AD cho account AWS khác, không phải cơ chế kết nối với forest on-prem.\n(E) SAI: Đăng ký external identity provider trong IAM Identity Center là việc SSO vào AWS, không tạo trust giữa hai AD.\n(F) ĐÚNG: Phải mở các cổng AD cần thiết (Kerberos, LDAP, DNS, SMB, RPC...) trong security group của directory, đặc biệt là outbound, và trên firewall on-prem.\nĐáp án đúng: A, C và F\nĐiểm cần nhớ: Trust Managed AD với on-prem = mạng (VPN/DX) + DNS conditional forwarder hai chiều + mở cổng AD trong security group và firewall.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Establish network connectivity such as AWS Direct Connect or Site-to-Site VPN between the VPC and on premises", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Deploy AD Connector in the same VPC to proxy the trust traffic to the on-premises domain controllers", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Configure DNS conditional forwarders so that each domain can resolve the name of the other domain", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable directory sharing so that the on-premises forest can consume the managed directory", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Register the on-premises forest as an external identity provider in IAM Identity Center", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "Allow the required AD ports in the directory security group and in the on-premises firewalls", "isCorrect": true }
+    ]
+  }
+]

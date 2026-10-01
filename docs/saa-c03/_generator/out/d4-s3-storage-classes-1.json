@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A veterinary hospital network stores X-ray images in Amazon S3. After the first visit, each image is typically viewed only once or twice a year during follow-up appointments, but it must appear on screen immediately when a veterinarian opens the patient record. The images are the only copy and must be kept for several years. Which storage class is the MOST cost-effective for images older than 60 days?",
+    "explanation": "Phân tích đề: Truy cập vài lần mỗi năm, phải hiển thị ngay (mili-giây), dữ liệu duy nhất cần độ bền nhiều AZ, lưu nhiều năm. Từ khóa 'rất ít đọc nhưng cần ngay' chỉ thẳng Glacier Instant Retrieval.\n(A) SAI: S3 Standard-IA đáp ứng mili-giây nhưng giá lưu trữ cao hơn Glacier Instant Retrieval đáng kể; nó hợp với truy cập khoảng một lần mỗi tháng, không phải một đến hai lần mỗi năm.\n(B) ĐÚNG: S3 Glacier Instant Retrieval lưu ở tối thiểu 3 AZ, trả dữ liệu trong mili-giây bằng GET thông thường, giá lưu trữ thấp hơn Standard-IA. Phí truy xuất theo GB cao hơn nhưng chỉ phát sinh vài lần mỗi năm, thời gian lưu tối thiểu 90 ngày không là vấn đề vì ảnh giữ nhiều năm.\n(C) SAI: S3 Glacier Flexible Retrieval phải gửi yêu cầu restore và chờ từ vài phút (Expedited) tới vài giờ, không thể hiện ảnh ngay khi mở hồ sơ.\n(D) SAI: S3 One Zone-IA chỉ lưu ở một AZ; ảnh X-quang là bản duy nhất nên mất AZ là mất dữ liệu vĩnh viễn.\nĐáp án đúng: B\nĐiểm cần nhớ: Vài lần mỗi năm + cần mili-giây => Glacier Instant Retrieval; khoảng một lần mỗi tháng + mili-giây => Standard-IA.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "S3 Standard-Infrequent Access", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "S3 Glacier Instant Retrieval", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "S3 Glacier Flexible Retrieval", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "S3 One Zone-Infrequent Access", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company uploads quarterly export files directly into a specific Amazon S3 storage class by setting the storage class on each PUT request. A cleanup job deletes every file exactly 100 days after upload. The files are never read. For which storage class will the company pay an early deletion charge?",
+    "explanation": "Phân tích đề: Object bị xóa ở ngày 100. Cần so với thời gian lưu tối thiểu của từng lớp: IA 30 ngày, Glacier Instant và Flexible 90 ngày, Deep Archive 180 ngày.\n(A) SAI: S3 Standard-IA có tối thiểu 30 ngày; xóa ở ngày 100 đã vượt mức nên không có phí xóa sớm.\n(B) SAI: S3 Glacier Instant Retrieval có tối thiểu 90 ngày; ngày 100 đã vượt mức.\n(C) SAI: S3 Glacier Flexible Retrieval cũng tối thiểu 90 ngày; không bị tính thêm.\n(D) ĐÚNG: S3 Glacier Deep Archive có thời gian lưu tối thiểu 180 ngày. Xóa ở ngày 100 thì S3 tính thêm phần còn lại theo tỷ lệ (80 ngày) như thể object vẫn nằm đó.\nĐáp án đúng: D\nĐiểm cần nhớ: Con số vàng: 30 ngày (IA), 90 ngày (Glacier Instant và Flexible), 180 ngày (Deep Archive). Xóa, ghi đè hoặc chuyển lớp trước hạn đều bị tính đủ thời gian tối thiểu.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "S3 Standard-Infrequent Access", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "S3 Glacier Instant Retrieval", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "S3 Glacier Flexible Retrieval", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "S3 Glacier Deep Archive", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A university enabled Requester Pays on an Amazon S3 bucket that hosts a large research dataset. The bucket policy still allows public read access. After the change, anonymous users who download objects with plain HTTPS links receive 403 Access Denied errors, while researchers who sign requests with their own AWS credentials can still download. What explains this behavior?",
+    "explanation": "Phân tích đề: Sau khi bật Requester Pays, người dùng ẩn danh bị 403, người dùng có chữ ký AWS vẫn tải được. Cần hiểu điều kiện của Requester Pays.\n(A) SAI: Requester Pays không tắt hay ghi đè bucket policy; researcher có credentials vẫn tải bình thường chứng tỏ policy vẫn có hiệu lực.\n(B) SAI: Requester Pays không bắt buộc dùng CloudFront; ngược lại, request qua CloudFront không tự gắn thông tin người trả tiền.\n(C) ĐÚNG: Với Requester Pays, S3 phải biết tài khoản AWS nào trả phí request và phí tải dữ liệu, nên mọi request phải được xác thực và kèm header x-amz-request-payer (hoặc tham số tương đương). Request ẩn danh không có danh tính để tính tiền nên bị từ chối.\n(D) SAI: Requester Pays không làm thay đổi lớp lưu trữ của object và không yêu cầu restore.\nĐáp án đúng: C\nĐiểm cần nhớ: Requester Pays: người tải trả phí request và data transfer, chủ bucket vẫn trả tiền lưu trữ; không hỗ trợ truy cập ẩn danh.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enabling Requester Pays automatically replaces the bucket policy with a private default policy.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Requester Pays buckets can be accessed only through an Amazon CloudFront distribution.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Requester Pays requires authenticated requests so that S3 can bill the requester's AWS account.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Requester Pays moves objects to an archive tier that must be restored before any download.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect is reviewing storage options for data that can be lost without business impact. The architect needs to identify which Amazon S3 storage classes keep data in only a single Availability Zone. Which TWO storage classes store data in a single Availability Zone?",
+    "explanation": "Phân tích đề: Hỏi lớp S3 nào chỉ lưu ở một AZ. Hầu hết lớp S3 lưu ở tối thiểu 3 AZ; chỉ các lớp có chữ One Zone là ngoại lệ.\n(A) ĐÚNG: S3 One Zone-IA lưu dữ liệu trong một AZ, rẻ hơn Standard-IA khoảng 20%, phù hợp dữ liệu tái tạo được hoặc bản sao thứ cấp.\n(B) SAI: S3 Glacier Instant Retrieval lưu dư thừa trên tối thiểu 3 AZ.\n(C) ĐÚNG: S3 Express One Zone là lớp hiệu năng cao với độ trễ mili-giây một chữ số, dữ liệu nằm trong một AZ do bạn chọn; nó nhằm tăng tốc chứ không nhằm tiết kiệm tiền lưu trữ.\n(D) SAI: S3 Standard-IA lưu ở tối thiểu 3 AZ; chỉ khác Standard ở giá và phí truy xuất.\n(E) SAI: S3 Intelligent-Tiering cũng lưu ở tối thiểu 3 AZ ở mọi tầng truy cập.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Chỉ lớp có tên One Zone mới nằm ở một AZ; mất AZ đó là mất dữ liệu.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "S3 One Zone-Infrequent Access", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "S3 Glacier Instant Retrieval", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "S3 Express One Zone", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "S3 Standard-Infrequent Access", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "S3 Intelligent-Tiering", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A manufacturing company uses commercial backup software that writes weekly full backups to an on-premises physical tape library through an iSCSI virtual tape interface. The company wants to retire the tape library and off-site tape courier service. Backups must be retained for 10 years, are restored less than once per year, and a restore that takes up to 24 hours is acceptable. The backup software and its tape-based workflows must remain unchanged. Which solution meets these requirements MOST cost-effectively?",
+    "explanation": "Phân tích đề: Giữ nguyên phần mềm backup dạng tape (iSCSI VTL), lưu 10 năm, gần như không restore, chấp nhận chờ tới 24 giờ, chi phí thấp nhất.\n(A) SAI: S3 File Gateway trình bày share NFS/SMB, không phải thiết bị tape iSCSI; phần mềm backup phải đổi từ tape job sang ghi file, vi phạm yêu cầu giữ nguyên quy trình.\n(B) ĐÚNG: Tape Gateway mô phỏng thư viện tape (VTL) qua iSCSI nên phần mềm backup không đổi. Tape đã eject được archive sang S3 Glacier Deep Archive, lớp rẻ nhất; lấy tape về trong khoảng 12 giờ, nằm trong giới hạn 24 giờ.\n(C) SAI: DataSync chép file từ NFS/SMB/HDFS lên S3, không nhận luồng ghi tape; ngoài ra Glacier Flexible Retrieval đắt hơn Deep Archive cho dữ liệu gần như không đọc.\n(D) SAI: Tape Gateway với archive pool là Glacier Flexible Retrieval vẫn hoạt động nhưng giá lưu trữ cao hơn Deep Archive nhiều lần, trong khi thời gian khôi phục nhanh hơn là không cần thiết.\nĐáp án đúng: B\nĐiểm cần nhớ: Thay thư viện tape mà không đổi phần mềm backup => Tape Gateway; chờ được khoảng 12 giờ => archive pool Deep Archive, cần nhanh hơn => Glacier Flexible Retrieval.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Deploy an S3 File Gateway and add a lifecycle rule that moves backup files to S3 Glacier Deep Archive.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Deploy a Tape Gateway and archive ejected virtual tapes to the S3 Glacier Deep Archive pool.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Use AWS DataSync to copy the backup catalog and tape images into S3 Glacier Flexible Retrieval every week.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Deploy a Tape Gateway and archive ejected virtual tapes to the S3 Glacier Flexible Retrieval pool.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A platform team wants to be alerted when the amount of storage consumed by incomplete multipart uploads in any bucket of the account grows beyond 500 GB. The team already uses the Amazon S3 Storage Lens default dashboard, but it cannot create an Amazon CloudWatch alarm on those metrics. Which solution meets this requirement with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần alarm CloudWatch trên chỉ số dung lượng multipart upload dang dở của Storage Lens; dashboard mặc định (free metrics) không đẩy số liệu sang CloudWatch.\n(A) SAI: S3 Inventory liệt kê object hoàn chỉnh theo lịch; muốn tính dung lượng multipart dang dở phải tự viết pipeline Athena và Lambda, tốn vận hành hơn nhiều.\n(B) SAI: Metric BucketSizeBytes mặc định của S3 trong CloudWatch chỉ phản ánh dung lượng theo storage class, không tách riêng phần multipart upload dang dở.\n(C) ĐÚNG: Bật advanced metrics and recommendations cho một dashboard Storage Lens và chọn tùy chọn publish sang CloudWatch; các chỉ số như incomplete multipart upload bytes xuất hiện dưới dạng metric CloudWatch nên tạo alarm trực tiếp được.\n(D) SAI: Storage Class Analysis chỉ quan sát truy cập để gợi ý mốc chuyển sang Standard-IA; nó không đo multipart upload dang dở và không tạo metric alarm.\nĐáp án đúng: C\nĐiểm cần nhớ: Publish chỉ số Storage Lens sang CloudWatch, prefix-level aggregation, activity metrics và lịch sử 15 tháng đều cần advanced metrics; free metrics chỉ giữ 14 ngày.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Configure daily S3 Inventory reports and query them with Amazon Athena from a scheduled AWS Lambda function.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a CloudWatch alarm on the default BucketSizeBytes storage metric for each bucket in the account.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable Storage Lens advanced metrics with CloudWatch publishing, then alarm on the metric.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable S3 Storage Class Analysis on every bucket and export the results to CloudWatch Logs.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An engineering firm stores all project files under the projects/ prefix of one Amazon S3 bucket. When a project closes, an application adds the tag status=closed to that project's objects. Files of closed projects are almost never read, but files of active projects under the same prefix must remain in S3 Standard. Other prefixes in the bucket have their own rules. The firm wants closed-project files moved to S3 Glacier Flexible Retrieval without custom code. How should the lifecycle rule be scoped?",
+    "explanation": "Phân tích đề: Chỉ object vừa nằm dưới projects/ vừa có tag status=closed mới được chuyển; object active cùng prefix phải giữ nguyên, prefix khác không bị ảnh hưởng.\n(A) SAI: Lọc chỉ theo prefix projects/ sẽ chuyển cả file của dự án đang hoạt động sang Glacier, vi phạm yêu cầu giữ ở Standard.\n(B) SAI: Lọc chỉ theo tag áp dụng cho toàn bucket; nếu prefix khác cũng dùng tag status=closed với ý nghĩa khác thì sẽ bị chuyển nhầm, không đúng phạm vi yêu cầu.\n(C) SAI: Lifecycle không cần Lambda để đọc tag; bộ lọc tag là tính năng có sẵn. Tự viết Lambda chép object là thêm code và thêm chi phí request.\n(D) ĐÚNG: Filter của lifecycle rule hỗ trợ phần tử And kết hợp prefix và một hoặc nhiều tag; rule chỉ khớp object thỏa cả hai điều kiện nên chuyển đúng file của dự án đã đóng.\nĐáp án đúng: D\nĐiểm cần nhớ: Lifecycle filter lọc theo prefix, tag, kích thước object, và có thể kết hợp bằng And để khoanh đúng tập object.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a rule filtered only on the projects/ prefix that transitions objects to Glacier Flexible Retrieval.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a bucket-wide rule filtered only on the status=closed tag that transitions matching objects.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use an AWS Lambda function to read object tags daily and copy closed objects into the archive class.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a rule whose filter uses an And condition with the projects/ prefix and the status=closed tag.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A media company restores old footage from S3 Glacier Flexible Retrieval by using Bulk retrievals. Restores finish at unpredictable times during the night. A transcoding workflow must start automatically as soon as each individual object becomes readable, and engineers do not want to poll the objects. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Cần kích hoạt xử lý ngay khi từng object restore xong, không polling.\n(A) SAI: CloudTrail ghi lại lời gọi RestoreObject lúc bắt đầu yêu cầu, không phải lúc restore hoàn tất; kích hoạt theo sự kiện này sẽ chạy khi object chưa đọc được.\n(B) ĐÚNG: S3 Event Notifications hỗ trợ sự kiện s3:ObjectRestore:Completed, phát ra khi bản tạm đã sẵn sàng; gửi tới Lambda, SQS, SNS hoặc qua EventBridge để khởi động transcoding cho từng object.\n(C) SAI: Chạy HeadObject định kỳ để đọc header x-amz-restore chính là polling mà đề muốn tránh, tốn request và có độ trễ.\n(D) SAI: Lifecycle rule không có hành động 'khi restore xong'; lifecycle chỉ chuyển tầng hoặc xóa theo tuổi object.\nĐáp án đúng: B\nĐiểm cần nhớ: Restore có ba sự kiện: ObjectRestore:Post (bắt đầu), ObjectRestore:Completed (sẵn sàng đọc), ObjectRestore:Delete (bản tạm hết hạn).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an EventBridge rule for the RestoreObject API call recorded by AWS CloudTrail and start the workflow.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Configure an S3 event notification for s3:ObjectRestore:Completed that invokes the workflow.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Schedule a Lambda function every 10 minutes to call HeadObject and check the x-amz-restore header.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add a lifecycle rule action that invokes the workflow when a restored copy becomes available.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A research bucket uses S3 Intelligent-Tiering because access patterns are unpredictable. Most datasets must always be readable in milliseconds. However, objects tagged lifecycle=cold-ok belong to finished studies, and for those objects a restore time of up to 12 hours is acceptable if they have not been accessed for at least 6 months. The team wants the lowest storage cost for the cold-ok objects without affecting any other objects. What should a solutions architect configure?",
+    "explanation": "Phân tích đề: Chỉ nhóm object có tag lifecycle=cold-ok được phép rơi xuống tầng lưu kho cần restore; các object khác phải luôn mili-giây. Ngưỡng 6 tháng không truy cập, chờ tới 12 giờ.\n(A) SAI: Bật Deep Archive Access cho toàn bucket sẽ khiến cả những object bắt buộc mili-giây cũng bị archive sau 180 ngày không truy cập, vi phạm yêu cầu.\n(B) ĐÚNG: Tạo cấu hình S3 Intelligent-Tiering archive (PutBucketIntelligentTieringConfiguration) có filter theo tag lifecycle=cold-ok và bật Deep Archive Access sau 180 ngày. Chỉ object khớp filter được archive; restore từ tầng này hoàn tất trong khoảng 12 giờ.\n(C) SAI: Lifecycle transition dựa trên tuổi object, không dựa trên lần truy cập cuối; một dataset cũ vẫn được đọc thường xuyên cũng sẽ bị đẩy vào Deep Archive.\n(D) SAI: Archive Access tier bật cho toàn bucket vẫn ảnh hưởng mọi object; hơn nữa mức giá của nó ngang Glacier Flexible Retrieval, cao hơn Deep Archive Access trong khi 12 giờ là chấp nhận được.\nĐáp án đúng: B\nĐiểm cần nhớ: Hai tầng archive của Intelligent-Tiering là tùy chọn, bật qua cấu hình riêng có thể lọc theo prefix hoặc tag; Archive Access từ 90 ngày, Deep Archive Access từ 180 ngày.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable the Deep Archive Access tier in a bucket-wide Intelligent-Tiering configuration at 180 days.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an Intelligent-Tiering configuration filtered on the cold-ok tag with Deep Archive Access at 180 days.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Add a lifecycle rule for the cold-ok tag that transitions objects to S3 Glacier Deep Archive at 180 days.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable the Archive Access tier in a bucket-wide Intelligent-Tiering configuration at 180 days.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A pharmaceutical company must make 50 TB of trial data readable again for a regulatory review. The data consists of about 400,000 objects in S3 Glacier Deep Archive, spread across many prefixes, and a list of the keys is available from an S3 Inventory report. The review starts in 3 days, and the company wants the lowest retrieval cost with the least manual effort. Which TWO actions should a solutions architect take?",
+    "explanation": "Phân tích đề: Deep Archive, 400,000 object, có sẵn danh sách key từ S3 Inventory, còn 3 ngày, cần rẻ nhất và ít thao tác tay.\n(A) SAI: Expedited retrieval không được hỗ trợ cho S3 Glacier Deep Archive; nó chỉ có ở Glacier Flexible Retrieval.\n(B) ĐÚNG: Bulk retrieval của Deep Archive hoàn tất trong vòng 48 giờ và là tùy chọn rẻ nhất; 48 giờ vẫn nằm trong 3 ngày.\n(C) ĐÚNG: S3 Batch Operations nhận manifest là báo cáo S3 Inventory (hoặc CSV) và chạy thao tác Restore cho hàng trăm nghìn object trong một job, có báo cáo hoàn tất, không phải viết script lặp.\n(D) SAI: Provisioned retrieval capacity chỉ bảo đảm năng lực cho Expedited retrieval của Glacier Flexible Retrieval, không áp dụng cho Deep Archive và chỉ làm tăng chi phí.\n(E) SAI: Lifecycle chỉ chuyển xuống các lớp rẻ hơn, không thể chuyển object từ Deep Archive ngược về S3 Standard.\nĐáp án đúng: B và C\nĐiểm cần nhớ: Deep Archive chỉ có Standard (trong 12 giờ) và Bulk (trong 48 giờ); restore số lượng lớn thì dùng S3 Batch Operations với manifest từ S3 Inventory.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Request Expedited retrievals so that every object is readable within a few minutes.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use the Bulk retrieval tier, which completes within 48 hours for Deep Archive objects.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Run an S3 Batch Operations restore job that uses the S3 Inventory report as its manifest.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Purchase provisioned retrieval capacity units to guarantee the restore throughput.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Add a lifecycle rule that transitions the objects from Deep Archive back to S3 Standard.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A film studio stores two kinds of content in Amazon S3. Raw camera files are unique, average 40 GB, are used only during the first 30 days of editing, and afterwards must be retained for 7 years; during a legal dispute any raw file must be available within 12 hours. Proxy files average 300 MB, can be regenerated from the raw files, and are reused unpredictably by marketing teams: some are hot for months, others are never opened again, and every open must start in milliseconds. Which storage design is the MOST cost-effective?",
+    "explanation": "Phân tích đề: Hai loại dữ liệu với hai pattern khác nhau. Raw: pattern biết trước (nguội sau 30 ngày), chờ được 12 giờ, lưu 7 năm. Proxy: pattern không đoán trước, cần mili-giây.\n(A) SAI: Glacier Flexible Retrieval cho raw đáp ứng 12 giờ nhưng giá lưu trữ cao hơn Deep Archive nhiều lần suốt 7 năm, trong khi Deep Archive đã đủ nhanh (Standard retrieval trong 12 giờ).\n(B) ĐÚNG: Raw có mốc nguội biết trước nên dùng lifecycle chuyển sang Deep Archive ở ngày 30, lớp rẻ nhất và restore trong 12 giờ. Proxy có truy cập không đoán trước nên để Intelligent-Tiering: tự hạ tầng khi nguội, tự về Frequent Access khi được mở lại, không phí truy xuất, luôn mili-giây khi không bật tầng archive.\n(C) SAI: Đưa proxy sang One Zone-IA sau 30 ngày sẽ phát sinh phí truy xuất theo GB mỗi khi proxy bất ngờ nóng trở lại, và pattern không đoán trước nên mốc 30 ngày là đoán mò.\n(D) SAI: Để cả hai trong Intelligent-Tiering có bật Deep Archive Access thì proxy lâu không mở cũng bị archive và mất khả năng mở mili-giây; raw còn phải chờ tối thiểu 180 ngày không truy cập mới xuống giá Deep Archive, trả phí giám sát trong suốt thời gian đó.\nĐáp án đúng: B\nĐiểm cần nhớ: Tách dữ liệu theo pattern: biết trước thì Lifecycle đến đúng lớp rẻ nhất; không đoán trước và cần mili-giây thì Intelligent-Tiering không bật tầng archive.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Transition raw files to S3 Glacier Flexible Retrieval at day 30 and store proxies in S3 Intelligent-Tiering.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Transition raw files to S3 Glacier Deep Archive at day 30 and store proxies in S3 Intelligent-Tiering.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Transition raw files to S3 Glacier Deep Archive at day 30 and transition proxies to S3 One Zone-IA at day 30.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Store both raw files and proxies in S3 Intelligent-Tiering with the Deep Archive Access tier enabled for the bucket.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A data provider enabled Requester Pays on a bucket so that partner companies pay for their own downloads. To simplify access, the provider created an IAM role in its own account and allowed partner accounts to assume it; partners assume the role and download objects with the request-payer header set. At the end of the month, all request and data transfer charges still appear on the provider's bill. The provider wants the charges to appear on each partner's bill while keeping access restricted to known partners. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Requester Pays đã bật, header đã gửi, nhưng tiền vẫn tính cho chủ bucket. Nguyên nhân nằm ở danh tính gửi request: partner dùng role thuộc tài khoản của chủ bucket.\n(A) SAI: Header x-amz-request-payer đã được gửi; thêm điều kiện vào trust policy của role không thay đổi việc role thuộc tài khoản nào.\n(B) SAI: CloudFront không chuyển phí cho người xem; chủ distribution trả phí truyền dữ liệu, nên chi phí vẫn nằm trên hóa đơn của nhà cung cấp.\n(C) SAI: Tắt rồi bật lại Requester Pays không thay đổi cơ chế tính tiền; request vẫn đến từ role của nhà cung cấp.\n(D) ĐÚNG: Khi requester assume một IAM role, tài khoản sở hữu role đó bị tính phí. Hãy cấp quyền trực tiếp cho các tài khoản partner trong bucket policy để họ dùng principal của chính tài khoản họ (kèm header request-payer); khi đó phí request và tải dữ liệu tính cho partner, quyền truy cập vẫn chỉ giới hạn cho các tài khoản được liệt kê.\nĐáp án đúng: D\nĐiểm cần nhớ: Requester Pays tính tiền cho tài khoản sở hữu danh tính gửi request; nếu partner assume role của chủ bucket thì chủ bucket trả.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a condition to the role trust policy that requires the x-amz-request-payer header on every request.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Place an Amazon CloudFront distribution with signed URLs in front of the bucket for partner downloads.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Disable and re-enable Requester Pays so that billing is recalculated for the assumed-role sessions.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Grant the partner accounts access in the bucket policy so they sign requests with their own principals.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An insurance company stores case documents in Amazon S3. Documents must be deleted 30 days after their case is closed; cases can stay open for years. When a case closes, an application adds the tag case=closed to the case's objects, and a lifecycle rule filtered on that tag expires objects after 30 days. Auditors found that documents from long-running cases were deleted within a day or two of closure instead of 30 days later. The company wants deletion exactly 30 days after closure with minimal custom code. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Lifecycle expire sau 30 ngày nhưng object của vụ việc kéo dài bị xóa gần như ngay khi gắn tag. Mấu chốt: lifecycle tính tuổi từ thời điểm tạo object, không phải từ lúc gắn tag.\n(A) ĐÚNG: Khi vụ việc đóng, chép object sang prefix closed/ (CopyObject tạo object mới với thời điểm tạo mới) rồi xóa bản gốc; một lifecycle rule theo prefix closed/ expire sau 30 ngày sẽ đếm từ lúc chép, tức là đúng 30 ngày sau khi đóng.\n(B) SAI: Đổi Days lên 60 không giải quyết gốc rễ; object của vụ việc đã mở nhiều năm vẫn đủ tuổi ngay khi gắn tag và bị xóa tức thì.\n(C) SAI: Chỉnh ngày theo từng vụ việc bằng cách tạo rule riêng cho mỗi case sẽ nhanh chóng vượt giới hạn 1,000 rule mỗi bucket và tốn vận hành, mà vẫn đếm theo thời điểm tạo object.\n(D) SAI: Object Lock governance mode ngăn xóa trong thời hạn giữ, không làm thay đổi cách lifecycle tính tuổi; đây là công cụ bảo vệ, không phải công cụ hẹn giờ xóa.\nĐáp án đúng: A\nĐiểm cần nhớ: Tuổi dùng cho lifecycle luôn tính từ thời điểm tạo object; gắn tag hay đổi metadata không đặt lại đồng hồ, chỉ tạo object mới (copy) mới đặt lại.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "On closure, copy the objects to a closed/ prefix and expire that prefix with a 30-day lifecycle rule.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Increase the Days value of the tag-filtered expiration rule to 60 days to create a safety buffer.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a separate tag-filtered lifecycle rule for every case with a custom expiration period.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Apply S3 Object Lock in governance mode for 30 days to each object when the case closes.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company plans to add a lifecycle rule that transitions a 300 TB prefix from S3 Standard to S3 Standard-IA after 30 days to reduce storage cost. Before approving, a solutions architect reviews the characteristics of the data in the prefix. Which THREE characteristics would make this transition likely to INCREASE total cost instead of reducing it?",
+    "explanation": "Phân tích đề: Tìm đặc điểm khiến Standard-IA đắt hơn Standard: kích thước tính phí tối thiểu 128 KB, thời gian lưu tối thiểu 30 ngày, và phí truy xuất theo GB.\n(A) ĐÚNG: Standard-IA tính mỗi object tối thiểu 128 KB; object trung vị 24 KB bị tính gấp khoảng 5 lần dung lượng thật, cộng thêm phí chuyển tầng theo từng object.\n(B) SAI: Standard-IA lưu ở tối thiểu 3 AZ nên đáp ứng tốt yêu cầu chịu được mất một AZ; đây không phải lý do tăng chi phí.\n(C) ĐÚNG: Object bị ghi đè hoặc xóa chỉ sau khoảng 10 ngày trong Standard-IA vẫn bị tính đủ 30 ngày, nên phí xóa sớm cộng dồn liên tục.\n(D) SAI: Standard-IA trả dữ liệu trong mili-giây giống Standard, nên yêu cầu mili-giây không làm tăng chi phí.\n(E) ĐÚNG: Mỗi GB đọc từ Standard-IA bị tính phí truy xuất; object được đọc nhiều lần mỗi tuần sẽ khiến phí truy xuất và phí request vượt phần tiết kiệm lưu trữ.\n(F) SAI: Lưu 5 năm là thuận lợi cho Standard-IA vì vượt xa mức tối thiểu 30 ngày.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: Standard-IA chỉ tiết kiệm khi object đủ lớn (từ 128 KB), sống lâu hơn 30 ngày và ít được đọc (khoảng một lần mỗi tháng trở xuống).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "The median object size in the prefix is about 24 KB.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "The data must survive the loss of an entire Availability Zone.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Most objects are overwritten about 10 days after they transition.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Every object must be retrievable in milliseconds when requested.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Each object is read several times per week by a reporting job.", "isCorrect": true },
+      { "answerLabel": "F", "answerText": "The objects must be retained for at least 5 years before deletion.", "isCorrect": false }
+    ]
+  }
+]

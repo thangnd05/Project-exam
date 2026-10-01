@@ -1,0 +1,409 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "AWS Compute Optimizer classifies an Amazon EC2 instance as Over-provisioned. What does this finding indicate?",
+    "explanation": "Phân tích đề: Hỏi ý nghĩa finding Over-provisioned của EC2 trong Compute Optimizer.\n(A) SAI: Mô tả này là Under-provisioned: ít nhất một thông số không đáp ứng yêu cầu, cần upsize.\n(B) SAI: Instance gần như không hoạt động trong suốt lookback thuộc nhóm recommendation Idle, gợi ý stop hoặc terminate thay vì đổi size.\n(C) ĐÚNG: Over-provisioned nghĩa là ít nhất một thông số (CPU, memory, network, EBS…) có thể giảm mà vẫn đáp ứng yêu cầu hiệu năng; có thể downsize để tiết kiệm chi phí.\n(D) SAI: Trạng thái cân bằng giữa chi phí và hiệu năng là Optimized, không cần hành động.\nĐáp án đúng: C\nĐiểm cần nhớ: Over-provisioned -> downsize để tiết kiệm; Under-provisioned -> upsize để bảo đảm hiệu năng; Optimized -> giữ nguyên.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "At least one specification does not meet the workload's performance needs, so the instance should be upsized",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "The instance showed almost no activity during the lookback period and should be stopped",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "At least one specification can be sized down while still meeting the workload's performance needs",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "The instance type balances cost and performance well and no change is recommended",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A new AWS account has several Amazon EC2 instances that have been running for a month. When a solutions architect opens the AWS Compute Optimizer console for the first time, no recommendations are shown. What must happen before Compute Optimizer can generate recommendations for the account?",
+    "explanation": "Phân tích đề: Account mới, lần đầu dùng Compute Optimizer, chưa có recommendation.\n(A) ĐÚNG: Compute Optimizer yêu cầu opt in; khi opt in, dịch vụ tạo service-linked role để đọc metric CloudWatch và cấu hình tài nguyên, sau đó bắt đầu phân tích và sinh recommendation.\n(B) SAI: CloudWatch agent chỉ cần để bổ sung memory metric; không có agent, Compute Optimizer vẫn sinh recommendation dựa trên CPU, network, disk.\n(C) SAI: Cost Explorer là công cụ phân tích chi phí riêng; bật nó không phải điều kiện để Compute Optimizer hoạt động.\n(D) SAI: AWS Config ghi lại lịch sử cấu hình tài nguyên, không phải nguồn dữ liệu bắt buộc của Compute Optimizer.\nĐáp án đúng: A\nĐiểm cần nhớ: Compute Optimizer không tự chạy: phải opt in (account hoặc cả organization) thì mới có recommendation.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "The account must opt in to Compute Optimizer, which creates a service-linked role for the service",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "The CloudWatch agent must be installed on every instance before any recommendation can be produced",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "AWS Cost Explorer must be enabled in the account so that pricing data becomes available",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "AWS Config recording must be turned on for EC2 resources in every Region",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company wants one AWS service that inspects its account against best practices for cost optimization, security, fault tolerance, performance, and service limits, and then lists recommended actions. Which service meets this requirement?",
+    "explanation": "Phân tích đề: Cần công cụ kiểm tra tổng quát theo nhiều nhóm best practice, kể cả service limits.\n(A) SAI: Compute Optimizer chỉ tập trung rightsizing tài nguyên compute và storage liên quan, không kiểm tra security hay service limits.\n(B) SAI: Cost Optimization Hub chỉ tập trung vào cơ hội tiết kiệm chi phí, không có check security hay fault tolerance.\n(C) SAI: AWS Config đánh giá cấu hình theo rule do người dùng chọn, không phải bộ check best practice đa nhóm có sẵn kèm service limits.\n(D) ĐÚNG: AWS Trusted Advisor kiểm tra account theo các nhóm cost optimization, security, fault tolerance, performance, service limits (và operational excellence) rồi đưa ra hành động khuyến nghị.\nĐáp án đúng: D\nĐiểm cần nhớ: Kiểm tra tổng quan nhiều khía cạnh gồm service limits -> Trusted Advisor; rightsizing chuyên sâu bằng ML -> Compute Optimizer.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "AWS Compute Optimizer",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "AWS Cost Optimization Hub",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "AWS Config with conformance packs",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "AWS Trusted Advisor",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect is evaluating the enhanced infrastructure metrics feature of AWS Compute Optimizer for a fleet of Amazon EC2 instances. Which TWO statements about this feature are correct? (Choose TWO.)",
+    "explanation": "Phân tích đề: Hỏi đặc tính của enhanced infrastructure metrics.\n(A) SAI: Tính năng này không thu thập memory; memory vẫn cần CloudWatch agent hoặc external metrics ingestion.\n(B) ĐÚNG: Enhanced infrastructure metrics kéo dài lookback period từ 14 ngày mặc định lên khoảng 3 tháng (93 ngày), giúp nhận diện chu kỳ tải dài hơn.\n(C) SAI: Tính năng không thay đổi độ phân giải metric; độ phân giải phụ thuộc CloudWatch (basic hay detailed monitoring).\n(D) ĐÚNG: Đây là tính năng trả phí, tính theo số giờ tài nguyên được bật, khác với recommendation tiêu chuẩn miễn phí.\n(E) SAI: Tính năng áp dụng cho EC2 instance và Auto Scaling group, không giới hạn ở Lambda.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Enhanced infrastructure metrics = lookback dài hơn, có phí; không phải cách lấy metric memory.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "It collects memory utilization from the instances without requiring any agent",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "It extends the lookback period used for analysis from 14 days to about 3 months",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "It increases the granularity of the analyzed metrics from 5 minutes to 1 second",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "It is a paid feature that is charged for each resource hour it is active",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "It applies only to AWS Lambda functions and not to Amazon EC2 instances",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An Amazon ECS service on AWS Fargate runs tasks with 2 vCPU and 8 GB of memory. AWS Compute Optimizer reports the service as Over-provisioned and recommends 1 vCPU and 4 GB for the task and new container-level sizes. The service is deployed with a rolling update strategy behind an Application Load Balancer. How should a solutions architect apply the recommendation without downtime?",
+    "explanation": "Phân tích đề: Áp dụng recommendation kích thước task Fargate cho ECS service đang chạy sau ALB, không downtime.\n(A) SAI: Không thể thay CPU/memory của task đang chạy; task definition là bất biến theo từng revision.\n(B) ĐÚNG: Đăng ký revision mới của task definition với CPU/memory task và container theo recommendation, rồi update service dùng revision này; rolling deployment thay dần task cũ bằng task mới sau ALB nên không gián đoạn.\n(C) SAI: Service Auto Scaling điều chỉnh số lượng task, không thay đổi kích thước CPU/memory của từng task.\n(D) SAI: Chuyển sang ECS trên EC2 là thay đổi kiến trúc lớn, không cần thiết để áp dụng một recommendation kích thước task.\nĐáp án đúng: B\nĐiểm cần nhớ: Recommendation Fargate được áp dụng qua revision task definition mới + update service (rolling deployment).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Modify the CPU and memory of the running tasks in place from the Amazon ECS console",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Register a new task definition revision with the recommended sizes and update the service to use it",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure Service Auto Scaling with target tracking so that each task uses fewer resources over time",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Move the service to the EC2 launch type and select smaller container instances that match the recommendation",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "AWS Compute Optimizer recommends changing a standalone, Amazon EBS-backed c5.2xlarge instance to c6i.large. The instance has an Elastic IP address that must stay the same, and the data on its EBS volumes must be preserved. A short maintenance window is acceptable. What is the MOST operationally efficient way to apply the recommendation?",
+    "explanation": "Phân tích đề: Instance EBS-backed đơn lẻ, cần giữ Elastic IP và dữ liệu, chấp nhận downtime ngắn, muốn ít công nhất.\n(A) SAI: Không thể đổi instance type khi instance đang running; phải stop trước.\n(B) SAI: Tạo AMI và launch instance mới rồi chuyển Elastic IP vẫn làm được nhưng tốn thêm bước, sinh instance ID mới và cần dọn dẹp tài nguyên cũ.\n(C) SAI: Compute Optimizer không có chức năng tự áp dụng thay đổi instance type; nó chỉ đưa ra recommendation.\n(D) ĐÚNG: Với instance EBS-backed, chỉ cần stop, đổi instance type sang c6i.large rồi start; EBS volume, instance ID và Elastic IP (gắn với ENI trong VPC) được giữ nguyên.\nĐáp án đúng: D\nĐiểm cần nhớ: Áp dụng rightsizing cho EC2 EBS-backed: stop -> change instance type -> start; kiểm tra tương thích nền tảng (ENA/NVMe) khi đổi thế hệ.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Change the instance type while the instance is running to avoid any downtime",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create an AMI, launch a c6i.large instance from it, move the Elastic IP address, and terminate the original instance",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Select the recommendation in Compute Optimizer and choose to apply it during the next maintenance window",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Stop the instance, change its instance type to c6i.large, and start it again",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "AWS Compute Optimizer recommends moving a Multi-AZ Amazon RDS for MySQL DB instance from db.r5.2xlarge to a smaller Graviton-based db.r7g.xlarge instance class. The database supports a customer-facing application, and the company wants to minimize downtime and effort. What should a solutions architect do?",
+    "explanation": "Phân tích đề: RDS Multi-AZ, đổi instance class sang Graviton nhỏ hơn, muốn downtime và công sức tối thiểu.\n(A) ĐÚNG: Modify DB instance class và áp dụng trong maintenance window; với Multi-AZ, RDS nâng cấp standby trước rồi failover, nên thời gian gián đoạn chỉ còn khoảng thời gian failover. RDS là engine được AWS quản lý nên chuyển sang Graviton không cần build lại ứng dụng.\n(B) SAI: Snapshot và restore sang instance mới buộc phải đổi endpoint và có khoảng thời gian dữ liệu không đồng bộ, tốn công và gián đoạn hơn.\n(C) SAI: Dùng AWS DMS để migrate sang instance mới là quá phức tạp cho việc chỉ đổi instance class.\n(D) SAI: Chuyển sang Aurora Serverless v2 là thay đổi engine và kiến trúc, không phải cách áp dụng recommendation rightsizing.\nĐáp án đúng: A\nĐiểm cần nhớ: Recommendation RDS áp dụng bằng modify instance class; Multi-AZ giúp giảm downtime; RDS chuyển Graviton dễ vì AWS quản lý engine.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Modify the DB instance class to db.r7g.xlarge and apply the change during the maintenance window",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Take a snapshot, restore it to a new db.r7g.xlarge DB instance, and update the application endpoint",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Use AWS Database Migration Service to replicate the data into a new db.r7g.xlarge DB instance",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Migrate the database to Amazon Aurora Serverless v2 so that capacity is sized automatically",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "AWS Compute Optimizer shows that most of a company's x86-based Amazon EC2 fleet is over-provisioned and that many workloads have a low migration effort to AWS Graviton. The company will rightsize now and move workloads to Graviton gradually over the next year. The company also wants to commit to a steady amount of compute spend today to reduce cost. Which purchase option provides the MOST flexibility for this plan?",
+    "explanation": "Phân tích đề: Sẽ đổi family và kiến trúc (x86 -> Graviton) dần trong năm, cần commitment linh hoạt nhất.\n(A) SAI: EC2 Instance Savings Plans gắn với một instance family trong một Region; khi chuyển sang family Graviton khác, commitment sẽ không còn áp dụng.\n(B) SAI: Standard Reserved Instances gắn với instance type/family và không đổi được sang family khác, kém linh hoạt nhất.\n(C) ĐÚNG: Compute Savings Plans áp dụng cho mọi instance family, size, Region, OS, kể cả Graviton, và cũng áp dụng cho Fargate và Lambda; phù hợp khi kiến trúc còn thay đổi.\n(D) SAI: On-Demand Capacity Reservations đảm bảo capacity chứ không giảm giá; nếu không kết hợp Savings Plans thì vẫn trả giá On-Demand.\nĐáp án đúng: C\nĐiểm cần nhớ: Rightsize trước, rồi commit bằng Compute Savings Plans khi còn dự định đổi family, kiến trúc hoặc chuyển sang Fargate/Lambda.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "EC2 Instance Savings Plans for the current x86 instance families",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Standard Reserved Instances for the rightsized x86 instance types",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Compute Savings Plans",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "On-Demand Capacity Reservations for the rightsized instance types",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company reviews AWS Compute Optimizer findings for Amazon EBS volumes attached to production instances. Several io1 volumes are provisioned with far more IOPS than they use, and several gp3 volumes are provisioned with extra throughput that is never consumed. Which TWO changes are typical of the recommendations that Compute Optimizer provides for these volumes? (Choose TWO.)",
+    "explanation": "Phân tích đề: Hỏi loại khuyến nghị Compute Optimizer đưa ra cho EBS (volume type, size, IOPS, throughput).\n(A) ĐÚNG: Compute Optimizer có thể khuyên đổi volume type, ví dụ io1 sang gp3 khi hiệu năng yêu cầu nằm trong khả năng của gp3, giảm đáng kể chi phí.\n(B) SAI: Instance store là lưu trữ tạm gắn với host, mất dữ liệu khi stop; Compute Optimizer không khuyên chuyển dữ liệu production sang đó.\n(C) SAI: Multi-Attach là tính năng chia sẻ volume io1/io2 cho nhiều instance, không phải khuyến nghị tối ưu chi phí.\n(D) SAI: Đổi KMS key liên quan đến mã hóa và bảo mật, không phải phạm vi rightsizing.\n(E) ĐÚNG: Compute Optimizer có thể khuyên giảm provisioned IOPS và throughput về mức phù hợp với mức sử dụng thực tế để giảm chi phí.\nĐáp án đúng: A và E\nĐiểm cần nhớ: Recommendation EBS xoay quanh 4 thông số: volume type, size, IOPS, throughput.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Change the volume type, for example from io1 to gp3, when gp3 can meet the performance needs",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Move the data to instance store volumes to eliminate the EBS storage charges",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable EBS Multi-Attach so that one volume can be shared by several instances",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Re-encrypt the volumes with a customer managed key to lower the storage price",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Reduce the provisioned IOPS and throughput to levels that match actual usage",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A FinOps team manages cost for 45 accounts in AWS Organizations. Before a holiday code freeze, the team wants a single list of cost optimization actions across all accounts and Regions that it can filter to show only actions that do not require a resource restart and that have low implementation effort. Which solution meets this requirement with the LEAST effort?",
+    "explanation": "Phân tích đề: Cần danh sách hành động tiết kiệm cho mọi account/Region, lọc theo không cần restart và implementation effort thấp.\n(A) SAI: Trusted Advisor có check chi phí nhưng không cung cấp thuộc tính implementation effort hay restart needed cho từng khuyến nghị.\n(B) ĐÚNG: Cost Optimization Hub gom recommendation của toàn organization qua các Region; mỗi recommendation có các thuộc tính như estimated savings, implementation effort, restart needed, rollback possible để lọc và ưu tiên.\n(C) SAI: Rightsizing recommendations trong Cost Explorer chỉ cho EC2 và không có bộ lọc implementation effort; mức độ bao phủ hẹp hơn.\n(D) SAI: Tự export từ Compute Optimizer và gắn nhãn thủ công mất nhiều công, chỉ bao phủ nguồn Compute Optimizer.\nĐáp án đúng: B\nĐiểm cần nhớ: Cost Optimization Hub giúp ưu tiên hóa: lọc theo savings, implementation effort, restart needed, rollback possible trên toàn organization.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Use the AWS Trusted Advisor cost optimization checks in the organizational view",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Use AWS Cost Optimization Hub and filter by restart needed and implementation effort",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Use the rightsizing recommendations in AWS Cost Explorer and filter them by linked account",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Export Compute Optimizer recommendations from every Region and label the restart impact of each one manually",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An application server uses a 1 TiB gp2 Amazon EBS volume. The volume was sized at 1 TiB only to obtain about 3,000 baseline IOPS, but it stores less than 100 GiB of data. AWS Compute Optimizer confirms that the workload never needs more than 3,000 IOPS or 125 MiB/s. The company wants to minimize storage cost and accepts a brief maintenance window. What should a solutions architect do?",
+    "explanation": "Phân tích đề: gp2 bị cấp dư dung lượng chỉ để lấy IOPS; dữ liệu nhỏ; cần tối thiểu chi phí, được phép downtime ngắn.\n(A) SAI: Chỉ đổi gp2 sang gp3 bằng Elastic Volumes giảm đơn giá nhưng vẫn trả tiền cho 1 TiB dung lượng không dùng.\n(B) SAI: Elastic Volumes không hỗ trợ giảm kích thước volume; thao tác thu nhỏ trực tiếp không thực hiện được.\n(C) SAI: st1 là HDD tối ưu cho throughput tuần tự, không phù hợp làm volume ứng dụng cần IOPS ngẫu nhiên và cũng có kích thước tối thiểu lớn.\n(D) ĐÚNG: gp3 cung cấp baseline 3,000 IOPS và 125 MiB/s bất kể kích thước; tạo volume gp3 nhỏ (ví dụ vài trăm GiB), sao chép dữ liệu trong maintenance window rồi chuyển sang dùng volume mới; vì EBS không thu nhỏ được nên phải copy dữ liệu.\nĐáp án đúng: D\nĐiểm cần nhớ: gp3 tách IOPS/throughput khỏi dung lượng; EBS chỉ tăng được size, muốn giảm phải tạo volume mới và copy dữ liệu.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Use Elastic Volumes to change the existing 1 TiB volume from gp2 to gp3 and keep its current size",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Use Elastic Volumes to shrink the gp2 volume to 200 GiB and change the type to gp3 in the same modification",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Change the volume to st1 so the company pays a lower price for each GiB that is provisioned",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create a smaller gp3 volume, copy the data during the window, and switch the server to the new volume",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company has approved hundreds of AWS Compute Optimizer EC2 rightsizing recommendations. Change management requires every resize to run only during approved maintenance windows, to require approval before execution, and to leave an auditable record. Engineers currently stop, resize, and start instances by hand, which is slow and error prone. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Nhiều resize đã được duyệt, cần chạy trong maintenance window, có bước phê duyệt, có audit trail, giảm thao tác thủ công.\n(A) ĐÚNG: Systems Manager Automation có runbook AWS-ResizeInstance thực hiện stop, đổi type và start; chạy qua Change Manager (có approval) và Maintenance Windows, lịch sử thực thi được lưu lại để kiểm toán.\n(B) SAI: Compute Optimizer không tự áp dụng thay đổi, không có chế độ auto-apply cho EC2 instance type.\n(C) SAI: Lambda tự viết chạy theo cron có thể làm được nhưng phải tự xây logic approval, xử lý lỗi và ghi log kiểm toán, nhiều công vận hành hơn.\n(D) SAI: AWS Config remediation hoạt động dựa trên kết quả rule compliance; không có managed rule dựa trên finding của Compute Optimizer và không đáp ứng quy trình phê duyệt theo maintenance window.\nĐáp án đúng: A\nĐiểm cần nhớ: Compute Optimizer chỉ khuyến nghị; thực thi có kiểm soát nên dùng Systems Manager Automation/Change Manager/Maintenance Windows.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Run the AWS-ResizeInstance Automation runbook through Systems Manager Change Manager within maintenance windows",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Turn on automatic application of recommendations in Compute Optimizer and restrict it to the maintenance windows",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Write a Lambda function that resizes instances on a cron schedule and emails the change board after each run",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create AWS Config rules for the instance types and use automatic remediation to change the non-compliant instances",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company activated AWS Compute Optimizer enhanced infrastructure metrics at the organization level. Development accounts now incur charges that the company wants to stop, but development accounts must still receive standard recommendations. One Auto Scaling group in a development account runs a performance test platform that does need the longer lookback period. Which TWO actions meet these requirements? (Choose TWO.)",
+    "explanation": "Phân tích đề: Tắt enhanced infrastructure metrics cho các account dev nhưng vẫn giữ recommendation; riêng một ASG trong account dev vẫn cần lookback dài.\n(A) ĐÚNG: Đặt preference enhanced infrastructure metrics ở cấp account là Inactive cho các account dev; preference ở cấp thấp hơn ghi đè cấp organization nên các account này không còn bị tính phí.\n(B) SAI: Opt out khỏi Compute Optimizer sẽ mất toàn bộ recommendation, vi phạm yêu cầu vẫn nhận recommendation tiêu chuẩn.\n(C) SAI: SCP chặn API đặt preference chỉ ngăn thay đổi cấu hình, không tắt được tính năng đã bật ở cấp organization nên phí vẫn phát sinh.\n(D) ĐÚNG: Đặt preference ở cấp resource là Active cho Auto Scaling group của nền tảng test; cấp resource được ưu tiên hơn cấp account nên chỉ nhóm này có lookback dài.\n(E) SAI: Xóa metric CloudWatch không khả thi (metric tự hết hạn theo retention) và cũng không phải cách kiểm soát phí enhanced infrastructure metrics.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Preference của Compute Optimizer có thứ bậc organization > account > resource; cấp thấp hơn ghi đè cấp cao hơn.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Set the enhanced infrastructure metrics preference to Inactive at the account level for the development accounts",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Opt the development accounts out of Compute Optimizer and opt them back in with default settings later",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Attach an SCP to the development OU that denies the compute-optimizer:PutRecommendationPreferences action",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Set the enhanced infrastructure metrics preference to Active at the resource level for the test Auto Scaling group",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Delete older CloudWatch metrics in the development accounts so the longer lookback cannot be calculated",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs 80 Amazon EC2 development instances that engineers use only from 08:00 to 18:00 on weekdays. AWS Compute Optimizer classifies the instances as Optimized because they are well utilized during working hours. The company wants to reduce the cost of these instances further without affecting developers during working hours. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Instance đã Optimized trong giờ làm việc nhưng chạy không cần thiết ngoài giờ; muốn giảm chi phí mà không ảnh hưởng giờ làm việc.\n(A) SAI: Downsize thêm trái với finding Optimized và làm tăng rủi ro hiệu năng trong giờ làm việc.\n(B) SAI: Savings Plans 3 năm cam kết chi tiêu theo giờ cho cả những giờ instance không cần chạy; với tải khoảng 50 giờ mỗi tuần, lên lịch tắt máy tiết kiệm hơn.\n(C) SAI: Enhanced infrastructure metrics chỉ kéo dài lookback; finding vẫn là Optimized vì kích thước đã phù hợp, không giải quyết giờ nhàn rỗi.\n(D) ĐÚNG: Dùng Instance Scheduler on AWS (hoặc EventBridge Scheduler với Systems Manager) để stop instance ngoài giờ và start lại trước giờ làm; chỉ trả tiền compute khoảng 50 trên 168 giờ mỗi tuần.\nĐáp án đúng: D\nĐiểm cần nhớ: Rightsizing tối ưu kích thước; lịch bật/tắt tối ưu thời gian chạy. Môi trường dev theo giờ hành chính -> scheduling.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Downsize the instances by one more size even though Compute Optimizer reports them as Optimized",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Purchase a 3-year Compute Savings Plan that covers the full hourly cost of the development instances",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Activate enhanced infrastructure metrics so that Compute Optimizer detects the idle hours",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Use Instance Scheduler on AWS to stop the instances outside working hours",
+        "isCorrect": true
+      }
+    ]
+  }
+]

@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A startup has containerized its REST API. The engineering team does not want to select instance types, patch operating systems, or scale a fleet of container hosts. They only want to declare CPU and memory for each copy of the container. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Chạy container nhưng không chọn instance type, không vá OS, không scale host, chỉ khai báo CPU/RAM cho mỗi bản container => container serverless.\n(A) SAI: ECS với EC2 launch type vẫn chạy trên cụm EC2 trong account của bạn; đội phải chọn instance type, vá AMI và scale cụm host.\n(B) ĐÚNG: Amazon ECS với AWS Fargate chỉ yêu cầu khai báo CPU/memory ở mức task; AWS cung cấp và quản lý toàn bộ hạ tầng bên dưới, không có host để vá hay scale.\n(C) SAI: Tự cài Docker trên EC2 trong Auto Scaling group là mức tự quản cao nhất: phải lo OS, runtime container, scaling và điều phối.\n(D) SAI: EKS với self-managed node group vẫn yêu cầu quản lý node EC2 (AMI, vá lỗi, nâng cấp), trái với yêu cầu không quản lý host.\nĐáp án đúng: B\nĐiểm cần nhớ: Container + không muốn quản lý server/instance => ECS (hoặc EKS) trên Fargate; chỉ khai báo CPU/memory cho task.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Run the API on Amazon ECS with the EC2 launch type and a cluster Auto Scaling group.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Run the API as an Amazon ECS service that uses the AWS Fargate launch type.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Install Docker on Amazon EC2 instances in an Auto Scaling group behind a load balancer.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Run the API on Amazon EKS with a self-managed node group of EC2 instances.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An application running in an Amazon ECS task on AWS Fargate must read objects from an Amazon S3 bucket by using the AWS SDK. A solutions architect must grant the permissions by following the principle of least privilege. Where should the s3:GetObject permission be granted?",
+    "explanation": "Phân tích đề: Code của ứng dụng bên trong container gọi API S3 => quyền phải nằm ở role mà container dùng khi chạy.\n(A) SAI: Task execution role được ECS agent/Fargate dùng để kéo image ECR, đẩy log CloudWatch và lấy secret khi khởi động task, không phải để code ứng dụng gọi S3.\n(B) SAI: Fargate không có container instance, và ngay cả trên EC2, gán quyền cho instance role làm mọi task trên host đều thừa hưởng quyền, vi phạm least privilege.\n(C) ĐÚNG: Task role (taskRoleArn) cung cấp credentials tạm thời cho các container trong task; SDK tự lấy credentials này, nên chỉ task đó có s3:GetObject.\n(D) SAI: Service-linked role của ECS dùng cho chính dịch vụ ECS quản lý ENI, load balancer; ứng dụng không dùng role này.\nĐáp án đúng: C\nĐiểm cần nhớ: Task role = quyền cho code ứng dụng; task execution role = quyền cho ECS kéo image, ghi log, lấy secret lúc khởi động.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "In the task execution role that is referenced by the ECS task definition.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "In the IAM instance profile of the container instances in the cluster.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "In the task role that is referenced by the ECS task definition.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "In the Amazon ECS service-linked role for the AWS account.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company has a containerized data export job that runs once every night and takes about 50 minutes to finish. The company wants to run the job on a schedule without managing any servers and wants to pay only while the job runs. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Job chạy 50 phút, theo lịch, không quản lý server, chỉ trả tiền khi chạy.\n(A) SAI: Lambda có thời gian chạy tối đa 15 phút mỗi lần gọi, job 50 phút sẽ bị timeout dù đặt timeout cao nhất.\n(B) ĐÚNG: EventBridge Scheduler gọi ECS RunTask theo lịch để chạy task trên Fargate; task chạy xong thì dừng, chỉ trả vCPU/memory trong thời gian chạy và không có server để quản lý.\n(C) SAI: EC2 instance chạy cron phải luôn bật (tốn tiền cả khi rảnh) và phải vá OS, trái với yêu cầu không quản lý server.\n(D) SAI: Provisioned concurrency chỉ giữ môi trường Lambda được khởi tạo sẵn, không nâng giới hạn 15 phút, và còn tốn phí khi không chạy.\nĐáp án đúng: B\nĐiểm cần nhớ: Tác vụ theo lịch dài hơn 15 phút, không muốn server => ECS scheduled task trên Fargate (EventBridge Scheduler + RunTask).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Package the job as an AWS Lambda function and invoke it nightly from Amazon EventBridge Scheduler.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use Amazon EventBridge Scheduler to run the container as an Amazon ECS task on AWS Fargate.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Run the container on an Amazon EC2 instance and start it from a cron entry every night.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Deploy the job as an AWS Lambda container image with provisioned concurrency configured.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A development team wants to run a stateless web application packaged as a container image. The team does not want to provision, patch, or scale any Amazon EC2 instances. Which TWO AWS services or options can run the container while meeting this requirement?",
+    "explanation": "Phân tích đề: Chạy container mà không phải provision, vá hay scale EC2 => các lựa chọn serverless cho container.\n(A) ĐÚNG: AWS App Runner nhận image từ Amazon ECR, tự cung cấp compute, load balancing, TLS và auto scaling; không có EC2 nào hiển thị cho khách hàng.\n(B) SAI: ECS với EC2 launch type chạy task trên các EC2 container instance mà đội vẫn phải vá và scale.\n(C) SAI: EKS managed node group giúp tự động hóa vòng đời node, nhưng node vẫn là EC2 trong account; đội vẫn phải cập nhật AMI và cấu hình scaling.\n(D) ĐÚNG: Amazon ECS với Fargate launch type chạy task mà không cần container instance; AWS quản lý toàn bộ hạ tầng.\n(E) SAI: Auto Scaling group với AMI có Docker sẵn vẫn là EC2 tự quản, đội phải vá OS và cấu hình scaling.\nĐáp án đúng: A và D\nĐiểm cần nhớ: App Runner và Fargate là hai cách chạy container không có server; managed node group vẫn là EC2 của bạn.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS App Runner with a service that deploys the image from Amazon ECR", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Amazon ECS with the EC2 launch type and an Auto Scaling group", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Amazon EKS with a managed node group of Amazon EC2 instances", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Amazon ECS with the AWS Fargate launch type", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "An EC2 Auto Scaling group that uses an AMI with Docker preinstalled", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs an Amazon ECS service on AWS Fargate. The task definition uses the secrets parameter to inject a database password from AWS Secrets Manager as an environment variable. The secret is encrypted with a customer managed AWS KMS key. New tasks fail to start with an error that says the secret could not be retrieved. The task role already has secretsmanager:GetSecretValue. What should a solutions architect do to resolve the issue?",
+    "explanation": "Phân tích đề: Secret được inject qua tham số secrets của task definition, lỗi xảy ra lúc task khởi động, secret mã hóa bằng customer managed key.\n(A) SAI: Task role chỉ được code ứng dụng dùng sau khi container chạy; việc inject secret lúc khởi động không dùng task role, nên thêm kms:Decrypt vào đây không sửa được lỗi.\n(B) ĐÚNG: Việc lấy secret để inject vào biến môi trường do ECS thực hiện bằng task execution role; role này cần secretsmanager:GetSecretValue trên secret và kms:Decrypt trên customer managed key.\n(C) SAI: Chuyển mật khẩu sang biến môi trường dạng plaintext trong task definition làm lộ secret cho bất kỳ ai đọc được task definition, vi phạm bảo mật.\n(D) SAI: Fargate không có container instance hay instance profile; quyền này phải nằm ở task execution role.\nĐáp án đúng: B\nĐiểm cần nhớ: Secret được inject lúc khởi động task => quyền nằm ở task execution role (kèm kms:Decrypt nếu dùng customer managed key).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add kms:Decrypt for the customer managed key to the task role that the application uses.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Grant secretsmanager:GetSecretValue and kms:Decrypt to the task execution role.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Store the password as a plaintext environment variable in the task definition instead.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Attach an instance profile with Secrets Manager permissions to the Fargate infrastructure.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company hosts a customer-facing web application on AWS Elastic Beanstalk in a load-balanced environment with 8 instances. Deployments must not reduce the number of instances that serve traffic, and the application must stay available during the deployment. Finance wants to avoid temporarily doubling the fleet size for every release. Which deployment policy should the company use?",
+    "explanation": "Phân tích đề: Không giảm capacity khi deploy, không downtime, nhưng không muốn nhân đôi fleet tạm thời.\n(A) SAI: All at once deploy lên tất cả instance cùng lúc, gây gián đoạn trong lúc cập nhật.\n(B) SAI: Rolling cập nhật theo batch trên instance hiện có, nên capacity phục vụ giảm đi một batch trong mỗi đợt.\n(C) ĐÚNG: Rolling with additional batch khởi chạy thêm một batch instance mới trước, nên luôn giữ đủ capacity; chi phí thêm chỉ bằng một batch chứ không phải nhân đôi fleet.\n(D) SAI: Immutable tạo Auto Scaling group tạm với một bộ instance mới đầy đủ, tức là tạm thời gấp đôi số instance, trái với yêu cầu của Finance.\nĐáp án đúng: C\nĐiểm cần nhớ: Beanstalk: Rolling giảm capacity; Rolling with additional batch giữ đủ capacity với chi phí thêm một batch; Immutable giữ đủ capacity nhưng tạm nhân đôi fleet.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "All at once", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Rolling", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Rolling with additional batch", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Immutable", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs Amazon ECS tasks on AWS Fargate in private subnets. A new security policy prohibits any route to the internet from these subnets, so the NAT gateways were removed. Now the tasks cannot pull images from Amazon ECR or send logs to Amazon CloudWatch Logs. The company wants to restore the functionality while keeping the subnets without internet access. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Subnet private không được có đường ra internet, task Fargate cần kéo image ECR và gửi log CloudWatch.\n(A) SAI: Gán public IP cho task trong subnet private không có internet gateway thì không có tác dụng, và đưa vào subnet public vi phạm chính sách không có đường ra internet.\n(B) SAI: NAT instance vẫn là đường ra internet, vi phạm chính sách, lại thêm gánh nặng vận hành.\n(C) SAI: ECR không hỗ trợ lưu image trên EFS; Fargate cần kéo image từ registry, và cách này không giải quyết việc gửi log.\n(D) ĐÚNG: Interface endpoint cho ecr.api và ecr.dkr cho phép gọi API và kéo manifest, S3 gateway endpoint để tải các layer image (lưu trên S3), interface endpoint cho logs để gửi log; tất cả đi qua mạng riêng AWS.\nĐáp án đúng: D\nĐiểm cần nhớ: Fargate trong subnet không có internet cần VPC endpoint: ecr.api, ecr.dkr (interface), S3 (gateway) cho image layer, logs cho CloudWatch Logs.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable the assignPublicIp setting for the tasks so that they can reach the ECR and CloudWatch endpoints.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Replace the NAT gateways with a NAT instance that allows only ECR and CloudWatch domains.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Copy the container images to an Amazon EFS file system and reference the images from the task definition.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create interface endpoints for ecr.api, ecr.dkr, and logs, plus a gateway endpoint for Amazon S3.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A research company must run 20,000 independent Monte Carlo simulations each weekend. Each simulation runs for 1 to 3 hours in a container and can be restarted if interrupted. The company wants the lowest compute cost and does not want to build or operate its own job scheduler. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Rất nhiều job độc lập, 1–3 giờ, chịu được gián đoạn, chi phí thấp nhất, không muốn tự vận hành scheduler.\n(A) SAI: Lambda giới hạn 15 phút mỗi lần gọi, không chạy được job 1–3 giờ.\n(B) ĐÚNG: AWS Batch quản lý hàng đợi và scheduling; compute environment managed dùng Spot với chiến lược SPOT_PRICE_CAPACITY_OPTIMIZED giảm chi phí và giảm gián đoạn, retry strategy tự chạy lại job bị thu hồi Spot.\n(C) SAI: Spot Fleet cộng scheduler tự viết trên EC2 có chi phí compute thấp, nhưng đội phải xây dựng và vận hành scheduler, trái yêu cầu.\n(D) SAI: ECS service On-Demand chạy liên tục phù hợp workload dài hạn, không phải job batch; On-Demand đắt hơn Spot và không có hàng đợi job.\nĐáp án đúng: B\nĐiểm cần nhớ: Batch job lớn, chịu gián đoạn, không muốn tự viết scheduler => AWS Batch với managed compute environment trên Spot + retry strategy.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Fan out the simulations to AWS Lambda functions by using an Amazon SQS queue as the event source.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Submit the simulations to AWS Batch with a managed Spot compute environment and a retry strategy.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Launch an EC2 Spot Fleet and run a custom scheduler on an EC2 instance to distribute the simulations.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Run the simulations as an Amazon ECS service on On-Demand EC2 capacity with target tracking scaling.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company plans to move all workloads in an Amazon EKS cluster from EC2 managed node groups to Fargate profiles to reduce node management. A solutions architect reviews the workloads before the migration. Which TWO workloads must remain on EC2-based nodes?",
+    "explanation": "Phân tích đề: Cần nhận diện workload mà EKS trên Fargate không hỗ trợ.\n(A) SAI: Pod HTTP stateless là workload lý tưởng cho Fargate.\n(B) ĐÚNG: EKS trên Fargate không hỗ trợ DaemonSet vì mỗi pod chạy trên một môi trường compute riêng; agent dạng DaemonSet phải chạy trên node EC2 (hoặc chuyển thành sidecar).\n(C) ĐÚNG: Fargate không cung cấp GPU, nên pod suy luận ML cần GPU phải chạy trên node group EC2 có GPU.\n(D) SAI: Pod trên Fargate dùng được IAM role qua service account, nên việc cần quyền DynamoDB không cản trở việc chạy trên Fargate.\n(E) SAI: EKS trên Fargate hỗ trợ mount Amazon EFS qua EFS CSI driver, nên pod cần lưu file dùng chung vẫn chạy được trên Fargate.\nĐáp án đúng: B và C\nĐiểm cần nhớ: EKS Fargate không hỗ trợ DaemonSet, GPU, privileged container; hỗ trợ EFS và IAM role cho service account.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "A stateless HTTP API Deployment that scales on CPU utilization", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "A security monitoring agent that is deployed as a DaemonSet", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "An ML inference Deployment whose pods request NVIDIA GPUs", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "A Deployment whose pods use an IAM role to write to DynamoDB", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "A Deployment whose pods mount a shared Amazon EFS file system", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A small team maintains a containerized web application whose image is stored in Amazon ECR. The team wants HTTPS, automatic scaling based on traffic, and automatic redeployment whenever a new image is pushed, without configuring load balancers or clusters. The application must query an Amazon RDS database that is in private subnets of a VPC. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Muốn HTTPS, auto scaling, auto deploy khi push image, không cấu hình load balancer/cluster, nhưng phải truy cập RDS trong subnet private.\n(A) ĐÚNG: App Runner tự cung cấp endpoint HTTPS, scale theo số request đồng thời và tự deploy khi có image mới trên ECR; VPC connector cho phép lưu lượng đi ra từ service vào VPC để kết nối RDS private.\n(B) SAI: ECS Fargate + ALB + CodePipeline đáp ứng chức năng, nhưng đội phải tự cấu hình ALB, target group, auto scaling và pipeline, nhiều vận hành hơn.\n(C) SAI: App Runner không có VPC connector chỉ đi ra internet công cộng nên không kết nối được RDS nằm trong subnet private; đưa RDS ra public vi phạm bảo mật.\n(D) SAI: Elastic Beanstalk với nền tảng Docker vẫn dựng EC2, ALB, Auto Scaling group trong account và không tự deploy khi push image lên ECR nếu không có thêm pipeline.\nĐáp án đúng: A\nĐiểm cần nhớ: App Runner = web app từ image/source, HTTPS + auto scaling + auto deploy sẵn; cần truy cập tài nguyên VPC private thì dùng VPC connector.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Deploy the image with AWS App Runner, enable automatic deployment, and attach a VPC connector.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Deploy an ECS service on Fargate behind an ALB and use AWS CodePipeline to redeploy new images.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Deploy the image with AWS App Runner using public networking and make the RDS database public.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Deploy the image on the Elastic Beanstalk Docker platform in a load-balanced environment.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs an image-recognition API on AWS Lambda. The function is packaged as a container image because the model files are large. Initializing the model takes about 30 seconds, which causes timeouts for the first requests after scale-out during business hours (08:00 to 18:00). Outside business hours, traffic is near zero and the company does not want to pay for idle capacity. The company wants to keep a serverless design with no containers or hosts to operate. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Hàm Lambda dạng container image, cold start 30 giây trong giờ hành chính, ngoài giờ không muốn trả phí rảnh, giữ serverless.\n(A) SAI: SnapStart không hỗ trợ hàm đóng gói dạng container image, nên không áp dụng được cho hàm này.\n(B) SAI: Reserved concurrency chỉ dành riêng/giới hạn số concurrency, không khởi tạo trước môi trường thực thi nên vẫn bị cold start.\n(C) ĐÚNG: Provisioned concurrency khởi tạo sẵn môi trường thực thi nên loại bỏ cold start; dùng Application Auto Scaling scheduled action để bật trong giờ hành chính và giảm về 0 ngoài giờ, chỉ trả phí khi cần.\n(D) SAI: ECS Fargate với số task tối thiểu luôn chạy loại bỏ cold start nhưng phải trả phí 24/7 cho task rảnh và đội phải vận hành service container, trái hai ràng buộc.\nĐáp án đúng: C\nĐiểm cần nhớ: Cold start Lambda theo khung giờ biết trước => provisioned concurrency + scheduled scaling; SnapStart không hỗ trợ container image, reserved concurrency không làm nóng sẵn.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable Lambda SnapStart on the function so that initialized snapshots are resumed on scale-out.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Configure reserved concurrency on the function equal to the peak concurrency during business hours.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Configure provisioned concurrency with scheduled Application Auto Scaling actions for business hours.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Move the model to an Amazon ECS service on AWS Fargate with a minimum task count kept running.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs an Amazon ECS cluster with the EC2 launch type. The cluster hosts general web services and a GPU-based video inference service. Today all services share one Auto Scaling group that mixes GPU and non-GPU instance types, so web tasks sometimes occupy expensive GPU instances and GPU instances stay running when no inference tasks exist. The company wants GPU instances to be used only by the inference service and to scale to zero when idle, with the least operational effort. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Tách GPU khỏi web, GPU scale về 0 khi rảnh, ít vận hành nhất.\n(A) SAI: Placement constraint trong một Auto Scaling group chung có thể giữ task web khỏi instance GPU, nhưng group chung không scale riêng phần GPU theo nhu cầu task, nên GPU không tự về 0.\n(B) SAI: Fargate không hỗ trợ GPU cho task ECS, nên không chạy được dịch vụ suy luận GPU.\n(C) SAI: Lambda chạy trên CPU, không có GPU, và giới hạn 15 phút không phù hợp suy luận video dài.\n(D) ĐÚNG: Hai capacity provider gắn hai Auto Scaling group riêng (GPU và thường) với managed scaling; service suy luận dùng capacity provider strategy trỏ tới GPU provider và khai báo GPU trong task definition. Managed scaling tăng/giảm GPU group theo nhu cầu task, về 0 khi không có task.\nĐáp án đúng: D\nĐiểm cần nhớ: Tách loại capacity trong ECS on EC2 bằng nhiều capacity provider (mỗi cái một ASG) + managed scaling; Fargate không có GPU.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Keep the shared Auto Scaling group and add a memberOf placement constraint to the web task definitions.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Move the inference service to AWS Fargate and specify GPU resource requirements in the task definition.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Move video inference to AWS Lambda functions that are triggered by new video objects in Amazon S3.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create separate GPU and general capacity providers with managed scaling, and target the GPU one per service.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company is moving a production web application to AWS Elastic Beanstalk. The application must remain available if an Availability Zone fails. The relational database must be retained even if the Beanstalk environment is deleted or replaced. Releases must be validated on a complete, separate copy of the environment, and the company must be able to switch back to the old version quickly. Which THREE actions should a solutions architect take?",
+    "explanation": "Phân tích đề: HA khi mất một AZ, database độc lập với vòng đời environment, kiểm thử trên bản sao đầy đủ và quay lại nhanh.\n(A) ĐÚNG: Environment load-balanced với Auto Scaling group tối thiểu 2 instance trải trên subnet ở nhiều AZ giúp ứng dụng tiếp tục phục vụ khi một AZ gặp sự cố.\n(B) SAI: Single-instance environment chỉ có một EC2, Elastic IP không mang lại HA; mất AZ đó là mất ứng dụng.\n(C) ĐÚNG: Tạo RDS Multi-AZ bên ngoài Beanstalk và truyền thông tin kết nối qua environment properties/Secrets Manager giúp database không bị xóa theo environment và có failover khi mất AZ.\n(D) SAI: RDS tạo bên trong environment gắn vòng đời với environment; xóa hay thay environment có thể xóa database, không phù hợp production.\n(E) ĐÚNG: Blue/green: clone environment, deploy bản mới lên bản sao, kiểm thử, rồi Swap environment URLs; quay lại bằng cách swap lần nữa.\n(F) SAI: All at once deploy lên tất cả instance hiện có, gây downtime và không có môi trường riêng để kiểm thử hay quay lại nhanh.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: Beanstalk production: load-balanced đa AZ, RDS tạo ngoài environment, blue/green bằng swap environment URLs (CNAME swap).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use a load-balanced environment with at least two instances in subnets in multiple Availability Zones.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Use a single-instance environment with an Elastic IP address to simplify failover.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an Amazon RDS Multi-AZ DB instance outside Beanstalk and pass its endpoint to the environment.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Add an Amazon RDS DB instance to the environment from the Beanstalk configuration settings.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Deploy releases to a cloned environment and then swap the environment URLs after validation.", "isCorrect": true },
+      { "answerLabel": "F", "answerText": "Use the All at once deployment policy so that every instance runs the same version immediately.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs Amazon EKS with the Kubernetes Cluster Autoscaler and 14 managed node groups, one for each instance type and purchase option. Scale-out often takes several minutes, many nodes are underutilized, and adding a new instance type requires a new node group. The cluster runs DaemonSets for logging and security. The company wants faster, right-sized node provisioning across many Spot and On-Demand instance types and automatic consolidation of underutilized nodes, with less node group management. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Cluster Autoscaler với quá nhiều node group, scale chậm, node dư thừa; cần provisioning nhanh, đúng kích thước, đa loại instance Spot/On-Demand, tự gom node, bớt quản lý node group; có DaemonSet.\n(A) SAI: Thêm node group cho Cluster Autoscaler làm tăng thêm gánh nặng quản lý node group, và Cluster Autoscaler vẫn chỉ tăng/giảm ASG có sẵn chứ không chọn instance vừa khít cho pod.\n(B) ĐÚNG: Karpenter theo dõi pod pending và gọi trực tiếp EC2 để tạo node có loại instance phù hợp từ danh sách rộng trong NodePool (Spot và On-Demand), không cần node group cho mỗi loại; tính năng consolidation tự thay/gỡ node dùng dưới mức.\n(C) SAI: Chuyển mọi pod sang Fargate profile không chạy được DaemonSet cho logging/security.\n(D) SAI: Đổi sang instance lớn hơn trong ít node group hơn làm lãng phí tài nguyên nhiều hơn và không giải quyết tốc độ scale hay consolidation.\nĐáp án đúng: B\nĐiểm cần nhớ: Karpenter = tạo node đúng kích thước trực tiếp từ nhu cầu pod, đa instance type, có consolidation; Cluster Autoscaler chỉ scale các node group định sẵn.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add more managed node groups with additional instance types and tune the Cluster Autoscaler scan interval.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Replace the Cluster Autoscaler with Karpenter and define a NodePool that allows many Spot and On-Demand types.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Move all workloads to Fargate profiles and remove the managed node groups and the Cluster Autoscaler.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Consolidate the node groups into two groups that use larger instance types and keep the Cluster Autoscaler.", "isCorrect": false }
+    ]
+  }
+]

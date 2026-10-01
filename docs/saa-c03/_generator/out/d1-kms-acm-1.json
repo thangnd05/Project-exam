@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company wants every new Amazon EBS volume created in its AWS account to be encrypted at rest, even when engineers forget to select encryption when they launch instances. Which solution meets this requirement with the LEAST operational effort?",
+    "explanation": "Phân tích đề: Mọi volume EBS mới phải được mã hóa kể cả khi người dùng quên chọn, yêu cầu công vận hành thấp nhất. Từ khóa: 'every new volume', 'LEAST operational effort'.\n(A) ĐÚNG: EBS encryption by default là thiết lập theo account và theo Region; khi bật, mọi volume mới (và snapshot tạo từ đó) tự động được mã hóa bằng key mặc định (aws/ebs hoặc customer managed key bạn chọn) mà không cần người dùng làm gì thêm.\n(B) SAI: Rule AWS Config kèm remediation xóa volume là cách phản ứng sau khi sự việc xảy ra, có thể xóa nhầm dữ liệu và tốn công xây dựng hơn nhiều so với một thiết lập có sẵn.\n(C) SAI: Rotation trên aws/ebs do AWS tự quản lý và không liên quan tới việc volume có được mã hóa hay không; volume tạo mà không bật mã hóa vẫn không được mã hóa.\n(D) SAI: Amazon Data Lifecycle Manager chỉ tự động tạo và giữ snapshot, không mã hóa volume gốc đang chạy.\nĐáp án đúng: A\nĐiểm cần nhớ: 'Mọi EBS volume mới phải được mã hóa' => bật EBS encryption by default ở từng Region; thiết lập này không mã hóa lại các volume đã có.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable EBS encryption by default in each AWS Region that the account uses.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create an AWS Config rule with remediation that deletes any unencrypted EBS volume after it is created.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable automatic key rotation on the AWS managed key aws/ebs for the account.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Configure Amazon Data Lifecycle Manager to create encrypted snapshots of every new volume.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company requested a public ACM certificate for *.example.com and attached it to an Application Load Balancer. Users who browse to https://shop.example.com connect successfully, but users who browse to https://example.com receive a certificate name mismatch warning. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Cert wildcard *.example.com chạy được cho shop.example.com nhưng lỗi với tên miền gốc example.com. Từ khóa: 'zone apex', 'name mismatch'.\n(A) SAI: ACM không tự thêm tên miền vào cert khi gia hạn; managed renewal chỉ cấp lại đúng các tên đã có trong cert.\n(B) SAI: Không thể tạo bản ghi CNAME ở zone apex, và dù có trỏ DNS đi đâu thì trình duyệt vẫn kiểm tra tên example.com trong cert nên lỗi vẫn còn.\n(C) SAI: KMS quản lý key mã hóa dữ liệu, không lưu hay phục vụ chứng chỉ TLS cho ALB.\n(D) ĐÚNG: Wildcard chỉ khớp một cấp subdomain và không bao gồm tên miền gốc. Yêu cầu cert mới có cả example.com và *.example.com (SAN) rồi gắn vào listener là cách chuẩn, vẫn miễn phí và tự gia hạn.\nĐáp án đúng: D\nĐiểm cần nhớ: *.example.com không bao gồm example.com; muốn phủ cả hai thì đưa cả hai tên vào cùng một cert ACM.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Wait for the next managed renewal, when ACM adds the apex name to the wildcard certificate automatically.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a Route 53 CNAME record at the zone apex that points example.com to shop.example.com.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Import the wildcard certificate into AWS KMS so that the ALB can use it for all names in the domain.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Request an ACM certificate that lists both example.com and *.example.com, and attach it to the listener.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company distributes firmware files to IoT devices that are often offline. The devices must verify that each file was produced by the company and was not modified. The private key must never leave a managed hardware security module. Which type of AWS KMS key should the company use?",
+    "explanation": "Phân tích đề: Cần chữ ký số để thiết bị xác minh nguồn gốc và tính toàn vẹn; thiết bị thường offline; private key không được rời HSM. Từ khóa: 'verify', 'produced by the company', 'private key never leaves'.\n(A) SAI: Key symmetric dùng chung một key cho mã hóa và giải mã, không thể phát cho thiết bị để tự xác minh mà không gọi KMS, và không tạo chữ ký số.\n(B) ĐÚNG: Asymmetric KMS key với key usage SIGN_VERIFY cho phép ký file bằng private key nằm trong KMS; public key tải về được và cài vào thiết bị để xác minh offline.\n(C) SAI: HMAC key yêu cầu bên xác minh gọi VerifyMac lên KMS hoặc biết secret chung; thiết bị offline không làm được và MAC không chứng minh nguồn gốc như chữ ký bất đối xứng.\n(D) SAI: aws/s3 chỉ mã hóa object lưu trong S3, không cung cấp cơ chế ký hay xác minh tính toàn vẹn cho thiết bị.\nĐáp án đúng: B\nĐiểm cần nhớ: Ký số hoặc cho bên ngoài dùng public key => asymmetric KMS key; symmetric key dùng cho mã hóa dữ liệu và envelope encryption.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "A symmetric encryption KMS key with automatic key rotation enabled.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "An asymmetric KMS key whose key usage is sign and verify.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "An HMAC KMS key that every device is allowed to use through the key policy.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "The AWS managed key aws/s3 that encrypts the bucket holding the firmware.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A startup runs its website behind an Application Load Balancer and needs HTTPS for www.example.com, which is hosted in Amazon Route 53. The founders want the lowest possible certificate cost and do not want to track certificate expiration dates. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Cần HTTPS trên ALB, chi phí chứng chỉ thấp nhất, không muốn theo dõi ngày hết hạn. Từ khóa: 'lowest certificate cost', 'do not want to track expiration'.\n(A) SAI: Cert mua từ CA thương mại tốn tiền, và khi import vào ACM thì ACM không tự gia hạn, vẫn phải theo dõi hạn và import lại.\n(B) SAI: AWS Private CA có phí hằng tháng và cert private không được trình duyệt công khai tin cậy, không hợp với website public.\n(C) ĐÚNG: Cert public do ACM cấp miễn phí (chỉ trả tiền cho ALB), DNS validation qua Route 53 gần như một click, và ACM tự gia hạn miễn là bản ghi CNAME còn tồn tại.\n(D) SAI: IAM server certificate vẫn phải mua cert bên ngoài và tự thay khi hết hạn; AWS khuyến nghị dùng ACM cho các Region hỗ trợ.\nĐáp án đúng: C\nĐiểm cần nhớ: HTTPS cho ALB/CloudFront rẻ nhất, không lo hết hạn => cert public ACM + DNS validation.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Buy a certificate from a commercial certificate authority and import it into ACM.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an AWS Private CA and issue a certificate for www.example.com from it.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Request a public ACM certificate with DNS validation and attach it to the ALB.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Upload a purchased certificate to the IAM server certificate store for the ALB.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A data lake bucket in Amazon S3 uses SSE-KMS with a customer managed key. After a new ingestion pipeline began writing millions of small objects per hour, applications started receiving ThrottlingException errors from AWS KMS, and the monthly KMS bill rose sharply. The security team requires that the customer managed key remain in use. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: SSE-KMS với lượng object rất lớn gây throttle và tăng phí KMS; bắt buộc giữ customer managed key; muốn ít công nhất. Từ khóa: 'ThrottlingException', 'KMS bill', 'remain in use'.\n(A) SAI: Chuyển sang SSE-S3 loại bỏ KMS nhưng vi phạm yêu cầu tiếp tục dùng customer managed key và mất khả năng audit qua KMS.\n(B) ĐÚNG: S3 Bucket Keys cho S3 tạo một data key cấp bucket từ KMS rồi dùng nó để sinh key cho từng object trong một khoảng thời gian, giảm tới khoảng 99% số lệnh gọi KMS, vừa hết throttle vừa giảm chi phí mà vẫn dùng đúng customer managed key.\n(C) SAI: Quota request của KMS tính chung cho mọi key trong account và Region, nên chia nhiều key không tăng hạn mức mà còn tăng công quản lý.\n(D) SAI: Automatic rotation chỉ thay backing key material vì mục đích bảo mật, không thay đổi số lệnh gọi KMS hay quota.\nĐáp án đúng: B\nĐiểm cần nhớ: SSE-KMS bị throttle hoặc phí KMS cao => bật S3 Bucket Keys; rotation phục vụ bảo mật, không phục vụ hiệu năng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Switch the bucket default encryption to SSE-S3 so that no KMS requests are made.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable S3 Bucket Keys in the default encryption configuration of the bucket.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Create additional customer managed keys and spread the objects across them by prefix.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable automatic key rotation so that KMS spreads requests across key versions.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company hosts three web applications, app1.example.com, app2.example.org, and app3.example.net, behind a single internet-facing Application Load Balancer in eu-west-1 that uses host-based routing. Each domain is owned by a different business unit, and each unit wants to manage its own certificate. The company wants to keep a single HTTPS listener. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Một ALB, một listener HTTPS, ba domain khác nhau, mỗi đơn vị muốn cert riêng. Từ khóa: 'single HTTPS listener', 'its own certificate'.\n(A) SAI: Mỗi cổng trên ALB chỉ có một listener, không thể tạo ba listener cùng cổng 443.\n(B) SAI: Cert cho ALB phải nằm cùng Region với ALB (eu-west-1), không phải us-east-1; hơn nữa gộp ba domain vào một cert trái với yêu cầu mỗi đơn vị có cert riêng.\n(C) ĐÚNG: Listener HTTPS của ALB hỗ trợ danh sách nhiều cert; ALB dùng SNI để chọn đúng cert theo hostname client gửi lên. Mỗi đơn vị có cert ACM riêng trong eu-west-1 mà vẫn dùng chung một listener.\n(D) SAI: Thêm NLB phía trước làm phức tạp kiến trúc, và target group không phải nơi gắn cert ACM.\nĐáp án đúng: C\nĐiểm cần nhớ: Nhiều domain trên một ALB => thêm nhiều cert vào listener HTTPS, ALB chọn cert theo SNI.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Configure three HTTPS listeners on port 443, one for each of the three ACM certificates.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create one ACM certificate in us-east-1 that lists all three domains, and attach it to the listener.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add the three ACM certificates to the listener certificate list so that the ALB selects one by SNI.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Place a Network Load Balancer in front of the ALB and attach one certificate to each target group.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company stores reports in an S3 bucket in its Production account. The objects are encrypted with SSE-KMS by using the AWS managed key aws/s3. An auditing team in a different AWS account has been granted s3:GetObject in the bucket policy, and the team's IAM role allows kms:Decrypt, but downloads fail with AccessDenied. Which solution will allow the auditing account to read the objects?",
+    "explanation": "Phân tích đề: Truy cập cross-account vào object SSE-KMS dùng AWS managed key aws/s3; bucket policy và IAM phía auditing đã đủ. Từ khóa: 'AWS managed key aws/s3', 'different AWS account'.\n(A) SAI: Key policy của AWS managed key do AWS quản lý, không chỉnh sửa được, nên không thể thêm principal của account khác.\n(B) SAI: Bucket Keys chỉ giảm số lệnh gọi KMS, không chia sẻ data key hay cấp quyền cho account khác.\n(C) SAI: kms:ViaService chỉ thu hẹp quyền; nó không khắc phục việc key policy của aws/s3 không cho phép account auditing.\n(D) ĐÚNG: Object mã hóa bằng aws/s3 không thể giải mã từ account khác. Cần mã hóa lại object (ví dụ copy đè hoặc S3 Batch Operations) bằng customer managed key có key policy cho phép role auditing gọi kms:Decrypt, và đặt key này làm default encryption.\nĐáp án đúng: D\nĐiểm cần nhớ: Chia sẻ dữ liệu mã hóa KMS sang account khác => phải dùng customer managed key; AWS managed key không bao giờ dùng cross-account được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Edit the key policy of the aws/s3 key to allow the auditing role to call kms:Decrypt.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable S3 Bucket Keys so that the bucket-level data key can be shared with the auditing account.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a kms:ViaService condition for Amazon S3 to the IAM policy of the auditing role.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Re-encrypt the objects with a customer managed key whose key policy grants the auditing account access.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company's domain example.com is registered and hosted with a third-party DNS provider, not Amazon Route 53. The company wants a public ACM certificate for its Amazon CloudFront distribution that renews automatically, without anyone approving emails each year. Moving DNS hosting to Route 53 is not allowed this year. What should the solutions architect do?",
+    "explanation": "Phân tích đề: DNS ở nhà cung cấp bên ngoài, cert cho CloudFront, muốn tự gia hạn không cần duyệt email. Từ khóa: 'third-party DNS provider', 'renews automatically', 'CloudFront'.\n(A) SAI: Email validation luôn đòi người nhận bấm duyệt mỗi lần gia hạn; chuyển tiếp hộp thư không loại bỏ thao tác thủ công.\n(B) ĐÚNG: DNS validation hoạt động với bất kỳ nhà cung cấp DNS nào; chỉ cần tạo thủ công bản ghi CNAME mà ACM đưa ra. Cert phải yêu cầu ở us-east-1 vì dùng cho CloudFront, và ACM tự gia hạn miễn là CNAME còn đó.\n(C) SAI: ACM chỉ tự tạo bản ghi validation khi hosted zone nằm trong Route 53 của cùng account; với DNS bên thứ ba phải tự thêm CNAME.\n(D) SAI: Cert import vào ACM không bao giờ được ACM tự gia hạn, sẽ lại hết hạn nếu không import lại.\nĐáp án đúng: B\nĐiểm cần nhớ: DNS validation không bắt buộc Route 53; Route 53 chỉ giúp tạo CNAME bằng một click. Cert cho CloudFront luôn ở us-east-1.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Request the certificate with email validation and forward the domain admin mailbox to a shared team alias.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Request the certificate in us-east-1 with DNS validation and create the provided CNAME at the current DNS provider.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Request the certificate with DNS validation and let ACM create the validation record at the third-party provider.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Import a certificate bought from the DNS provider's certificate authority into ACM so that ACM renews it.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company must use an Extended Validation certificate from an external certificate authority for its public Application Load Balancer, so the certificate is imported into ACM. Last year the imported certificate expired unnoticed and caused an outage. The company wants automated alerts well before expiration with minimal custom code. Which TWO actions meet these requirements?",
+    "explanation": "Phân tích đề: Cert import từ CA bên ngoài không được ACM tự gia hạn; cần cảnh báo tự động trước khi hết hạn, ít code. Từ khóa: 'imported into ACM', 'alerts well before expiration'.\n(A) ĐÚNG: ACM phát sự kiện 'ACM Certificate Approaching Expiration' lên Amazon EventBridge hằng ngày trong khoảng thời gian trước khi hết hạn (số ngày cấu hình được); một rule EventBridge gửi tới SNS là cảnh báo không cần code.\n(B) SAI: Managed renewal chỉ áp dụng cho cert do ACM cấp; ACM không liên hệ CA bên ngoài để gia hạn cert import.\n(C) ĐÚNG: AWS Config managed rule acm-certificate-expiration-check đánh dấu NON_COMPLIANT khi cert còn ít hơn số ngày ngưỡng, kết hợp thông báo khi không tuân thủ để có cảnh báo liên tục.\n(D) SAI: Private key của cert import không phải KMS key; bật rotation KMS không gia hạn hay thay cert.\n(E) SAI: Rotation của Secrets Manager cần Lambda tự viết để gọi CA bên ngoài, trái với yêu cầu ít code, và không cập nhật cert trên ALB.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Cert import không tự gia hạn => theo dõi bằng sự kiện EventBridge của ACM hoặc Config rule acm-certificate-expiration-check, rồi import lại trước hạn.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an Amazon EventBridge rule for the ACM Certificate Approaching Expiration event that notifies an Amazon SNS topic.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Enable ACM managed renewal on the imported certificate so that ACM requests a new one from the external CA.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable the AWS Config managed rule acm-certificate-expiration-check with a days threshold and notify on noncompliance.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable automatic key rotation in AWS KMS on the private key that belongs to the imported certificate.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Store the certificate in AWS Secrets Manager and turn on automatic rotation every 30 days.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A security team wants separation of duties for a customer managed KMS key. Members of the KeyAdmins role must manage the key, including editing the key policy, enabling, disabling, and scheduling deletion, but must not decrypt data. The application role must encrypt and decrypt data but must not change the key configuration. Which TWO key policy statements should the solutions architect include?",
+    "explanation": "Phân tích đề: Tách vai trò quản trị key và vai trò sử dụng key trong key policy. Từ khóa: 'must not decrypt', 'must not change the key configuration'.\n(A) ĐÚNG: Statement cho KeyAdmins gồm các action quản trị (kms:Create*, kms:Put*, kms:Enable*, kms:Disable*, kms:ScheduleKeyDeletion, kms:CancelKeyDeletion...) và không có kms:Decrypt; đây đúng là mẫu 'key administrators' mà console tạo sẵn.\n(B) ĐÚNG: Statement cho application role chỉ gồm các action mật mã như kms:Encrypt, kms:Decrypt, kms:ReEncrypt*, kms:GenerateDataKey* và kms:DescribeKey; đây là mẫu 'key users', không có quyền sửa cấu hình.\n(C) SAI: kms:* cho KeyAdmins bao gồm cả kms:Decrypt, vi phạm yêu cầu admin không được giải mã dữ liệu.\n(D) SAI: kms:PutKeyPolicy cho application role cho phép ứng dụng tự nâng quyền và đổi cấu hình key, phá vỡ tách biệt nhiệm vụ.\n(E) SAI: Không thể bỏ key policy; key policy luôn bắt buộc, và IAM policy chỉ có hiệu lực khi key policy ủy quyền cho account.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Key policy nên tách 'key administrators' (quản trị, không dùng key) và 'key users' (dùng key, không quản trị).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Allow KeyAdmins the administrative actions such as kms:Create*, kms:Put*, kms:Enable*, kms:Disable*, and kms:ScheduleKeyDeletion, without kms:Decrypt.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Allow the application role kms:Encrypt, kms:Decrypt, kms:ReEncrypt*, kms:GenerateDataKey*, and kms:DescribeKey only.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Allow KeyAdmins kms:* on the key so that they can recover access if the application role is deleted.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Allow the application role kms:PutKeyPolicy so that it can add new application instances to the key policy.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Remove all key policy statements and rely only on the IAM policies that are attached to each role.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs an Amazon API Gateway REST API in eu-west-1 as an edge-optimized endpoint so that global clients benefit from the CloudFront edge network. The team wants the custom domain api.example.com with a free, automatically renewed certificate. They requested an ACM certificate in eu-west-1 with DNS validation, but it does not appear when they configure the edge-optimized custom domain name. The API must remain in eu-west-1. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Custom domain cho API edge-optimized, cert đang ở eu-west-1 không hiện ra; API phải ở eu-west-1; ít công nhất. Từ khóa: 'edge-optimized', 'does not appear'.\n(A) SAI: Chuyển sang regional endpoint và tự dựng CloudFront riêng vẫn chạy được nhưng phải tự quản lý thêm một distribution, tốn công hơn chỉ cần tạo cert đúng Region.\n(B) SAI: Cert public ACM tiêu chuẩn không export được private key; ngay cả cert import sang Region khác cũng mất tính năng tự gia hạn.\n(C) SAI: Multi-Region key là tính năng của KMS, không sao chép được chứng chỉ ACM giữa các Region.\n(D) ĐÚNG: Custom domain edge-optimized được phục vụ qua CloudFront, nên cert phải nằm ở us-east-1 bất kể API ở Region nào. Yêu cầu cert ACM cho api.example.com ở us-east-1 là đủ, vẫn miễn phí và tự gia hạn.\nĐáp án đúng: D\nĐiểm cần nhớ: API Gateway edge-optimized và CloudFront => cert ở us-east-1; API Gateway regional và ALB => cert cùng Region với tài nguyên.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Change the API to a regional endpoint that uses the eu-west-1 certificate, and add a separately managed CloudFront distribution in front.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Export the eu-west-1 certificate with its private key, and import the copy into ACM in us-east-1.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a multi-Region KMS key so that the eu-west-1 certificate is replicated to us-east-1.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Request an ACM certificate for api.example.com in us-east-1 and use it for the edge-optimized custom domain name.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A European bank must encrypt Amazon S3 objects with SSE-KMS and Amazon EBS volumes by using native AWS service integrations. A regulator requires that the root key material be stored and used only in the bank's own key manager located on premises, outside AWS, so that the bank can stop all decryption in AWS by disconnecting it. The bank does not want to write client-side encryption code. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Key material phải nằm và được dùng ngoài AWS (on-premises), vẫn dùng tích hợp gốc SSE-KMS và EBS, không viết code client-side. Từ khóa: 'outside AWS', 'stop all decryption by disconnecting'.\n(A) SAI: Custom key store backed by CloudHSM giữ key material trong cluster CloudHSM single-tenant, nhưng cluster này vẫn nằm trong AWS, không đáp ứng yêu cầu 'ngoài AWS'.\n(B) SAI: Imported key material được sao chép vào HSM của KMS; sau khi import, KMS dùng bản sao đó trong AWS, nên ngắt kết nối on-premises không chặn được việc giải mã.\n(C) ĐÚNG: External key store (XKS) cho phép tạo KMS key có key material nằm trong key manager bên ngoài AWS, KMS gọi qua XKS proxy cho mỗi thao tác. S3 và EBS vẫn tích hợp như KMS key bình thường, và ngắt kết nối sẽ chặn mọi thao tác mã hóa và giải mã.\n(D) SAI: AWS Encryption SDK là mã hóa phía client, trái với yêu cầu không viết code client-side và không dùng được tích hợp SSE-KMS hay EBS gốc.\nĐáp án đúng: C\nĐiểm cần nhớ: Key material trong HSM riêng nhưng trong AWS => custom key store CloudHSM; key material ở ngoài AWS => external key store (XKS).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create KMS keys in a custom key store that is backed by an AWS CloudHSM cluster in the bank's VPC.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create KMS keys with imported key material that was generated by the on-premises key manager.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create KMS keys in an external key store that uses an XKS proxy connected to the on-premises key manager.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Use the AWS Encryption SDK in every application with keys fetched from the on-premises key manager.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company replicates objects from an S3 bucket in us-east-1 to a bucket in eu-west-1 by using S3 Cross-Region Replication. Source objects are encrypted with SSE-KMS using a single-Region customer managed key in us-east-1. After replication was enabled, the SSE-KMS objects are not replicated, while unencrypted test objects are. The replicas must be encrypted with a key that can be used in eu-west-1. Which THREE actions should the solutions architect take?",
+    "explanation": "Phân tích đề: CRR không sao chép object SSE-KMS; replica phải mã hóa bằng key dùng được ở eu-west-1. Từ khóa: 'SSE-KMS objects are not replicated', 'single-Region key'.\n(A) ĐÚNG: Mặc định replication bỏ qua object SSE-KMS; phải bật tiêu chí chọn object mã hóa bằng KMS (SseKmsEncryptedObjects) trong replication rule.\n(B) ĐÚNG: Phải chỉ định replica KMS key ở Region đích (eu-west-1) để S3 mã hóa lại bản sao bằng key đó.\n(C) ĐÚNG: Replication role cần kms:Decrypt trên key nguồn để đọc object và kms:Encrypt (hoặc GenerateDataKey) trên key đích để ghi replica; key policy của hai key cũng phải cho phép role này.\n(D) SAI: Key single-Region ở us-east-1 không dùng được để mã hóa dữ liệu ở eu-west-1; replica key phải thuộc Region đích.\n(E) SAI: Automatic rotation chỉ thay backing material trong cùng Region, không sao chép key sang Region khác.\n(F) SAI: Bucket Keys chỉ giảm số lệnh gọi KMS, không thay thế việc cấu hình replica key và quyền KMS.\nĐáp án đúng: A, B và C\nĐiểm cần nhớ: CRR với SSE-KMS cần ba thứ: bật replicate object SSE-KMS, chỉ định key ở Region đích, và quyền KMS cho replication role trên cả hai key.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable replication of objects encrypted with AWS KMS in the selection criteria of the replication rule.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Specify a customer managed KMS key in eu-west-1 as the replica encryption key in the rule.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Allow the replication role kms:Decrypt on the source key and kms:Encrypt on the destination key.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Specify the us-east-1 key ARN as the replica key so that the same key protects both copies.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Enable automatic rotation on the source key so that KMS copies its key material to eu-west-1.", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "Enable S3 Bucket Keys on the destination bucket instead of configuring a replica key.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company requests a public ACM certificate for portal.example.com with DNS validation. The CNAME validation record was created correctly in the company's Route 53 hosted zone hours ago, but the certificate request failed with a CAA error. The security team previously added CAA records to example.com that authorize only the company's former certificate authority. The company wants ACM to issue the certificate and renew it automatically. What should the solutions architect do?",
+    "explanation": "Phân tích đề: CNAME validation đúng nhưng yêu cầu cert thất bại do CAA; CAA chỉ cho phép CA cũ. Muốn ACM cấp và tự gia hạn. Từ khóa: 'CAA error', 'authorize only the former CA'.\n(A) SAI: CAA được kiểm tra bất kể phương thức validation; đổi sang email không vượt qua CAA mà còn mất tự gia hạn không cần thao tác.\n(B) ĐÚNG: CAA record quy định CA nào được phép cấp cert cho domain. Thêm CAA cho phép Amazon (ví dụ amazon.com, amazontrust.com) rồi yêu cầu lại cert với DNS validation; từ đó ACM cấp và tự gia hạn bình thường.\n(C) SAI: Cert import từ CA cũ không bao giờ được ACM tự gia hạn; ACM không có managed renewal cho cert import.\n(D) SAI: CAA là cơ chế DNS toàn cầu, mọi CA đều phải kiểm tra, không phụ thuộc Region của ACM.\nĐáp án đúng: B\nĐiểm cần nhớ: Cert ACM kẹt hoặc lỗi dù CNAME đúng => kiểm tra CAA record, phải cho phép Amazon là CA.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Switch the request to email validation so that the CAA check is skipped during issuance.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a CAA record that authorizes Amazon as an issuer, and request the certificate again.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Import a certificate from the former CA into ACM and turn on managed renewal for it.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Request the certificate in us-east-1, where ACM does not evaluate CAA records for domains.", "isCorrect": false }
+    ]
+  }
+]

@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A fitness app stores user workout videos in Amazon S3. Some videos are replayed for months, while others are never watched again after the first week, and the team cannot predict which will be which. The team wants Amazon S3 to move each object to a cheaper tier automatically based on its own access history, with no retrieval fees and no lifecycle rules to maintain. Which storage class should the team use?",
+    "explanation": "Phân tích đề: Pattern truy cập không đoán trước, muốn tự động chuyển tầng theo hành vi từng object, không phí truy xuất, không viết lifecycle.\n(A) SAI: S3 Standard-IA có phí truy xuất theo GB và không tự chuyển object; video bất ngờ được xem nhiều sẽ đội chi phí.\n(B) SAI: S3 Glacier Instant Retrieval có phí truy xuất cao hơn IA và tối thiểu 90 ngày; không tự đưa object nóng về tầng rẻ cho truy cập thường xuyên.\n(C) ĐÚNG: S3 Intelligent-Tiering theo dõi truy cập của từng object, hạ xuống Infrequent Access sau 30 ngày và Archive Instant Access sau 90 ngày không truy cập; khi object được đọc lại nó tự về Frequent Access, không có phí truy xuất, chỉ có phí giám sát nhỏ theo số object.\n(D) SAI: S3 Storage Class Analysis chỉ quan sát và gợi ý mốc chuyển sang Standard-IA; nó không phải lớp lưu trữ và không tự di chuyển object.\nĐáp án đúng: C\nĐiểm cần nhớ: Không đoán được pattern truy cập => Intelligent-Tiering; biết trước mốc nguội => Lifecycle.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "S3 Standard-Infrequent Access", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "S3 Glacier Instant Retrieval", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "S3 Intelligent-Tiering", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "S3 Storage Class Analysis", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A law office keeps closed case files in S3 Glacier Deep Archive. A judge has asked for one specific file, and the office must provide it by the start of business tomorrow, about 20 hours from now. The office wants the lowest retrieval cost that still meets the deadline. Which retrieval option should be used?",
+    "explanation": "Phân tích đề: Deep Archive, còn khoảng 20 giờ, cần rẻ nhất mà vẫn kịp.\n(A) SAI: Expedited retrieval không tồn tại cho Deep Archive; chỉ Glacier Flexible Retrieval có Expedited.\n(B) ĐÚNG: Standard retrieval của Deep Archive hoàn tất trong vòng 12 giờ, nằm trong 20 giờ còn lại; đây là tùy chọn rẻ nhất vẫn bảo đảm kịp hạn.\n(C) SAI: Bulk retrieval rẻ hơn nhưng có thể mất tới 48 giờ, không bảo đảm có file trước sáng mai.\n(D) SAI: Provisioned capacity chỉ bảo đảm năng lực cho Expedited của Glacier Flexible Retrieval, không áp dụng cho Deep Archive.\nĐáp án đúng: B\nĐiểm cần nhớ: Deep Archive: Standard trong 12 giờ, Bulk trong 48 giờ, không có Expedited.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Expedited retrieval", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Standard retrieval", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Bulk retrieval", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Expedited retrieval with provisioned capacity", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A marketing team uploaded 5 TB of campaign assets directly into S3 Glacier Instant Retrieval. The campaign was cancelled, and the team deleted all of the assets 40 days after upload. How will Amazon S3 bill the storage for these objects?",
+    "explanation": "Phân tích đề: Object trong Glacier Instant Retrieval bị xóa ở ngày 40; lớp này có thời gian lưu tối thiểu 90 ngày.\n(A) SAI: Không có chuyện chỉ tính 40 ngày; mọi lớp có thời gian lưu tối thiểu đều tính thêm phần còn thiếu khi xóa sớm.\n(B) SAI: Glacier Instant Retrieval không có mức tối thiểu 30 ngày; 30 ngày là của Standard-IA và One Zone-IA.\n(C) ĐÚNG: S3 tính 40 ngày đã lưu cộng phí xóa sớm tương ứng 50 ngày còn lại theo giá Glacier Instant Retrieval, tức tổng cộng như lưu đủ 90 ngày.\n(D) SAI: 180 ngày là mức tối thiểu của Glacier Deep Archive, không phải Glacier Instant Retrieval.\nĐáp án đúng: C\nĐiểm cần nhớ: Glacier Instant Retrieval: tối thiểu 90 ngày và 128 KB mỗi object; xóa sớm vẫn trả đủ 90 ngày.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Only for the 40 days that the objects were actually stored", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "For a minimum of 30 days, so no extra charge applies", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "For 40 days plus a prorated charge for the remaining 50 days", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "For 40 days plus a prorated charge for the remaining 140 days", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A developer is writing an application that reads archived objects from Amazon S3. The developer needs to know for which storage classes the application must first submit a RestoreObject request and wait before it can read the object data. Which TWO storage classes require a restore before the object can be read?",
+    "explanation": "Phân tích đề: Lớp nào phải restore trước khi GET được. Nhóm lớp truy cập tức thì trả dữ liệu trong mili-giây; nhóm lưu kho thật sự cần restore.\n(A) SAI: S3 Glacier Instant Retrieval trả dữ liệu trong mili-giây bằng GET thông thường, không cần restore.\n(B) ĐÚNG: S3 Glacier Flexible Retrieval yêu cầu RestoreObject và chờ từ vài phút (Expedited) đến 12 giờ (Bulk) để tạo bản tạm có thể đọc.\n(C) SAI: S3 Standard-IA đọc được ngay trong mili-giây, chỉ có thêm phí truy xuất theo GB.\n(D) ĐÚNG: S3 Glacier Deep Archive yêu cầu restore, mất tới 12 giờ (Standard) hoặc 48 giờ (Bulk).\n(E) SAI: S3 Intelligent-Tiering khi không bật tầng archive tùy chọn thì mọi tầng đều truy cập mili-giây, không cần restore.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Chỉ Glacier Flexible Retrieval, Glacier Deep Archive và hai tầng archive tùy chọn của Intelligent-Tiering mới cần restore; Glacier Instant Retrieval thì không.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "S3 Glacier Instant Retrieval", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "S3 Glacier Flexible Retrieval", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "S3 Standard-Infrequent Access", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "S3 Glacier Deep Archive", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "S3 Intelligent-Tiering with default tiers only", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company's finance department stores documents in many different prefixes of a shared Amazon S3 bucket, and every finance object carries the tag dept=finance. The FinOps team wants AWS to observe how often finance objects are accessed over time and recommend after how many days they should move to S3 Standard-IA. The results must be exported daily to a bucket so they can be visualized in Amazon QuickSight. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Cần phân tích truy cập cho tập object theo tag (nằm rải rác nhiều prefix), gợi ý mốc chuyển Standard-IA, xuất hằng ngày để vẽ trên QuickSight.\n(A) SAI: Dashboard mặc định của Storage Lens chỉ có free metrics ở cấp bucket, không phân tích truy cập theo tag để gợi ý mốc chuyển Standard-IA.\n(B) ĐÚNG: S3 Storage Class Analysis cho phép tạo filter theo tag (hoặc prefix, hoặc cả hai), quan sát tần suất truy cập theo tuổi object để gợi ý mốc chuyển sang Standard-IA, và xuất báo cáo CSV hằng ngày vào bucket đích để phân tích bằng QuickSight.\n(C) SAI: S3 Inventory liệt kê key, storage class, mã hóa... nhưng không có dữ liệu truy cập, nên không gợi ý được mốc chuyển tầng.\n(D) SAI: Chuyển sang Intelligent-Tiering là hành động tự động, không tạo báo cáo gợi ý; đề yêu cầu phân tích trước khi viết lifecycle rule.\nĐáp án đúng: B\nĐiểm cần nhớ: Storage Class Analysis: lọc theo prefix hoặc tag, gợi ý mốc Standard sang Standard-IA, xuất CSV hằng ngày; không tự chuyển tầng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Review the S3 Storage Lens default dashboard, filtering its bucket-level metrics by the finance tag.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Configure S3 Storage Class Analysis with a dept=finance tag filter and a daily export to a bucket.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Configure a daily S3 Inventory report that includes the object tags and query it with Amazon Athena.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Transition the finance objects to S3 Intelligent-Tiering and review its monthly access tier summary.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A logistics company replicates its shipment-document bucket to a second AWS Region for disaster recovery. Objects are written once and never modified. The replica bucket is read only during an annual DR test or an actual Regional failover, and during a failover the application must read replicas in milliseconds. The replicas must also survive the loss of an Availability Zone in the DR Region. Which configuration is the MOST cost-effective for the replicas?",
+    "explanation": "Phân tích đề: Bản sao DR hầu như không đọc (một lần mỗi năm hoặc khi sự cố), khi cần phải mili-giây, phải chịu được mất một AZ ở Region DR, object ghi một lần.\n(A) SAI: S3 Standard cho bản sao gần như không đọc là trả giá lưu trữ cao nhất một cách lãng phí.\n(B) SAI: One Zone-IA chỉ lưu ở một AZ nên không đáp ứng yêu cầu chịu được mất AZ ở Region DR.\n(C) ĐÚNG: CRR cho phép đặt storage class riêng cho bản sao ở đích. Glacier Instant Retrieval lưu ở tối thiểu 3 AZ, trả dữ liệu mili-giây, giá lưu rẻ hơn Standard-IA; phí truy xuất chỉ phát sinh khi test DR hoặc failover. Object ghi một lần nên mức tối thiểu 90 ngày không gây phí xóa sớm.\n(D) SAI: Glacier Flexible Retrieval rẻ hơn nhưng phải restore mất phút đến giờ, không đáp ứng yêu cầu đọc mili-giây khi failover.\nĐáp án đúng: C\nĐiểm cần nhớ: Replication cho phép chọn lớp rẻ hơn cho bucket đích; bản sao DR ít đọc mà vẫn cần mili-giây và nhiều AZ => Glacier Instant Retrieval.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Replicate with Cross-Region Replication and keep the replicas in S3 Standard.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Replicate with Cross-Region Replication and store the replicas in S3 One Zone-IA.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Replicate with Cross-Region Replication and store the replicas in S3 Glacier Instant Retrieval.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Replicate with Cross-Region Replication and store the replicas in S3 Glacier Flexible Retrieval.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A retail company keeps sales data in an Amazon S3 data lake partitioned by month and queried with Amazon Athena. Partitions older than 6 months are queried by auditors only a few times per year, but those queries must run directly without any restore step. The company wants to minimize storage cost for the older partitions. Which lifecycle action should a solutions architect configure for objects older than 180 days?",
+    "explanation": "Phân tích đề: Partition cũ chỉ được Athena truy vấn vài lần mỗi năm, phải truy vấn trực tiếp không restore, giảm tối đa chi phí lưu trữ.\n(A) SAI: Athena không đọc được object đang ở Glacier Flexible Retrieval khi chưa restore; truy vấn sẽ bỏ qua hoặc lỗi, vi phạm yêu cầu không restore.\n(B) SAI: Deep Archive rẻ nhất nhưng cũng phải restore (12 đến 48 giờ) trước khi Athena đọc được.\n(C) SAI: Standard-IA truy vấn trực tiếp được nhưng giá lưu trữ cao hơn Glacier Instant Retrieval; với tần suất vài lần mỗi năm, Standard-IA không phải lựa chọn rẻ nhất.\n(D) ĐÚNG: Glacier Instant Retrieval trả dữ liệu mili-giây bằng GET thông thường nên Athena truy vấn trực tiếp; giá lưu trữ thấp hơn Standard-IA, phí truy xuất chỉ phát sinh vài lần mỗi năm.\nĐáp án đúng: D\nĐiểm cần nhớ: Dữ liệu lưu kho mà dịch vụ phân tích vẫn cần đọc trực tiếp => Glacier Instant Retrieval; Glacier Flexible và Deep Archive phải restore trước.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Transition the objects to S3 Glacier Flexible Retrieval.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Transition the objects to S3 Glacier Deep Archive.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Transition the objects to S3 Standard-Infrequent Access.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Transition the objects to S3 Glacier Instant Retrieval.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A bank stores customer correspondence in S3 Intelligent-Tiering because access is unpredictable. Regulations require every document to be readable in milliseconds for 3 years after creation. After 3 years, documents must be retained for another 7 years, are never expected to be read, and a 12-hour retrieval time is acceptable. Which approach provides the lowest storage cost after year 3 while meeting all requirements?",
+    "explanation": "Phân tích đề: 3 năm đầu pattern không đoán trước và bắt buộc mili-giây; sau 3 năm pattern đã biết (không đọc), chờ 12 giờ được, lưu thêm 7 năm.\n(A) SAI: Bật Deep Archive Access cho Intelligent-Tiering sẽ archive tài liệu đã 180 ngày không truy cập ngay cả trong 3 năm đầu, vi phạm yêu cầu mili-giây.\n(B) ĐÚNG: Lifecycle hỗ trợ chuyển từ Intelligent-Tiering xuống Glacier Deep Archive; đặt transition ở ngày 1095 (3 năm) giữ nguyên hành vi mili-giây trong giai đoạn đầu, sau đó chuyển sang lớp rẻ nhất với restore trong 12 giờ và bỏ luôn phí giám sát.\n(C) SAI: Để nguyên Intelligent-Tiering thì object nguội chỉ xuống tới Archive Instant Access, giá cao hơn Deep Archive nhiều trong 7 năm, lại vẫn trả phí giám sát.\n(D) SAI: Chuyển sang Glacier Instant Retrieval sau 3 năm vẫn đắt hơn Deep Archive, trong khi khả năng mili-giây không còn cần thiết.\nĐáp án đúng: B\nĐiểm cần nhớ: Intelligent-Tiering vẫn là nguồn hợp lệ cho lifecycle transition xuống họ Glacier; khi pattern trở nên biết trước, dùng lifecycle để về đúng lớp rẻ nhất.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable the Deep Archive Access tier for the bucket's Intelligent-Tiering configuration at 180 days.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a lifecycle rule that transitions objects from Intelligent-Tiering to Deep Archive at day 1095.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Keep the objects in Intelligent-Tiering so they settle in the Archive Instant Access tier.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add a lifecycle rule that transitions objects to S3 Glacier Instant Retrieval at day 1095.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company still stores legacy archives in Amazon S3 Glacier vaults that it accesses through the original Glacier vault API. Last quarter, an engineer started a large number of archive retrieval jobs at once, which produced an unexpectedly large retrieval bill. Management wants a control that caps how much data can be retrieved from the vaults per hour, without blocking retrievals entirely. What should a solutions architect configure?",
+    "explanation": "Phân tích đề: Dữ liệu ở Glacier vault (API cũ), cần giới hạn tốc độ truy xuất để tránh hóa đơn đột biến nhưng không chặn hoàn toàn.\n(A) SAI: Vault Lock khóa chính sách WORM để chống xóa hoặc sửa archive; nó không giới hạn lượng truy xuất.\n(B) ĐÚNG: Data Retrieval Policy của Glacier vault có chế độ Max Retrieval Rate giới hạn số GB truy xuất mỗi giờ; job vượt ngưỡng bị từ chối, nhờ đó chi phí truy xuất được kiểm soát mà vẫn cho phép truy xuất.\n(C) SAI: IAM policy deny glacier:InitiateJob chặn toàn bộ việc truy xuất, trái với yêu cầu không chặn hẳn.\n(D) SAI: AWS Budgets chỉ cảnh báo khi chi phí vượt ngưỡng, không ngăn được các job truy xuất đang chạy.\nĐáp án đúng: B\nĐiểm cần nhớ: Glacier vault: Vault Lock = WORM tuân thủ; Data Retrieval Policies = giới hạn lượng truy xuất để tránh hóa đơn đột biến.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Apply a Vault Lock policy to each vault and complete the lock.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Set a data retrieval policy with a Max Retrieval Rate per hour.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Attach an IAM policy that denies the glacier:InitiateJob action.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create an AWS Budgets alert for Glacier data retrieval charges.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A FinOps team uses the free Amazon S3 Storage Lens metrics and is deciding whether to upgrade a dashboard to advanced metrics and recommendations. The team wants to know which capabilities are available ONLY with advanced metrics. Which TWO capabilities require Storage Lens advanced metrics?",
+    "explanation": "Phân tích đề: Phân biệt free metrics và advanced metrics của Storage Lens.\n(A) SAI: Dung lượng và số object theo storage class ở cấp bucket là usage metrics có sẵn trong free metrics.\n(B) ĐÚNG: Prefix-level aggregation (xem chỉ số tới cấp prefix) là tính năng của advanced metrics.\n(C) SAI: Dashboard mặc định được tạo sẵn và miễn phí cho mọi tài khoản, không cần nâng cấp.\n(D) ĐÚNG: Publish chỉ số Storage Lens sang Amazon CloudWatch để vẽ, đặt alarm là tính năng của advanced metrics.\n(E) SAI: Storage Lens không tự áp dụng lifecycle rule cho bucket; nó chỉ cung cấp chỉ số và khuyến nghị để bạn tự hành động.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Advanced metrics thêm activity metrics, prefix aggregation, CloudWatch publishing, khuyến nghị và lịch sử 15 tháng; free metrics giữ 14 ngày.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Storage bytes and object counts by storage class for each bucket", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Aggregation of usage metrics down to the prefix level", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "A preconfigured account-level default dashboard", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Publishing Storage Lens metrics to Amazon CloudWatch", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Automatic creation of lifecycle rules on buckets that lack them", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A machine learning team stores 800 TB of training datasets in S3 Standard. Each dataset consists of objects of 50 MB to 500 MB. Some datasets are used for retraining every week, others sit unused for many months and are then suddenly needed again, and nobody can predict which. Training jobs read entire datasets and fail if any object is not immediately readable. The team wants the lowest storage cost with no ongoing manual tuning. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Truy cập không đoán trước, đọc toàn bộ dataset (nhiều GB) khi dùng lại, bắt buộc đọc ngay (không restore), object lớn, không muốn tinh chỉnh thủ công.\n(A) SAI: Bật Archive Access khiến dataset 90 ngày không dùng bị đưa vào tầng cần restore mất nhiều giờ; job training đọc ngay sẽ thất bại.\n(B) SAI: Lifecycle sang Glacier Instant Retrieval ở ngày 90 dựa trên tuổi chứ không dựa trên truy cập; dataset dùng hằng tuần cũng bị chuyển và mỗi lần retrain đọc toàn bộ dataset sẽ trả phí truy xuất theo GB rất lớn.\n(C) ĐÚNG: S3 Intelligent-Tiering chỉ với các tầng mặc định (Frequent, Infrequent, Archive Instant Access) tự hạ tầng dataset không dùng, tất cả vẫn đọc được trong mili-giây, không phí truy xuất khi dataset bị dùng lại; object lớn nên phí giám sát theo object không đáng kể.\n(D) SAI: Standard-IA ở ngày 30 cũng dựa trên tuổi và tính phí truy xuất cho mỗi GB đọc; dataset dùng hằng tuần sẽ bị tính phí liên tục.\nĐáp án đúng: C\nĐiểm cần nhớ: Intelligent-Tiering không bật tầng archive giữ mọi object ở mức mili-giây; chỉ bật Archive Access hoặc Deep Archive Access khi ứng dụng chịu được việc restore.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Move the data to S3 Intelligent-Tiering and enable the optional Archive Access tier at 90 days.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a lifecycle rule that transitions all objects to S3 Glacier Instant Retrieval at day 90.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Move the data to S3 Intelligent-Tiering without enabling any of the optional archive tiers.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Add a lifecycle rule that transitions all objects to S3 Standard-IA at day 30 after creation.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company holds 10 PB of objects in S3 Glacier Flexible Retrieval. All objects are more than a year old. The legal team has formally relaxed the retrieval requirement from 12 hours to 48 hours. The company wants to reduce storage cost as much as possible with the least effort and without paying to restore the data. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Dữ liệu đã ở Glacier Flexible hơn một năm (quá mức tối thiểu 90 ngày), SLA truy xuất nới lên 48 giờ, muốn giảm tiền lưu trữ, ít công sức, không trả phí restore.\n(A) SAI: CopyObject không đọc được object đang ở Glacier Flexible Retrieval khi chưa restore, nên job Batch Operations copy sẽ thất bại; muốn copy phải restore trước, phát sinh phí restore mà đề muốn tránh.\n(B) SAI: Restore toàn bộ 10 PB rồi copy tốn phí truy xuất, phí request và phí lưu bản tạm, đi ngược yêu cầu.\n(C) ĐÚNG: Lifecycle hỗ trợ chuyển thẳng từ Glacier Flexible Retrieval xuống Glacier Deep Archive mà không cần restore; object đã quá 90 ngày nên không có phí xóa sớm, chỉ trả phí chuyển tầng theo số object. Deep Archive có Bulk trong 48 giờ, đáp ứng SLA mới.\n(D) SAI: Intelligent-Tiering Deep Archive Access chỉ áp dụng cho object thuộc lớp Intelligent-Tiering; đưa dữ liệu vào đó vẫn phải restore và copy, lại thêm phí giám sát.\nĐáp án đúng: C\nĐiểm cần nhớ: Lifecycle chỉ chuyển xuống theo thác nước và làm được với object đang ở lớp lưu kho; Glacier Flexible sang Deep Archive không cần restore.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Run an S3 Batch Operations job that copies each object in place with the DEEP_ARCHIVE storage class.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Restore all objects with Bulk retrieval and then copy them into S3 Glacier Deep Archive with a script.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a lifecycle rule that transitions the objects from Glacier Flexible Retrieval to Glacier Deep Archive.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Move the objects into S3 Intelligent-Tiering and enable its optional Deep Archive Access tier.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company must archive about 2 billion email messages for 10 years. Each message is stored as an individual object averaging 60 KB. Messages are almost never read, but during eDiscovery the legal team must retrieve specific messages within 48 hours. A proposal is to write each message directly to S3 Glacier Deep Archive. Which solution is the MOST cost-effective?",
+    "explanation": "Phân tích đề: Hàng tỷ object nhỏ (60 KB), lưu 10 năm, gần như không đọc, cần lấy từng message trong 48 giờ. Bẫy: chi phí theo từng object của lớp lưu kho.\n(A) SAI: Ghi từng message vào Deep Archive làm mỗi object chịu thêm khoảng 40 KB metadata tính phí (8 KB giá Standard và 32 KB giá Deep Archive), tức tăng khoảng 67% dung lượng tính phí, cộng phí PUT và phí restore trên 2 tỷ object.\n(B) ĐÚNG: Gộp message thành các archive lớn (ví dụ theo ngày) rồi lưu ở Deep Archive giảm số object xuống vài nghìn, làm phần overhead 40 KB và phí request không đáng kể. Một chỉ mục (ví dụ DynamoDB) ghi message nằm trong archive nào và ở offset nào; khi eDiscovery chỉ restore đúng archive cần (Bulk trong 48 giờ) rồi đọc bằng ranged GET.\n(C) SAI: Glacier Instant Retrieval tính mỗi object tối thiểu 128 KB, nên message 60 KB bị tính hơn gấp đôi, và giá lưu trữ cao hơn Deep Archive nhiều lần cho dữ liệu hầu như không đọc.\n(D) SAI: Object nhỏ hơn 128 KB trong Intelligent-Tiering không được giám sát và không bao giờ chuyển tầng, luôn tính giá Frequent Access, nên gần như không tiết kiệm được gì.\nĐáp án đúng: B\nĐiểm cần nhớ: Với hàng triệu hoặc hàng tỷ file nhỏ, gộp trước khi lưu kho; overhead theo object (40 KB ở Glacier Flexible và Deep Archive, 128 KB tối thiểu ở IA và Glacier Instant) sẽ nuốt hết phần tiết kiệm.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Write every message as its own object directly to S3 Glacier Deep Archive with a PUT request.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Bundle messages into large daily archives in Deep Archive and keep an offset index in Amazon DynamoDB.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Write every message as its own object to S3 Glacier Instant Retrieval for faster eDiscovery.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Write every message to S3 Intelligent-Tiering with the Deep Archive Access tier enabled at 180 days.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A research laboratory is retiring an on-premises NFS archive that holds 600 TB. Most files are larger than 100 MB, but the archive also contains about 20 million metadata sidecar files smaller than 64 KB. The data must be kept for 12 years and is almost never read; when a request arrives, the lab has 3 days to deliver the files. The lab has sufficient network bandwidth to AWS and wants the lowest total cost with the least ongoing operational effort. Which THREE actions should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Di chuyển NFS lên AWS, lưu 12 năm, gần như không đọc, 3 ngày để trả dữ liệu, có 20 triệu file nhỏ, băng thông đủ, cần rẻ và ít vận hành.\n(A) ĐÚNG: AWS DataSync hỗ trợ ghi thẳng vào storage class Glacier Deep Archive cho S3 location, tránh trả tiền S3 Standard tạm thời và phí lifecycle transition cho từng object; DataSync là dịch vụ managed, tự kiểm tra toàn vẹn.\n(B) SAI: Glacier Instant Retrieval đắt hơn Deep Archive nhiều lần và tính mỗi file nhỏ tối thiểu 128 KB, trong khi khả năng đọc mili-giây là không cần.\n(C) ĐÚNG: Đóng gói 20 triệu file sidecar nhỏ thành các file tar lớn trước khi chuyển giúp tránh overhead khoảng 40 KB tính phí trên mỗi object Deep Archive và giảm hàng triệu request PUT và restore.\n(D) SAI: Deep Archive không hỗ trợ Expedited retrieval; tùy chọn này chỉ có ở Glacier Flexible Retrieval.\n(E) ĐÚNG: Khi có yêu cầu, restore bằng Bulk retrieval, hoàn tất trong vòng 48 giờ và là mức rẻ nhất, vẫn nằm trong hạn 3 ngày.\n(F) SAI: S3 File Gateway ghi vào S3 Standard rồi mới lifecycle chuyển xuống, phát sinh thêm phí lưu tạm và phí transition, lại phải vận hành gateway lâu dài cho một lần di chuyển.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: Biết chắc là dữ liệu lưu kho thì ghi thẳng vào lớp đích (DataSync hoặc PUT kèm storage class), gộp file nhỏ trước, và chọn Bulk khi thời hạn cho phép.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use AWS DataSync with the S3 location storage class set to S3 Glacier Deep Archive.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Use AWS DataSync with the S3 location storage class set to S3 Glacier Instant Retrieval.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Package the small sidecar files into large tar archives before transferring them.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Restore requested files with Expedited retrieval to minimize the waiting time.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Restore requested files with Bulk retrieval, which completes within 48 hours.", "isCorrect": true },
+      { "answerLabel": "F", "answerText": "Mount an S3 File Gateway share and add a lifecycle rule to Deep Archive at day 0.", "isCorrect": false }
+    ]
+  }
+]

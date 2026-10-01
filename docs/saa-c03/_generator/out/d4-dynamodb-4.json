@@ -1,0 +1,173 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A news application reads article items from an Amazon DynamoDB table with GetItem. Readers can tolerate seeing an article update a second or two late. The table uses provisioned capacity, and all reads currently use the ConsistentRead=true setting. Which change will reduce read capacity consumption the MOST without changing the data model?",
+    "explanation": "Phân tích đề: Người đọc chấp nhận dữ liệu trễ 1 đến 2 giây, nhưng mọi lần đọc đang strongly consistent. Cần giảm RCU mà không đổi mô hình dữ liệu.\n(A) SAI: Chuyển sang TransactGetItems tốn gấp đôi RCU so với strongly consistent read.\n(B) SAI: Tăng RCU chỉ tăng chi phí; không giảm lượng capacity mỗi lần đọc.\n(C) SAI: ProjectionExpression chỉ giảm dữ liệu trả về; RCU vẫn tính theo toàn bộ kích thước item.\n(D) ĐÚNG: Đổi sang eventually consistent read (ConsistentRead=false, mặc định). Mỗi lần đọc chỉ tốn một nửa RCU so với strongly consistent, và độ trễ dữ liệu thường dưới một giây, phù hợp với mức chấp nhận của người đọc.\nĐáp án đúng: D\nĐiểm cần nhớ: Eventually consistent read rẻ bằng một nửa strongly consistent. Đề nói 'chấp nhận dữ liệu hơi cũ' là tín hiệu dùng eventually consistent.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Replace the GetItem calls with TransactGetItems calls.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Increase the provisioned RCUs to reduce read retries.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a ProjectionExpression that returns fewer attributes.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use eventually consistent reads for the article requests.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "Hundreds of microservices read the same 200 feature-flag items from an Amazon DynamoDB table about 50,000 times per second in total. Eventually consistent reads are acceptable. The company wants microsecond read latency and lower read capacity consumption with minimal application code changes. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Đọc lặp lại cùng 200 item rất nhiều lần, chấp nhận eventually consistent, cần độ trễ micro-giây, giảm RCU, ít sửa code.\n(A) SAI: Thêm GSI không giảm lượng đọc mà còn thêm chi phí ghi và lưu trữ; độ trễ vẫn ở mức mili-giây.\n(B) ĐÚNG: DynamoDB Accelerator (DAX) là cache in-memory tương thích API DynamoDB. Các lần đọc lặp lại được phục vụ từ cache với độ trễ micro-giây nên gần như không tiêu tốn RCU của bảng; chỉ cần đổi client SDK sang DAX client.\n(C) SAI: Global tables tạo replica ở Region khác, thêm chi phí replicated write và không đạt độ trễ micro-giây.\n(D) SAI: Strongly consistent read tốn gấp đôi RCU và không được DAX cache.\nĐáp án đúng: B\nĐiểm cần nhớ: Đọc lặp lại cùng item + micro-giây + ít sửa code = DAX, đồng thời giảm RCU của bảng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a global secondary index that projects only the feature-flag attributes.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Deploy a DynamoDB Accelerator (DAX) cluster and use the DAX client in the services.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Convert the table to a global table with replicas in the Regions where the services run.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Switch the reads to strongly consistent reads so that items are cached by DynamoDB.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An authentication service stores one-time passcodes in Amazon DynamoDB. Each code is valid for 10 minutes and is useless afterward. The table keeps growing because codes are never removed, and the team wants old codes cleaned up without paying for delete operations. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Mã OTP hết hiệu lực sau 10 phút, bảng phình vì không xóa; muốn dọn mà không trả phí thao tác xóa.\n(A) SAI: Lambda chạy theo lịch gọi Scan và DeleteItem tốn RCU cho Scan và WCU cho mỗi lần xóa.\n(B) ĐÚNG: Lưu thuộc tính hết hạn (epoch seconds, kiểu Number) và bật Time to Live. DynamoDB tự xóa item hết hạn ở chế độ nền mà không tiêu tốn WCU; ứng dụng vẫn nên kiểm tra thời hạn khi xác thực vì TTL không xóa ngay tức thì.\n(C) SAI: Standard-IA chỉ giảm giá lưu trữ, dữ liệu vẫn phình ra mãi và không được xóa.\n(D) SAI: Xóa và tạo lại bảng mỗi ngày làm mất cả mã đang còn hiệu lực và gây gián đoạn dịch vụ.\nĐáp án đúng: B\nĐiểm cần nhớ: Dữ liệu tạm có thời hạn (session, OTP, token) dùng TTL để xóa miễn phí.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Run a scheduled Lambda function that scans the table and deletes expired codes.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Store an expiration timestamp on each code and enable Time to Live on the table.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Change the table to the Standard-Infrequent Access table class to store old codes.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Delete the table every night and recreate it empty with the same key schema.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect is estimating the monthly bill for an Amazon DynamoDB table that uses provisioned capacity mode in a single AWS Region, with no backups, streams, or global tables enabled. Which TWO items determine the main cost of this table? (Choose TWO.)",
+    "explanation": "Phân tích đề: Bảng provisioned, một Region, không bật tính năng phụ. Cần xác định thành phần chi phí chính.\n(A) ĐÚNG: Provisioned RCU/WCU tính theo giờ cho lượng capacity đã cấu hình, dù có dùng hết hay không.\n(B) SAI: DynamoDB tự nhân bản dữ liệu qua nhiều AZ mà không tính phí riêng cho từng bản sao.\n(C) ĐÚNG: Lưu trữ tính theo GB-tháng của dữ liệu bảng và index.\n(D) SAI: Số partition do DynamoDB tự quản lý, không phải hạng mục tính phí.\n(E) SAI: Dữ liệu truyền vào DynamoDB từ Internet hoặc EC2 cùng Region không tính phí data transfer in.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Chi phí cơ bản của bảng provisioned = capacity đã cấp (theo giờ) + lưu trữ (GB-tháng). Nhân bản Multi-AZ có sẵn, không tính thêm.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "The provisioned RCUs and WCUs billed per hour, whether or not they are consumed.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Each copy of the data that DynamoDB stores in separate Availability Zones.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "The amount of data stored in the table and its indexes, billed per GB-month.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "The number of partitions that DynamoDB allocates to store the table's data.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Data transferred into the table from Amazon EC2 instances in the same Region.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A media company ingests about 50 TB of clickstream events per month into an Amazon DynamoDB table in on-demand mode. The events are never retrieved by key. Analysts only run SQL aggregations over days or weeks of data, which requires a nightly export of the table. DynamoDB write and storage charges are the company's largest database cost. Which solution is MOST cost-effective?",
+    "explanation": "Phân tích đề: 50 TB/tháng sự kiện, không bao giờ tra cứu theo key, chỉ chạy SQL tổng hợp. DynamoDB là lựa chọn đắt và không phù hợp cho data lake phân tích.\n(A) SAI: Chuyển sang provisioned + reserved capacity giảm đơn giá ghi nhưng vẫn trả phí lưu trữ DynamoDB rất cao cho dữ liệu chỉ dùng để phân tích.\n(B) SAI: Standard-IA giảm giá lưu trữ nhưng tăng đơn giá ghi cho workload ghi cực lớn; vẫn đắt hơn S3 nhiều lần.\n(C) SAI: Aurora có thể chạy SQL nhưng lưu 50 TB/tháng và ingest tốc độ cao trên cơ sở dữ liệu quan hệ vẫn đắt, và không tối ưu cho quét phân tích lớn.\n(D) ĐÚNG: Gửi sự kiện qua Amazon Data Firehose, chuyển sang định dạng cột (Parquet) và ghi vào Amazon S3, truy vấn bằng Amazon Athena. S3 lưu trữ rẻ, Firehose tính theo GB ingest, Athena tính theo dữ liệu quét (Parquet giảm mạnh lượng quét).\nĐáp án đúng: D\nĐiểm cần nhớ: Dữ liệu chỉ để phân tích SQL, không tra cứu theo key thì đưa vào S3 + Athena, không dùng DynamoDB làm data lake.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Switch the table to provisioned capacity and buy 3-year reserved capacity for the ingestion rate.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Change the table to the Standard-Infrequent Access table class and keep the nightly export.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Load the events into an Amazon Aurora PostgreSQL cluster and run the SQL aggregations there.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Deliver the events through Amazon Data Firehose to Amazon S3 in Parquet and query with Athena.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A write-heavy Amazon DynamoDB table of about 50 GB consumes a steady 15,000 WCUs. Once a month, a compliance officer needs a list of items where the region attribute equals a given value. A developer proposes adding a global secondary index on region with the ALL projection. The result can take several minutes to produce. What is the MOST cost-effective approach?",
+    "explanation": "Phân tích đề: Bảng ghi rất nhiều (15,000 WCU liên tục), chỉ 50 GB. Truy vấn theo region chỉ chạy mỗi tháng một lần và chấp nhận chạy vài phút.\n(A) SAI: GSI với ALL projection nhân bản mọi lần ghi vào index, tăng gần gấp đôi chi phí ghi 24/7 và thêm lưu trữ, chỉ để phục vụ một truy vấn mỗi tháng.\n(B) ĐÚNG: Chạy một lần Scan eventually consistent (có thể dùng FilterExpression trên region) mỗi tháng. Quét 50 GB tốn lượng RCU cố định và nhỏ so với chi phí ghi thêm liên tục của một GSI trên bảng 15,000 WCU.\n(C) SAI: GSI KEYS_ONLY rẻ hơn ALL nhưng vẫn phát sinh chi phí ghi index cho mọi item suốt tháng, đắt hơn một lần Scan mỗi tháng.\n(D) SAI: Global tables thêm replica ở Region khác nhân đôi chi phí ghi và lưu trữ để phục vụ một truy vấn hằng tháng, hoàn toàn không hợp lý.\nĐáp án đúng: B\nĐiểm cần nhớ: GSI có chi phí ghi liên tục. Với truy vấn rất hiếm trên bảng nhỏ nhưng ghi nhiều, Scan định kỳ (hoặc export) có thể rẻ hơn duy trì một index.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add the global secondary index on region with the ALL projection and query it monthly.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Run a single eventually consistent Scan each month and filter the results on region.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Add a global secondary index on region with the KEYS_ONLY projection and query it monthly.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a global table replica in a second Region and run the monthly query against it.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A product detail page is assembled from three sources: pricing data in Amazon Aurora PostgreSQL, inventory data in Amazon DynamoDB, and a third-party reviews API. The team wants to cache the fully assembled page fragments for 60 seconds to reduce load and cost on all three sources. A developer proposes DynamoDB Accelerator (DAX) for the inventory reads plus a separate cache for the other sources. Which solution is MOST cost-effective?",
+    "explanation": "Phân tích đề: Cần cache kết quả đã tổng hợp từ ba nguồn (Aurora, DynamoDB, API ngoài) trong 60 giây. Đề xuất dùng DAX cho DynamoDB cộng một cache khác.\n(A) SAI: DAX chỉ cache request tới DynamoDB, không cache được dữ liệu Aurora hay API ngoài, nên vẫn cần thêm cache khác; hai cụm cache làm tăng chi phí và vận hành.\n(B) ĐÚNG: Một cụm Amazon ElastiCache (Valkey hoặc Redis OSS) lưu các page fragment đã tổng hợp với TTL 60 giây. Một lớp cache duy nhất giảm tải cho cả ba nguồn, bao gồm RCU của DynamoDB.\n(C) SAI: Aurora Replica chỉ giảm tải cho Aurora, không giúp DynamoDB hay API ngoài, và cũng tốn tiền instance.\n(D) SAI: Global tables không phải cache, còn thêm chi phí replicated write.\nĐáp án đúng: B\nĐiểm cần nhớ: DAX chỉ dành cho DynamoDB. Cần cache chung cho nhiều nguồn hoặc cache kết quả đã tổng hợp thì dùng ElastiCache.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Deploy DAX for the inventory reads and a separate ElastiCache cluster for the pricing and reviews data.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Cache the assembled page fragments in one Amazon ElastiCache cluster with a 60-second TTL.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Add Aurora Replicas for pricing reads and increase the provisioned RCUs on the inventory table.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Convert the inventory table to a global table and serve product pages from the nearest replica.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A reconciliation job writes to an Amazon DynamoDB table once per day. The job's start time varies with upstream files and cannot be predicted. For about 20 minutes it writes at roughly 8,000 WCUs, and the table is nearly idle for the rest of the day. Auto scaling reacted too slowly at the start of the job, so the team now keeps the table provisioned at 8,000 WCUs around the clock. Which change is MOST cost-effective?",
+    "explanation": "Phân tích đề: Burst 20 phút mỗi ngày, thời điểm không đoán trước, phần còn lại gần như nhàn rỗi. Đang trả 8,000 WCU 24/7.\n(A) SAI: Scheduled scaling yêu cầu biết trước thời điểm; đề nói thời điểm bắt đầu không dự đoán được.\n(B) ĐÚNG: On-demand trả theo request thực tế và hấp thụ burst ngay lập tức (trong giới hạn bảng), không cần cấp sẵn. Chỉ trả cho khoảng 20 phút ghi mỗi ngày thay vì 8,000 WCU suốt 24 giờ.\n(C) SAI: Reserved capacity cho 8,000 WCU giảm đơn giá nhưng vẫn trả cho capacity nhàn rỗi 23 giờ mỗi ngày trong 1 đến 3 năm.\n(D) SAI: Giảm target utilization làm auto scaling cấp nhiều capacity hơn, không giải quyết độ trễ phản ứng và còn tốn hơn.\nĐáp án đúng: B\nĐiểm cần nhớ: Burst ngắn, thời điểm không đoán được, còn lại nhàn rỗi: on-demand. Scheduled scaling chỉ dùng khi biết trước lịch.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Configure scheduled scaling actions that raise capacity before the job and lower it afterward.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Switch the table to on-demand capacity mode.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Keep 8,000 WCUs and purchase 1-year reserved capacity to lower the hourly rate.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Lower the auto scaling target utilization so that capacity is added earlier.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A 4 TB Amazon DynamoDB table was created with a local secondary index (LSI) that uses the ALL projection. The access pattern that used the LSI was retired a year ago, but the index still stores a full copy of every item and consumes write capacity on every write. A maintenance window of several hours is acceptable. What should a solutions architect do to stop paying for the LSI?",
+    "explanation": "Phân tích đề: LSI không còn dùng nhưng vẫn tốn lưu trữ (bản sao ALL) và WCU. Có cửa sổ bảo trì vài giờ.\n(A) SAI: LSI không thể xóa khỏi bảng đang tồn tại; UpdateTable chỉ xóa được GSI.\n(B) SAI: Projection của LSI (và GSI) không thể sửa sau khi tạo.\n(C) ĐÚNG: LSI chỉ tồn tại cùng bảng, nên cần bảng mới không có LSI. Export to S3 (không tốn RCU) rồi Import from S3 vào bảng mới (import không tiêu tốn WCU của bảng), chuyển ứng dụng sang bảng mới trong cửa sổ bảo trì và xóa bảng cũ.\n(D) SAI: Standard-IA giảm giá lưu trữ của cả bảng và index nhưng vẫn trả cho LSI không dùng, và tăng đơn giá ghi.\nĐáp án đúng: C\nĐiểm cần nhớ: LSI chỉ tạo lúc tạo bảng và không xóa được; muốn bỏ LSI phải chuyển sang bảng mới (Export to S3 + Import from S3 là cách ít tốn capacity nhất).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Delete the LSI with an UpdateTable call during the maintenance window.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Change the LSI projection from ALL to KEYS_ONLY to shrink the index.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Export the table to Amazon S3 and import it into a new table without the LSI.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Change the table class to Standard-IA to reduce the storage cost of the LSI.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company has 120 Amazon DynamoDB tables across several accounts. The FinOps team suspects that many provisioned tables are overprovisioned and wants to identify which tables and which cost categories (throughput, storage, backups) are driving spend before making changes. Which TWO tools should a solutions architect use? (Choose TWO.)",
+    "explanation": "Phân tích đề: Cần xác định bảng cấp dư capacity và hạng mục chi phí chính (throughput, lưu trữ, backup).\n(A) ĐÚNG: So sánh metric CloudWatch ConsumedReadCapacityUnits/ConsumedWriteCapacityUnits với ProvisionedReadCapacityUnits/ProvisionedWriteCapacityUnits theo từng bảng cho thấy bảng nào cấp dư.\n(B) SAI: Amazon Inspector đánh giá lỗ hổng phần mềm và mạng, không phân tích chi phí DynamoDB.\n(C) ĐÚNG: AWS Cost Explorer lọc theo dịch vụ DynamoDB và nhóm theo usage type (capacity-hours, storage, backup) cho biết hạng mục chi phí nào lớn nhất, kết hợp với tag để xem theo bảng/nhóm.\n(D) SAI: AWS X-Ray theo dõi độ trễ của request trong ứng dụng, không cho biết capacity cấp dư hay chi phí theo hạng mục.\n(E) SAI: Amazon Macie phát hiện dữ liệu nhạy cảm trong Amazon S3, không liên quan chi phí DynamoDB.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Tìm lãng phí DynamoDB: CloudWatch consumed vs provisioned để phát hiện cấp dư; Cost Explorer theo usage type để thấy hạng mục chi phí.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Amazon CloudWatch consumed capacity metrics compared with provisioned capacity metrics.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Amazon Inspector findings for the DynamoDB tables in each account.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "AWS Cost Explorer filtered on DynamoDB and grouped by usage type.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "AWS X-Ray traces of the applications that call the DynamoDB tables.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Amazon Macie discovery jobs that classify the data in each table.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A data platform loads a 3 TB Amazon DynamoDB staging table from files in Amazon S3 at the start of each month. Before each load, all existing data must be removed completely. Today, a job scans the table and deletes every item with BatchWriteItem, which consumes a very large amount of write capacity and takes many hours. The table has no backups or streams that other systems depend on. Which approach is MOST cost-effective?",
+    "explanation": "Phân tích đề: Mỗi tháng phải xóa sạch 3 TB rồi nạp lại từ S3. Xóa từng item tốn rất nhiều WCU và thời gian.\n(A) SAI: TTL xóa miễn phí nhưng phải ghi thuộc tính hết hạn lên từng item (tốn WCU) và TTL có thể mất tới vài ngày mới xóa xong, không đảm bảo bảng sạch trước khi nạp.\n(B) SAI: PartiQL DELETE vẫn xóa từng item theo khóa và tốn WCU y như DeleteItem.\n(C) SAI: Chuyển sang on-demand khi xóa chỉ đổi cách tính tiền; mỗi item bị xóa vẫn tính write request unit.\n(D) ĐÚNG: Xóa bảng (DeleteTable không tính phí theo số item) và dùng Import from S3 để tạo bảng mới với cùng định nghĩa từ các file nguồn. Import không tiêu tốn WCU của bảng, nên cả bước xóa lẫn bước nạp đều rẻ hơn nhiều.\nĐáp án đúng: D\nĐiểm cần nhớ: Cần làm sạch toàn bộ bảng thì DeleteTable rồi tạo lại (Import from S3 nếu nạp từ S3), không xóa từng item.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add an expiration attribute to every item and enable Time to Live so DynamoDB removes the items for free.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Replace the BatchWriteItem calls with PartiQL DELETE statements that are executed in parallel.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Switch the table to on-demand capacity mode during the delete job so the deletes are not throttled.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Delete the table and use Import from S3 to create a new table from the monthly files.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An internal directory service reads from a provisioned Amazon DynamoDB table. Peak demand is about 150 RCUs of eventually consistent reads, with a p99 latency requirement of 20 ms that the table already meets. A developer proposes a three-node DynamoDB Accelerator (DAX) cluster to 'cut read costs,' because most reads are repeated. Which recommendation is MOST cost-effective?",
+    "explanation": "Phân tích đề: Lượng đọc nhỏ (150 RCU), độ trễ yêu cầu 20 ms đã đạt. DAX tính phí theo node-giờ.\n(A) SAI: Cụm DAX 3 node tính phí từng node mỗi giờ; với chỉ 150 RCU, tiền node DAX lớn hơn nhiều so với phần RCU tiết kiệm được.\n(B) SAI: Cụm DAX một node rẻ hơn nhưng không có tính sẵn sàng cao (không khuyến nghị cho production) và vẫn có thể đắt hơn RCU tiết kiệm.\n(C) SAI: Thêm ElastiCache cũng tính phí node theo giờ và phải tự viết logic cache, không hợp lý cho lượng đọc nhỏ.\n(D) ĐÚNG: Giữ đọc trực tiếp DynamoDB bằng eventually consistent read, dùng auto scaling để RCU bám sát mức tiêu thụ thực. Độ trễ đã đạt yêu cầu nên không cần cache; đây là phương án rẻ nhất.\nĐáp án đúng: D\nĐiểm cần nhớ: DAX đáng tiền khi lượng đọc lặp lại lớn hoặc cần micro-giây. Với lượng đọc nhỏ, phí node DAX vượt quá phần RCU tiết kiệm.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Deploy the three-node DAX cluster so that repeated reads are served from the cache.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Deploy a single-node DAX cluster to reduce the cost of caching the repeated reads.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add an ElastiCache cluster with application-managed caching of the directory items.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Keep reading from DynamoDB directly and use auto scaling to right-size the RCUs.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A mobile game with 5 million players stores scores in Amazon DynamoDB. To show a global top-100 leaderboard, every score item carries a constant attribute 'board = GLOBAL' that is the partition key of a global secondary index sorted by score. Score updates peak at 50,000 per second, and the index partition is throttled, so the team keeps raising capacity at high cost. The leaderboard can be rebuilt from the game servers if it is lost. Which solution is MOST cost-effective?",
+    "explanation": "Phân tích đề: GSI có partition key hằng số (GLOBAL) tạo hot partition cho 50,000 lần cập nhật/giây; tăng capacity tốn kém mà vẫn throttle. Leaderboard có thể dựng lại nên không cần độ bền cao.\n(A) SAI: DAX có thể cache kết quả Query đọc leaderboard, nhưng nút thắt là ghi vào một partition của GSI; DAX không giảm lượng ghi đó.\n(B) SAI: Chuyển sang on-demand không vượt được giới hạn throughput của một partition; hot partition vẫn throttle.\n(C) ĐÚNG: Dùng sorted set của Amazon ElastiCache (Valkey hoặc Redis OSS): ZADD cập nhật điểm và ZREVRANGE lấy top 100 trong bộ nhớ, xử lý hàng chục nghìn thao tác/giây trên một cụm nhỏ, rẻ hơn nhiều so với việc liên tục tăng WCU cho GSI. Dữ liệu có thể dựng lại nên độ bền in-memory là chấp nhận được.\n(D) SAI: Write sharding GSI thành nhiều partition giảm throttle, nhưng vẫn trả WCU cho mọi lần ghi index và phải đọc gộp nhiều shard mỗi lần hiển thị; tốn hơn giải pháp sorted set.\nĐáp án đúng: C\nĐiểm cần nhớ: Leaderboard/xếp hạng thời gian thực là trường hợp kinh điển của ElastiCache sorted set; tránh GSI có partition key hằng số trên DynamoDB.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Place a DynamoDB Accelerator (DAX) cluster in front of the GSI to absorb the leaderboard traffic.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Switch the table and the GSI to on-demand capacity mode so the index scales automatically.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Maintain the leaderboard in an Amazon ElastiCache sorted set and remove the GSI.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Shard the GSI partition key across 20 random suffixes and merge the shards on every read.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "An operations dashboard shows the number of orders in each status. It refreshes every 30 seconds for about 200 users, and each refresh scans a 500 GB Amazon DynamoDB table to count items by status. Read cost is now the largest DynamoDB line item. Counts may lag by a few seconds. Which TWO changes will reduce cost the MOST? (Choose TWO.)",
+    "explanation": "Phân tích đề: Mỗi lần refresh quét 500 GB để đếm, 200 người dùng mỗi 30 giây; chấp nhận trễ vài giây. Cần thay Scan bằng số liệu tổng hợp sẵn.\n(A) ĐÚNG: Bật DynamoDB Streams, Lambda cập nhật các item tổng hợp (một item đếm cho mỗi status) bằng UpdateItem ADD; dashboard chỉ GetItem vài item nhỏ thay vì quét 500 GB. Lambda trigger đọc Streams không tính phí read request.\n(B) SAI: Parallel scan làm quét nhanh hơn nhưng tổng RCU không đổi.\n(C) ĐÚNG: Trong mỗi batch bản ghi stream, Lambda cộng dồn số thay đổi theo từng status rồi ghi một UpdateItem cho mỗi status, thay vì ghi một lần cho mỗi bản ghi. Giảm WCU và tránh item đếm trở thành hot key.\n(D) SAI: DAX không phù hợp cho Scan toàn bảng liên tục trên dữ liệu thay đổi; chỉ thêm phí node.\n(E) SAI: On-demand không giảm lượng dữ liệu quét; mỗi lần Scan 500 GB vẫn bị tính read request unit.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Số liệu tổng hợp đọc thường xuyên nên được tính sẵn bằng Streams + Lambda (có gộp theo batch), không Scan lặp lại.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Maintain per-status count items that a Lambda function updates from DynamoDB Streams.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Use a parallel scan with more segments so that each refresh finishes faster.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Aggregate the changes per status within each stream batch before updating the counts.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Route the dashboard scans through a DynamoDB Accelerator (DAX) cluster.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Switch the table to on-demand capacity mode to pay only for the scans.", "isCorrect": false }
+    ]
+  }
+]

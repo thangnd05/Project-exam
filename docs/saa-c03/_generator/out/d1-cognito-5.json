@@ -1,0 +1,414 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company stores 3 million customer accounts in an Amazon Cognito user pool in production. An operator recently came close to deleting the user pool by mistake while cleaning up test resources in the same account. The company wants a simple safeguard that stops the user pool from being deleted until the setting is turned off on purpose. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: cần chặn việc xóa nhầm chính User Pool, cách đơn giản, chỉ gỡ được khi cố ý tắt => tính năng deletion protection của User Pool.\n(A) SAI: AWS Backup không hỗ trợ Amazon Cognito làm resource được backup; không có recovery point nào cho User Pool, và backup cũng không ngăn được thao tác xóa.\n(B) SAI: CloudFormation DeletionPolicy: Retain chỉ có tác dụng khi stack bị xóa hoặc resource bị gỡ khỏi template; operator vẫn xóa trực tiếp User Pool qua console hoặc API được.\n(C) ĐÚNG: Bật deletion protection trên User Pool khiến lệnh DeleteUserPool bị từ chối cho tới khi có người chủ động tắt cài đặt này; đây là cơ chế có sẵn, không cần thêm dịch vụ.\n(D) SAI: Xuất danh sách user ra S3 hằng ngày không ngăn được việc xóa; ngoài ra mật khẩu không thể export nên khôi phục từ bản xuất vẫn buộc user đặt lại mật khẩu.\nĐáp án đúng: C\nĐiểm cần nhớ: User Pool có deletion protection riêng; Cognito không phải resource của AWS Backup và mật khẩu user không export được.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create an AWS Backup plan that takes daily backups of the user pool and its users.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Set DeletionPolicy: Retain on the user pool resource in the CloudFormation template.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Turn on deletion protection for the user pool so that delete requests fail until disabled.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Export the user list to an S3 bucket every day by using a scheduled Lambda function.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company is replacing a retired customer database with an Amazon Cognito user pool. It has a one-time export of 50,000 user profiles in a CSV file, and the old system will be shut down before the migration. Users have already been told that they must set a new password at their first sign-in. Which approach requires the LEAST effort?",
+    "explanation": "Phân tích đề: nạp một lần 50.000 user từ CSV, hệ thống cũ sẽ tắt, user chấp nhận đặt lại mật khẩu => user import job của User Pool.\n(A) ĐÚNG: User import job nhận file CSV theo header của User Pool, tạo user hàng loạt với trạng thái yêu cầu reset mật khẩu; chỉ cần một IAM role cho CloudWatch Logs để ghi log job.\n(B) SAI: Migrate user Lambda trigger cần hệ thống cũ còn chạy để xác thực mật khẩu lúc user đăng nhập; đề nói hệ thống cũ sẽ tắt, và trigger này dùng để giữ mật khẩu cũ, điều không cần ở đây.\n(C) SAI: AWS DMS di chuyển dữ liệu giữa các database, không có target là Cognito User Pool.\n(D) SAI: Script gọi AdminCreateUser cho từng user làm được, nhưng phải tự viết, xử lý throttling và lỗi; tốn công hơn import job có sẵn.\nĐáp án đúng: A\nĐiểm cần nhớ: Chấp nhận reset mật khẩu => import CSV vào User Pool; muốn giữ mật khẩu cũ khi hệ thống cũ còn chạy => migrate user Lambda trigger.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Run a user pool import job that loads the CSV file of user profiles.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Configure a Migrate user Lambda trigger that reads profiles from the CSV file during sign-in.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Use AWS Database Migration Service with the user pool configured as the target endpoint.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Write a script that calls the AdminCreateUser API once for each row in the CSV file.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A small team is building a React web application and wants to add sign-up, sign-in, and password reset screens that are backed by an Amazon Cognito user pool. The team wants prebuilt UI components and client libraries instead of writing the authentication calls by hand. Which AWS offering should the team use?",
+    "explanation": "Phân tích đề: app React, muốn component UI dựng sẵn và thư viện client gọi Cognito => AWS Amplify (Amplify Auth + Authenticator UI component).\n(A) SAI: AWS AppSync là dịch vụ GraphQL API; nó có thể dùng Cognito để authorize nhưng không cung cấp màn hình đăng ký/đăng nhập cho front end.\n(B) SAI: AWS App Runner chạy container web/API được quản lý, không phải thư viện xác thực phía client.\n(C) SAI: CloudFront Functions chạy logic nhẹ ở edge trên request/response, không cung cấp UI đăng nhập hay luồng sign-up.\n(D) ĐÚNG: AWS Amplify cung cấp thư viện Auth và Authenticator UI component dùng Cognito User Pool phía sau, có sẵn sign-up, sign-in, MFA, quên mật khẩu.\nĐáp án đúng: D\nĐiểm cần nhớ: Front end web/mobile cần tích hợp Cognito nhanh bằng code => AWS Amplify; không muốn viết UI nào => Hosted UI/managed login của User Pool.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "AWS AppSync with a GraphQL schema that uses Cognito user pool authorization.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "AWS App Runner with a managed web service that hosts the sign-in screens.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Amazon CloudFront Functions that render the sign-in form at the edge.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "AWS Amplify libraries together with the Amplify Authenticator UI component.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A developer is configuring an Amazon Cognito identity pool so that signed-in users of a mobile app can receive temporary AWS credentials. Which TWO identity sources can the identity pool accept as authentication providers? (Select TWO.)",
+    "explanation": "Phân tích đề: hỏi nguồn danh tính mà Identity Pool chấp nhận để đổi lấy credential tạm thời.\n(A) SAI: Access key dài hạn của IAM user không phải nguồn danh tính của Identity Pool; mục tiêu của Identity Pool chính là tránh nhúng key dài hạn vào app.\n(B) ĐÚNG: Token từ Cognito User Pool là nguồn phổ biến nhất; Identity Pool kiểm token rồi cấp credential qua IAM role.\n(C) SAI: Permission set của IAM Identity Center dùng cho nhân viên vào nhiều account AWS, không phải provider của Identity Pool.\n(D) SAI: Trust anchor X.509 thuộc IAM Roles Anywhere, dành cho workload ngoài AWS, không cấu hình được trong Identity Pool.\n(E) ĐÚNG: Identity Pool chấp nhận SAML 2.0 identity provider đã đăng ký trong IAM, cùng với OIDC và các social provider như Google, Facebook, Apple.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Identity Pool nhận danh tính từ User Pool, social, OIDC, SAML hoặc developer-authenticated rồi đổi lấy credential tạm thời qua STS.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Long-term access keys that belong to IAM users created for each app user.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Tokens issued by an Amazon Cognito user pool after sign-in.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Permission sets that are assigned to users in IAM Identity Center.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "X.509 certificates validated by an IAM Roles Anywhere trust anchor.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "A SAML 2.0 identity provider that is registered in IAM.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A brokerage app uses an Amazon Cognito user pool with authenticator-app (TOTP) MFA. Customers complain about entering an MFA code every time they sign in from their own phone. Security agrees that MFA can be skipped on a device that the user has already confirmed, but every sign-in from a new or unconfirmed device must require MFA regardless of any risk score. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: bỏ MFA trên thiết bị user đã xác nhận, nhưng thiết bị mới luôn phải MFA, không phụ thuộc điểm rủi ro => device tracking (remember devices) và suppress MFA trên thiết bị đã nhớ.\n(A) SAI: Đặt MFA là optional cho user tự tắt thì user có thể bỏ MFA trên mọi thiết bị, kể cả thiết bị mới; vi phạm yêu cầu bảo mật.\n(B) ĐÚNG: Bật remember devices trong User Pool và chọn không yêu cầu MFA trên thiết bị đã nhớ; Cognito cấp device key cho thiết bị đã qua MFA, lần sau trên thiết bị đó bỏ qua MFA, còn thiết bị lạ vẫn phải MFA.\n(C) SAI: Adaptive authentication của threat protection quyết định MFA theo điểm rủi ro; một thiết bị mới có rủi ro thấp có thể không bị hỏi MFA, trái với yêu cầu bất kể điểm rủi ro.\n(D) SAI: Kéo dài refresh token giúp ít phải đăng nhập lại, nhưng mỗi lần đăng nhập thật sự trên chính điện thoại đó vẫn bị hỏi MFA; không giải quyết đúng yêu cầu.\nĐáp án đúng: B\nĐiểm cần nhớ: Bỏ MFA trên thiết bị tin cậy => device tracking (remember devices); MFA theo rủi ro => adaptive authentication.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Change MFA to optional so that each customer can turn MFA off for their own account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable remembered devices and suppress MFA on remembered devices.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable adaptive authentication so that MFA is requested only when the sign-in risk is high.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Increase the refresh token validity so that customers sign in again only every 30 days.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company is building a single-page application (SPA) that runs entirely in the browser and has no backend. Users sign in through the Amazon Cognito user pool managed login pages. A security review found that the current design returns tokens in the URL fragment of the redirect, where they can leak through browser history. The SPA cannot keep a secret. Which configuration should a solutions architect recommend?",
+    "explanation": "Phân tích đề: SPA không có backend, không giữ được secret, token không được nằm trên URL => authorization code grant với PKCE trên app client public (không secret).\n(A) SAI: Implicit grant chính là luồng trả token trong URL fragment; rút ngắn thời hạn token chỉ giảm thiệt hại chứ không loại bỏ việc lộ token qua URL.\n(B) SAI: Client credentials grant dành cho machine-to-machine, không có người dùng đăng nhập, và cần client secret mà SPA không giữ được.\n(C) ĐÚNG: Authorization code grant chỉ trả mã code trên URL; SPA đổi code lấy token qua token endpoint bằng code_verifier của PKCE, nên không cần client secret và code bị đánh cắp cũng không dùng được.\n(D) SAI: Nhúng client secret vào bundle JavaScript làm lộ secret cho bất kỳ ai xem mã nguồn trang; app client cho SPA phải là public client.\nĐáp án đúng: C\nĐiểm cần nhớ: SPA/mobile => authorization code grant + PKCE, app client không secret; tránh implicit grant.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Keep the implicit grant and reduce the ID and access token validity to five minutes.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Switch the app client to the client credentials grant with a custom resource server scope.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Use the authorization code grant with PKCE on an app client without a secret.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Use the authorization code grant and store the app client secret in the JavaScript bundle.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs 12 microservices on Amazon ECS behind an internal Network Load Balancer, without Amazon API Gateway. Clients send Amazon Cognito user pool access tokens with each request. Each service must reject invalid or expired tokens, and the design must not add a network call to Cognito on every request, because peak traffic is high. What should the microservices do?",
+    "explanation": "Phân tích đề: không có API Gateway, phải tự kiểm token, không gọi Cognito mỗi request => verify JWT cục bộ bằng public key (JWKS) của User Pool.\n(A) ĐÚNG: Mỗi service tải và cache bộ public key từ endpoint JWKS của User Pool, kiểm chữ ký JWT, rồi kiểm iss, client_id, token_use và exp; không cần gọi Cognito ở mỗi request.\n(B) SAI: Gọi GetUser với access token mỗi request cũng kiểm được token, nhưng thêm độ trễ mạng và dễ chạm quota request của Cognito khi tải cao; vi phạm ràng buộc không gọi Cognito mỗi request.\n(C) SAI: Chỉ decode base64 và tin claim mà không kiểm chữ ký thì kẻ tấn công có thể tự tạo token giả; không an toàn.\n(D) SAI: Identity Pool cấp credential AWS tạm thời, không phải cơ chế xác minh token cho API tự viết; đồng thời vẫn là một lời gọi tới Cognito ở mỗi request.\nĐáp án đúng: A\nĐiểm cần nhớ: JWT của User Pool ký RS256; backend tự verify bằng JWKS (cache key), kiểm thêm exp, iss, audience/client_id.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Verify each JWT signature with cached keys from the user pool JWKS endpoint, then check its claims.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Call the Cognito GetUser API with each access token and reject requests for which the call fails.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Base64-decode each JWT payload and accept the request when the exp claim is still in the future.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Exchange each token at a Cognito identity pool and accept the request when credentials are returned.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A penetration test on a consumer app that uses an Amazon Cognito user pool found that the sign-in and forgot-password APIs return different error messages for unknown usernames and for wrong passwords. Attackers can use this to discover which email addresses have accounts. The company wants to fix this with the LEAST development effort. What should a solutions architect do?",
+    "explanation": "Phân tích đề: lỗi trả về khác nhau làm lộ user có tồn tại hay không (user enumeration); cần sửa ít công sức nhất => bật prevent user existence errors trên app client.\n(A) SAI: Rate-based rule của AWS WAF giảm tốc độ dò, nhưng mỗi request vẫn trả thông báo khác nhau nên kẻ tấn công vẫn dò được, chỉ chậm hơn.\n(B) SAI: Compromised credentials detection chặn mật khẩu đã lộ, không thay đổi nội dung lỗi trả về khi username không tồn tại.\n(C) SAI: Pre authentication trigger có thể từ chối đăng nhập, nhưng không kiểm soát được thông báo lỗi của Cognito cho user không tồn tại và không phủ luồng forgot-password; lại phải viết code.\n(D) ĐÚNG: Bật cài đặt prevent user existence errors trên app client khiến Cognito trả thông báo chung (sai username hoặc mật khẩu) và phản hồi giống nhau ở luồng khôi phục mật khẩu, không cần viết code.\nĐáp án đúng: D\nĐiểm cần nhớ: Chống dò user (user enumeration) trong Cognito => PreventUserExistenceErrors ở mức app client.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Associate an AWS WAF web ACL with a rate-based rule with the user pool.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable compromised credentials detection in the user pool threat protection settings.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Add a Pre authentication Lambda trigger that rejects sign-ins for unknown usernames.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable the prevent user existence errors setting on the app client used by the app.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A retail company wants customers of its mobile app to sign in to an Amazon Cognito user pool without creating or typing a password. The company has enabled a feature plan that supports passwordless sign-in and wants to use only built-in Cognito capabilities, with no custom authentication Lambda triggers. Which TWO sign-in methods can the company offer as the first factor? (Select TWO.)",
+    "explanation": "Phân tích đề: đăng nhập không mật khẩu (passwordless), chỉ dùng tính năng có sẵn của User Pool, không viết custom auth challenge.\n(A) ĐÚNG: User Pool hỗ trợ passkey (WebAuthn/FIDO2) làm yếu tố đăng nhập đầu tiên, user xác thực bằng sinh trắc học hoặc khóa bảo mật trên thiết bị.\n(B) SAI: TOTP từ authenticator app chỉ dùng làm yếu tố thứ hai (MFA) sau mật khẩu, không dùng làm yếu tố đầu tiên trong User Pool.\n(C) SAI: IAM Roles Anywhere cấp credential AWS cho workload ngoài AWS dựa trên chứng chỉ X.509, không phải phương thức đăng nhập cho end-user app.\n(D) ĐÚNG: Email one-time password là phương thức passwordless có sẵn: Cognito gửi mã một lần tới email đã xác minh để user đăng nhập.\n(E) SAI: Security question là luồng phải tự xây bằng custom authentication challenge Lambda triggers, trái ràng buộc không dùng trigger tùy chỉnh.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Passwordless có sẵn trong User Pool: passkey, email OTP, SMS OTP; TOTP chỉ là MFA.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Passkeys that use WebAuthn with the device biometrics or a security key.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Time-based one-time passwords (TOTP) from an authenticator app without a password.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "X.509 client certificates that are validated through IAM Roles Anywhere.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "One-time passwords sent to the customer's verified email address.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Security questions that the customer answers during each sign-in attempt.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A video platform stores each customer's subscription tier in the custom:tier attribute of an Amazon Cognito user pool. The mobile app reads the attribute from the ID token to unlock premium features. A tester showed that a user can call UpdateUserAttributes with their own access token to set custom:tier to premium. The billing backend must still be able to change the tier whenever a subscription changes. What should a solutions architect do?",
+    "explanation": "Phân tích đề: user không được tự sửa custom:tier, nhưng backend billing vẫn phải đổi được bất cứ lúc nào => bỏ quyền ghi thuộc tính khỏi app client, backend cập nhật bằng admin API.\n(A) SAI: Đặt custom attribute là immutable thì sau khi tạo user không ai đổi được nữa, kể cả admin API; backend billing không thể nâng/hạ tier, vi phạm yêu cầu. Ngoài ra không đổi được tính mutable của attribute đã tạo.\n(B) ĐÚNG: Gỡ custom:tier khỏi danh sách attribute có quyền ghi (write) của app client mobile; user không sửa được qua UpdateUserAttributes, còn backend gọi AdminUpdateUserAttributes bằng IAM credential để đổi tier.\n(C) SAI: Đưa custom:tier vào user pool group không có ý nghĩa và vẫn để nguyên quyền ghi attribute của app client; lỗ hổng không được vá.\n(D) SAI: Cho app đọc tier từ access token thay vì ID token không ngăn user sửa attribute; giá trị bị sửa vẫn xuất hiện trong token mới.\nĐáp án đúng: B\nĐiểm cần nhớ: Quyền đọc/ghi attribute được cấu hình theo từng app client; attribute nhạy cảm nên chỉ do backend cập nhật bằng Admin API. Immutable nghĩa là không ai đổi được sau khi tạo user.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Recreate custom:tier as an immutable custom attribute so that it cannot be changed after sign-up.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Remove write permission for custom:tier from the app client; update it with AdminUpdateUserAttributes.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Add every premium user to a premium group and keep custom:tier writable for the mobile app client.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Have the app read custom:tier from the access token instead of the ID token after each sign-in.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company uses an Amazon Cognito identity pool with rules-based role mapping for its user pool provider. Users whose custom:department claim is finance receive FinanceRole, and users whose claim is sales receive SalesRole. An audit found that contractors, who have no department claim, still obtain temporary credentials through the identity pool's default authenticated role. Users that match no rule must not receive any AWS credentials. Guest access is already disabled. What should a solutions architect do?",
+    "explanation": "Phân tích đề: user không khớp rule nào đang rơi vào default authenticated role; yêu cầu là không được nhận credential nào => đổi cách giải quyết role mơ hồ (role resolution) thành Deny.\n(A) SAI: Gỡ hết policy khỏi default authenticated role làm credential gần như vô dụng, nhưng contractor vẫn nhận được credential tạm thời; vi phạm yêu cầu không được nhận credential.\n(B) SAI: Pre token generation trigger gán department mặc định sẽ khiến contractor khớp rule và nhận role của phòng ban đó, tức là cấp thêm quyền thay vì chặn.\n(C) ĐÚNG: Đặt role resolution (AmbiguousRoleResolution) của provider thành Deny; khi không rule nào khớp, Identity Pool từ chối cấp credential thay vì dùng default authenticated role.\n(D) SAI: Chuyển sang token-based mapping chỉ đọc role từ group trong token; contractor không thuộc group nào vẫn rơi về cùng cài đặt role resolution, mặc định là authenticated role, nên vấn đề không được giải quyết.\nĐáp án đúng: C\nĐiểm cần nhớ: Role mapping của Identity Pool có role resolution: dùng default authenticated role hoặc Deny khi không khớp rule/không có role trong token.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Detach all permissions policies from the default authenticated role of the identity pool.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Add a Pre token generation trigger that sets a default department claim for contractors.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Set the role resolution for unmatched rules to Deny.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Switch to token-based role mapping that reads the IAM role from the cognito:roles claim.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "An Amazon Cognito user pool uses a Post confirmation Lambda trigger that calls a third-party CRM API to create a customer record. The CRM API sometimes takes 8 to 12 seconds to respond. During those periods, users see errors when they confirm their accounts, and some customers get duplicate CRM records. The company wants account confirmation to succeed reliably and wants each customer to be created in the CRM exactly once, without changing CRM vendors. Which THREE actions should a solutions architect take? (Select THREE.)",
+    "explanation": "Phân tích đề: Cognito gọi Lambda trigger đồng bộ, chỉ chờ khoảng 5 giây và thử lại khi quá thời gian => CRM chậm gây lỗi và gây bản ghi trùng do retry. Cần tách xử lý chậm ra khỏi trigger và đảm bảo idempotent.\n(A) SAI: Tăng timeout của Lambda lên 15 phút không giúp gì; giới hạn chờ nằm ở phía Cognito (khoảng 5 giây), Cognito vẫn báo lỗi và gọi lại trigger.\n(B) ĐÚNG: Cho trigger chỉ gửi một message (user sub, email) vào Amazon SQS rồi trả về ngay, nên luôn hoàn tất trong giới hạn thời gian của Cognito.\n(C) SAI: Chuyển lời gọi CRM sang Pre sign-up trigger vẫn là gọi đồng bộ với cùng giới hạn thời gian, lại tạo bản ghi CRM cho cả user chưa bao giờ xác nhận tài khoản.\n(D) ĐÚNG: Một Lambda khác xử lý hàng đợi SQS, gọi CRM với retry và dead-letter queue; độ chậm của CRM không còn ảnh hưởng tới luồng xác nhận của user.\n(E) SAI: Provisioned concurrency chỉ loại bỏ cold start của Lambda, không làm CRM phản hồi nhanh hơn; trigger vẫn quá thời gian chờ.\n(F) ĐÚNG: Vì Cognito có thể gọi lại trigger và SQS giao message ít nhất một lần, cần xử lý idempotent, ví dụ dùng user sub làm khóa idempotency khi tạo bản ghi CRM, để mỗi khách hàng chỉ được tạo một lần.\nĐáp án đúng: B, D và F\nĐiểm cần nhớ: Lambda trigger của Cognito là đồng bộ, phải phản hồi trong khoảng 5 giây; việc chậm thì đẩy vào SQS/EventBridge và xử lý bất đồng bộ, idempotent.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Increase the timeout of the Post confirmation Lambda function to 15 minutes.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Change the trigger to send the new user's details to an Amazon SQS queue and return.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Move the CRM API call from the Post confirmation trigger to a Pre sign-up trigger.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Process the queue with a separate Lambda function that retries CRM calls and uses a DLQ.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Configure provisioned concurrency for the Post confirmation Lambda function.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "F",
+        "answerText": "Make CRM record creation idempotent by using the user's sub as an idempotency key.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A logistics company has 400 backend services that call an internal API protected by OAuth scopes. Each service uses the client credentials grant against an Amazon Cognito user pool token endpoint. Each service currently requests a new access token before every API call, even though tokens are valid for 60 minutes. The company now receives TooManyRequestsException errors from Cognito during peak hours, and its Cognito bill for machine-to-machine token requests keeps growing. Which solution resolves both problems MOST cost-effectively?",
+    "explanation": "Phân tích đề: mỗi lời gọi API lại xin token mới dù token sống 60 phút => vừa chạm quota request của Cognito, vừa tăng chi phí M2M (tính theo số lần xin token). Cần giảm số lần gọi token endpoint.\n(A) SAI: Xin tăng quota qua Service Quotas có thể hết lỗi throttling, nhưng số lần xin token và chi phí M2M vẫn giữ nguyên hoặc tăng; không giải quyết bài toán chi phí.\n(B) SAI: Tách thành nhiều app client không giảm số lần gọi token endpoint; quota request áp dụng ở mức User Pool/account nên throttling vẫn xảy ra, chi phí còn tăng theo số app client.\n(C) SAI: Thay OAuth bằng API key của API Gateway làm mất phân quyền theo scope và API key không phải cơ chế xác thực đủ mạnh; đây là thay đổi bảo mật lớn chứ không phải tối ưu.\n(D) ĐÚNG: Mỗi service cache access token và tái sử dụng tới gần lúc hết hạn rồi mới xin token mới; số lần gọi token endpoint giảm từ mỗi request xuống khoảng một lần mỗi giờ cho mỗi service, hết throttling và giảm chi phí.\nĐáp án đúng: D\nĐiểm cần nhớ: Client credentials: cache token tới gần hết hạn; xin token cho mỗi request gây throttling và tăng phí M2M.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Request a higher Cognito token request rate quota for the account by using Service Quotas.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create a separate app client for each service so that token requests are spread across clients.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Replace OAuth scopes with Amazon API Gateway API keys and usage plans for each backend service.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Cache each access token in the service and request a new token only shortly before it expires.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company uses AWS Organizations. A central identity account hosts the Amazon Cognito user pool that all customer-facing applications share. Product teams deploy Amazon API Gateway REST APIs in 15 separate workload accounts, and each API must accept only requests that carry a valid access token from the central user pool. Users must keep a single account, and the company wants to avoid writing and maintaining token validation code. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: User Pool ở account trung tâm, REST API ở 15 account khác, giữ một tài khoản user duy nhất, không muốn tự viết code kiểm token => Cognito user pool authorizer cross-account.\n(A) ĐÚNG: Authorizer kiểu COGNITO_USER_POOLS của REST API có thể tham chiếu User Pool ở account khác bằng ARN; API Gateway tự kiểm chữ ký, hạn và scope của token, không cần code.\n(B) SAI: Tạo User Pool riêng ở mỗi account và đồng bộ user làm user có nhiều tài khoản, mật khẩu không đồng bộ được, vận hành rất nặng.\n(C) SAI: Lambda authorizer verify JWT bằng JWKS của User Pool trung tâm hoạt động được, nhưng phải viết và bảo trì code trong 15 account; đề muốn tránh điều này.\n(D) SAI: Dùng IAM authorization với Identity Pool ở mỗi account buộc client đổi token lấy credential và ký SigV4 theo từng account, thêm 15 Identity Pool và role mapping; phức tạp hơn nhiều.\nĐáp án đúng: A\nĐiểm cần nhớ: REST API hỗ trợ Cognito user pool authorizer với User Pool ở account khác; chỉ cần Lambda authorizer khi logic kiểm token vượt ngoài khả năng có sẵn.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Configure a Cognito user pool authorizer on each REST API that references the central user pool ARN.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create a user pool in each workload account and synchronize users from the central pool every hour.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Deploy a Lambda authorizer in each workload account that verifies tokens with the central pool JWKS.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Use IAM authorization on each API and create an identity pool in each account for the central user pool.",
+        "isCorrect": false
+      }
+    ]
+  }
+]

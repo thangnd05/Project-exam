@@ -1,0 +1,52 @@
+1. During a customer due diligence review, an auditor requests the AWS SOC 2 Type II report and the ISO 27001 certificate covering Amazon RDS and AWS CodePipeline. The company's engineers must not produce or edit these documents themselves, and the documents must
+2. An external partner conducting a security assessment needs to review the AWS PCI DSS documentation. The partner must not have any access to production accounts, must not be able to view production resources, and the company wants to keep an auditable record of
+3. A prospective customer asks two things: whether AWS is certified against PCI DSS for the services the company uses, and where the responsibilities of AWS end and those of the company begin for those services. The compliance lead must answer with official docum
+4. Only members of the compliance team may download AWS Artifact reports. Developers working in the same account must not be able to open Artifact at all, and the restriction must survive someone attaching a broader policy to a developer role later. Which TWO con
+5. An auditor is not satisfied with evidence that someone downloaded a SOC report last year. They want proof that the company formally accepted the relevant AWS agreement for handling regulated data, including who accepted it and on what date, and whether that ac
+6. During a customer security questionnaire, a company must provide its current SOC 2 Type II report and its ISO 27001 certificate for the AWS services it uses, and must be able to share them under a non-disclosure agreement. The DevOps engineer is asked to obtai
+7. A healthcare company is moving a workload that processes protected health information to AWS. Legal asks the DevOps team to put in place the agreement that allows the company to process this data on AWS, and to keep a record of its acceptance. Where is this do
+8. An auditor asks a company to demonstrate compliance for a workload on AWS. The company must show both that AWS operates its infrastructure according to recognized standards and that the company configures its own resources according to the same controls. Which
+9. A DevOps engineer must ensure that only a small group of compliance officers can download AWS Artifact reports, while all other users in the account are prevented from doing so. Which approach implements this control?
+10. A customer asks whether the company's AWS environment is PCI DSS compliant. The DevOps engineer downloads the AWS PCI DSS Attestation of Compliance from AWS Artifact and plans to send it as the complete answer. What is the MOST accurate assessment of this plan
+11. An auditor asks for evidence that the physical data centres hosting a workload are subject to independent controls testing. Where does a DevOps engineer obtain this?
+12. A DevOps engineer must explain to an auditor why a provider compliance report alone does not prove the company's workload is compliant. What is the correct explanation?
+13. A company must sign an agreement covering the handling of regulated health information before processing it on AWS. Which TWO statements about this process are correct?
+14. A DevOps engineer must restrict who in the company can download compliance reports, because the reports are covered by confidentiality terms. What control is appropriate?
+15. A prospective customer asks for a compliance report that covers a period ending three months ago, but the company only has a report from last year. What should the DevOps engineer do?
+16. A DevOps engineer must provide evidence that the company's own controls operated correctly, not just the provider's. What is the appropriate source?
+17. A DevOps engineer prepares for a certification audit. Which TWO categories of evidence are needed and from where?
+18. A DevOps engineer must confirm whether a specific AWS service in a specific Region is in scope for a certification the company relies on. Where is this confirmed?
+19. A customer security questionnaire asks whether the company encrypts customer data at rest. What is the correct way to answer?
+20. A DevOps engineer must track which compliance agreements the organization has accepted and when. What is the appropriate method?
+21. A DevOps engineer must automate the collection of evidence for a recurring audit so the team does not repeat manual work each cycle. What approach fits?
+22. A DevOps engineer reviews how compliance documents are handled internally. Which TWO practices are appropriate given their confidentiality terms?
+23. A DevOps engineer must decide what to tell a customer who asks whether the company is certified against a standard because it runs on AWS. What is the accurate answer?
+24. A DevOps engineer must ensure that when a provider compliance report is updated, the company's shared copies are not left outdated. What practice addresses this?
+25. A DevOps engineer must decide which team should own the process of obtaining and distributing provider compliance documents. What is the appropriate arrangement?
+26. A DevOps engineer must respond to a customer request for assurance about data residency. Which TWO sources contribute to the answer?
+27. A DevOps engineer must explain what a service control report tells a reader and what it does not. What is accurate?
+28. A DevOps engineer must determine whether the company needs to accept a specific legal agreement before launching a workload that processes regulated data. What is the correct first step?
+29. A DevOps engineer must support an auditor question about how quickly the company remediates non-compliant resources. What evidence answers this?
+30. A DevOps engineer must decide how compliance documentation fits into the release process for a regulated workload. What is a reasonable integration?
+31. A DevOps engineer must give a subcontractor limited access to a provider compliance report. What is the correct handling?
+32. A DevOps engineer prepares a compliance evidence pack for a workload. Which TWO items demonstrate customer-side control operation over time?
+33. A DevOps engineer must reduce the effort of answering repeated customer security questionnaires. What approach helps most?
+34. A DevOps engineer must decide what to do when an auditor requests evidence the company cannot produce because the control was never implemented. What is the correct response?
+35. A DevOps engineer must decide how often to review the company's compliance posture against the frameworks it claims. What cadence is appropriate?
+36. A DevOps engineer must decide which compliance questions can be answered from provider documentation and which cannot. Which TWO can be answered from provider documentation?
+37. A DevOps engineer must ensure that accepting a legal agreement on behalf of the organization is properly controlled. What safeguard is appropriate?
+38. A DevOps engineer must explain the difference between a certification and an attestation report to a colleague preparing an audit response. What is accurate?
+39. A DevOps engineer must handle a request from a customer for the company to complete an on-site audit of AWS data centres. What is the correct response?
+40. A DevOps engineer must decide what compliance evidence to keep after an audit closes. What is the appropriate practice?
+41. A DevOps engineer must support a due diligence review where the reviewer asks how the company knows its cloud provider meets its obligations. What answer is correct?
+42. A DevOps engineer reviews a provider audit report and finds noted exceptions. Which TWO actions are appropriate?
+43. A DevOps engineer must decide how to demonstrate that only authorised staff accessed compliance documents. What evidence provides this?
+44. A DevOps engineer must decide what to do when the company begins using a new AWS service in a regulated workload. What compliance step is required?
+45. A DevOps engineer must decide how to present the shared responsibility model to a team new to regulated workloads. What framing is most useful operationally?
+46. A DevOps engineer must build a compliance dashboard for leadership. Which TWO indicators are genuinely informative?
+47. A DevOps engineer must decide whether compliance obligations change when a workload expands into an additional Region. What is the correct assessment?
+48. A DevOps engineer must respond when a customer asks for proof that a subprocessor list is current. What is the appropriate source?
+49. A DevOps engineer must decide what to automate first in a compliance programme that currently depends heavily on manual evidence gathering. What gives the greatest return?
+50. A DevOps engineer must decide how to treat compliance requirements when designing a new system rather than retrofitting them later. What approach is correct?
+51. During a customer security review, an auditor asks for evidence that the physical and environmental controls of the data centers hosting the company workload are independently tested. The auditor also asks the company to prove that its own S3 buckets are encry
+52. A healthcare company is preparing to process protected health information on AWS. Legal counsel states that a specific agreement must be in place with AWS before the workload goes live, and the company has 30 member accounts that will handle this data. What sh

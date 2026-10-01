@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "VPC Prod has an S3 gateway endpoint. VPC Tools is connected to VPC Prod through VPC peering and has no NAT gateway. Instances in VPC Tools must reach Amazon S3 in the same Region without using the internet. What should a solutions architect do?",
+    "explanation": "Phân tích đề: VPC Tools peering với VPC Prod (có gateway endpoint), muốn dùng S3 riêng tư.\n(A) SAI: Gateway endpoint không thể dùng xuyên qua peering; route tới prefix list trỏ sang peering không được hỗ trợ.\n(B) SAI: Endpoint policy chỉ giới hạn quyền, không làm gateway endpoint dùng được từ VPC khác.\n(C) ĐÚNG: Tạo gateway endpoint S3 riêng trong VPC Tools và gắn vào route table của subnet; gateway endpoint miễn phí và chỉ phục vụ VPC chứa nó.\n(D) SAI: Internet gateway đưa traffic S3 ra Internet, vi phạm yêu cầu.\nĐáp án đúng: C\nĐiểm cần nhớ: Gateway endpoint không transitive: không dùng được qua peering, Transit Gateway, VPN hay Direct Connect.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a route in VPC Tools that sends the S3 prefix list through the peering connection.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Update the endpoint policy in VPC Prod to allow principals that come from VPC Tools.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a separate S3 gateway endpoint in VPC Tools and associate its route tables.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Attach an internet gateway to VPC Tools and restrict it with an S3 bucket policy.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A security architect is documenting how interface VPC endpoints provide private access to AWS services such as Amazon SNS and AWS KMS. Which technology powers interface endpoints?",
+    "explanation": "Phân tích đề: Hỏi công nghệ nền của interface endpoint.\n(A) SAI: Direct Connect là kết nối vật lý riêng từ on-prem vào AWS, không phải cơ chế của interface endpoint.\n(B) SAI: Transit Gateway là hub định tuyến giữa VPC và mạng on-prem.\n(C) SAI: Global Accelerator cung cấp IP anycast công khai để tăng tốc ứng dụng qua mạng AWS toàn cầu.\n(D) ĐÚNG: Interface endpoint được xây trên AWS PrivateLink, đặt ENI private IP trong subnet để truy cập dịch vụ mà không cần IGW, NAT hay peering.\nĐáp án đúng: D\nĐiểm cần nhớ: Interface endpoint = AWS PrivateLink = ENI private IP trong subnet.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS Direct Connect", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "AWS Transit Gateway", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "AWS Global Accelerator", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "AWS PrivateLink", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company creates an interface VPC endpoint for Amazon SNS with private DNS enabled. An EC2 instance in the same VPC performs a DNS lookup for sns.us-east-1.amazonaws.com by using the Amazon-provided DNS server. What does the name resolve to?",
+    "explanation": "Phân tích đề: Private DNS bật, tra cứu hostname mặc định từ trong VPC bằng Amazon DNS.\n(A) ĐÚNG: Private DNS tạo một private hosted zone ẩn cho tên dịch vụ trong VPC, nên hostname mặc định phân giải ra IP private của các ENI endpoint.\n(B) SAI: IP public của SNS chỉ trả về khi private DNS tắt hoặc tra cứu từ ngoài VPC.\n(C) SAI: Interface endpoint không dùng prefix list; prefix list là của gateway endpoint.\n(D) SAI: Không có NAT gateway nào tham gia vào phân giải DNS hay đường đi của interface endpoint.\nĐáp án đúng: A\nĐiểm cần nhớ: Private DNS bật => code giữ nguyên hostname chuẩn nhưng traffic đi vào ENI private.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "The private IP addresses of the endpoint network interfaces", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "The public IP addresses of the regional Amazon SNS service", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "The IP address ranges of the Amazon SNS managed prefix list", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "The private IP address of the NAT gateway in the same subnet", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A data lake team wants to give an analytics VPC a dedicated way to access a shared S3 bucket. Requests that use this access path must be rejected if they do not come from that VPC. Which solution meets this requirement?",
+    "explanation": "Phân tích đề: Một đường truy cập riêng tới bucket chỉ nhận request từ một VPC.\n(A) SAI: S3 access point không có security group; security group chỉ áp dụng cho ENI trong VPC.\n(B) ĐÚNG: Tạo S3 access point với network origin là VPC (chỉ định VPC ID); access point đó chỉ chấp nhận request đến từ VPC này qua VPC endpoint.\n(C) SAI: Object Lock bảo vệ đối tượng khỏi xóa/ghi đè (WORM), không giới hạn nguồn mạng.\n(D) SAI: Block Public Access chặn truy cập công khai nhưng không giới hạn request có credential hợp lệ từ ngoài VPC.\nĐáp án đúng: B\nĐiểm cần nhớ: S3 access point có network origin = VPC giúp tạo đường truy cập chỉ dùng được từ VPC đó.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an S3 access point and attach a security group that allows only the VPC.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an S3 access point with its network origin set to the analytics VPC.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Enable S3 Object Lock on the bucket and grant the VPC role governance mode.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable S3 Block Public Access and grant the analytics role an IAM policy.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A security team must prove during an audit that requests to a sensitive S3 bucket were made through the company's VPC endpoint and not through a public path. CloudTrail data events are enabled for the bucket. Which data source provides this evidence for each request with the LEAST additional effort?",
+    "explanation": "Phân tích đề: Cần bằng chứng từng request tới bucket đi qua VPC endpoint, CloudTrail data events đã bật.\n(A) SAI: VPC Flow Logs ghi IP/port, không có tên bucket hay thao tác S3, nên không gắn được với từng request cụ thể.\n(B) ĐÚNG: Bản ghi CloudTrail của request đi qua VPC endpoint có trường vpcEndpointId; data events đã bật nên chỉ cần truy vấn trường này.\n(C) SAI: AWS Config ghi lại cấu hình tài nguyên, không ghi từng request truy cập dữ liệu.\n(D) SAI: Route table chỉ chứng minh đường đi có thể có, không chứng minh từng request thực tế đã đi qua đâu.\nĐáp án đúng: B\nĐiểm cần nhớ: CloudTrail ghi vpcEndpointId cho request đi qua endpoint, hữu ích cho điều tra và kiểm toán.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "VPC Flow Logs on the private subnets, filtered by the S3 prefix list address ranges", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "The vpcEndpointId field in the CloudTrail data event records for the bucket", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "AWS Config configuration history of the bucket policy and the gateway endpoint", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "The route table entries of the private subnets exported with AWS Config snapshots", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An AWS Secrets Manager rotation function for an Amazon RDS database is attached to private subnets so it can connect to the database. The subnets have no NAT gateway. Rotation fails because the function times out when it calls the Secrets Manager API. The company must not add any internet path. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Lambda xoay vòng gắn VPC để tới RDS, không có NAT, gọi API Secrets Manager bị timeout.\n(A) SAI: Lambda gắn VPC không dùng được public IP để ra Internet; và đây cũng là đường Internet.\n(B) ĐÚNG: Tạo interface endpoint cho Secrets Manager trong VPC (private DNS bật, security group cho 443 từ security group của Lambda) để hàm gọi API riêng tư.\n(C) SAI: Gỡ Lambda khỏi VPC sẽ làm mất kết nối tới RDS trong private subnet.\n(D) SAI: Không có gateway endpoint cho Secrets Manager.\nĐáp án đúng: B\nĐiểm cần nhớ: Lambda gắn VPC không có Internet; cần interface endpoint cho mọi API AWS mà hàm gọi (trừ S3/DynamoDB có thể dùng gateway).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Assign a public IP address to the Lambda function network interfaces in the subnets.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an interface endpoint for Secrets Manager and allow HTTPS from the function.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Detach the function from the VPC so that it can reach the Secrets Manager public API.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a gateway endpoint for Secrets Manager and associate it with the route tables.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "Workers in private subnets send messages to an Amazon SQS queue that contains regulated data. The workers have no internet access. The security team requires that the queue reject SendMessage calls that do not arrive through the company's own VPC endpoint, even when the caller has valid credentials. Which TWO actions should a solutions architect take?",
+    "explanation": "Phân tích đề: Worker không có Internet, queue chỉ chấp nhận request qua endpoint của công ty.\n(A) ĐÚNG: Tạo interface endpoint cho SQS có private DNS để worker gửi message riêng tư.\n(B) SAI: SQS không hỗ trợ gateway endpoint.\n(C) ĐÚNG: Queue policy (resource policy của SQS) với Deny khi aws:SourceVpce khác ID endpoint sẽ chặn mọi đường khác dù có credential hợp lệ.\n(D) SAI: SQS queue không nằm trong VPC nên không gắn security group được.\n(E) SAI: aws:SourceIp không chứa IP private khi request đi qua VPC endpoint, nên điều kiện theo CIDR VPC không hoạt động.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Private hóa dịch vụ = endpoint (đường đi) + resource policy aws:SourceVpce (khóa tài nguyên).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an interface endpoint for Amazon SQS with private DNS enabled.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create a gateway endpoint for Amazon SQS in the private route tables.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a queue policy that denies requests when aws:SourceVpce does not match.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Attach a security group to the queue that allows only the worker subnets.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Add a queue policy that allows only the VPC CIDR range in aws:SourceIp.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An IAM role used by instances allows s3:* on all resources. The S3 gateway endpoint used by the instances has an endpoint policy that allows only s3:GetObject on arn:aws:s3:::reports-bucket/*. An instance tries to upload an object to reports-bucket through the endpoint. What is the result?",
+    "explanation": "Phân tích đề: IAM cho phép rộng, endpoint policy chỉ cho GetObject; thử PutObject qua endpoint.\n(A) SAI: Endpoint policy không bị IAM policy ghi đè; request qua endpoint phải được cả hai lớp cho phép.\n(B) SAI: Không có cơ chế tự chuyển hướng request sang NAT khi endpoint policy từ chối; request bị từ chối ngay.\n(C) ĐÚNG: Endpoint policy không cho phép s3:PutObject nên request bị từ chối, dù IAM role có s3:*.\n(D) SAI: Bucket policy cũng không thể ghi đè sự từ chối của endpoint policy; mọi lớp policy trên đường đi đều phải cho phép.\nĐáp án đúng: C\nĐiểm cần nhớ: IAM policy, endpoint policy và bucket policy là các lớp độc lập; thiếu cho phép ở endpoint policy là đủ để bị từ chối.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "The upload succeeds because the IAM role policy grants s3:* on every resource.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "The upload is retried automatically through the default route and then succeeds.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "The upload is denied because the endpoint policy does not allow s3:PutObject.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "The upload succeeds only if the bucket policy also explicitly grants PutObject.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Applications in private subnets without a NAT gateway assume IAM roles in other accounts by calling AWS STS. The team created an STS interface endpoint with private DNS enabled, but calls still fail because the SDK sends requests to sts.amazonaws.com. Which change allows the calls to use the endpoint?",
+    "explanation": "Phân tích đề: Đã có interface endpoint STS nhưng SDK dùng global endpoint sts.amazonaws.com.\n(A) SAI: Không có gateway endpoint cho STS.\n(B) ĐÚNG: Interface endpoint STS phục vụ regional endpoint (sts.<region>.amazonaws.com); cấu hình SDK dùng regional STS endpoint (vd AWS_STS_REGIONAL_ENDPOINTS=regional) thì private DNS sẽ phân giải về ENI.\n(C) SAI: Private hosted zone cho sts.amazonaws.com là cách vòng không được hỗ trợ cho global endpoint và dễ gây lỗi; đúng chuẩn là dùng regional endpoint.\n(D) SAI: NAT gateway đưa traffic ra Internet, trái mục tiêu private.\nĐáp án đúng: B\nĐiểm cần nhớ: VPC endpoint của STS chỉ dùng với regional STS endpoint, không dùng với global sts.amazonaws.com.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a gateway endpoint for AWS STS and associate it with the private route tables.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Configure the SDK to use the regional STS endpoint for the Region of the VPC.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Create a private hosted zone for sts.amazonaws.com that points to a public IP address.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add a NAT gateway and route only the STS global address ranges through it.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "On-premises applications must read and write an Amazon DynamoDB table in us-east-1 over an existing AWS Direct Connect private virtual interface. The security policy requires that the traffic use only private IP addresses and never public AWS service endpoints. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: On-prem qua DX private VIF, chỉ dùng IP private, gọi DynamoDB.\n(A) SAI: Gateway endpoint chỉ dùng được bên trong VPC, không truy cập được từ on-prem qua DX.\n(B) SAI: Public VIF đi tới endpoint public của DynamoDB (IP public), trái yêu cầu chỉ dùng IP private.\n(C) ĐÚNG: DynamoDB hỗ trợ interface endpoint (PrivateLink); ENI có IP private trong VPC nên on-prem gọi tới qua private VIF.\n(D) SAI: NAT gateway đưa traffic ra endpoint public qua Internet.\nĐáp án đúng: C\nĐiểm cần nhớ: Từ on-prem, gateway endpoint không dùng được; S3 và DynamoDB đều có interface endpoint cho trường hợp này.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a DynamoDB gateway endpoint and route on-premises traffic to it over the private virtual interface.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a public virtual interface on the Direct Connect connection and use the DynamoDB public endpoint.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a DynamoDB interface endpoint in the VPC and send on-premises requests to its private addresses.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Route on-premises traffic through a NAT gateway in the VPC that forwards requests to DynamoDB.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company restricts its S3 gateway endpoint policy so that it allows access only to buckets in the company's AWS account. Worker nodes in private subnets without NAT pull container images from Amazon ECR through ecr.api and ecr.dkr interface endpoints. After the policy change, image manifests are retrieved, but layer downloads fail with access denied errors. The endpoint restriction must stay in place. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Manifest lấy được (ecr.dkr ổn) nhưng layer bị từ chối sau khi siết endpoint policy S3; phải giữ hạn chế.\n(A) SAI: Endpoint ecr.dkr đã hoạt động (manifest tải được); tạo thêm không giải quyết lỗi tải layer từ S3.\n(B) SAI: Thêm NAT gateway không đổi được đường S3 vì route prefix list tới gateway endpoint cụ thể hơn, và còn mở đường Internet trái yêu cầu.\n(C) SAI: Quyền IAM của node không vượt qua được endpoint policy; cả hai lớp đều phải cho phép.\n(D) ĐÚNG: Layer image của ECR nằm trong bucket S3 do AWS sở hữu (arn:aws:s3:::prod-<region>-starport-layer-bucket/*); thêm statement cho phép s3:GetObject trên ARN này vào endpoint policy.\nĐáp án đúng: D\nĐiểm cần nhớ: ECR private cần ecr.api + ecr.dkr + S3 gateway endpoint; khi siết endpoint policy S3 phải cho phép bucket starport-layer của ECR.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an additional ecr.dkr interface endpoint in every subnet that runs the worker nodes.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a NAT gateway so that layer requests bypass the S3 gateway endpoint and its policy.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Grant the node IAM role s3:GetObject on all resources to override the endpoint restriction.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Allow s3:GetObject on the ECR starport layer bucket ARN in the S3 endpoint policy.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A SaaS provider publishes its API as a VPC endpoint service. Customers currently must configure applications with long vpce DNS names. The provider wants customers who enable private DNS on their interface endpoints to call the API by using api.example-saas.com, without exposing the service publicly. Which TWO actions must the provider take?",
+    "explanation": "Phân tích đề: Muốn consumer dùng tên miền riêng api.example-saas.com qua private DNS của interface endpoint, không phơi dịch vụ ra Internet.\n(A) ĐÚNG: Cấu hình private DNS name (api.example-saas.com) trên endpoint service.\n(B) SAI: Tạo A record công khai trỏ tới NLB internet-facing là phơi dịch vụ ra Internet.\n(C) ĐÚNG: AWS yêu cầu xác minh quyền sở hữu tên miền bằng cách tạo bản ghi TXT do AWS cung cấp trong DNS công khai của domain; sau khi xác minh, consumer bật private DNS là tên này phân giải về ENI của họ.\n(D) SAI: Chia sẻ private hosted zone cho từng khách hàng qua RAM không phải cơ chế của PrivateLink và tốn vận hành.\n(E) SAI: Gateway endpoint không hỗ trợ dịch vụ tự xây.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Private DNS name cho endpoint service = cấu hình tên + xác minh domain bằng bản ghi TXT.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Configure api.example-saas.com as the private DNS name of the endpoint service.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create a public A record for api.example-saas.com that points to an internet-facing NLB.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Verify ownership of the domain by publishing the AWS-provided TXT record in public DNS.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Share a private hosted zone for the domain with every customer account by using AWS RAM.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Create a gateway endpoint in each customer VPC that routes the domain to the provider.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A bucket policy denies all S3 actions when aws:SourceVpce does not match the company's gateway endpoint. Analysts now report that Amazon Athena queries against the bucket fail, although the analysts' IAM permissions are correct and they submit queries from inside the VPC. The company must keep blocking direct access from outside the VPC while allowing AWS services to access the bucket on the analysts' behalf. Which change meets these requirements?",
+    "explanation": "Phân tích đề: Athena đọc S3 thay mặt người dùng từ hạ tầng của dịch vụ, không đi qua endpoint của công ty nên bị Deny; cần ngoại lệ cho dịch vụ AWS mà không mở truy cập trực tiếp.\n(A) SAI: Athena không đọc S3 qua VPC của khách hàng; tạo interface endpoint Athena không đổi được đường Athena gọi S3.\n(B) ĐÚNG: Thêm điều kiện BoolIfExists aws:ViaAWSService = false vào statement Deny; request do dịch vụ AWS thực hiện thay mặt principal (forward access session) có aws:ViaAWSService = true nên được miễn, còn truy cập trực tiếp ngoài VPC vẫn bị chặn.\n(C) SAI: Xóa Deny làm mất hoàn toàn kiểm soát mạng.\n(D) SAI: aws:SourceVpc vẫn đòi request đến từ VPC, Athena vẫn bị chặn.\nĐáp án đúng: B\nĐiểm cần nhớ: Khi khóa bucket theo aws:SourceVpce/SourceVpc, thêm ngoại lệ aws:ViaAWSService để không làm hỏng các dịch vụ AWS truy cập thay mặt người dùng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an interface endpoint for Athena so that Athena reads the bucket through the VPC.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a BoolIfExists aws:ViaAWSService false condition to the Deny statement.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Remove the Deny statement and grant Athena access by using analyst IAM policies only.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Replace aws:SourceVpce with aws:SourceVpc so that requests from Athena are accepted.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company uses an AWS Secrets Manager interface endpoint in a production VPC. A security review requires defense in depth: only application subnets may connect to the endpoint, only principals from the company's AWS Organizations organization may use the endpoint, and the production secrets must be unusable through any other network path. Which THREE controls should a solutions architect implement?",
+    "explanation": "Phân tích đề: Ba lớp: mạng (subnet ứng dụng), danh tính dùng endpoint (trong tổ chức), tài nguyên (secret chỉ qua endpoint).\n(A) ĐÚNG: Security group của ENI endpoint chỉ cho inbound 443 từ security group/CIDR của subnet ứng dụng.\n(B) ĐÚNG: Endpoint policy với điều kiện aws:PrincipalOrgID bằng ID tổ chức, chặn credential bên ngoài dùng endpoint này.\n(C) ĐÚNG: Resource policy của secret với Deny khi aws:SourceVpce khác ID endpoint, nên secret không dùng được qua đường khác.\n(D) SAI: Network ACL gắn vào subnet chứ không gắn trực tiếp vào ENI của endpoint; ngoài ra NACL không lọc theo danh tính.\n(E) SAI: Không có gateway endpoint cho Secrets Manager.\n(F) SAI: Tắt private DNS chỉ thay đổi cách phân giải tên, không phải một biện pháp kiểm soát truy cập.\nĐáp án đúng: A, B và C\nĐiểm cần nhớ: Phòng thủ nhiều lớp cho interface endpoint = security group + endpoint policy + resource policy aws:SourceVpce.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Allow inbound TCP 443 on the endpoint security group only from the application subnets.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Use an endpoint policy that allows access only when aws:PrincipalOrgID matches the organization.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Add secret resource policies that deny access when aws:SourceVpce does not match the endpoint.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Attach a network ACL directly to the endpoint network interfaces that filters by IAM principal.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Create a gateway endpoint for Secrets Manager and associate it only with application route tables.", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "Disable private DNS on the endpoint so that other workloads cannot discover the endpoint address.", "isCorrect": false }
+    ]
+  }
+]

@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A security engineer is editing an Amazon S3 bucket policy and tries to add the ARN of an IAM group named DataAnalysts to the Principal element so that every member of the group can read the bucket. The policy is rejected. The bucket and the group are in the same AWS account. What should the engineer do to give the group members read access?",
+    "explanation": "Phân tích đề: IAM group không phải là principal nên không thể xuất hiện trong phần tử Principal của resource-based policy; bucket và group cùng account.\n(A) SAI: Unique ID của group (AGPA...) cũng không hợp lệ trong Principal; group không bao giờ là principal dù viết theo ARN hay ID.\n(B) ĐÚNG: Gắn identity-based policy cho phép s3:GetObject (và s3:ListBucket nếu cần) lên group; mọi user trong group thừa hưởng quyền. Trong cùng account, chỉ cần identity policy hoặc resource policy cho phép là đủ.\n(C) SAI: Service-linked role do dịch vụ AWS tạo và quản lý cho chính dịch vụ đó, không dùng để gom người dùng và không thay thế được việc cấp quyền cho group.\n(D) SAI: ACL của S3 chỉ nhận grantee là canonical user ID hoặc nhóm định sẵn của S3, không nhận IAM group; ACL cũng là cơ chế cũ nên tránh.\nĐáp án đúng: B\nĐiểm cần nhớ: IAM group chỉ là nơi gắn policy chung cho nhiều user; group không assume được và không đặt được làm Principal.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Replace the group ARN with the group's unique ID in the Principal element of the bucket policy.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Attach an identity-based policy that allows reading the bucket to the DataAnalysts group.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Create a service-linked role for Amazon S3 and add each analyst as a trusted entity of the role.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add the group to the bucket ACL as a grantee with READ permission instead of using a bucket policy.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company stores personal working files for 300 IAM users in one Amazon S3 bucket. Each user has a prefix named after their user name, for example home/alice/. Each user must be able to access only their own prefix, and administrators want to maintain a single policy that does not need to change when users are added. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: 300 user, mỗi người một prefix theo tên user, chỉ muốn duy trì một policy duy nhất không phải sửa khi thêm user.\n(A) SAI: Mỗi user một inline policy vẫn chạy được nhưng phải tạo và sửa 300 policy, trái với yêu cầu chỉ duy trì một policy.\n(B) ĐÚNG: Policy variable ${aws:username} được thay bằng tên user lúc đánh giá request, nên một managed policy gắn cho group với Resource dạng home/${aws:username}/* tự áp đúng prefix cho từng người, thêm user chỉ cần đưa vào group.\n(C) SAI: Tạo một S3 access point cho mỗi user làm số lượng tài nguyên và policy tăng theo số user, vận hành nặng hơn nhiều.\n(D) SAI: Policy generation của IAM Access Analyzer sinh policy từ hoạt động CloudTrail cho từng danh tính, kết quả vẫn là nhiều policy riêng lẻ phải quản lý.\nĐáp án đúng: B\nĐiểm cần nhớ: Thư mục riêng cho từng IAM user trên S3 là bài toán kinh điển của policy variable ${aws:username}.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create one inline policy for each user that lists that user's prefix in the Resource element.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Attach one managed policy to a group that uses the ${aws:username} variable in the prefix.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Create an S3 access point for each user and allow each user to use only their own access point.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use IAM Access Analyzer to generate a separate policy for each user from AWS CloudTrail activity.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A mobile photo-sharing app lets users sign in with Google or Facebook. After sign-in, the app must upload photos directly to Amazon S3 by using temporary AWS credentials. No AWS credentials may be embedded in the app. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Người dùng cuối của app mobile, đăng nhập mạng xã hội, cần credential tạm thời gọi thẳng S3, không nhúng key.\n(A) SAI: Tạo IAM user cho từng người dùng cuối phát sinh access key dài hạn, không mở rộng được và trái nguyên tắc không phát key.\n(B) ĐÚNG: Cognito identity pool nhận token từ Google hoặc Facebook, rồi đổi lấy credential tạm thời của một IAM role (phía sau là AssumeRoleWithWebIdentity); credential tự hết hạn và app không chứa key nào.\n(C) SAI: GetSessionToken phải được gọi bằng credential dài hạn của IAM user, nghĩa là vẫn phải nhúng key vào app.\n(D) SAI: IAM Identity Center dành cho workforce (nhân viên) truy cập nhiều account và ứng dụng, không dành cho hàng triệu người dùng cuối của một app mobile.\nĐáp án đúng: B\nĐiểm cần nhớ: Người dùng cuối đăng nhập mạng xã hội cần gọi dịch vụ AWS => Cognito identity pool (WebIdentity); nhân viên => SAML hoặc IAM Identity Center.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an IAM user for each app user and deliver its access keys to the app after social sign-in.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use an Amazon Cognito identity pool with the social providers to get temporary role credentials.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Call AWS STS GetSessionToken from the app by using a shared IAM user stored in the app bundle.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Connect the social providers to IAM Identity Center and assign app users a permission set for S3.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect is explaining IAM policy types to a new operations team. Which TWO statements correctly describe identity-based policies and resource-based policies? (Select TWO.)",
+    "explanation": "Phân tích đề: Phân biệt identity-based policy (gắn vào danh tính) và resource-based policy (gắn vào tài nguyên).\n(A) ĐÚNG: Resource-based policy như bucket policy, SQS queue policy, KMS key policy bắt buộc có phần tử Principal để chỉ ra ai được cấp quyền.\n(B) ĐÚNG: Identity-based policy gắn vào user, group hoặc role; principal chính là danh tính được gắn nên policy không có phần tử Principal.\n(C) SAI: Truy cập cross-account luôn cần phía tài nguyên đồng ý (resource policy hoặc trust policy của role); identity policy một mình ở account gọi không đủ.\n(D) SAI: IAM group không phải tài nguyên có resource-based policy và cũng không phải principal; group chỉ nhận identity-based policy.\n(E) SAI: SCP là policy của AWS Organizations dùng để đặt trần quyền cho account, không phải resource-based policy và không cấp quyền.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Có Principal => resource-based policy; không có Principal => identity-based policy. Cross-account cần cả hai phía cho phép.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Resource-based policies, such as S3 bucket policies, must include a Principal element.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Identity-based policies attach to users, groups, or roles and have no Principal element.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "An identity-based policy alone can grant access to a resource that is owned by another account.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Resource-based policies can be attached to IAM groups to share access with other accounts.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Service control policies are resource-based policies that grant permissions to member accounts.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A platform team updated a customer managed IAM policy that is attached to 40 IAM roles used by production applications. Immediately after the update, several applications began to receive AccessDenied errors. The team must restore the previous permissions for all 40 roles as quickly as possible and with the least risk of human error. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Customer managed policy gắn cho 40 role vừa bị sửa sai, cần quay lại nhanh và ít rủi ro thao tác tay.\n(A) ĐÚNG: Customer managed policy có versioning (lưu tối đa 5 version); đặt version cũ làm default version là một thao tác duy nhất, áp dụng ngay cho mọi role đang gắn policy đó.\n(B) SAI: Gỡ policy rồi tạo inline policy cho từng role là 80 thao tác, dễ sai sót, và inline policy không có versioning để quản lý về sau.\n(C) SAI: AWS Config ghi lại lịch sử cấu hình và đánh giá compliance nhưng không tự khôi phục IAM policy về configuration item cũ.\n(D) SAI: Khách hàng không thể tạo AWS managed policy; loại này do AWS tạo và duy trì.\nĐáp án đúng: A\nĐiểm cần nhớ: Managed policy có version và có thể rollback bằng cách đặt default version; inline policy không có versioning.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Set the previous version of the customer managed policy as the default policy version.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Detach the policy from every role and attach an inline copy of the old permissions to each role.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use AWS Config to roll back each IAM role to its last compliant recorded configuration item.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a new AWS managed policy that contains the old permissions and attach it to all the roles.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses AWS Organizations and must prevent all member accounts from using any AWS Region other than eu-west-1 and eu-central-1. After the company attaches a service control policy (SCP) that denies all actions when aws:RequestedRegion is not one of those Regions, administrators can no longer manage IAM roles, Amazon CloudFront distributions, or AWS Support cases. How should a solutions architect change the SCP?",
+    "explanation": "Phân tích đề: SCP chặn Region làm hỏng các dịch vụ global (IAM, CloudFront, Support) vì request của chúng đi qua endpoint us-east-1; vẫn phải giữ ràng buộc chỉ dùng 2 Region.\n(A) SAI: SCP không áp dụng cho management account, và gắn thêm vào đó cũng không làm thay đổi cách dịch vụ global được đánh giá trong member account.\n(B) ĐÚNG: Dùng NotAction trong statement Deny để loại trừ các dịch vụ global (iam, cloudfront, sts, support, organizations, route53...). Mọi action khác vẫn bị Deny khi aws:RequestedRegion nằm ngoài danh sách, còn dịch vụ global hoạt động bình thường.\n(C) SAI: Explicit Deny trong SCP luôn thắng; IAM policy Allow trong account không vượt qua được SCP Deny.\n(D) SAI: Thêm us-east-1 vào danh sách cho phép mọi dịch vụ regional chạy ở us-east-1, vi phạm yêu cầu chỉ dùng hai Region.\nĐáp án đúng: B\nĐiểm cần nhớ: SCP chặn Region phải kèm NotAction cho dịch vụ global; SCP Deny không bị IAM Allow nào vượt qua.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Attach the SCP to the management account so that global service calls are evaluated there.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use NotAction in the Deny statement to exempt global services such as IAM and CloudFront.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Add IAM policies in each member account that explicitly allow the IAM, CloudFront, and Support actions.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add us-east-1 to the approved Regions so that requests to global services are allowed in all accounts.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A data-processing platform runs thousands of short batch jobs each day. An orchestrator assumes a single IAM role that can read every input prefix in an Amazon S3 bucket. Security now requires that the credentials used by each job be limited to that job's own input prefix. The team does not want to create or manage an additional IAM role for every job. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Một role dùng chung, cần thu hẹp quyền theo từng job (prefix riêng), không tạo thêm role cho mỗi job.\n(A) ĐÚNG: Khi gọi AssumeRole cho từng job, orchestrator truyền inline session policy chỉ cho phép prefix của job đó. Quyền hiệu lực của phiên là phần giao giữa permission policy của role và session policy, nên job không thể đọc prefix khác.\n(B) SAI: Permissions boundary gắn cố định lên role và áp cho mọi phiên của role; liệt kê mọi prefix trong boundary không giới hạn được từng job riêng.\n(C) SAI: Bucket policy chỉ cho prefix mới nhất sẽ làm hỏng các job chạy song song và không gắn quyền theo từng job.\n(D) SAI: GetFederationToken chỉ được gọi bằng credential dài hạn của IAM user, không gọi được từ phiên của role; hơn nữa session tag không tự giới hạn prefix nếu không có policy ABAC.\nĐáp án đúng: A\nĐiểm cần nhớ: Session policy truyền lúc AssumeRole chỉ có thể thu hẹp quyền của một phiên, không bao giờ mở rộng vượt quyền của role.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Pass an inline session policy that allows only the job's prefix in each AssumeRole call.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Attach a permissions boundary to the orchestrator role that lists every job prefix as a resource.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a bucket policy that denies access to every prefix except the prefix of the most recent job.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Call GetFederationToken from the orchestrator role for each job and pass the prefix as a session tag.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An application in the Analytics account runs under an IAM role and must copy objects from an Amazon S3 bucket in the Sales account into a bucket in the Analytics account by using a single CopyObject request. The team configured the application to assume a role in the Sales account, but the copy failed because that session could not write to the Analytics bucket. Which solution meets the requirement with the FEWEST changes?",
+    "explanation": "Phân tích đề: Một request CopyObject cần đồng thời quyền đọc nguồn (Sales) và ghi đích (Analytics). Khi assume role sang Sales, phiên mới chỉ có quyền của role đó, bỏ lại quyền gốc ở Analytics.\n(A) SAI: Lỗi không liên quan tới thời hạn credential; tăng session duration không cho phiên Sales quyền ghi bucket Analytics.\n(B) ĐÚNG: Giữ ứng dụng chạy bằng role của chính nó (đã có quyền ghi bucket Analytics), cấp quyền đọc qua bucket policy của Sales cho role đó và thêm s3:GetObject vào identity policy của role. Với resource-based policy, principal vẫn giữ quyền gốc nên một danh tính có đủ cả hai phía.\n(C) SAI: Role chaining quay lại role Analytics lại làm mất quyền của phiên Sales, vẫn không có danh tính nào giữ cả hai quyền.\n(D) SAI: AWS RAM không hỗ trợ chia sẻ S3 bucket; chia sẻ bucket cross-account dùng bucket policy hoặc access point.\nĐáp án đúng: B\nĐiểm cần nhớ: Assume role = đổi hẳn danh tính và mất quyền cũ; resource-based policy cho phép giữ nguyên danh tính và quyền gốc, hợp với thao tác cần quyền ở cả hai account.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Increase the maximum session duration of the Sales role so the copy completes before expiration.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Allow the application role to read in the Sales bucket policy and use that role without AssumeRole.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Chain a second AssumeRole call from the Sales session back to the Analytics role before copying.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Share the Sales bucket with the Analytics account by creating a resource share in AWS RAM.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company operates a SaaS monitoring product. Each customer creates an IAM role in its own AWS account that trusts the company's AWS account, and the company's platform assumes those roles to collect metrics. The company must prevent a malicious customer from tricking the platform into accessing another customer's account (the confused deputy problem). Which TWO actions should the company take? (Select TWO.)",
+    "explanation": "Phân tích đề: Góc nhìn của nhà cung cấp SaaS (deputy). Rủi ro: khách hàng xấu đăng ký ARN role của khách hàng khác để platform assume nhầm.\n(A) ĐÚNG: Nhà cung cấp sinh external ID duy nhất, khó đoán cho từng khách hàng và yêu cầu khách hàng đặt điều kiện sts:ExternalId trong trust policy; role của nạn nhân chỉ chấp nhận ID của chính nạn nhân.\n(B) SAI: Nếu khách hàng tự chọn external ID, kẻ xấu có thể nhập đúng ID mà nạn nhân đang dùng, phá vỡ cơ chế bảo vệ.\n(C) ĐÚNG: Platform luôn truyền external ID gắn với tài khoản khách hàng đã đăng ký ARN đó khi gọi AssumeRole; khi kẻ xấu đăng ký ARN của nạn nhân, platform gửi ID của kẻ xấu nên AssumeRole bị từ chối.\n(D) SAI: IAM user với access key dài hạn làm tăng rủi ro lộ key và không giải quyết confused deputy.\n(E) SAI: Không thể bắt khách hàng đưa account của nhà cung cấp vào Organizations của họ; aws:PrincipalOrgID cũng không phân biệt được các khách hàng.\nĐáp án đúng: A và C\nĐiểm cần nhớ: External ID do bên thứ ba sinh ra, duy nhất cho mỗi khách hàng, và được truyền trong mọi AssumeRole; khách hàng chỉ cần kiểm tra sts:ExternalId trong trust policy.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Generate a unique, unguessable external ID for each customer to require in the role trust policy.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Let each customer choose any external ID value and store it together with the customer's role ARN.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Always pass the external ID of the customer who registered the role ARN when calling AssumeRole.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Ask each customer to create an IAM user for the platform and share its access keys securely.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Require customers to invite the company's account into their organization and use aws:PrincipalOrgID.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An application runs as an Amazon ECS task on AWS Fargate. The task pulls its image from Amazon ECR and sends logs to Amazon CloudWatch Logs successfully. When the application code calls Amazon DynamoDB, it receives AccessDenied errors. The task definition references only a task execution role. What should a solutions architect do to follow AWS best practices?",
+    "explanation": "Phân tích đề: Pull image và ghi log chạy được (việc của task execution role), nhưng code ứng dụng gọi DynamoDB bị từ chối vì chưa có task role.\n(A) SAI: Task execution role do ECS agent dùng để pull image, ghi log, lấy secret khi khởi động; nhồi quyền ứng dụng vào đó trộn trách nhiệm và code ứng dụng cũng không dùng role này để gọi API.\n(B) ĐÚNG: Task role là role mà container dùng để gọi dịch vụ AWS; tạo role với quyền DynamoDB tối thiểu và khai báo taskRoleArn trong task definition, SDK sẽ tự lấy credential tạm thời.\n(C) SAI: Dùng access key của IAM user vẫn là credential dài hạn, trái khuyến nghị dùng role cho workload trên AWS.\n(D) SAI: Cấp quyền cho service principal của ECS trên bảng không làm code ứng dụng có quyền; request của ứng dụng được ký bằng danh tính của task chứ không phải service principal.\nĐáp án đúng: B\nĐiểm cần nhớ: ECS task execution role = quyền cho agent (ECR, logs, secrets); task role = quyền cho code ứng dụng trong container.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add the DynamoDB permissions to the existing task execution role that pulls the container image.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a task role with the needed DynamoDB permissions and reference it in the task definition.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Store an IAM user's access keys in AWS Secrets Manager and inject them into the container.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add a DynamoDB resource-based policy that grants the ECS tasks service principal access to the table.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A developer accidentally wrote the temporary credentials of an IAM role that is used by a fleet of Amazon EC2 instances into a public build log. The credentials remain valid for several more hours. The security team must immediately invalidate every credential that has been issued for that role so far. The instances must keep working with minimal disruption, and no new infrastructure should be deployed. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Credential tạm thời đã lộ và chưa hết hạn; cần vô hiệu hóa tất cả phiên đã phát hành, giữ fleet EC2 hoạt động, không dựng hạ tầng mới.\n(A) SAI: Xóa role làm toàn bộ instance mất quyền ngay, phải tạo lại role và instance profile rồi gắn lại cho cả fleet, gây gián đoạn lớn.\n(B) SAI: MaxSessionDuration chỉ áp dụng cho phiên phát hành sau này; credential đã phát hành vẫn sống tới thời điểm hết hạn ban đầu.\n(C) ĐÚNG: Revoke active sessions gắn inline policy AWSRevokeOlderSessions Deny mọi action khi aws:TokenIssueTime sớm hơn thời điểm thu hồi. Credential bị lộ vô dụng ngay, còn instance nhận credential mới qua instance metadata khi làm mới nên tiếp tục chạy.\n(D) SAI: Credential bị lộ là của role chứ không phải access key của IAM user đã launch instance; xoay key của user đó không ảnh hưởng tới phiên của role.\nĐáp án đúng: C\nĐiểm cần nhớ: Credential tạm thời không thu hồi riêng lẻ được; cách chuẩn là Revoke active sessions (Deny theo aws:TokenIssueTime) hoặc gỡ quyền của role.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Delete the role, create a new role with the same name and permissions, and reattach it to the fleet.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Reduce the maximum session duration of the role to 1 hour so that the leaked credentials expire sooner.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use Revoke active sessions on the role to deny credentials that were issued before now.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Rotate the access keys of the IAM user who launched the instances and require MFA for that user.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An AWS Lambda function in the Prod account reads objects from an Amazon S3 bucket in the Data account. The objects are encrypted with SSE-KMS by using a customer managed key that is owned by the Data account. The bucket policy allows the function's execution role to call s3:GetObject. The execution role's identity policy allows s3:GetObject on the bucket and kms:Decrypt on the key ARN. Requests still fail with AccessDenied. What should a solutions architect do to resolve the issue?",
+    "explanation": "Phân tích đề: Cross-account, S3 đã cho phép ở cả hai phía, nhưng object mã hóa bằng customer managed key thuộc account Data; key policy là điểm còn thiếu.\n(A) SAI: Bucket policy chỉ điều khiển action của S3, không thể cấp quyền kms:Decrypt trên một KMS key.\n(B) ĐÚNG: Với KMS, key policy là nguồn quyền bắt buộc. Cross-account cần key policy ở account Data cho phép role (hoặc account Prod) dùng kms:Decrypt, và identity policy ở Prod cũng cho phép (đã có). Thiếu phía key policy thì luôn AccessDenied.\n(C) SAI: Alias không dùng được để tham chiếu key cross-account, và muốn tạo grant thì principal vẫn cần quyền kms:CreateGrant do key policy cho phép.\n(D) SAI: S3 Bucket Key chỉ giảm số lần gọi KMS để tiết kiệm chi phí; người đọc object vẫn cần quyền dùng key.\nĐáp án đúng: B\nĐiểm cần nhớ: KMS là ngoại lệ của evaluation logic: key policy phải cho phép, kể cả trong cùng account; cross-account thì cần key policy và IAM policy cùng cho phép.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a statement to the S3 bucket policy that allows the execution role to call kms:Decrypt.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Update the key policy in the Data account to allow the execution role to use kms:Decrypt.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Create a KMS grant in the Prod account that references the key by its alias from the Data account.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable S3 Bucket Keys on the bucket so that readers of the objects no longer need KMS permissions.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company keeps a BreakGlassAdmin IAM role in its production account. Only approved incident responders who are IAM users in the central Security account may assume the role. They must have authenticated with MFA within the last hour. AWS CloudTrail in the production account must show which individual person performed each action after the role is assumed. Which THREE configurations together meet these requirements? (Select THREE.)",
+    "explanation": "Phân tích đề: Ba yêu cầu: chỉ responder của account Security được assume, MFA trong vòng 1 giờ, và truy vết từng cá nhân trong CloudTrail của production.\n(A) ĐÚNG: Trust policy chỉ tin account Security và đặt điều kiện aws:MultiFactorAuthPresent là true cùng aws:MultiFactorAuthAge không quá 3600 giây, nên chỉ phiên đã xác thực MFA gần đây mới assume được.\n(B) ĐÚNG: Cho phép sts:SetSourceIdentity và yêu cầu sts:SourceIdentity bằng ${aws:username}; source identity được ghi vào CloudTrail cho mọi action của phiên và không thể đổi sau khi đặt, nên biết chính xác ai thao tác.\n(C) ĐÚNG: Trust policy tin cả account Security nên cần identity policy trong account đó chỉ cấp sts:AssumeRole trên ARN role cho đúng nhóm responder được phê duyệt.\n(D) SAI: Tăng MaxSessionDuration lên 12 giờ không đáp ứng yêu cầu nào, còn kéo dài phiên đặc quyền và mâu thuẫn tinh thần xác thực MFA gần đây.\n(E) SAI: Tạo IAM user trong production mở thêm đường truy cập bằng credential dài hạn, vi phạm yêu cầu chỉ user của account Security.\n(F) SAI: External ID dùng chống confused deputy cho bên thứ ba, không xác thực danh tính cá nhân và không xuất hiện như danh tính người thao tác.\nĐáp án đúng: A, B và C\nĐiểm cần nhớ: Bảo vệ role đặc quyền = trust policy (ai + MFA) + identity policy phía gọi (sts:AssumeRole) + source identity để truy vết cá nhân.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Trust the Security account in the role trust policy and require MFA with an MFA age of 3600 seconds or less.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Allow sts:SetSourceIdentity in the trust policy and require the source identity to equal the caller's user name.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "In the Security account, allow sts:AssumeRole on the role ARN only for the approved responders.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Set the role's maximum session duration to 12 hours so responders do not reauthenticate during incidents.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Create IAM users with MFA directly in the production account for each responder as a fallback path.", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "Require an sts:ExternalId condition in the trust policy that contains each responder's employee ID.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "The production account has a DeployTarget role whose trust policy allows the CIRunner role in the Tools account to assume it. Last week an engineer deleted the CIRunner role and recreated it with the same name and the same permissions. Since then, the pipeline receives AccessDenied when CIRunner calls AssumeRole on DeployTarget. Nobody has changed DeployTarget. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Role được xóa và tạo lại cùng tên; trust policy phía production không ai sửa nhưng AssumeRole bắt đầu bị từ chối.\n(A) ĐÚNG: Khi lưu trust policy, IAM chuyển ARN role thành unique ID (dạng AROA...). Role tạo lại có unique ID mới nên không khớp; trust policy hiển thị ID cũ thay vì ARN. Sửa trust policy và chỉ định lại ARN của CIRunner để IAM gắn với unique ID mới.\n(B) SAI: sts:AssumeRole phải nằm trong identity policy của bên gọi (CIRunner), không phải permission policy của role đích; và vấn đề ở đây là trust policy.\n(C) SAI: Eventual consistency của IAM chỉ kéo dài rất ngắn, không phải nguyên nhân lỗi kéo dài cả tuần.\n(D) SAI: External ID dùng chống confused deputy với bên thứ ba, không giúp trust policy nhận ra role mới.\nĐáp án đúng: A\nĐiểm cần nhớ: Principal trong trust policy (và resource policy) được lưu theo unique ID; xóa rồi tạo lại user hoặc role cùng tên thì phải cập nhật lại các policy tham chiếu tới nó.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Edit the DeployTarget trust policy and specify the CIRunner role ARN again to bind the new role.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add sts:AssumeRole to the DeployTarget permission policy because the recreated role lost that permission.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Wait for IAM eventual consistency, because recreated roles take days to propagate between accounts.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add an sts:ExternalId condition to the trust policy so the recreated role is distinguished from the old one.", "isCorrect": false }
+    ]
+  }
+]

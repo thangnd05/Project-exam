@@ -1,0 +1,52 @@
+1. Users report errors starting at 14:05. A DevOps engineer must narrow the cause quickly. What is the most efficient first step?
+2. A DevOps engineer sees elevated error rates but only on some requests. What analysis narrows the cause fastest?
+3. A DevOps engineer must distinguish a symptom from the underlying cause during an investigation. Which TWO practices help?
+4. A service shows high latency but low CPU and low memory usage on every instance. What does this pattern suggest?
+5. A DevOps engineer must decide between continuing to investigate and applying a mitigation while users are affected. What is the right priority?
+6. A DevOps engineer must find which of 30 microservices is responsible for a slow end-user request. What is the most direct method?
+7. A DevOps engineer must compare a healthy period with the incident period to find what differs. Which TWO comparisons are most informative?
+8. A DevOps engineer suspects a recent deployment caused a problem but the deployment finished two hours before symptoms appeared. How should this be evaluated?
+9. A DevOps engineer must investigate an issue that only affects a small subset of users. What approach is most effective?
+10. A DevOps engineer must verify that a fix actually resolved an incident rather than the symptoms disappearing for another reason. What confirms this?
+11. A DevOps engineer cannot trace a single user request across services because each service logs in its own format with no shared field. What change fixes this for future incidents?
+12. Average latency looks normal during an incident, yet many users report the application as unusably slow. What measurement explains the discrepancy?
+13. A DevOps engineer finds that the telemetry needed to diagnose an incident does not exist. Which TWO actions are appropriate?
+14. A DevOps engineer investigating intermittent failures finds that traces exist for only a small fraction of requests. What should be considered?
+15. A DevOps engineer must search many gigabytes of aggregated logs to find the first occurrence of an error pattern. What approach is most efficient?
+16. A DevOps engineer must make future investigations faster. Which TWO logging practices contribute most?
+17. A DevOps engineer notices that log timestamps from different hosts disagree by several minutes, making correlation unreliable. What is the underlying problem?
+18. A DevOps engineer must determine whether a spike in errors is caused by the application or by the client calling it. What evidence distinguishes these?
+19. A DevOps engineer must investigate why a metric dashboard shows no data during part of an incident. What is the most likely explanation to check first?
+20. A DevOps engineer must decide how to handle an investigation that has run for hours without a conclusion while the service is stable after a mitigation. What is appropriate?
+21. An application becomes unresponsive under load while CPU stays low, and thread dumps show most threads waiting to obtain a database connection. What is the diagnosis?
+22. A service restarts every few hours with memory usage climbing steadily between restarts. What does this pattern indicate?
+23. A brief downstream outage turns into a long multi-service failure that persists after the downstream service recovers. Which TWO mechanisms typically cause this?
+24. Requests to an internal service fail intermittently with name resolution errors. What should a DevOps engineer investigate?
+25. A DevOps engineer sees throttling errors from a downstream AWS service during peak traffic. What is the appropriate investigation and response?
+26. One instance in a fleet shows much higher latency than its peers, with identical configuration and similar request volume. What should be checked?
+27. A DevOps engineer must diagnose a request that intermittently times out when calling a service in another VPC. Which TWO checks are most relevant?
+28. A batch job that normally completes in 20 minutes now takes three hours, with no code change. What investigation is most likely to find the cause?
+29. A DevOps engineer must explain why a service degraded even though every individual dependency reported itself as healthy. What concept applies?
+30. A DevOps engineer finds that an incident coincided exactly with a scheduled job starting. How should this be treated?
+31. A post-incident review concludes that the root cause was 'human error' when an engineer ran a wrong command. Why is this conclusion inadequate?
+32. A DevOps engineer must write up an incident so the organization learns from it. Which TWO elements make the write-up useful?
+33. A DevOps engineer must decide how many root causes an incident has. What is the realistic view for a complex distributed system?
+34. A DevOps engineer must preserve evidence during an investigation without prolonging user impact. What approach balances both?
+35. A DevOps engineer must decide what to do when an investigation cannot determine the cause and the problem has not recurred. What is the responsible handling?
+36. A DevOps engineer must decide which follow-up actions from an incident to prioritise. Which TWO criteria should drive the order?
+37. A DevOps engineer notices the same class of incident has occurred four times in six months with a different trigger each time. What does this suggest?
+38. A DevOps engineer must decide how to treat a mitigation that was applied during an incident and left in place afterwards, such as disabled caching. What is the correct follow-up?
+39. A DevOps engineer must reduce the time it takes to detect incidents, which currently averages 40 minutes. What change addresses this most directly?
+40. A DevOps engineer must hand over an unfinished investigation at the end of a shift. What information transfer matters most?
+41. A DevOps engineer must reproduce a production-only failure that never occurs in the test environment. What approach is most likely to succeed?
+42. A DevOps engineer must determine which of 12 changes deployed together caused a regression. Which TWO approaches narrow it down?
+43. A DevOps engineer must decide how to deploy changes so that future regressions are easier to attribute. What practice helps most?
+44. A DevOps engineer must investigate a failure in a container that has already been replaced by the orchestrator. What makes this possible?
+45. A DevOps engineer must decide whether an anomaly found during an investigation is related to the incident. What test applies?
+46. A DevOps engineer must build a culture where incidents lead to improvement. Which TWO practices support this?
+47. A DevOps engineer must explain why an alarm did not fire during a real outage. What should the investigation examine?
+48. A DevOps engineer must decide how to treat a near miss where a fault occurred but users were not affected. What is the right response?
+49. A DevOps engineer must decide what to do when two teams disagree about which service caused a cross-service incident. What resolves this productively?
+50. A DevOps engineer must choose the single highest-value improvement for a team whose investigations consistently take hours because data is scattered. What should come first?
+51. Users report elevated error rates beginning at 14:05. A DevOps engineer sees that overall CPU and memory utilization on the application fleet are normal, and average latency looks unchanged. What is the MOST efficient next step to narrow down the cause?
+52. An application becomes unresponsive under load roughly every three days and recovers after a restart. During the incident, CPU and memory on the instances are normal, but thread dumps show most worker threads blocked waiting to obtain a database connection. Wh

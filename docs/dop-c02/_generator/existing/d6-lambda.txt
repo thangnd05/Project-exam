@@ -1,0 +1,54 @@
+1. A security automation must react to GuardDuty findings of high severity by tagging the affected resource and posting a summary to a chat channel. The work takes under 30 seconds per finding, findings arrive irregularly with occasional bursts of a few dozen, an
+2. A Lambda function was attached to private subnets so it could query an Amazon RDS instance. Since then, the calls it makes to the Secrets Manager API time out, while the database queries succeed. The security groups allow outbound HTTPS, the execution role has
+3. A pipeline uploads thousands of files to Amazon S3 in short bursts. Each object must be processed within a few seconds of arrival by code that takes about two seconds to run, the solution must scale automatically with the burst, and the team does not want to m
+4. During a flash sale, one Lambda function scaled up sharply. It exhausted the account concurrency so unrelated functions began to be throttled, and its write volume caused throttling on a DynamoDB table shared with another service. The team must protect unrelat
+5. A media conversion job implemented as a Lambda function now needs about 20 minutes per large video and consistently hits the maximum function timeout. The team must process every video reliably, wants to keep paying only for what it uses, and does not want to 
+6. An AWS Lambda function processes objects from Amazon S3. Some objects take longer than 15 minutes to process, and those invocations fail with a timeout. The team must process every object reliably, keep costs proportional to the workload, and avoid managing se
+7. A Lambda function triggered by an Amazon SQS queue occasionally fails because of a downstream outage. The team discovered that failed messages were retried many times and eventually disappeared, and that during the outage the function scaled up and exhausted t
+8. A latency-sensitive API backed by Lambda shows p99 latency spikes after periods of low traffic and after every deployment. The team must eliminate cold start latency for a predictable baseline of traffic while keeping costs reasonable outside business hours. W
+9. A DevOps engineer must deploy a new Lambda version so that 10 percent of traffic uses it for 10 minutes while CloudWatch alarms are monitored, with automatic rollback on alarm, and with no change to the callers of the function. The deployment is defined with A
+10. A Lambda function inside a VPC must reach Amazon DynamoDB, AWS Secrets Manager, and an on-premises service through AWS Direct Connect. After attaching the function to private subnets, calls to DynamoDB and Secrets Manager time out while the on-premises call su
+11. A DevOps engineer must prevent one Lambda function from consuming all available concurrency in an account during a traffic spike. What configuration achieves this?
+12. A DevOps engineer must ensure that failed asynchronous Lambda invocations are not lost. What configuration handles this?
+13. A DevOps engineer must reduce cold start latency for a latency-sensitive Lambda function. Which TWO measures help?
+14. A DevOps engineer must deploy a Lambda change so that a small share of traffic uses the new code first with automatic rollback on errors. What approach fits?
+15. A Lambda function processing messages from a queue keeps retrying a message that can never succeed, blocking the queue. What configuration resolves this?
+16. A DevOps engineer must decide how to package a Lambda function that depends on a large native library exceeding the zip size limit. What option fits?
+17. A DevOps engineer must share common code across many Lambda functions. Which TWO approaches are reasonable?
+18. A DevOps engineer must give a Lambda function access to a database in a private subnet while still allowing it to call a public AWS API. What networking configuration is required?
+19. A DevOps engineer must decide how much memory to allocate to a Lambda function to minimise cost. What approach is correct?
+20. A DevOps engineer must ensure that a Lambda function processing financial events does not process the same event twice. What design is required?
+21. A DevOps engineer must diagnose why a Lambda function intermittently fails with permission errors only in production. What is the most efficient first step?
+22. A DevOps engineer must make a Lambda-based system observable. Which TWO practices provide the most value?
+23. A DevOps engineer must run a Lambda function on a schedule and be alerted if a scheduled run does not happen. What design covers both needs?
+24. A DevOps engineer must decide how a Lambda function should obtain configuration that changes occasionally. What approach balances freshness and cost?
+25. A DevOps engineer must handle a Lambda function that writes to a relational database and exhausts its connections during scale-out. What is the correct remedy?
+26. A DevOps engineer reviews a Lambda function for production readiness. Which TWO findings should be raised?
+27. A DevOps engineer must decide whether a workload belongs in Lambda or in a container service. What consideration is decisive?
+28. A DevOps engineer must ensure that an automation function reacting to security events cannot be modified by the teams it operates on. What control is appropriate?
+29. A DevOps engineer must decide how to handle a long-running task triggered by an event when the function exceeds the maximum execution time. What approach fits?
+30. A DevOps engineer must ensure that a Lambda deployment can be rolled back quickly. What practice supports this?
+31. A DevOps engineer must reduce the blast radius of a Lambda-based automation that can modify resources in many accounts. What design helps?
+32. A DevOps engineer must decide how to test Lambda functions before deployment. Which TWO layers of testing are most valuable?
+33. A DevOps engineer must explain why a Lambda function occasionally shows much higher duration for the first request after idle time. What is the cause?
+34. A DevOps engineer must ensure that a function triggered by object uploads processes each object exactly once even when the same object is overwritten. What design is required?
+35. A DevOps engineer must give a Lambda function permission to be invoked by another AWS service. What must be configured?
+36. A DevOps engineer must control the cost of a Lambda-heavy architecture. Which TWO levers matter most?
+37. A DevOps engineer must decide how a Lambda function should report a business-level failure that is not an exception. What practice is appropriate?
+38. A DevOps engineer must ensure that a function consuming from a stream does not fall behind during traffic peaks. What should be monitored and tuned?
+39. A DevOps engineer must decide how to structure a serverless application composed of many functions in source control and deployment. What approach is appropriate?
+40. A DevOps engineer must reduce the risk that an automation function loops by invoking itself indirectly through the event that triggers it. What safeguard applies?
+41. A DevOps engineer must ensure that an event source mapping does not process a batch repeatedly when only one record in the batch fails. What configuration helps?
+42. A DevOps engineer must choose alarms for a production Lambda function. Which TWO alarms are the most useful?
+43. A DevOps engineer must decide how to handle secrets used by a Lambda function that runs thousands of times per minute. What approach is appropriate?
+44. A DevOps engineer must decide how to migrate an existing scheduled script running on an EC2 instance to a serverless model. What is the first thing to verify?
+45. A DevOps engineer must ensure that a function's execution role cannot be used by anything other than that function. What configuration supports this?
+46. A DevOps engineer must design a function that calls an unreliable third-party API. Which TWO practices make it resilient?
+47. A DevOps engineer must decide how to grant a Lambda-based automation access to resources in many member accounts. What design is appropriate?
+48. A DevOps engineer must explain why a function that worked in testing fails in production with a timeout when calling a database. What is the most likely cause?
+49. A DevOps engineer must decide how to keep an automation function's behaviour auditable. What practice supports this?
+50. A DevOps engineer must decide the right response when a Lambda function's error rate rises immediately after a deployment. What is the correct action?
+51. An AWS Lambda function processes messages from an Amazon SQS queue. A malformed message causes the function to fail repeatedly, and because the message returns to the queue after each failure, it blocks processing of subsequent messages. Which solution resolve
+52. During a flash sale, one AWS Lambda function scaled up sharply and consumed the entire account concurrency limit. Other critical Lambda functions in the same account were throttled and failed. A DevOps engineer must prevent one function from starving the other
+53. An AWS Lambda function is invoked asynchronously by Amazon S3 events. Occasionally the function fails for all retry attempts, and the team has no record of which events were lost. The team must capture the failed events along with the error details for later a
+54. A latency-sensitive API backed by AWS Lambda shows p99 latency spikes of several seconds after periods of low traffic, while p50 latency remains stable. The team must reduce the spikes during known business hours without paying for the capacity overnight. Whic

@@ -1,0 +1,414 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company activated the Department cost allocation tag last month. When the finance team groups Cost Explorer by Department, a large share of the spend appears under a No tag key label. What does this bucket represent?",
+    "explanation": "Phân tích đề: Hiểu ý nghĩa nhóm No tag key khi group theo tag. Từ khóa: chi phí không mang giá trị tag đó.\n(A) ĐÚNG: Khi group theo một tag, mọi chi phí không có key đó (tài nguyên chưa gắn tag, hoặc khoản phí không gắn tag được như support, thuế) được gom vào nhóm No tag key. Đây là phần cần xử lý để chargeback đầy đủ.\n(B) SAI: Activate tag được làm ở management account và áp cho cả tổ chức; member account không cần activate riêng.\n(C) SAI: Tag do AWS sinh ra là các key riêng (aws:createdBy, ...), không làm chi phí rơi vào nhóm không có Department.\n(D) SAI: Giá trị sai quy ước vẫn là một giá trị của key Department và hiển thị riêng, không bị gom vào No tag key.\nĐáp án đúng: A\nĐiểm cần nhớ: No tag key = chi phí không mang key đang group. Giảm nhóm này bằng tag đầy đủ, ép tag khi tạo, và cost categories hoặc split charge cho khoản không tag được.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Spend from resources, or charges, that do not carry the Department tag key",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Spend from resources in member accounts that have not activated the tag",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Spend from AWS-generated tags that were activated together with Department",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Spend from resources whose Department value is not approved by a tag policy",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company committed to $20 per hour with a Compute Savings Plan. The finance team wants to know how much of that hourly commitment was actually consumed last month and how much was wasted. Which AWS Cost Explorer report should they open?",
+    "explanation": "Phân tích đề: Hỏi phần cam kết SP đã dùng và phần bị bỏ phí. Từ khóa: utilization của Savings Plans.\n(A) SAI: Coverage cho biết bao nhiêu phần trăm chi phí đủ điều kiện được SP phủ, không cho biết cam kết có bị bỏ phí hay không.\n(B) ĐÚNG: Utilization report so sánh cam kết theo giờ với phần thực sự được dùng, hiển thị số tiền unused commitment, đúng thứ finance cần.\n(C) SAI: Recommendations gợi ý mua thêm, không báo cáo mức dùng của gói đã mua.\n(D) SAI: Rightsizing gợi ý thu nhỏ hoặc tắt EC2, không liên quan tới mức dùng cam kết.\nĐáp án đúng: B\nĐiểm cần nhớ: SP/RI utilization: cam kết có bị bỏ phí không. SP/RI coverage: chi phí đang chạy có được cam kết phủ không.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Savings Plans coverage report",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Savings Plans utilization report",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Savings Plans purchase recommendations",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Cost Explorer rightsizing recommendations",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company is starting a FinOps practice. In the first phase, the team will activate cost allocation tags, set up the Cost and Usage Report, and publish dashboards so that each team understands who is spending what. Which FinOps lifecycle phase do these activities belong to?",
+    "explanation": "Phân tích đề: Hoạt động tag, CUR, dashboard để biết ai tiêu gì. Từ khóa: tạo khả năng nhìn thấy chi phí.\n(A) SAI: Optimize là giảm lãng phí: rightsizing, Spot, Savings Plans, lifecycle; chưa phải bước tạo khả năng nhìn thấy chi phí.\n(B) SAI: Operate là duy trì kỷ luật và quy trình liên tục như budgets, anomaly alerts, tag policies, review định kỳ.\n(C) ĐÚNG: Inform là tạo visibility và phân bổ chi phí: tag, CUR, Cost Explorer, dashboard, showback, để mọi người biết tiền đi đâu và ai tiêu.\n(D) SAI: Migrate không phải một giai đoạn của vòng đời FinOps (Inform, Optimize, Operate).\nĐáp án đúng: C\nĐiểm cần nhớ: Vòng đời FinOps: Inform (nhìn thấy, phân bổ), Optimize (giảm lãng phí), Operate (duy trì kỷ luật), lặp lại liên tục.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Optimize",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Operate",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Inform",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Migrate",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A cloud team is reviewing what AWS Budgets actions can do automatically when a threshold is reached. Which TWO are valid AWS Budgets action types? (Choose TWO.)",
+    "explanation": "Phân tích đề: Cần biết các loại budget action hợp lệ. Từ khóa: IAM policy, SCP, stop EC2/RDS.\n(A) SAI: Budget action chỉ dừng (stop) instance, không terminate; AWS tránh hành động phá hủy dữ liệu.\n(B) ĐÚNG: Action loại SCP gắn một SCP vào account hoặc OU (từ management account), chặn các API đắt tiền cho cả account.\n(C) SAI: Budgets không có action xóa tài nguyên lưu trữ.\n(D) ĐÚNG: Action target EC2/RDS dừng các instance được chọn khi chạm ngưỡng, dữ liệu và cấu hình vẫn giữ.\n(E) SAI: Budgets không tự thay đổi kích thước instance; rightsizing là việc của Compute Optimizer và con người.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Ba loại budget action: gắn IAM policy, áp SCP, dừng EC2/RDS được chọn. Không terminate, không xóa, không resize.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Terminate the Amazon EC2 instances that belong to the budget scope",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Apply a service control policy to an account or organizational unit",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Delete the unattached Amazon EBS volumes in the budget's account",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Stop specific Amazon EC2 or Amazon RDS instances that you select",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Change running instances to a smaller instance type automatically",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An internal cost dashboard calls the AWS Cost Explorer API every minute for 40 widgets to show near real-time spend. After a month, the company notices significant charges for Cost Explorer API requests, and the numbers on the dashboard rarely change during the day. What should a solutions architect recommend to reduce cost without losing useful information?",
+    "explanation": "Phân tích đề: API Cost Explorer bị gọi dày đặc trong khi dữ liệu chỉ cập nhật vài lần mỗi ngày. Từ khóa: API tính phí theo request, dữ liệu refresh ít nhất một lần mỗi 24 giờ.\n(A) ĐÚNG: Cost Explorer API tính phí cho mỗi request có phân trang, còn dữ liệu chi phí chỉ refresh vài lần mỗi ngày (ít nhất một lần mỗi 24 giờ). Gọi vài lần mỗi ngày và cache kết quả giữ nguyên độ tươi thực tế mà cắt gần hết phí.\n(B) SAI: Hourly granularity là tính năng có phí thêm và không làm dữ liệu cập nhật theo phút; số lần gọi API vẫn nguyên.\n(C) SAI: Billing alarm chỉ có metric tổng hóa đơn và chiều service, không thay được dữ liệu group by của dashboard.\n(D) SAI: Budgets cũng không cập nhật theo phút và cũng không phải nguồn dữ liệu phân tích đa chiều cho dashboard.\nĐáp án đúng: A\nĐiểm cần nhớ: Dữ liệu billing không phải thời gian thực. Cost Explorer API tính phí theo request: cache kết quả, gọi theo nhịp refresh của dữ liệu.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Call the API a few times per day and cache the results for the dashboard",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable hourly granularity so each API call returns fresher data per minute",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Replace the API calls with a CloudWatch billing alarm for each widget",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Move the dashboard to query AWS Budgets every minute instead of Cost Explorer",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company adds new AWS accounts to its Workloads OU every week. Each account must automatically get a monthly cost budget with an 80% forecasted alert sent to that account's owner, without anyone creating budgets by hand. What is the MOST operationally efficient solution?",
+    "explanation": "Phân tích đề: Account mới liên tục, mỗi account cần budget tự động, không làm tay. Từ khóa: StackSets với auto-deployment vào OU.\n(A) SAI: Một budget gộp không cảnh báo riêng cho chủ từng account và không phản ánh hạn mức của từng account.\n(B) ĐÚNG: StackSet dùng service-managed permissions với automatic deployment sẽ tự tạo stack (và budget trong template) trong mọi account mới gia nhập OU, thông báo tới địa chỉ chủ account truyền qua tham số hoặc thông tin account.\n(C) SAI: Phụ thuộc thao tác tay của từng chủ account, dễ bị bỏ sót, trái yêu cầu tự động.\n(D) SAI: Anomaly monitor không phải budget có hạn mức và không có ngưỡng forecasted 80%.\nĐáp án đúng: B\nĐiểm cần nhớ: Triển khai cấu hình chuẩn (budget, alarm, role) cho mọi account mới trong OU => CloudFormation StackSets service-managed với automatic deployment.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create one budget in the management account that covers all accounts in the OU combined",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Deploy an AWS::Budgets::Budget template with a service-managed StackSet that auto-deploys to the OU",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Ask each account owner to create a budget during onboarding by following a runbook",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create a Cost Anomaly Detection linked account monitor that includes every new account",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A SaaS company stores data for all tenants in a single Amazon S3 bucket. Engineers added a Tenant tag to every object and activated Tenant as a cost allocation tag, expecting Cost Explorer to split the S3 storage cost by tenant. The split never appears. The company needs per-tenant S3 storage cost in its billing reports. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Tag trên object không dùng cho cost allocation; phân bổ S3 dựa trên tag của bucket. Từ khóa: bucket-level tags.\n(A) SAI: Không phải vấn đề thời gian; object tag không bao giờ trở thành cost allocation tag.\n(B) ĐÚNG: Chi phí S3 được phân bổ theo tag của bucket, không theo tag của object. Tách bucket theo tenant và gắn tag Tenant trên bucket thì Cost Explorer và CUR chia được chi phí storage theo tenant.\n(C) SAI: Intelligent-Tiering chỉ tối ưu lớp lưu trữ, không đổi cách phân bổ chi phí theo tag.\n(D) SAI: aws:createdBy không áp cho object S3 và người upload không tương ứng tenant.\nĐáp án đúng: B\nĐiểm cần nhớ: Cost allocation cho S3 dựa trên tag của bucket. Object tag không vào billing; cần chia theo tenant thì tách bucket, hoặc dùng số liệu Storage Lens để ước lượng.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Wait 24 hours more, because object tags take longer than bucket tags to reach billing data",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Store each tenant's data in a separate bucket that is tagged with that tenant's Tenant value",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable S3 Intelligent-Tiering so that storage costs are reported for each object tag",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Activate the AWS-generated aws:createdBy tag so objects are grouped by uploader",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company deploys almost all of its resources with 200 AWS CloudFormation stacks. Finance now requires the CostCenter tag on every resource. The team wants to add the tag with the fewest template changes. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Cần gắn tag cho mọi tài nguyên của 200 stack với ít thay đổi template nhất. Từ khóa: stack-level tags propagate xuống tài nguyên.\n(A) SAI: Làm được nhưng phải sửa từng tài nguyên trong 200 template, đúng thứ mà đề muốn tránh.\n(B) SAI: Tag Editor gắn cho tài nguyên hiện có nhưng tài nguyên mới tạo sau đó sẽ thiếu tag, phải lặp lại thủ công.\n(C) ĐÚNG: Tag đặt ở cấp stack được CloudFormation tự gắn xuống các tài nguyên hỗ trợ tag trong stack, không cần sửa template; tài nguyên tạo mới từ stack cũng nhận tag.\n(D) SAI: Đổi tên stack không làm được vì tên stack không đổi được sau khi tạo; và đây là lách vấn đề chứ không gắn CostCenter.\nĐáp án đúng: C\nĐiểm cần nhớ: CloudFormation stack-level tags tự lan xuống tài nguyên hỗ trợ tag: cách nhanh nhất để gắn tag hàng loạt cho tài nguyên do IaC quản lý.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Add a Tags property to every resource in each of the 200 templates",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Use Tag Editor once to tag the current resources and repeat it monthly",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Update each stack with a stack-level CostCenter tag so it propagates to its resources",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Activate the aws:cloudformation:stack-name tag and rename each stack to its CostCenter",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "AWS Cost Anomaly Detection sends the FinOps team several individual alerts every day for anomalies with a total cost impact of $10 to $40. The team ignores them and has twice missed alerts that mattered. The team wants to be notified only when the total impact of an anomaly is at least $500, without losing detection coverage. What should a solutions architect change?",
+    "explanation": "Phân tích đề: Quá nhiều alert nhỏ gây nhiễu; chỉ muốn nhận khi tác động từ $500. Từ khóa: threshold của alert subscription.\n(A) SAI: Budget ngưỡng cố định trên tổng chi tiêu không phát hiện bất thường; mất toàn bộ khả năng ML.\n(B) SAI: Weekly summary làm chậm thông báo quan trọng và vẫn gồm các anomaly nhỏ.\n(C) ĐÚNG: Subscription có threshold theo total impact (số tiền tuyệt đối hoặc phần trăm). Monitor vẫn phát hiện mọi anomaly nhưng chỉ gửi alert khi tác động từ $500, giảm nhiễu mà không mất độ phủ.\n(D) SAI: Đổi loại monitor không lọc được theo mức tác động; alert nhỏ vẫn tới.\nĐáp án đúng: C\nĐiểm cần nhớ: Giảm nhiễu Cost Anomaly Detection bằng threshold của alert subscription (total impact theo $ hoặc %), không cần xóa monitor.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Delete the monitor and create an AWS Budgets cost budget with a $500 threshold",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Change the alert subscription to a weekly summary so small anomalies are grouped",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Set the alert subscription threshold to a total impact of $500 or more",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Replace the AWS services monitor with a cost category monitor for each team",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "Cost Explorer shows that the EC2-Other category has grown to 35% of the monthly bill. The team does not know what is inside it and wants to break it down before optimizing. Which THREE approaches will identify what is driving the EC2-Other cost? (Choose THREE.)",
+    "explanation": "Phân tích đề: EC2-Other là nhóm gồm EBS, snapshot, NAT gateway, data transfer, Elastic IP... Cần tách thành phần. Từ khóa: usage type, API operation, CUR.\n(A) ĐÚNG: Usage type tách ra các thành phần như EBS:VolumeUsage, NatGateway-Bytes, DataTransfer-Regional-Bytes, cho biết khoản nào tăng.\n(B) SAI: Service limits chỉ so mức dùng với quota, không phân tách chi phí.\n(C) ĐÚNG: API operation phân biệt các loại hoạt động như NatGateway, CreateVolume-Gp3, CreateSnapshot, giúp nhận diện nguồn chi phí.\n(D) ĐÚNG: CUR cho chi tiết tới resource ID, chỉ ra cụ thể NAT gateway nào, volume hay snapshot nào đang tốn tiền.\n(E) SAI: Khuyến nghị instance của Compute Optimizer không phân tách các khoản trong EC2-Other như NAT hay data transfer.\n(F) SAI: Billing alarm chỉ báo khi vượt ngưỡng, không cho biết thành phần bên trong.\nĐáp án đúng: A, C và D\nĐiểm cần nhớ: EC2-Other gồm EBS, snapshot, NAT gateway, data transfer, Elastic IP. Tách bằng usage type hoặc API operation trong Cost Explorer, chi tiết tài nguyên bằng CUR.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Filter Cost Explorer to EC2-Other and group by usage type",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Review the AWS Trusted Advisor service limits checks",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Filter Cost Explorer to EC2-Other and group by API operation",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Query the CUR in Athena by usage type and resource ID",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Review the AWS Compute Optimizer EC2 instance findings",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "F",
+        "answerText": "Create a CloudWatch billing alarm for the EC2-Other service",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company has a private pricing agreement with AWS that gives a negotiated discount, and it buys Partial Upfront Reserved Instances and Savings Plans. For monthly chargeback, finance wants each team's cost to reflect the discount the company actually receives and to spread upfront commitment fees evenly across the months they cover. Which Cost Explorer cost metric should finance use?",
+    "explanation": "Phân tích đề: Cần phản ánh giảm giá thương lượng và rải phí trả trước theo kỳ hạn. Từ khóa: net amortized.\n(A) SAI: Unblended ghi nhận chi phí theo thời điểm phát sinh, phí trả trước dồn vào tháng mua, và chưa trừ giảm giá thương lượng.\n(B) SAI: Blended dùng mức giá trung bình trong consolidated billing family, không rải phí trả trước và không phản ánh giảm giá.\n(C) ĐÚNG: Net amortized rải phí trả trước và phí định kỳ của RI/SP theo kỳ hạn (amortized) và trừ các khoản giảm giá áp dụng (net), phản ánh đúng chi phí kinh tế mà công ty thực trả cho từng tháng.\n(D) SAI: Amortized rải phí trả trước nhưng vẫn là giá trước khi trừ giảm giá thương lượng.\nĐáp án đúng: C\nĐiểm cần nhớ: Unblended: theo thời điểm. Amortized: rải phí cam kết. Net: sau giảm giá. Chargeback công bằng theo chi phí thật: net amortized.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Unblended cost",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Blended cost",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Net amortized cost",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Amortized cost",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company has 25 development accounts in AWS Organizations. Each account has its own monthly limit. When an account reaches 100% of actual spend, launching new resources in that account must be blocked automatically, even for administrators inside that account, while other accounts stay unaffected. Account administrators have full IAM permissions in their accounts. What should a solutions architect configure?",
+    "explanation": "Phân tích đề: Chặn theo từng account, không cho admin trong account vượt qua, không ảnh hưởng account khác. Từ khóa: SCP action từ management account cho từng linked account.\n(A) SAI: Admin trong account có toàn quyền IAM nên có thể gỡ policy deny; không đáp ứng yêu cầu chặn cả admin.\n(B) ĐÚNG: SCP được áp từ management account và admin của member account không gỡ được. Mỗi account một budget lọc theo linked account với action SCP nhắm đúng account đó, nên chỉ account vượt hạn mức bị chặn.\n(C) SAI: Budget gộp chỉ bắn khi tổng vượt, và SCP gắn lên OU sẽ chặn cả những account chưa vượt hạn mức của mình.\n(D) SAI: Dừng instance không ngăn việc launch tài nguyên mới, và admin có thể khởi động lại ngay.\nĐáp án đúng: B\nĐiểm cần nhớ: Admin trong account có thể gỡ IAM policy nhưng không gỡ được SCP. Kiểm soát cứng theo account: budget ở management account với action SCP nhắm đúng account.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "In each development account, a budget with an IAM policy action that attaches a deny policy to all roles",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "In the management account, one budget per linked account with an SCP action that targets that account",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "In the management account, one combined budget with an SCP action that targets the development OU",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "In each development account, a budget action that stops all EC2 instances at the threshold",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A CFO asks for executive and engineering cost dashboards across 50 accounts that show trends, Savings Plans coverage, and drill-down to individual resources over more than a year. The company already delivers a Cost and Usage Report to Amazon S3 and has Amazon QuickSight. The solution must use prebuilt, AWS-supported dashboards and minimize custom development. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Cần dashboard điều hành và kỹ thuật, drill-down tới tài nguyên, hơn một năm, dựng sẵn. Từ khóa: Cloud Intelligence Dashboards trên CUR và QuickSight.\n(A) SAI: Cost Explorer không cung cấp drill-down cấp tài nguyên cho khoảng thời gian dài và không phải bộ dashboard điều hành tùy biến.\n(B) SAI: Làm được nhưng phải tự thiết kế toàn bộ, trái yêu cầu tối thiểu phát triển tùy biến.\n(C) ĐÚNG: Cloud Intelligence Dashboards (CUDOS, Cost Intelligence, KPI) là bộ dashboard dựng sẵn do AWS công bố, triển khai lên CUR qua Athena và QuickSight, có góc nhìn điều hành, coverage cam kết và drill-down tới tài nguyên.\n(D) SAI: Phải tự xây pipeline ingest và dashboard, tốn công và chi phí vận hành cụm OpenSearch.\nĐáp án đúng: C\nĐiểm cần nhớ: Dashboard chi phí dựng sẵn trên CUR => Cloud Intelligence Dashboards (CUDOS) với Athena và QuickSight.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Share saved Cost Explorer reports with executives and engineers in each account",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Build custom QuickSight analyses from scratch over an Athena table on the CUR",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Deploy the Cloud Intelligence Dashboards such as CUDOS on top of the CUR with Athena and QuickSight",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Stream the CUR into Amazon OpenSearch Service and build dashboards in OpenSearch Dashboards",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "In an organization with consolidated billing and discount sharing turned on, the Shared account bought regional Reserved Instances for m5.large Linux instances in us-east-1 with default tenancy. Other member accounts run m5.xlarge Linux instances in us-east-1 and m5.large Linux instances in eu-west-1. Which TWO statements about how the Reserved Instance discount is applied are correct? (Choose TWO.)",
+    "explanation": "Phân tích đề: RI regional Linux có instance size flexibility, discount chia sẻ trong consolidated billing nhưng chỉ trong cùng Region. Từ khóa: size flexibility, cùng Region.\n(A) ĐÚNG: Regional RI Linux default tenancy có instance size flexibility theo normalization factor, và khi discount sharing bật, discount áp cho usage cùng family, cùng Region ở bất kỳ account nào trong tổ chức.\n(B) SAI: RI gắn với Region đã mua; discount không áp sang Region khác dù ở cùng tổ chức.\n(C) SAI: Trong consolidated billing, discount RI mặc định được chia sẻ giữa các account nếu sharing đang bật.\n(D) ĐÚNG: Giờ RI không dùng hết ở account mua sẽ được áp cho usage phù hợp trong các account khác cùng Region, giúp tăng utilization.\n(E) SAI: RI được mua cho Linux; khác nền tảng hệ điều hành thì không khớp, và size flexibility chỉ áp cho Linux/Unix default tenancy.\nĐáp án đúng: A và D\nĐiểm cần nhớ: RI discount trong consolidated billing: chia sẻ giữa account, cùng Region, cùng nền tảng; regional Linux RI còn có size flexibility trong cùng family.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "The discount can apply to the m5.xlarge usage in other member accounts in us-east-1 through size flexibility",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "The discount can apply to the m5.large usage in eu-west-1 because sharing works across Regions",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "The discount applies only to the Shared account because RIs are never shared between accounts",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Unused Reserved Instance hours in the Shared account can cover matching usage in other accounts in us-east-1",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "The discount can apply to Windows m5.xlarge instances in us-east-1 through size flexibility",
+        "isCorrect": false
+      }
+    ]
+  }
+]

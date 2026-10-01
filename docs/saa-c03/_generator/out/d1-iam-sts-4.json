@@ -1,0 +1,173 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An IAM user belongs to two IAM groups. The Ops group has a policy that allows ec2:* on all resources. The Audit group has a policy with a statement that denies ec2:TerminateInstances. No other policies apply to the user. What happens when the user tries to terminate an Amazon EC2 instance?",
+    "explanation": "Phân tích đề: Một policy Allow ec2:* và một policy Deny ec2:TerminateInstances cùng áp lên user qua hai group.\n(A) SAI: Không có chuyện Allow rộng hơn thì thắng; độ rộng của statement không ảnh hưởng thứ tự ưu tiên.\n(B) SAI: IAM không xét thứ tự thêm group; mọi policy áp dụng được gộp lại và đánh giá cùng lúc.\n(C) SAI: Đề không có điều kiện MFA nào; statement Deny áp dụng vô điều kiện.\n(D) ĐÚNG: Evaluation logic: explicit Deny thắng mọi Allow, nên TerminateInstances bị từ chối, còn các action EC2 khác vẫn được phép.\nĐáp án đúng: D\nĐiểm cần nhớ: Explicit Deny > Explicit Allow > Implicit Deny, bất kể Deny đến từ policy nào.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "The request is allowed because the ec2:* Allow is broader than the Deny statement.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "The request is allowed because the group the user joined most recently takes precedence.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "The request is denied only when the user has signed in without multi-factor authentication.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "The request is denied because an explicit Deny overrides any Allow.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A member account in AWS Organizations has only the default FullAWSAccess service control policy (SCP) attached. A newly created IAM user in that account has no policies attached. The user tries to list Amazon DynamoDB tables and receives an AccessDenied error. What should an administrator do?",
+    "explanation": "Phân tích đề: SCP FullAWSAccess cho phép mọi thứ ở mức trần, nhưng user mới không có policy nào nên bị implicit deny.\n(A) SAI: SCP không cấp quyền; thêm SCP Allow DynamoDB chỉ nâng trần, user vẫn không có quyền nào.\n(B) ĐÚNG: Cần identity-based policy cấp dynamodb:ListTables (và các action cần thiết) cho user hoặc group của user; SCP đã cho phép nên quyền có hiệu lực.\n(C) SAI: Permissions boundary cũng chỉ đặt trần, không cấp quyền, nên gắn boundary cho phép dynamodb:* không giải quyết được.\n(D) SAI: Chuyển account sang OU khác không thay đổi việc user chưa có policy cấp quyền.\nĐáp án đúng: B\nĐiểm cần nhớ: SCP và permissions boundary chỉ đặt trần; luôn cần identity policy (hoặc resource policy) cấp quyền thật.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Attach an additional SCP to the account that explicitly allows all DynamoDB actions.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Attach an identity-based policy that grants the needed DynamoDB actions to the user.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Set a permissions boundary on the user that allows dynamodb:* on all resources.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Move the account to a different OU that has a less restrictive set of SCPs attached.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A team built a new application that runs under an IAM role with broad permissions during testing. Before the application goes to production, the security team wants a least-privilege policy that is based on the API calls the application actually made, as recorded in AWS CloudTrail. Which AWS feature should the team use?",
+    "explanation": "Phân tích đề: Cần sinh policy tối thiểu dựa trên hoạt động thực tế ghi trong CloudTrail.\n(A) SAI: IAM policy simulator kiểm thử xem một policy có cho phép action nào đó không, không tự sinh policy từ log.\n(B) ĐÚNG: Policy generation của IAM Access Analyzer đọc CloudTrail trong khoảng thời gian chọn, xác định các service và action role đã dùng, rồi sinh bản nháp policy để tinh chỉnh.\n(C) SAI: Credential report liệt kê trạng thái mật khẩu, MFA, access key của IAM user, không liên quan tới hoạt động của role.\n(D) SAI: Trusted Advisor đưa ra các kiểm tra bảo mật tổng quát, không sinh policy cho một role cụ thể.\nĐáp án đúng: B\nĐiểm cần nhớ: Từ hoạt động thực tế ra policy tối thiểu => Access Analyzer policy generation; tìm dịch vụ không dùng => Access Advisor.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "The IAM policy simulator, run against the role's current policies.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "The policy generation feature of IAM Access Analyzer.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "The IAM credential report generated for the account.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "The security checks provided by AWS Trusted Advisor.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A developer is learning about the temporary security credentials that AWS STS issues when an IAM role is assumed. Which TWO statements about these credentials are correct? (Select TWO.)",
+    "explanation": "Phân tích đề: Đặc tính của credential tạm thời do STS phát hành.\n(A) SAI: Credential tạm thời dùng được từ bất kỳ đâu có mạng tới AWS nếu không có điều kiện policy giới hạn; vì vậy lộ credential vẫn nguy hiểm.\n(B) ĐÚNG: Bộ credential gồm access key ID, secret access key và session token; thiếu session token thì request bị từ chối.\n(C) SAI: Credential tạm thời không cần và không thể xoay thủ công; chúng tự hết hạn.\n(D) ĐÚNG: Credential tự hết hạn theo thời hạn đã cấp và không thể gia hạn; muốn tiếp tục phải yêu cầu bộ credential mới.\n(E) SAI: Credential report chỉ liệt kê mật khẩu và access key dài hạn của IAM user, không chứa credential tạm thời.\nĐáp án đúng: B và D\nĐiểm cần nhớ: STS = AccessKeyId + SecretAccessKey + SessionToken, tự hết hạn, không gia hạn được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "They can be used only from the instance or network where they were requested.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "They consist of an access key ID, a secret access key, and a session token.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "They remain valid until an administrator manually rotates them in IAM.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "They expire automatically and cannot be extended after they are issued.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "They appear in the IAM credential report next to each user's access keys.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company still has 40 IAM users who sign in to the AWS Management Console with passwords while a migration to federation is planned. Compliance requires passwords of at least 14 characters that include numbers and symbols, expiration every 90 days, and prevention of reuse of the last five passwords. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Yêu cầu độ phức tạp, thời hạn và chống dùng lại mật khẩu cho IAM user, ít vận hành nhất.\n(A) SAI: SCP điều khiển quyền gọi API, không định nghĩa được độ dài hay độ phức tạp mật khẩu.\n(B) SAI: Config rule iam-password-policy chỉ đánh giá password policy có đạt chuẩn không, không tự áp chuẩn cho mật khẩu.\n(C) SAI: Lambda đọc credential report rồi ép đổi mật khẩu là giải pháp tự chế, không kiểm soát được độ phức tạp của mật khẩu mới.\n(D) ĐÚNG: IAM account password policy hỗ trợ sẵn độ dài tối thiểu, yêu cầu ký tự, thời hạn mật khẩu và chống dùng lại N mật khẩu gần nhất, áp cho mọi IAM user của account.\nĐáp án đúng: D\nĐiểm cần nhớ: Chuẩn mật khẩu IAM user => account password policy (không áp cho root user); lâu dài nên chuyển sang federation.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Attach an SCP that rejects console sign-in when the password does not meet the rules.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Deploy the AWS Config iam-password-policy rule with the required parameters.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Run a daily Lambda function that reads the credential report and forces password resets.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Configure the IAM account password policy with the length, age, and reuse settings.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A legacy application on a running Amazon EC2 instance reads an Amazon S3 bucket by using access keys stored in a configuration file. The instance was launched without an IAM role. The company wants to remove the access keys without downtime and without relaunching the instance. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Instance đang chạy chưa có role; cần bỏ access key, không downtime, không launch lại.\n(A) SAI: Tạo AMI rồi launch instance mới là launch lại, trái ràng buộc, và thêm công chuyển lưu lượng.\n(B) SAI: Không cần stop instance để gắn hoặc thay IAM role; stop gây downtime không cần thiết.\n(C) SAI: Chuyển key sang Parameter Store vẫn là access key dài hạn của IAM user, chỉ đổi nơi lưu trữ.\n(D) ĐÚNG: Tạo role và instance profile với quyền đọc bucket, gắn vào instance đang chạy (associate instance profile), rồi xóa key khỏi file cấu hình và vô hiệu hóa key; SDK tự chuyển sang lấy credential từ instance metadata.\nĐáp án đúng: D\nĐiểm cần nhớ: IAM role có thể gắn hoặc thay cho EC2 đang chạy mà không cần stop; sau đó gỡ access key để SDK dùng credential của role.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an AMI of the instance, launch a replacement with a role, and shift traffic to it.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Stop the instance, attach an instance profile with S3 read access, and then start it again.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Move the access keys to a SecureString parameter and have the application read them at runtime.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Attach an instance profile with S3 read access to the running instance and delete the keys.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An application on an Amazon EC2 instance uses the AWS SDK default credential provider chain. The instance profile role was updated to allow access to a new Amazon S3 bucket, but the application still receives AccessDenied for that bucket while access to older buckets works. An engineer finds AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY environment variables set for the application's service account. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Quyền mới đã thêm vào role nhưng ứng dụng không nhận; có biến môi trường chứa access key.\n(A) ĐÚNG: Default credential provider chain ưu tiên biến môi trường trước file credentials và trước instance profile; ứng dụng đang dùng key cũ của một IAM user. Gỡ biến môi trường và vô hiệu hóa key để SDK dùng credential của role.\n(B) SAI: Quyền mới của role có hiệu lực gần như ngay lập tức, không phải chờ nhiều giờ.\n(C) SAI: Trust policy của role đã cho EC2 assume (instance profile đang hoạt động), vấn đề không nằm ở trust policy.\n(D) SAI: Instance ID không phải principal hợp lệ trong bucket policy, và trong cùng account identity policy của role là đủ.\nĐáp án đúng: A\nĐiểm cần nhớ: Thứ tự credential chain: tham số trong code > biến môi trường > file credentials/config > container/instance metadata; key sót lại sẽ che mất role.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Remove the environment variables and deactivate those keys so the SDK uses the role.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Wait several hours for the updated instance profile permissions to propagate to the instance.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Update the role trust policy to trust the application's operating system service account.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add the instance ID as a principal in the new bucket's policy with permission to read objects.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has 60 AWS accounts in AWS Organizations, and new accounts are added every month. A central security tooling account needs read-only access to every account for auditing. The company does not allow IAM users and wants the least operational effort to keep new accounts covered automatically. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Truy cập cross-account chỉ đọc cho mọi account, account mới tự được phủ, không dùng IAM user.\n(A) ĐÚNG: CloudFormation StackSets với service-managed permissions và automatic deployment tạo audit role trong mọi account của OU, kể cả account mới; trust policy của role chỉ tin một role cụ thể trong account security, công cụ audit dùng AssumeRole để lấy credential tạm thời.\n(B) SAI: IAM user với access key trong từng account vi phạm yêu cầu không dùng IAM user và phải quản lý key ở 60 account.\n(C) SAI: Nhiều loại tài nguyên không có resource-based policy, và sửa policy của mọi tài nguyên là không khả thi.\n(D) SAI: AWS RAM không chia sẻ IAM policy; managed policy không thể chia sẻ sang account khác.\nĐáp án đúng: A\nĐiểm cần nhớ: Truy cập tập trung vào nhiều account => role cross-account triển khai đồng loạt bằng StackSets, bên trung tâm dùng AssumeRole.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Use StackSets with automatic deployment to create an audit role that trusts the security account.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create an IAM user in every account for the security team and store the keys in Secrets Manager.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add resource-based policies that grant the security account read access to every resource.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Share the ReadOnlyAccess managed policy with all member accounts by using AWS RAM.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company is sharing data with a partner. It wants principals in the partner's AWS account to access some of its resources directly through resource-based policies, so that the partner does not need to assume an IAM role in the company's account. Which TWO resource types support resource-based policies for this purpose? (Select TWO.)",
+    "explanation": "Phân tích đề: Cần loại tài nguyên có resource-based policy để cấp quyền cross-account trực tiếp, không qua AssumeRole.\n(A) ĐÚNG: S3 bucket có bucket policy, là cách phổ biến nhất để chia sẻ dữ liệu cross-account.\n(B) SAI: EC2 instance không có resource-based policy; quyền trên EC2 chỉ cấp qua identity policy.\n(C) ĐÚNG: KMS key có key policy (resource-based), có thể cho phép principal của account khác dùng key; account đó cũng cần IAM policy cho phép.\n(D) SAI: IAM group không phải tài nguyên có resource-based policy và không phải principal.\n(E) SAI: EBS volume không có resource-based policy; chia sẻ cross-account thực hiện qua quyền tạo volume của snapshot, không qua policy.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Tài nguyên có resource-based policy hay gặp: S3, KMS, SQS, SNS, Lambda, Secrets Manager, ECR; cross-account qua policy này cần cả hai phía cho phép.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Amazon S3 buckets, by using bucket policies.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Amazon EC2 instances, by using instance policies.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "AWS KMS keys, by using key policies.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "IAM groups, by using group resource policies.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Amazon EBS volumes, by using volume policies.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A developer's call to ec2:RunInstances fails with an UnauthorizedOperation error that includes a long encoded authorization failure message. The developer needs to see which action, resource, and context values caused the denial without opening a support case. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Lỗi của EC2 trả về thông điệp phân quyền đã mã hóa; cần xem chi tiết ngữ cảnh bị từ chối.\n(A) SAI: Thông điệp được AWS mã hóa, không phải chỉ Base64; decode cục bộ không đọc được nội dung.\n(B) SAI: CloudTrail ghi mã lỗi và thông tin request nhưng không cung cấp chi tiết policy và ngữ cảnh như thông điệp đã giải mã.\n(C) ĐÚNG: Cấp quyền sts:DecodeAuthorizationMessage và gọi API này của STS để giải mã, nhận thông tin về action, resource, điều kiện và statement liên quan tới việc bị từ chối.\n(D) SAI: Policy validation của Access Analyzer kiểm tra cú pháp và best practice của policy, không giải thích một lần từ chối cụ thể.\nĐáp án đúng: C\nĐiểm cần nhớ: Encoded authorization failure message => sts:DecodeAuthorizationMessage (cần được cấp quyền riêng).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Base64-decode the message locally to read the policy statement that caused the denial.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Search AWS CloudTrail for the failed event to read the full evaluated policy context.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Grant sts:DecodeAuthorizationMessage and decode the message by calling AWS STS.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Run IAM Access Analyzer policy validation on the developer's identity-based policies.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An Amazon SNS topic policy allows the service principal s3.amazonaws.com to publish messages so that event notifications from a company's S3 bucket can be delivered. A security review warns that an S3 bucket in any other AWS account could be configured to publish to the topic if its ARN is known. The company must allow only its own bucket in its own account to publish, without changing the notification design. What should a solutions architect add to the topic policy?",
+    "explanation": "Phân tích đề: Confused deputy với service principal: dịch vụ S3 thay mặt bất kỳ bucket nào gửi tới topic. Cần ràng buộc nguồn là đúng bucket và đúng account.\n(A) SAI: sts:ExternalId chỉ có ý nghĩa khi một bên gọi AssumeRole; S3 publish lên SNS không đi qua AssumeRole.\n(B) SAI: Service principal không thuộc Organization nên aws:PrincipalOrgID không khớp và sẽ chặn luôn thông báo hợp lệ.\n(C) ĐÚNG: aws:SourceArn bằng ARN của bucket và aws:SourceAccount bằng account ID của công ty bảo đảm dịch vụ S3 chỉ publish thay mặt đúng bucket đó; bucket của account khác bị từ chối.\n(D) SAI: Request tới từ hạ tầng của dịch vụ S3 chứ không từ mạng công ty, nên điều kiện aws:SourceIp làm hỏng việc gửi thông báo.\nĐáp án đúng: C\nĐiểm cần nhớ: Chống confused deputy cho service principal => aws:SourceArn và aws:SourceAccount; cho bên thứ ba assume role => sts:ExternalId.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add an sts:ExternalId condition whose value is shared only with the Amazon S3 service.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add an aws:PrincipalOrgID condition that matches the company's organization ID.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add aws:SourceArn for the bucket ARN and aws:SourceAccount for the account ID.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Add an aws:SourceIp condition that matches the company's public IP address range.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An IAM role's identity-based policy allows s3:* and dynamodb:* on all resources. The role's permissions boundary allows s3:GetObject, s3:PutObject, and sqs:SendMessage on all resources. No SCPs, resource-based policies, or session policies affect the role. Which actions can a session of this role successfully perform?",
+    "explanation": "Phân tích đề: Quyền hiệu lực của role có boundary = phần giao giữa identity policy và boundary.\n(A) SAI: Quyền không phải phần hợp; boundary không mở rộng quyền mà chỉ giới hạn.\n(B) ĐÚNG: Phần giao của {s3:*, dynamodb:*} và {s3:GetObject, s3:PutObject, sqs:SendMessage} chỉ còn s3:GetObject và s3:PutObject.\n(C) SAI: sqs:SendMessage có trong boundary nhưng identity policy không cấp, và boundary không cấp quyền nên action này bị implicit deny.\n(D) SAI: Permissions boundary áp dụng cho cả IAM user và IAM role, không chỉ cho user.\nĐáp án đúng: B\nĐiểm cần nhớ: Quyền hiệu lực = identity policy ∩ boundary (∩ SCP ∩ session policy nếu có); boundary không bao giờ cấp quyền.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Every S3 and DynamoDB action plus sqs:SendMessage, which is the union of both policies.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Only s3:GetObject and s3:PutObject, which both policies allow.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "s3:GetObject, s3:PutObject, and sqs:SendMessage, which the boundary lists.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Every S3 and DynamoDB action, because boundaries restrict only IAM users and never roles.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company deploys IAM identity-based policies and Amazon S3 bucket policies through a CI/CD pipeline. Security requires the pipeline to fail automatically before deployment when a changed identity policy grants any access that the currently approved version does not grant, or when a bucket policy would allow public access. The solution must require minimal custom code. Which TWO actions should a solutions architect add to the pipeline? (Select TWO.)",
+    "explanation": "Phân tích đề: Kiểm tra trước khi triển khai (preventive, trong pipeline), hai điều kiện: policy mới không được rộng hơn bản đã duyệt, bucket policy không được public; ít code tự viết.\n(A) ĐÚNG: Custom policy check CheckNoNewAccess của IAM Access Analyzer so sánh policy mới với policy tham chiếu đã duyệt và trả về FAIL nếu có quyền mới, dùng trực tiếp làm cổng chặn trong pipeline.\n(B) SAI: Access Advisor cho biết dịch vụ được dùng lần cuối khi nào sau khi đã triển khai, không đánh giá policy trước khi deploy.\n(C) ĐÚNG: CheckNoPublicAccess kiểm tra resource policy (như bucket policy) có cho phép truy cập public hay không trước khi áp dụng.\n(D) SAI: Config rule chỉ phát hiện bucket public sau khi đã triển khai, không làm pipeline thất bại trước.\n(E) SAI: Credential report về MFA của user không liên quan tới nội dung policy đang được triển khai.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Chặn policy xấu trước khi deploy => Access Analyzer custom policy checks (CheckNoNewAccess, CheckAccessNotGranted, CheckNoPublicAccess) và ValidatePolicy trong pipeline.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Run the Access Analyzer CheckNoNewAccess check against the approved reference policy.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Review Access Advisor last accessed data for each role before approving the change.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Run the Access Analyzer CheckNoPublicAccess check on every bucket policy.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable the AWS Config rule that detects S3 buckets allowing public read access.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Generate the IAM credential report and fail the run if any user lacks MFA.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An automation script runs with an IAM user's long-term access keys. To limit use of those keys, it first calls sts:GetSessionToken without MFA and then uses the returned temporary credentials. Amazon S3 and Amazon EC2 calls work, but calls to iam:CreateRole fail even though the user's policy allows iam:*. The company wants the automation to keep using temporary credentials and does not want a person to enter MFA codes. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Credential từ GetSessionToken không kèm MFA không gọi được IAM API; không muốn nhập MFA thủ công nhưng vẫn dùng credential tạm thời.\n(A) SAI: Thời hạn phiên không liên quan; giới hạn gọi IAM API áp dụng cho mọi credential GetSessionToken không có MFA.\n(B) SAI: Credential từ GetFederationToken cũng không gọi được IAM API, nên đổi sang API này không giải quyết vấn đề.\n(C) SAI: Dùng root user cho automation vi phạm best practice nghiêm trọng, và credential tạm thời của root vẫn không phải hướng đi đúng.\n(D) ĐÚNG: Script dùng sts:AssumeRole vào một role có quyền IAM cần thiết; phiên role gọi được IAM API bình thường và không cần MFA (trừ khi trust policy yêu cầu).\nĐáp án đúng: D\nĐiểm cần nhớ: Credential GetSessionToken không có MFA không gọi được IAM API và chỉ gọi được AssumeRole, GetCallerIdentity của STS; automation nên dùng role.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Increase the DurationSeconds value of GetSessionToken so that the session includes IAM permissions.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Allow sts:GetFederationToken and use a federation token, which is permitted to call IAM APIs.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Call GetSessionToken with root user credentials, which are not subject to the same restriction.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Have the script assume an IAM role that has the IAM permissions and use that role session.", "isCorrect": true }
+    ]
+  }
+]

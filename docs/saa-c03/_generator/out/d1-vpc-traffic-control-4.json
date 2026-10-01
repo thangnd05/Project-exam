@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An administrator can connect to an Amazon EC2 instance over SSH from a workstation, but ping requests from the same workstation to the instance's public IP address time out. The instance's security group allows only inbound TCP 22 from the workstation's IP address, and the subnet uses the default network ACL. What should the administrator do to allow ping?",
+    "explanation": "Phân tích đề: SSH (TCP 22) thông nhưng ping (ICMP) không thông; subnet dùng default NACL (cho phép tất cả in/out), nên lớp đang chặn là security group vốn chỉ mở TCP 22.\n(A) SAI: Default NACL đã cho phép mọi traffic in/out, nên thêm rule ephemeral không thay đổi gì; hơn nữa ICMP không dùng port nên rule TCP 1024-65535 không liên quan tới ping.\n(B) SAI: Source/destination check chỉ cần tắt khi instance chuyển tiếp traffic không thuộc về nó (NAT instance, appliance); instance trả lời ping cho chính nó không bị ảnh hưởng bởi thiết lập này.\n(C) ĐÚNG: Security group chỉ có rule allow và mặc định từ chối mọi thứ chưa được cho phép; ICMP là protocol riêng nên phải có rule inbound ICMP (echo request) từ IP của workstation. SG stateful nên echo reply tự được phép đi ra.\n(D) SAI: Route table quyết định đường đi chứ không lọc traffic; SSH tới cùng IP public đã thông chứng tỏ đường đi qua internet gateway đã đúng.\nĐáp án đúng: C\nĐiểm cần nhớ: Ping cần rule ICMP riêng trong security group; SSH thông mà ping không thông thì kiểm tra protocol trong SG, không phải route table.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add an outbound network ACL rule that allows TCP 1024-65535 to the workstation's IP address.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Disable the source/destination check on the instance so that it can reply to echo requests.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add an inbound security group rule that allows ICMP echo request from the workstation.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Add a route for the workstation's IP address that targets the internet gateway in the subnet route table.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A security team must send the full packet contents of traffic from several Amazon EC2 instances to an out-of-band intrusion detection appliance so that the appliance can analyze payloads. Which AWS feature should the team use?",
+    "explanation": "Phân tích đề: Từ khóa 'full packet contents', 'analyze payloads', 'out-of-band' => cần bản sao nguyên gói tin, không chỉ metadata.\n(A) ĐÚNG: VPC Traffic Mirroring sao chép toàn bộ gói tin từ ENI nguồn (mirror source) và gửi tới mirror target (ENI, NLB hoặc Gateway Load Balancer endpoint) qua đóng gói VXLAN, phù hợp cho IDS phân tích nội dung ngoài luồng.\n(B) SAI: VPC Flow Logs chỉ ghi metadata của luồng (IP, port, protocol, bytes, ACCEPT/REJECT); dù dùng custom format với mọi trường cũng không có payload.\n(C) SAI: Reachability Analyzer phân tích cấu hình để xác định đường đi có thông hay không, không chạm vào traffic thật nên không thể cung cấp nội dung gói tin.\n(D) SAI: GuardDuty Runtime Monitoring phát hiện hành vi đáng ngờ ở cấp hệ điều hành/container và tạo finding, không chuyển tiếp gói tin cho một appliance bên thứ ba.\nĐáp án đúng: A\nĐiểm cần nhớ: Cần nội dung gói tin (DPI, IDS, forensics) => Traffic Mirroring; chỉ cần biết ai nói chuyện với ai và ACCEPT/REJECT => Flow Logs.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "VPC Traffic Mirroring sessions that copy traffic from the instances' network interfaces", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "VPC Flow Logs with a custom format that includes every available field, published to Amazon S3", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "VPC Reachability Analyzer analyses between each instance and the detection appliance", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Amazon GuardDuty with Runtime Monitoring enabled for the EC2 instances", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A web application runs on Amazon EC2 instances behind an internet-facing Application Load Balancer (ALB). Application logs show SQL injection attempts in HTTP query strings that come from many constantly changing IP addresses. Which solution should a solutions architect use to block these requests?",
+    "explanation": "Phân tích đề: Tấn công ở tầng ứng dụng (SQL injection trong query string, L7), IP nguồn thay đổi liên tục nên lọc theo IP là vô nghĩa.\n(A) SAI: Network ACL lọc ở L3/L4 theo CIDR, không đọc được nội dung HTTP; danh sách IP thay đổi liên tục và NACL lại có giới hạn số rule.\n(B) SAI: Security group cũng chỉ lọc theo IP/port/protocol; giới hạn HTTPS về dải IP khách hàng đã biết sẽ chặn luôn người dùng hợp lệ của một ứng dụng public mà vẫn không phát hiện SQL injection.\n(C) SAI: Shield Advanced tập trung chống DDoS và hỗ trợ từ đội phản ứng; nó không tự kiểm tra payload để chặn SQL injection (việc đó cần rule của WAF).\n(D) ĐÚNG: AWS WAF kiểm tra request HTTP ở L7; managed rule group cho SQL injection (hoặc rule SQLi match) trong web ACL gắn với ALB sẽ chặn request độc hại bất kể IP nguồn.\nĐáp án đúng: D\nĐiểm cần nhớ: SQLi/XSS/lọc theo nội dung HTTP => AWS WAF (gắn ALB, CloudFront, API Gateway); SG/NACL chỉ hiểu IP, port, protocol.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Network ACL deny rules on the ALB subnets for each source IP address that appears in the logs", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "A security group on the ALB that allows HTTPS only from the address ranges of known customers", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "AWS Shield Advanced protection for the ALB, with proactive engagement from the response team", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "An AWS WAF web ACL with a SQL injection managed rule group, associated with the ALB", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A team enabled VPC Flow Logs on a VPC to audit the IP traffic of its Amazon EC2 instances. The instances use the Amazon-provided DNS server. Which TWO types of traffic are NOT recorded in the flow logs? (Select TWO.)",
+    "explanation": "Phân tích đề: Hỏi các loại traffic mà Flow Logs không ghi lại theo thiết kế.\n(A) SAI: Traffic bị security group hoặc NACL từ chối vẫn được ghi với action REJECT; đây chính là giá trị chẩn đoán chính của Flow Logs.\n(B) ĐÚNG: Traffic từ instance tới Amazon DNS server (Route 53 Resolver tại địa chỉ VPC+2) không được ghi; nếu dùng DNS server tự quản thì traffic DNS mới xuất hiện trong log.\n(C) SAI: Traffic giữa hai instance trong cùng subnet vẫn đi qua ENI và được ghi ở flow log của các ENI đó.\n(D) SAI: Traffic đi ra qua NAT gateway được ghi ở ENI của instance và ENI của NAT gateway.\n(E) ĐÚNG: Request tới instance metadata service (169.254.169.254) không được ghi trong Flow Logs, tương tự traffic tới Amazon Time Sync Service và DHCP.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Flow Logs bỏ qua traffic tới dịch vụ link-local/Amazon DNS (metadata, Time Sync, DHCP, Amazon DNS); traffic bị REJECT thì vẫn được ghi.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Inbound connection attempts that were rejected by a security group", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "DNS queries that instances send to the Amazon-provided DNS server", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Traffic between two instances that are in the same subnet", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Outbound traffic from private instances that passes through a NAT gateway", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Requests to the instance metadata service at 169.254.169.254", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company's VPC has a main route table that contains a 0.0.0.0/0 route to an internet gateway, because the main route table was used for the first public subnets. Engineers often create new subnets for databases and forget to associate a route table with them. A security review requires that every new subnet be private by default. The public subnets must keep internet access. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Subnet không được gắn route table tường minh sẽ dùng main route table (implicit association). Main route table đang có route ra IGW nên subnet mới mặc định thành public. Cần mặc định private, ít vận hành nhất.\n(A) SAI: Không thể đổi NACL nào là default NACL của VPC; hơn nữa NACL deny mọi CIDR internet là lọc chứ không sửa nguyên nhân là routing, và dễ làm hỏng traffic hợp lệ.\n(B) ĐÚNG: Đưa route 0.0.0.0/0 => IGW sang một custom route table gắn tường minh cho các public subnet, để main route table chỉ còn route local. Mọi subnet mới không được gắn sẽ tự động thành private, không cần công cụ phát hiện hay sửa lỗi nào.\n(C) SAI: AWS Config kết hợp SSM Automation chạy được nhưng là cơ chế phát hiện rồi sửa sau, có khoảng thời gian subnet vẫn public và phải duy trì rule, runbook; vận hành nhiều hơn so với sửa main route table.\n(D) SAI: Tháo IGW khỏi VPC làm public subnet mất truy cập internet, đồng thời NAT gateway public cũng cần IGW để hoạt động.\nĐáp án đúng: B\nĐiểm cần nhớ: Best practice: giữ main route table ở dạng private (chỉ local), gắn tường minh public subnet vào route table có IGW; subnet quên gắn route table sẽ an toàn theo mặc định.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a custom network ACL that denies all internet CIDR ranges and make it the default network ACL of the VPC.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Move the internet gateway route from the main route table to a custom route table that is explicitly associated with the public subnets.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Deploy an AWS Config custom rule that detects subnets implicitly associated with the main route table and an AWS Systems Manager Automation runbook that reassociates them.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Detach the internet gateway from the VPC and point 0.0.0.0/0 in the main route table to a NAT gateway instead.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Amazon EC2 instances in a private subnet download packages from HTTPS repositories on the internet through a NAT gateway. To harden the subnet, an engineer replaced the default network ACL with a custom network ACL. Outbound rule 100 allows TCP 443 to 0.0.0.0/0. Inbound rule 100 allows TCP 22 from the corporate VPN range 10.200.0.0/16. Package downloads now time out. Security groups were not changed. What should the engineer do to restore the downloads?",
+    "explanation": "Phân tích đề: Instance chủ động gọi ra ngoài trên 443. NACL stateless nên response từ repository quay về instance trên ephemeral port (cổng nguồn mà instance đã mở) phải được cho phép ở chiều inbound của subnet.\n(A) SAI: Đây là bẫy đảo chiều. Rule outbound ephemeral cần khi subnet là phía server nhận kết nối; ở đây subnet là phía client, response đi vào chứ không đi ra.\n(B) SAI: Response từ repository có source port 443 nhưng destination port là ephemeral port của instance; NACL so khớp theo destination port nên rule inbound TCP 443 không cho response vào.\n(C) ĐÚNG: Thêm rule inbound cho phép TCP 1024-65535 từ 0.0.0.0/0. NAT gateway chỉ đổi địa chỉ phía instance, nên gói phản hồi vào private subnet có source là IP của repository và destination port là ephemeral port của instance.\n(D) SAI: NAT gateway không gắn được security group; ngoài ra security group của instance là stateful nên response đã tự được phép, không cần rule ephemeral.\nĐáp án đúng: C\nĐiểm cần nhớ: Với NACL, subnet làm client cần inbound ephemeral cho response; subnet làm server cần outbound ephemeral. Xác định ai khởi tạo kết nối trước khi chọn chiều rule.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add an outbound rule that allows TCP 1024-65535 to 0.0.0.0/0 so that responses can leave the subnet.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add an inbound rule that allows TCP 443 from 0.0.0.0/0 so that HTTPS responses can enter the subnet.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add an inbound rule to the network ACL that allows TCP 1024-65535 from 0.0.0.0/0.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Attach a security group to the NAT gateway with an outbound rule that allows TCP 1024-65535.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company serves a web application through an internet-facing Application Load Balancer (ALB). Amazon CloudFront is not used. Because of licensing terms, requests from two specific countries must be rejected with an HTTP 403 response. The solution must stay accurate as IP address allocations change and must require the LEAST operational overhead. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Chặn theo quốc gia, trả về 403, danh sách IP theo quốc gia thay đổi theo thời gian, không có CloudFront, ít vận hành nhất.\n(A) ĐÚNG: AWS WAF web ACL gắn với ALB có geo match statement chặn hai quốc gia; AWS tự cập nhật cơ sở dữ liệu IP theo vị trí và action Block mặc định trả HTTP 403.\n(B) SAI: Danh sách IP của cả một quốc gia rất lớn, vượt xa số rule tối đa của một NACL; NACL cũng không trả 403 mà chỉ drop gói tin, và còn phải duy trì Lambda cập nhật.\n(C) SAI: Geolocation routing chỉ ảnh hưởng tới việc phân giải DNS dựa trên vị trí của resolver; client vẫn có thể truy cập trực tiếp DNS name của ALB hoặc dùng resolver ở nước khác, và không có phản hồi 403.\n(D) SAI: Shield Advanced với automatic application layer DDoS mitigation chỉ tạo rule giảm thiểu khi phát hiện tấn công DDoS, không phải cơ chế chặn cố định theo quốc gia.\nĐáp án đúng: A\nĐiểm cần nhớ: Chặn theo quốc gia trên ALB => AWS WAF geo match; nếu có CloudFront thì cũng có thể dùng CloudFront geographic restrictions. Route 53 geolocation là định tuyến, không phải kiểm soát truy cập.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Associate an AWS WAF web ACL that has a geo match rule for the two countries with the ALB.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add network ACL deny rules on the ALB subnets for the published IP ranges of the two countries, refreshed weekly by an AWS Lambda function.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create Amazon Route 53 geolocation records so that only the allowed countries resolve the domain to the ALB, with no default location record.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Subscribe to AWS Shield Advanced and enable automatic application layer DDoS mitigation for the ALB.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An application on Amazon EC2 instances in private subnets keeps long-lived TCP connections to an external database service on the internet through a NAT gateway. Connections that stay idle for several minutes are terminated, and the application reports connection reset errors when it tries to reuse them. A solutions architect must fix the issue without adding infrastructure. What should the architect do?",
+    "explanation": "Phân tích đề: Kết nối qua NAT gateway bị cắt sau vài phút idle, không được thêm hạ tầng. NAT gateway có idle timeout cố định 350 giây; khi hết hạn, NAT gateway trả RST cho instance nếu instance tiếp tục dùng kết nối đó.\n(A) SAI: Idle timeout của NAT gateway là giá trị cố định, không có thiết lập nào để tăng lên; đây là tính năng nghe hợp lý nhưng không tồn tại.\n(B) SAI: NAT instance thêm hạ tầng tự quản (patch, HA, scale), vi phạm yêu cầu không thêm hạ tầng và làm giảm độ sẵn sàng so với NAT gateway.\n(C) SAI: Vấn đề không phải NACL chặn response; kết nối đã hoạt động bình thường cho tới khi idle quá lâu. Thêm rule ephemeral không ngăn NAT gateway hủy kết nối idle.\n(D) ĐÚNG: Bật TCP keepalive trên instance (hệ điều hành hoặc driver kết nối) với chu kỳ ngắn hơn idle timeout của NAT gateway, để kết nối không bao giờ bị coi là idle.\nĐáp án đúng: D\nĐiểm cần nhớ: Kết nối dài qua NAT gateway bị reset sau khi idle khoảng 350 giây => bật TCP keepalive trên client; NAT gateway không cho chỉnh idle timeout.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Increase the idle timeout setting of the NAT gateway to 3,600 seconds so that idle connections are kept open.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Replace the NAT gateway with a NAT instance on a larger instance type that keeps idle connections open longer.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add outbound network ACL rules for TCP 1024-65535 on the private subnets so that return traffic keeps flowing.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Configure TCP keepalive in the operating system of the instances with an interval that is shorter than the NAT gateway idle timeout.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company associated an IPv6 CIDR block with its VPC and assigned IPv6 addresses to web servers in a public subnet. IPv4 clients can reach the servers over HTTPS, but IPv6 clients cannot. The subnet uses the default network ACL. The subnet route table has a 0.0.0.0/0 route to an internet gateway, and the security group allows inbound TCP 443 from 0.0.0.0/0. Which TWO actions are required to allow IPv6 clients to connect? (Select TWO.)",
+    "explanation": "Phân tích đề: IPv4 hoạt động, IPv6 không. Default NACL đã tự có rule cho phép IPv6 khi VPC được gắn IPv6 CIDR. Còn thiếu route IPv6 và rule SG cho IPv6 (0.0.0.0/0 chỉ khớp IPv4).\n(A) ĐÚNG: Route table phải có route ::/0 trỏ tới internet gateway; route 0.0.0.0/0 chỉ áp dụng cho IPv4. Internet gateway hỗ trợ IPv6 hai chiều.\n(B) SAI: Egress-only internet gateway chỉ cho phép kết nối IPv6 do instance khởi tạo đi ra và chặn kết nối khởi tạo từ internet, đúng điều ngược với yêu cầu web server public.\n(C) SAI: Elastic IP chỉ dành cho IPv4; địa chỉ IPv6 trong VPC vốn là địa chỉ global unicast có thể định tuyến công khai, không cần cấp phát thêm.\n(D) ĐÚNG: Rule nguồn 0.0.0.0/0 không khớp client IPv6; security group cần thêm rule inbound TCP 443 từ ::/0.\n(E) SAI: DNS64 và NAT64 qua NAT gateway dùng cho workload IPv6 cần gọi đích chỉ có IPv4, không liên quan tới client IPv6 truy cập vào server.\nĐáp án đúng: A và D\nĐiểm cần nhớ: IPv6 cần cấu hình song song với IPv4: route ::/0 và rule ::/0 riêng. Public IPv6 inbound => internet gateway; chỉ outbound IPv6 => egress-only internet gateway.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a ::/0 route that targets the internet gateway to the subnet route table.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add a ::/0 route that targets a new egress-only internet gateway to the subnet route table.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Allocate an Elastic IP address for IPv6 and associate it with each web server.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add an inbound security group rule that allows TCP 443 from ::/0.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Enable DNS64 on the subnet and route 64:ff9b::/96 to a NAT gateway.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Applications in VPC-App connect to a reporting server in a peered VPC-Reports (same Region and account) by using the server's public IPv4 DNS hostname, which is hard-coded in a vendor tool and cannot be changed. The hostname resolves to the server's public IP address, so the traffic leaves through a NAT gateway and the internet. The company requires this traffic to stay on the existing VPC peering connection. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Không đổi được hostname, hostname public đang phân giải ra IP public. Muốn traffic đi qua peering hiện có => cần hostname public phân giải ra IP private khi truy vấn từ VPC peer.\n(A) SAI: Tự tạo private hosted zone đè lên namespace DNS của EC2 do AWS quản lý là cách vá thủ công, phải duy trì record cho mỗi instance và cập nhật khi IP đổi; nhiều vận hành và dễ sai.\n(B) ĐÚNG: Bật tùy chọn DNS resolution cho peering connection (cho phép VPC-App phân giải DNS hostname public của instance trong VPC-Reports ra IP private). Khi đó traffic dùng IP private và đi theo route peering sẵn có; hai VPC cần bật DNS hostnames và DNS resolution.\n(C) SAI: Route của peering chỉ đưa traffic tới CIDR của VPC peer; IP public của server không thuộc CIDR VPC-Reports nên peering connection sẽ không chuyển gói tin tới đó.\n(D) SAI: Transit gateway có tùy chọn DNS support tương tự nhưng yêu cầu là giữ traffic trên peering connection hiện có; thay kiến trúc là thừa và vi phạm ràng buộc.\nĐáp án đúng: B\nĐiểm cần nhớ: Peering + truy cập bằng public DNS hostname => bật DNS resolution support trên peering connection để hostname phân giải ra IP private.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an Amazon Route 53 private hosted zone that overrides the hostname with the private IP address and associate it with VPC-App.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable DNS resolution support on the peering connection so that VPC-App resolves the public DNS hostname to the private IP address.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Add a route for the server's public IP address that targets the peering connection in the VPC-App route tables.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Replace the peering connection with transit gateway attachments and enable DNS support on the transit gateway.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A fleet of web crawlers runs on thousands of Amazon EC2 instances in private subnets that share one route table. All outbound traffic goes through a single NAT gateway to one third-party API endpoint IP address. During peaks, the NAT gateway's ErrorPortAllocation metric increases and new connections fail, although each instance opens only a modest number of connections. The company must fix the issue with the LEAST operational overhead and without changing application code or the subnet layout. What should a solutions architect do?",
+    "explanation": "Phân tích đề: ErrorPortAllocation = NAT gateway hết port nguồn cho một đích duy nhất (mỗi địa chỉ IP của NAT gateway hỗ trợ tối đa khoảng 55.000 kết nối đồng thời tới mỗi đích riêng biệt). Không đổi code, không đổi subnet, ít vận hành nhất.\n(A) SAI: Một route table không thể có hai route cùng đích 0.0.0.0/0 trỏ tới hai NAT gateway, nên NAT gateway thứ hai không nhận được traffic nếu không tách route table và subnet.\n(B) SAI: NAT instance trong Auto Scaling group là giải pháp tự quản (patch, failover, cập nhật route) và vẫn bị giới hạn port trên mỗi IP; vận hành nhiều hơn hẳn.\n(C) ĐÚNG: Gắn thêm Elastic IP phụ (secondary IPv4 address) vào NAT gateway hiện tại; mỗi địa chỉ bổ sung cung cấp thêm khoảng port riêng tới cùng một đích, giải quyết ErrorPortAllocation mà không đổi route, subnet hay code.\n(D) SAI: Tách subnet và mỗi nhóm subnet đi một NAT gateway riêng có hiệu quả nhưng vi phạm ràng buộc không đổi subnet layout và tốn công di chuyển instance.\nĐáp án đúng: C\nĐiểm cần nhớ: ErrorPortAllocation tới một đích duy nhất => thêm secondary IP cho NAT gateway; giới hạn kết nối đồng thời tính theo mỗi IP và mỗi đích.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a second NAT gateway in the same public subnet and add another 0.0.0.0/0 route that targets it in the shared route table.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Replace the NAT gateway with NAT instances on larger instance types in an Auto Scaling group behind the same route.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Associate additional secondary Elastic IP addresses with the existing NAT gateway to increase the available source ports.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Split the private subnets into smaller subnets and route each group of subnets through its own NAT gateway.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A public application runs behind an internet-facing Application Load Balancer (ALB) in public subnets. A threat intelligence feed provides about 2,000 malicious IPv4 addresses that change every day, and requests from these addresses must be blocked before they reach the application. The public subnets already use custom network ACLs that contain several rules. The solution must scale with the size of the list and require the LEAST operational overhead. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Khoảng 2.000 IP, đổi hằng ngày, chặn trước khi tới ứng dụng sau ALB, ít vận hành nhất, phải co giãn theo danh sách.\n(A) ĐÚNG: AWS WAF IP set chứa được hàng nghìn địa chỉ (tối đa 10.000 mỗi IP set); rule block tham chiếu IP set trong web ACL gắn với ALB. Cập nhật hằng ngày chỉ là thay nội dung IP set qua API, không đụng tới mạng.\n(B) SAI: NACL bị giới hạn số rule mỗi chiều (mặc định 20, nâng tối đa 40), không thể chứa 2.000 địa chỉ dù đã xin tăng quota.\n(C) SAI: Network Firewall chặn được danh sách IP nhưng phải triển khai firewall endpoint, subnet riêng và ingress routing qua internet gateway; nhiều thành phần và chi phí hơn hẳn cho bài toán mà WAF trên ALB đã giải quyết.\n(D) SAI: Security group chỉ có rule allow, không có deny; tham chiếu prefix list vào SG chỉ có thể cho phép các địa chỉ đó, ngược với yêu cầu chặn.\nĐáp án đúng: A\nĐiểm cần nhớ: Chặn vài IP => NACL deny; chặn danh sách IP lớn, thay đổi thường xuyên trước ALB/CloudFront => AWS WAF IP set.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Store the addresses in an AWS WAF IP set that is referenced by a block rule in a web ACL associated with the ALB, and update it daily.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Request a quota increase for rules per network ACL and add one deny rule per address to the ACLs of the public subnets.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Deploy AWS Network Firewall with a stateless rule group that drops the addresses, and add ingress routing through the firewall endpoints.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Add the addresses to a customer managed prefix list and reference it in a deny rule of the ALB security group.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A VPC has an application subnet and a database subnet in each of two Availability Zones. A new compliance rule requires that all traffic between the application subnets and the database subnets pass through an intrusion prevention system that can drop malicious flows. The company wants a managed service and does not want to split the workload into multiple VPCs. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Kiểm tra east-west giữa các subnet trong cùng VPC, cần IPS inline có thể drop, dịch vụ managed, không tách VPC.\n(A) SAI: Traffic Mirroring chỉ gửi bản sao gói tin ra ngoài luồng; IPS nhận bản sao không thể chặn flow gốc, nên không đáp ứng yêu cầu drop.\n(B) SAI: Vi phạm ràng buộc không tách VPC; ngoài ra VPC peering không hỗ trợ edge-to-edge routing nên không thể ép traffic peering đi qua firewall endpoint.\n(C) SAI: NACL chỉ lọc L3/L4 theo CIDR và port, không có khả năng phát hiện và chặn hành vi độc hại như một IPS.\n(D) ĐÚNG: AWS Network Firewall là dịch vụ managed, stateful, có IPS. Đặt firewall endpoint trong subnet riêng ở mỗi AZ, rồi thêm vào route table của subnet ứng dụng và subnet database các route cụ thể hơn route local (CIDR của subnet bên kia) trỏ tới firewall endpoint cùng AZ.\nĐáp án đúng: D\nĐiểm cần nhớ: Route table VPC cho phép route cụ thể hơn route local trỏ tới firewall endpoint/appliance để kiểm tra traffic giữa các subnet trong cùng VPC; Mirroring là thụ động, không chặn được.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable VPC Traffic Mirroring from the application network interfaces to a Network Load Balancer that fronts a fleet of IPS appliances.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Move the database subnets to a new VPC, peer the two VPCs, and route the peering traffic through AWS Network Firewall endpoints.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Replace the database subnet network ACLs with rules that allow only the application subnet CIDR ranges on the database port.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Deploy AWS Network Firewall in dedicated subnets and add subnet routes, more specific than the local route, to its endpoints.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company has 20 spoke VPCs attached to a transit gateway. All internet-bound traffic from the spokes must be inspected centrally by AWS Network Firewall in an inspection VPC that also hosts NAT gateways in two Availability Zones. Flows must stay symmetric so that the stateful firewall sees both directions of every connection, and the spoke VPCs must not have their own internet gateways. Which THREE configurations are required? (Select THREE.)",
+    "explanation": "Phân tích đề: Mô hình centralized egress + inspection qua transit gateway. Yêu cầu: spoke không có IGW, traffic đối xứng cho firewall stateful, NAT tập trung ở inspection VPC.\n(A) SAI: VPC peering không hỗ trợ edge-to-edge routing, nên spoke không thể dùng NAT gateway hoặc IGW của inspection VPC qua peering; đồng thời phải quản lý 20 peering.\n(B) ĐÚNG: Bật appliance mode trên attachment của inspection VPC để transit gateway giữ cả hai chiều của một flow trên cùng một AZ (cùng firewall endpoint), tránh traffic bất đối xứng làm firewall stateful drop gói tin.\n(C) SAI: Network Firewall cần subnet riêng cho firewall endpoint; đặt chung subnet với NAT gateway khiến không thể định tuyến traffic đi qua firewall rồi mới tới NAT (cùng một route table cho cả hai).\n(D) ĐÚNG: Route table của spoke gửi 0.0.0.0/0 tới transit gateway, để mọi traffic internet đi về inspection VPC.\n(E) SAI: NAT gateway public trong mỗi spoke cần IGW trong spoke (vi phạm ràng buộc) và làm traffic thoát ra internet mà không qua firewall trung tâm.\n(F) ĐÚNG: Trong inspection VPC, route table của các subnet transit gateway attachment gửi 0.0.0.0/0 tới firewall endpoint cùng AZ; sau đó subnet firewall gửi tới NAT gateway, subnet NAT gửi tới IGW.\nĐáp án đúng: B, D và F\nĐiểm cần nhớ: Inspection tập trung qua transit gateway với firewall stateful => bật appliance mode; thứ tự route: spoke => TGW => firewall endpoint => NAT gateway => IGW.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Peer every spoke VPC with the inspection VPC and route 0.0.0.0/0 in the spokes to the peering connection.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable appliance mode on the transit gateway attachment of the inspection VPC.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Place the firewall endpoints in the same subnets as the NAT gateways to reduce the number of route tables.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "In each spoke VPC route table, send 0.0.0.0/0 to the transit gateway.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Deploy a NAT gateway in each spoke VPC so that traffic is translated before it reaches the transit gateway.", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "Route 0.0.0.0/0 from the transit gateway attachment subnets to the firewall endpoint in the same AZ.", "isCorrect": true }
+    ]
+  }
+]

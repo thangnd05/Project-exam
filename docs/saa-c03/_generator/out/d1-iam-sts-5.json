@@ -1,0 +1,409 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company stores financial records in an Amazon S3 bucket that has versioning enabled. Auditors require that permanently deleting an object version or changing the versioning state must need an additional MFA code. An administrator with the AdministratorAccess policy tries to enable this protection and fails. Which identity must enable it?",
+    "explanation": "Phân tích đề: Tính năng cần bật là S3 MFA Delete. Từ khóa: admin có AdministratorAccess vẫn không bật được, hỏi danh tính nào bắt buộc phải dùng.\n(A) SAI: IAM role có s3:PutBucketVersioning đổi được trạng thái versioning thông thường, nhưng cấu hình MFA Delete không chấp nhận credential của IAM role.\n(B) SAI: Permission set AdministratorAccess trong IAM Identity Center thực chất vẫn là một IAM role trong account, nên gặp đúng giới hạn như admin hiện tại.\n(C) ĐÚNG: MFA Delete chỉ có thể bật hoặc tắt bởi root user của account sở hữu bucket, qua AWS CLI hoặc API, kèm thiết bị MFA của root user; đây là một trong các tác vụ chỉ root làm được.\n(D) SAI: Thêm Condition aws:MultiFactorAuthPresent vào bucket policy chỉ bắt MFA cho request, không phải là cấu hình MFA Delete và không thay đổi việc ai được bật tính năng này.\nĐáp án đúng: C\nĐiểm cần nhớ: MFA Delete của S3 là tác vụ chỉ root user làm được (qua CLI/API, dùng MFA của root); nhớ cùng nhóm với đổi support plan, đóng account.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "An IAM role that has s3:PutBucketVersioning permission on the bucket and a registered MFA device.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "A user who signs in through IAM Identity Center with an AdministratorAccess permission set.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "The root user of the bucket owner account, using the AWS CLI together with the root user's own MFA device.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Any IAM user, after a bucket policy condition requires aws:MultiFactorAuthPresent to be true.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A legacy third-party backup tool runs outside AWS and can authenticate only with an IAM user access key. Company policy requires the key to be rotated every 90 days without interrupting the nightly backup job. How should a solutions architect rotate the key?",
+    "explanation": "Phân tích đề: Công cụ chỉ hỗ trợ access key của IAM user, cần xoay key định kỳ mà không gián đoạn job.\n(A) ĐÚNG: Mỗi IAM user có thể có tối đa hai access key cùng lúc. Tạo key thứ hai, cập nhật công cụ dùng key mới, kiểm tra hoạt động, rồi deactivate key cũ và cuối cùng xóa nó; nếu có lỗi vẫn có thể kích hoạt lại key cũ.\n(B) SAI: Xóa key cũ trước rồi mới tạo key mới tạo ra khoảng thời gian công cụ không có credential hợp lệ, job đêm có thể thất bại và không có đường lùi.\n(C) SAI: IAM password policy chỉ áp dụng cho mật khẩu Console, không làm access key tự hết hạn hay tự xoay.\n(D) SAI: Credential Report chỉ là file CSV báo cáo tuổi của access key, MFA và mật khẩu; nó không tự xoay key.\nĐáp án đúng: A\nĐiểm cần nhớ: Xoay access key không downtime = tạo key thứ hai, chuyển ứng dụng, deactivate key cũ, rồi xóa. Credential Report chỉ để phát hiện key cũ.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a second access key, update the tool, then deactivate and delete the old key.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Delete the current access key, create a new access key, and update the tool configuration right away.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure the account password policy with a 90-day expiration so that the access key expires and renews.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Generate an IAM credential report every 90 days so that IAM rotates any access key older than the limit.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "Developers in a sandbox account need to create and manage resources in almost every AWS service. They must not be able to manage IAM users or IAM groups. The team wants to use an existing AWS managed policy instead of writing a custom policy. Which policy should be attached?",
+    "explanation": "Phân tích đề: Cần quyền rộng trên hầu hết dịch vụ nhưng không quản lý IAM user/group, và muốn dùng AWS managed policy sẵn có.\n(A) SAI: AdministratorAccess cho phép mọi action, bao gồm tạo/xóa IAM user và group, vi phạm yêu cầu.\n(B) SAI: ViewOnlyAccess là job-function policy chỉ cho xem danh sách và metadata tài nguyên, developer không tạo hay sửa được tài nguyên.\n(C) SAI: SecurityAudit cấp quyền đọc cấu hình bảo mật để kiểm toán, không cho tạo tài nguyên.\n(D) ĐÚNG: PowerUserAccess là AWS managed job-function policy cho phép toàn quyền trên các dịch vụ AWS nhưng loại trừ việc quản lý IAM (user, group) và Organizations, đúng nhu cầu developer.\nĐáp án đúng: D\nĐiểm cần nhớ: PowerUserAccess = gần như admin nhưng không quản lý IAM. AWS managed job-function policy giúp cấp quyền nhanh mà không phải tự viết policy.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "The AdministratorAccess managed policy attached to a developers IAM group.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "The ViewOnlyAccess job function policy attached to a developers IAM group.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "The SecurityAudit managed policy attached to every developer IAM user.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "The PowerUserAccess job function managed policy.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect is reviewing which AWS STS API fits each access scenario. Which TWO pairings of an AWS STS API and a scenario are correct? (Select TWO.)",
+    "explanation": "Phân tích đề: Cần ghép đúng API của STS với nguồn danh tính: IAM user, IdP doanh nghiệp SAML, OIDC/mạng xã hội, hay workload ngoài AWS.\n(A) SAI: Server on-premises xác thực bằng chứng chỉ X.509 dùng IAM Roles Anywhere, không phải AssumeRoleWithWebIdentity (API này nhận token OIDC).\n(B) ĐÚNG: Nhân viên đăng nhập qua AD FS (IdP SAML 2.0) vào một account dùng AssumeRoleWithSAML; trust policy của role dùng Principal Federated trỏ tới SAML provider.\n(C) SAI: Lambda truy cập bảng DynamoDB ở account khác cần assume role cross-account bằng AssumeRole; GetSessionToken chỉ trả credential cho chính IAM user gọi nó, không đổi sang account khác.\n(D) SAI: Người dùng app mobile đăng nhập bằng Facebook là danh tính web/OIDC, dùng AssumeRoleWithWebIdentity (thường qua Cognito identity pool), không phải AssumeRole.\n(E) ĐÚNG: GetSessionToken cho IAM user lấy credential tạm thời kèm mã MFA để chạy CLI, sau đó các API nhạy cảm kiểm tra aws:MultiFactorAuthPresent.\nĐáp án đúng: B và E\nĐiểm cần nhớ: AssumeRole = principal AWS/cross-account; WithSAML = nhân viên qua IdP doanh nghiệp; WithWebIdentity = người dùng cuối OIDC; GetSessionToken = chính IAM user + MFA; on-prem X.509 = Roles Anywhere.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "AssumeRoleWithWebIdentity for on-premises servers that authenticate with X.509 certificates.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "AssumeRoleWithSAML for employees who sign in through AD FS to one AWS account.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "GetSessionToken for a Lambda function that reads a DynamoDB table in another account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "AssumeRole for mobile app users who sign in with their Facebook accounts.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "GetSessionToken for an IAM user who needs MFA-authenticated temporary CLI credentials.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company hires an external auditor for a fixed engagement that ends on June 30. The auditor assumes an IAM role named ExternalAudit to read AWS Config and AWS CloudTrail data. Security requires the role to stop working automatically at the end of the engagement, even if nobody remembers to remove it. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Quyền phải tự hết hiệu lực sau một ngày cố định, không phụ thuộc người nhớ gỡ, và ít vận hành nhất.\n(A) SAI: MaxSessionDuration chỉ giới hạn độ dài mỗi phiên (tối đa 12 giờ); auditor vẫn có thể assume lại để lấy phiên mới sau ngày kết thúc.\n(B) ĐÚNG: Thêm Condition DateLessThan với aws:CurrentTime vào trust policy (hoặc permission policy) khiến mọi request sau mốc thời gian bị implicit deny tự động, không cần job hay người can thiệp.\n(C) SAI: Lambda theo lịch EventBridge xóa role hoạt động được nhưng phải viết, triển khai và giám sát code; nếu Lambda lỗi thì quyền vẫn còn, tốn vận hành hơn một condition có sẵn.\n(D) SAI: Password policy chỉ áp dụng cho mật khẩu Console của IAM user, không ảnh hưởng tới việc assume role.\nĐáp án đúng: B\nĐiểm cần nhớ: Quyền có hạn theo ngày => Condition DateLessThan/DateGreaterThan với aws:CurrentTime trong policy, không cần tự động hóa thêm.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Set the MaxSessionDuration of the ExternalAudit role to the shortest value so that its sessions expire quickly.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Add a DateLessThan condition on aws:CurrentTime for June 30 to the trust policy of the ExternalAudit role.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Schedule an Amazon EventBridge rule that invokes an AWS Lambda function to delete the role on June 30.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Configure the account password policy so that the auditor's console password expires on June 30.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An application in the Analytics account must read a database secret that is stored in AWS Secrets Manager in the Shared account. The secret uses the default AWS managed key aws/secretsmanager. The team added a resource policy to the secret that allows the application role, and the role's identity policy allows secretsmanager:GetSecretValue on the secret ARN. Requests still fail with AccessDenied. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Cross-account đã có cả resource policy của secret và identity policy bên gọi, vẫn AccessDenied. Từ khóa: secret mã hóa bằng AWS managed key aws/secretsmanager.\n(A) ĐÚNG: Secret mã hóa bằng aws/secretsmanager không thể dùng cross-account vì không sửa được key policy của AWS managed key. Phải chuyển secret sang customer managed KMS key có key policy cho role của account Analytics quyền kms:Decrypt (và role cũng cần kms:Decrypt trong identity policy).\n(B) SAI: Key policy của AWS managed key do AWS quản lý, khách hàng không chỉnh sửa được, nên không thể thêm account khác vào.\n(C) SAI: Replicate secret chỉ sao chép sang Region khác trong cùng account, không đưa secret sang account Analytics và không giải quyết quyền KMS.\n(D) SAI: Sao chép giá trị sang Parameter Store của account kia chạy được nhưng tạo bản sao dữ liệu nhạy cảm, mất rotation tự động và phải đồng bộ thủ công, tốn vận hành.\nĐáp án đúng: A\nĐiểm cần nhớ: Chia sẻ Secrets Manager cross-account cần 3 thứ: resource policy của secret, identity policy bên gọi, và customer managed KMS key cho phép bên gọi Decrypt; aws/secretsmanager không dùng cross-account được.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Re-encrypt the secret with a customer managed KMS key whose key policy lets the role decrypt.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Edit the key policy of the aws/secretsmanager key to allow kms:Decrypt for the Analytics account root principal.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure Secrets Manager secret replication so that a replica of the secret is created for the Analytics account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Copy the secret value into an AWS Systems Manager Parameter Store SecureString parameter in the Analytics account.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A partner company uploads daily files from its own AWS account into a company's Amazon S3 bucket by using a role that the bucket policy allows. The bucket was created years ago and still uses the Object writer setting for object ownership. Company analysts receive AccessDenied when they read the uploaded files. The partner cannot change its upload code. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Object do account partner upload nên partner sở hữu object (Object writer), bucket owner không đọc được. Ràng buộc: partner không đổi code, ít vận hành nhất.\n(A) SAI: Thêm Allow s3:GetObject vào bucket policy cho analyst không đủ, vì với ACL bật và Object writer, object thuộc account partner; bucket policy của bucket owner không cấp quyền trên object mà mình không sở hữu.\n(B) SAI: Bắt buộc ACL bucket-owner-full-control qua condition s3:x-amz-acl giải quyết được ở mức nguyên tắc nhưng partner phải sửa code để gửi header ACL, vi phạm ràng buộc; upload hiện tại sẽ bị từ chối.\n(C) SAI: Lambda copy lại object sau mỗi lần upload chạy được nhưng phải viết và vận hành code, nhân đôi chi phí lưu trữ/request, không phải cách ít vận hành nhất.\n(D) ĐÚNG: Bật S3 Object Ownership ở chế độ Bucket owner enforced sẽ tắt ACL, và bucket owner tự động sở hữu mọi object trong bucket (kể cả object đã có); quyền khi đó chỉ do policy quyết định, partner không phải sửa gì.\nĐáp án đúng: D\nĐiểm cần nhớ: Cross-account upload mà bucket owner không đọc được object => Object Ownership = Bucket owner enforced (tắt ACL). Bucket mới mặc định đã như vậy.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Add a bucket policy statement that allows s3:GetObject on all objects in the bucket for the analysts' IAM role.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Add a bucket policy condition that denies uploads unless the bucket-owner-full-control canned ACL is included.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Use an S3 event notification to invoke a Lambda function that copies each uploaded object back into the same bucket.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Change the S3 Object Ownership setting of the bucket to Bucket owner enforced, which disables all object ACLs.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company's Amazon EC2 instances in private subnets reach Amazon S3 only through an S3 gateway endpoint. The security team is concerned that a compromised instance could copy data to an S3 bucket owned by an attacker's AWS account. Access must be limited to buckets owned by accounts in the company's organization in AWS Organizations, without editing every bucket policy. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Cần chặn dữ liệu đi ra bucket của account lạ (exfiltration), tức kiểm soát tài nguyên đích mà principal của mình được dùng, áp tại điểm đi ra duy nhất là gateway endpoint, không sửa từng bucket policy.\n(A) SAI: Bucket policy với aws:PrincipalOrgID kiểm soát ai được vào bucket của công ty; nó không ngăn instance ghi sang bucket của kẻ tấn công, vì bucket đó không nằm trong tay công ty.\n(B) SAI: SCP với aws:PrincipalOrgID là sai key: principal của account thành viên luôn thuộc organization nên điều kiện luôn khớp, không hạn chế gì về bucket đích.\n(C) ĐÚNG: Endpoint policy của S3 gateway endpoint chỉ Allow khi aws:ResourceOrgID bằng organization ID, nên mọi request qua endpoint tới bucket của account ngoài tổ chức bị từ chối; không phải sửa bucket policy nào.\n(D) SAI: Lọc domain trên AWS Network Firewall không phân biệt được bucket theo account chủ sở hữu (mọi bucket dùng chung domain S3), và lưu lượng qua gateway endpoint không đi qua firewall đó.\nĐáp án đúng: C\nĐiểm cần nhớ: aws:PrincipalOrgID = ai đang gọi; aws:ResourceOrgID = tài nguyên thuộc tổ chức nào. Chống exfiltration qua VPC endpoint => endpoint policy với aws:ResourceOrgID.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Add an aws:PrincipalOrgID condition to the bucket policies so that only principals in the organization can read them.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Attach an SCP that denies S3 actions when the aws:PrincipalOrgID value is not the organization ID.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Attach an endpoint policy to the S3 gateway endpoint that allows S3 actions only when aws:ResourceOrgID matches.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Deploy AWS Network Firewall with domain filtering rules that allow only the company's S3 bucket names.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Employees federate into a single AWS account from a corporate SAML 2.0 identity provider and assume the DataAnalyst role in the AWS Management Console. Their console sessions end after 1 hour, but analysts need sessions of 8 hours. The role currently uses the default settings. Which solution meets this requirement?",
+    "explanation": "Phân tích đề: Phiên Console qua SAML hết sau 1 giờ, cần 8 giờ; role đang dùng mặc định (MaxSessionDuration 1 giờ).\n(A) SAI: Chỉ tăng MaxSessionDuration lên 8 giờ là chưa đủ: với đăng nhập Console qua SAML, nếu IdP không gửi thuộc tính SessionDuration thì phiên vẫn mặc định 1 giờ.\n(B) ĐÚNG: Phải làm cả hai: nâng MaxSessionDuration của role lên ít nhất 8 giờ (trần), và cấu hình IdP gửi SAML attribute https://aws.amazon.com/SAML/Attributes/SessionDuration bằng 28800 giây; giá trị này không được vượt MaxSessionDuration.\n(C) SAI: Chỉ gửi SessionDuration 8 giờ trong khi MaxSessionDuration vẫn 1 giờ thì giá trị yêu cầu vượt trần của role nên không đạt 8 giờ.\n(D) SAI: GetSessionToken dành cho IAM user, không dùng cho người dùng federation qua SAML; tạo IAM user cho từng nhân viên đi ngược mục tiêu federation.\nĐáp án đúng: B\nĐiểm cần nhớ: Thời lượng phiên federation = giá trị yêu cầu (SessionDuration hoặc DurationSeconds), bị chặn trên bởi MaxSessionDuration của role (tối đa 12 giờ).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Increase the role's MaxSessionDuration to 8 hours and keep the identity provider assertion unchanged.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Raise MaxSessionDuration to 8 hours and send a SessionDuration SAML attribute of 8 hours.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure the identity provider to send a SessionDuration SAML attribute of 28800 seconds for the role.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create IAM users for the analysts and have them call GetSessionToken with an 8-hour duration value.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A mobile app authenticates users with an Amazon Cognito user pool and obtains AWS credentials from an Amazon Cognito identity pool. Free users may only read from an Amazon S3 bucket, while premium users may also upload files. Each user's tier is already managed by placing the user in a user pool group. Which TWO steps should a solutions architect take to give each tier the correct permissions? (Select TWO.)",
+    "explanation": "Phân tích đề: Đã có user pool group theo tier; cần mỗi tier nhận IAM role khác nhau qua identity pool, không nhúng credential.\n(A) ĐÚNG: Gán IAM role tương ứng (role chỉ đọc, role đọc và ghi) cho từng user pool group; khi user đăng nhập, ID token chứa cognito:roles và cognito:preferred_role theo group.\n(B) SAI: Tạo IAM user cho mỗi người dùng premium không mở rộng được, phải nhúng hoặc phân phối access key dài hạn cho app mobile, trái best practice.\n(C) SAI: Token của user pool chỉ dùng để xác thực với app hoặc API Gateway; S3 không chấp nhận user pool token làm credential AWS, vẫn cần identity pool đổi sang credential STS.\n(D) ĐÚNG: Cấu hình authenticated role selection của identity pool là Choose role from token, để identity pool gọi AssumeRoleWithWebIdentity với role ưu tiên lấy từ token, thay vì luôn dùng một authenticated role mặc định.\n(E) SAI: GetFederationToken cần credential của một IAM user dài hạn để gọi, nên app mobile phải giữ access key; đây là cách cũ và không phù hợp với Cognito.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Phân quyền khác nhau theo nhóm người dùng cuối => gán IAM role cho user pool group + identity pool chọn role từ token (hoặc rules-based mapping).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Assign a read-only IAM role and a read-write IAM role to the matching user pool groups.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create an IAM user for each premium user and store the access keys in the app's secure storage.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Have the app send user pool ID tokens directly to Amazon S3 as request credentials.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Set the identity pool authenticated role selection to Choose role from token.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Have the app call GetFederationToken with a session policy that matches each user's tier.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company attaches an SCP to its Production OU that denies ec2:TerminateInstances for every principal except a break-glass role. Engineers are blocked as expected. However, an Amazon EC2 Auto Scaling group that runs a legacy stateful application in a production account still terminated instances during a scale-in event. The company wants those instances protected from scale-in while the group can still launch new instances when demand grows. What should a solutions architect do?",
+    "explanation": "Phân tích đề: SCP chặn người dùng nhưng Auto Scaling vẫn terminate. Cần hiểu vì sao và chọn cách bảo vệ instance khỏi scale-in mà vẫn scale-out được.\n(A) SAI: Policy của service-linked role AWSServiceRoleForAutoScaling do dịch vụ quản lý, khách hàng không sửa được để thêm Deny.\n(B) SAI: Thêm deny autoscaling:TerminateInstanceInAutoScalingGroup vào SCP chỉ chặn principal gọi API đó; scale-in do dịch vụ thực hiện qua service-linked role, mà SCP không áp dụng cho service-linked role, nên vẫn bị terminate.\n(C) SAI: Auto Scaling group bắt buộc dùng service-linked role (mặc định hoặc custom suffix), không nhận một IAM role thông thường để SCP có thể áp vào.\n(D) ĐÚNG: SCP không ảnh hưởng service-linked role, nên Auto Scaling vẫn terminate được. Bật instance scale-in protection cho group (hoặc từng instance) khiến scale-in bỏ qua các instance được bảo vệ, trong khi scale-out vẫn hoạt động bình thường.\nĐáp án đúng: D\nĐiểm cần nhớ: SCP không giới hạn service-linked role. Muốn ngăn Auto Scaling xóa instance => scale-in protection hoặc suspend process Terminate, không phải SCP.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Add an explicit Deny for ec2:TerminateInstances to the AWSServiceRoleForAutoScaling permissions policy in the account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Update the SCP to also deny autoscaling:TerminateInstanceInAutoScalingGroup for every principal in the OU.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure the Auto Scaling group to use a customer managed IAM role so that the SCP applies to the group.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable instance scale-in protection, because SCPs do not apply to service-linked roles.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A security team deploys an IAM role named SecurityAudit into all 120 member accounts of its organization in AWS Organizations by using a central automation role named SecOpsAutomation that exists in every account. Member account administrators have AdministratorAccess. Security requires that nobody in a member account can modify, delete, or change the trust policy of SecurityAudit, but SecOpsAutomation must still update it. New accounts must be covered automatically. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần ngăn chặn (preventive) admin của account thành viên sửa role SecurityAudit, có ngoại lệ cho SecOpsAutomation, tự áp cho account mới, ít vận hành nhất.\n(A) ĐÚNG: Một SCP gắn ở root hoặc OU Deny các action IAM thay đổi role (UpdateRole, DeleteRole, UpdateAssumeRolePolicy, Put/Attach/Detach policy...) trên ARN role SecurityAudit, kèm Condition ArnNotLike aws:PrincipalArn là ARN của SecOpsAutomation. Admin không vượt qua được explicit Deny của SCP, account mới vào OU tự được áp.\n(B) SAI: Permissions boundary phải gắn lên từng principal ở từng account; admin có AdministratorAccess có thể tự gỡ boundary của mình hoặc tạo principal mới không có boundary, nên không phải biện pháp chặn đáng tin cậy và tốn vận hành.\n(C) SAI: AWS Config rule với auto remediation chỉ phát hiện rồi khôi phục sau khi thay đổi đã xảy ra; trong khoảng đó trust policy có thể đã bị sửa và bị lợi dụng, không đáp ứng yêu cầu ngăn chặn.\n(D) SAI: Customer managed policy Deny gắn vào group admin trong mỗi account có thể bị chính admin gỡ ra, và phải triển khai lại cho từng account mới.\nĐáp án đúng: A\nĐiểm cần nhớ: Bảo vệ role dùng chung trong mọi account khỏi admin cục bộ => SCP Deny trên ARN role + ngoại lệ bằng aws:PrincipalArn cho role tự động hóa.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Attach an SCP at the root that denies IAM changes to SecurityAudit unless aws:PrincipalArn is SecOpsAutomation.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Attach a permissions boundary to every administrator principal that excludes IAM actions on the SecurityAudit role.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Deploy an AWS Config rule with automatic remediation that restores the SecurityAudit role after any modification.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Attach a customer managed policy that denies changes to SecurityAudit to the administrators group in each account.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company exposes an internal REST API through Amazon API Gateway in its Platform account. AWS Lambda functions in three other accounts in the same organization must call the API. Security forbids shared secrets or API keys, requires every caller to be an authenticated AWS principal from the organization, and wants new accounts in the organization to work without changing the API. The team wants the LEAST operational overhead. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Caller là Lambda ở account khác cùng organization, không dùng secret/API key, phải là AWS principal đã xác thực, account mới tự được phép, ít vận hành.\n(A) SAI: API key với usage plan dùng để định danh và giới hạn lưu lượng, không phải cơ chế xác thực AWS principal; đồng thời phải phân phối key, tức là shared secret bị cấm.\n(B) SAI: Cognito user pool authorizer dành cho người dùng cuối có tài khoản trong user pool; Lambda phải giữ thông tin đăng nhập app client và lấy token, vừa thêm secret vừa tốn vận hành.\n(C) ĐÚNG: Bật AWS_IAM authorization để mọi request phải ký SigV4 bằng credential của execution role; resource policy của API cho phép execute-api:Invoke khi aws:PrincipalOrgID bằng organization ID, và identity policy của execution role bên gọi cấp execute-api:Invoke. Account mới trong tổ chức tự khớp điều kiện.\n(D) SAI: Lambda authorizer tự kiểm tra token chạy được nhưng phải tự viết, vận hành code xác thực và quản lý token (là một dạng secret), tốn vận hành hơn tính năng IAM có sẵn.\nĐáp án đúng: C\nĐiểm cần nhớ: Service-to-service gọi API Gateway cross-account => AWS_IAM auth (SigV4) + resource policy của API (dùng aws:PrincipalOrgID) + identity policy execute-api:Invoke bên gọi.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Require an API key on each method, create a usage plan per account, and store the keys in each caller account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Configure an Amazon Cognito user pool authorizer and create an app client for each caller account's Lambda functions.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Use AWS_IAM authorization and an API resource policy that allows execute-api:Invoke for the organization ID.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Configure a Lambda authorizer that validates signed tokens which each caller obtains from a central token service.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "Developers deploy application stacks with AWS CloudFormation, and some templates create IAM roles for the applications. Security requires that developers cannot create or modify IAM roles directly through the console, CLI, or SDK, and that all IAM changes happen only through CloudFormation stacks. The solution must follow least privilege. Which TWO actions should a solutions architect take? (Select TWO.)",
+    "explanation": "Phân tích đề: IAM chỉ được thay đổi qua CloudFormation, developer không có quyền IAM trực tiếp, theo least privilege.\n(A) SAI: Cấp cloudformation:* mà không có service role thì CloudFormation dùng chính credential của developer để tạo tài nguyên, nên tạo IAM role trong template sẽ bị AccessDenied; quyền CloudFormation một mình là không đủ.\n(B) SAI: Cấp iam:* kèm permissions boundary vẫn cho developer tạo và sửa role trực tiếp qua CLI/SDK, vi phạm yêu cầu chỉ thay đổi IAM qua stack.\n(C) ĐÚNG: Tạo CloudFormation service role có trust policy cho cloudformation.amazonaws.com và quyền tạo tài nguyên cần thiết (kể cả IAM); khi stack chỉ định role này, CloudFormation dùng role đó cho mọi thao tác thay vì quyền của developer.\n(D) SAI: AdministratorAccess cộng SCP chặn IAM sẽ chặn luôn cả thao tác IAM của CloudFormation khi nó chạy bằng quyền developer, đồng thời cấp quá nhiều quyền, trái least privilege.\n(E) ĐÚNG: Developer chỉ cần quyền CloudFormation cho stack và iam:PassRole giới hạn đúng ARN của service role đó, để chuyển role cho CloudFormation mà không có quyền IAM nào khác.\nĐáp án đúng: C và E\nĐiểm cần nhớ: Cho dịch vụ thao tác thay người dùng => service role + iam:PassRole trên đúng ARN role. Người dùng không cần quyền trực tiếp trên tài nguyên mà dịch vụ tạo.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Grant developers cloudformation:* on all stacks and no other permissions so that stacks run with full rights.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Grant developers iam:* with a permissions boundary that limits the roles they can create for applications.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Create a CloudFormation service role that has the permissions needed to create the stack resources.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Grant developers AdministratorAccess and attach an SCP that denies all IAM actions in the account.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Grant developers CloudFormation stack permissions and iam:PassRole on only that service role.",
+        "isCorrect": true
+      }
+    ]
+  }
+]

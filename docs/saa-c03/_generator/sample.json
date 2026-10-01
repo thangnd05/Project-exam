@@ -1,0 +1,69 @@
+[
+  {
+    "questionNumber": 22,
+    "questionType": "MCQ",
+    "questionText": "Amazon Inspector reports a critical CVE on a group of EC2 instances. The fix requires a kernel update that can only be applied during next week's maintenance window, and the security team has accepted that risk in writing. Until then, the finding floods the dashboard and hides other issues, but the team must not lose visibility of it permanently. What should the DevOps engineer do?",
+    "explanation": "Phân tích đề: Rủi ro đã được chấp nhận có thời hạn, cần giảm nhiễu trên dashboard nhưng không được đánh mất finding vĩnh viễn.\n(A) SAI: Đánh dấu finding là đã xử lý khi chưa vá là ghi nhận sai sự thật và làm hỏng dữ liệu kiểm toán.\n(B) SAI: Tắt Inspector cho các instance đó làm mất toàn bộ khả năng phát hiện, kể cả các lỗ hổng khác.\n(C) ĐÚNG: Tạo suppression rule của Inspector giới hạn đúng finding và tập tài nguyên đó, với thời hạn tới cửa sổ bảo trì; finding vẫn tồn tại và xuất hiện trở lại khi hết hạn. Nếu nguy cơ khai thác cao, kết hợp biện pháp bù đắp như thu hẹp security group hoặc cô lập.\n(D) SAI: Giảm mức độ nghiêm trọng của finding làm sai lệch đánh giá rủi ro và ảnh hưởng tới các quy trình dựa trên severity.\nĐáp án đúng: C\nĐiểm cần nhớ: Suppression rule là cách chính thức để tạm ẩn finding đã được chấp nhận rủi ro; luôn đặt thời hạn và phạm vi hẹp, đồng thời ghi lại lý do chấp nhận rủi ro.",
+    "tagNames": [
+      "Security and Compliance > Amazon GuardDuty & Amazon Inspector"
+    ],
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Mark the finding as resolved so it disappears from the dashboard",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Disable Inspector scanning for those instances until the patch is applied",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Create a scoped Inspector suppression rule that expires at the maintenance window, and apply compensating controls if exploitation risk is high",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Lower the severity of the finding so it no longer appears in the critical view",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionNumber": 6,
+    "questionType": "MSQ",
+    "questionText": "An AWS Config rule reports NON_COMPLIANT for S3 buckets that allow public access. The team wants the condition corrected automatically within minutes, but the compliance officer insists that every corrective action be attributable to an identity and reviewable afterwards, and that the correction itself be visible in the compliance timeline. Which TWO components complete this design?",
+    "explanation": "Phân tích đề: Cần khắc phục tự động và đồng thời giữ được dấu vết kiểm toán của chính hành động khắc phục.\n(A) SAI: Cho phép người vận hành tự sửa khi nhận thông báo là quy trình thủ công, không đạt yêu cầu tự động trong vài phút.\n(B) ĐÚNG: Gắn remediation action của Config vào một SSM Automation runbook (có sẵn hoặc tự viết) để tự sửa bucket vi phạm; remediation chạy bằng một IAM role xác định nên hành động có danh tính rõ ràng.\n(C) SAI: Xóa bucket vi phạm là hành động phá hủy dữ liệu, không phải khắc phục.\n(D) SAI: Tắt Config recorder cho các bucket đã sửa để giảm chi phí sẽ xóa bỏ chính bằng chứng mà compliance officer cần.\n(E) ĐÚNG: Giữ CloudTrail bật và Config recorder hoạt động để mọi lời gọi API do remediation thực hiện đều được ghi, và trạng thái tài nguyên chuyển từ NON_COMPLIANT sang COMPLIANT xuất hiện trên compliance timeline.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Auto remediation của Config luôn đi qua SSM Automation; tính kiểm toán đến từ việc CloudTrail ghi lời gọi API và Config ghi lại chuyển trạng thái tuân thủ của tài nguyên.",
+    "tagNames": [
+      "Security and Compliance > AWS Config"
+    ],
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Notify the bucket owner and let them correct the configuration themselves",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Attach a Systems Manager Automation remediation action to the rule so the correction runs under a defined role",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Have the remediation delete any bucket that is found to be public",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Stop recording those buckets in AWS Config once they are compliant to reduce cost",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Keep CloudTrail and the Config recorder enabled so the remediation calls and the compliance state change are recorded",
+        "isCorrect": true
+      }
+    ]
+  }
+]

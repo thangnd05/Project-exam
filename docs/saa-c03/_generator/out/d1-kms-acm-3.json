@@ -1,0 +1,174 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An engineer tries to delete an old ACM certificate but receives an error stating that the certificate is in use. The certificate is still attached to an HTTPS listener on an Application Load Balancer, although a new certificate has already been issued for the same domain. What must the engineer do before the old certificate can be deleted?",
+    "explanation": "Phân tích đề: ACM từ chối xóa cert vì đang gắn vào listener của ALB. Từ khóa: 'in use'.\n(A) SAI: ACM không tự xóa cert khi hết hạn; cert hết hạn vẫn nằm trong ACM và vẫn bị chặn xóa nếu còn gắn vào tài nguyên.\n(B) SAI: Private key của cert ACM được bảo vệ bởi key do AWS quản lý, người dùng không disable được, và việc này cũng không gỡ cert khỏi ALB.\n(C) ĐÚNG: ACM không cho xóa cert đang được tài nguyên khác sử dụng. Thay cert trên listener bằng cert mới (hoặc gỡ cert khỏi listener) rồi mới xóa cert cũ.\n(D) SAI: Cert public do ACM cấp không có thao tác revoke để tự gỡ khỏi tài nguyên; điều kiện xóa vẫn là không còn gắn vào dịch vụ nào.\nĐáp án đúng: C\nĐiểm cần nhớ: Cert ACM đang gắn vào ALB, CloudFront hay API Gateway thì không xóa được; phải gỡ liên kết trước.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Wait until the old certificate expires, because ACM deletes expired certificates automatically.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Disable the KMS key that protects the private key of the old certificate.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Replace the old certificate on the ALB listener with the new one, then delete it.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Revoke the old certificate in ACM so that it is detached from the ALB automatically.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company stores customer data in Amazon DynamoDB tables that use the default encryption setting. Auditors now require that the company control the key policy of the encryption key and see every use of the key in AWS CloudTrail. What should the solutions architect do?",
+    "explanation": "Phân tích đề: DynamoDB đang dùng mặc định (AWS owned key); cần kiểm soát key policy và audit mỗi lần dùng key. Từ khóa: 'control the key policy', 'every use in CloudTrail'.\n(A) SAI: AWS owned key không hiển thị trong account, không có key policy để quản lý và không ghi CloudTrail trong account của bạn.\n(B) SAI: Key policy của AWS managed key aws/dynamodb không chỉnh sửa được, nên không đáp ứng yêu cầu kiểm soát key policy.\n(C) ĐÚNG: DynamoDB cho phép đổi encryption at rest của bảng sang customer managed key bất kỳ lúc nào; công ty sở hữu key policy và mọi lệnh gọi KMS đều được ghi vào CloudTrail.\n(D) SAI: AWS owned key không dùng được cho mã hóa phía client, và client-side encryption cũng không đáp ứng yêu cầu kiểm soát key policy.\nĐáp án đúng: C\nĐiểm cần nhớ: DynamoDB có ba lựa chọn key: AWS owned (mặc định, miễn phí), AWS managed (aws/dynamodb), customer managed (toàn quyền policy và audit).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Keep the default setting, because the AWS owned key already provides key policy control and logs.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Switch the tables to the AWS managed key aws/dynamodb and edit that key's key policy.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Switch the encryption of the tables to a customer managed KMS key.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable client-side encryption in the application by using an AWS owned key.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company deploys a web application to AWS Elastic Beanstalk in a load-balanced environment. The team wants HTTPS for www.example.com by using a free certificate that renews automatically. Where should the certificate be configured?",
+    "explanation": "Phân tích đề: Beanstalk môi trường load-balanced, cần HTTPS với cert miễn phí và tự gia hạn. Từ khóa: 'load-balanced environment'.\n(A) SAI: Cert public ACM tiêu chuẩn không tải private key xuống được, nên không có cách để script .ebextensions cài lên instance.\n(B) ĐÚNG: Môi trường load-balanced của Beanstalk có ELB phía trước; thêm listener HTTPS 443 trên load balancer đó với cert public ACM là cách chuẩn, ACM tự gia hạn.\n(C) SAI: KMS key mã hóa dữ liệu lưu trữ, không cung cấp HTTPS cho người dùng.\n(D) SAI: Bản ghi DNS của Route 53 không gắn cert; alias record chỉ trỏ tên miền tới load balancer.\nĐáp án đúng: B\nĐiểm cần nhớ: HTTPS cho Elastic Beanstalk => gắn cert ACM lên listener của load balancer trong môi trường.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "On each EC2 instance, by using an .ebextensions script to download a public ACM certificate.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "On an HTTPS listener of the environment's load balancer, by using a public ACM certificate.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "In the environment's KMS key settings, by selecting a customer managed key for traffic.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "On the Route 53 alias record that points to the environment, by using a public ACM certificate.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A developer is building envelope encryption for large files with AWS KMS. For each file, the application needs a unique plaintext key to encrypt the file locally and an encrypted copy of that same key to store next to the file. Which KMS API operation provides both?",
+    "explanation": "Phân tích đề: Envelope encryption cần một data key ở hai dạng, plaintext để mã hóa cục bộ và bản mã hóa để lưu cạnh dữ liệu. Từ khóa: 'plaintext key', 'encrypted copy'.\n(A) SAI: Encrypt chỉ mã hóa trực tiếp dữ liệu tối đa 4 KB bằng KMS key, không sinh data key mới.\n(B) SAI: CreateKey tạo một KMS key mới nằm trong KMS, key này không bao giờ rời KMS ở dạng plaintext.\n(C) ĐÚNG: GenerateDataKey trả về data key ở dạng plaintext và dạng đã mã hóa bằng KMS key; ứng dụng dùng bản plaintext mã hóa file rồi xóa khỏi bộ nhớ, chỉ lưu bản mã hóa.\n(D) SAI: ReEncrypt giải mã rồi mã hóa lại ciphertext bằng key khác ngay trong KMS, không tạo data key mới.\nĐáp án đúng: C\nĐiểm cần nhớ: Envelope encryption = GenerateDataKey (plaintext + encrypted), mã hóa cục bộ, lưu data key đã mã hóa, khi đọc gọi Decrypt.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Encrypt", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "CreateKey", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "GenerateDataKey", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "ReEncrypt", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs a TCP-based financial messaging service on Amazon EC2 instances behind a Network Load Balancer. Clients connect with TLS on port 8443. The company wants to offload TLS from the instances to the load balancer and use a certificate that renews automatically. The company must keep the NLB because clients allowlist its static IP addresses. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Giao thức TCP có TLS, muốn offload TLS khỏi instance, cert tự gia hạn, bắt buộc giữ NLB vì IP tĩnh. Từ khóa: 'offload TLS', 'keep the NLB'.\n(A) SAI: Target group không phải nơi gắn cert; với TCP listener, NLB chỉ chuyển tiếp nguyên gói nên TLS vẫn terminate ở instance.\n(B) SAI: ALB không hỗ trợ Elastic IP hay IP tĩnh, và ALB chỉ xử lý HTTP/HTTPS, không hợp với giao thức TCP tùy biến.\n(C) SAI: Cert public ACM tiêu chuẩn không export được; và cài cert trên instance là không offload TLS.\n(D) ĐÚNG: NLB hỗ trợ TLS listener dùng cert ACM, terminate TLS tại load balancer rồi chuyển tiếp tới target group TCP; vẫn giữ IP tĩnh của NLB và ACM tự gia hạn cert.\nĐáp án đúng: D\nĐiểm cần nhớ: NLB dùng cert ACM khi có TLS listener; NLB TCP listener là passthrough, cert nằm ở backend.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Keep a TCP listener on the NLB and attach the ACM certificate to the target group.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Replace the NLB with an Application Load Balancer that has Elastic IP addresses attached.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Keep a TCP listener and install an exported public ACM certificate on every instance.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a TLS listener on the NLB with an ACM certificate that forwards to a TCP target group.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses a customer managed KMS key for SSE-KMS encryption of objects in Amazon S3. The security team discovered that some developers call kms:Decrypt directly from scripts to decrypt data outside Amazon S3. The team wants the key to be usable by these roles only when requests come through Amazon S3 in the same Region, without breaking normal S3 access. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Chỉ cho dùng key khi request đi qua S3, cấm gọi KMS trực tiếp, không làm hỏng truy cập S3. Từ khóa: 'only when requests come through Amazon S3'.\n(A) ĐÚNG: Điều kiện kms:ViaService = s3.<region>.amazonaws.com trên statement cho phép các role dùng key làm cho KMS chỉ chấp nhận request do S3 thay mặt role gửi lên; gọi Decrypt trực tiếp từ script sẽ bị từ chối.\n(B) SAI: Khi đọc object SSE-KMS, S3 gọi KMS bằng quyền của người gọi, nên bỏ kms:Decrypt khỏi role sẽ làm hỏng luôn việc đọc qua S3.\n(C) SAI: Bucket Keys chỉ giảm số lệnh gọi KMS, không ngăn role gọi KMS trực tiếp.\n(D) SAI: Rotation giữ phiên bản cũ để giải mã dữ liệu cũ, nên script vẫn giải mã được; rotation không kiểm soát đường gọi.\nĐáp án đúng: A\nĐiểm cần nhớ: Giới hạn key chỉ dùng qua một dịch vụ cụ thể => kms:ViaService trong key policy.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a kms:ViaService condition for S3 in the Region to the key policy statement for the roles.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Remove kms:Decrypt from the roles and keep only the s3:GetObject permission for them.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable S3 Bucket Keys so that developers can no longer request data keys directly from KMS.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Rotate the key so that ciphertext that scripts obtained earlier can no longer be decrypted.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has an imported third-party certificate in ACM in us-east-1. The certificate is associated with several Application Load Balancer listeners and an Amazon CloudFront distribution. The renewed certificate from the certificate authority has just arrived. The company wants to update all resources with the LEAST effort and without changing the configuration of each resource. What should the solutions architect do?",
+    "explanation": "Phân tích đề: Cert import đã được CA gia hạn; muốn cập nhật mọi tài nguyên đang dùng mà không sửa từng tài nguyên. Từ khóa: 'imported', 'without changing the configuration of each resource'.\n(A) SAI: Import thành cert mới tạo ARN mới, buộc phải sửa từng listener và distribution.\n(B) ĐÚNG: ACM cho phép reimport cert mới cùng private key vào đúng ARN của cert import hiện có; ARN giữ nguyên nên mọi ALB listener và CloudFront distribution đang liên kết tự dùng cert mới.\n(C) SAI: Managed renewal chỉ dành cho cert do ACM cấp; ACM không gia hạn cert import.\n(D) SAI: Chuyển sang IAM server certificate đòi cấu hình lại mọi tài nguyên và mất quản lý tập trung trong ACM.\nĐáp án đúng: B\nĐiểm cần nhớ: Cert import sắp hết hạn => reimport vào cùng ARN để giữ nguyên các liên kết.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Import the renewed certificate as a new ACM certificate and update each listener and distribution.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Reimport the renewed certificate and its private key into the existing certificate ARN.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Start ACM managed renewal on the imported certificate so that ACM applies the new version.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Upload the renewed certificate to IAM and point each resource to the IAM server certificate.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An Amazon EFS file system was created without encryption at rest two years ago and is mounted by several Linux application servers. A new policy requires encryption at rest with a customer managed KMS key. What should the solutions architect do?",
+    "explanation": "Phân tích đề: EFS đã tạo không mã hóa; cần mã hóa at rest bằng customer managed key. Từ khóa: 'created without encryption', 'at rest'.\n(A) SAI: Mã hóa at rest của EFS chỉ bật được lúc tạo file system; không có thao tác bật trên file system đang tồn tại.\n(B) SAI: Encryption in transit (TLS qua mount helper) chỉ bảo vệ dữ liệu trên đường truyền, không mã hóa dữ liệu lưu trên đĩa.\n(C) ĐÚNG: Tạo file system EFS mới có bật mã hóa at rest với customer managed key, chuyển dữ liệu sang (ví dụ bằng AWS DataSync), rồi đổi mount target của client sang file system mới.\n(D) SAI: Khôi phục về chính file system cũ không thay đổi trạng thái mã hóa của nó; file system đó vẫn không được mã hóa.\nĐáp án đúng: C\nĐiểm cần nhớ: EFS: mã hóa at rest chọn lúc tạo; muốn mã hóa file system cũ thì tạo file system mới có mã hóa và copy dữ liệu.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable encryption at rest on the existing file system and select the customer managed key.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable encryption in transit in the EFS mount helper, which also encrypts the stored data.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create an encrypted EFS file system with the key, copy the data with DataSync, and remount.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Back up the file system with AWS Backup and restore it into the same file system with encryption.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company serves www.example.com through Amazon CloudFront, with an Application Load Balancer in ap-northeast-1 as the origin. Users sometimes type http:// in their browsers and must be sent to HTTPS automatically. The company wants a free certificate for the viewer connection that renews automatically. Which TWO actions should the solutions architect take?",
+    "explanation": "Phân tích đề: Cần HTTPS phía viewer của CloudFront với domain riêng, cert miễn phí tự gia hạn, và tự chuyển HTTP sang HTTPS. Từ khóa: 'viewer connection', 'sent to HTTPS automatically'.\n(A) ĐÚNG: Cert cho CloudFront phải yêu cầu ở us-east-1; thêm www.example.com làm alternate domain name và chọn cert này cho distribution.\n(B) SAI: Cert ở ap-northeast-1 dùng cho ALB ở Region đó, nhưng không xuất hiện trong danh sách cert của CloudFront.\n(C) ĐÚNG: Viewer protocol policy 'Redirect HTTP to HTTPS' trên cache behavior làm CloudFront trả redirect 301 cho request HTTP.\n(D) SAI: Origin protocol policy điều khiển kết nối CloudFront => origin, không chuyển hướng người dùng.\n(E) SAI: Field-level encryption mã hóa thêm các trường dữ liệu nhạy cảm bằng public key, không biến request HTTP thành HTTPS.\nĐáp án đúng: A và C\nĐiểm cần nhớ: CloudFront HTTPS: cert ACM ở us-east-1 + viewer protocol policy Redirect HTTP to HTTPS; origin protocol policy là chặng phía sau.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Request a public ACM certificate for www.example.com in us-east-1 and add it to the distribution.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Request a public ACM certificate in ap-northeast-1 and select it in the distribution settings.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Set the viewer protocol policy of the cache behavior to Redirect HTTP to HTTPS.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Set the origin protocol policy to HTTPS only so that viewers are redirected to HTTPS.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Enable field-level encryption on the distribution so that HTTP requests are encrypted.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A multi-tenant application encrypts each tenant's records with the same customer managed KMS key and passes an encryption context that contains tenant_id on every Encrypt and Decrypt call. The security team asks how the encryption context can strengthen its controls. Which TWO statements are correct?",
+    "explanation": "Phân tích đề: Hiểu vai trò của encryption context trong KMS. Từ khóa: 'encryption context', 'tenant_id'.\n(A) ĐÚNG: Encryption context là additional authenticated data được gắn mật mã với ciphertext; Decrypt chỉ thành công khi truyền đúng context đã dùng lúc Encrypt.\n(B) ĐÚNG: Key policy hoặc IAM policy có thể dùng condition key kms:EncryptionContext:tenant_id để giới hạn mỗi role chỉ mã hóa và giải mã dữ liệu của đúng tenant.\n(C) SAI: Encryption context được ghi dạng plaintext trong CloudTrail, vì vậy không được đặt dữ liệu bí mật vào đó.\n(D) SAI: Encryption context không tạo phiên bản key riêng cho từng tenant, và key policy luôn bắt buộc.\n(E) SAI: KMS có sử dụng encryption context trong quá trình mã hóa; sai context thì Decrypt thất bại.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Encryption context: phải khớp khi Decrypt, dùng được trong policy condition, hiện rõ trong CloudTrail nên không chứa secret.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "A Decrypt request succeeds only when it supplies the same encryption context that was used to encrypt.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Policies can use kms:EncryptionContext condition keys to limit a role to one tenant_id value.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Encryption context values are encrypted in CloudTrail, so they are a safe place to store secrets.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Encryption context creates a separate key version per tenant, so no key policy is required.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Encryption context is ignored by AWS KMS and is used only by the application for logging.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company encrypts sensitive documents on the client side with the AWS Encryption SDK and a single-Region KMS key in us-east-1 before uploading them to Amazon S3. S3 Cross-Region Replication copies the ciphertext to eu-west-1. For disaster recovery, applications in eu-west-1 must be able to decrypt the replicated documents even when us-east-1 is unavailable, without re-encrypting documents after each replication. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Dữ liệu mã hóa phía client bằng key single-Region; bản sao ở eu-west-1 phải giải mã được khi us-east-1 sập, không mã hóa lại sau mỗi lần replicate. Từ khóa: 'client side', 'single-Region key', 'us-east-1 is unavailable'.\n(A) SAI: Không thể chuyển một key single-Region đã có thành multi-Region key; thuộc tính multi-Region chỉ chọn được khi tạo key.\n(B) ĐÚNG: Multi-Region primary key ở us-east-1 và replica key ở eu-west-1 dùng chung key material và key ID, nên ciphertext tạo ở us-east-1 giải mã được bằng replica ngay tại eu-west-1 mà không gọi chéo Region. Tài liệu cũ cần được mã hóa lại một lần bằng key mới.\n(C) SAI: Với mã hóa phía client, S3 chỉ thấy ciphertext; replication không thể giải mã và mã hóa lại dữ liệu bằng key ở Region đích.\n(D) SAI: Import cùng key material vào hai key single-Region khác nhau không làm chúng tương thích; ciphertext của key này không giải mã được bằng key kia.\nĐáp án đúng: B\nĐiểm cần nhớ: Cần cùng một key giải mã được ở nhiều Region (đặc biệt với mã hóa phía client) => multi-Region keys; không convert được key cũ.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Turn on the multi-Region property of the existing us-east-1 key and create a replica key in eu-west-1.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a multi-Region primary key in us-east-1 with a replica in eu-west-1, and encrypt with it.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Configure the replication rule to re-encrypt the objects with a key in eu-west-1 during replication.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Import the same key material into separate single-Region KMS keys in us-east-1 and eu-west-1.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company exposes an API through an internet-facing Application Load Balancer to 200 partner systems. Every partner must authenticate with an X.509 client certificate issued by the company, and the ALB must reject connections that do not present a valid certificate. The company wants to manage issuance and revocation centrally and does not want to run its own CA servers. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Xác thực client bằng cert (mTLS) tại ALB, từ chối kết nối không có cert hợp lệ, CA do AWS vận hành, ít công nhất. Từ khóa: 'client certificate', 'ALB must reject', 'not run its own CA servers'.\n(A) SAI: Cert public ACM dùng để xác thực server, không phát cho đối tác làm client cert; thêm vào danh sách cert của listener chỉ phục vụ SNI.\n(B) SAI: Ở chế độ mTLS passthrough, ALB chỉ chuyển chuỗi cert tới target qua header mà không xác thực; AWS WAF không xác thực chuỗi cert X.509.\n(C) SAI: Tự vận hành CA mã nguồn mở trên EC2 và xác thực trong code ứng dụng vi phạm yêu cầu không chạy CA server và tốn công nhất.\n(D) ĐÚNG: AWS Private CA do AWS vận hành, cấp và thu hồi client cert tập trung (có CRL). ALB mutual TLS ở verify mode dùng trust store chứa CA certificate (kèm CRL) để xác thực client và từ chối kết nối không hợp lệ ngay tại ALB.\nĐáp án đúng: D\nĐiểm cần nhớ: mTLS trên ALB => verify mode + trust store; client cert nội bộ do công ty cấp => AWS Private CA.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Request a public ACM certificate for each partner and add all of them to the listener certificate list.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Configure the ALB in mutual TLS passthrough mode and validate client certificates with AWS WAF rules.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Run an open-source CA on EC2 instances and validate client certificates in the application code.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Issue client certificates from AWS Private CA and use ALB mutual TLS verify mode with a trust store.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company is launching shop.example.com globally. Amazon CloudFront will serve viewers, and the origin is an internet-facing Application Load Balancer in ap-southeast-1 that is reached at origin.example.com. Security requires TLS on both the viewer connection and the origin connection. Certificates must be free and renew automatically, and DNS is hosted in Amazon Route 53. Which THREE actions should the solutions architect take?",
+    "explanation": "Phân tích đề: Hai chặng TLS: viewer => CloudFront và CloudFront => ALB ở ap-southeast-1; cert miễn phí, tự gia hạn. Từ khóa: 'both the viewer connection and the origin connection', 'ap-southeast-1'.\n(A) ĐÚNG: Cert cho CloudFront luôn phải nằm ở us-east-1; cert cho shop.example.com phục vụ chặng viewer.\n(B) ĐÚNG: Cert cho ALB phải cùng Region với ALB (ap-southeast-1) và khớp tên origin.example.com mà CloudFront dùng khi kết nối tới origin, để CloudFront xác thực được cert origin.\n(C) ĐÚNG: Origin protocol policy HTTPS only buộc CloudFront kết nối tới ALB bằng TLS, đáp ứng yêu cầu mã hóa chặng origin.\n(D) SAI: Cert ACM là regional; cert ở us-east-1 không gắn được vào ALB ở ap-southeast-1.\n(E) SAI: Cert public ACM tiêu chuẩn không export được, và CloudFront chỉ nhận cert từ ACM ở us-east-1 hoặc IAM, không cần dùng chung cặp key.\n(F) SAI: Origin HTTP để chặng CloudFront => ALB đi qua internet không mã hóa, vi phạm yêu cầu TLS ở cả hai chặng.\nĐáp án đúng: A, B và C\nĐiểm cần nhớ: CloudFront + ALB origin: cert viewer ở us-east-1, cert origin ở Region của ALB, và origin protocol policy HTTPS only.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Request a public ACM certificate for shop.example.com in us-east-1 for the distribution.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Request a public ACM certificate for origin.example.com in ap-southeast-1 for the ALB listener.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Set the origin protocol policy of the distribution to HTTPS only.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Attach the us-east-1 certificate to the ALB as well, because CloudFront certificates are global.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Export the ALB certificate and upload it to CloudFront so that both connections share one key pair.", "isCorrect": false },
+      { "answerLabel": "F", "answerText": "Configure the origin to use HTTP only, because CloudFront already encrypts traffic to all origins.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A payment platform encrypts each message with a new data key from AWS KMS by calling GenerateDataKey. At peak, it processes 40,000 messages per second, and calls are throttled because they exceed the account's KMS request quota in the Region. The security team accepts reusing a data key for up to 5 minutes or 10,000 messages. The team wants the least redesign and must keep using AWS KMS. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Mỗi message gọi GenerateDataKey nên vượt quota KMS; chấp nhận tái dùng data key có giới hạn thời gian và số message; ít thay đổi thiết kế. Từ khóa: 'throttled', 'reusing a data key for up to 5 minutes or 10,000 messages'.\n(A) SAI: Quota request mật mã của KMS tính chung cho mọi key trong account và Region, nên thêm key không tăng hạn mức.\n(B) SAI: Rotation không liên quan tới hiệu năng hay quota; KMS không phục vụ request từ bộ nhớ đệm của phiên bản key.\n(C) SAI: S3 Bucket Keys chỉ áp dụng cho object SSE-KMS trong Amazon S3, không áp dụng cho ứng dụng tự mã hóa message.\n(D) ĐÚNG: AWS Encryption SDK hỗ trợ data key caching với giới hạn tuổi tối đa và số message tối đa cho mỗi data key; cấu hình 5 phút và 10.000 message giảm mạnh số lệnh GenerateDataKey mà vẫn dùng KMS và nằm trong ngưỡng bảo mật đã chấp nhận.\nĐáp án đúng: D\nĐiểm cần nhớ: Throttle do gọi KMS quá nhiều trong ứng dụng => data key caching (Encryption SDK) hoặc xin tăng quota; trong S3 thì dùng Bucket Keys.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create several KMS keys and spread GenerateDataKey calls across them to multiply the quota.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable automatic rotation every 90 days so that KMS serves requests from cached key versions.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable S3 Bucket Keys so that the application reuses bucket-level keys for its messages.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use data key caching in the AWS Encryption SDK with limits of 5 minutes and 10,000 messages.", "isCorrect": true }
+    ]
+  }
+]

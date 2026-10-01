@@ -1,0 +1,173 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A team uses AWS Elastic Beanstalk for a development environment that only internal developers use. The team wants deployments to finish as quickly as possible and accepts a short period of downtime during each deployment. Which deployment policy should the team choose?",
+    "explanation": "Phân tích đề: Môi trường dev, ưu tiên deploy nhanh nhất, chấp nhận downtime ngắn.\n(A) SAI: Immutable tạo bộ instance mới trong ASG tạm, an toàn nhất nhưng chậm nhất và tốn thêm instance.\n(B) ĐÚNG: All at once triển khai phiên bản mới lên mọi instance cùng lúc, nhanh nhất; đổi lại có gián đoạn ngắn, chấp nhận được cho môi trường dev.\n(C) SAI: Rolling with additional batch giữ đủ capacity nhưng phải khởi chạy thêm batch và cập nhật lần lượt, chậm hơn.\n(D) SAI: Traffic splitting tạo instance mới và có thời gian đánh giá canary, chậm hơn nhiều.\nĐáp án đúng: B\nĐiểm cần nhớ: All at once = nhanh nhất, có downtime, hợp dev/test; production nên dùng rolling with additional batch, immutable hoặc traffic splitting.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Immutable", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "All at once", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Rolling with additional batch", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Traffic splitting", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A team builds all of its services with Docker and wants to reuse its existing container build pipeline for a new event-driven function that processes Amazon S3 upload events in under a minute. The function has dependencies of about 2 GB. The team does not want to manage servers. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Xử lý sự kiện S3 dưới 1 phút, không quản lý server, muốn dùng lại pipeline Docker, dependency khoảng 2 GB.\n(A) SAI: Gói .zip của Lambda giới hạn 250 MB khi giải nén, không chứa được 2 GB dependency.\n(B) SAI: ECS service trên Fargate chạy liên tục để chờ sự kiện, không hợp tác vụ ngắn theo sự kiện và tốn phí khi rảnh.\n(C) SAI: EC2 chạy container lắng nghe sự kiện phải quản lý server, trái yêu cầu.\n(D) ĐÚNG: Lambda hỗ trợ đóng gói function dưới dạng container image (tối đa 10 GB) lưu trên Amazon ECR, nên dùng lại được pipeline Docker và vẫn là serverless theo sự kiện.\nĐáp án đúng: D\nĐiểm cần nhớ: Lambda container image tối đa 10 GB (so với .zip 250 MB giải nén); vẫn giữ giới hạn 15 phút và mô hình event-driven.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Package the function and dependencies as a .zip deployment package for AWS Lambda.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Run the container as an Amazon ECS service on AWS Fargate that polls for S3 events.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Run the container on an Amazon EC2 instance that receives S3 event notifications.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Package the function as a container image in Amazon ECR and deploy it to AWS Lambda.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company with no Kubernetes experience wants to run several containerized microservices on AWS. The services run only on AWS, and the company wants the simplest orchestration option with deep AWS integration and no servers to manage. Which solution should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Không có kinh nghiệm Kubernetes, chỉ chạy trên AWS, muốn đơn giản, tích hợp sâu AWS, không quản lý server.\n(A) ĐÚNG: Amazon ECS là orchestrator AWS-native, đơn giản, tích hợp sẵn IAM, ALB, CloudWatch; chạy trên Fargate thì không có server để quản lý.\n(B) SAI: EKS trên Fargate bỏ được việc quản lý node, nhưng đội vẫn phải học và vận hành Kubernetes (manifest, add-on, nâng cấp phiên bản cluster), phức tạp hơn nhu cầu.\n(C) SAI: EKS với managed node group vừa đòi hỏi kiến thức Kubernetes vừa còn node EC2 phải cập nhật.\n(D) SAI: ECS trên EC2 launch type đơn giản về orchestration nhưng vẫn phải quản lý cụm EC2.\nĐáp án đúng: A\nĐiểm cần nhớ: Không cần chuẩn Kubernetes, muốn đơn giản AWS-native => ECS; thêm yêu cầu không quản lý server => Fargate.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Amazon ECS with the AWS Fargate launch type", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Amazon EKS with Fargate profiles for every namespace", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Amazon EKS with managed node groups", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Amazon ECS with the EC2 launch type", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A company needs to run containerized data reconciliation tasks. Each task runs for about 2 hours. The company does not want to provision or manage any servers. Which TWO options can run these tasks while meeting the requirements?",
+    "explanation": "Phân tích đề: Task container chạy khoảng 2 giờ, không quản lý server.\n(A) SAI: Lambda giới hạn 15 phút mỗi lần gọi, không chạy được tác vụ 2 giờ.\n(B) ĐÚNG: ECS task trên Fargate chạy tới khi hoàn thành, không giới hạn 15 phút và không có server để quản lý.\n(C) SAI: Provisioned concurrency không thay đổi giới hạn 15 phút của Lambda.\n(D) SAI: EC2 Spot Instances là server mà công ty phải cung cấp và quản lý.\n(E) ĐÚNG: AWS Batch với compute environment Fargate chạy job container dài, có hàng đợi và retry, không cần quản lý instance.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Tác vụ serverless dài hơn 15 phút => ECS trên Fargate hoặc AWS Batch trên Fargate, không phải Lambda.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "AWS Lambda functions with the maximum timeout configured", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Amazon ECS tasks that use the AWS Fargate launch type", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "AWS Lambda functions with provisioned concurrency configured", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Amazon EC2 Spot Instances that run the containers with Docker", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "AWS Batch jobs that run in a Fargate compute environment", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs an Amazon ECS service on the EC2 launch type with bridge network mode. The task definition maps container port 8080 to host port 8080, so only one task can run on each container instance and scaling is limited even when instances have spare CPU and memory. The service is behind an Application Load Balancer. The company wants to run multiple tasks of the service on each instance. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Host port cố định 8080 làm mỗi instance chỉ chạy được một task; cần nhiều task trên một instance sau ALB, vẫn bridge mode.\n(A) SAI: Placement constraint distinctInstance còn ép mỗi task nằm trên instance khác nhau, ngược với mục tiêu.\n(B) ĐÚNG: Đặt host port là 0 (hoặc bỏ trống) để dùng dynamic port mapping; mỗi task nhận một host port ngẫu nhiên và ECS tự đăng ký cặp instance:port vào target group của ALB.\n(C) SAI: Network Load Balancer không giải quyết việc xung đột host port cố định trên cùng instance.\n(D) SAI: Chuyển sang instance lớn hơn vẫn chỉ có một cổng 8080 trên host, nên vẫn chỉ chạy được một task mỗi instance.\nĐáp án đúng: B\nĐiểm cần nhớ: ECS bridge mode + ALB: host port 0 = dynamic port mapping, nhiều task cùng service trên một instance; awsvpc thì mỗi task có IP riêng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a distinctInstance placement constraint so that tasks are spread across the instances.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Set the host port to 0 in the port mapping so that ECS assigns dynamic host ports.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Replace the Application Load Balancer with a Network Load Balancer that uses port 8080.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Move the service to larger instance types so that each host can accept more connections.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs production workloads on AWS Elastic Beanstalk. The security team requires that operating system and runtime patches be applied every week, but the operations team often forgets to update platform versions manually. Patching must not cause downtime or reduce capacity. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cần vá platform định kỳ hàng tuần, hay bị quên, không downtime, ít vận hành nhất.\n(A) SAI: Script định kỳ SSH vào instance để chạy yum update tạo sai lệch cấu hình, mất khi instance bị thay và có thể gây gián đoạn.\n(B) ĐÚNG: Managed platform updates cho phép Beanstalk tự áp dụng bản cập nhật minor và patch của platform trong cửa sổ bảo trì hàng tuần; Beanstalk dùng cơ chế immutable nên không downtime, không giảm capacity.\n(C) SAI: Tạo environment mới mỗi tuần rồi swap URL làm được nhưng là quy trình thủ công/tự xây, nhiều vận hành hơn.\n(D) SAI: Systems Manager Patch Manager vá OS trực tiếp trên instance Beanstalk tạo trạng thái lệch khỏi platform version, và không cập nhật runtime của platform.\nĐáp án đúng: B\nĐiểm cần nhớ: Beanstalk tự vá platform => bật managed platform updates với maintenance window hàng tuần (áp dụng bằng immutable deployment).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Schedule a script that connects to each instance with SSH and runs operating system updates.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Enable managed platform updates with a weekly maintenance window for minor and patch versions.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Create a new environment on the latest platform every week and swap the environment URLs.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use AWS Systems Manager Patch Manager to patch the Beanstalk instances in a weekly window.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company wants to lower the cost of an Amazon EKS cluster by running fault-tolerant batch pods on Spot Instances. The company wants AWS to manage the node lifecycle, including replacing Spot nodes that receive a rebalance recommendation, and wants to reduce the chance that capacity is unavailable. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Pod batch chịu lỗi chạy Spot, AWS quản lý vòng đời node và phản ứng với rebalance recommendation, giảm khả năng thiếu capacity.\n(A) SAI: Fargate profile trên EKS không có tùy chọn Spot (Fargate Spot chỉ dành cho ECS).\n(B) SAI: Self-managed node group bắt buộc tự xử lý vòng đời node, tự cài công cụ xử lý interruption, trái yêu cầu AWS quản lý.\n(C) ĐÚNG: Managed node group với capacity type SPOT tự bật Capacity Rebalancing, chủ động thay node khi có rebalance recommendation và drain pod; khai báo nhiều instance type tương đương tăng số Spot pool, giảm thiếu capacity.\n(D) SAI: Managed node group Spot chỉ một instance type phụ thuộc một Spot pool, dễ thiếu capacity và bị thu hồi đồng loạt.\nĐáp án đúng: C\nĐiểm cần nhớ: EKS Spot ít vận hành => managed node group capacity type SPOT, đa dạng instance type cùng kích thước vCPU/memory.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a Fargate profile for the batch namespace and select the Spot capacity option.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a self-managed node group from a Spot Fleet and install a custom termination handler.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a managed node group with the SPOT capacity type and several similar instance types.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Create a managed node group with the SPOT capacity type and a single large instance type.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company stores container images in an Amazon ECR repository in a shared services account. A workload account runs Amazon ECS tasks on AWS Fargate that must pull those images. Tasks fail with an authorization error when pulling the image. Which combination of changes should a solutions architect make?",
+    "explanation": "Phân tích đề: Kéo image ECR khác account; cần quyền phía repository và phía danh tính kéo image.\n(A) SAI: Task role chỉ dùng cho code ứng dụng; việc kéo image do ECS thực hiện bằng task execution role.\n(B) SAI: Làm repository public để tránh cấu hình quyền vi phạm bảo mật và không cần thiết.\n(C) ĐÚNG: Repository policy trong account dùng chung cho phép account workload (hoặc ARN của execution role) các hành động ecr:BatchGetImage, ecr:GetDownloadUrlForLayer; đồng thời task execution role trong account workload có quyền ECR tương ứng và ecr:GetAuthorizationToken.\n(D) SAI: VPC endpoint giải quyết đường mạng, không giải quyết lỗi phân quyền giữa hai account.\nĐáp án đúng: C\nĐiểm cần nhớ: ECR cross-account: repository policy cho account/role bên kia + quyền ECR trên task execution role (không phải task role).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add ECR pull permissions to the task role and keep the repository policy unchanged.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Make the repository public so that tasks in any account can pull the images.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Allow the workload account in the repository policy and grant ECR pull rights to the execution role.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Create ECR interface VPC endpoints in the workload account for the private subnets.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company runs an application on AWS Elastic Beanstalk in a load-balanced web server environment with 6 instances. The company needs a cleanup job to run exactly once every night at 02:00 without adding a separate scheduling server, and the job must not run on the instances that serve web traffic. Which TWO actions should a solutions architect take?",
+    "explanation": "Phân tích đề: Job chạy đúng một lần mỗi đêm, không thêm server lập lịch, không chạy trên instance phục vụ web.\n(A) ĐÚNG: Tạo worker environment của Beanstalk để chạy tác vụ nền tách khỏi web tier.\n(B) SAI: Cron qua .ebextensions trên web environment sẽ chạy trên cả 6 instance (lặp lại 6 lần) và chạy trên instance phục vụ web.\n(C) ĐÚNG: File cron.yaml trong source bundle của worker environment định nghĩa tác vụ định kỳ; Beanstalk chọn leader để gửi message vào hàng đợi SQS đúng một lần mỗi lịch, worker daemon POST tới đường dẫn đã khai báo.\n(D) SAI: Thêm một EC2 instance riêng chạy cron là thêm server lập lịch, trái yêu cầu.\n(E) SAI: Tăng số instance tối thiểu của web environment không liên quan tới việc lập lịch job.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Tác vụ định kỳ trong Beanstalk => worker environment + cron.yaml (chạy một lần mỗi lịch, qua SQS).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create an Elastic Beanstalk worker environment for the cleanup application.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add a cron entry to the web environment instances by using an .ebextensions file.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add a cron.yaml file that defines the 02:00 schedule to the worker source bundle.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Launch a separate small EC2 instance that runs the cleanup job from crontab.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Raise the minimum instance count of the web environment to handle the job load.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs a public web API as an Amazon ECS service on AWS Fargate across two Availability Zones. Security requires that tasks never have public IP addresses and accept traffic only from the load balancer. The API must remain reachable from the internet and stay available if one Availability Zone fails. Which design meets these requirements?",
+    "explanation": "Phân tích đề: Task không có IP public, chỉ nhận traffic từ load balancer, API vẫn public, chịu lỗi một AZ.\n(A) SAI: Đặt task trong subnet public với public IP vi phạm yêu cầu không có IP public.\n(B) ĐÚNG: ALB internet-facing trong subnet public ở hai AZ, task trong subnet private ở hai AZ; security group của task chỉ cho phép inbound từ security group của ALB. Mất một AZ, ALB và task ở AZ còn lại vẫn phục vụ.\n(C) SAI: ALB internal chỉ có địa chỉ private, không nhận được traffic từ internet.\n(D) SAI: Một subnet private duy nhất nằm trong một AZ, không chịu được lỗi AZ.\nĐáp án đúng: B\nĐiểm cần nhớ: Mẫu chuẩn: ALB public ở subnet public đa AZ, task Fargate ở subnet private đa AZ, SG task tham chiếu SG của ALB.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Place tasks in public subnets with public IPs and restrict their security group to HTTPS.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use an internet-facing ALB in public subnets and tasks in private subnets that allow only the ALB SG.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Use an internal ALB in private subnets and tasks in private subnets in both Availability Zones.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use an internet-facing ALB and run all tasks in one private subnet that allows only the ALB SG.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company is containerizing a legacy ASP.NET application that depends on the full .NET Framework and must run in Windows Server containers. The company wants to avoid managing any servers, operating systems, or cluster capacity. The application runs continuously behind an Application Load Balancer and must span two Availability Zones. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Cần Windows Server container (.NET Framework), không quản lý server/OS/capacity, chạy liên tục sau ALB, đa AZ.\n(A) SAI: EKS trên Fargate chỉ hỗ trợ pod Linux, không chạy được Windows container.\n(B) SAI: App Runner chỉ chạy container Linux, không hỗ trợ Windows container.\n(C) ĐÚNG: Amazon ECS trên Fargate hỗ trợ Windows Server container (task định nghĩa operatingSystemFamily Windows); service trải trên subnet của hai AZ sau ALB, không có host để quản lý.\n(D) SAI: ECS trên EC2 Windows container instance chạy được nhưng phải quản lý AMI Windows, vá OS và capacity cụm, trái yêu cầu.\nĐáp án đúng: C\nĐiểm cần nhớ: Windows container không quản lý server => ECS trên Fargate (Windows); EKS Fargate và App Runner chỉ Linux.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Run the application on Amazon EKS with a Fargate profile for the application namespace.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Deploy the Windows container image to an AWS App Runner service with auto scaling.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Run an Amazon ECS service on AWS Fargate with a Windows Server operating system family.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Run an Amazon ECS service on Windows EC2 container instances in an Auto Scaling group.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company runs a trading portal on AWS Elastic Beanstalk with 40 instances. Many corporate clients cache DNS records for hours and ignore short TTLs. For each release, the company must keep full capacity at all times, test the new version on fresh instances before they receive all traffic, and be able to roll back a failed release without redeploying the previous version or changing DNS. Which deployment approach should a solutions architect choose?",
+    "explanation": "Phân tích đề: Client cache DNS lâu => không được dựa vào đổi DNS; cần giữ đủ capacity, triển khai lên instance mới, rollback không cần deploy lại bản cũ.\n(A) SAI: Blue/green bằng Swap environment URLs đổi bản ghi CNAME; client cache DNS lâu sẽ tiếp tục gọi môi trường cũ, và rollback cũng phụ thuộc DNS.\n(B) SAI: Rolling cập nhật trên instance hiện có, giảm capacity trong lúc deploy, rollback phải deploy lại phiên bản cũ.\n(C) SAI: Rolling with additional batch giữ đủ capacity nhưng các batch sau cập nhật trên instance cũ; rollback phải chạy một deployment mới.\n(D) ĐÚNG: Immutable khởi chạy instance mới trong ASG tạm sau cùng load balancer và endpoint, chỉ gắn vào khi vượt health check; instance cũ giữ nguyên nên luôn đủ capacity; lỗi thì hủy ASG tạm, không cần deploy lại và không đổi DNS.\nĐáp án đúng: D\nĐiểm cần nhớ: Không được đổi DNS mà vẫn cần instance mới và rollback nhanh => Immutable (hoặc Traffic splitting); blue/green Beanstalk dựa trên CNAME swap.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Clone the environment, deploy to the clone, and swap the environment URLs.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Use the Rolling policy with a batch size of 25 percent and health checks.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Use Rolling with additional batch and a fixed batch size of 10 instances.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use the Immutable deployment policy for the production environment.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "An Amazon EKS cluster uses the Kubernetes Cluster Autoscaler with one managed node group of m5.large instances (8 GiB memory). A new analytics Deployment requests 28 GiB of memory per pod. The pods remain Pending indefinitely, and the Cluster Autoscaler does not add nodes. Other workloads must keep running on the existing node group. Which TWO solutions would each allow the analytics pods to be scheduled automatically?",
+    "explanation": "Phân tích đề: Pod yêu cầu 28 GiB, node group chỉ có instance 8 GiB; Cluster Autoscaler chỉ thêm node nếu node group có thể chứa pod.\n(A) SAI: Tăng max size của node group m5.large chỉ thêm node 8 GiB, không node nào chứa được pod 28 GiB, nên Cluster Autoscaler vẫn không scale.\n(B) ĐÚNG: Thêm managed node group dùng instance memory-optimized đủ lớn (như r6i.2xlarge 64 GiB); Cluster Autoscaler mô phỏng thấy node group này chứa được pod nên sẽ scale nó.\n(C) SAI: Giảm memory request của pod xuống dưới mức thực cần khiến pod bị OOMKilled khi chạy, không phải giải pháp.\n(D) ĐÚNG: Karpenter xem yêu cầu của pod pending và chọn trực tiếp loại instance đủ memory trong phạm vi NodePool cho phép, không cần node group định sẵn.\n(E) SAI: Tăng scan interval của Cluster Autoscaler chỉ làm nó kiểm tra chậm hơn, không thay đổi việc không có node group phù hợp.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Cluster Autoscaler chỉ scale node group có instance chứa được pod; pod lớn cần node group phù hợp hoặc dùng Karpenter chọn instance theo pod.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Increase the maximum size of the existing m5.large managed node group.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add a managed node group of memory-optimized instances larger than 28 GiB.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Reduce the memory request of the analytics pods to 7 GiB to fit the nodes.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use Karpenter with a NodePool that allows memory-optimized instance types.", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "Increase the Cluster Autoscaler scan interval so that it retries more slowly.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company receives satellite image uploads in an Amazon S3 bucket. Each upload must be processed by a container that needs 16 GB of memory and runs for about 30 minutes. Uploads arrive in unpredictable bursts from zero to several hundred files within minutes. Every file must be processed with automatic retries, excess work must wait in a queue rather than be dropped, and the company does not want to manage servers or write scaling policies. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Mỗi file cần container 16 GB chạy 30 phút, tải đột biến tới hàng trăm file, cần retry, hàng đợi, không quản lý server, không tự viết scaling policy.\n(A) SAI: Lambda giới hạn 15 phút và 10 GB memory, không đáp ứng 30 phút và 16 GB.\n(B) SAI: EventBridge gọi thẳng ECS RunTask không có hàng đợi job; khi lỗi hoặc bị giới hạn tốc độ, task có thể không được chạy và phải tự xây retry.\n(C) SAI: ECS service đọc SQS trên Fargate làm được nhưng phải tự viết và tinh chỉnh scaling policy theo backlog, trái yêu cầu.\n(D) ĐÚNG: Rule EventBridge cho sự kiện Object Created submit job vào AWS Batch trên compute environment Fargate; Batch giữ job trong queue khi vượt capacity, tự scale theo số job và áp dụng retry strategy, không có server hay scaling policy phải quản lý.\nĐáp án đúng: D\nĐiểm cần nhớ: Job container dài, bùng nổ, cần queue + retry, không muốn viết scaling policy => EventBridge + AWS Batch (Fargate).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Invoke an AWS Lambda function with 10 GB of memory for each S3 object created event.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create an EventBridge rule that runs an Amazon ECS task on Fargate for each new object.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Send events to Amazon SQS and run an ECS service on Fargate that polls the queue.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create an EventBridge rule that submits AWS Batch jobs to a Fargate compute environment.", "isCorrect": true }
+    ]
+  }
+]

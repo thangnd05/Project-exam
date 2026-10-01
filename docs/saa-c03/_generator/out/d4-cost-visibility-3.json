@@ -1,0 +1,414 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A startup received a large amount of AWS promotional credits. In AWS Cost Explorer, its monthly cost chart is almost zero, so the founders cannot see how fast real usage is growing before the credits expire. What should they do in Cost Explorer?",
+    "explanation": "Phân tích đề: Credits làm biểu đồ chi phí gần bằng 0, cần thấy chi phí dùng thật. Từ khóa: lọc theo Charge type, loại bỏ Credit.\n(A) SAI: Độ phân giải theo giờ không tách credits ra khỏi chi phí; biểu đồ vẫn bị credits bù trừ.\n(B) ĐÚNG: Cost Explorer có dimension Charge type (Usage, Credit, Refund, Tax, ...). Loại bỏ Credit giúp nhìn chi phí sử dụng thật trước khi bị credits bù trừ, thấy rõ tốc độ tăng.\n(C) SAI: Group theo account chỉ chia theo account; credits vẫn bị trừ vào chi phí của từng account.\n(D) SAI: Tag phân bổ chi phí theo nhãn tài nguyên, không liên quan tới việc loại bỏ credits khỏi biểu đồ.\nĐáp án đúng: B\nĐiểm cần nhớ: Muốn xem chi phí thật khi có credits hoặc refunds: lọc Charge type trong Cost Explorer (và trong Budgets có tùy chọn loại trừ tương ứng).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Switch the chart to hourly granularity so credits are shown as separate data points",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Apply a Charge type filter that excludes credits so only usage charges remain",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Group the chart by linked account so the credit balance is displayed separately",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Activate the AWS-generated cost allocation tags so credits are attributed to tags",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company created an AWS Budgets cost budget. The finance department wants 25 people, including managers in several departments, to receive the alert email when the budget's actual cost exceeds 90%. What is the simplest way to deliver the alert to all 25 recipients?",
+    "explanation": "Phân tích đề: Cần gửi alert cho 25 người. Từ khóa: giới hạn số email trực tiếp của mỗi alert Budgets.\n(A) SAI: Mỗi alert của AWS Budgets chỉ nhận tối đa 10 địa chỉ email trực tiếp, nên không thêm đủ 25 người.\n(B) SAI: Nhân bản budget chỉ để lách giới hạn làm tăng việc quản lý và dễ lệch cấu hình.\n(C) ĐÚNG: Budgets alert gửi được tới một SNS topic; SNS topic có thể có nhiều subscription email hoặc endpoint khác, nên phát tán tới cả 25 người chỉ với một alert.\n(D) SAI: Cost Explorer không gửi cảnh báo khi vượt ngưỡng; link báo cáo không tự thông báo cho ai.\nĐáp án đúng: C\nĐiểm cần nhớ: Budgets alert: tối đa 10 email trực tiếp mỗi thông báo; cần nhiều hơn hoặc cần chat/Lambda thì gửi qua SNS topic.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Add all 25 email addresses directly to the budget alert as email recipients",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create three identical budgets and split the 25 addresses across their alerts",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Send the alert to an SNS topic that has all 25 addresses subscribed",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create a Cost Explorer saved report and share its link with all 25 recipients",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company runs hundreds of AWS Lambda functions. Most were created with the default memory settings years ago. The company wants recommendations for the memory size of each function based on its actual usage, to reduce cost without hurting performance. Which AWS service provides these recommendations?",
+    "explanation": "Phân tích đề: Cần khuyến nghị kích thước memory cho Lambda dựa trên mức dùng thực. Từ khóa: rightsizing Lambda.\n(A) SAI: Rightsizing của Cost Explorer chỉ áp dụng cho EC2 instance, không đưa ra khuyến nghị memory cho Lambda.\n(B) SAI: Usage budget chỉ theo dõi mức dùng so với ngưỡng, không phân tích và đề xuất cấu hình memory.\n(C) SAI: Service limits check theo dõi mức dùng so với quota, không đề xuất memory cho function.\n(D) ĐÚNG: Compute Optimizer phân tích metric sử dụng và đưa khuyến nghị cho EC2, Auto Scaling group, EBS, Lambda (memory), ECS trên Fargate và một số dịch vụ khác, kèm ước tính tiết kiệm.\nĐáp án đúng: D\nĐiểm cần nhớ: Rightsizing ngoài EC2 (Lambda memory, EBS, Fargate) => Compute Optimizer. Rightsizing trong Cost Explorer chỉ nói về EC2.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "AWS Cost Explorer rightsizing recommendations",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "AWS Budgets usage budget for Lambda duration",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "AWS Trusted Advisor service limits checks",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "AWS Compute Optimizer",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A student opens a new AWS account for coursework and wants to avoid surprise charges. The student wants a warning when usage approaches the AWS Free Tier limits, and another notification as soon as any charge above zero appears on the bill. Which TWO actions should the student take? (Choose TWO.)",
+    "explanation": "Phân tích đề: Cần cảnh báo khi sắp chạm giới hạn Free Tier và khi có bất kỳ khoản phí nào. Từ khóa: Free Tier alerts, zero spend budget.\n(A) ĐÚNG: Free Tier usage alerts gửi email khi mức dùng của một dịch vụ Free Tier tiến gần hoặc vượt giới hạn miễn phí.\n(B) ĐÚNG: Template zero spend budget tạo một budget cảnh báo ngay khi chi tiêu vượt $0.01, đúng yêu cầu báo khi có khoản phí đầu tiên.\n(C) SAI: Pricing Calculator chỉ ước tính trước, không theo dõi mức dùng thực hay gửi cảnh báo.\n(D) SAI: Forecast chỉ hiển thị dự báo, không gửi thông báo khi có phí.\n(E) SAI: Đây là việc thủ công và chỉ chỉ ra tài nguyên chưa tối ưu, không cảnh báo Free Tier hay khoản phí đầu tiên.\nĐáp án đúng: A và B\nĐiểm cần nhớ: Tài khoản học tập: bật Free Tier usage alerts và tạo zero spend budget. CloudWatch billing alarm cũng làm được nhưng thô sơ hơn.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Turn on AWS Free Tier usage alerts in the Billing preferences",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create a zero spend budget from the AWS Budgets templates",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Run the AWS Pricing Calculator for every service the student uses",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Enable Cost Explorer forecasting for the next three months",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Review the AWS Trusted Advisor cost optimization checks weekly",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An engineer sees that EC2 spend rose sharply four days ago. The engineer wants to identify which individual EC2 instance IDs drove the increase, directly in the AWS Cost Explorer console without writing SQL. Cost Explorer currently shows data only by service and instance type. What should the engineer do?",
+    "explanation": "Phân tích đề: Cần xem chi phí theo từng instance ID trong vài ngày gần đây, ngay trong Cost Explorer, không SQL. Từ khóa: resource-level granularity trong khoảng 14 ngày gần nhất.\n(A) SAI: Có resource ID nhưng phải viết SQL, trái yêu cầu; dữ liệu cũng chỉ có từ khi report được tạo.\n(B) SAI: Tag mới activate không phản ánh ngay cho các ngày trước, và Name không nhất thiết duy nhất cho từng instance.\n(C) ĐÚNG: Cost Explorer có tùy chọn (tính phí) bật dữ liệu cấp tài nguyên cho các ngày gần đây (khoảng 14 ngày), cho phép group và filter theo resource ID ngay trên giao diện.\n(D) SAI: Anomaly Detection chỉ phát hiện bất thường mới và nêu nguyên nhân theo service, account, Region, usage type, không liệt kê chi phí từng instance.\nĐáp án đúng: C\nĐiểm cần nhớ: Cần resource ID trong Cost Explorer: bật resource-level/hourly granularity (khoảng 14 ngày gần nhất). Cần lâu hơn hoặc SQL => CUR.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a Cost and Usage Report with resource IDs and query it with Amazon Athena",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Activate the Name tag as a cost allocation tag and group Cost Explorer by Name",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable resource-level data in the Cost Explorer preferences and filter by resource",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Turn on AWS Cost Anomaly Detection and wait for the next anomaly to list the instances",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An AWS Budgets cost budget has two alert recipients at the 80% threshold: an email address and an Amazon SNS topic. When the threshold was crossed, the email arrived but no message was published to the SNS topic. The SNS topic is in the same account and has a working subscription. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Email đến nhưng SNS không nhận. Từ khóa: SNS topic policy phải cho phép dịch vụ Budgets publish.\n(A) SAI: Budgets không bắt buộc SNS topic phải ở us-east-1; lỗi ở đây là quyền publish, không phải Region.\n(B) ĐÚNG: AWS Budgets publish vào SNS bằng service principal budgets.amazonaws.com. Topic access policy phải có statement cho phép SNS:Publish từ principal này; thiếu nó thì email vẫn tới nhưng SNS không nhận thông điệp.\n(C) SAI: Loại ngưỡng không quyết định kênh gửi; SNS dùng được cho cả actual lẫn forecasted.\n(D) SAI: Thông báo được Budgets gửi, không phải do IAM user tạo budget; quyền của user không ảnh hưởng việc publish.\nĐáp án đúng: B\nĐiểm cần nhớ: Budgets hoặc Anomaly Detection gửi vào SNS: kiểm tra topic policy cho phép service principal publish (và key policy nếu topic mã hóa bằng KMS).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Recreate the SNS topic in us-east-1 because Budgets only publishes to that Region",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Allow budgets.amazonaws.com to publish in the SNS topic access policy",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Change the alert from actual cost to forecasted cost so the SNS integration is triggered",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Attach an IAM policy with sns:Publish to the IAM user who created the budget",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses a single AWS account without AWS Organizations. Developers regularly launch large instances for experiments. When the monthly budget reaches 100% of actual cost, the company wants developers to be unable to launch new EC2 instances, while the cloud administrators keep full access and existing instances keep running. What should a solutions architect configure?",
+    "explanation": "Phân tích đề: Một account, không có Organizations; cần chặn developer tạo instance mới khi vượt ngân sách, admin giữ quyền, instance đang chạy không bị dừng. Từ khóa: budget action loại IAM policy.\n(A) SAI: SCP cần AWS Organizations và budget ở management account; account này không có Organizations. Hơn nữa SCP sẽ chặn cả admin.\n(B) SAI: Dừng instance làm gián đoạn workload đang chạy, trái yêu cầu giữ instance hiện có, và không ngăn việc launch mới.\n(C) ĐÚNG: Action loại IAM policy tự gắn một policy deny (ví dụ chặn ec2:RunInstances) vào IAM group, role hoặc user của developer khi chạm ngưỡng; admin không bị ảnh hưởng và instance đang chạy vẫn giữ nguyên.\n(D) SAI: Anomaly Detection chỉ gửi cảnh báo, không tự thay đổi quyền IAM.\nĐáp án đúng: C\nĐiểm cần nhớ: Không có Organizations hoặc chỉ muốn chặn một nhóm người: budget action loại IAM policy. Chặn cả account trong tổ chức: SCP từ management account.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "A budget action that applies an SCP that denies ec2:RunInstances to the account",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "A budget action that stops all EC2 instances in the account when the threshold is reached",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "A budget action that attaches an IAM deny policy for ec2:RunInstances to the developers' group",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "A Cost Anomaly Detection monitor with an alert that removes developer permissions automatically",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company applied a Product tag to all its resources six months ago, but the finance team activated Product as a cost allocation tag only today. Finance needs to view the previous six months of spend grouped by Product in Cost Explorer for a quarterly review. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Tag đã có trên tài nguyên 6 tháng nhưng mới activate hôm nay; cần xem lại 6 tháng trước. Từ khóa: backfill cost allocation tag.\n(A) ĐÚNG: AWS cho phép backfill cost allocation tag (tối đa khoảng 12 tháng trước) từ trang Cost allocation tags. Vì tag thực sự đã nằm trên tài nguyên trong giai đoạn đó, dữ liệu lịch sử sẽ được gắn giá trị Product.\n(B) SAI: Gắn lại tag không làm dữ liệu cũ được tính lại; chỉ tạo thêm công việc.\n(C) SAI: CUR mới chỉ chứa cột tag đã activate; nếu không backfill thì các tháng trước vẫn không có giá trị tag.\n(D) SAI: 24 giờ là thời gian tag xuất hiện cho dữ liệu từ lúc activate trở đi; dữ liệu lịch sử không tự được gắn nếu không backfill.\nĐáp án đúng: A\nĐiểm cần nhớ: Activate tag chỉ áp dụng từ thời điểm đó; muốn áp cho các tháng trước (khi tag đã có trên tài nguyên) thì dùng tính năng backfill.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Request a cost allocation tag backfill for the previous months",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Remove and re-apply the Product tag on every resource to trigger the historical reprocessing",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Create a new Cost and Usage Report because it contains tag columns for all prior months",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Wait 24 hours, because activated tags are automatically applied to all historical data",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company requires every Amazon EC2 instance, EBS volume, and RDS database to carry the CostCenter and Owner tags for chargeback. Many resources were created before this rule. The FinOps team wants continuous detection of existing and new noncompliant resources across all accounts, with a compliance dashboard, using a managed capability. What should a solutions architect use?",
+    "explanation": "Phân tích đề: Cần phát hiện liên tục tài nguyên thiếu tag (cả cũ và mới) trên nhiều account, có dashboard tuân thủ, dùng dịch vụ managed. Từ khóa: AWS Config required-tags.\n(A) SAI: SCP chỉ chặn tạo mới; không phát hiện hay báo cáo các tài nguyên thiếu tag đã tồn tại.\n(B) ĐÚNG: Managed rule required-tags đánh giá liên tục tài nguyên cũ và mới có mang đủ tag bắt buộc; triển khai cho toàn tổ chức và gom kết quả bằng aggregator cho dashboard tuân thủ tập trung.\n(C) SAI: Nhóm No tag key chỉ cho biết có chi phí chưa tag, không chỉ ra tài nguyên cụ thể và là rà soát thủ công.\n(D) SAI: Budgets theo dõi chi phí hoặc mức dùng so với ngưỡng, không đánh giá tuân thủ tag của từng tài nguyên.\nĐáp án đúng: B\nĐiểm cần nhớ: Ngăn chặn tag thiếu khi tạo mới => SCP/IAM với aws:RequestTag. Phát hiện liên tục tài nguyên thiếu tag => AWS Config required-tags.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "An SCP that denies resource creation when the CostCenter or Owner tag is missing",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "The AWS Config required-tags managed rule deployed to all accounts with an aggregator",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "A Cost Explorer report grouped by CostCenter that is reviewed every month",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "An AWS Budgets usage budget filtered to resources without the CostCenter tag",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A solutions architect is designing AWS Budgets cost budgets for a company. The finance team wants to scope each budget precisely. Which THREE of the following can be used as filters in an AWS Budgets cost budget? (Choose THREE.)",
+    "explanation": "Phân tích đề: Cần biết Budgets lọc được theo những dimension nào. Từ khóa: filter của cost budget.\n(A) ĐÚNG: Budgets lọc được theo linked account, hay dùng ở management account để đặt ngân sách từng account.\n(B) SAI: Đây là metric hiệu năng CloudWatch, không phải dimension chi phí trong Budgets.\n(C) ĐÚNG: Budgets lọc theo cost allocation tag đã activate, dùng để đặt ngân sách theo team hay dự án.\n(D) SAI: Budgets không đọc CloudTrail; tên event API không phải dimension lọc chi phí.\n(E) ĐÚNG: Lọc theo service (ví dụ chỉ Amazon EC2 hoặc Amazon S3) là một trong những filter cơ bản của Budgets.\n(F) SAI: Security group không phải dimension billing; Budgets không lọc theo nó.\nĐáp án đúng: A, C và E\nĐiểm cần nhớ: Budgets lọc theo các dimension billing: account, service, Region, usage type, instance type, tag, cost category, charge type... không theo metric hiệu năng hay cấu hình mạng.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Linked account",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Average CPU utilization of an instance",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Activated cost allocation tag",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "CloudTrail event name of the request",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "AWS service",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "F",
+        "answerText": "Security group attached to the instance",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A holding company uses AWS Organizations for eight subsidiaries. It has a confidential negotiated discount with AWS. Subsidiary engineers must keep using Cost Explorer to analyze their own accounts' spend, but they must not be able to see the negotiated discount amounts. The management account must continue to see all discounts. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Member account vẫn dùng Cost Explorer nhưng không được thấy khoản giảm giá thương lượng. Từ khóa: Cost Management preferences của management account kiểm soát linked account discounts.\n(A) SAI: Tắt linked account access chặn member dùng Cost Explorer hoàn toàn, trái yêu cầu họ vẫn phân tích chi phí của mình.\n(B) SAI: SCP deny Cost Explorer cũng chặn toàn bộ việc phân tích chi phí của subsidiary.\n(C) SAI: Loại trừ discount trong budget chỉ đổi cách tính của budget, không ẩn thông tin giảm giá trong Cost Explorer.\n(D) ĐÚNG: Management account có các thiết lập cho linked account: có được dùng Cost Explorer, có thấy refunds và credits, có thấy discounts. Tắt riêng discounts giúp subsidiary vẫn phân tích chi phí của mình nhưng không thấy giảm giá thương lượng.\nĐáp án đúng: D\nĐiểm cần nhớ: Management account kiểm soát member account thấy gì trong Cost Explorer: truy cập, refunds và credits, discounts; chỉnh từng mục thay vì chặn hết.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Disable linked account access to Cost Explorer in the management account preferences",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Attach an SCP to all subsidiary accounts that denies every Cost Explorer API action",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure every subsidiary budget to exclude discounts so the amounts are hidden",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Turn off the linked account discounts setting in the management account",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "Cost Explorer and AWS Compute Optimizer recommend downsizing a group of memory-intensive EC2 instances by half. The operations team suspects the recommendation is unsafe because the instances run a large month-end batch and the tool only sees CPU, network, and disk metrics. The company wants trustworthy recommendations with the least effort. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Khuyến nghị không tính memory và không thấy chu kỳ cuối tháng. Từ khóa: CloudWatch agent cho memory, enhanced infrastructure metrics kéo dài lookback lên khoảng 3 tháng.\n(A) SAI: Detailed monitoring chỉ tăng tần suất metric lên 1 phút; vẫn không có memory và không mở rộng cửa sổ phân tích.\n(B) ĐÚNG: Compute Optimizer chỉ xét memory khi CloudWatch agent đẩy metric memory. Enhanced infrastructure metrics (có phí) mở rộng cửa sổ phân tích lên khoảng 3 tháng nên bắt được đỉnh batch cuối tháng; khuyến nghị trở nên đáng tin.\n(C) SAI: Lookback 60 ngày là của khuyến nghị mua Savings Plans, không ảnh hưởng tới khuyến nghị rightsizing.\n(D) SAI: Làm thủ công tốn nhiều công sức hơn nhiều so với cung cấp đủ dữ liệu cho công cụ có sẵn.\nĐáp án đúng: B\nĐiểm cần nhớ: Rightsizing đáng tin cần đủ dữ liệu: memory qua CloudWatch agent, và chu kỳ dài qua enhanced infrastructure metrics của Compute Optimizer.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Enable detailed monitoring on the instances and regenerate the rightsizing recommendation",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Install the CloudWatch agent to publish memory metrics and enable enhanced infrastructure metrics",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Change the Savings Plans recommendation lookback to 60 days to capture the month-end batch",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Ignore the tools and resize manually after load testing each instance type every quarter",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company acquired another business that has its own AWS Organization with a management account and 15 member accounts. The acquirer wants all accounts under its existing organization for one consolidated bill, shared Savings Plans benefits, and combined volume pricing. The acquired team must keep its accounts and workloads. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Hợp nhất tổ chức sau thương vụ mua lại, giữ nguyên account và workload. Từ khóa: account chỉ thuộc một organization; management account của tổ chức cũ phải xóa organization rồi mới gia nhập.\n(A) SAI: Không có cơ chế liên kết hai organization để dùng chung hóa đơn; consolidated billing chỉ trong phạm vi một organization.\n(B) ĐÚNG: Một account chỉ thuộc một organization. Member phải rời tổ chức cũ; management account cũ chỉ gia nhập được sau khi organization của nó bị xóa. Khi tất cả đã vào tổ chức mới, consolidated billing, chia sẻ Savings Plans và volume pricing áp dụng chung.\n(C) SAI: Management account đang quản lý organization không thể nhận lời mời vào organization khác, và member của nó không tự chuyển theo.\n(D) SAI: Di chuyển account là khả thi nên việc dựng lại workload là không cần thiết, rủi ro và trái yêu cầu giữ nguyên account.\nĐáp án đúng: B\nĐiểm cần nhớ: Mỗi account chỉ thuộc một organization. Gộp tổ chức: member rời tổ chức cũ, xóa tổ chức cũ, rồi mời tất cả vào tổ chức đích.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Link the two management accounts with a consolidated billing trust so both organizations share one bill",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Remove the members, delete the acquired organization, then invite all 16 accounts",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Invite the acquired management account to the acquirer's organization so its members join automatically",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Recreate the 15 workloads in new accounts under the acquirer's organization and close the old accounts",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company bought a three-year EC2 Instance Savings Plan for the m5 family in us-east-1. Since then, most workloads moved to Graviton instances and some moved to AWS Fargate, so the plan's utilization dropped to 55%. The company wants to be warned automatically if utilization of any plan falls below 90% in the future and to reduce the risk of this recurring. Which TWO actions should a solutions architect recommend? (Choose TWO.)",
+    "explanation": "Phân tích đề: Savings Plan loại EC2 Instance bị dùng dưới mức sau khi đổi sang Graviton và Fargate. Cần cảnh báo tự động và giảm rủi ro tái diễn. Từ khóa: SP utilization budget, Compute Savings Plans linh hoạt.\n(A) SAI: Savings Plans không thể exchange (khác với Convertible RI); cam kết hiện tại phải giữ tới hết kỳ.\n(B) ĐÚNG: Savings Plans utilization budget gửi cảnh báo khi phần cam kết được dùng thấp hơn ngưỡng, giúp phát hiện sớm lãng phí.\n(C) SAI: Chỉ Standard RI mới bán được trên Reserved Instance Marketplace; Savings Plans không bán lại được.\n(D) ĐÚNG: Compute Savings Plans áp dụng cho mọi instance family, size, Region, và cả Fargate, Lambda, nên chuyển sang Graviton hay container không làm cam kết bị bỏ phí.\n(E) SAI: Chặn Graviton đi ngược mục tiêu tối ưu chi phí và hiệu năng chỉ để lấp đầy cam kết cũ.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Savings Plans không exchange, không bán lại. Giảm rủi ro bằng Compute Savings Plans cho workload dễ thay đổi, và theo dõi bằng utilization budget.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Exchange the EC2 Instance Savings Plan for a Compute Savings Plan of the same value",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create an AWS Budgets Savings Plans utilization budget with an alert below 90%",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "List the unused Savings Plan on the Reserved Instance Marketplace to recover value",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Use Compute Savings Plans for future commitments because they apply across families and Fargate",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Attach an SCP that prevents launching Graviton instances until the plan expires",
+        "isCorrect": false
+      }
+    ]
+  }
+]

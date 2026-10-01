@@ -1,0 +1,173 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A solutions architect creates an interface VPC endpoint for Amazon Kinesis Data Streams and selects one subnet in each of two Availability Zones. How does the endpoint appear inside the VPC?",
+    "explanation": "Phân tích đề: Interface endpoint chọn hai subnet ở hai AZ.\n(A) SAI: Route prefix list là cơ chế của gateway endpoint, interface endpoint không thêm route.\n(B) SAI: Interface endpoint không dùng NAT; mỗi ENI tự có IP private trong subnet.\n(C) ĐÚNG: AWS tạo một ENI có IP private trong mỗi subnet được chọn, tức hai ENI ở hai AZ, được gắn security group của endpoint.\n(D) SAI: Interface endpoint không cấp Elastic IP public; mục đích chính là truy cập riêng tư.\nĐáp án đúng: C\nĐiểm cần nhớ: Interface endpoint = một ENI private cho mỗi subnet (mỗi AZ) được chọn.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "As a route to a Kinesis prefix list in every route table of the VPC", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "As a managed NAT device that is shared by both of the selected subnets", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "As one network interface with a private IP in each selected subnet", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "As a single Elastic IP address that is reachable from both subnets", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An engineer creates an S3 gateway endpoint and does not specify a custom endpoint policy. What access does the endpoint allow by default?",
+    "explanation": "Phân tích đề: Endpoint tạo không kèm policy tùy chỉnh.\n(A) SAI: Endpoint không mặc định chặn hết; nếu vậy endpoint vừa tạo sẽ vô dụng.\n(B) SAI: Mặc định không giới hạn theo bucket cùng account.\n(C) SAI: Mặc định không giới hạn thao tác chỉ đọc.\n(D) ĐÚNG: Policy mặc định cho phép full access tới dịch vụ qua endpoint; quyền thực tế vẫn do IAM policy và bucket policy quyết định. Muốn least privilege trên đường đi thì phải thay policy mặc định.\nĐáp án đúng: D\nĐiểm cần nhớ: Endpoint policy mặc định = full access; siết lại bằng policy tùy chỉnh khi cần chống rò rỉ dữ liệu.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "It denies all requests until an explicit allow statement is added.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "It allows access only to buckets that the same AWS account owns.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "It allows read-only actions on any bucket in the same AWS Region.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "It allows full access, subject to IAM and bucket policies.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "On-premises servers connect to a VPC through an AWS Site-to-Site VPN. The servers must write records to Amazon Kinesis Data Streams without sending data over the public internet. Which solution meets this requirement?",
+    "explanation": "Phân tích đề: On-prem qua VPN cần gọi Kinesis Data Streams riêng tư.\n(A) ĐÚNG: Interface endpoint cho Kinesis Data Streams có IP private trong VPC nên on-prem truy cập được qua VPN.\n(B) SAI: Kinesis không có gateway endpoint; gateway endpoint cũng không dùng được từ on-prem.\n(C) SAI: NAT gateway là đường ra Internet cho VPC, không phục vụ traffic từ on-prem và vẫn dùng endpoint public.\n(D) SAI: Global Accelerator dùng IP anycast công khai, traffic từ on-prem đi qua Internet.\nĐáp án đúng: A\nĐiểm cần nhớ: On-prem (VPN/DX) muốn gọi dịch vụ AWS riêng tư => interface endpoint.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a Kinesis Data Streams interface endpoint in the VPC.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create a Kinesis Data Streams gateway endpoint in the VPC.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Send the records through a NAT gateway in a public subnet.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Use an AWS Global Accelerator accelerator for the stream.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A security engineer wants to attach a security group to an S3 gateway endpoint to limit which instances can use it. Which statement is correct?",
+    "explanation": "Phân tích đề: Muốn gắn security group lên gateway endpoint.\n(A) SAI: Gateway endpoint không có ENI nên không có inbound rule nào.\n(B) ĐÚNG: Gateway endpoint không hỗ trợ security group; kiểm soát bằng endpoint policy, route table (subnet nào được gắn) và outbound rule của instance trỏ tới S3 prefix list.\n(C) SAI: Security group không thể gắn vào bucket S3.\n(D) SAI: Việc gắn endpoint vào route table không tự sinh security group nào.\nĐáp án đúng: B\nĐiểm cần nhớ: Gateway endpoint = không security group; interface endpoint = có security group.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Gateway endpoints accept a security group whose inbound rules list the allowed instances.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Gateway endpoints do not support security groups, so use endpoint policies and routes.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "The security group must be attached to the bucket, which then filters the gateway traffic.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "A security group is created automatically for each route table that uses the endpoint.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A VPC uses a DHCP options set that points instances to custom DNS servers running on EC2, which forward all queries to on-premises resolvers. After an AWS KMS interface endpoint with private DNS was created, packet captures show that KMS requests from instances still go to public IP addresses through a NAT gateway. What should a solutions architect do so that instances use the endpoint?",
+    "explanation": "Phân tích đề: Instance dùng DNS server tự quản (không phải Amazon DNS), nên zone private DNS của endpoint không được áp dụng.\n(A) SAI: Security group ảnh hưởng tới kết nối vào ENI, không làm thay đổi kết quả phân giải DNS ra IP public.\n(B) SAI: Gateway endpoint không hỗ trợ KMS.\n(C) SAI: Tạo lại endpoint ở subnet khác không giải quyết được việc DNS server tự quản không thấy private hosted zone.\n(D) ĐÚNG: Cấu hình DNS server tự quản chuyển tiếp các truy vấn amazonaws.com (hoặc tên dịch vụ) về Amazon-provided DNS (Route 53 Resolver, địa chỉ VPC base +2), khi đó tên KMS phân giải ra IP private của ENI.\nĐáp án đúng: D\nĐiểm cần nhớ: Private DNS của interface endpoint chỉ có tác dụng khi truy vấn đi qua Route 53 Resolver của VPC.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Allow inbound TCP 443 from the instance subnets in the endpoint security group.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Replace the KMS interface endpoint with a gateway endpoint in the route tables.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Recreate the KMS endpoint in the same subnets as the custom DNS server instances.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Forward AWS service domain queries from the custom servers to the Amazon DNS server.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company publishes an internal pricing service as a VPC endpoint service. Only three specific partner AWS accounts should be able to create interface endpoints to the service, and no other account should even be able to request a connection. Which configuration meets this requirement?",
+    "explanation": "Phân tích đề: Chỉ ba account đối tác được phép tạo endpoint/yêu cầu kết nối.\n(A) SAI: Security group của NLB lọc theo IP nguồn; qua PrivateLink, IP nguồn không phản ánh account nên không giới hạn được ai tạo endpoint.\n(B) ĐÚNG: Thêm ARN của ba account vào allowed principals (permissions) của endpoint service; chỉ principal trong danh sách mới tạo được interface endpoint tới service.\n(C) SAI: Endpoint policy nằm phía consumer, do consumer quản lý, không kiểm soát được ai được kết nối tới service.\n(D) SAI: Chia sẻ subnet qua RAM cho đối tác mở quyền vào VPC của provider, rộng hơn nhiều so với yêu cầu.\nĐáp án đúng: B\nĐiểm cần nhớ: Allowed principals quyết định ai được kết nối tới endpoint service; acceptance required thêm bước duyệt từng kết nối.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add inbound rules to the NLB security group that allow only the partner account IDs.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add the ARNs of the three partner accounts to the allowed principals of the service.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Ask each partner to configure an endpoint policy that names the pricing service ARN.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Share the service subnets with the three partner accounts by using AWS RAM.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A company has a private REST API in Amazon API Gateway that currently has a resource policy allowing any VPC endpoint in the account. The security team requires that only the execute-api interface endpoint in the payments VPC can invoke the API from now on. Which TWO actions should a solutions architect take?",
+    "explanation": "Phân tích đề: Thu hẹp private API để chỉ một endpoint (VPC payments) gọi được.\n(A) ĐÚNG: Sửa resource policy: Allow execute-api:Invoke và Deny khi aws:SourceVpce khác ID endpoint của VPC payments.\n(B) SAI: Không có gateway endpoint cho API Gateway.\n(C) ĐÚNG: Với REST API, thay đổi resource policy chỉ có hiệu lực sau khi deploy lại API tới stage.\n(D) SAI: IAM authorization kiểm soát danh tính, không giới hạn endpoint mạng; ai có credential vẫn gọi được từ endpoint khác.\n(E) SAI: Security group của endpoint VPC payments không ảnh hưởng tới các endpoint ở VPC khác.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Private API: khóa bằng resource policy aws:SourceVpce và luôn deploy lại sau khi đổi policy.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Update the resource policy to deny calls when aws:SourceVpce does not match the payments endpoint.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create a gateway endpoint for API Gateway in the payments VPC and remove the interface endpoint.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Deploy the API to its stage again so that the updated resource policy takes effect.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable IAM authorization on all methods so that only callers in the payments VPC are accepted.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Restrict the payments endpoint security group so that other VPCs cannot reach the API.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A private subnet route table has a default route (0.0.0.0/0) to a NAT gateway. A solutions architect associates an S3 gateway endpoint with this route table to keep S3 traffic off the internet path. How will instances in the subnet reach Amazon S3 in the same Region?",
+    "explanation": "Phân tích đề: Route table có cả route mặc định tới NAT và route prefix list của S3 tới gateway endpoint.\n(A) SAI: Route mặc định không được ưu tiên; route cụ thể hơn luôn thắng.\n(B) ĐÚNG: Route tới prefix list của S3 cụ thể hơn 0.0.0.0/0 nên traffic tới S3 cùng Region đi qua gateway endpoint; NAT chỉ còn phục vụ đích khác.\n(C) SAI: Không cần xóa route mặc định; hai route cùng tồn tại được.\n(D) SAI: Không có cơ chế cân tải traffic giữa NAT và endpoint.\nĐáp án đúng: B\nĐiểm cần nhớ: Gateway endpoint thắng NAT cho S3/DynamoDB nhờ route prefix list cụ thể hơn route mặc định.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Through the NAT gateway, because the default route is evaluated before prefix lists", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Through the endpoint, because the prefix list route is more specific", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Only after the default route is removed, because the two routes conflict", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Across both paths, because the route table balances traffic between the targets", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company peered its VPC with a partner's VPC so the partner could call one internal HTTPS service. An audit found that the peering lets the partner reach every subnet in the company's VPC, which violates least privilege. The partner must still reach only that service privately. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Peering mở toàn mạng; chỉ cần phơi một dịch vụ riêng tư theo least privilege.\n(A) ĐÚNG: Đặt dịch vụ sau NLB, tạo endpoint service và cho account đối tác tạo interface endpoint; đối tác chỉ thấy đúng dịch vụ đó, không định tuyến được vào VPC công ty, rồi xóa peering.\n(B) SAI: Chuyển sang Transit Gateway vẫn là nối mạng với mạng, phải tự quản lý route để thu hẹp và vẫn rộng hơn yêu cầu.\n(C) SAI: Phơi dịch vụ qua ALB internet-facing đưa nó ra Internet, trái yêu cầu private.\n(D) SAI: Gateway endpoint chỉ dành cho S3 và DynamoDB.\nĐáp án đúng: A\nĐiểm cần nhớ: Chia sẻ MỘT dịch vụ cho bên khác = PrivateLink; nối cả mạng = peering/Transit Gateway.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Publish the service as an endpoint service and let the partner create an interface endpoint.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Replace the peering with a transit gateway attachment and propagate all routes to the partner.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Expose the service through an internet-facing ALB and allow only partner IPs in security groups.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a gateway endpoint for the service and associate it with the partner VPC route tables.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Some application instances intermittently fail to connect to an AWS KMS interface endpoint, and the team suspects that the endpoint security group is dropping traffic from a newly added subnet. Which approach will show whether connections to the endpoint are being rejected?",
+    "explanation": "Phân tích đề: Cần xác định kết nối tới endpoint có bị security group từ chối không.\n(A) SAI: CloudTrail ghi lời gọi API đã tới được dịch vụ; kết nối bị chặn ở tầng mạng không tạo sự kiện CloudTrail.\n(B) SAI: AWS Config ghi lịch sử cấu hình, không ghi từng kết nối bị từ chối.\n(C) ĐÚNG: Bật VPC Flow Logs cho ENI của endpoint (hoặc subnet chứa nó) sẽ thấy bản ghi REJECT với IP nguồn từ subnet mới, xác nhận security group chặn.\n(D) SAI: Metric KMS chỉ phản ánh request đã tới dịch vụ, không cho thấy kết nối bị chặn tại ENI.\nĐáp án đúng: C\nĐiểm cần nhớ: Chẩn đoán kết nối tới interface endpoint: VPC Flow Logs trên ENI endpoint (ACCEPT/REJECT).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Query CloudTrail management events for KMS calls with an AccessDenied error code.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Review AWS Config history for changes to the endpoint and its security group.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable VPC Flow Logs on the endpoint network interfaces and look for REJECT records.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Review the KMS request metrics in Amazon CloudWatch for throttled or failed calls.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "An S3 gateway endpoint policy allows S3 actions only when aws:ResourceOrgID equals the company's organization ID, to stop data from being copied to external buckets. A new workload in the VPC must download reference files from a single bucket owned by an external data vendor that is not in the organization. The workload has no internet access, and the exfiltration control must remain effective for all other external buckets. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Endpoint policy chỉ cho bucket trong tổ chức; cần đọc đúng một bucket của vendor ngoài tổ chức, vẫn chống rò rỉ cho các bucket khác, không có Internet.\n(A) SAI: Bucket policy của vendor chỉ là một lớp; endpoint policy phía công ty vẫn chặn vì bucket không thuộc tổ chức.\n(B) SAI: Bỏ điều kiện aws:ResourceOrgID mở toàn bộ bucket bên ngoài, phá kiểm soát chống rò rỉ.\n(C) ĐÚNG: Thêm statement Allow chỉ s3:GetObject (và ListBucket nếu cần) trên đúng ARN bucket của vendor; chỉ cho đọc nên không tạo đường ghi dữ liệu ra ngoài, các bucket ngoài khác vẫn bị chặn.\n(D) SAI: NAT gateway tạo đường Internet trái yêu cầu và cho phép lách endpoint policy.\nĐáp án đúng: C\nĐiểm cần nhớ: Ngoại lệ cho data perimeter nên hẹp nhất có thể: đúng ARN, đúng hành động (thường chỉ đọc).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Ask the vendor to add the company's VPC endpoint ID to an Allow statement in the vendor bucket policy.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Remove the aws:ResourceOrgID condition and rely on IAM policies to limit which buckets are written.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add an endpoint policy statement that allows only s3:GetObject on the vendor bucket ARN.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Add a NAT gateway for the workload subnets so that requests to the vendor bucket skip the endpoint.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A provider's endpoint service uses a Network Load Balancer that is enabled only in the provider account's us-east-1a and us-east-1b Availability Zones. A consumer in another account tries to create an interface endpoint in subnets in its own us-east-1a and us-east-1c zones, but the endpoint cannot be created in one of those subnets. The consumer needs endpoint network interfaces in at least two zones for resilience. Which TWO actions will resolve the issue?",
+    "explanation": "Phân tích đề: NLB provider chỉ bật ở hai AZ (theo tên AZ của account provider); consumer chọn AZ theo tên của account mình; tên AZ ánh xạ khác nhau giữa các account.\n(A) ĐÚNG: Interface endpoint chỉ tạo được trong AZ mà endpoint service khả dụng; consumer cần so sánh theo AZ ID (vd use1-az1) và chọn subnet nằm trong AZ ID mà service hỗ trợ.\n(B) SAI: Bật private DNS không ảnh hưởng tới việc endpoint được tạo trong AZ nào.\n(C) ĐÚNG: Provider có thể bật NLB ở thêm AZ (theo AZ ID) mà consumer dùng, để service khả dụng ở đó.\n(D) SAI: Security group không liên quan tới việc AZ có được hỗ trợ hay không.\n(E) SAI: Tắt acceptance required chỉ bỏ bước duyệt, không mở thêm AZ.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Tên AZ khác nhau giữa các account; PrivateLink cần khớp theo AZ ID giữa provider và consumer.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Have the consumer choose subnets by matching the AZ IDs where the endpoint service is available.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Have the consumer enable private DNS on the endpoint so that the service is resolved in every zone.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Have the provider enable the NLB in the additional AZ IDs that the consumer uses.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Have the consumer allow inbound TCP 443 from the provider VPC CIDR in the endpoint security group.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Have the provider turn off acceptance required so that connections are accepted in all zones.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A provider offers a service to hundreds of consumer VPCs through AWS PrivateLink with a Network Load Balancer. For security auditing and per-customer rate limiting, the backend application must identify which consumer VPC endpoint originated each TCP connection. Several consumers use overlapping CIDR ranges. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Backend cần biết kết nối đến từ endpoint nào; CIDR consumer trùng nhau nên IP không đáng tin làm định danh.\n(A) SAI: Qua PrivateLink, IP nguồn backend thấy là IP private của NLB, không phải IP client; hơn nữa CIDR trùng nên IP không định danh duy nhất.\n(B) SAI: NLB không chèn header X-Forwarded-For; đó là tính năng của ALB ở tầng HTTP.\n(C) SAI: Flow Logs phía provider chỉ thấy IP của NLB, không có endpoint ID và không dùng được cho xử lý theo từng kết nối thời gian thực.\n(D) ĐÚNG: Bật Proxy Protocol v2 trên target group của NLB; header PPv2 mang IP client và TLV chứa VPC endpoint ID của consumer, backend đọc để kiểm toán và giới hạn theo khách hàng.\nĐáp án đúng: D\nĐiểm cần nhớ: PrivateLink + NLB: định danh consumer bằng Proxy Protocol v2 (có VPC endpoint ID), không dựa vào IP nguồn.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Read the client source IP address that the NLB preserves for PrivateLink traffic to each target.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Read the X-Forwarded-For header that the NLB adds to every request that comes from consumers.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable VPC Flow Logs in the provider VPC and join the records with the connection timestamps.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable Proxy Protocol v2 on the target group and parse the VPC endpoint ID in the header.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company wants its S3 gateway endpoints to enforce a data perimeter. Workloads must not be able to use the endpoint with credentials from outside the company's AWS Organizations organization, and workloads must not be able to send data to buckets owned outside the organization, even if an attacker gains control of an instance. Which TWO conditions should the endpoint policy use?",
+    "explanation": "Phân tích đề: Hai chiều của data perimeter trên endpoint: danh tính tin cậy (principal trong tổ chức) và tài nguyên tin cậy (bucket trong tổ chức).\n(A) ĐÚNG: aws:PrincipalOrgID bằng ID tổ chức chặn attacker dùng credential của account ngoài qua endpoint.\n(B) SAI: aws:SourceVpce dùng trong resource policy phía tài nguyên; trong endpoint policy thì request nào cũng đã đi qua chính endpoint đó nên điều kiện này không thêm giới hạn.\n(C) ĐÚNG: aws:ResourceOrgID bằng ID tổ chức chỉ cho phép truy cập bucket thuộc tổ chức, chặn đẩy dữ liệu ra bucket bên ngoài.\n(D) SAI: aws:SourceIp không chứa IP private khi đi qua endpoint, và không liên quan tới danh tính hay chủ sở hữu bucket.\n(E) SAI: Điều kiện mã hóa phía server bảo vệ dữ liệu lưu trữ, không ngăn ghi sang bucket của người khác.\nĐáp án đúng: A và C\nĐiểm cần nhớ: Endpoint policy cho data perimeter = aws:PrincipalOrgID (danh tính) + aws:ResourceOrgID (tài nguyên).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "aws:PrincipalOrgID equal to the organization ID of the company", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "aws:SourceVpce equal to the ID of the same gateway endpoint", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "aws:ResourceOrgID equal to the organization ID of the company", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "aws:SourceIp equal to the private CIDR range of the workload VPC", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "s3:x-amz-server-side-encryption equal to aws:kms for all requests", "isCorrect": false }
+    ]
+  }
+]

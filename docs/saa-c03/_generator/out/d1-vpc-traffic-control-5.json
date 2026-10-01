@@ -1,0 +1,173 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A VPC contains two subnets, and a solutions architect wants to stop all traffic between them. An engineer proposes deleting the local route from the route tables of both subnets. What should the solutions architect tell the engineer?",
+    "explanation": "Phân tích đề: Muốn chặn traffic giữa hai subnet trong cùng VPC; đề xuất xóa route local.\n(A) SAI: Route local không xóa được; và route local cũng không liên quan tới truy cập internet qua internet gateway (đó là route 0.0.0.0/0 riêng).\n(B) ĐÚNG: Route local (CIDR của VPC) được tạo tự động trong mọi route table và không thể xóa. Muốn chặn traffic giữa các subnet thì dùng lớp lọc: network ACL ở biên subnet (deny CIDR của subnet kia) và/hoặc security group.\n(C) SAI: Main route table cũng chứa route local không xóa được; không có route table nào cho phép xóa route local.\n(D) SAI: Route cụ thể hơn route local chỉ được trỏ tới một số target như NAT gateway, network interface, Gateway Load Balancer endpoint hoặc firewall endpoint; không có target 'blackhole' để tạo thủ công.\nĐáp án đúng: B\nĐiểm cần nhớ: Route table quyết định đường đi, route local luôn tồn tại; chặn traffic giữa subnet trong VPC là việc của NACL/security group.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Deleting the local route works, but it also removes internet access through the internet gateway.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "The local route cannot be deleted, so use network ACL rules to block the traffic instead.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "The local route can be deleted only from the main route table, so associate both subnets with it first.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Replace the local route with a blackhole route for the CIDR block of the other subnet.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A company created an AWS Site-to-Site VPN connection with dynamic (BGP) routing between its data center and a virtual private gateway that is attached to a VPC. Both tunnels are UP, but Amazon EC2 instances in private subnets cannot reach on-premises servers. Security groups and network ACLs allow the traffic. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Tunnel UP, SG/NACL đã cho phép => lớp lọc không phải vấn đề, nghi vấn là routing trong VPC: route table của private subnet chưa có route tới CIDR on-premises.\n(A) SAI: Internet gateway đưa traffic ra internet public, không phải qua tunnel VPN tới mạng private on-premises.\n(B) SAI: NAT gateway dùng để ra internet (hoặc NAT private), không thay thế được route tới virtual private gateway; đặt NAT gateway trong private subnet cũng không tạo route tới on-premises.\n(C) ĐÚNG: Bật route propagation từ virtual private gateway trên route table của private subnet; các prefix on-premises học qua BGP sẽ tự xuất hiện trong route table với target là virtual private gateway.\n(D) SAI: Customer gateway là tài nguyên đại diện cho thiết bị phía on-premises, không phải target hợp lệ trong route table của VPC.\nĐáp án đúng: C\nĐiểm cần nhớ: VPN/Direct Connect qua virtual private gateway: nhớ bật route propagation (hoặc thêm static route) trên đúng route table của subnet cần dùng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a route to the on-premises CIDR block that targets the internet gateway in the private route tables.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create a NAT gateway in a private subnet and route the on-premises CIDR block to the NAT gateway.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Enable route propagation from the virtual private gateway on the private subnets' route tables.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Add a route to the on-premises CIDR block that targets the customer gateway.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A developer wants internet users to reach a web application that runs on an Amazon EC2 instance in a private subnet. The developer plans to configure the existing NAT gateway to forward TCP 443 from its Elastic IP address to the instance. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Cần cho người dùng internet truy cập vào instance trong private subnet; đề xuất dùng NAT gateway để port forwarding.\n(A) ĐÚNG: NAT gateway chỉ hỗ trợ kết nối do instance bên trong khởi tạo đi ra, không nhận kết nối khởi tạo từ internet và không có port forwarding. Cách đúng là đặt ALB internet-facing ở public subnet, đăng ký instance làm target và giữ instance ở private subnet.\n(B) SAI: NAT gateway không gắn được security group, nên không có rule inbound nào để thêm; kể cả có thì NAT gateway cũng không chuyển tiếp kết nối vào.\n(C) SAI: NAT gateway không có tính năng port mapping; route 0.0.0.0/0 tới NAT gateway chỉ phục vụ traffic đi ra.\n(D) SAI: Egress-only internet gateway chỉ dành cho IPv6 và chỉ cho phép kết nối đi ra, chặn kết nối khởi tạo từ internet.\nĐáp án đúng: A\nĐiểm cần nhớ: NAT gateway = chỉ outbound, không inbound, không port forwarding. Expose ứng dụng private => load balancer ở public subnet.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Put an internet-facing Application Load Balancer in public subnets and register the instance as a target.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Add an inbound rule that allows TCP 443 from 0.0.0.0/0 to the security group of the NAT gateway.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a port mapping on the NAT gateway from TCP 443 on its Elastic IP address to the instance's private IP address.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Replace the NAT gateway with an egress-only internet gateway and allow inbound TCP 443 through it.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A solutions architect is writing inbound rules for a security group that protects an application tier. Which TWO values can be specified as the source of an inbound security group rule? (Select TWO.)",
+    "explanation": "Phân tích đề: Hỏi các loại nguồn hợp lệ trong rule inbound của security group.\n(A) SAI: Security group lọc ở tầng mạng; IAM role là danh tính cho API AWS, không thể dùng làm nguồn traffic mạng.\n(B) ĐÚNG: Nguồn có thể là một khối CIDR IPv4 hoặc IPv6 (một địa chỉ /32 hoặc một dải).\n(C) SAI: Security group không hỗ trợ tên miền (FQDN) làm nguồn; lọc theo domain là việc của AWS Network Firewall (đối với egress) hoặc Route 53 Resolver DNS Firewall.\n(D) SAI: Security group không lọc theo tag của instance; muốn nhóm instance theo logic thì tham chiếu security group.\n(E) ĐÚNG: Nguồn có thể là ID của security group khác (hoặc chính nó), cho phép mọi ENI gắn SG đó mà không cần biết IP; ngoài ra nguồn còn có thể là managed prefix list.\nĐáp án đúng: B và E\nĐiểm cần nhớ: Nguồn của rule SG: CIDR, security group ID, prefix list. Không có FQDN, tag hay IAM; NACL thì chỉ hiểu CIDR.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "An IAM role that is attached to the client instances", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "An IPv4 or IPv6 CIDR block", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "A fully qualified domain name such as api.example.com", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "A tag key and value that are applied to the client instances", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "The ID of another security group", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company has 12 VPCs in one AWS Region, and the number is growing every quarter. Every VPC must communicate with every other VPC and with the on-premises network over a single AWS Direct Connect connection. Managing VPC peering connections and route tables has become error prone. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Nhiều VPC, đang tăng, cần any-to-any và kết nối on-premises qua một Direct Connect, ít vận hành nhất.\n(A) SAI: Full mesh peering với 12 VPC cần 66 peering connection và tăng theo cấp số khi thêm VPC, kèm route trong mọi route table; chính là vấn đề đang gặp phải.\n(B) SAI: VPC peering không có transitive routing; spoke không thể đi qua VPC hub để tới spoke khác.\n(C) SAI: VPN từ mỗi VPC rồi vòng qua on-premises để nói chuyện giữa các VPC tạo hairpin, tăng độ trễ và phụ thuộc thiết bị on-premises; phải quản lý nhiều tunnel.\n(D) ĐÚNG: Transit gateway là hub định tuyến có transitive routing; mỗi VPC chỉ cần một attachment. Kết nối Direct Connect qua transit VIF tới Direct Connect gateway gắn với transit gateway để on-premises tới mọi VPC.\nĐáp án đúng: D\nĐiểm cần nhớ: Vài VPC, ít thay đổi => peering; nhiều VPC cần transitive + hybrid => transit gateway (Direct Connect qua transit VIF + Direct Connect gateway).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create full-mesh VPC peering connections and associate each VPC's virtual private gateway with a Direct Connect gateway.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Designate one VPC as a hub, peer every other VPC with it, and route spoke-to-spoke traffic through the hub VPC.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create a Site-to-Site VPN from each VPC to the on-premises router and route inter-VPC traffic through the data center.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Attach all VPCs to a transit gateway that is associated with a Direct Connect gateway over a transit VIF.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company uses AWS Organizations. A central network team must own and control the VPC, subnets, route tables, network ACLs, and NAT gateways. Application teams in separate accounts must launch their own Amazon EC2 instances and Amazon RDS databases into those subnets but must not be able to change the network configuration. The company wants to avoid creating a VPC in every account. What should a solutions architect recommend?",
+    "explanation": "Phân tích đề: Một đội mạng sở hữu VPC; nhiều account ứng dụng triển khai tài nguyên vào cùng subnet nhưng không sửa được mạng; không tạo VPC ở mỗi account.\n(A) ĐÚNG: VPC sharing qua AWS RAM chia sẻ subnet từ account mạng cho các account trong Organization. Participant tạo EC2, RDS và security group của mình trong subnet được chia sẻ, nhưng không thể sửa route table, NACL, NAT gateway hay subnet thuộc owner.\n(B) SAI: Vi phạm yêu cầu không tạo VPC ở mỗi account; thêm vào đó, peering không có edge-to-edge routing nên các VPC ứng dụng không thể dùng NAT gateway của VPC trung tâm.\n(C) SAI: Cấp IAM role trong account mạng khiến tài nguyên ứng dụng nằm trong account mạng, mất ranh giới account và tách chi phí giữa các đội.\n(D) SAI: Vẫn cần VPC ở mỗi account và đội ứng dụng tự quản lý mạng của VPC mình; SCP chặn sửa route table chỉ là vá thêm, không đạt mô hình đội mạng sở hữu một VPC chung.\nĐáp án đúng: A\nĐiểm cần nhớ: Một VPC tập trung, nhiều account cùng triển khai vào, đội mạng giữ quyền routing/NACL => VPC sharing bằng AWS RAM.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Share the subnets from the network account with the application accounts by using AWS Resource Access Manager.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Create a VPC in each application account and peer it with a central network VPC that owns the NAT gateways.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Grant the application teams IAM roles in the network account that allow them to launch resources into the VPC.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Attach a VPC from each application account to a transit gateway and apply SCPs that deny route table changes.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "Amazon EC2 instances in private subnets call AWS Secrets Manager through an interface VPC endpoint that has private DNS enabled. The Secrets Manager DNS name resolves to the endpoint's private IP addresses, but API calls time out. The endpoint network interfaces use a security group that allows inbound traffic only from itself. The instances use the security group sg-app, and the subnets use the default network ACL. The traffic must stay private. What should a solutions architect do?",
+    "explanation": "Phân tích đề: DNS đã phân giải đúng về IP của endpoint, kết nối timeout => lớp lọc chặn. Default NACL cho phép tất cả, nên nghi vấn là security group của endpoint chỉ cho phép traffic từ chính nó.\n(A) SAI: NAT gateway đưa traffic ra endpoint public của Secrets Manager qua internet, vi phạm yêu cầu giữ traffic private và bỏ qua endpoint đã tạo.\n(B) ĐÚNG: ENI của interface endpoint được bảo vệ bởi security group; thêm rule inbound TCP 443 với nguồn là sg-app để instance gọi API được. Response tự quay về vì SG stateful.\n(C) SAI: Default NACL cho phép tất cả in/out, nên thêm rule ephemeral không thay đổi gì.\n(D) SAI: Gateway endpoint chỉ hỗ trợ Amazon S3 và DynamoDB; Secrets Manager chỉ dùng được interface endpoint (PrivateLink).\nĐáp án đúng: B\nĐiểm cần nhớ: Interface endpoint timeout dù DNS đúng => kiểm tra security group của endpoint (inbound 443 từ SG của client).",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Add a NAT gateway and a 0.0.0.0/0 route so that the calls can reach the regional Secrets Manager endpoint.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Add an inbound rule for TCP 443 from sg-app to the security group of the endpoint network interfaces.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Add network ACL rules that allow TCP 1024-65535 outbound and inbound on the private subnets.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create a gateway VPC endpoint for Secrets Manager and add it to the private subnets' route tables.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A security team wants to be alerted within a few minutes when the number of rejected connection attempts to a group of bastion host network interfaces exceeds a threshold. The team also wants to search the recent records interactively during investigations. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Cảnh báo trong vài phút dựa trên số kết nối bị REJECT, tìm kiếm tương tác log gần đây, ít vận hành nhất.\n(A) SAI: S3 + Athena rẻ cho lưu trữ dài hạn nhưng truy vấn chạy theo lịch mỗi giờ không đạt yêu cầu cảnh báo trong vài phút, và phải tự dựng lịch, xử lý kết quả.\n(B) SAI: Traffic Mirroring cần EC2 tự quản để đếm gói tin và tự đẩy metric; nhiều vận hành, trong khi metadata ACCEPT/REJECT đã có sẵn trong Flow Logs.\n(C) ĐÚNG: Gửi Flow Logs của các ENI vào CloudWatch Logs; metric filter đếm bản ghi có action REJECT, CloudWatch alarm gửi thông báo qua SNS khi vượt ngưỡng. CloudWatch Logs Insights cho phép tìm kiếm tương tác.\n(D) SAI: AWS Config đánh giá cấu hình (vd SG mở SSH ra 0.0.0.0/0), không đếm được số lần kết nối bị từ chối thực tế.\nĐáp án đúng: C\nĐiểm cần nhớ: Cảnh báo gần thời gian thực từ Flow Logs => CloudWatch Logs + metric filter + alarm; lưu trữ lâu, truy vấn ad hoc rẻ => S3 + Athena.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Publish the flow logs to Amazon S3 and run a scheduled Amazon Athena query every hour that sends results to an Amazon SNS topic.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Mirror the bastion traffic to an EC2 instance that counts rejected packets and publishes a custom CloudWatch metric.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Send VPC Flow Logs for the interfaces to CloudWatch Logs and alarm on a metric filter for REJECT records.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Enable the AWS Config restricted-ssh managed rule and send noncompliance notifications through Amazon SNS.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "Private subnets (10.0.16.0/20) reach the internet through a NAT gateway in a public subnet. The network team associated a custom network ACL with the public subnet that contains only these rules: inbound rule 100 allows TCP 443 from 10.0.16.0/20, and outbound rule 100 allows TCP 443 to 0.0.0.0/0. The private subnets use the default network ACL. HTTPS calls from the private instances now fail. Which TWO rules must be added to the public subnet's network ACL? (Select TWO.)",
+    "explanation": "Phân tích đề: Theo dõi cả 4 chặng qua subnet chứa NAT gateway. Request từ instance vào subnet (443, đã cho phép) rồi đi ra internet (443, đã cho phép). Response từ internet vào subnet trên port tạm của NAT gateway, rồi đi ra tới instance trên ephemeral port của instance: hai chặng này còn thiếu vì NACL stateless.\n(A) ĐÚNG: Response từ server internet tới địa chỉ của NAT gateway trên port nguồn mà NAT gateway đã cấp (1024-65535) cần rule inbound TCP 1024-65535 từ 0.0.0.0/0.\n(B) SAI: Inbound TCP 443 từ 0.0.0.0/0 chỉ khớp kết nối mới đi tới port 443; response có destination port là ephemeral nên không khớp, đồng thời mở rộng bề mặt tấn công không cần thiết.\n(C) SAI: Response từ NAT gateway tới instance có destination port là ephemeral port của instance chứ không phải 443.\n(D) ĐÚNG: Sau khi NAT gateway dịch ngược địa chỉ, gói response rời public subnet tới instance trên ephemeral port, cần rule outbound TCP 1024-65535 tới 10.0.16.0/20.\n(E) SAI: Traffic từ private subnet vào public subnet có destination port 443 (đã được rule 100 cho phép), không phải ephemeral; rule này không khớp chặng nào bị chặn.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Subnet chứa NAT gateway với custom NACL cần đủ 4 rule: in 443 từ private, out 443 ra internet, in ephemeral từ internet, out ephemeral về private.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "An inbound rule that allows TCP 1024-65535 from 0.0.0.0/0", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "An inbound rule that allows TCP 443 from 0.0.0.0/0", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "An outbound rule that allows TCP 443 to 10.0.16.0/20", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "An outbound rule that allows TCP 1024-65535 to 10.0.16.0/20", "isCorrect": true },
+      { "answerLabel": "E", "answerText": "An inbound rule that allows TCP 1024-65535 from 10.0.16.0/20", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company acquired another company. Both companies have VPCs that use the 10.0.0.0/16 CIDR block in separate AWS accounts. Applications in the acquiring company's VPC must call a single internal HTTPS service in the acquired company's VPC. Re-addressing either VPC is not possible in the near term, and the service must not be exposed to the internet. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Hai VPC trùng CIDR, chỉ cần truy cập một dịch vụ, một chiều, không public, không đổi địa chỉ, ít vận hành nhất.\n(A) SAI: VPC peering không thể tạo giữa hai VPC có CIDR trùng nhau, nên không có peering để thêm route /32.\n(B) SAI: Gắn hai VPC trùng CIDR vào transit gateway không giải quyết xung đột: route local 10.0.0.0/16 trong mỗi VPC luôn thắng nên traffic tới 10.0.x.x không bao giờ rời VPC nguồn.\n(C) SAI: Private NAT gateway với subnet không trùng và transit gateway có thể giải quyết trùng CIDR, nhưng cần thêm CIDR phụ, subnet, transit gateway, NAT gateway và routing ở cả hai bên; nhiều vận hành hơn hẳn cho nhu cầu một dịch vụ.\n(D) ĐÚNG: AWS PrivateLink: bên cung cấp đặt dịch vụ sau NLB và tạo endpoint service; bên dùng tạo interface endpoint với IP trong VPC của mình. Không cần routing giữa hai VPC nên trùng CIDR không thành vấn đề và dịch vụ không lộ ra internet.\nĐáp án đúng: D\nĐiểm cần nhớ: CIDR trùng + chỉ cần truy cập một dịch vụ cụ thể => PrivateLink (endpoint service + interface endpoint); peering không hỗ trợ CIDR trùng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Create a VPC peering connection and add routes for only the service's /32 address in the consumer route tables.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Attach both VPCs to a shared transit gateway and add a static route for the service's IP address.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add non-overlapping secondary CIDR blocks with private NAT gateways in both VPCs and connect them through a transit gateway.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Publish the service as an NLB-based endpoint service and create an interface endpoint in the consumer VPC.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company attaches Dev, Test, Prod, and Shared Services VPCs to one transit gateway and connects its data center through a Site-to-Site VPN attachment. Dev and Test may communicate with each other. Prod must not communicate with Dev or Test. All VPCs must reach Shared Services, and the data center must reach every VPC. The company does not want to manage network ACL or security group rules for this isolation. Which solution meets these requirements with the LEAST operational overhead?",
+    "explanation": "Phân tích đề: Phân đoạn mạng trên transit gateway: non-prod nói chuyện với nhau, prod tách biệt, ai cũng tới Shared Services và on-premises; không dùng NACL/SG để cô lập.\n(A) SAI: Default route table có propagation từ mọi attachment cho phép mọi VPC thấy nhau; thêm NACL deny trong Prod chạy được nhưng vi phạm yêu cầu không quản lý NACL và dễ sai khi thêm VPC.\n(B) ĐÚNG: Dùng nhiều transit gateway route table: Dev và Test gắn vào bảng non-prod có propagation từ Dev, Test, Shared Services và VPN; Prod gắn vào bảng có propagation từ Shared Services và VPN; Shared Services và VPN gắn vào bảng có propagation từ mọi VPC. Prod không có route tới Dev/Test và ngược lại.\n(C) SAI: Blackhole route cho CIDR Prod trong default route table áp dụng cho mọi attachment gắn bảng đó, nên Shared Services và on-premises cũng mất đường tới Prod.\n(D) SAI: Transit gateway peering chỉ hỗ trợ static route, không hỗ trợ propagation; và nếu chia sẻ toàn bộ route giữa hai transit gateway thì Prod lại thấy được Dev/Test.\nĐáp án đúng: B\nĐiểm cần nhớ: Cô lập theo môi trường trên transit gateway => nhiều route table: association quyết định attachment tra bảng nào, propagation quyết định bảng học route của ai.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Keep the default transit gateway route table with propagation from every attachment, and add network ACL deny rules for the Dev and Test CIDR blocks in the Prod subnets.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Create separate transit gateway route tables for non-prod, prod, and shared attachments, and control reachability with associations and route propagations.", "isCorrect": true },
+      { "answerLabel": "C", "answerText": "Keep the default transit gateway route table and add blackhole routes for the Prod CIDR block so that Dev and Test traffic to Prod is dropped.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Move Prod to a second transit gateway, peer the two transit gateways, and enable route propagation across the peering attachment.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company is moving container workloads into IPv6-only subnets to conserve IPv4 address space. The containers must call a partner API that is reachable only over IPv4 on the internet. The subnets must remain IPv6-only, the containers must not be reachable from the internet, and the solution must use managed AWS networking services. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Workload IPv6-only cần gọi đích chỉ có IPv4 trên internet; không được thêm IPv4 vào subnet; không inbound; dùng dịch vụ managed.\n(A) ĐÚNG: Bật DNS64 trên subnet IPv6-only để Route 53 Resolver tổng hợp bản ghi AAAA (prefix 64:ff9b::/96) cho tên miền chỉ có A record; route 64:ff9b::/96 tới public NAT gateway trong public subnet dual-stack. NAT gateway thực hiện NAT64 sang IPv4 ra internet, và chỉ cho phép kết nối đi ra.\n(B) SAI: Egress-only internet gateway chỉ xử lý traffic IPv6; đích chỉ có IPv4 thì container IPv6-only không thể tới được qua đó.\n(C) SAI: Thêm CIDR IPv4 vào subnet vi phạm yêu cầu giữ subnet IPv6-only và tiêu tốn đúng không gian IPv4 cần tiết kiệm.\n(D) SAI: Private NAT gateway không có đường ra internet (không gắn Elastic IP, không dùng IGW), nên không tới được API của partner trên internet.\nĐáp án đúng: A\nĐiểm cần nhớ: IPv6-only gọi đích IPv4 => DNS64 trên subnet + route 64:ff9b::/96 tới NAT gateway (NAT64). IPv6 ra internet thuần IPv6 => egress-only internet gateway.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable DNS64 on the subnets and route 64:ff9b::/96 to a public NAT gateway in a dual-stack public subnet.", "isCorrect": true },
+      { "answerLabel": "B", "answerText": "Route ::/0 from the subnets to an egress-only internet gateway so that the containers can reach the partner API.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Add an IPv4 CIDR block to each subnet and route 0.0.0.0/0 to a public NAT gateway in a public subnet.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Enable DNS64 on the subnets and route 64:ff9b::/96 to a private NAT gateway in the same subnets.", "isCorrect": false }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A company must send a copy of all traffic of 300 Nitro-based Amazon EC2 instances across three Availability Zones to a third-party intrusion detection system (IDS) that runs on a fleet of EC2 appliances. The IDS must analyze full packet payloads out of band and must not be placed inline. The appliance fleet must scale and tolerate the loss of an appliance, and internal health check traffic must be excluded from the copies. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Cần bản sao đầy đủ gói tin (payload), out-of-band, appliance co giãn và chịu lỗi, lọc bỏ traffic health check.\n(A) SAI: Flow Logs chỉ có metadata, không có payload, nên IDS không phân tích nội dung được.\n(B) SAI: Network Firewall nằm inline trên đường đi (vi phạm yêu cầu không inline) và alert log không phải là gói tin thô cho IDS bên thứ ba.\n(C) SAI: Mirror target là ENI của một appliance mỗi AZ tạo single point of failure và không co giãn; mất appliance là mất dữ liệu của AZ đó.\n(D) ĐÚNG: Traffic Mirroring session trên ENI của các instance Nitro, mirror filter loại bỏ traffic health check, mirror target là Network Load Balancer (listener UDP 4789 cho VXLAN) phía trước Auto Scaling group của appliance; NLB phân tải và tránh appliance lỗi qua health check.\nĐáp án đúng: D\nĐiểm cần nhớ: Traffic Mirroring ở quy mô lớn => mirror target là NLB (hoặc Gateway Load Balancer endpoint) trước fleet appliance; mirror filter để giảm khối lượng.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Enable VPC Flow Logs on all network interfaces and stream them through Amazon Data Firehose to the IDS appliance fleet.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Deploy AWS Network Firewall with stateful IDS rules in each Availability Zone and forward its alert logs to the IDS appliances.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Create Traffic Mirroring sessions with a filter that excludes health checks and target one large IDS appliance ENI per Availability Zone.", "isCorrect": false },
+      { "answerLabel": "D", "answerText": "Create filtered Traffic Mirroring sessions that target a Network Load Balancer in front of an Auto Scaling group of IDS appliances.", "isCorrect": true }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "An application runs on Amazon EC2 instances in private subnets in two Availability Zones behind an internet-facing Application Load Balancer (ALB). A partner requires that all outbound API calls from the application come from a small, fixed set of public IPv4 addresses. The partner also calls a webhook on the application and must allow-list fixed destination IPv4 addresses in its firewall. The solution must remain highly available across both Availability Zones. Which TWO actions meet these requirements? (Select TWO.)",
+    "explanation": "Phân tích đề: Hai yêu cầu IP cố định: chiều ra (source IP cố định) và chiều vào (destination IP cố định), cả hai phải HA trên 2 AZ.\n(A) SAI: ALB không hỗ trợ gắn Elastic IP; địa chỉ IP của ALB thay đổi theo thời gian, nên đây là bẫy dễ chọn.\n(B) SAI: Instance ở private subnet đi ra qua route của subnet, Elastic IP gắn trên instance không được dùng; ngoài ra gắn EIP cho từng instance trong Auto Scaling group tốn vận hành và không giữ được tập IP nhỏ cố định.\n(C) ĐÚNG: Mỗi AZ có một NAT gateway với một Elastic IP, route table private của AZ trỏ tới NAT gateway cùng AZ. Partner allow-list hai địa chỉ này; một AZ lỗi không ảnh hưởng AZ còn lại.\n(D) SAI: Egress-only internet gateway chỉ phục vụ IPv6, không cung cấp IPv4 public cố định.\n(E) ĐÚNG: NLB internet-facing hỗ trợ gắn một Elastic IP cho mỗi subnet/AZ, và có thể dùng target group kiểu ALB để chuyển tiếp tới ALB hiện có; partner allow-list các EIP của NLB.\nĐáp án đúng: C và E\nĐiểm cần nhớ: IP nguồn cố định cho traffic đi ra => NAT gateway + Elastic IP (một NAT/AZ). IP đích cố định cho traffic đi vào => NLB với Elastic IP (hoặc Global Accelerator); ALB không có EIP.",
+    "answers": [
+      { "answerLabel": "A", "answerText": "Associate an Elastic IP address with the ALB in each Availability Zone and give those addresses to the partner.", "isCorrect": false },
+      { "answerLabel": "B", "answerText": "Allocate an Elastic IP address for each instance in the Auto Scaling group by using a launch script.", "isCorrect": false },
+      { "answerLabel": "C", "answerText": "Route each private subnet to a NAT gateway in its own AZ that has an Elastic IP address.", "isCorrect": true },
+      { "answerLabel": "D", "answerText": "Add an egress-only internet gateway and route the private subnets' outbound traffic through it.", "isCorrect": false },
+      { "answerLabel": "E", "answerText": "Place an internet-facing NLB with an Elastic IP address per AZ in front of the ALB as its target.", "isCorrect": true }
+    ]
+  }
+]

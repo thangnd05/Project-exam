@@ -1,0 +1,409 @@
+[
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A single-page application signs users in with an Amazon Cognito user pool. The front end must display the signed-in user's name and email address from the authentication result without calling another API. Which token should the application read?",
+    "explanation": "Phân tích đề: Cần thông tin hồ sơ (name, email) của user ngay sau đăng nhập => token mang claim về danh tính người dùng.\n(A) SAI: Refresh token của Cognito là chuỗi mờ (opaque, được mã hóa) chỉ dùng để lấy token mới, ứng dụng không đọc được thuộc tính từ nó.\n(B) SAI: Access token dùng để ủy quyền gọi API: chứa scope, group, username, không chứa đầy đủ thuộc tính như email hay name theo mặc định.\n(C) SAI: Session token là một phần của AWS credentials tạm thời để ký request AWS, không chứa hồ sơ người dùng.\n(D) ĐÚNG: ID token là JWT theo chuẩn OpenID Connect, chứa các claim thuộc tính người dùng như sub, email, name, dùng để ứng dụng biết người đang đăng nhập là ai.\nĐáp án đúng: D\nĐiểm cần nhớ: ID token = người dùng là ai (thuộc tính). Access token = được phép gọi gì (scope, group). Refresh token = lấy token mới.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "The refresh token, which carries all of the user's attributes in a signed JSON payload.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "The access token, which includes every standard and custom user attribute by default.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "The AWS session token that AWS STS returns for the identity pool's authenticated role.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "The ID token, which carries claims about the authenticated user's identity attributes.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "A travel booking app wants customers to sign in with Facebook or Sign in with Apple, and it must also support email and password accounts. The app must receive one consistent set of tokens and keep one user profile store regardless of how each customer signs in. What should the company use?",
+    "explanation": "Phân tích đề: Social login (Facebook, Apple) + tài khoản email/password, một bộ token và một thư mục người dùng thống nhất => User Pool với social federation.\n(A) SAI: IAM Identity Center dành cho workforce, chỉ dùng một identity source doanh nghiệp, không hỗ trợ đăng nhập khách hàng bằng Facebook hay Apple.\n(B) SAI: Identity Pool không lưu hồ sơ và không có tài khoản email/password; nó trả AWS credentials, không phải bộ JWT thống nhất cho app.\n(C) ĐÚNG: User Pool federate với social IdP, tạo hồ sơ người dùng trong pool cho cả user native lẫn user social và luôn phát hành JWT của Cognito, nên app chỉ xử lý một loại token.\n(D) SAI: IAM OIDC provider phục vụ việc assume IAM role bằng web identity, không có thư mục người dùng hay tài khoản email/password.\nĐáp án đúng: C\nĐiểm cần nhớ: Đăng nhập Google/Facebook/Apple/SAML vào app và nhận JWT thống nhất => User Pool federation.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "AWS IAM Identity Center with Facebook and Apple configured as external identity sources.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "An Amazon Cognito identity pool that uses developer-authenticated identities for each provider.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "An Amazon Cognito user pool with Facebook and Apple configured as social identity providers.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "An IAM OIDC identity provider for each social network created in the company's AWS account.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "basic",
+    "questionText": "An online learning platform uses an Amazon Cognito user pool. New users must prove that they own their email address by entering a one-time code before their account is confirmed. Which user pool configuration meets this requirement?",
+    "explanation": "Phân tích đề: Xác minh quyền sở hữu email bằng mã một lần trước khi xác nhận tài khoản => tính năng verification có sẵn của User Pool.\n(A) SAI: CloudTrail chỉ ghi log hoạt động API để kiểm toán, không xác minh gì cho người dùng.\n(B) ĐÚNG: Khi bật xác minh email, Cognito gửi mã tới địa chỉ email lúc sign-up; user nhập mã (ConfirmSignUp) thì tài khoản mới được xác nhận và email được đánh dấu verified.\n(C) SAI: Guest access của Identity Pool cấp quyền AWS cho người chưa đăng nhập, không liên quan tới việc xác minh email.\n(D) SAI: Phải tự xây luồng xử lý email trả lời, không phải cơ chế xác minh của Cognito và dễ bị giả mạo.\nĐáp án đúng: B\nĐiểm cần nhớ: Xác minh email/phone, quên mật khẩu, MFA đều là tính năng có sẵn của User Pool, không cần tự xây.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Enable AWS CloudTrail data events on the user pool to capture the users' email addresses.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable Cognito-assisted verification of the email attribute during self-service sign-up.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Enable unauthenticated identities in a Cognito identity pool linked to the user pool.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create an Amazon SES receipt rule that confirms users when they reply to a welcome email.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "basic",
+    "questionText": "A company is choosing between Amazon Cognito and AWS IAM Identity Center for two new projects. Which TWO statements about these services are correct? (Select TWO.)",
+    "explanation": "Phân tích đề: Phân biệt CIAM (Cognito, khách hàng) với workforce identity (IAM Identity Center, nhân viên nhiều account).\n(A) SAI: Truy cập console cho kỹ sư dùng IAM Identity Center (hoặc IAM); User Pool không cấp quyền vào AWS Management Console.\n(B) ĐÚNG: Cognito là dịch vụ customer identity and access management: sign-up, sign-in, federation cho end-user của ứng dụng ở quy mô lớn.\n(C) ĐÚNG: IAM Identity Center cung cấp SSO cho nhân viên vào nhiều account trong AWS Organizations và các ứng dụng doanh nghiệp qua permission set.\n(D) SAI: Guest access cho app mobile là unauthenticated role của Cognito Identity Pool; IAM Identity Center luôn yêu cầu người dùng đăng nhập.\n(E) SAI: Cognito Identity Pool vẫn assume IAM role qua STS; quyền trên S3, DynamoDB luôn được định nghĩa bằng IAM policy của role.\nĐáp án đúng: B và C\nĐiểm cần nhớ: Cognito = khách hàng của app (CIAM). IAM Identity Center = nhân viên, nhiều AWS account. Khác đối tượng hoàn toàn.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Amazon Cognito user pools are the recommended way to give engineers AWS console access.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Amazon Cognito is designed for customer identities of web and mobile apps at a scale of millions.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "IAM Identity Center is designed for workforce users who access multiple AWS accounts and apps.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "IAM Identity Center issues temporary AWS credentials to anonymous guests of a mobile app.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Amazon Cognito replaces IAM roles, so Cognito users never need a role to access AWS resources.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "An e-commerce company uses an Amazon Cognito user pool. When a new customer confirms their account, the company must create a customer profile item in Amazon DynamoDB and request a welcome coupon from an internal service. Profiles must not be created for users who never finish confirmation. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Hành động chỉ sau khi user xác nhận tài khoản thành công, không tạo hồ sơ cho user chưa xác nhận => Lambda trigger sau bước confirm.\n(A) SAI: Pre sign-up chạy trước khi user được tạo và trước khi xác nhận, nên sẽ tạo hồ sơ cho cả user bỏ dở, vi phạm yêu cầu.\n(B) SAI: Quét định kỳ gây trễ tới một giờ, tốn gọi API ListUsers và phải tự xử lý trùng lặp, trong khi đã có trigger hướng sự kiện.\n(C) SAI: Custom message chạy khi gửi mã xác minh, tức là trước khi user xác nhận, nên vẫn tạo hồ sơ cho user chưa hoàn tất.\n(D) ĐÚNG: Post confirmation chỉ chạy sau khi user xác nhận tài khoản (hoặc được admin xác nhận), nên hồ sơ và coupon chỉ tạo cho user thật sự hoàn tất đăng ký.\nĐáp án đúng: D\nĐiểm cần nhớ: Pre sign-up = trước khi tạo user (kiểm tra, auto-confirm). Post confirmation = sau khi xác nhận (tạo hồ sơ, gửi chào mừng).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Configure a Pre sign-up Lambda trigger that writes the profile and calls the coupon service.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Schedule an Amazon EventBridge rule that scans the user pool hourly and creates missing profiles.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure a Custom message Lambda trigger that writes the profile when a verification email is sent.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Configure a Post confirmation Lambda trigger that writes the profile and calls the coupon service.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A multi-tenant SaaS application uses one Amazon Cognito user pool. Each user's tenant ID and role are stored in an Amazon DynamoDB table that is managed by the provisioning service, not in user pool attributes. Backend microservices want to read tenant_id directly from the token claims instead of querying DynamoDB on every request. What should a solutions architect implement?",
+    "explanation": "Phân tích đề: Đưa dữ liệu từ nguồn bên ngoài (DynamoDB) vào claim của token lúc phát hành => Lambda trigger tùy biến token.\n(A) SAI: Identity Pool cấp AWS credentials, không thay đổi JWT mà microservice nhận; session name cũng không phải claim trong token.\n(B) SAI: Usage plan dùng cho throttling và quota theo API key, không có khả năng chèn header theo người dùng.\n(C) ĐÚNG: Pre token generation chạy ngay trước khi Cognito phát hành token; Lambda đọc DynamoDB và thêm hoặc sửa claim (tenant_id, role) nên mọi microservice đọc thẳng từ JWT đã ký.\n(D) SAI: Post authentication chỉ nhận thông tin sự kiện để ghi log hoặc xử lý phụ, không thể sửa token; token đã ký không thể chèn thêm claim.\nĐáp án đúng: C\nĐiểm cần nhớ: Thêm/bớt claim trong token dựa trên dữ liệu ngoài => Pre token generation trigger.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "A Cognito identity pool rule that maps tenant_id to the IAM role session name for each user.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "An API Gateway usage plan that injects tenant_id into every request header sent to services.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "A Pre token generation Lambda trigger that looks up DynamoDB and adds tenant_id as a claim.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "A Post authentication Lambda trigger that inserts tenant_id into the ID token after it is issued.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A consumer app's Amazon Cognito user pool sends verification and password-reset emails by using the default Cognito email configuration. After a marketing launch, many users report that they never received their verification codes. The company also wants these emails to come from no-reply@example.com. Which change should a solutions architect make?",
+    "explanation": "Phân tích đề: Email mặc định của Cognito có hạn mức gửi thấp và không dùng được địa chỉ gửi riêng => chuyển sang gửi qua Amazon SES.\n(A) SAI: Custom message chỉ tùy biến nội dung, không đổi kênh gửi hay hạn mức; trả nội dung rỗng còn làm hỏng việc xác minh.\n(B) ĐÚNG: Cấu hình email của User Pool dùng Amazon SES cho phép gửi khối lượng lớn theo hạn mức SES của account và dùng địa chỉ FROM trên domain đã xác minh; tính năng email mặc định chỉ có hạn mức nhỏ mỗi ngày, phù hợp thử nghiệm.\n(C) SAI: Cognito không gửi email xác minh qua SNS; SNS email subscription còn buộc người nhận xác nhận đăng ký trước, không phù hợp.\n(D) SAI: Mã không tới được hộp thư là do hạn mức gửi, kéo dài thời hạn mã không giải quyết được nguyên nhân và không đổi địa chỉ gửi.\nĐáp án đúng: B\nĐiểm cần nhớ: Cognito gửi email production => cấu hình Amazon SES (hạn mức cao, địa chỉ gửi riêng); SMS => Amazon SNS.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Replace email verification with a Custom message Lambda trigger that returns an empty message.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Configure the user pool to send email through Amazon SES with a verified example.com identity.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure the user pool to deliver email through Amazon SNS email subscriptions for each user.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Increase the verification code expiration time so that users request fewer replacement codes.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A company runs an Amazon OpenSearch Service domain in a VPC. Business analysts who do not have AWS accounts must sign in to OpenSearch Dashboards with credentials managed by the company, and they need self-service password reset and MFA. The company wants to avoid running a proxy or a custom login application. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Người dùng không có tài khoản AWS cần đăng nhập OpenSearch Dashboards, có quên mật khẩu và MFA, không dựng proxy => tích hợp Cognito authentication có sẵn của OpenSearch.\n(A) ĐÚNG: OpenSearch Service tích hợp sẵn Cognito: User Pool xác thực (MFA, reset mật khẩu, hosted UI), Identity Pool cấp IAM role để truy cập domain, không cần proxy.\n(B) SAI: Tạo IAM user cho người không quản trị AWS là sai đối tượng, và việc truy cập Dashboards bằng IAM vẫn cần ký SigV4 hoặc proxy.\n(C) SAI: ALB không có Lambda authorizer (đó là tính năng của API Gateway), và thêm tầng này trái yêu cầu không dựng proxy.\n(D) SAI: Lọc theo IP không phải xác thực danh tính, IP nhà thay đổi, không có MFA hay reset mật khẩu; domain trong VPC cũng không nhận truy cập từ Internet như vậy.\nĐáp án đúng: A\nĐiểm cần nhớ: OpenSearch Dashboards cho người dùng không có tài khoản AWS => bật Cognito authentication (User Pool + Identity Pool).",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Enable Amazon Cognito authentication for OpenSearch Dashboards with a user pool and identity pool.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create IAM users for the analysts and give each of them a console password for OpenSearch access.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Place an Application Load Balancer with a Lambda authorizer in front of OpenSearch Dashboards.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Configure the domain access policy to allow requests from each analyst's home IP address.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "intermediate",
+    "questionText": "A banking app's Amazon Cognito user pool must send SMS one-time codes for MFA to all customers in production. During testing, SMS messages were delivered only to a few verified phone numbers. Which TWO actions are required for Cognito to send SMS messages to every customer? (Select TWO.)",
+    "explanation": "Phân tích đề: Cognito gửi SMS thông qua Amazon SNS; chỉ tới được số đã xác minh => đang ở SNS SMS sandbox; Cognito cũng cần quyền gọi SNS.\n(A) SAI: Amazon SES gửi email, không gửi SMS; dedicated IP không liên quan tới SMS.\n(B) ĐÚNG: User Pool dùng một IAM role (trust cognito-idp.amazonaws.com) có quyền sns:Publish để gửi SMS thay mặt account.\n(C) ĐÚNG: Trong SMS sandbox, SNS chỉ gửi tới số điện thoại đã xác minh; phải yêu cầu ra khỏi sandbox thì mới gửi được tới mọi khách hàng.\n(D) SAI: Cognito gửi SMS trực tiếp tới số điện thoại, không qua topic; tạo topic cho từng khách hàng là không cần và không giải quyết sandbox.\n(E) SAI: Identity Pool guest access cấp AWS credentials, không liên quan tới việc gửi SMS MFA.\nĐáp án đúng: B và C\nĐiểm cần nhớ: Cognito SMS = Amazon SNS: cần IAM role cho Cognito và thoát SNS SMS sandbox trước khi lên production.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Configure Amazon SES with a dedicated IP address to deliver the SMS messages to phones.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Give Cognito an IAM role that allows it to publish SMS messages through Amazon SNS.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Move the Amazon SNS account out of the SMS sandbox in the Region that sends the messages.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create an Amazon SNS topic for each customer and subscribe that customer's phone number.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Enable guest access in an identity pool so customers can receive SMS codes before sign-in.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "intermediate",
+    "questionText": "A web application already authenticates users through its own backend that runs on AWS Lambda behind Amazon API Gateway. Users must upload documents directly from the browser to a private Amazon S3 bucket. The security team requires that browsers never receive AWS credentials of any kind and that the backend approve each individual upload. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Upload thẳng vào S3 nhưng browser không được nhận bất kỳ AWS credential nào, backend phê duyệt từng lần upload => presigned URL chứ không phải Identity Pool.\n(A) SAI: S3 không chấp nhận JWT của Cognito làm cơ chế xác thực; request S3 phải được ký SigV4 hoặc dùng presigned URL.\n(B) SAI: Cho phép PutObject ẩn danh mở bucket cho bất kỳ ai ghi dữ liệu, không có bước backend phê duyệt; Transfer Acceleration chỉ tăng tốc truyền.\n(C) ĐÚNG: Backend kiểm tra quyền rồi ký presigned URL giới hạn một object và thời gian ngắn; browser PUT thẳng lên S3 bằng URL đó mà không nhận access key hay session token nào.\n(D) SAI: Identity Pool vẫn giao temporary AWS credentials cho browser, vi phạm yêu cầu, và backend không phê duyệt được từng upload riêng lẻ.\nĐáp án đúng: C\nĐiểm cần nhớ: Client cần AWS credentials để gọi nhiều dịch vụ => Identity Pool; backend kiểm soát từng object và client không được giữ credentials => presigned URL.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a Cognito user pool and send the ID token as the Authorization header of the S3 request.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Enable S3 Transfer Acceleration and allow anonymous PutObject requests with a bucket policy.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Have the backend create a short-lived S3 presigned URL for each approved upload and return it.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create a Cognito identity pool so the browser gets temporary credentials scoped to its prefix.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A SaaS company stores data for all tenants in one Amazon S3 bucket under prefixes named after each tenant ID. Users sign in through an Amazon Cognito user pool, where custom:tenant_id is an attribute that users cannot modify, and a Cognito identity pool provides temporary credentials so the app can read S3 directly. The company has 4,000 tenants and adds new tenants daily. Users must access only their own tenant's prefix, and the company does not want to create or update IAM roles when tenants are added. What should a solutions architect do?",
+    "explanation": "Phân tích đề: Cô lập theo tenant (nhiều user cùng tenant), hàng nghìn tenant tăng hằng ngày, không tạo role mới => ABAC: map claim thành session tag, một role dùng policy theo principal tag.\n(A) SAI: Identity ID là của từng user, không phải của tenant; các user khác cùng tenant sẽ không truy cập được dữ liệu chung.\n(B) ĐÚNG: Attributes for access control của Identity Pool chuyển claim trong token thành session tag; một role duy nhất dùng ${aws:PrincipalTag/tenant_id} trong resource ARN nên mọi tenant mới tự động được cô lập.\n(C) SAI: Mỗi tenant mới phải tạo role và thêm rule; số rule role mapping và số role trong account đều có giới hạn, vi phạm yêu cầu không sửa IAM.\n(D) SAI: Vẫn phải tạo group và role cho từng tenant, vận hành tăng theo số tenant, gặp giới hạn số role mỗi account.\nĐáp án đúng: B\nĐiểm cần nhớ: Cô lập theo thuộc tính (tenant, department) với số lượng lớn => ABAC: Identity Pool attributes for access control + aws:PrincipalTag trong một role.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Use ${cognito-identity.amazonaws.com:sub} in the policy and name each tenant prefix after one user.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Map custom:tenant_id to a principal tag with attributes for access control and use it in the ARN.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Create one IAM role per tenant and use rules-based role mapping to pick the role by custom:tenant_id.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create one user pool group per tenant with its own IAM role and use token-based role mapping.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MSQ",
+    "level": "advanced",
+    "questionText": "A company is adding authentication to a web application that runs on Amazon ECS behind an internet-facing Application Load Balancer. Users are stored in an existing Amazon Cognito user pool. The application code must not contain any sign-in logic. Which TWO configuration steps are required? (Select TWO.)",
+    "explanation": "Phân tích đề: Xác thực tại ALB với Cognito, không sửa code => authenticate-cognito trên HTTPS listener + app client phù hợp với callback của ALB.\n(A) ĐÚNG: Hành động authenticate chỉ hỗ trợ trên HTTPS listener; rule chạy authenticate-cognito trước rồi forward tới target group khi user đã đăng nhập.\n(B) ĐÚNG: ALB dùng authorization code grant với app client có client secret; callback URL phải là https://<DNS của ALB hoặc domain>/oauth2/idpresponse.\n(C) SAI: Ngược lại: authenticate action bắt buộc HTTPS listener; luồng OAuth của Cognito dùng HTTPS.\n(D) SAI: NLB hoạt động ở lớp 4 và không có hành động xác thực người dùng; chỉ ALB hỗ trợ authenticate-cognito và authenticate-oidc.\n(E) SAI: Identity Pool cấp AWS credentials cho end-user, không liên quan tới việc ALB xác thực; task role của ECS không nên là role của end-user.\nĐáp án đúng: A và B\nĐiểm cần nhớ: ALB + Cognito: HTTPS listener, action authenticate-cognito, app client có secret và callback /oauth2/idpresponse.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Add an authenticate-cognito action followed by a forward action on an HTTPS listener rule.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create an app client with a client secret and the callback URL ending in /oauth2/idpresponse.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Configure an HTTP listener on port 80 because the Cognito redirect flow does not support TLS.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Replace the ALB with a Network Load Balancer, which supports authenticate-cognito on TCP.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "E",
+        "answerText": "Create a Cognito identity pool and attach its authenticated role to the ECS task definition.",
+        "isCorrect": false
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A gaming company runs its own authentication system that stores 20 million player accounts and issues its own session tokens. Contractual terms prevent moving player credentials into any other identity store. A new mobile feature must let signed-in players upload replays directly to Amazon S3 by using temporary, per-player AWS credentials. Which solution meets these requirements?",
+    "explanation": "Phân tích đề: Giữ nguyên hệ thống xác thực riêng, không được chuyển credential sang nơi khác, vẫn cần temporary credentials theo từng người chơi => Identity Pool developer-authenticated identities.\n(A) SAI: User migration chuyển mật khẩu vào User Pool, vi phạm điều khoản không được chuyển credential sang identity store khác.\n(B) SAI: 20 triệu IAM user vượt xa quota 5.000 IAM user mỗi account và dùng long-term key, trái yêu cầu credentials tạm thời.\n(C) SAI: Hệ thống hiện tại không phải SAML IdP; phải xây thêm IdP SAML, và gọi STS trực tiếp từ mobile không có quản lý identity theo người chơi như Identity Pool.\n(D) ĐÚNG: Backend của công ty xác thực phiên người chơi rồi gọi GetOpenIdTokenForDeveloperIdentity để lấy identity ID và token Cognito; app đổi token đó lấy temporary credentials, mỗi người chơi có identity ID riêng dùng cho prefix S3.\nĐáp án đúng: D\nĐiểm cần nhớ: Có hệ thống đăng nhập riêng, không di chuyển user nhưng cần AWS credentials cho end-user => Identity Pool developer-authenticated identities.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create a user pool with a User migration Lambda trigger so players move into Cognito at sign-in.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Create an IAM user for each player and have the backend return that user's access keys.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Register the existing system as an IAM SAML provider and call AssumeRoleWithSAML from the app.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Use identity pool developer-authenticated identities, requested by the backend after it checks the session.",
+        "isCorrect": true
+      }
+    ]
+  },
+  {
+    "questionType": "MCQ",
+    "level": "advanced",
+    "questionText": "A document collaboration app uses Amazon API Gateway REST APIs and an Amazon Cognito user pool. Authorization rules depend on document ownership, sharing lists, and the user's department, and product managers change these rules frequently. The company wants to manage the rules as auditable policies outside the Lambda function code while keeping Cognito as the identity provider. Which solution meets these requirements with the LEAST development effort?",
+    "explanation": "Phân tích đề: Phân quyền chi tiết (ownership, sharing, department) thay đổi thường xuyên, tách khỏi code thành policy có thể kiểm toán, giữ Cognito => Amazon Verified Permissions với Cognito làm identity source.\n(A) SAI: Role theo phòng ban không biểu diễn được quyền theo chủ sở hữu hay danh sách chia sẻ ở mức tài liệu trong ứng dụng.\n(B) SAI: Scope là quyền tĩnh gắn với app client, không mở rộng tới hàng nghìn tài liệu và không có logic chia sẻ theo người dùng.\n(C) ĐÚNG: Verified Permissions lưu policy Cedar tập trung, dùng User Pool làm identity source để đọc claim từ token; API Gateway gọi qua Lambda authorizer (có thể được tạo sẵn khi liên kết với API) để quyết định allow/deny theo từng request.\n(D) SAI: Cognito authorizer chỉ xác thực token và scope, không kiểm tra group; số group mỗi pool có giới hạn, không phù hợp với từng tài liệu.\nĐáp án đúng: C\nĐiểm cần nhớ: Cognito lo xác thực; phân quyền chi tiết dạng policy thay đổi thường xuyên => Amazon Verified Permissions (Cedar) với Cognito identity source.",
+    "answers": [
+      {
+        "answerLabel": "A",
+        "answerText": "Create an IAM role for each department and use identity pool role mapping to control documents.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "B",
+        "answerText": "Define an OAuth scope for each document and grant the scopes on the hosted UI consent screen.",
+        "isCorrect": false
+      },
+      {
+        "answerLabel": "C",
+        "answerText": "Use Amazon Verified Permissions with the user pool as identity source through a Lambda authorizer.",
+        "isCorrect": true
+      },
+      {
+        "answerLabel": "D",
+        "answerText": "Create a user pool group per document and check membership in the Cognito user pool authorizer.",
+        "isCorrect": false
+      }
+    ]
+  }
+]

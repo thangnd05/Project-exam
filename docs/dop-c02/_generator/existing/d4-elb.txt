@@ -1,0 +1,52 @@
+1. An Auto Scaling group behind an Application Load Balancer keeps instances that pass EC2 status checks but return HTTP 500 for every request. A DevOps engineer must have those instances replaced automatically. What change is required?
+2. A health check endpoint queries the application database on every call. During a brief database slowdown, every instance is marked unhealthy and the service goes fully offline. What is the correct remediation?
+3. A DevOps engineer must expose a TCP-based application that requires very high throughput, low latency and preservation of the client source IP address. Which load balancer should be used?
+4. Traffic is unevenly distributed across Availability Zones behind a load balancer, with one zone receiving far more requests per target. Which TWO factors should a DevOps engineer examine?
+5. New instances registered behind an Application Load Balancer receive full traffic immediately and time out while caches warm up. What feature addresses this?
+6. A DevOps engineer must distinguish whether HTTP 5xx errors seen by users originate from the load balancer itself or from the backend targets. Which metrics answer this?
+7. A DevOps engineer must route requests to different target groups based on the URL path and the Host header of incoming requests. What should be configured?
+8. A DevOps engineer tunes target group health checks so that genuinely broken targets are removed quickly without removing healthy targets during brief latency spikes. Which TWO settings must be balanced?
+9. Long-running requests are being cut off after about a minute even though the backend is still processing them. Which load balancer setting should a DevOps engineer review first?
+10. A DevOps engineer must verify from the end-user perspective that an application endpoint is reachable and correct, not only that targets pass health checks. What should be implemented?
+11. A DevOps engineer must terminate TLS at an Application Load Balancer using a certificate that renews automatically. What is the recommended configuration?
+12. A single Application Load Balancer must serve several hostnames, each with its own TLS certificate. What capability makes this possible?
+13. A DevOps engineer must protect a public Application Load Balancer from common web exploits and from request floods. Which TWO measures apply directly at the edge of the application?
+14. A DevOps engineer needs a record of every request served by an Application Load Balancer, including client address, target, processing times and response code, for later analysis. What should be enabled?
+15. An application behind an Application Load Balancer stores user session state in memory on each instance, causing users to be logged out when instances are replaced. The team enabled stickiness as a workaround. What is the durable fix?
+16. A DevOps engineer must perform a weighted traffic shift between an existing version and a new version of a service that sit in two target groups behind one Application Load Balancer. How is this done?
+17. A DevOps engineer must alarm on load balancer health in a way that catches real user impact. Which TWO alarm definitions are the most meaningful?
+18. A DevOps engineer must send traffic to targets that are not EC2 instances, such as on-premises servers reachable over a private connection. What target type supports this?
+19. During a deployment, users report connection errors even though the deployment tool reports success and targets pass health checks afterwards. What is the most likely cause?
+20. A DevOps engineer must redirect all HTTP requests to HTTPS without changing the application code. What is the simplest implementation?
+21. A Network Load Balancer forwards traffic to targets that log the load balancer address instead of the real client address. What should a DevOps engineer verify?
+22. Behind an Application Load Balancer, targets see the load balancer address as the source. The application must apply rules based on the original client address. What should be used?
+23. A DevOps engineer must ensure that a load balancer keeps serving traffic when an entire Availability Zone becomes impaired. Which TWO configurations are necessary?
+24. A DevOps engineer wants to remove an impaired Availability Zone from service quickly during an incident, without changing Auto Scaling or DNS configuration. What capability is designed for this?
+25. A DevOps engineer must run health checks on a management port that differs from the port serving traffic. How is this configured?
+26. Targets are marked unhealthy although the application responds correctly when tested directly from another instance. What should a DevOps engineer check first?
+27. A DevOps engineer must design health checks for a service that depends on a cache which is optional for correctness. Which TWO principles apply?
+28. A DevOps engineer must front a fleet of third-party security appliances so that traffic is transparently inspected before reaching the application. Which service fits?
+29. A DevOps engineer must ensure that an internal microservice is only reachable from within the VPC, while still using load balancing and health checks. What configuration achieves this?
+30. A DevOps engineer must reduce the time between an instance becoming unresponsive and traffic stopping being sent to it. Which calculation determines that time?
+31. A DevOps engineer must combine DNS failover with load balancer health so that a Region is removed from DNS when its application is down. What is the correct configuration?
+32. A DevOps engineer investigates why a load balancer reports high target response time while target CPU usage is low. Which TWO explanations are plausible?
+33. A DevOps engineer must support gRPC services behind an Application Load Balancer with correct health checking. What configuration is required?
+34. A DevOps engineer must return a friendly maintenance page instead of an error when no healthy targets exist behind an Application Load Balancer. What is the simplest approach?
+35. An Auto Scaling group with load balancer health checks terminates new instances before the application finishes starting. What setting resolves this?
+36. A DevOps engineer prepares a load balanced service for a large, predictable traffic spike. Which TWO preparations are most relevant at the load balancing layer?
+37. A DevOps engineer must allow only requests carrying a valid authenticated identity to reach the application, without building authentication into the service. What load balancer capability helps?
+38. A DevOps engineer notices that after a target is marked unhealthy, traffic still reaches it for a short period. What explains this behaviour?
+39. A DevOps engineer must choose the routing algorithm for a target group where requests vary greatly in processing cost, and some targets become overloaded while others are idle. What is the best choice?
+40. A DevOps engineer must verify a new load balancer configuration change without exposing it to all production traffic. What method fits best?
+41. A DevOps engineer must ensure a load balanced service can absorb a sudden very large increase in connections without rejecting them while the load balancer itself scales. What is the correct expectation and action?
+42. A DevOps engineer must manage load balancer configuration reliably across environments. Which TWO practices support this?
+43. Health checks fail for targets in a private subnet while targets in another subnet pass, and both run identical software. What should a DevOps engineer examine?
+44. A DevOps engineer must ensure that a service behind a load balancer sheds excess load gracefully rather than failing completely when demand exceeds capacity. What approach is correct?
+45. A DevOps engineer must deploy a change to the load balancer listener rules with a way to revert quickly if it causes problems. What practice provides this?
+46. A DevOps engineer reviews a design where a health check endpoint returns success unconditionally. Which TWO consequences should be raised?
+47. A DevOps engineer must decide where to place a load balancer for a service that receives traffic from the public internet but whose compute must not be publicly addressable. What layout is correct?
+48. After a deployment, a small percentage of requests fail with gateway errors while most succeed. What is the most efficient first investigation step?
+49. A DevOps engineer must ensure a load balanced service continues to work when clients hold long-lived connections and targets are replaced regularly. What client-side behaviour should the design assume?
+50. A DevOps engineer must decide what a load balancer should do when every target in a target group is unhealthy. What behaviour should be planned for?
+51. An Auto Scaling group behind an Application Load Balancer keeps instances in service that pass EC2 status checks but return HTTP 500 for every request because the application process has crashed. A DevOps engineer must ensure such instances are terminated and 
+52. Users receive connection errors during every deployment of an application that runs behind an Application Load Balancer, even though the deployment reports success and healthy targets afterwards. Requests typically take up to 25 seconds to complete, and the ta
