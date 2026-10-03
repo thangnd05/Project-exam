@@ -8,7 +8,7 @@
       "questionType": "MCQ",
       "questionText": "A networking team owns a CloudFormation stack that creates a shared VPC and its subnets. Twelve application stacks, owned by different teams and deployed independently, must reference the subnet IDs. The networking team must be prevented from deleting a subnet while an application stack still depends on it. Which approach meets these requirements?",
       "explanation": "Phân tích đề: Cần chia sẻ giá trị giữa các stack độc lập và có cơ chế ngăn xóa khi còn phụ thuộc.\n(A) SAI: Sao chép thủ công subnet ID vào tham số của từng stack làm mất quan hệ phụ thuộc, nên việc xóa subnet không bị chặn.\n(B) ĐÚNG: Dùng Outputs kèm Export trong stack mạng và Fn::ImportValue trong các stack ứng dụng; CloudFormation theo dõi quan hệ phụ thuộc và từ chối xóa hoặc sửa giá trị đã xuất khi còn stack khác đang import, đúng yêu cầu bảo vệ.\n(C) SAI: Lưu subnet ID trong Parameter Store cho phép chia sẻ giá trị nhưng CloudFormation không biết về phụ thuộc nên vẫn cho phép xóa.\n(D) SAI: Nested stack yêu cầu các stack con thuộc cùng một stack cha nên không phù hợp khi mười hai stack được triển khai độc lập bởi các đội khác nhau.\nĐáp án đúng: B\nĐiểm cần nhớ: Export và ImportValue tạo phụ thuộc giữa các stack, và CloudFormation chặn việc xóa giá trị đang được import.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "tagNames": ["Configuration Management and IaC > AWS CloudFormation"],
       "answers": [
         { "answerLabel": "A", "answerText": "Pass the subnet IDs into each application stack as template parameters entered by the team.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Export the subnet IDs as stack outputs and have the application stacks consume them with Fn::ImportValue.", "isCorrect": true },
@@ -21,7 +21,7 @@
       "questionType": "MCQ",
       "questionText": "A CloudFormation template creates an Amazon RDS instance. The master password must never appear in the template, in stack parameters, or in stack outputs, and it must be rotated by AWS Secrets Manager afterwards. Which approach meets these requirements?",
       "explanation": "Phân tích đề: Mật khẩu không được xuất hiện ở bất kỳ phần nào của stack.\n(A) SAI: Ghi cứng mật khẩu trong template là lỗi nghiêm trọng vì template nằm trong kho nguồn.\n(B) SAI: Xuất mật khẩu ở phần Outputs để dịch vụ khác dùng làm lộ giá trị cho bất kỳ ai đọc được đầu ra của stack.\n(C) ĐÚNG: Tạo secret trong Secrets Manager qua template, dùng dynamic reference để RDS lấy giá trị lúc tạo tài nguyên, rồi gắn secret với RDS instance bằng tài nguyên attachment để bật xoay vòng; giá trị mật khẩu không nằm trong template, không nằm trong tham số và không được xuất ra.\n(D) SAI: Truyền mật khẩu qua tham số có NoEcho vẫn khiến giá trị đi qua lệnh triển khai và tồn tại trong lịch sử của stack.\nĐáp án đúng: C\nĐiểm cần nhớ: Dùng dynamic reference tới Secrets Manager và secret attachment để mật khẩu không bao giờ xuất hiện trong template hay outputs.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "tagNames": ["Configuration Management and IaC > AWS CloudFormation"],
       "answers": [
         { "answerLabel": "A", "answerText": "Hard-code the password in the template and restrict who can read the repository.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Generate the password in the template and publish it as a stack output for other stacks to consume.", "isCorrect": false },
@@ -34,7 +34,7 @@
       "questionType": "MCQ",
       "questionText": "A DevOps engineer must provision a resource in a third-party SaaS system as part of a CloudFormation stack, and the resource must be removed when the stack is deleted. CloudFormation has no native resource type for this system. Which solution meets these requirements?",
       "explanation": "Phân tích đề: Cần quản lý tài nguyên ngoài phạm vi các loại tài nguyên có sẵn, theo đúng vòng đời stack.\n(A) ĐÚNG: Viết custom resource được hỗ trợ bởi Lambda; hàm nhận các yêu cầu Create, Update và Delete từ CloudFormation và gọi API của hệ thống bên ngoài tương ứng, rồi gửi phản hồi thành công hay thất bại, nên tài nguyên bên ngoài theo đúng vòng đời của stack. Cách khác là đăng ký một resource type riêng trong registry.\n(B) SAI: Tạo tài nguyên thủ công rồi ghi chú lại làm mất khả năng quản lý bằng mã.\n(C) SAI: Dùng wait condition chỉ để chờ tín hiệu chứ không tạo hay xóa tài nguyên bên ngoài.\n(D) SAI: Chạy script sau khi stack hoàn tất không gắn với vòng đời stack nên tài nguyên không bị xóa khi stack bị xóa.\nĐáp án đúng: A\nĐiểm cần nhớ: Custom resource cho phép CloudFormation quản lý tài nguyên ngoài theo đúng vòng đời Create, Update và Delete.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "tagNames": ["Configuration Management and IaC > AWS CloudFormation"],
       "answers": [
         { "answerLabel": "A", "answerText": "Implement a Lambda-backed custom resource that handles the Create, Update, and Delete requests by calling the SaaS API.", "isCorrect": true },
         { "answerLabel": "B", "answerText": "Create the SaaS resource manually and record its identifier in the stack description.", "isCorrect": false },
@@ -47,7 +47,7 @@
       "questionType": "MCQ",
       "questionText": "During an incident, an engineer modified a security group that is managed by a CloudFormation stack. A DevOps engineer must identify all resources in the stack whose actual configuration no longer matches the template, and must do so without changing any resource. Which action provides this information?",
       "explanation": "Phân tích đề: Cần so sánh trạng thái thực tế với định nghĩa của stack mà không tác động gì.\n(A) SAI: Tạo change set cho biết tác động của một template mới chứ không phát hiện thay đổi thủ công đã xảy ra.\n(B) SAI: Cập nhật lại stack với cùng template sẽ đưa tài nguyên về trạng thái khai báo, tức là có thay đổi tài nguyên, trái yêu cầu chỉ để xác định.\n(C) SAI: Đọc nhật ký gọi API cho biết ai đã thực hiện hành động nào nhưng không tổng hợp được danh sách tài nguyên đang lệch so với template.\n(D) ĐÚNG: Chạy drift detection trên stack; CloudFormation so sánh cấu hình hiện tại của từng tài nguyên với template và báo cáo tài nguyên nào bị lệch cùng các thuộc tính khác biệt, và thao tác này chỉ đọc nên không thay đổi tài nguyên nào.\nĐáp án đúng: D\nĐiểm cần nhớ: Drift detection là thao tác chỉ đọc, so sánh trạng thái thực tế với template của stack.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > AWS CloudFormation"],
+      "tagNames": ["Configuration Management and IaC > AWS CloudFormation"],
       "answers": [
         { "answerLabel": "A", "answerText": "Create a change set from the current template and review the proposed actions.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Run a stack update with the existing template to restore the declared configuration.", "isCorrect": false },
@@ -60,7 +60,7 @@
       "questionType": "MCQ",
       "questionText": "A DevOps engineer must automate a database maintenance procedure that runs several scripted steps on EC2 instances. A database administrator must explicitly approve the procedure after the pre-checks succeed but before the disruptive step runs, and every execution must be recorded. Which solution meets these requirements?",
       "explanation": "Phân tích đề: Cần tự động hóa nhiều bước có chèn phê duyệt của con người giữa chừng.\n(A) SAI: Dùng Run Command chạy toàn bộ script một lần không có điểm dừng để chờ phê duyệt.\n(B) SAI: Chia thành hai lần chạy thủ công cách nhau đòi hỏi người vận hành tự theo dõi và dễ bỏ sót bước.\n(C) ĐÚNG: Tạo Systems Manager Automation runbook gồm các bước kiểm tra, một bước aws:approve chỉ định người phê duyệt, rồi các bước thực hiện thay đổi; automation dừng ở bước phê duyệt và chỉ tiếp tục khi nhận được chấp thuận, còn lịch sử thực thi ghi lại toàn bộ.\n(D) SAI: Gửi thông báo rồi tiếp tục chạy không thực sự chờ quyết định của quản trị viên cơ sở dữ liệu.\nĐáp án đúng: C\nĐiểm cần nhớ: Bước phê duyệt trong Automation runbook cho phép dừng giữa các bước tự động để chờ quyết định con người.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Systems Manager"],
+      "tagNames": ["Configuration Management and IaC > AWS Systems Manager"],
       "answers": [
         { "answerLabel": "A", "answerText": "Use Systems Manager Run Command to execute the full maintenance script on the instances.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Split the procedure into two Run Command invocations and have an engineer start the second one after approval.", "isCorrect": false },
@@ -73,7 +73,7 @@
       "questionType": "MCQ",
       "questionText": "A security team must answer, within minutes, which EC2 instances across 40 accounts have a specific vulnerable version of an application package installed. The team does not want to connect to instances individually. Which Systems Manager capability provides this?",
       "explanation": "Phân tích đề: Cần truy vấn thông tin phần mềm đã cài trên đội hình lớn.\n(A) SAI: Session Manager phục vụ truy cập tương tác vào từng máy, không phải công cụ truy vấn diện rộng.\n(B) SAI: Patch Manager báo cáo tình trạng bản vá của hệ điều hành chứ không liệt kê phiên bản ứng dụng bất kỳ.\n(C) SAI: Chạy Run Command truy vấn từng instance mỗi lần cần là chậm và tạo tải lên toàn đội hình.\n(D) ĐÚNG: Bật Systems Manager Inventory để thu thập danh sách ứng dụng đã cài trên từng instance, rồi truy vấn dữ liệu đã tổng hợp bằng resource data sync tới một bucket trung tâm và Amazon Athena; câu trả lời có được từ dữ liệu đã thu thập sẵn thay vì phải kết nối vào từng máy.\nĐáp án đúng: D\nĐiểm cần nhớ: Inventory thu thập danh sách phần mềm và resource data sync cho phép truy vấn tập trung nhiều tài khoản.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Systems Manager"],
+      "tagNames": ["Configuration Management and IaC > AWS Systems Manager"],
       "answers": [
         { "answerLabel": "A", "answerText": "Use Session Manager to connect to a sample of instances and check the installed version.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Use Patch Manager compliance reporting to list the installed application versions.", "isCorrect": false },
@@ -86,7 +86,7 @@
       "questionType": "MSQ",
       "questionText": "A DevOps engineer must run a configuration script on 3,000 EC2 instances. A previous attempt caused a downstream API to be overwhelmed because all instances executed at once, and a bug in the script left 200 instances in a broken state before anyone noticed. Which TWO Run Command settings address these problems? (Choose TWO.)",
       "explanation": "Phân tích đề: Hai vấn đề là chạy đồng loạt gây quá tải và không dừng lại khi lỗi lan rộng.\n(A) SAI: Chia thủ công thành nhiều lần chạy nhỏ là cách thủ công thay thế cho hai thiết lập đã có sẵn.\n(B) ĐÚNG: Đặt concurrency, theo số lượng hoặc theo tỉ lệ phần trăm mục tiêu, để lệnh được thực thi theo từng nhóm thay vì đồng thời trên toàn bộ đội hình, nhờ đó dịch vụ phía sau không bị dồn tải.\n(C) SAI: Ghi đầu ra của lệnh vào S3 hỗ trợ chẩn đoán nhưng không ngăn quá tải hay lan lỗi.\n(D) SAI: Tăng thời gian chờ của lệnh không giới hạn mức đồng thời và không dừng khi có lỗi.\n(E) ĐÚNG: Đặt error threshold để Run Command dừng gửi lệnh tới các mục tiêu còn lại khi số hoặc tỉ lệ thất bại vượt ngưỡng; nhờ đó một script có lỗi chỉ ảnh hưởng tới một phần nhỏ.\nĐáp án đúng: B, E\nĐiểm cần nhớ: Run Command có concurrency để giới hạn tốc độ và error threshold để dừng sớm khi lỗi vượt ngưỡng.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Systems Manager"],
+      "tagNames": ["Configuration Management and IaC > AWS Systems Manager"],
       "answers": [
         { "answerLabel": "A", "answerText": "Split the instances into ten separate Run Command invocations issued manually.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Set a concurrency limit so the command runs on a controlled number or percentage of targets at a time.", "isCorrect": true },
@@ -100,7 +100,7 @@
       "questionType": "MCQ",
       "questionText": "A company uses EC2 Image Builder to produce a golden AMI. The security team requires that a new AMI is produced automatically whenever AWS publishes an updated Amazon Linux base image, rather than waiting for the monthly schedule. Which configuration meets this requirement?",
       "explanation": "Phân tích đề: Cần kích hoạt pipeline theo sự thay đổi của image nền, không chỉ theo lịch.\n(A) ĐÚNG: Đặt build schedule của pipeline theo điều kiện phụ thuộc, để pipeline chạy khi phát hiện image nền hoặc component trong recipe có phiên bản mới; như vậy AMI được dựng lại ngay khi có bản cập nhật thay vì chờ tới kỳ.\n(B) SAI: Theo dõi thông báo phát hành rồi chạy pipeline thủ công phụ thuộc vào con người.\n(C) SAI: Rút ngắn lịch xuống hằng ngày tạo nhiều lần dựng không cần thiết khi image nền không đổi, và vẫn có độ trễ tới một ngày.\n(D) SAI: Ghim phiên bản image nền cố định đi ngược lại yêu cầu cập nhật theo bản mới.\nĐáp án đúng: A\nĐiểm cần nhớ: Image Builder có thể kích hoạt pipeline khi phụ thuộc như image nền có phiên bản mới, thay vì chỉ theo lịch.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > AMI Pipeline"],
+      "tagNames": ["Configuration Management and IaC > AMI Pipeline"],
       "answers": [
         { "answerLabel": "A", "answerText": "Configure the pipeline schedule to run when a dependency such as the base image or a component has a new version available.", "isCorrect": true },
         { "answerLabel": "B", "answerText": "Subscribe to the Amazon Linux release notifications and start the pipeline manually when an update is announced.", "isCorrect": false },
@@ -113,7 +113,7 @@
       "questionType": "MCQ",
       "questionText": "An application on AWS Elastic Beanstalk must have an operating system package installed and a configuration file written before the application starts, on every instance the environment launches. The solution must be versioned together with the application source. What should a DevOps engineer use?",
       "explanation": "Phân tích đề: Cần tùy biến instance theo mã nguồn và áp dụng cho mọi instance mới.\n(A) SAI: Dựng AMI tùy chỉnh khả thi nhưng tách cấu hình khỏi mã nguồn và đòi hỏi quy trình dựng image riêng.\n(B) ĐÚNG: Thêm tệp cấu hình trong thư mục .ebextensions của gói nguồn ứng dụng, khai báo gói cần cài và nội dung tệp cần ghi; Elastic Beanstalk áp dụng chúng trong quá trình cấp phát mọi instance, và vì tệp nằm trong mã nguồn nên chúng được phiên bản hóa cùng ứng dụng.\n(C) SAI: Lưu script trong S3 rồi gọi bằng tay sau mỗi lần triển khai là quy trình thủ công dễ bỏ sót.\n(D) SAI: Kết nối vào từng instance để cài đặt thủ công không áp dụng cho instance được tạo sau này bởi mở rộng tự động.\nĐáp án đúng: B\nĐiểm cần nhớ: Thư mục .ebextensions cho phép khai báo tùy biến instance ngay trong gói nguồn ứng dụng.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > AWS OpsWorks / Elastic Beanstalk"],
+      "tagNames": ["Configuration Management and IaC > AWS OpsWorks / Elastic Beanstalk"],
       "answers": [
         { "answerLabel": "A", "answerText": "Build a custom AMI with the package preinstalled and configure the environment to use it.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Add configuration files under the .ebextensions directory in the application source bundle that declare the package and the file to write.", "isCorrect": true },
@@ -126,7 +126,7 @@
       "questionType": "MCQ",
       "questionText": "A company manages production infrastructure with Terraform through a CI pipeline. A recent change unexpectedly destroyed a database because the author did not realize the change forced replacement. The company must ensure that destructive changes are visible and explicitly approved before they are applied. Which pipeline design meets this requirement?",
       "explanation": "Phân tích đề: Cần nhìn thấy tác động phá hủy trước khi áp dụng và có bước phê duyệt.\n(A) ĐÚNG: Tách pipeline thành hai giai đoạn: giai đoạn chạy terraform plan và lưu tệp plan làm artifact, hiển thị các tài nguyên sẽ bị xóa hoặc thay thế, rồi một bước phê duyệt thủ công, và giai đoạn apply chỉ áp dụng đúng tệp plan đã được duyệt; áp dụng chính plan đã duyệt bảo đảm thứ được thực thi trùng với thứ đã xem xét.\n(B) SAI: Chạy plan rồi apply riêng rẽ mà không dùng lại tệp plan có thể áp dụng một kết quả khác nếu trạng thái thay đổi giữa hai lần chạy.\n(C) SAI: Dựa vào việc xem xét mã trong pull request không cho thấy tác động thực tế lên trạng thái hiện có.\n(D) SAI: Chạy apply với tùy chọn tự động chấp nhận loại bỏ hoàn toàn khâu xem xét.\nĐáp án đúng: A\nĐiểm cần nhớ: Lưu tệp plan làm artifact, phê duyệt, rồi apply đúng tệp đó để thứ thực thi trùng với thứ đã duyệt.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > Terraform / Ansible"],
+      "tagNames": ["Configuration Management and IaC > Terraform / Ansible"],
       "answers": [
         { "answerLabel": "A", "answerText": "Run terraform plan and save the plan file as an artifact, require a manual approval that reviews the destroy and replace actions, then apply the saved plan file.", "isCorrect": true },
         { "answerLabel": "B", "answerText": "Run terraform plan in one stage and terraform apply in the next stage without reusing the plan file.", "isCorrect": false },
@@ -139,7 +139,7 @@
       "questionType": "MCQ",
       "questionText": "A DevOps engineer must verify what an Ansible playbook would change on a fleet of production servers before actually applying it. Which approach provides this?",
       "explanation": "Phân tích đề: Cần xem trước tác động mà không thay đổi hệ thống.\n(A) SAI: Đọc lại nội dung playbook không cho biết trạng thái hiện tại của từng máy chủ khác với trạng thái mong muốn ra sao.\n(B) ĐÚNG: Chạy playbook ở chế độ check kết hợp tùy chọn hiển thị khác biệt; Ansible mô phỏng các tác vụ và báo cáo những gì sẽ thay đổi mà không thực sự áp dụng, với điều kiện các module được dùng hỗ trợ chế độ này.\n(C) SAI: Chạy playbook trên một máy chủ sản xuất vẫn là thay đổi thật trên hệ thống đang phục vụ.\n(D) SAI: Thêm tác vụ ghi nhật ký vào playbook vẫn phải chạy các tác vụ thay đổi để biết kết quả.\nĐáp án đúng: B\nĐiểm cần nhớ: Chế độ check của Ansible mô phỏng thay đổi và báo cáo khác biệt mà không áp dụng.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > Terraform / Ansible"],
+      "tagNames": ["Configuration Management and IaC > Terraform / Ansible"],
       "answers": [
         { "answerLabel": "A", "answerText": "Review the playbook tasks and compare them with the documented server configuration.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Run the playbook in check mode with the diff option to report the changes that would be made.", "isCorrect": true },
@@ -152,7 +152,7 @@
       "questionType": "MCQ",
       "questionText": "A team uses AWS AppConfig to deliver application configuration. On one occasion a malformed configuration value caused every application instance to crash on startup after the configuration was deployed. The team must prevent an invalid configuration from ever being deployed again. What should a DevOps engineer configure?",
       "explanation": "Phân tích đề: Cần chặn cấu hình không hợp lệ trước khi nó được phân phối.\n(A) SAI: Gắn alarm để tự quay lại giúp giảm thời gian ảnh hưởng nhưng ứng dụng vẫn đã nhận cấu hình sai và bị lỗi.\n(B) SAI: Dùng chiến lược triển khai chậm hơn chỉ làm sự cố lan chậm hơn chứ không ngăn cấu hình sai được phát hành.\n(C) SAI: Yêu cầu xem xét thủ công trước khi triển khai phụ thuộc vào con người và không phải kiểm soát tự động.\n(D) ĐÚNG: Thêm validator cho configuration profile, dùng lược đồ JSON để kiểm tra cấu trúc và kiểu dữ liệu, hoặc dùng validator dạng Lambda cho các quy tắc phức tạp hơn; AppConfig từ chối phiên bản cấu hình không vượt qua validator nên nó không bao giờ tới được ứng dụng.\nĐáp án đúng: D\nĐiểm cần nhớ: Validator của AppConfig chặn cấu hình không hợp lệ ngay tại thời điểm phát hành.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > AWS AppConfig"],
+      "tagNames": ["Configuration Management and IaC > AWS AppConfig"],
       "answers": [
         { "answerLabel": "A", "answerText": "Associate a CloudWatch alarm with the environment so AppConfig rolls back automatically.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Change the deployment strategy so the configuration rolls out more slowly.", "isCorrect": false },
@@ -165,7 +165,7 @@
       "questionType": "MCQ",
       "questionText": "A platform team publishes a Service Catalog product that 80 application teams have provisioned. A security fix requires a new AMI in the product template. The teams must move to the fixed version in a controlled way, and the platform team must be able to see which provisioned products are still running the old version. What should the platform team do?",
       "explanation": "Phân tích đề: Cần phát hành phiên bản mới và theo dõi mức độ áp dụng.\n(A) SAI: Xóa phiên bản cũ ngay lập tức khiến các provisioned product đang tham chiếu nó gặp vấn đề và ép các đội cập nhật gấp.\n(B) SAI: Tạo một sản phẩm mới hoàn toàn làm các đội mất liên hệ với sản phẩm đang dùng và không cập nhật tại chỗ được.\n(C) ĐÚNG: Thêm một provisioning artifact mới cho sản phẩm với template đã sửa, giữ phiên bản cũ trong giai đoạn chuyển tiếp rồi đánh dấu không còn được hỗ trợ; các đội cập nhật provisioned product của họ sang phiên bản mới, và khung nhìn quản trị của Service Catalog cho biết provisioned product nào còn ở phiên bản cũ.\n(D) SAI: Sửa trực tiếp template của phiên bản hiện có làm mất khả năng truy vết và không cho phép chuyển đổi có kiểm soát.\nĐáp án đúng: C\nĐiểm cần nhớ: Phát hành phiên bản sản phẩm mới, giữ phiên bản cũ trong giai đoạn chuyển tiếp, và theo dõi phiên bản của các provisioned product.",
-      "tagNames": ["Configuration Management and Infrastructure as Code > AWS Service Catalog"],
+      "tagNames": ["Configuration Management and IaC > AWS Service Catalog"],
       "answers": [
         { "answerLabel": "A", "answerText": "Delete the old provisioning artifact so teams are forced to use the fixed version.", "isCorrect": false },
         { "answerLabel": "B", "answerText": "Create a new product with the fixed template and ask teams to provision it and delete the old one.", "isCorrect": false },
