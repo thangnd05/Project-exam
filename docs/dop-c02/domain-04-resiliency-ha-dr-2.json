@@ -3225,14 +3225,14 @@
       "questionNumber": 100,
       "questionType": "MSQ",
       "questionText": "A company asks which storage statements are accurate for its 35-day Amazon EBS snapshots, its seven-year monthly Amazon EFS recovery points, and its 14-day continuous backups of Amazon RDS. Which THREE statements are correct?",
-      "explanation": "Phân tích đề: Ba nhóm dữ liệu là EBS snapshot 35 ngày, EFS monthly giữ 7 năm, và RDS continuous 14 ngày. Cần nhận định đúng về lưu trữ AWS Backup.\n(A) ĐÚNG: Tier cold storage của AWS Backup không dùng cho recovery point Amazon EBS. Archive của EBS snapshot là tính năng EBS riêng, không phải lifecycle cold storage trong AWS Backup.\n(B) ĐÚNG: Snapshot EBS qua AWS Backup là incremental. Block không đổi không bị ghi thành một bản đầy đủ mới cho mỗi recovery point.\n(C) SAI: Continuous backup của RDS giữ tối đa 35 ngày, không giữ 7 năm trên cùng một continuous recovery point. Bản dài hạn phải là snapshot định kỳ.\n(D) SAI: Xóa một recovery point EBS ở giữa chuỗi không làm các recovery point mới hơn mất khả năng restore. AWS vẫn giữ block mà các bản sau cần.\n(E) SAI: Lifecycle chuyển Amazon EBS sang cold storage của AWS Backup không được hỗ trợ, nên không phải cách giảm giá phần lưu 35 ngày.\n(F) ĐÚNG: EFS hỗ trợ cold storage. Sau khi chuyển, recovery point phải nằm ở cold storage ít nhất 90 ngày.\nĐáp án đúng: A, B và F\nĐiểm cần nhớ: EBS backup là incremental và không có cold storage trong AWS Backup. EFS có cold storage với tối thiểu 90 ngày. Continuous backup giữ tối đa 35 ngày.",
+      "explanation": "Phân tích đề: Ba nhóm dữ liệu là EBS snapshot 35 ngày, EFS monthly giữ 7 năm, và RDS continuous 14 ngày. Cần nhận định đúng về lưu trữ AWS Backup.\n(A) ĐÚNG: Continuous backup của RDS cho phép point-in-time restore tới bất kỳ giây nào trong cửa sổ retention đã đặt, ở đây là 14 ngày.\n(B) ĐÚNG: Snapshot EBS qua AWS Backup là incremental. Block không đổi không bị ghi thành một bản đầy đủ mới cho mỗi recovery point.\n(C) SAI: Continuous backup của RDS giữ tối đa 35 ngày, không giữ 7 năm trên cùng một continuous recovery point. Bản dài hạn phải là snapshot định kỳ.\n(D) SAI: Xóa một recovery point EBS ở giữa chuỗi không làm các recovery point mới hơn mất khả năng restore. AWS vẫn giữ block mà các bản sau cần.\n(E) SAI: AWS Backup có hỗ trợ chuyển EBS snapshot sang cold storage (qua EBS Snapshots Archive), nhưng recovery point ở cold storage phải nằm ít nhất 90 ngày. Retention 35 ngày ngắn hơn mức đó nên đây không phải cách giảm chi phí cho nhóm dữ liệu này.\n(F) ĐÚNG: EFS hỗ trợ cold storage. Sau khi chuyển, recovery point phải nằm ở cold storage ít nhất 90 ngày.\nĐáp án đúng: A, B và F\nĐiểm cần nhớ: EBS backup là incremental. AWS Backup có cold storage cho cả EBS (qua EBS Snapshots Archive) và EFS, tối thiểu 90 ngày ở cold. Continuous backup giữ tối đa 35 ngày và cho PITR trong cửa sổ đó.",
       "tagNames": [
         "Resilient Cloud Solutions > AWS Backup"
       ],
       "answers": [
         {
           "answerLabel": "A",
-          "answerText": "Amazon EBS recovery points stay in warm storage because the AWS Backup cold storage tier does not apply to them",
+          "answerText": "The 14-day RDS continuous backup supports point-in-time restore to any second within those 14 days",
           "isCorrect": true
         },
         {
@@ -3390,7 +3390,7 @@
       "questionNumber": 105,
       "questionType": "MCQ",
       "questionText": "A document store hypothesis says application threads stall when EBS volume I/O pauses, while the guest operating system must stay up so an engineer can capture a stack trace. The impairment must end on its own after ten minutes. Which FIS action matches that hypothesis?",
-      "explanation": "Phân tích đề: Cần treo I/O của volume, guest vẫn chạy để lấy stack, và hết hạn sau mười phút. Đó là pause volume I/O có duration, không phải stop instance.\n(A) SAI: AWSFIS-Run-IO-Stress tạo tải đĩa trong guest qua SSM. Volume vẫn phục vụ I/O, không bị pause như pause-volume-io.\n(B) SAI: aws:ec2:stop-instances tắt guest nên không lấy stack trong lúc treo đĩa. Duration của action này không tự bật lại instance.\n(C) ĐÚNG: aws:ebs:pause-volume-io tạm dừng I/O trên volume được gắn, guest vẫn lên. Hết duration hoặc khi experiment dừng, FIS cho I/O chạy lại.\n(D) SAI: aws:network:disrupt-connectivity chặn lưu lượng mạng của subnet, không treo I/O giữa instance và EBS volume.\nĐáp án đúng: C\nĐiểm cần nhớ: Treo đĩa EBS dùng aws:ebs:pause-volume-io. IO stress chỉ làm guest bận; stop instance tắt máy và không tự rollback.",
+      "explanation": "Phân tích đề: Cần treo I/O của volume, guest vẫn chạy để lấy stack, và hết hạn sau mười phút. Đó là pause volume I/O có duration, không phải stop instance.\n(A) SAI: AWSFIS-Run-IO-Stress tạo tải đĩa trong guest qua SSM. Volume vẫn phục vụ I/O, không bị pause như pause-volume-io.\n(B) SAI: aws:ec2:stop-instances tắt guest nên không lấy được stack trace trong lúc treo đĩa. Action này có thể bật lại instance sau duration nếu đặt startInstancesAfterDuration, nhưng đó vẫn là tắt máy, không phải treo I/O.\n(C) ĐÚNG: aws:ebs:pause-volume-io tạm dừng I/O trên volume được gắn, guest vẫn lên. Hết duration hoặc khi experiment dừng, FIS cho I/O chạy lại.\n(D) SAI: aws:network:disrupt-connectivity chặn lưu lượng mạng của subnet, không treo I/O giữa instance và EBS volume.\nĐáp án đúng: C\nĐiểm cần nhớ: Treo đĩa EBS dùng aws:ebs:pause-volume-io. IO stress chỉ làm guest bận; stop instance tắt máy, chỉ tự bật lại khi đặt startInstancesAfterDuration.",
       "tagNames": [
         "Resilient Cloud Solutions > AWS Fault Injection Service (FIS)"
       ],
@@ -3421,7 +3421,7 @@
       "questionNumber": 106,
       "questionType": "MCQ",
       "questionText": "Search subnets in us-east-1b must lose network connectivity for 15 minutes, then recover without an operator editing network ACLs. Subnets in the other Availability Zones of the same VPC must stay reachable. Which FIS configuration meets that scope and restores connectivity by itself?",
-      "explanation": "Phân tích đề: Cần chặn mạng đúng một AZ trong 15 phút rồi tự hoàn tác, các AZ kia không bị ảnh hưởng. Action phù hợp là disrupt-connectivity với scope availability-zone.\n(A) SAI: Stop instance ở us-east-1b không sửa rồi trả lại network ACL, và instance đã stop không tự chạy lại khi hết PT15M.\n(B) SAI: AWSFIS-Run-Network-Latency thêm độ trễ trên instance có SSM Agent, không deny cả subnet và không có scope availability-zone.\n(C) SAI: Sửa network ACL tay không có rollback của FIS. Stop condition không xóa ACL dù alarm chuyển ALARM.\n(D) ĐÚNG: aws:network:disrupt-connectivity nhắm subnet ở us-east-1b, scope availability-zone, duration PT15M. Hết hạn hoặc khi experiment dừng, FIS gỡ association tạm và trả network ACL cũ.\nĐáp án đúng: D\nĐiểm cần nhớ: Mất kết nối subnet hoặc AZ dùng aws:network:disrupt-connectivity. FIS hoàn tác network ACL khi action kết thúc. SSM latency chỉ làm chậm trên instance có agent.",
+      "explanation": "Phân tích đề: Cần chặn toàn bộ mạng của các subnet ở us-east-1b trong 15 phút rồi tự hoàn tác. Các subnet ở AZ khác không bị nhắm nên vẫn liên lạc được với nhau. Action phù hợp là disrupt-connectivity với scope all, chỉ nhắm vào subnet của us-east-1b.\n(A) SAI: Stop instance không sửa rồi trả lại network ACL. Kể cả khi đặt startInstancesAfterDuration để instance tự bật lại, đó là tắt máy chứ không phải mất kết nối mạng của subnet.\n(B) SAI: AWSFIS-Run-Network-Latency thêm độ trễ trên instance có SSM Agent, không deny cả subnet.\n(C) SAI: Sửa network ACL tay không có rollback của FIS. Stop condition không xóa ACL dù alarm chuyển ALARM.\n(D) ĐÚNG: aws:network:disrupt-connectivity với scope all trên các subnet ở us-east-1b chặn mọi traffic vào ra các subnet đó trong PT15M. Hết hạn hoặc khi experiment dừng, FIS gỡ ACL tạm và trả network ACL cũ. Scope availability-zone chỉ chặn traffic giữa subnet đích và subnet ở AZ khác, nên không đủ cho yêu cầu mất kết nối hoàn toàn.\nĐáp án đúng: D\nĐiểm cần nhớ: Mất toàn bộ kết nối của subnet dùng disrupt-connectivity scope all. Scope availability-zone chỉ chặn traffic liên AZ trong VPC. FIS tự hoàn tác network ACL khi action kết thúc.",
       "tagNames": [
         "Resilient Cloud Solutions > AWS Fault Injection Service (FIS)"
       ],
@@ -3443,7 +3443,7 @@
         },
         {
           "answerLabel": "D",
-          "answerText": "aws:network:disrupt-connectivity on the us-east-1b subnets, scope availability-zone, duration PT15M",
+          "answerText": "aws:network:disrupt-connectivity on the us-east-1b subnets, scope all, duration PT15M",
           "isCorrect": true
         }
       ]
@@ -4050,7 +4050,7 @@
       "questionNumber": 125,
       "questionType": "MCQ",
       "questionText": "An engineer terminates uploader instances with aws:ec2:terminate-instances and then stops the experiment, expecting the same instance IDs to come back the way a network impairment does when it ends. The instances are gone. Why did rollback not restore them?",
-      "explanation": "Phân tích đề: Rollback của FIS chỉ hoàn tác impairment có cơ chế đảo. Terminate xóa instance, StopExperiment không tạo lại instance ID cũ.\n(A) ĐÚNG: Terminate không phải impairment đảo được. Dừng experiment hoàn tác disrupt-connectivity, pause volume I/O và lệnh SSM đang chạy, nhưng không khôi phục instance đã xóa. Auto Scaling có thể launch instance mới với ID khác.\n(B) SAI: aws:fis:wait chỉ chờ một khoảng duration. Nó không tạo lại instance ID đã terminate.\n(C) SAI: Thêm ec2:StartInstances không biến terminate thành action tự rollback. Instance đã terminate không được start lại bằng quyền đó.\n(D) SAI: INSUFFICIENT_DATA không phải tín hiệu để FIS start lại instance đã terminate.\nĐáp án đúng: A\nĐiểm cần nhớ: Duration và StopExperiment rollback network disruption, EBS pause và SSM command. Stop, terminate, reboot và failover không tự đảo về trạng thái cũ.",
+      "explanation": "Phân tích đề: Rollback của FIS chỉ hoàn tác impairment có cơ chế đảo. Terminate xóa instance, StopExperiment không tạo lại instance ID cũ.\n(A) ĐÚNG: Terminate không phải impairment đảo được. Dừng experiment hoàn tác disrupt-connectivity, pause volume I/O và lệnh SSM đang chạy, nhưng không khôi phục instance đã xóa. Auto Scaling có thể launch instance mới với ID khác.\n(B) SAI: aws:fis:wait chỉ chờ một khoảng duration. Nó không tạo lại instance ID đã terminate.\n(C) SAI: Thêm ec2:StartInstances không biến terminate thành action tự rollback. Instance đã terminate không được start lại bằng quyền đó.\n(D) SAI: INSUFFICIENT_DATA không phải tín hiệu để FIS start lại instance đã terminate.\nĐáp án đúng: A\nĐiểm cần nhớ: Duration và StopExperiment rollback network disruption, EBS pause và SSM command. Terminate, reboot và failover không tự đảo. Stop instance chỉ tự bật lại khi đặt startInstancesAfterDuration.",
       "tagNames": [
         "Resilient Cloud Solutions > AWS Fault Injection Service (FIS)"
       ],
@@ -4143,7 +4143,7 @@
       "questionNumber": 128,
       "questionType": "MSQ",
       "questionText": "A drill should approximate a power interruption in one Availability Zone of a VPC: packets to those subnets fail, and EBS I/O in that zone stalls, while the other zones keep serving. Which TWO actions belong in that pattern?",
-      "explanation": "Phân tích đề: Mẫu mất điện một AZ cần cả mất kết nối subnet trong AZ đó và treo I/O volume ở AZ đó. Các AZ khác không nằm trong target.\n(A) ĐÚNG: aws:ebs:pause-volume-io trên volume gắn với instance đang chạy trong AZ đó làm I/O đình trệ đúng phạm vi zone.\n(B) SAI: Reboot mọi AZ làm gián đoạn cả các zone phải tiếp tục phục vụ, và reboot không mô phỏng mất điện.\n(C) SAI: aws:fis:wait chỉ chờ thời gian. Một mình nó không gây mất mạng hay treo đĩa.\n(D) ĐÚNG: aws:network:disrupt-connectivity với scope availability-zone trên subnet của AZ bị impairment chặn traffic tới các subnet đó.\n(E) SAI: CPU stress trên một instance qua SSM không chặn subnet cả AZ và không pause EBS.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Suy giảm kiểu mất AZ kết hợp disrupt-connectivity scope availability-zone và pause-volume-io trong AZ đó. Wait hoặc CPU stress không thay hai action này.",
+      "explanation": "Phân tích đề: Mẫu mất điện một AZ cần cả mất kết nối của các subnet trong AZ đó và treo I/O volume ở AZ đó. Các AZ khác không nằm trong target.\n(A) ĐÚNG: aws:ebs:pause-volume-io trên volume gắn với instance đang chạy trong AZ đó làm I/O đình trệ đúng phạm vi zone.\n(B) SAI: Reboot mọi AZ làm gián đoạn cả các zone phải tiếp tục phục vụ, và reboot không mô phỏng mất điện.\n(C) SAI: aws:fis:wait chỉ chờ thời gian. Một mình nó không gây mất mạng hay treo đĩa.\n(D) ĐÚNG: aws:network:disrupt-connectivity với scope all trên các subnet của AZ bị impairment chặn mọi traffic vào ra các subnet đó. Đây là cách kịch bản AZ power interruption của FIS mô phỏng mất mạng.\n(E) SAI: CPU stress trên một instance qua SSM không chặn subnet cả AZ và không pause EBS.\nĐáp án đúng: A và D\nĐiểm cần nhớ: Suy giảm kiểu mất AZ kết hợp disrupt-connectivity scope all trên subnet của AZ đó và pause-volume-io trong AZ đó. Scope availability-zone chỉ chặn traffic liên AZ, không cắt hẳn mạng của subnet.",
       "tagNames": [
         "Resilient Cloud Solutions > AWS Fault Injection Service (FIS)"
       ],
@@ -4165,7 +4165,7 @@
         },
         {
           "answerLabel": "D",
-          "answerText": "aws:network:disrupt-connectivity with scope availability-zone on subnets in the impaired zone",
+          "answerText": "aws:network:disrupt-connectivity with scope all on subnets in the impaired zone",
           "isCorrect": true
         },
         {
@@ -4349,7 +4349,7 @@
       "questionNumber": 134,
       "questionType": "MCQ",
       "questionText": "A deployment on Amazon EKS should lose a few pods so the team can watch the PodDisruptionBudget and pod replacement. The worker nodes must stay up, and the test must go through the Kubernetes API rather than the hypervisor. Which approach fits?",
-      "explanation": "Phân tích đề: Cần xóa pod qua Kubernetes để PDB và controller tạo pod mới, node vẫn Ready. Dùng action EKS inject custom resource, role phải được RBAC của cluster cho phép.\n(A) SAI: Kill kubelet bằng SSM làm node NotReady và ảnh hưởng mọi pod trên node, không phải xóa có kiểm soát một vài pod qua API.\n(B) SAI: Terminate worker node là fault ở hypervisor, nổ rộng hơn vài pod và không đi qua API xóa pod nên không phải bài PDB đang cần.\n(C) ĐÚNG: aws:eks:inject-kubernetes-custom-resource tạo custom resource để xóa các pod đã chọn. Experiment role cần quyền Kubernetes qua RBAC, không chỉ IAM terminate EC2.\n(D) SAI: aws:ecs:stop-task là action ECS, không phải cách EKS xóa pod.\nĐáp án đúng: C\nĐiểm cần nhớ: Xóa pod EKS để thử PDB dùng aws:eks:inject-kubernetes-custom-resource và RBAC cho experiment role. Terminate node hoặc kill kubelet là fault khác, rộng hơn.",
+      "explanation": "Phân tích đề: Cần xóa pod qua Kubernetes API để controller tạo pod mới, node vẫn Ready. FIS có action native aws:eks:pod-delete; experiment role phải được RBAC của cluster cho phép.\n(A) SAI: Kill kubelet bằng SSM làm node NotReady và ảnh hưởng mọi pod trên node, không phải xóa có kiểm soát một vài pod qua API.\n(B) SAI: Terminate worker node là fault ở hypervisor, nổ rộng hơn vài pod và không đi qua API xóa pod.\n(C) ĐÚNG: aws:eks:pod-delete xóa các pod được chọn thông qua Kubernetes API. Experiment role cần quyền Kubernetes qua RBAC (access entry hoặc aws-auth), không chỉ quyền IAM EC2.\n(D) SAI: aws:ecs:stop-task là action ECS, không phải cách EKS xóa pod.\nĐáp án đúng: C\nĐiểm cần nhớ: Xóa pod EKS dùng aws:eks:pod-delete và RBAC cho experiment role. aws:eks:inject-kubernetes-custom-resource cũng làm được nhưng cần cài Chaos Mesh hoặc Litmus. Terminate node hoặc kill kubelet là fault khác, rộng hơn.",
       "tagNames": [
         "Resilient Cloud Solutions > AWS Fault Injection Service (FIS)"
       ],
@@ -4366,7 +4366,7 @@
         },
         {
           "answerLabel": "C",
-          "answerText": "aws:eks:inject-kubernetes-custom-resource to delete those pods, with RBAC allowing the experiment role",
+          "answerText": "aws:eks:pod-delete on the selected pods, with Kubernetes RBAC allowing the experiment role",
           "isCorrect": true
         },
         {
@@ -4585,8 +4585,8 @@
     {
       "questionNumber": 141,
       "questionType": "MCQ",
-      "questionText": "A Spot handler needs about two minutes after the interruption notice to flush its queue. The template uses aws:ec2:send-spot-instance-interruptions, but durationBeforeInterruption is only a few seconds, and the handler never finishes. What should the team change?",
-      "explanation": "Phân tích đề: Action Spot đã đúng nhưng cửa sổ giữa notice và interrupt quá ngắn so với hai phút handler cần để flush queue.\n(A) SAI: AWSFIS-Run-Kill-Process giết process qua SSM. Nó không ghi Spot interruption notice lên instance metadata.\n(B) ĐÚNG: Tăng durationBeforeInterruption lên hai phút để handler có cùng khoảng production Spot dùng giữa notice và interruption.\n(C) SAI: Cooldown của Auto Scaling không làm FIS hoãn notice của action send-spot-instance-interruptions.\n(D) SAI: aws:ec2:terminate-instances không chờ hai phút và không phát Spot interruption notice mà handler đang đọc.\nĐáp án đúng: B\nĐiểm cần nhớ: durationBeforeInterruption của aws:ec2:send-spot-instance-interruptions là khoảng handler có để checkpoint. Cửa sổ production thông thường là hai phút.",
+      "questionText": "A Spot handler must checkpoint within the roughly two minutes it gets in production. The drill template uses aws:ec2:send-spot-instance-interruptions with durationBeforeInterruption set to PT15M, so the handler always finishes and the drill hides a slow checkpoint. What should the team change?",
+      "explanation": "Phân tích đề: Action Spot đã đúng, nhưng cửa sổ giữa notice và interrupt dài hơn nhiều so với production, nên drill không phát hiện được handler chậm.\n(A) SAI: AWSFIS-Run-Kill-Process giết process qua SSM. Nó không ghi Spot interruption notice lên instance metadata.\n(B) ĐÚNG: Đặt durationBeforeInterruption về PT2M, mức tối thiểu của tham số và cũng là cửa sổ cảnh báo Spot thật. Handler chậm hơn hai phút sẽ lộ ra trong drill.\n(C) SAI: Cooldown của Auto Scaling không đổi khoảng cách giữa notice và interruption của action FIS.\n(D) SAI: aws:ec2:terminate-instances không phát Spot interruption notice mà handler đang đọc.\nĐáp án đúng: B\nĐiểm cần nhớ: durationBeforeInterruption nhận giá trị từ PT2M đến PT15M. Muốn drill giống production thì dùng PT2M.",
       "tagNames": [
         "Resilient Cloud Solutions > AWS Fault Injection Service (FIS)"
       ],
@@ -4598,12 +4598,12 @@
         },
         {
           "answerLabel": "B",
-          "answerText": "Increase durationBeforeInterruption to two minutes so the handler gets the usual production window",
+          "answerText": "Set durationBeforeInterruption to PT2M so the drill matches the two-minute production warning",
           "isCorrect": true
         },
         {
           "answerLabel": "C",
-          "answerText": "Raise the Auto Scaling cooldown to two minutes, which delays the FIS interruption notice by the same amount",
+          "answerText": "Lower the Auto Scaling cooldown to two minutes, which shortens the FIS interruption notice by the same amount",
           "isCorrect": false
         },
         {
@@ -4947,7 +4947,7 @@
       "questionNumber": 152,
       "questionType": "MCQ",
       "questionText": "A new ECS release returns HTTP 500 to users, but every task stays RUNNING and the shallow health check still returns 200. The deployment circuit breaker is already on, with rollback, and never fires. The shallow health URL must keep returning 200, and the team will not write custom rollback code. What implements automatic rollback from the ALB 5xx rate during the release?",
-      "explanation": "Phân tích đề: Task vẫn RUNNING và health check nông vẫn trả 200, nên circuit breaker không có tín hiệu thất bại. Cần rollback theo tỷ lệ 5xx của ALB trong lúc phát hành, không viết code tự rollback.\n(A) ĐÚNG: CodeDeploy canary hoặc linear chuyển traffic giữa hai target group và có thể tự rollback khi alarm 5xx báo cháy trong lúc deployment còn đang chạy.\n(B) SAI: Circuit breaker không nhận CloudWatch alarm. Alarm 5xx không làm nó FAILED khi task vẫn khỏe và health check vẫn 200.\n(C) SAI: Grace period chỉ làm scheduler bỏ qua health check lúc khởi động. Nó không theo dõi 5xx và không hoàn tác một bản đã phục vụ lỗi.\n(D) SAI: Retry che lỗi tạm thời của từng request, không dừng bản phát hành hỏng và không chuyển traffic về bản cũ.\nĐáp án đúng: A\nĐiểm cần nhớ: Circuit breaker của ECS rolling chỉ nhìn task không lên hoặc health check thất bại. Rollback theo alarm 5xx trong lúc chuyển traffic là việc của CodeDeploy, không phải của circuit breaker.",
+      "explanation": "Phân tích đề: Task vẫn RUNNING và health check nông vẫn trả 200, nên circuit breaker không có tín hiệu thất bại. Cần rollback theo tỷ lệ 5xx của ALB trong lúc phát hành, không viết code tự rollback.\n(A) ĐÚNG: CodeDeploy canary hoặc linear chuyển traffic giữa hai target group và tự rollback khi alarm 5xx báo cháy trong lúc deployment còn đang chạy.\n(B) SAI: Circuit breaker chỉ đếm task không lên hoặc health check thất bại. Nó không có ngưỡng nào biến response HTTP 500 thành task thất bại.\n(C) SAI: Grace period chỉ làm scheduler bỏ qua health check lúc khởi động. Nó không theo dõi 5xx và không hoàn tác một bản đã phục vụ lỗi.\n(D) SAI: Retry che lỗi tạm thời của từng request, không dừng bản phát hành hỏng và không chuyển traffic về bản cũ.\nĐáp án đúng: A\nĐiểm cần nhớ: Circuit breaker không đọc CloudWatch alarm. Rollback theo alarm 5xx có hai cách không cần code: CodeDeploy deployment group có alarm, hoặc deployment alarms của chính ECS (deploymentConfiguration.alarms với rollback bật).",
       "tagNames": [
         "Resilient Cloud Solutions > Amazon ECS / EKS"
       ],
@@ -4959,7 +4959,7 @@
         },
         {
           "answerLabel": "B",
-          "answerText": "Leave the ECS circuit breaker in place and attach the ALB 5xx alarm to that breaker",
+          "answerText": "Leave the ECS circuit breaker in place and raise its failure threshold so HTTP 500 responses count as failed tasks",
           "isCorrect": false
         },
         {
@@ -5008,20 +5008,20 @@
     {
       "questionNumber": 154,
       "questionType": "MCQ",
-      "questionText": "A team believes an ECS service can blue/green between two target groups by setting maximumPercent to 200 on the built-in ECS deployment controller. The service already exists with that controller. What is the correct way to get a real blue/green cutover with a managed traffic shift?",
-      "explanation": "Phân tích đề: Deployment controller kiểu ECS chỉ rolling update trên một target group. Blue/green với hai target group và listener là CodeDeploy. Controller không đổi được sau khi service đã tạo.\n(A) SAI: maximumPercent 200 chỉ cho phép chạy thêm task mới rồi rút task cũ trên cùng một target group. Đó là rolling, không phải hai môi trường và một lần chuyển listener.\n(B) ĐÚNG: Blue/green của ECS đi qua CodeDeploy. Service phải được tạo với controller CODE_DEPLOY, hai target group, và deployment group đảm nhiệm canary, linear, hoặc all-at-once.\n(C) SAI: Circuit breaker hoàn tác revision của service rolling. Nó không điều khiển listener và không tạo target group thứ hai.\n(D) SAI: API không cho đổi deployment controller sau khi service đã tạo. UpdateService với controller mới bị từ chối.\nĐáp án đúng: B\nĐiểm cần nhớ: ECS không có blue/green dựng sẵn trong deployment controller ECS. Phải tạo service mới với controller CODE_DEPLOY, hai target group, và một CodeDeploy deployment group. maximumPercent 200 chỉ là rolling có thêm chỗ.",
+      "questionText": "A team believes an ECS service can do a blue/green cutover between two target groups by setting maximumPercent to 200 on a rolling deployment. The service already uses the ECS deployment controller, and the team does not want to add CodeDeploy. What gives a real blue/green cutover with a managed traffic shift?",
+      "explanation": "Phân tích đề: maximumPercent 200 chỉ là rolling có thêm chỗ trên một target group. ECS deployment controller hiện có chiến lược BLUE_GREEN dựng sẵn, không cần CodeDeploy.\n(A) SAI: maximumPercent 200 chỉ cho phép chạy thêm task mới rồi rút task cũ trên cùng một target group. Đó là rolling, không phải hai môi trường và một lần chuyển listener.\n(B) ĐÚNG: Đặt strategy BLUE_GREEN trên ECS deployment controller, khai báo production và alternate target group trên listener rule cùng bake time. ECS tạo môi trường green, chuyển traffic, giữ blue trong bake time để rollback nhanh.\n(C) SAI: Circuit breaker hoàn tác revision của service rolling. Nó không điều khiển listener và không tạo target group thứ hai.\n(D) SAI: Tự sửa Route 53 weighted giữa hai service là cutover thủ công, không phải traffic shift do ECS quản lý, và còn chịu cache DNS.\nĐáp án đúng: B\nĐiểm cần nhớ: ECS có blue/green native (strategy BLUE_GREEN, hai target group, bake time, lifecycle hook). CodeDeploy vẫn là một lựa chọn khác. maximumPercent 200 chỉ là rolling.",
       "tagNames": [
         "Resilient Cloud Solutions > Amazon ECS / EKS"
       ],
       "answers": [
         {
           "answerLabel": "A",
-          "answerText": "Keep the ECS controller and set maximumPercent to 200 so the extra tasks form a green copy on the same target group",
+          "answerText": "Keep the rolling strategy and set maximumPercent to 200 so the extra tasks form a green copy on the same target group",
           "isCorrect": false
         },
         {
           "answerLabel": "B",
-          "answerText": "Create a new service with the CODE_DEPLOY controller and a deployment group that shifts the listener between two target groups",
+          "answerText": "Set the deployment strategy to BLUE_GREEN on the ECS controller, with production and alternate target groups and a bake time",
           "isCorrect": true
         },
         {
@@ -5031,7 +5031,7 @@
         },
         {
           "answerLabel": "D",
-          "answerText": "Call UpdateService and change the existing deployment controller to CODE_DEPLOY, then add a second target group",
+          "answerText": "Run a second ECS service and shift users between the two services by editing Route 53 weighted records each release",
           "isCorrect": false
         }
       ]
@@ -5205,7 +5205,7 @@
       "questionNumber": 160,
       "questionType": "MSQ",
       "questionText": "Which THREE statements describe a blue/green release of an ECS service through CodeDeploy, rather than an ECS rolling update?",
-      "explanation": "Phân tích đề: Blue/green cho ECS là CodeDeploy cộng controller CODE_DEPLOY, hai target group, và listener chuyển dần. Alarm CloudWatch có thể hoàn tác trong lúc deployment chưa xong. Rolling dùng minimumHealthyPercent trên một target group.\n(A) SAI: Circuit breaker không điều khiển listener và không dùng CPU làm tín hiệu. Hoàn tác traffic của blue/green là cấu hình rollback của CodeDeploy.\n(B) ĐÚNG: Loại deployment controller gắn lúc CreateService. Service đang dùng controller ECS không đổi sang CODE_DEPLOY bằng UpdateService.\n(C) SAI: Chỉ đổi image trên một target group là rolling. Blue/green đăng ký bộ task mới vào target group còn lại rồi mới chuyển traffic.\n(D) SAI: Cặp minimumHealthyPercent và maximumPercent điều khiển rolling của controller ECS, không phải kích thước môi trường green của CodeDeploy.\n(E) ĐÚNG: CodeDeploy giữ hai target group và đổi trọng số trên listener theo deployment config, thay vì rút task trên một target group.\n(F) ĐÚNG: Deployment group bật rollback theo alarm thì CodeDeploy dừng chuyển traffic và đưa listener về target group gốc nếu alarm kêu trong lúc deployment đang chạy.\nĐáp án đúng: B, E và F\nĐiểm cần nhớ: Controller CODE_DEPLOY phải chọn lúc tạo service. CodeDeploy chuyển traffic theo canary, linear, hoặc all-at-once và rollback được bằng alarm. Circuit breaker và minimumHealthyPercent không thay các việc đó.",
+      "explanation": "Phân tích đề: Blue/green qua CodeDeploy dùng controller CODE_DEPLOY, hai target group, task set thay thế và listener chuyển dần. Alarm CloudWatch có thể hoàn tác trong lúc deployment chưa xong. Rolling dùng minimumHealthyPercent trên một target group.\n(A) SAI: Circuit breaker không điều khiển listener và không dùng CPU làm tín hiệu. Hoàn tác traffic của blue/green là cấu hình rollback của CodeDeploy.\n(B) ĐÚNG: Service dùng controller CODE_DEPLOY. Mỗi lần release, CodeDeploy tạo task set thay thế và đăng ký vào target group còn lại rồi mới chuyển traffic.\n(C) SAI: Chỉ đổi image trên một target group là rolling. Blue/green đăng ký bộ task mới vào target group còn lại rồi mới chuyển traffic.\n(D) SAI: Cặp minimumHealthyPercent và maximumPercent điều khiển rolling của controller ECS, không phải kích thước môi trường green của CodeDeploy.\n(E) ĐÚNG: CodeDeploy giữ hai target group và đổi trọng số trên listener theo deployment config, thay vì rút task trên một target group.\n(F) ĐÚNG: Deployment group bật rollback theo alarm thì CodeDeploy dừng chuyển traffic và đưa listener về target group gốc nếu alarm kêu trong lúc deployment đang chạy.\nĐáp án đúng: B, E và F\nĐiểm cần nhớ: CodeDeploy blue/green = controller CODE_DEPLOY + task set thay thế + hai target group + canary, linear hoặc all-at-once + rollback theo alarm. ECS giờ cũng có blue/green native trên controller ECS.",
       "tagNames": [
         "Resilient Cloud Solutions > Amazon ECS / EKS"
       ],
@@ -5217,7 +5217,7 @@
         },
         {
           "answerLabel": "B",
-          "answerText": "The service is created with the CODE_DEPLOY deployment controller, which cannot be switched on later",
+          "answerText": "The service uses the CODE_DEPLOY controller, and CodeDeploy registers a replacement task set to the second target group",
           "isCorrect": true
         },
         {
@@ -6328,20 +6328,20 @@
     {
       "questionNumber": 194,
       "questionType": "MCQ",
-      "questionText": "Spot instances in an EKS managed node group disappear without a cordon, so in-flight requests die with the node. A PodDisruptionBudget already exists. The team will keep Spot capacity. What should act on the interruption warning?",
-      "explanation": "Phân tích đề: Managed node group đang dùng Spot. Instance bị lấy lại trước khi kubelet drain, request đang xử lý chết theo node. PDB có sẵn nhưng không kịp acting vì không có eviction. Đội giữ Spot.\n(A) SAI: Circuit breaker là cấu hình deployment của ECS service. Node group EKS không có tham số đó và nó không nghe cảnh báo Spot.\n(B) SAI: Hết interruption của Spot, nhưng trái với quyết định tiếp tục dùng Spot. Đề đòi xử lý cảnh báo, không phải bỏ Spot.\n(C) ĐÚNG: EventBridge đưa Spot interruption vào hàng đợi, handler cordon rồi drain trong khoảng hai phút. PDB lúc đó mới giới hạn số pod bị evict, và pod được xếp lại trước khi instance mất.\n(D) SAI: Budget chỉ từ chối eviction tự nguyện. Hypervisor vẫn tắt instance Spot khi hết interruption window, và nếu không ai drain thì budget không được tham gia.\nĐáp án đúng: C\nĐiểm cần nhớ: AWS Node Termination Handler, nên dùng queue processor, cordon và drain trong cửa sổ cảnh báo khoảng hai phút của Spot. PDB không ngăn EC2 thu hồi instance. Circuit breaker của ECS không chạy trên node group EKS.",
+      "questionText": "Spot instances in an EKS self-managed node group disappear without a cordon, so in-flight requests die with the node. A PodDisruptionBudget already exists. The team will keep Spot capacity. What should act on the interruption warning?",
+      "explanation": "Phân tích đề: Self-managed node group đang dùng Spot. Instance bị lấy lại trước khi kubelet drain, request đang xử lý chết theo node. PDB có sẵn nhưng không có eviction nào để nó can thiệp. Đội giữ Spot.\n(A) SAI: Circuit breaker là cấu hình deployment của ECS service. Node group EKS không có tham số đó và nó không nghe cảnh báo Spot.\n(B) SAI: Hết interruption của Spot, nhưng trái với quyết định tiếp tục dùng Spot. Đề đòi xử lý cảnh báo, không phải bỏ Spot.\n(C) ĐÚNG: EventBridge đưa Spot interruption vào hàng đợi, handler cordon rồi drain trong khoảng hai phút. PDB lúc đó mới giới hạn số pod bị evict, và pod được xếp lại trước khi instance mất.\n(D) SAI: Budget chỉ từ chối eviction tự nguyện. EC2 vẫn thu hồi instance Spot khi hết cửa sổ cảnh báo, và nếu không ai drain thì budget không được tham gia.\nĐáp án đúng: C\nĐiểm cần nhớ: Với self-managed node group, AWS Node Termination Handler (queue processor) cordon và drain trong cửa sổ hai phút. Managed node group dùng Spot đã tự bật Capacity Rebalancing và tự drain, không cần NTH. PDB không ngăn EC2 thu hồi instance.",
       "tagNames": [
         "Resilient Cloud Solutions > Amazon ECS / EKS"
       ],
       "answers": [
         {
           "answerLabel": "A",
-          "answerText": "Enable the ECS circuit breaker inside the EKS managed node group update configuration",
+          "answerText": "Enable the ECS circuit breaker inside the EKS node group update configuration",
           "isCorrect": false
         },
         {
           "answerLabel": "B",
-          "answerText": "Change the managed node group capacity type from Spot to On-Demand and leave the warning unused",
+          "answerText": "Move the node group from Spot to On-Demand instances and leave the warning unused",
           "isCorrect": false
         },
         {
@@ -6488,8 +6488,8 @@
     {
       "questionNumber": 199,
       "questionType": "MSQ",
-      "questionText": "Which TWO measures limit user-visible errors when an EC2 Spot interruption warning is delivered for a worker in an EKS managed node group?",
-      "explanation": "Phân tích đề: Cảnh báo Spot khoảng hai phút chỉ có ích nếu có tiến trình cordon và drain trước khi instance mất. PDB và topology spread giúp lần drain đó không lấy hết replica và phần còn lại không nằm cùng một zone.\n(A) SAI: Ít pod hơn làm mỗi pod quan trọng hơn lúc node mất, không phải cách chịu interruption. CPU target cũng không nghe cảnh báo Spot.\n(B) ĐÚNG: Handler nhận sự kiện interruption, cô lập node, và evict pod trong khoảng hai phút để pod được xếp lại trước khi instance biến mất.\n(C) SAI: Fargate profile không phát và không chặn cảnh báo Spot của node EC2. Xóa profile còn làm pod Fargate khác không có chỗ chạy.\n(D) ĐÚNG: Spread giữ replica ở zone khác trong lúc một node bị drain. Budget chặn việc evict quá nhiều pod trong chính lần drain tự nguyện đó.\n(E) SAI: Khi instance đã mất, probe không chạy nữa. Restart nhanh không tạo cửa sổ drain và không giảm request đang chết cùng node.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Với managed node group Spot, AWS Node Termination Handler hoặc cơ chế interruption của Karpenter nếu node do Karpenter tạo, phải drain trong cửa sổ cảnh báo. PDB không thay handler. Liveness không kéo dài đời instance.",
+      "questionText": "Which TWO measures limit user-visible errors when an EC2 Spot interruption warning is delivered for a worker in an EKS self-managed node group?",
+      "explanation": "Phân tích đề: Cảnh báo Spot khoảng hai phút chỉ có ích nếu có tiến trình cordon và drain trước khi instance mất. PDB và topology spread giúp lần drain đó không lấy hết replica và phần còn lại không nằm cùng một zone.\n(A) SAI: Ít pod hơn làm mỗi pod quan trọng hơn lúc node mất, không phải cách chịu interruption. CPU target cũng không nghe cảnh báo Spot.\n(B) ĐÚNG: Handler nhận sự kiện interruption, cô lập node, và evict pod trong khoảng hai phút để pod được xếp lại trước khi instance biến mất.\n(C) SAI: Fargate profile không phát và không chặn cảnh báo Spot của node EC2. Xóa profile còn làm pod Fargate khác không có chỗ chạy.\n(D) ĐÚNG: Spread giữ replica ở zone khác trong lúc một node bị drain. Budget chặn việc evict quá nhiều pod trong chính lần drain tự nguyện đó.\n(E) SAI: Khi instance đã mất, probe không chạy nữa. Restart nhanh không tạo cửa sổ drain và không giảm request đang chết cùng node.\nĐáp án đúng: B và D\nĐiểm cần nhớ: Self-managed node group cần AWS Node Termination Handler (hoặc Karpenter interruption handling nếu node do Karpenter tạo). Managed node group Spot đã tự drain. PDB không thay handler; liveness không kéo dài đời instance.",
       "tagNames": [
         "Resilient Cloud Solutions > Amazon ECS / EKS"
       ],
@@ -7184,8 +7184,8 @@
     {
       "questionNumber": 220,
       "questionType": "MSQ",
-      "questionText": "A platform standard tries to use one rule for both Amazon ElastiCache engines. Which THREE statements are accurate?",
-      "explanation": "Phân tích đề: Redis/Valkey cần replication group có replica thì mới auto-failover. Memcached không replicate và không persistent. Snapshot Redis là backup để restore, không phải failover của node đơn.\n(A) ĐÚNG: Memcached không replicate và không lưu bền, nên mất node là mất key nằm trên node đó.\n(B) SAI: Redis một node không có standby ẩn để Multi-AZ promote. Không có replica thì không có mục tiêu failover.\n(C) SAI: Failover Redis không dùng last-writer-wins đa Region như DynamoDB global tables.\n(D) SAI: Memcached không có read replica và không có reader endpoint.\n(E) ĐÚNG: Snapshot RDB của Redis dùng để restore sau, không tự failover một node đơn đang chạy.\n(F) ĐÚNG: Auto-failover của Redis cần replication group có ít nhất một replica, dù cluster mode bật hay tắt.\nĐáp án đúng: A, E và F\nĐiểm cần nhớ: ElastiCache Redis auto-failover cần replica trong replication group. Memcached không replication, không persistence. Snapshot không thay Multi-AZ.",
+      "questionText": "A platform standard tries to use one rule for both Amazon ElastiCache engines on node-based (self-designed) clusters. Which THREE statements are accurate?",
+      "explanation": "Phân tích đề: Với cluster node-based, Redis/Valkey cần replication group có replica thì mới auto-failover. Memcached node-based không replicate và không persistent. Snapshot Redis là backup để restore, không phải failover của node đơn.\n(A) ĐÚNG: Memcached node-based không replicate và không lưu bền, nên mất node là mất key nằm trên node đó.\n(B) SAI: Redis một node không có standby ẩn để Multi-AZ promote. Không có replica thì không có mục tiêu failover.\n(C) SAI: Failover Redis không dùng last-writer-wins đa Region như DynamoDB global tables.\n(D) SAI: Memcached không có read replica và không có reader endpoint.\n(E) ĐÚNG: Snapshot RDB của Redis dùng để restore sau, không tự failover một node đơn đang chạy.\n(F) ĐÚNG: Auto-failover của Redis cần replication group có ít nhất một replica, dù cluster mode bật hay tắt.\nĐáp án đúng: A, E và F\nĐiểm cần nhớ: ElastiCache Redis node-based cần replica trong replication group để auto-failover. Memcached node-based không replication, không persistence. ElastiCache Serverless (cả Memcached) thì tự nhân bản đa AZ và có snapshot.",
       "tagNames": [
         "Resilient Cloud Solutions > Database HA & Replication"
       ],
@@ -7587,7 +7587,7 @@
       "questionNumber": 232,
       "questionType": "MCQ",
       "questionText": "The primary Region of an Amazon Aurora Global Database can no longer be reached. The secondary cluster is read-only, and replication lag was under a second before the break. The secondary Region must start accepting writes. Which action is appropriate?",
-      "explanation": "Phân tích đề: Primary Region không tới được thì không làm switchover có kiểm soát. Dùng unplanned failover (detach and promote). Có thể mất transaction chưa kịp replicate. Primary cũ không tự gia nhập lại như secondary.\n(A) ĐÚNG: Detach and promote secondary để nó nhận ghi. Có thể mất transaction chưa replicate. Primary cũ không tự trở thành secondary.\n(B) SAI: Promote một reader bên trong secondary không thay thao tác failover của global database và không giữ liên kết global theo kiểu secondary vẫn read-only rồi đột nhiên thành writer toàn cục.\n(C) SAI: Planned switchover cần primary còn liên lạc để bắt kịp replication và không mất commit. Region primary đã đứt thì không đi đường đó.\n(D) SAI: Secondary không tự thành writer khi hết heartbeat. Phải có thao tác failover.\nĐáp án đúng: A\nĐiểm cần nhớ: Primary Region sập: unplanned detach-and-promote. RPO có thể mất phần chưa replicate (thường rất nhỏ, không bảo đảm bằng 0). Switchover dùng khi primary còn khỏe.",
+      "explanation": "Phân tích đề: Primary Region không tới được thì không làm switchover có kiểm soát. Phải failover kiểu unplanned, chấp nhận mất transaction chưa kịp replicate.\n(A) ĐÚNG: Detach and promote secondary để nó nhận ghi. Có thể mất transaction chưa replicate. Theo đường detach-and-promote, primary cũ không tự trở thành secondary.\n(B) SAI: Promote một reader bên trong secondary không thay thao tác failover của global database và không giữ liên kết global theo kiểu secondary vẫn read-only rồi đột nhiên thành writer toàn cục.\n(C) SAI: Planned switchover cần primary còn liên lạc để bắt kịp replication và không mất commit. Region primary đã đứt thì không đi đường đó.\n(D) SAI: Secondary không tự thành writer khi hết heartbeat. Phải có thao tác failover.\nĐáp án đúng: A\nĐiểm cần nhớ: Primary Region sập: unplanned failover, RPO có thể mất phần chưa replicate. Ngoài detach-and-promote, Aurora còn có managed unplanned failover (FailoverGlobalCluster với AllowDataLoss), cách này giữ topology global và dựng lại primary cũ thành secondary khi Region đó hồi phục. Switchover dùng khi primary còn khỏe.",
       "tagNames": [
         "Resilient Cloud Solutions > Database HA & Replication"
       ],
@@ -8138,8 +8138,8 @@
     {
       "questionNumber": 249,
       "questionType": "MSQ",
-      "questionText": "A cache standard claims that snapshots and engine choice already provide automatic failover for Amazon ElastiCache. Which TWO corrections are right?",
-      "explanation": "Phân tích đề: Redis auto-failover cần ít nhất một replica trong replication group. Memcached không có replication và không có snapshot để dựng standby.\n(A) SAI: Snapshot RDB hằng ngày trên Redis một node không promote node thay thế tự động và không bảo đảm không mất dữ liệu.\n(B) SAI: Bật cluster mode không biến Memcached thành replication group tương thích Redis.\n(C) ĐÚNG: Auto-failover của Redis cần ít nhất một replica trong replication group. Node đơn không có mục tiêu promote.\n(D) SAI: Memcached không copy hash slot đồng bộ sang node phụ ở AZ khác, và không có cluster mode kiểu đó.\n(E) ĐÚNG: Memcached không có replication và không có snapshot để dựng key của node hỏng sang standby.\nĐáp án đúng: C và E\nĐiểm cần nhớ: ElastiCache Redis: Multi-AZ auto-failover cần replica. Memcached: không replication, không persistence, không failover.",
+      "questionText": "A cache standard claims that snapshots and engine choice already provide automatic failover for node-based (self-designed) Amazon ElastiCache clusters. Which TWO corrections are right?",
+      "explanation": "Phân tích đề: Với cluster node-based, Redis auto-failover cần ít nhất một replica trong replication group. Memcached node-based không có replication và không có snapshot để dựng standby.\n(A) SAI: Snapshot RDB hằng ngày trên Redis một node không promote node thay thế tự động và không bảo đảm không mất dữ liệu.\n(B) SAI: Bật cluster mode không biến Memcached thành replication group tương thích Redis.\n(C) ĐÚNG: Auto-failover của Redis cần ít nhất một replica trong replication group. Node đơn không có mục tiêu promote.\n(D) SAI: Memcached không copy hash slot đồng bộ sang node phụ ở AZ khác, và không có cluster mode kiểu đó.\n(E) ĐÚNG: Memcached node-based không có replication và không có snapshot để dựng key của node hỏng sang standby.\nĐáp án đúng: C và E\nĐiểm cần nhớ: ElastiCache Redis node-based: Multi-AZ auto-failover cần replica. Memcached node-based: không replication, không persistence, không failover. ElastiCache Serverless thì tự nhân bản đa AZ và có snapshot.",
       "tagNames": [
         "Resilient Cloud Solutions > Database HA & Replication"
       ],
@@ -8576,30 +8576,30 @@
     {
       "questionNumber": 262,
       "questionType": "MCQ",
-      "questionText": "Updating a Network Load Balancer target group is rejected. The health check interval is 5 seconds, copied from an Application Load Balancer group for the same process. Which interval will the Network Load Balancer accept when the check must be as frequent as that type allows?",
-      "explanation": "Phân tích đề: API từ chối interval 5 giây trên target group của NLB. Cùng một process đang dùng interval đó trên ALB.\n(A) SAI: Lỗi nằm ở interval không được phép, không phải vì timeout. Hạ timeout không làm NLB chấp nhận 5 giây.\n(B) ĐÚNG: Health check của NLB chỉ nhận interval 10 giây hoặc 30 giây. Mức nhanh nhất là 10 giây.\n(C) SAI: 30 giây là mức mặc định thường gặp, nhưng 10 giây vẫn hợp lệ và nhanh hơn.\n(D) SAI: Đổi protocol health check sang TCP không mở thêm mức 5 giây. Giới hạn interval của NLB không phụ thuộc TCP hay HTTP.\nĐáp án đúng: B\nĐiểm cần nhớ: Interval health check tối thiểu của ALB là 5 giây. NLB chỉ cho 10 hoặc 30 giây.",
+      "questionText": "Updating a Network Load Balancer target group is rejected. The health check interval is 3 seconds, copied from a monitoring script that polls every 3 seconds. Which interval will the Network Load Balancer accept when the check must be as frequent as that type allows?",
+      "explanation": "Phân tích đề: API từ chối interval 3 giây trên target group của NLB. Cần mức interval nhỏ nhất hợp lệ.\n(A) SAI: Lỗi nằm ở interval không hợp lệ, không phải vì timeout. Hạ timeout không làm NLB chấp nhận 3 giây.\n(B) ĐÚNG: Health check của NLB nhận interval từ 5 đến 300 giây, giống ALB. Mức nhanh nhất là 5 giây.\n(C) SAI: Giới hạn chỉ 10 hoặc 30 giây là quy tắc cũ của NLB trước 11/2022. Hiện NLB nhận mọi giá trị trong khoảng 5 đến 300 giây.\n(D) SAI: Đổi protocol health check sang TCP không mở thêm mức dưới 5 giây.\nĐáp án đúng: B\nĐiểm cần nhớ: Interval health check của cả ALB và NLB là 5 đến 300 giây. Timeout của ALB phải nhỏ hơn interval.",
       "tagNames": [
         "Resilient Cloud Solutions > Elastic Load Balancing & Health Checks"
       ],
       "answers": [
         {
           "answerLabel": "A",
-          "answerText": "Keep 5 seconds and lower the timeout, because the rejection is caused by the timeout being too large",
+          "answerText": "Keep 3 seconds and lower the timeout, because the rejection is caused by the timeout being too large",
           "isCorrect": false
         },
         {
           "answerLabel": "B",
-          "answerText": "Use 10 seconds, the shortest health check interval a Network Load Balancer target group allows",
+          "answerText": "Use 5 seconds, the shortest health check interval a Network Load Balancer target group allows",
           "isCorrect": true
         },
         {
           "answerLabel": "C",
-          "answerText": "Use only 30 seconds, because a Network Load Balancer cannot run a health check more often than that",
+          "answerText": "Use only 10 or 30 seconds, because a Network Load Balancer accepts no other interval values",
           "isCorrect": false
         },
         {
           "answerLabel": "D",
-          "answerText": "Keep 5 seconds after switching the health check protocol to TCP, which unlocks that shorter interval",
+          "answerText": "Keep 3 seconds after switching the health check protocol to TCP, which unlocks that shorter interval",
           "isCorrect": false
         }
       ]
@@ -8763,7 +8763,7 @@
       "questionNumber": 268,
       "questionType": "MSQ",
       "questionText": "Which TWO statements about health check timing on Application Load Balancers and Network Load Balancers are correct?",
-      "explanation": "Phân tích đề: Cần phân biệt interval, timeout và hai ngưỡng liên tiếp. Không nhầm với grace period.\n(A) SAI: Trên ALB, timeout phải nhỏ hơn interval, không được dài hơn.\n(B) SAI: NLB vẫn dùng healthy threshold. Target chỉ healthy sau đủ số lần thành công liên tiếp, không phải sau một lần.\n(C) SAI: Target group của ALB không có grace period. Grace period nằm trên ECS service hoặc Auto Scaling group.\n(D) ĐÚNG: Cả ALB và NLB đều đợi đủ số lần thành công liên tiếp bằng healthy threshold, và đủ số lần thất bại liên tiếp bằng unhealthy threshold, rồi mới đổi trạng thái target.\n(E) ĐÚNG: Interval của ALB có thể là 5 giây. NLB chỉ cho 10 giây hoặc 30 giây.\nĐáp án đúng: D và E\nĐiểm cần nhớ: Cả ALB và NLB đều có healthy threshold lẫn unhealthy threshold. Khác nhau ở interval tối thiểu: ALB 5 giây, NLB 10 hoặc 30 giây.",
+      "explanation": "Phân tích đề: Cần phân biệt interval, timeout và hai ngưỡng liên tiếp. Không nhầm với grace period.\n(A) SAI: Trên ALB, timeout phải nhỏ hơn interval, không được dài hơn.\n(B) SAI: NLB vẫn dùng healthy threshold. Target chỉ healthy sau đủ số lần thành công liên tiếp, không phải sau một lần.\n(C) SAI: Target group của ALB không có grace period. Grace period nằm trên ECS service hoặc Auto Scaling group.\n(D) ĐÚNG: Cả ALB và NLB đều đợi đủ số lần thành công liên tiếp bằng healthy threshold, và đủ số lần thất bại liên tiếp bằng unhealthy threshold, rồi mới đổi trạng thái target.\n(E) ĐÚNG: Cả ALB và NLB đều cho interval từ 5 đến 300 giây. Giới hạn 10 hoặc 30 giây của NLB đã được bỏ từ 11/2022.\nĐáp án đúng: D và E\nĐiểm cần nhớ: Cả ALB và NLB đều có healthy threshold lẫn unhealthy threshold, và interval tối thiểu đều là 5 giây.",
       "tagNames": [
         "Resilient Cloud Solutions > Elastic Load Balancing & Health Checks"
       ],
@@ -8790,7 +8790,7 @@
         },
         {
           "answerLabel": "E",
-          "answerText": "An Application Load Balancer interval can be 5 seconds, while a Network Load Balancer interval can be only 10 or 30 seconds",
+          "answerText": "Both Application Load Balancer and Network Load Balancer target groups accept a health check interval as short as 5 seconds",
           "isCorrect": true
         }
       ]
@@ -8835,14 +8835,14 @@
       "questionNumber": 270,
       "questionType": "MSQ",
       "questionText": "Which THREE health-check choices are valid for these load balancers?",
-      "explanation": "Phân tích đề: Cấu hình health check cần mã đúng, timeout hợp lệ và ngưỡng mà API thực sự cho phép.\n(A) SAI: NLB không nhận interval 5 giây. Mức thấp nhất là 10 giây.\n(B) ĐÚNG: Dùng path readiness và matcher chỉ nhận mã mà path đó trả khi process sẵn sàng.\n(C) SAI: Target group không có grace period. Grace period đặt trên ECS hoặc Auto Scaling.\n(D) SAI: Gọi homepage phụ thuộc API thanh toán trên mỗi lần probe làm cả nhóm unhealthy khi dependency tùy chọn chậm. Path health check nên phản ánh process sẵn sàng nhận traffic.\n(E) ĐÚNG: Unhealthy threshold thấp nhất là 2 trên cả ALB và NLB. Muốn gỡ target nhanh hơn thì giảm interval, không đặt ngưỡng bằng 1.\n(F) ĐÚNG: Timeout của health check phải ngắn hơn interval.\nĐáp án đúng: B, E và F\nĐiểm cần nhớ: Health check dùng path readiness và mã thành công thật. Timeout nhỏ hơn interval. Ngưỡng unhealthy tối thiểu là 2; grace period không nằm trên target group.",
+      "explanation": "Phân tích đề: Cấu hình health check cần mã đúng, timeout hợp lệ và ngưỡng mà API thực sự cho phép.\n(A) SAI: Interval tối thiểu của NLB (và ALB) là 5 giây. Giá trị 2 giây bị API từ chối.\n(B) ĐÚNG: Dùng path readiness và matcher chỉ nhận mã mà path đó trả khi process sẵn sàng.\n(C) SAI: Target group không có grace period. Grace period đặt trên ECS hoặc Auto Scaling.\n(D) SAI: Gọi homepage phụ thuộc API thanh toán trên mỗi lần probe làm cả nhóm unhealthy khi dependency tùy chọn chậm. Path health check nên phản ánh process sẵn sàng nhận traffic.\n(E) ĐÚNG: Unhealthy threshold thấp nhất là 2 trên cả ALB và NLB. Muốn gỡ target nhanh hơn thì giảm interval, không đặt ngưỡng bằng 1.\n(F) ĐÚNG: Timeout của health check phải ngắn hơn interval.\nĐáp án đúng: B, E và F\nĐiểm cần nhớ: Health check dùng path readiness và mã thành công thật. Interval từ 5 giây trở lên, timeout nhỏ hơn interval. Ngưỡng unhealthy tối thiểu là 2; grace period không nằm trên target group.",
       "tagNames": [
         "Resilient Cloud Solutions > Elastic Load Balancing & Health Checks"
       ],
       "answers": [
         {
           "answerLabel": "A",
-          "answerText": "Use a 5-second interval on a Network Load Balancer target group so failures are detected sooner",
+          "answerText": "Use a 2-second interval on a Network Load Balancer target group so failures are detected sooner",
           "isCorrect": false
         },
         {
@@ -11547,7 +11547,7 @@
       "questionNumber": 352,
       "questionType": "MCQ",
       "questionText": "Players whose resolvers are in Seoul are sent to the Sao Paulo game stack by a latency-based record group. The Seoul Region record is healthy, and Sao Paulo is much farther on a map. Operations believes the policy should have picked the geographically closest Region. What is the correct interpretation?",
-      "explanation": "Phân tích đề: Latency routing đang trả Sao Paulo cho resolver ở Seoul dù Region Seoul khỏe và gần hơn trên bản đồ. Cần xét xem hành vi này có đúng bản chất latency hay không.\n(A) SAI: IP-based routing khớp CIDR đã khai báo, không giải thích việc một nhóm latency chọn Sao Paulo.\n(B) ĐÚNG: Latency-based routing chọn Region có độ trễ đo được thấp nhất với nơi gửi truy vấn. Region đó có thể khác Region gần nhất về địa lý.\n(C) SAI: Bias geoproximity chỉ có trong traffic flow, không nằm sẵn trong một nhóm latency record thông thường.\n(D) SAI: Geolocation mới chọn theo quốc gia hoặc lục địa. Latency không map Seoul sang vị trí Nam Mỹ.\nĐáp án đúng: B\nĐiểm cần nhớ: Latency chọn Region có latency thấp nhất với người dùng hoặc resolver, không phải Region gần nhất theo quốc gia. Gần trên bản đồ mà chậm trên mạng vẫn có thể thua.",
+      "explanation": "Phân tích đề: Latency routing đang trả Sao Paulo cho resolver ở Seoul dù Region Seoul khỏe và gần hơn trên bản đồ. Cần xét xem hành vi này có đúng bản chất latency hay không.\n(A) SAI: IP-based routing khớp CIDR đã khai báo, không giải thích việc một nhóm latency chọn Sao Paulo.\n(B) ĐÚNG: Latency-based routing chọn Region có độ trễ đo được thấp nhất với nơi gửi truy vấn. Region đó có thể khác Region gần nhất về địa lý.\n(C) SAI: Bias là thuộc tính của policy geoproximity, không tồn tại trong một nhóm latency record. Record cùng tên chỉ dùng một routing policy.\n(D) SAI: Geolocation mới chọn theo quốc gia hoặc lục địa. Latency không map Seoul sang vị trí Nam Mỹ.\nĐáp án đúng: B\nĐiểm cần nhớ: Latency chọn Region có latency thấp nhất với người dùng hoặc resolver, không phải Region gần nhất theo quốc gia. Gần trên bản đồ mà chậm trên mạng vẫn có thể thua.",
       "tagNames": [
         "Resilient Cloud Solutions > Route 53 Routing Policies"
       ],
@@ -11671,7 +11671,7 @@
       "questionNumber": 356,
       "questionType": "MCQ",
       "questionText": "During a launch, the Mumbai stack has spare capacity and planners want its catchment to grow so that more users who currently land on Singapore are steered to Mumbai. Today's records are ordinary geolocation records keyed by country. They do not want to maintain an expanding country list. What should they implement?",
-      "explanation": "Phân tích đề: Muốn nới vùng phục vụ của Mumbai so với Singapore mà không phải thêm dần mã quốc gia. Hiện tại đang là geolocation theo quốc gia.\n(A) SAI: IP-based default 0.0.0.0/0 sẽ đổ mọi nguồn không khớp sang Mumbai, không phải nới dần vùng lân cận Singapore.\n(B) ĐÚNG: Geoproximity nằm trong traffic flow, không phải record thường như geolocation. Tăng bias của endpoint Mumbai sẽ mở rộng vùng địa lý mà Route 53 đổ về Mumbai.\n(C) SAI: Latency chọn theo độ trễ đo được, không có nút kéo rộng vùng địa lý của Mumbai.\n(D) SAI: Thêm từng quốc gia vào geolocation đúng là việc họ muốn tránh, và cũng không phải cơ chế bias.\nĐáp án đúng: B\nĐiểm cần nhớ: Geoproximity chỉ có trong traffic flow. Bias dương nới vùng, bias âm thu vùng. Không tạo được như một record geolocation thông thường.",
+      "explanation": "Phân tích đề: Muốn nới vùng phục vụ của Mumbai so với Singapore mà không phải thêm dần mã quốc gia. Hiện tại đang là geolocation theo quốc gia.\n(A) SAI: IP-based default 0.0.0.0/0 sẽ đổ mọi nguồn không khớp sang Mumbai, không phải nới dần vùng lân cận Singapore.\n(B) ĐÚNG: Geoproximity routing dùng bias để co giãn vùng địa lý của từng endpoint. Tăng bias của Mumbai làm vùng của Mumbai lấn sang phía người dùng đang vào Singapore. Geoproximity tạo được như record thường trong hosted zone hoặc trong traffic flow.\n(C) SAI: Latency chọn theo độ trễ đo được, không có nút kéo rộng vùng địa lý của Mumbai.\n(D) SAI: Thêm từng quốc gia vào geolocation đúng là việc họ muốn tránh, và cũng không phải cơ chế bias.\nĐáp án đúng: B\nĐiểm cần nhớ: Geoproximity dùng bias: dương nới vùng, âm thu vùng. Có thể tạo như record thường hoặc trong traffic flow; không ghép với geolocation trên cùng record set.",
       "tagNames": [
         "Resilient Cloud Solutions > Route 53 Routing Policies"
       ],
@@ -11683,7 +11683,7 @@
         },
         {
           "answerLabel": "B",
-          "answerText": "A traffic flow policy that uses geoproximity routing, with a higher bias on Mumbai so its geographic area expands toward users who now reach Singapore",
+          "answerText": "Geoproximity routing records, with a higher bias on Mumbai so its geographic area expands toward users who now reach Singapore",
           "isCorrect": true
         },
         {
@@ -12537,7 +12537,7 @@
       "questionNumber": 382,
       "questionType": "MCQ",
       "questionText": "A traffic flow policy uses geoproximity and currently sends more users to the Paris endpoint than that stack can serve. Paris must remain available, but its geographic area should shrink so more users fall through to neighboring endpoints. Which change does that?",
-      "explanation": "Phân tích đề: Traffic flow geoproximity đang đổ quá nhiều người về Paris. Paris phải còn, nhưng vùng địa lý cần thu lại.\n(A) ĐÚNG: Bias âm trên endpoint Paris trong luật geoproximity thu nhỏ vùng quanh Paris, phần tràn chuyển sang endpoint lân cận. Geoproximity nằm trong traffic flow.\n(B) SAI: Weight 0 trên một record weighted là ngừng chọn hẳn, không thu vùng geoproximity mà vẫn giữ Paris.\n(C) SAI: Latency không có bias để thu vùng Paris trong một policy geoproximity.\n(D) SAI: Xóa record geolocation quốc gia không phải cách thu bias, và thiết kế này không phải geolocation từng nước.\nĐáp án đúng: A\nĐiểm cần nhớ: Trong geoproximity, bias dương nới vùng, bias âm thu vùng. Tính năng này thuộc traffic flow, không phải record geolocation thường.",
+      "explanation": "Phân tích đề: Policy geoproximity đang đổ quá nhiều người về Paris. Paris phải còn, nhưng vùng địa lý cần thu lại.\n(A) ĐÚNG: Bias âm trên endpoint Paris thu nhỏ vùng quanh Paris, phần tràn chuyển sang endpoint lân cận mà Paris vẫn nằm trong policy.\n(B) SAI: Weight 0 trên một record weighted là ngừng chọn hẳn, không thu vùng geoproximity mà vẫn giữ Paris.\n(C) SAI: Latency không có bias để thu vùng Paris trong một policy geoproximity.\n(D) SAI: Xóa record geolocation quốc gia không phải cách thu bias, và thiết kế này không phải geolocation từng nước.\nĐáp án đúng: A\nĐiểm cần nhớ: Trong geoproximity, bias dương nới vùng, bias âm thu vùng. Geoproximity dùng được trong traffic flow hoặc như record thường, nhưng khác hẳn geolocation theo quốc gia.",
       "tagNames": [
         "Resilient Cloud Solutions > Route 53 Routing Policies"
       ],
@@ -12795,7 +12795,7 @@
       "questionNumber": 390,
       "questionType": "MSQ",
       "questionText": "A design review covers several Route 53 proposals for one public hostname. Which THREE proposals are valid?",
-      "explanation": "Phân tích đề: Một hostname công khai, cần ba đề xuất đúng về policy, active-active và active-passive.\n(A) ĐÚNG: Active-active dùng latency hoặc weighted, kèm health check để bỏ Region hỏng.\n(B) SAI: Geoproximity không có như record thường giống geolocation. Nó nằm trong traffic flow.\n(C) ĐÚNG: Active-passive dùng failover. Primary phải có health check, hoặc alias primary dùng evaluate target health.\n(D) SAI: Simple routing không tự gỡ địa chỉ hỏng khỏi câu trả lời.\n(E) SAI: CNAME không đặt được ở zone apex, kể cả khi đích là Application Load Balancer. Dùng alias.\n(F) ĐÚNG: Mỗi record set một routing policy. Không gán cả geolocation lẫn latency lên cùng tên.\nĐáp án đúng: A, C và F\nĐiểm cần nhớ: Một tên một policy. Active-active là weighted hoặc latency có health check. Active-passive là failover với primary được giám sát sức khỏe.",
+      "explanation": "Phân tích đề: Một hostname công khai, cần ba đề xuất đúng về policy, active-active và active-passive.\n(A) ĐÚNG: Active-active dùng latency hoặc weighted, kèm health check để bỏ Region hỏng.\n(B) SAI: Một record set chỉ có một routing policy. Geoproximity tạo được như record thường, nhưng không ghép chung với geolocation trên cùng record set; muốn kết hợp thì dùng traffic flow.\n(C) ĐÚNG: Active-passive dùng failover. Primary phải có health check, hoặc alias primary dùng evaluate target health.\n(D) SAI: Simple routing không tự gỡ địa chỉ hỏng khỏi câu trả lời.\n(E) SAI: CNAME không đặt được ở zone apex, kể cả khi đích là Application Load Balancer. Dùng alias.\n(F) ĐÚNG: Mỗi record set một routing policy. Không gán cả geolocation lẫn latency lên cùng tên.\nĐáp án đúng: A, C và F\nĐiểm cần nhớ: Một tên một policy. Active-active là weighted hoặc latency có health check. Active-passive là failover với primary được giám sát sức khỏe. Muốn kết hợp nhiều policy thì dùng traffic flow hoặc alias trỏ sang tên khác.",
       "tagNames": [
         "Resilient Cloud Solutions > Route 53 Routing Policies"
       ],
@@ -12807,7 +12807,7 @@
         },
         {
           "answerLabel": "B",
-          "answerText": "Select geoproximity as an ordinary record type in the hosted zone, the same way geolocation is selected",
+          "answerText": "Assign geolocation and geoproximity together on one record set so country rules and bias apply at the same time",
           "isCorrect": false
         },
         {
