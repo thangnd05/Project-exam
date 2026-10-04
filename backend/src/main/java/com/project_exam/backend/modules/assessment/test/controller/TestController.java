@@ -72,6 +72,8 @@ public class TestController {
     @GetMapping("/usertest/{testId}")
     public ResponseEntity<TestResponse> getUserTest(
             @PathVariable String testId,
+            @RequestParam(required = false) String userTestId,
+            @RequestHeader(value = "X-Guest-Session", required = false) String guestSessionId,
             HttpServletRequest httpRequest
     ) {
         String userId;
@@ -80,7 +82,7 @@ public class TestController {
         } catch (Exception e) {
             userId = null;
         }
-        TestResponse response = testPaperQueryService.getTestFullById(testId, userId);
+        TestResponse response = testPaperQueryService.getTestFullById(testId, userId, userTestId, guestSessionId);
         if (response == null) {
             throw new NotFoundException("Không tìm thấy bài test");
         }
@@ -168,6 +170,17 @@ public class TestController {
         String currentUserId = authUtils.getUserId(httpRequest);
         AddRandomQuestionsResponse response = testQuestionAssignmentService.addRandomQuestionsToTestPart(request, currentUserId);
         return ResponseEntity.ok(response);
+    }
+
+    /** Xáo một lần thứ tự câu của đề (lưu vào display_order), câu cùng đoạn văn giữ liền nhau. */
+    @PostMapping("/{testId}/shuffle-questions")
+    public ResponseEntity<Void> shuffleQuestionOrder(
+            @PathVariable String testId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        testQuestionAssignmentService.shuffleTestQuestionOrder(testId, userId);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")

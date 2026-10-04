@@ -74,6 +74,7 @@ public class TestMapper {
                 .totalAttempts(totalAttempts)
                 .canDoTest(canDoTest)
                 .costCoins(test.getCostCoins())
+                .shuffleQuestions(test.isShuffleQuestions())
                 .owned(owned)
                 .locked(locked)
                 .parts(null)
@@ -104,6 +105,7 @@ public class TestMapper {
                 .status(status)
                 .canDoTest(canDoTest)
                 .costCoins(test.getCostCoins())
+                .shuffleQuestions(test.isShuffleQuestions())
                 .owned(owned)
                 .locked(locked)
                 .build();
@@ -135,6 +137,7 @@ public class TestMapper {
                 .totalAttempts(totalAttempts)
                 .canDoTest(canDoTest)
                 .costCoins(test.getCostCoins())
+                .shuffleQuestions(test.isShuffleQuestions())
                 .owned(owned)
                 .locked(locked)
                 .parts(partResponses)
@@ -165,6 +168,7 @@ public class TestMapper {
                 .totalAttempts(totalAttempts)
                 .canDoTest(canDoTest)
                 .costCoins(test.getCostCoins())
+                .shuffleQuestions(test.isShuffleQuestions())
                 .owned(owned)
                 .locked(locked)
                 .parts(partResponses)
@@ -188,6 +192,7 @@ public class TestMapper {
                 .remainingAttempts(rem)
                 .totalAttempts(total)
                 .costCoins(test.getCostCoins())
+                .shuffleQuestions(test.isShuffleQuestions())
                 .owned(owned)
                 .locked(locked)
                 .canDoTest(canDoTest)
@@ -212,6 +217,7 @@ public class TestMapper {
                 .maxAttempts(test.getMaxAttempts())
                 .totalAttempts(totalAttempts)
                 .classId(test.getClassId())
+                .shuffleQuestions(test.isShuffleQuestions())
                 .parts(null)
                 .build();
     }
@@ -235,6 +241,7 @@ public class TestMapper {
                 .maxAttempts(test.getMaxAttempts())
                 .totalAttempts(totalAttempts)
                 .classId(test.getClassId())
+                .shuffleQuestions(test.isShuffleQuestions())
                 .parts(partResponses)
                 .build();
     }
@@ -258,6 +265,7 @@ public class TestMapper {
                 .maxAttempts(test.getMaxAttempts())
                 .totalAttempts(totalAttempts)
                 .classId(test.getClassId())
+                .shuffleQuestions(test.isShuffleQuestions())
                 .parts(partResponses)
                 .build();
     }

@@ -32,6 +32,7 @@ import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
 import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestQuestionRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
+import com.project_exam.backend.modules.assessment.test.service.TestPaperQueryService;
 import com.project_exam.backend.modules.assessment.target.repository.UserTargetRepository;
 import com.project_exam.backend.modules.assessment.target.repository.UserTargetPartRepository;
 import com.project_exam.backend.modules.assessment.target.domain.UserTarget;
@@ -169,7 +170,8 @@ public class EnhancedResultService {
                 statusMap.put(qId, Boolean.TRUE.equals(correctnessMap.get(qId)) ? "correct" : "wrong");
             }
         }
-        Map<String, Integer> questionNumberMap = buildQuestionNumberMap(layout);
+        Map<String, Integer> questionNumberMap = buildQuestionNumberMap(
+                layout, test.isShuffleQuestions() ? userTest.getUserTestId() : null);
 
         Set<String> examPartIds = questionMap.values().stream()
                 .map(Question::getExamPartId)
@@ -421,7 +423,8 @@ public class EnhancedResultService {
     }
 
     private TestLayout loadTestLayout(String testId) {
-        List<TestPart> parts = testPartRepository.findByTestId(testId);
+        // Cùng thứ tự part với đề khi làm bài để số câu trong kết quả khớp màn làm bài.
+        List<TestPart> parts = testPartRepository.findByTestIdOrderByExamPartDisplayOrder(testId);
         if (parts.isEmpty()) {
             return new TestLayout(List.of(), Map.of());
         }
@@ -431,16 +434,23 @@ public class EnhancedResultService {
         return new TestLayout(parts, byPart);
     }
 
-    private Map<String, Integer> buildQuestionNumberMap(TestLayout layout) {
+    private Map<String, Integer> buildQuestionNumberMap(TestLayout layout, String orderAttemptId) {
         if (layout.parts().isEmpty()) return Map.of();
+
+        List<String> layoutQuestionIds = layout.questionsByPart().values().stream()
+                .flatMap(List::stream).map(TestQuestion::getQuestionId).distinct().toList();
+        Map<String, Question> layoutQuestions = questionRepository.findAllById(layoutQuestionIds).stream()
+                .collect(Collectors.toMap(Question::getQuestionId, q -> q, (q1, q2) -> q1));
 
         Map<String, Integer> numberMap = new HashMap<>();
         int num = 0;
         for (TestPart tp : layout.parts()) {
             List<TestQuestion> qs = new ArrayList<>(
                     layout.questionsByPart().getOrDefault(tp.getTestPartId(), List.of()));
-            qs.sort(Comparator.comparingInt(tq ->
-                    tq.getDisplayOrder() == null ? Integer.MAX_VALUE : tq.getDisplayOrder()));
+            qs.sort(Comparator.<TestQuestion>comparingInt(tq ->
+                            tq.getDisplayOrder() == null ? Integer.MAX_VALUE : tq.getDisplayOrder())
+                    .thenComparing(TestQuestion::getTestQuestionId));
+            qs = TestPaperQueryService.orderPartQuestions(tp.getTestPartId(), qs, layoutQuestions, orderAttemptId);
             for (TestQuestion tq : qs) {
                 numberMap.put(tq.getQuestionId(), ++num);
             }

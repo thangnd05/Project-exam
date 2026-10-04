@@ -3,10 +3,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toDateTimeLocalInput, fromDateTimeLocalInput } from '@/app/utils/format-date-time';
-import { Button, Spinner, Row, Col, Accordion } from 'react-bootstrap';
+import { Button, Spinner, Row, Col, Accordion, Form } from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
-import { getAdminTestById, updateTest } from '@/app/apis/testApi';
+import { getAdminTestById, shuffleTestQuestions, updateTest } from '@/app/apis/testApi';
 import { getExamTypes } from '@/app/apis/examTypeApi';
 import { durationMinutesFromExamType } from '@/app/hooks/useExamTypes';
 import { getExamCategories } from '@/app/apis/examCategoryApi';
@@ -21,6 +21,7 @@ import {
   IoListOutline,
   IoImageOutline,
   IoRocketOutline,
+  IoShuffleOutline,
 } from 'react-icons/io5';
 import EditQuestionModal from '@/app/components/tests/EditQuestionModal';
 import { PermissionCode } from '@/app/enums';
@@ -64,6 +65,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
     availableFrom: '',
     availableTo: '',
     costCoins: '' as string | number,
+    shuffleQuestions: false,
   });
 
   useEffect(() => {
@@ -84,6 +86,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
           availableFrom: toDateTimeLocalInput(test.availableFrom),
           availableTo: toDateTimeLocalInput(test.availableTo),
           costCoins: test.costCoins != null ? test.costCoins : '',
+          shuffleQuestions: Boolean(test.shuffleQuestions),
         });
         fetchTestDetail(test.testId || test.id);
       }
@@ -171,6 +174,25 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
     },
   });
 
+  const shuffleMutation = useMutation({
+    mutationFn: (testId: string) => shuffleTestQuestions(testId),
+    onSuccess: async (_data, testId) => {
+      toast.success('Đã xáo lại thứ tự câu trong đề');
+      await fetchTestDetail(testId);
+    },
+    onError: (error: any) => {
+      const msg = error.response?.data?.message ?? error.message;
+      toast.error(`Lỗi khi xáo thứ tự câu: ${msg}`);
+    },
+  });
+
+  const handleShuffleNow = () => {
+    const testId = test?.testId || test?.id;
+    if (!testId) return;
+    if (!window.confirm('Xáo lại thứ tự câu của đề? Thứ tự mới áp dụng cho mọi lượt làm sau này.')) return;
+    shuffleMutation.mutate(testId);
+  };
+
   const handleSave = () => {
     if (!formData.title?.trim() || !formData.examTypeId) {
       toast.warning('Vui lòng nhập tên đề thi và chọn loại kỳ thi');
@@ -201,6 +223,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
       costCoins: formData.costCoins === '' || formData.costCoins === null
         ? null
         : Number(formData.costCoins),
+      shuffleQuestions: formData.shuffleQuestions,
     };
 
     updateMutation.mutate({
@@ -472,12 +495,36 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                 />
               </div>
             </Col>
+
+            <Col md={12}>
+              <Form.Check
+                type="checkbox"
+                id="edit-test-shuffle-per-attempt"
+                label="Xáo trộn thứ tự câu mỗi lượt làm (mỗi người, mỗi lần làm một thứ tự khác)"
+                checked={formData.shuffleQuestions}
+                onChange={(e) =>
+                  setFormData({ ...formData, shuffleQuestions: e.target.checked })
+                }
+              />
+            </Col>
           </Row>
         </div>
 
         <div className={cxCreate('configCard')} style={{ marginTop: 16 }}>
           <div className={cxCreate('sectionTitle')}>
             <IoListOutline /> Danh sách câu hỏi trong đề
+            <Button
+              type="button"
+              variant="outline-secondary"
+              size="sm"
+              className="ms-auto"
+              onClick={handleShuffleNow}
+              disabled={shuffleMutation.isPending || loadingDetail || groupedQuestions.length === 0}
+              title="Xáo một lần thứ tự câu trong từng phần thi và lưu lại; câu cùng đoạn văn giữ liền nhau"
+            >
+              <IoShuffleOutline size={16} />{' '}
+              {shuffleMutation.isPending ? 'Đang xáo...' : 'Xáo thứ tự câu ngay'}
+            </Button>
           </div>
           {loadingDetail ? (
             <div className="text-center py-4">

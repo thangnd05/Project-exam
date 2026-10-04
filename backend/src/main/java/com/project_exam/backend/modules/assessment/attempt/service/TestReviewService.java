@@ -59,6 +59,6 @@ public class TestReviewService {
             throw new ForbiddenException("Đề vẫn đang mở, chưa tới lúc xem đáp án.");
         }
 
-        return testPaperQueryService.getTestFullByIdAdmin(test.getTestId());
+        return testPaperQueryService.getTestFullByIdAdmin(test.getTestId(), userTest.getUserTestId());
     }
 }

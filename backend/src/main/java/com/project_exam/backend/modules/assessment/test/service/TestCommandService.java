@@ -59,6 +59,7 @@ public class TestCommandService {
         test.setCollectionId(request.getCollectionId());
         test.setAvailableFrom(request.getAvailableFrom());
         test.setAvailableTo(request.getAvailableTo());
+        test.setShuffleQuestions(Boolean.TRUE.equals(request.getShuffleQuestions()));
 
         if (request.getCostCoins() != null
                 && authUtils.hasPermission(PermissionCatalog.TEST_MANAGE_PRICING)
@@ -145,6 +146,7 @@ public class TestCommandService {
         }
         if (request.getAvailableFrom() != null) test.setAvailableFrom(request.getAvailableFrom());
         if (request.getAvailableTo() != null) test.setAvailableTo(request.getAvailableTo());
+        if (request.getShuffleQuestions() != null) test.setShuffleQuestions(request.getShuffleQuestions());
 
         if (request.getCostCoins() != null) {
             boolean publicTest = effectiveClassId == null;

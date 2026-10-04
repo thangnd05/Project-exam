@@ -3,156 +3,66 @@
   "usageScope": "EXAM",
   "questions": [
     {
-      "questionType": "MCQ",
-      "questionText": "A company uses a third-party monitoring vendor that must read objects in an Amazon S3 bucket in the company's AWS account. The vendor runs its software in its own AWS account and serves many other customers in the same way. The security team does not want any long-term credentials to be shared and wants protection against the confused deputy problem. What should a solutions architect do?",
-      "explanation": "Phân tích đề: bên thứ ba ở account khác cần đọc S3; yêu cầu không chia sẻ credential dài hạn và chống \"confused deputy\" (vendor phục vụ nhiều khách nên có thể bị lừa dùng role của khách này cho khách khác).\n(A) SAI: Access key của IAM user là credential dài hạn, đúng thứ đề cấm; cất trong Secrets Manager không thay đổi bản chất.\n(B) ĐÚNG: Role cross-account cho vendor assume qua STS (credential tạm thời), điều kiện sts:ExternalId duy nhất cho từng khách là cách AWS khuyến nghị để chống confused deputy.\n(C) SAI: Bucket policy cấp cho account vendor không có cơ chế chống confused deputy; MFA delete chỉ bảo vệ việc xóa version, không liên quan.\n(D) SAI: Gần đúng nhất: role cross-account là đúng hướng, nhưng thiếu external ID nên vẫn dính confused deputy. Permissions boundary chỉ giới hạn quyền, không xác thực \"ai đang gọi thay cho ai\".\nĐáp án đúng: B\nĐiểm cần nhớ: Cho bên thứ ba truy cập account = IAM role + external ID trong trust policy, không bao giờ đưa access key.",
-      "tagNames": [
-        "Secure Architectures > IAM / AWS-STS (Identity and Access Management / Security Token Service)"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Create an IAM user with read-only S3 access for the vendor and share its access keys through AWS Secrets Manager.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Create an IAM role that trusts the vendor's AWS account, requires a unique external ID, and allows reading the bucket.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Add a bucket policy that lets the vendor's AWS account read objects, and turn on MFA delete for the bucket.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Create an IAM role that trusts the vendor's AWS account and attach a permissions boundary scoped to the bucket.",
-          "isCorrect": false
-        }
-      ]
-    },
-    {
-      "questionType": "MCQ",
-      "questionText": "A company uses AWS Organizations. The SCP attached to the Development OU allows \"s3:*\", and no other SCP denies any Amazon S3 action. In an account under that OU, a developer assumes an IAM role whose only policy allows \"ec2:Describe*\". The target bucket is in the same account and has no bucket policy. The developer receives an AccessDenied error when uploading an object to the bucket. What is the cause?",
-      "explanation": "Phân tích đề: SCP cho phép s3:*, không có deny nào; role chỉ có quyền ec2:Describe*; bucket không có bucket policy.\n(A) SAI: SCP hỗ trợ wildcard trong Action; \"s3:*\" là hợp lệ.\n(B) SAI: Block Public Access chỉ chặn truy cập công khai (ACL/policy public), không ảnh hưởng principal trong cùng account có quyền IAM.\n(C) SAI: Ngược lại: SCP không áp dụng cho management account mà áp dụng cho các member account.\n(D) ĐÚNG: SCP không bao giờ cấp quyền, chỉ đặt trần. Quyền hiệu lực = giao của SCP và identity policy (cộng resource policy nếu có). Role không có quyền s3:PutObject và bucket không có policy nên bị từ chối.\nĐáp án đúng: D\nĐiểm cần nhớ: SCP \"Allow\" chỉ có nghĩa là \"được phép cấp\", vẫn phải có IAM policy hoặc resource policy thực sự cấp quyền.",
-      "tagNames": [
-        "Secure Architectures > IAM / AWS-STS (Identity and Access Management / Security Token Service)"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "The SCP must name s3:PutObject and the bucket ARN explicitly, because SCPs do not evaluate wildcard actions.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "S3 Block Public Access must be turned off before principals in the same account are allowed to write objects.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "SCPs take effect only in the management account, so member accounts keep the default deny-all SCP behavior.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "An SCP only sets the maximum permissions; the role also needs an identity-based policy that allows the upload.",
-          "isCorrect": true
-        }
-      ]
-    },
-    {
-      "questionType": "MCQ",
-      "questionText": "A team requested a public certificate from AWS Certificate Manager (ACM) in eu-west-1, where its application runs, and validated it by using DNS. When the team configures an Amazon CloudFront distribution to use the company's custom domain name, the certificate does not appear in the list of available certificates. What should the team do?",
-      "explanation": "Phân tích đề: Cert ACM nằm ở eu-west-1, CloudFront không thấy cert để gắn cho tên miền tùy chỉnh.\n(A) ĐÚNG: CloudFront chỉ dùng được cert ACM ở Region us-east-1 (N. Virginia). Cần request (hoặc import) cert cho cùng tên miền ở us-east-1 rồi gắn vào distribution.\n(B) SAI: Phương thức xác thực (DNS hay email) không ảnh hưởng Region của cert.\n(C) SAI: ACM không có tính năng \"cross-Region replication\" cho certificate; mỗi Region quản lý cert riêng.\n(D) SAI: Gắn cert vào ALB chỉ mã hóa đoạn CloudFront → origin; viewer kết nối tới CloudFront bằng tên miền riêng vẫn cần cert trên distribution.\nĐáp án đúng: A\nĐiểm cần nhớ: Cert cho CloudFront (và API Gateway edge-optimized) phải ở us-east-1; cert cho ALB phải ở đúng Region của ALB.",
-      "tagNames": [
-        "Secure Architectures > AWS-KMS / ACM (Encryption Keys and Certificates)"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Request or import a certificate for the same domain in ACM in us-east-1 and associate it with the distribution.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Switch the certificate from DNS validation to email validation so that CloudFront can discover it in any Region.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Turn on cross-Region replication for the certificate in ACM so that a copy is created in every CloudFront Region.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Attach the certificate to an Application Load Balancer in eu-west-1 and set that load balancer as the origin.",
-          "isCorrect": false
-        }
-      ]
-    },
-    {
       "questionType": "MSQ",
-      "questionText": "A company stores regulated documents in an Amazon S3 bucket. A new policy requires that all requests to the bucket use encryption in transit and that all new objects are encrypted at rest with an AWS KMS key that the company manages. The solution must require the least ongoing effort. Which TWO actions should a solutions architect take? (Choose TWO.)",
-      "explanation": "Phân tích đề: Cần 2 thứ: bắt buộc HTTPS (in transit) và mã hóa at rest bằng KMS key do công ty quản lý, ít công vận hành.\n(A) SAI: Block Public Access chặn truy cập công khai, không liên quan HTTP hay HTTPS.\n(B) ĐÚNG: Điều kiện aws:SecureTransport = false + Deny là cách chuẩn để từ chối mọi request không dùng TLS.\n(C) SAI: Versioning và MFA delete bảo vệ chống xóa/ghi đè, không phải lớp mã hóa.\n(D) SAI: Macie phát hiện dữ liệu nhạy cảm và báo cáo, không tự mã hóa lại object; đây cũng là cách làm thủ công, tốn công.\n(E) ĐÚNG: Default encryption SSE-KMS với customer managed key tự mã hóa mọi object mới; Bucket Key giảm số lần gọi KMS (giảm chi phí và nguy cơ throttle).\nĐáp án đúng: B, E\nĐiểm cần nhớ: S3 đã mặc định mã hóa SSE-S3, nên khi đề đòi \"KMS key công ty quản lý\" phải cấu hình SSE-KMS; HTTPS thì dùng aws:SecureTransport.",
+      "questionText": "Analysts use Amazon Athena to query about 5 TB of gzip-compressed CSV application logs in an Amazon S3 bucket. The objects are stored without any folder structure. Most queries filter on a single day and read only a few columns. The queries are slow and expensive. Which TWO actions will improve performance and reduce cost? (Choose TWO.)",
+      "explanation": "Phân tích đề: Athena tính phí theo dữ liệu quét. CSV đọc toàn bộ cột; không có partition nên mỗi truy vấn theo ngày vẫn quét 5 TB.\n(A) SAI: Phí Athena tính theo TB quét chứ không theo storage class; Glacier Instant Retrieval còn thêm phí retrieval mỗi lần đọc.\n(B) SAI: Provisioned capacity có thể làm query nhanh hơn nhưng vẫn quét đủ 5 TB, và tính thêm phí DPU nên không giảm chi phí.\n(C) ĐÚNG: Parquet là định dạng cột: query chỉ đọc vài cột cần thiết, có nén và thống kê theo khối, giảm mạnh dữ liệu quét.\n(D) SAI: S3 Select không gọi được bên trong truy vấn Athena, và AWS đã ngừng cho khách hàng mới dùng S3 Select.\n(E) ĐÚNG: Partition theo ngày giúp Athena chỉ đọc partition của ngày được lọc (partition pruning).\nĐáp án đúng: C, E\nĐiểm cần nhớ: Tối ưu Athena = định dạng cột (Parquet/ORC) + partition + nén. Ít dữ liệu quét = nhanh hơn và rẻ hơn.",
       "tagNames": [
-        "Secure Architectures > S3-Encryption-Policies"
+        "High-Performing Architectures > AWS-Glue / Amazon-Athena (Analytics)"
       ],
       "answers": [
         {
           "answerLabel": "A",
-          "answerText": "Turn on S3 Block Public Access at the account level so that unencrypted requests never reach the bucket.",
+          "answerText": "Move the log objects to S3 Glacier Instant Retrieval so that Athena scans them at a lower price.",
           "isCorrect": false
         },
         {
           "answerLabel": "B",
-          "answerText": "Add a bucket policy statement that denies all S3 actions when the aws:SecureTransport key is false.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Turn on S3 Versioning and MFA delete so that every object version gets an extra layer of encryption.",
+          "answerText": "Switch the Athena workgroup to provisioned capacity so that every query gets more compute power.",
           "isCorrect": false
         },
         {
+          "answerLabel": "C",
+          "answerText": "Convert the logs to a columnar format such as Apache Parquet by using an AWS Glue ETL job.",
+          "isCorrect": true
+        },
+        {
           "answerLabel": "D",
-          "answerText": "Configure Amazon Macie to scan the bucket daily and re-encrypt any object that it finds unencrypted.",
+          "answerText": "Add S3 Select calls inside each Athena query so that only matching rows are read from each object.",
           "isCorrect": false
         },
         {
           "answerLabel": "E",
-          "answerText": "Set the bucket default encryption to SSE-KMS with a customer managed key and enable S3 Bucket Keys.",
+          "answerText": "Store the data in date-based partitions and register the partitions in the AWS Glue Data Catalog.",
           "isCorrect": true
         }
       ]
     },
     {
       "questionType": "MCQ",
-      "questionText": "An AWS Lambda function runs in private subnets of a VPC that has no internet gateway and no NAT gateway. The function must retrieve a database password from AWS Secrets Manager. Company policy forbids adding any route to the internet. What should a solutions architect do?",
-      "explanation": "Phân tích đề: Lambda trong private subnet, không có NAT/IGW, không được thêm đường ra internet, cần gọi Secrets Manager.\n(A) SAI: Bẫy chính: gateway endpoint chỉ tồn tại cho Amazon S3 và DynamoDB; Secrets Manager không có gateway endpoint.\n(B) SAI: Đưa Lambda ra ngoài VPC thì gọi được Secrets Manager nhưng mất đường tới database trong VPC; và đi ngược chính sách mạng của công ty.\n(C) ĐÚNG: Interface endpoint (AWS PrivateLink) tạo ENI trong subnet; bật private DNS thì SDK gọi tên miền mặc định của Secrets Manager mà vẫn đi đường riêng. Security group của endpoint phải cho phép HTTPS 443 từ function.\n(D) SAI: Chạy được về mặt mạng, nhưng bỏ Secrets Manager (mất rotation, audit) và đề yêu cầu lấy password từ Secrets Manager.\nĐáp án đúng: C\nĐiểm cần nhớ: Gateway endpoint = chỉ S3 và DynamoDB, miễn phí, dùng route table; mọi dịch vụ khác dùng interface endpoint.",
+      "questionText": "A company hosts the domain example.com in an Amazon Route 53 public hosted zone. Users must be able to reach the company's website at example.com (without www). The website is served by an Application Load Balancer. The solution must not require any additional infrastructure. What should a solutions architect do?",
+      "explanation": "Phân tích đề: Cần trỏ zone apex (example.com, không có www) tới ALB, không thêm hạ tầng.\n(A) ĐÚNG: Alias record dùng được ở zone apex, tự theo IP của ALB khi thay đổi, và truy vấn alias tới tài nguyên AWS không tính phí.\n(B) SAI: Bẫy chính: theo chuẩn DNS, CNAME không đặt được ở zone apex (đã có bản ghi SOA và NS).\n(C) SAI: IP của ALB thay đổi theo thời gian; ghi cứng IP sẽ hỏng khi ALB scale hoặc đổi node.\n(D) SAI: Chạy được nhưng thêm một tầng hạ tầng (S3 website) và chỉ redirect, trái yêu cầu.\nĐáp án đúng: A\nĐiểm cần nhớ: Zone apex → alias record. CNAME chỉ cho subdomain (www.example.com).",
       "tagNames": [
-        "Secure Architectures > VPC-Endpoint (Virtual Private Cloud Endpoint)"
+        "Resilient Architectures > Amazon-Route-53"
       ],
       "answers": [
         {
           "answerLabel": "A",
-          "answerText": "Create a gateway VPC endpoint for Secrets Manager and add a route for it to the private subnet route tables.",
-          "isCorrect": false
+          "answerText": "Create an alias A record for example.com that points to the DNS name of the load balancer.",
+          "isCorrect": true
         },
         {
           "answerLabel": "B",
-          "answerText": "Move the function out of the VPC so that it can call Secrets Manager directly over the AWS public network.",
+          "answerText": "Create a CNAME record for example.com that points to the DNS name of the load balancer.",
           "isCorrect": false
         },
         {
           "answerLabel": "C",
-          "answerText": "Create an interface VPC endpoint for Secrets Manager with private DNS, and allow HTTPS from the function.",
-          "isCorrect": true
+          "answerText": "Create an A record for example.com that lists the current IP addresses of the load balancer.",
+          "isCorrect": false
         },
         {
           "answerLabel": "D",
-          "answerText": "Copy the password to an encrypted object in Amazon S3 and read the object through an S3 gateway endpoint.",
+          "answerText": "Create an S3 website bucket for example.com that redirects every request to the load balancer.",
           "isCorrect": false
         }
       ]
@@ -189,311 +99,6 @@
     },
     {
       "questionType": "MCQ",
-      "questionText": "A security team wants to be alerted automatically when IAM credentials from any of the company's AWS accounts are used to call AWS APIs from known malicious IP addresses or from unusual locations. The solution must require the least operational overhead. What should a solutions architect recommend?",
-      "explanation": "Phân tích đề: Phát hiện tự động việc dùng credential từ IP độc hại hoặc vị trí bất thường, ít công vận hành.\n(A) SAI: CloudTrail chỉ ghi log; xem tay mỗi sáng vừa chậm vừa tốn công, không phải \"cảnh báo tự động\".\n(B) SAI: Macie tìm dữ liệu nhạy cảm (PII) trong S3, không phân tích hành vi gọi API.\n(C) ĐÚNG: GuardDuty phân tích CloudTrail, VPC Flow Logs, DNS logs bằng threat intelligence và ML; có các finding như gọi API từ IP độc hại hay vị trí bất thường. Gửi finding qua EventBridge (rồi SNS) để cảnh báo.\n(D) SAI: Inspector quét lỗ hổng phần mềm trên EC2, image ECR, Lambda; không theo dõi việc dùng credential.\nĐáp án đúng: C\nĐiểm cần nhớ: GuardDuty = phát hiện mối đe dọa và hành vi bất thường; Macie = dữ liệu nhạy cảm S3; Inspector = lỗ hổng phần mềm; CloudTrail = ghi log.",
-      "tagNames": [
-        "Secure Architectures > Threat-Detection (GuardDuty / Inspector / Macie / Security Hub)"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Turn on AWS CloudTrail in all Regions and have analysts review the event history every morning.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Turn on Amazon Macie in each account and route Macie findings to the team by using EventBridge.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Turn on Amazon GuardDuty in each account and route its findings to the team by using EventBridge.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Turn on Amazon Inspector in each account to scan IAM roles for credentials used from new addresses.",
-          "isCorrect": false
-        }
-      ]
-    },
-    {
-      "questionType": "MCQ",
-      "questionText": "An application uses Amazon RDS for MySQL in a Multi-AZ DB instance deployment. Long-running reporting queries every night slow down the application. The company wants to offload the reporting workload with minimal application changes while keeping automatic failover for the primary database. What should a solutions architect do?",
-      "explanation": "Phân tích đề: RDS MySQL Multi-AZ DB instance (1 primary + 1 standby); cần tách tải báo cáo, giữ failover tự động.\n(A) SAI: Bẫy chính: ở Multi-AZ DB instance deployment, standby không nhận kết nối đọc; nó chỉ dùng cho failover. (Chỉ Multi-AZ DB cluster mới có standby đọc được.)\n(B) ĐÚNG: Read replica nhận replication bất đồng bộ, có endpoint riêng cho truy vấn đọc; Multi-AZ của primary vẫn giữ nguyên.\n(C) SAI: Bỏ Multi-AZ là mất failover tự động, trái yêu cầu; \"dung lượng standby\" cũng không dùng được cho việc khác.\n(D) SAI: RDS Proxy gom và tái sử dụng kết nối, không phân tải đọc lên standby.\nĐáp án đúng: B\nĐiểm cần nhớ: Multi-AZ (instance) = sẵn sàng cao; Read replica = mở rộng đọc. Hai thứ dùng chung được.",
-      "tagNames": [
-        "Resilient Architectures > RDS-Multi-AZ-and-Read-Replicas"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Point the reporting tool at the standby instance, because the standby in the second AZ is otherwise idle.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Create a read replica of the DB instance and point the reporting tool at the read replica's endpoint.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Convert the database to a Single-AZ deployment and use the freed standby capacity for the reports.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Put Amazon RDS Proxy in front of the database so that reporting queries are spread across both instances.",
-          "isCorrect": false
-        }
-      ]
-    },
-    {
-      "questionType": "MCQ",
-      "questionText": "Worker instances poll an Amazon SQS standard queue for new orders. Each order takes about 90 seconds to process, and the queue uses the default visibility timeout of 30 seconds. The operations team reports that many orders are processed two or more times. What is the MOST effective way to fix this problem?",
-      "explanation": "Phân tích đề: Xử lý mất 90 giây nhưng visibility timeout chỉ 30 giây.\n(A) SAI: Bẫy chính: FIFO chống trùng ở phía gửi trong khoảng deduplication, nhưng nếu visibility timeout hết hạn trước khi xử lý xong, message vẫn hiện lại và bị xử lý lần nữa.\n(B) SAI: Long polling giảm số lần nhận rỗng và chi phí, không ngăn message hiện lại khi timeout hết.\n(C) SAI: maxReceiveCount = 1 sẽ đẩy message sang DLQ ngay khi lần đầu chưa kịp xử lý xong, làm mất đơn hàng khỏi luồng chính.\n(D) ĐÚNG: Visibility timeout phải lớn hơn thời gian xử lý (có thể gia hạn bằng ChangeMessageVisibility); xử lý xong phải DeleteMessage.\nĐáp án đúng: D\nĐiểm cần nhớ: Xử lý lặp trên SQS thường do visibility timeout < thời gian xử lý; FIFO không sửa được nguyên nhân này.",
-      "tagNames": [
-        "Resilient Architectures > Amazon-SQS (Simple Queue Service)"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Convert the queue to a FIFO queue so that every message is delivered to the workers exactly once.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Turn on long polling with a 20-second wait time so that the workers receive fewer duplicate messages.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Add a dead-letter queue with a maximum receive count of 1 so that repeated messages are removed.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Raise the visibility timeout above the processing time, and delete each message after processing it.",
-          "isCorrect": true
-        }
-      ]
-    },
-    {
-      "questionType": "MCQ",
-      "questionText": "A company runs a critical order application in us-east-1 on Amazon EC2 instances behind an Application Load Balancer, with an Amazon Aurora MySQL database. The company needs disaster recovery in us-west-2 with an RTO of 15 minutes and an RPO of a few seconds. The solution must be as cost-effective as possible. Which solution meets these requirements?",
-      "explanation": "Phân tích đề: RTO 15 phút, RPO vài giây, tối ưu chi phí.\n(A) SAI: Backup & restore rẻ nhất nhưng khôi phục cluster và dựng hạ tầng thường mất hàng giờ; RPO bằng chu kỳ backup.\n(B) SAI: Multi-site active/active đáp ứng RTO/RPO nhưng tốn chi phí nhất, vượt nhu cầu.\n(C) ĐÚNG: Warm standby: Aurora global database replicate sang Region khác với độ trễ thường dưới 1 giây (RPO vài giây), promote trong vài phút; tầng ứng dụng thu nhỏ đã chạy sẵn chỉ cần scale out, vừa RTO 15 phút.\n(D) SAI: Snapshot mỗi giờ cho RPO tới 1 giờ, không đạt yêu cầu vài giây.\nĐáp án đúng: C\nĐiểm cần nhớ: Thứ tự chi phí/tốc độ: backup & restore < pilot light < warm standby < multi-site. RPO giây với Aurora → global database.",
-      "tagNames": [
-        "Resilient Architectures > AWS-DR-Strategies"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Back up the Aurora cluster and the EC2 AMIs with AWS Backup, copy them to us-west-2, and restore after a disaster.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Run a full-size copy of the application in us-west-2 that serves live traffic through Route 53 latency routing.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Use an Aurora global database and run a scaled-down application tier in us-west-2 that scales out on failover.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Copy Aurora snapshots to us-west-2 every hour and keep AMIs there so that new instances can launch when needed.",
-          "isCorrect": false
-        }
-      ]
-    },
-    {
-      "questionType": "MCQ",
-      "questionText": "A company hosts the domain example.com in an Amazon Route 53 public hosted zone. Users must be able to reach the company's website at example.com (without www). The website is served by an Application Load Balancer. The solution must not require any additional infrastructure. What should a solutions architect do?",
-      "explanation": "Phân tích đề: Cần trỏ zone apex (example.com, không có www) tới ALB, không thêm hạ tầng.\n(A) ĐÚNG: Alias record dùng được ở zone apex, tự theo IP của ALB khi thay đổi, và truy vấn alias tới tài nguyên AWS không tính phí.\n(B) SAI: Bẫy chính: theo chuẩn DNS, CNAME không đặt được ở zone apex (đã có bản ghi SOA và NS).\n(C) SAI: IP của ALB thay đổi theo thời gian; ghi cứng IP sẽ hỏng khi ALB scale hoặc đổi node.\n(D) SAI: Chạy được nhưng thêm một tầng hạ tầng (S3 website) và chỉ redirect, trái yêu cầu.\nĐáp án đúng: A\nĐiểm cần nhớ: Zone apex → alias record. CNAME chỉ cho subdomain (www.example.com).",
-      "tagNames": [
-        "Resilient Architectures > Amazon-Route-53"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Create an alias A record for example.com that points to the DNS name of the load balancer.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Create a CNAME record for example.com that points to the DNS name of the load balancer.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Create an A record for example.com that lists the current IP addresses of the load balancer.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Create an S3 website bucket for example.com that redirects every request to the load balancer.",
-          "isCorrect": false
-        }
-      ]
-    },
-    {
-      "questionType": "MSQ",
-      "questionText": "An application runs on Amazon EC2 instances in an Auto Scaling group behind an Application Load Balancer. All instances are currently launched in a single Availability Zone. When the application on an instance hangs, the instance keeps running and is never replaced, because the group uses only EC2 status checks. Which TWO changes will improve availability? (Choose TWO.)",
-      "explanation": "Phân tích đề: Hai vấn đề: (1) chỉ một AZ → mất AZ là sập; (2) ứng dụng treo nhưng EC2 status check vẫn OK nên không bị thay.\n(A) ĐÚNG: Trải ASG qua nhiều AZ; khi một AZ lỗi, ASG khởi chạy bù ở AZ còn lại.\n(B) SAI: Scheduled scaling tăng số lượng theo giờ, không giải quyết lỗi AZ hay instance treo.\n(C) SAI: Instance lớn hơn vẫn nằm trong một AZ và vẫn không bị thay khi ứng dụng treo.\n(D) ĐÚNG: Bật ELB health check cho ASG: instance trượt health check của target group sẽ bị đánh dấu unhealthy và được thay thế.\n(E) SAI: Detailed monitoring chỉ tăng tần suất metric, không tự thay instance hay thêm AZ.\nĐáp án đúng: A, D\nĐiểm cần nhớ: Ứng dụng treo mà instance vẫn chạy → cần ELB health check trên ASG, EC2 status check không phát hiện được.",
-      "tagNames": [
-        "Resilient Architectures > AWS-Auto-Scaling"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Configure the Auto Scaling group to launch instances in subnets in at least two Availability Zones.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Add a scheduled scaling action that doubles the desired capacity during business hours each weekday.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Replace the instances with a larger instance type so that each instance can absorb more of the load.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Turn on Elastic Load Balancing health checks for the group in addition to the EC2 status checks.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "E",
-          "answerText": "Turn on detailed monitoring for the instances so that CloudWatch collects their metrics every minute.",
-          "isCorrect": false
-        }
-      ]
-    },
-    {
-      "questionType": "MCQ",
-      "questionText": "A company is splitting a monolithic web application into microservices that run on Amazon ECS. Requests to /orders/* must go to the order service, and requests to /users/* must go to the user service. Both services must be available under one public hostname. Which solution meets these requirements with the LEAST operational overhead?",
-      "explanation": "Phân tích đề: Định tuyến theo đường dẫn URL tới các service khác nhau dưới một hostname.\n(A) SAI: NLB hoạt động ở layer 4 (TCP/UDP/TLS), không đọc được đường dẫn HTTP.\n(B) ĐÚNG: ALB (layer 7) có listener rule theo path pattern, mỗi rule forward tới target group của từng ECS service; tích hợp sẵn với ECS.\n(C) SAI: Gateway Load Balancer dùng để đưa traffic qua thiết bị mạng bên thứ ba (firewall, IDS), không định tuyến theo path.\n(D) SAI: Route 53 weighted chia traffic theo tỉ lệ ở mức DNS, không theo path; CLB là thế hệ cũ, nhiều load balancer cũng tốn công hơn.\nĐáp án đúng: B\nĐiểm cần nhớ: Path/host/header routing → ALB. Cần static IP, TCP/UDP, hiệu năng cực cao → NLB.",
-      "tagNames": [
-        "Resilient Architectures > ELB (Application / Network Load Balancer)"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Use a Network Load Balancer with one listener per service that routes by the URL path in each request.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Use an Application Load Balancer with listener rules that forward each path pattern to a target group.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Use a Gateway Load Balancer that inspects each request and forwards it to the service for that path.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Use one Classic Load Balancer per service and a weighted Route 53 record for each load balancer.",
-          "isCorrect": false
-        }
-      ]
-    },
-    {
-      "questionType": "MCQ",
-      "questionText": "A gaming company stores leaderboard data in an Amazon DynamoDB table. The workload is read-heavy, and the same items are read thousands of times per second. The company needs read latency in microseconds, and the developers want to keep using the DynamoDB API with as few code changes as possible. What should a solutions architect recommend?",
-      "explanation": "Phân tích đề: Đọc lặp lại cùng item, cần độ trễ micro giây, giữ API DynamoDB, ít sửa code.\n(A) SAI: ElastiCache cũng đạt độ trễ thấp nhưng phải tự viết logic cache-aside và đồng bộ khi ghi, nhiều thay đổi code hơn.\n(B) SAI: Thêm RCU tránh throttle nhưng độ trễ vẫn mức mili giây; strongly consistent read còn tốn gấp đôi RCU.\n(C) ĐÚNG: DAX là cache in-memory tương thích API DynamoDB, đọc cache trả về trong micro giây; chỉ cần đổi client SDK sang DAX client.\n(D) SAI: Global tables phục vụ đa Region và khả năng chịu lỗi, độ trễ đọc vẫn mức mili giây.\nĐáp án đúng: C\nĐiểm cần nhớ: DynamoDB + micro giây + ít sửa code → DAX. Cache cho nhiều nguồn dữ liệu hay cấu trúc phức tạp → ElastiCache.",
-      "tagNames": [
-        "High-Performing Architectures > Amazon-DynamoDB"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Put Amazon ElastiCache for Redis in front of the table and add cache-aside logic to every read code path.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Increase the provisioned read capacity of the table and switch every read to strongly consistent reads.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Add a DynamoDB Accelerator (DAX) cluster and switch the application's DynamoDB client to the DAX client.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Turn on DynamoDB global tables so that each read is served by the replica closest to the application.",
-          "isCorrect": false
-        }
-      ]
-    },
-    {
-      "questionType": "MCQ",
-      "questionText": "A database runs on an Amazon EC2 instance and stores its data on a 1 TiB gp2 EBS volume. The database now needs 10,000 IOPS sustained, but the volume delivers only about 3,000 IOPS of baseline performance. The instance already supports the required EBS performance. What is the MOST cost-effective way to meet the requirement?",
-      "explanation": "Phân tích đề: gp2 cho 3 IOPS/GiB (1 TiB ≈ 3.072 IOPS baseline); cần 10.000 IOPS ổn định, rẻ nhất.\n(A) ĐÚNG: gp3 tách IOPS khỏi dung lượng: có sẵn 3.000 IOPS, mua thêm IOPS riêng; đổi type tại chỗ bằng Elastic Volumes, không downtime. gp3 rẻ hơn gp2 theo GiB.\n(B) SAI: Chạy được nhưng phải trả tiền cho khoảng 2,4 TiB dung lượng không dùng, đắt hơn gp3.\n(C) SAI: io2 đáp ứng thừa nhưng giá IOPS provisioned cao hơn nhiều; hợp khi cần độ bền 99,999% hoặc IOPS rất lớn.\n(D) SAI: st1 (HDD) tối ưu throughput tuần tự, IOPS ngẫu nhiên rất thấp, không hợp cho database.\nĐáp án đúng: A\nĐiểm cần nhớ: Cần thêm IOPS mà không cần thêm dung lượng → gp3. Đừng phình gp2 chỉ để lấy IOPS.",
-      "tagNames": [
-        "High-Performing Architectures > Amazon-EBS-SSD (Elastic Block Store - Solid State Drive)"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Change the volume type to gp3 and provision 10,000 IOPS while keeping the volume size the same.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Increase the size of the gp2 volume to about 3.4 TiB so that its baseline reaches 10,000 IOPS.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Change the volume type to io2 Block Express and provision 10,000 IOPS on the same volume size.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Change the volume type to st1, because throughput optimized HDD volumes offer more IOPS per dollar.",
-          "isCorrect": false
-        }
-      ]
-    },
-    {
-      "questionType": "MCQ",
-      "questionText": "A company runs a multiplayer game that uses a custom UDP protocol. Game servers run in two AWS Regions. Players around the world report high latency and jitter. The company wants to route player traffic over the AWS global network and give the game clients fixed IP addresses to connect to. What should a solutions architect do?",
-      "explanation": "Phân tích đề: Giao thức UDP tùy chỉnh, hai Region, cần đi mạng toàn cầu của AWS và IP cố định.\n(A) SAI: CloudFront phục vụ HTTP/HTTPS (kể cả HTTP/3 qua QUIC giữa viewer và edge), không proxy giao thức UDP tùy chỉnh tới origin.\n(B) SAI: Latency routing chọn Region gần hơn nhưng traffic vẫn đi internet công cộng, và không có IP cố định.\n(C) SAI: ALB không hỗ trợ UDP; cross-zone chỉ chia tải trong một Region.\n(D) ĐÚNG: Global Accelerator cấp 2 IP anycast tĩnh, đưa traffic TCP/UDP vào edge gần nhất rồi đi backbone AWS tới endpoint group khỏe nhất, failover giữa các Region.\nĐáp án đúng: D\nĐiểm cần nhớ: UDP, IP tĩnh toàn cầu, failover đa Region → Global Accelerator; nội dung HTTP cache được → CloudFront.",
-      "tagNames": [
-        "High-Performing Architectures > AWS-Global-Accelerator"
-      ],
-      "answers": [
-        {
-          "answerLabel": "A",
-          "answerText": "Create an Amazon CloudFront distribution with the game servers as custom origins, and turn on HTTP/3.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "B",
-          "answerText": "Create Route 53 latency-based records for both Regions so that each player resolves the nearest servers.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "C",
-          "answerText": "Place an Application Load Balancer in each Region and turn on cross-zone load balancing for the servers.",
-          "isCorrect": false
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Create an AWS Global Accelerator with endpoint groups in both Regions that point to the game servers.",
-          "isCorrect": true
-        }
-      ]
-    },
-    {
-      "questionType": "MCQ",
       "questionText": "A company wants to collect clickstream events from its web servers and store them in Amazon S3 within a few minutes of being generated. The data should be delivered in compressed batches. The company does not want to write or manage any consumer applications. Which solution meets these requirements?",
       "explanation": "Phân tích đề: Gần real-time (vài phút), ghi S3 theo lô nén, không viết consumer.\n(A) SAI: Kinesis Data Streams không tự ghi ra S3; phải có consumer (Lambda, KCL app) hoặc thêm Firehose phía sau.\n(B) SAI: SQS không có tính năng tự giao message tới S3; cần worker để đọc và ghi.\n(C) ĐÚNG: Amazon Data Firehose là dịch vụ delivery được quản lý hoàn toàn: gom theo buffer size/interval, nén (GZIP, Snappy...), ghi thẳng vào S3, không cần code consumer.\n(D) SAI: S3 bucket không phải loại subscriber của SNS (SNS hỗ trợ SQS, Lambda, HTTP, email, SMS, Firehose...).\nĐáp án đúng: C\nĐiểm cần nhớ: \"Không viết consumer, đổ vào S3/Redshift/OpenSearch, chấp nhận trễ vài giây đến phút\" → Firehose. Cần real-time và nhiều consumer tự viết → Data Streams.",
       "tagNames": [
@@ -523,37 +128,32 @@
       ]
     },
     {
-      "questionType": "MSQ",
-      "questionText": "Analysts use Amazon Athena to query about 5 TB of gzip-compressed CSV application logs in an Amazon S3 bucket. The objects are stored without any folder structure. Most queries filter on a single day and read only a few columns. The queries are slow and expensive. Which TWO actions will improve performance and reduce cost? (Choose TWO.)",
-      "explanation": "Phân tích đề: Athena tính phí theo dữ liệu quét. CSV đọc toàn bộ cột; không có partition nên mỗi truy vấn theo ngày vẫn quét 5 TB.\n(A) SAI: Phí Athena tính theo TB quét chứ không theo storage class; Glacier Instant Retrieval còn thêm phí retrieval mỗi lần đọc.\n(B) SAI: Provisioned capacity có thể làm query nhanh hơn nhưng vẫn quét đủ 5 TB, và tính thêm phí DPU nên không giảm chi phí.\n(C) ĐÚNG: Parquet là định dạng cột: query chỉ đọc vài cột cần thiết, có nén và thống kê theo khối, giảm mạnh dữ liệu quét.\n(D) SAI: S3 Select không gọi được bên trong truy vấn Athena, và AWS đã ngừng cho khách hàng mới dùng S3 Select.\n(E) ĐÚNG: Partition theo ngày giúp Athena chỉ đọc partition của ngày được lọc (partition pruning).\nĐáp án đúng: C, E\nĐiểm cần nhớ: Tối ưu Athena = định dạng cột (Parquet/ORC) + partition + nén. Ít dữ liệu quét = nhanh hơn và rẻ hơn.",
+      "questionType": "MCQ",
+      "questionText": "A company uses a third-party monitoring vendor that must read objects in an Amazon S3 bucket in the company's AWS account. The vendor runs its software in its own AWS account and serves many other customers in the same way. The security team does not want any long-term credentials to be shared and wants protection against the confused deputy problem. What should a solutions architect do?",
+      "explanation": "Phân tích đề: bên thứ ba ở account khác cần đọc S3; yêu cầu không chia sẻ credential dài hạn và chống \"confused deputy\" (vendor phục vụ nhiều khách nên có thể bị lừa dùng role của khách này cho khách khác).\n(A) SAI: Access key của IAM user là credential dài hạn, đúng thứ đề cấm; cất trong Secrets Manager không thay đổi bản chất.\n(B) ĐÚNG: Role cross-account cho vendor assume qua STS (credential tạm thời), điều kiện sts:ExternalId duy nhất cho từng khách là cách AWS khuyến nghị để chống confused deputy.\n(C) SAI: Bucket policy cấp cho account vendor không có cơ chế chống confused deputy; MFA delete chỉ bảo vệ việc xóa version, không liên quan.\n(D) SAI: Gần đúng nhất: role cross-account là đúng hướng, nhưng thiếu external ID nên vẫn dính confused deputy. Permissions boundary chỉ giới hạn quyền, không xác thực \"ai đang gọi thay cho ai\".\nĐáp án đúng: B\nĐiểm cần nhớ: Cho bên thứ ba truy cập account = IAM role + external ID trong trust policy, không bao giờ đưa access key.",
       "tagNames": [
-        "High-Performing Architectures > AWS-Glue / Amazon-Athena (Analytics)"
+        "Secure Architectures > IAM / AWS-STS (Identity and Access Management / Security Token Service)"
       ],
       "answers": [
         {
           "answerLabel": "A",
-          "answerText": "Move the log objects to S3 Glacier Instant Retrieval so that Athena scans them at a lower price.",
+          "answerText": "Create an IAM user with read-only S3 access for the vendor and share its access keys through AWS Secrets Manager.",
           "isCorrect": false
         },
         {
           "answerLabel": "B",
-          "answerText": "Switch the Athena workgroup to provisioned capacity so that every query gets more compute power.",
-          "isCorrect": false
+          "answerText": "Create an IAM role that trusts the vendor's AWS account, requires a unique external ID, and allows reading the bucket.",
+          "isCorrect": true
         },
         {
           "answerLabel": "C",
-          "answerText": "Convert the logs to a columnar format such as Apache Parquet by using an AWS Glue ETL job.",
-          "isCorrect": true
-        },
-        {
-          "answerLabel": "D",
-          "answerText": "Add S3 Select calls inside each Athena query so that only matching rows are read from each object.",
+          "answerText": "Add a bucket policy that lets the vendor's AWS account read objects, and turn on MFA delete for the bucket.",
           "isCorrect": false
         },
         {
-          "answerLabel": "E",
-          "answerText": "Store the data in date-based partitions and register the partitions in the AWS Glue Data Catalog.",
-          "isCorrect": true
+          "answerLabel": "D",
+          "answerText": "Create an IAM role that trusts the vendor's AWS account and attach a permissions boundary scoped to the bucket.",
+          "isCorrect": false
         }
       ]
     },
@@ -594,31 +194,301 @@
     },
     {
       "questionType": "MCQ",
-      "questionText": "A company stores user-uploaded media files, most of them larger than 1 MB, in S3 Standard. Access patterns are unpredictable: some files are not opened for months and then suddenly become popular again. The company wants to reduce storage costs without paying retrieval fees and without analyzing access patterns itself. What should a solutions architect recommend?",
-      "explanation": "Phân tích đề: Truy cập không đoán được, file thường > 1 MB, không muốn phí retrieval, không muốn tự phân tích.\n(A) SAI: Lifecycle chỉ chuyển một chiều theo tuổi object; không có cơ chế \"quay về Standard khi được truy cập\". Standard-IA còn tính phí retrieval mỗi lần đọc.\n(B) ĐÚNG: Intelligent-Tiering tự chuyển object giữa các tier theo mức truy cập, đưa về tier Frequent khi được đọc lại, không phí retrieval (chỉ phí giám sát nhỏ mỗi object; object < 128 KB không được chuyển tier).\n(C) SAI: Glacier Flexible Retrieval cần restore mất vài phút đến vài giờ và có phí retrieval; lifecycle cũng không dựa trên \"không truy cập\" mà dựa trên tuổi object.\n(D) SAI: One Zone-IA có phí retrieval và chỉ lưu ở một AZ, tăng rủi ro mất dữ liệu.\nĐáp án đúng: B\nĐiểm cần nhớ: Pattern không biết trước hoặc thay đổi → Intelligent-Tiering. Pattern biết rõ theo tuổi → lifecycle rule.",
+      "questionText": "A company uses AWS Organizations. The SCP attached to the Development OU allows \"s3:*\", and no other SCP denies any Amazon S3 action. In an account under that OU, a developer assumes an IAM role whose only policy allows \"ec2:Describe*\". The target bucket is in the same account and has no bucket policy. The developer receives an AccessDenied error when uploading an object to the bucket. What is the cause?",
+      "explanation": "Phân tích đề: SCP cho phép s3:*, không có deny nào; role chỉ có quyền ec2:Describe*; bucket không có bucket policy.\n(A) SAI: SCP hỗ trợ wildcard trong Action; \"s3:*\" là hợp lệ.\n(B) SAI: Block Public Access chỉ chặn truy cập công khai (ACL/policy public), không ảnh hưởng principal trong cùng account có quyền IAM.\n(C) SAI: Ngược lại: SCP không áp dụng cho management account mà áp dụng cho các member account.\n(D) ĐÚNG: SCP không bao giờ cấp quyền, chỉ đặt trần. Quyền hiệu lực = giao của SCP và identity policy (cộng resource policy nếu có). Role không có quyền s3:PutObject và bucket không có policy nên bị từ chối.\nĐáp án đúng: D\nĐiểm cần nhớ: SCP \"Allow\" chỉ có nghĩa là \"được phép cấp\", vẫn phải có IAM policy hoặc resource policy thực sự cấp quyền.",
       "tagNames": [
-        "Cost-Optimized Architectures > S3-Storage-Classes-and-Lifecycle (Intelligent-Tiering / Glacier)"
+        "Secure Architectures > IAM / AWS-STS (Identity and Access Management / Security Token Service)"
       ],
       "answers": [
         {
           "answerLabel": "A",
-          "answerText": "Add a lifecycle rule that moves objects to S3 Standard-IA after 30 days and back to Standard on access.",
+          "answerText": "The SCP must name s3:PutObject and the bucket ARN explicitly, because SCPs do not evaluate wildcard actions.",
           "isCorrect": false
         },
         {
           "answerLabel": "B",
-          "answerText": "Move the objects to S3 Intelligent-Tiering so that S3 shifts each object between tiers based on its use.",
-          "isCorrect": true
+          "answerText": "S3 Block Public Access must be turned off before principals in the same account are allowed to write objects.",
+          "isCorrect": false
         },
         {
           "answerLabel": "C",
-          "answerText": "Add a lifecycle rule that moves objects to S3 Glacier Flexible Retrieval after 90 days without access.",
+          "answerText": "SCPs take effect only in the management account, so member accounts keep the default deny-all SCP behavior.",
           "isCorrect": false
         },
         {
           "answerLabel": "D",
-          "answerText": "Move the objects to S3 One Zone-IA so that storage is cheaper while files remain instantly available.",
+          "answerText": "An SCP only sets the maximum permissions; the role also needs an identity-based policy that allows the upload.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "An application uses Amazon RDS for MySQL in a Multi-AZ DB instance deployment. Long-running reporting queries every night slow down the application. The company wants to offload the reporting workload with minimal application changes while keeping automatic failover for the primary database. What should a solutions architect do?",
+      "explanation": "Phân tích đề: RDS MySQL Multi-AZ DB instance (1 primary + 1 standby); cần tách tải báo cáo, giữ failover tự động.\n(A) SAI: Bẫy chính: ở Multi-AZ DB instance deployment, standby không nhận kết nối đọc; nó chỉ dùng cho failover. (Chỉ Multi-AZ DB cluster mới có standby đọc được.)\n(B) ĐÚNG: Read replica nhận replication bất đồng bộ, có endpoint riêng cho truy vấn đọc; Multi-AZ của primary vẫn giữ nguyên.\n(C) SAI: Bỏ Multi-AZ là mất failover tự động, trái yêu cầu; \"dung lượng standby\" cũng không dùng được cho việc khác.\n(D) SAI: RDS Proxy gom và tái sử dụng kết nối, không phân tải đọc lên standby.\nĐáp án đúng: B\nĐiểm cần nhớ: Multi-AZ (instance) = sẵn sàng cao; Read replica = mở rộng đọc. Hai thứ dùng chung được.",
+      "tagNames": [
+        "Resilient Architectures > RDS-Multi-AZ-and-Read-Replicas"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Point the reporting tool at the standby instance, because the standby in the second AZ is otherwise idle.",
           "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create a read replica of the DB instance and point the reporting tool at the read replica's endpoint.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Convert the database to a Single-AZ deployment and use the freed standby capacity for the reports.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Put Amazon RDS Proxy in front of the database so that reporting queries are spread across both instances.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company runs a multiplayer game that uses a custom UDP protocol. Game servers run in two AWS Regions. Players around the world report high latency and jitter. The company wants to route player traffic over the AWS global network and give the game clients fixed IP addresses to connect to. What should a solutions architect do?",
+      "explanation": "Phân tích đề: Giao thức UDP tùy chỉnh, hai Region, cần đi mạng toàn cầu của AWS và IP cố định.\n(A) SAI: CloudFront phục vụ HTTP/HTTPS (kể cả HTTP/3 qua QUIC giữa viewer và edge), không proxy giao thức UDP tùy chỉnh tới origin.\n(B) SAI: Latency routing chọn Region gần hơn nhưng traffic vẫn đi internet công cộng, và không có IP cố định.\n(C) SAI: ALB không hỗ trợ UDP; cross-zone chỉ chia tải trong một Region.\n(D) ĐÚNG: Global Accelerator cấp 2 IP anycast tĩnh, đưa traffic TCP/UDP vào edge gần nhất rồi đi backbone AWS tới endpoint group khỏe nhất, failover giữa các Region.\nĐáp án đúng: D\nĐiểm cần nhớ: UDP, IP tĩnh toàn cầu, failover đa Region → Global Accelerator; nội dung HTTP cache được → CloudFront.",
+      "tagNames": [
+        "High-Performing Architectures > AWS-Global-Accelerator"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create an Amazon CloudFront distribution with the game servers as custom origins, and turn on HTTP/3.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create Route 53 latency-based records for both Regions so that each player resolves the nearest servers.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Place an Application Load Balancer in each Region and turn on cross-zone load balancing for the servers.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Create an AWS Global Accelerator with endpoint groups in both Regions that point to the game servers.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A security team wants to be alerted automatically when IAM credentials from any of the company's AWS accounts are used to call AWS APIs from known malicious IP addresses or from unusual locations. The solution must require the least operational overhead. What should a solutions architect recommend?",
+      "explanation": "Phân tích đề: Phát hiện tự động việc dùng credential từ IP độc hại hoặc vị trí bất thường, ít công vận hành.\n(A) SAI: CloudTrail chỉ ghi log; xem tay mỗi sáng vừa chậm vừa tốn công, không phải \"cảnh báo tự động\".\n(B) SAI: Macie tìm dữ liệu nhạy cảm (PII) trong S3, không phân tích hành vi gọi API.\n(C) ĐÚNG: GuardDuty phân tích CloudTrail, VPC Flow Logs, DNS logs bằng threat intelligence và ML; có các finding như gọi API từ IP độc hại hay vị trí bất thường. Gửi finding qua EventBridge (rồi SNS) để cảnh báo.\n(D) SAI: Inspector quét lỗ hổng phần mềm trên EC2, image ECR, Lambda; không theo dõi việc dùng credential.\nĐáp án đúng: C\nĐiểm cần nhớ: GuardDuty = phát hiện mối đe dọa và hành vi bất thường; Macie = dữ liệu nhạy cảm S3; Inspector = lỗ hổng phần mềm; CloudTrail = ghi log.",
+      "tagNames": [
+        "Secure Architectures > Threat-Detection (GuardDuty / Inspector / Macie / Security Hub)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Turn on AWS CloudTrail in all Regions and have analysts review the event history every morning.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Turn on Amazon Macie in each account and route Macie findings to the team by using EventBridge.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Turn on Amazon GuardDuty in each account and route its findings to the team by using EventBridge.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Turn on Amazon Inspector in each account to scan IAM roles for credentials used from new addresses.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A gaming company stores leaderboard data in an Amazon DynamoDB table. The workload is read-heavy, and the same items are read thousands of times per second. The company needs read latency in microseconds, and the developers want to keep using the DynamoDB API with as few code changes as possible. What should a solutions architect recommend?",
+      "explanation": "Phân tích đề: Đọc lặp lại cùng item, cần độ trễ micro giây, giữ API DynamoDB, ít sửa code.\n(A) SAI: ElastiCache cũng đạt độ trễ thấp nhưng phải tự viết logic cache-aside và đồng bộ khi ghi, nhiều thay đổi code hơn.\n(B) SAI: Thêm RCU tránh throttle nhưng độ trễ vẫn mức mili giây; strongly consistent read còn tốn gấp đôi RCU.\n(C) ĐÚNG: DAX là cache in-memory tương thích API DynamoDB, đọc cache trả về trong micro giây; chỉ cần đổi client SDK sang DAX client.\n(D) SAI: Global tables phục vụ đa Region và khả năng chịu lỗi, độ trễ đọc vẫn mức mili giây.\nĐáp án đúng: C\nĐiểm cần nhớ: DynamoDB + micro giây + ít sửa code → DAX. Cache cho nhiều nguồn dữ liệu hay cấu trúc phức tạp → ElastiCache.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-DynamoDB"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Put Amazon ElastiCache for Redis in front of the table and add cache-aside logic to every read code path.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Increase the provisioned read capacity of the table and switch every read to strongly consistent reads.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Add a DynamoDB Accelerator (DAX) cluster and switch the application's DynamoDB client to the DAX client.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Turn on DynamoDB global tables so that each read is served by the replica closest to the application.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company is splitting a monolithic web application into microservices that run on Amazon ECS. Requests to /orders/* must go to the order service, and requests to /users/* must go to the user service. Both services must be available under one public hostname. Which solution meets these requirements with the LEAST operational overhead?",
+      "explanation": "Phân tích đề: Định tuyến theo đường dẫn URL tới các service khác nhau dưới một hostname.\n(A) SAI: NLB hoạt động ở layer 4 (TCP/UDP/TLS), không đọc được đường dẫn HTTP.\n(B) ĐÚNG: ALB (layer 7) có listener rule theo path pattern, mỗi rule forward tới target group của từng ECS service; tích hợp sẵn với ECS.\n(C) SAI: Gateway Load Balancer dùng để đưa traffic qua thiết bị mạng bên thứ ba (firewall, IDS), không định tuyến theo path.\n(D) SAI: Route 53 weighted chia traffic theo tỉ lệ ở mức DNS, không theo path; CLB là thế hệ cũ, nhiều load balancer cũng tốn công hơn.\nĐáp án đúng: B\nĐiểm cần nhớ: Path/host/header routing → ALB. Cần static IP, TCP/UDP, hiệu năng cực cao → NLB.",
+      "tagNames": [
+        "Resilient Architectures > ELB (Application / Network Load Balancer)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Use a Network Load Balancer with one listener per service that routes by the URL path in each request.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Use an Application Load Balancer with listener rules that forward each path pattern to a target group.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Use a Gateway Load Balancer that inspects each request and forwards it to the service for that path.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Use one Classic Load Balancer per service and a weighted Route 53 record for each load balancer.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A team requested a public certificate from AWS Certificate Manager (ACM) in eu-west-1, where its application runs, and validated it by using DNS. When the team configures an Amazon CloudFront distribution to use the company's custom domain name, the certificate does not appear in the list of available certificates. What should the team do?",
+      "explanation": "Phân tích đề: Cert ACM nằm ở eu-west-1, CloudFront không thấy cert để gắn cho tên miền tùy chỉnh.\n(A) ĐÚNG: CloudFront chỉ dùng được cert ACM ở Region us-east-1 (N. Virginia). Cần request (hoặc import) cert cho cùng tên miền ở us-east-1 rồi gắn vào distribution.\n(B) SAI: Phương thức xác thực (DNS hay email) không ảnh hưởng Region của cert.\n(C) SAI: ACM không có tính năng \"cross-Region replication\" cho certificate; mỗi Region quản lý cert riêng.\n(D) SAI: Gắn cert vào ALB chỉ mã hóa đoạn CloudFront → origin; viewer kết nối tới CloudFront bằng tên miền riêng vẫn cần cert trên distribution.\nĐáp án đúng: A\nĐiểm cần nhớ: Cert cho CloudFront (và API Gateway edge-optimized) phải ở us-east-1; cert cho ALB phải ở đúng Region của ALB.",
+      "tagNames": [
+        "Secure Architectures > AWS-KMS / ACM (Encryption Keys and Certificates)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Request or import a certificate for the same domain in ACM in us-east-1 and associate it with the distribution.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Switch the certificate from DNS validation to email validation so that CloudFront can discover it in any Region.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Turn on cross-Region replication for the certificate in ACM so that a copy is created in every CloudFront Region.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Attach the certificate to an Application Load Balancer in eu-west-1 and set that load balancer as the origin.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "The finance team wants to see monthly AWS costs for each engineering team. Two weeks ago, engineers added a \"team\" tag to all resources, but the tag key still does not appear as a filter or grouping option in AWS Cost Explorer. What should a solutions architect do?",
+      "explanation": "Phân tích đề: Tag đã gắn lên tài nguyên nhưng không xuất hiện trong Cost Explorer.\n(A) SAI: AWS Config ghi lịch sử cấu hình và đánh giá tuân thủ, không đưa tag vào dữ liệu chi phí.\n(B) SAI: Budgets dùng để cảnh báo ngưỡng chi phí; tạo budget không làm tag thành chiều phân tích trong Cost Explorer.\n(C) SAI: Gắn lại tag không thay đổi gì; vấn đề là tag chưa được kích hoạt cho mục đích tính chi phí.\n(D) ĐÚNG: User-defined tag phải được activate làm cost allocation tag (bởi management/payer account) mới xuất hiện trong Cost Explorer và billing report; dữ liệu tính từ lúc kích hoạt trở đi, có thể mất tới 24 giờ.\nĐáp án đúng: D\nĐiểm cần nhớ: Gắn tag ≠ tag có trong báo cáo chi phí. Phải activate cost allocation tag, và nó không áp ngược về quá khứ.",
+      "tagNames": [
+        "Cost-Optimized Architectures > Cost-Visibility-and-Governance (Cost Explorer / Budgets / Allocation Tags / FinOps)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Turn on AWS Config in every Region so that tag values are recorded and passed to Cost Explorer.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create an AWS Budgets budget for each team so that Cost Explorer can group costs by the tag.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Reapply the tag with Tag Editor so that Cost Explorer re-indexes every tagged resource again.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Activate the \"team\" tag as a cost allocation tag in the Billing and Cost Management console.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "An AWS Lambda function runs in private subnets of a VPC that has no internet gateway and no NAT gateway. The function must retrieve a database password from AWS Secrets Manager. Company policy forbids adding any route to the internet. What should a solutions architect do?",
+      "explanation": "Phân tích đề: Lambda trong private subnet, không có NAT/IGW, không được thêm đường ra internet, cần gọi Secrets Manager.\n(A) SAI: Bẫy chính: gateway endpoint chỉ tồn tại cho Amazon S3 và DynamoDB; Secrets Manager không có gateway endpoint.\n(B) SAI: Đưa Lambda ra ngoài VPC thì gọi được Secrets Manager nhưng mất đường tới database trong VPC; và đi ngược chính sách mạng của công ty.\n(C) ĐÚNG: Interface endpoint (AWS PrivateLink) tạo ENI trong subnet; bật private DNS thì SDK gọi tên miền mặc định của Secrets Manager mà vẫn đi đường riêng. Security group của endpoint phải cho phép HTTPS 443 từ function.\n(D) SAI: Chạy được về mặt mạng, nhưng bỏ Secrets Manager (mất rotation, audit) và đề yêu cầu lấy password từ Secrets Manager.\nĐáp án đúng: C\nĐiểm cần nhớ: Gateway endpoint = chỉ S3 và DynamoDB, miễn phí, dùng route table; mọi dịch vụ khác dùng interface endpoint.",
+      "tagNames": [
+        "Secure Architectures > VPC-Endpoint (Virtual Private Cloud Endpoint)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create a gateway VPC endpoint for Secrets Manager and add a route for it to the private subnet route tables.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Move the function out of the VPC so that it can call Secrets Manager directly over the AWS public network.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Create an interface VPC endpoint for Secrets Manager with private DNS, and allow HTTPS from the function.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Copy the password to an encrypted object in Amazon S3 and read the object through an S3 gateway endpoint.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "Worker instances poll an Amazon SQS standard queue for new orders. Each order takes about 90 seconds to process, and the queue uses the default visibility timeout of 30 seconds. The operations team reports that many orders are processed two or more times. What is the MOST effective way to fix this problem?",
+      "explanation": "Phân tích đề: Xử lý mất 90 giây nhưng visibility timeout chỉ 30 giây.\n(A) SAI: Bẫy chính: FIFO chống trùng ở phía gửi trong khoảng deduplication, nhưng nếu visibility timeout hết hạn trước khi xử lý xong, message vẫn hiện lại và bị xử lý lần nữa.\n(B) SAI: Long polling giảm số lần nhận rỗng và chi phí, không ngăn message hiện lại khi timeout hết.\n(C) SAI: maxReceiveCount = 1 sẽ đẩy message sang DLQ ngay khi lần đầu chưa kịp xử lý xong, làm mất đơn hàng khỏi luồng chính.\n(D) ĐÚNG: Visibility timeout phải lớn hơn thời gian xử lý (có thể gia hạn bằng ChangeMessageVisibility); xử lý xong phải DeleteMessage.\nĐáp án đúng: D\nĐiểm cần nhớ: Xử lý lặp trên SQS thường do visibility timeout < thời gian xử lý; FIFO không sửa được nguyên nhân này.",
+      "tagNames": [
+        "Resilient Architectures > Amazon-SQS (Simple Queue Service)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Convert the queue to a FIFO queue so that every message is delivered to the workers exactly once.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Turn on long polling with a 20-second wait time so that the workers receive fewer duplicate messages.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Add a dead-letter queue with a maximum receive count of 1 so that repeated messages are removed.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Raise the visibility timeout above the processing time, and delete each message after processing it.",
+          "isCorrect": true
         }
       ]
     },
@@ -653,32 +523,162 @@
       ]
     },
     {
-      "questionType": "MCQ",
-      "questionText": "The finance team wants to see monthly AWS costs for each engineering team. Two weeks ago, engineers added a \"team\" tag to all resources, but the tag key still does not appear as a filter or grouping option in AWS Cost Explorer. What should a solutions architect do?",
-      "explanation": "Phân tích đề: Tag đã gắn lên tài nguyên nhưng không xuất hiện trong Cost Explorer.\n(A) SAI: AWS Config ghi lịch sử cấu hình và đánh giá tuân thủ, không đưa tag vào dữ liệu chi phí.\n(B) SAI: Budgets dùng để cảnh báo ngưỡng chi phí; tạo budget không làm tag thành chiều phân tích trong Cost Explorer.\n(C) SAI: Gắn lại tag không thay đổi gì; vấn đề là tag chưa được kích hoạt cho mục đích tính chi phí.\n(D) ĐÚNG: User-defined tag phải được activate làm cost allocation tag (bởi management/payer account) mới xuất hiện trong Cost Explorer và billing report; dữ liệu tính từ lúc kích hoạt trở đi, có thể mất tới 24 giờ.\nĐáp án đúng: D\nĐiểm cần nhớ: Gắn tag ≠ tag có trong báo cáo chi phí. Phải activate cost allocation tag, và nó không áp ngược về quá khứ.",
+      "questionType": "MSQ",
+      "questionText": "A company stores regulated documents in an Amazon S3 bucket. A new policy requires that all requests to the bucket use encryption in transit and that all new objects are encrypted at rest with an AWS KMS key that the company manages. The solution must require the least ongoing effort. Which TWO actions should a solutions architect take? (Choose TWO.)",
+      "explanation": "Phân tích đề: Cần 2 thứ: bắt buộc HTTPS (in transit) và mã hóa at rest bằng KMS key do công ty quản lý, ít công vận hành.\n(A) SAI: Block Public Access chặn truy cập công khai, không liên quan HTTP hay HTTPS.\n(B) ĐÚNG: Điều kiện aws:SecureTransport = false + Deny là cách chuẩn để từ chối mọi request không dùng TLS.\n(C) SAI: Versioning và MFA delete bảo vệ chống xóa/ghi đè, không phải lớp mã hóa.\n(D) SAI: Macie phát hiện dữ liệu nhạy cảm và báo cáo, không tự mã hóa lại object; đây cũng là cách làm thủ công, tốn công.\n(E) ĐÚNG: Default encryption SSE-KMS với customer managed key tự mã hóa mọi object mới; Bucket Key giảm số lần gọi KMS (giảm chi phí và nguy cơ throttle).\nĐáp án đúng: B, E\nĐiểm cần nhớ: S3 đã mặc định mã hóa SSE-S3, nên khi đề đòi \"KMS key công ty quản lý\" phải cấu hình SSE-KMS; HTTPS thì dùng aws:SecureTransport.",
       "tagNames": [
-        "Cost-Optimized Architectures > Cost-Visibility-and-Governance (Cost Explorer / Budgets / Allocation Tags / FinOps)"
+        "Secure Architectures > S3-Encryption-Policies"
       ],
       "answers": [
         {
           "answerLabel": "A",
-          "answerText": "Turn on AWS Config in every Region so that tag values are recorded and passed to Cost Explorer.",
+          "answerText": "Turn on S3 Block Public Access at the account level so that unencrypted requests never reach the bucket.",
           "isCorrect": false
         },
         {
           "answerLabel": "B",
-          "answerText": "Create an AWS Budgets budget for each team so that Cost Explorer can group costs by the tag.",
-          "isCorrect": false
+          "answerText": "Add a bucket policy statement that denies all S3 actions when the aws:SecureTransport key is false.",
+          "isCorrect": true
         },
         {
           "answerLabel": "C",
-          "answerText": "Reapply the tag with Tag Editor so that Cost Explorer re-indexes every tagged resource again.",
+          "answerText": "Turn on S3 Versioning and MFA delete so that every object version gets an extra layer of encryption.",
           "isCorrect": false
         },
         {
           "answerLabel": "D",
-          "answerText": "Activate the \"team\" tag as a cost allocation tag in the Billing and Cost Management console.",
+          "answerText": "Configure Amazon Macie to scan the bucket daily and re-encrypt any object that it finds unencrypted.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Set the bucket default encryption to SSE-KMS with a customer managed key and enable S3 Bucket Keys.",
           "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MSQ",
+      "questionText": "An application runs on Amazon EC2 instances in an Auto Scaling group behind an Application Load Balancer. All instances are currently launched in a single Availability Zone. When the application on an instance hangs, the instance keeps running and is never replaced, because the group uses only EC2 status checks. Which TWO changes will improve availability? (Choose TWO.)",
+      "explanation": "Phân tích đề: Hai vấn đề: (1) chỉ một AZ → mất AZ là sập; (2) ứng dụng treo nhưng EC2 status check vẫn OK nên không bị thay.\n(A) ĐÚNG: Trải ASG qua nhiều AZ; khi một AZ lỗi, ASG khởi chạy bù ở AZ còn lại.\n(B) SAI: Scheduled scaling tăng số lượng theo giờ, không giải quyết lỗi AZ hay instance treo.\n(C) SAI: Instance lớn hơn vẫn nằm trong một AZ và vẫn không bị thay khi ứng dụng treo.\n(D) ĐÚNG: Bật ELB health check cho ASG: instance trượt health check của target group sẽ bị đánh dấu unhealthy và được thay thế.\n(E) SAI: Detailed monitoring chỉ tăng tần suất metric, không tự thay instance hay thêm AZ.\nĐáp án đúng: A, D\nĐiểm cần nhớ: Ứng dụng treo mà instance vẫn chạy → cần ELB health check trên ASG, EC2 status check không phát hiện được.",
+      "tagNames": [
+        "Resilient Architectures > AWS-Auto-Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Configure the Auto Scaling group to launch instances in subnets in at least two Availability Zones.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Add a scheduled scaling action that doubles the desired capacity during business hours each weekday.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Replace the instances with a larger instance type so that each instance can absorb more of the load.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Turn on Elastic Load Balancing health checks for the group in addition to the EC2 status checks.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Turn on detailed monitoring for the instances so that CloudWatch collects their metrics every minute.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A database runs on an Amazon EC2 instance and stores its data on a 1 TiB gp2 EBS volume. The database now needs 10,000 IOPS sustained, but the volume delivers only about 3,000 IOPS of baseline performance. The instance already supports the required EBS performance. What is the MOST cost-effective way to meet the requirement?",
+      "explanation": "Phân tích đề: gp2 cho 3 IOPS/GiB (1 TiB ≈ 3.072 IOPS baseline); cần 10.000 IOPS ổn định, rẻ nhất.\n(A) ĐÚNG: gp3 tách IOPS khỏi dung lượng: có sẵn 3.000 IOPS, mua thêm IOPS riêng; đổi type tại chỗ bằng Elastic Volumes, không downtime. gp3 rẻ hơn gp2 theo GiB.\n(B) SAI: Chạy được nhưng phải trả tiền cho khoảng 2,4 TiB dung lượng không dùng, đắt hơn gp3.\n(C) SAI: io2 đáp ứng thừa nhưng giá IOPS provisioned cao hơn nhiều; hợp khi cần độ bền 99,999% hoặc IOPS rất lớn.\n(D) SAI: st1 (HDD) tối ưu throughput tuần tự, IOPS ngẫu nhiên rất thấp, không hợp cho database.\nĐáp án đúng: A\nĐiểm cần nhớ: Cần thêm IOPS mà không cần thêm dung lượng → gp3. Đừng phình gp2 chỉ để lấy IOPS.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-EBS-SSD (Elastic Block Store - Solid State Drive)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Change the volume type to gp3 and provision 10,000 IOPS while keeping the volume size the same.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Increase the size of the gp2 volume to about 3.4 TiB so that its baseline reaches 10,000 IOPS.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Change the volume type to io2 Block Express and provision 10,000 IOPS on the same volume size.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Change the volume type to st1, because throughput optimized HDD volumes offer more IOPS per dollar.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company stores user-uploaded media files, most of them larger than 1 MB, in S3 Standard. Access patterns are unpredictable: some files are not opened for months and then suddenly become popular again. The company wants to reduce storage costs without paying retrieval fees and without analyzing access patterns itself. What should a solutions architect recommend?",
+      "explanation": "Phân tích đề: Truy cập không đoán được, file thường > 1 MB, không muốn phí retrieval, không muốn tự phân tích.\n(A) SAI: Lifecycle chỉ chuyển một chiều theo tuổi object; không có cơ chế \"quay về Standard khi được truy cập\". Standard-IA còn tính phí retrieval mỗi lần đọc.\n(B) ĐÚNG: Intelligent-Tiering tự chuyển object giữa các tier theo mức truy cập, đưa về tier Frequent khi được đọc lại, không phí retrieval (chỉ phí giám sát nhỏ mỗi object; object < 128 KB không được chuyển tier).\n(C) SAI: Glacier Flexible Retrieval cần restore mất vài phút đến vài giờ và có phí retrieval; lifecycle cũng không dựa trên \"không truy cập\" mà dựa trên tuổi object.\n(D) SAI: One Zone-IA có phí retrieval và chỉ lưu ở một AZ, tăng rủi ro mất dữ liệu.\nĐáp án đúng: B\nĐiểm cần nhớ: Pattern không biết trước hoặc thay đổi → Intelligent-Tiering. Pattern biết rõ theo tuổi → lifecycle rule.",
+      "tagNames": [
+        "Cost-Optimized Architectures > S3-Storage-Classes-and-Lifecycle (Intelligent-Tiering / Glacier)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Add a lifecycle rule that moves objects to S3 Standard-IA after 30 days and back to Standard on access.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Move the objects to S3 Intelligent-Tiering so that S3 shifts each object between tiers based on its use.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Add a lifecycle rule that moves objects to S3 Glacier Flexible Retrieval after 90 days without access.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Move the objects to S3 One Zone-IA so that storage is cheaper while files remain instantly available.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company runs a critical order application in us-east-1 on Amazon EC2 instances behind an Application Load Balancer, with an Amazon Aurora MySQL database. The company needs disaster recovery in us-west-2 with an RTO of 15 minutes and an RPO of a few seconds. The solution must be as cost-effective as possible. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: RTO 15 phút, RPO vài giây, tối ưu chi phí.\n(A) SAI: Backup & restore rẻ nhất nhưng khôi phục cluster và dựng hạ tầng thường mất hàng giờ; RPO bằng chu kỳ backup.\n(B) SAI: Multi-site active/active đáp ứng RTO/RPO nhưng tốn chi phí nhất, vượt nhu cầu.\n(C) ĐÚNG: Warm standby: Aurora global database replicate sang Region khác với độ trễ thường dưới 1 giây (RPO vài giây), promote trong vài phút; tầng ứng dụng thu nhỏ đã chạy sẵn chỉ cần scale out, vừa RTO 15 phút.\n(D) SAI: Snapshot mỗi giờ cho RPO tới 1 giờ, không đạt yêu cầu vài giây.\nĐáp án đúng: C\nĐiểm cần nhớ: Thứ tự chi phí/tốc độ: backup & restore < pilot light < warm standby < multi-site. RPO giây với Aurora → global database.",
+      "tagNames": [
+        "Resilient Architectures > AWS-DR-Strategies"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Back up the Aurora cluster and the EC2 AMIs with AWS Backup, copy them to us-west-2, and restore after a disaster.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Run a full-size copy of the application in us-west-2 that serves live traffic through Route 53 latency routing.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Use an Aurora global database and run a scaled-down application tier in us-west-2 that scales out on failover.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Copy Aurora snapshots to us-west-2 every hour and keep AMIs there so that new instances can launch when needed.",
+          "isCorrect": false
         }
       ]
     }

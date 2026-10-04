@@ -22,4 +22,7 @@ public class CreateTestRequest {
     private Instant availableTo;
 
     private Integer costCoins;
+
+    /** Xáo thứ tự câu theo từng lượt làm (lưu trên đề). */
+    private Boolean shuffleQuestions;
 }

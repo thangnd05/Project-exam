@@ -33,6 +33,7 @@ public class TestResponse {
     private Integer costCoins;
     private Boolean owned;
     private Boolean locked;
+    private Boolean shuffleQuestions;
 
     private List<TestPartResponse> parts;
 

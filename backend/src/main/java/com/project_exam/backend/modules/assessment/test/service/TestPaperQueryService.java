@@ -81,8 +81,12 @@ public class TestPaperQueryService {
         return testRepository.findById(id);
     }
 
+    /**
+     * @param attemptId      lượt làm cần thứ tự câu (đề bật xáo theo lượt); bỏ qua nếu không thuộc người gọi
+     * @param guestSessionId phiên guest, dùng để xác minh lượt làm của guest
+     */
     @Transactional
-    public TestResponse getTestFullById(String testId, String currentUserId) {
+    public TestResponse getTestFullById(String testId, String currentUserId, String attemptId, String guestSessionId) {
         Test test = testRepository.findById(testId).orElseThrow(() -> new NotFoundException("Test not found"));
 
         boolean isGuest = (currentUserId == null);
@@ -129,9 +133,11 @@ public class TestPaperQueryService {
             return buildEmptyUserTestResponse(test, maxAttempts, attemptsUsed, remaining);
         }
 
-        long seed = (latest != null ? latest.getUserTestId() : testId).hashCode();
+        String orderAttemptId = test.isShuffleQuestions()
+                ? resolveOrderAttemptId(testId, currentUserId, attemptId, guestSessionId, latest)
+                : null;
 
-        List<TestPartResponse> partResponses = buildUserPartResponses(data, seed);
+        List<TestPartResponse> partResponses = buildUserPartResponses(data, orderAttemptId);
 
         return buildUserTestResponse(test, maxAttempts, attemptsUsed, remaining, totalAttempts, partResponses);
     }
@@ -181,6 +187,11 @@ public class TestPaperQueryService {
     }
 
     public TestAdminResponse getTestFullByIdAdmin(String testId) {
+        return getTestFullByIdAdmin(testId, null);
+    }
+
+    /** @param orderAttemptId lượt làm để xếp câu đúng thứ tự người làm đã thấy (chỉ áp dụng khi đề bật xáo theo lượt) */
+    public TestAdminResponse getTestFullByIdAdmin(String testId, String orderAttemptId) {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
         long totalAttempts = userTestRepository.countByTestId(testId);
@@ -191,15 +202,51 @@ public class TestPaperQueryService {
             return buildEmptyAdminResponse(test, totalAttempts);
         }
 
-        List<TestPartAdminResponse> partResponses = buildAdminPartResponses(data);
+        List<TestPartAdminResponse> partResponses = buildAdminPartResponses(
+                data, test.isShuffleQuestions() ? orderAttemptId : null);
 
         return buildAdminTestResponse(test, totalAttempts, partResponses);
     }
 
-    private List<TestPartResponse> buildUserPartResponses(TestUserDataBundle data, long seed) {
+    /**
+     * Lượt làm quyết định thứ tự câu: lượt được chỉ định nếu đúng là của người gọi (user hoặc phiên guest),
+     * không thì lượt đang làm dở mới nhất của user. Null -> thứ tự gốc của đề.
+     */
+    private String resolveOrderAttemptId(
+            String testId, String currentUserId, String attemptId, String guestSessionId, UserTest latest) {
+        if (attemptId != null && !attemptId.isBlank()) {
+            UserTest requested = userTestRepository.findById(attemptId).orElse(null);
+            if (requested != null && testId.equals(requested.getTestId())) {
+                boolean ownUser = currentUserId != null && currentUserId.equals(requested.getUserId());
+                boolean ownGuest = currentUserId == null && guestSessionId != null && !guestSessionId.isBlank()
+                        && guestSessionId.equals(requested.getGuestSessionId());
+                if (ownUser || ownGuest) {
+                    return requested.getUserTestId();
+                }
+            }
+        }
+        if (latest != null && latest.getStatus() == UserTest.Status.IN_PROGRESS) {
+            return latest.getUserTestId();
+        }
+        return null;
+    }
+
+    /** Câu của part theo thứ tự hiển thị; có lượt làm thì xáo theo lượt đó (đề bật xáo theo lượt). */
+    public static List<TestQuestion> orderPartQuestions(
+            String testPartId, List<TestQuestion> ordered, Map<String, Question> questionMap, String orderAttemptId) {
+        return TestQuestionOrdering.order(
+                ordered,
+                qid -> Optional.ofNullable(questionMap.get(qid)).map(Question::getPassageId).orElse(null),
+                orderAttemptId != null ? TestQuestionOrdering.attemptRandom(orderAttemptId, testPartId) : null);
+    }
+
+    private List<TestPartResponse> buildUserPartResponses(TestUserDataBundle data, String orderAttemptId) {
         return data.testParts().stream().map(tp -> {
-            List<TestQuestion> tqList = data.questionsByPartId()
-                    .getOrDefault(tp.getTestPartId(), Collections.emptyList());
+            List<TestQuestion> tqList = orderPartQuestions(
+                    tp.getTestPartId(),
+                    data.questionsByPartId().getOrDefault(tp.getTestPartId(), Collections.emptyList()),
+                    data.questionMap(),
+                    orderAttemptId);
 
             Map<String, QuestionGroupResponse> groupsMap = new LinkedHashMap<>();
 
@@ -337,7 +384,7 @@ public class TestPaperQueryService {
     }
 
     private TestAdminDataBundle loadAdminTestData(String testId) {
-        List<TestPart> testParts = testPartRepository.findByTestId(testId);
+        List<TestPart> testParts = testPartRepository.findByTestIdOrderByExamPartDisplayOrder(testId);
         if (testParts.isEmpty()) {
             return new TestAdminDataBundle(
                     Collections.emptyList(),
@@ -393,10 +440,13 @@ public class TestPaperQueryService {
                 .collect(Collectors.groupingBy(PassageMediaResponse::getPassageId));
     }
 
-    private List<TestPartAdminResponse> buildAdminPartResponses(TestAdminDataBundle data) {
+    private List<TestPartAdminResponse> buildAdminPartResponses(TestAdminDataBundle data, String orderAttemptId) {
         return data.testParts().stream().map(tp -> {
-            List<TestQuestion> tqList = data.questionsByPartId()
-                    .getOrDefault(tp.getTestPartId(), Collections.emptyList());
+            List<TestQuestion> tqList = orderPartQuestions(
+                    tp.getTestPartId(),
+                    data.questionsByPartId().getOrDefault(tp.getTestPartId(), Collections.emptyList()),
+                    data.questionMap(),
+                    orderAttemptId);
 
             Map<String, List<Question>> groupedByPassage = tqList.stream()
                     .map(tq -> data.questionMap().get(tq.getQuestionId()))

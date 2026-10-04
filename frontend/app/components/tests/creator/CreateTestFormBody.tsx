@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect, useMemo } from 'react';
-import { Row, Col, Alert } from 'react-bootstrap';
+import { Row, Col, Alert, Form } from 'react-bootstrap';
 import { getClassById } from '@/app/apis/classApi';
 import { getChapterById } from '@/app/apis/chapterApi';
 import { previewDocument, previewJsonFile, previewPassageDocument } from '@/app/apis/questionApi';
@@ -901,6 +901,24 @@ const CreateTestFormBody = ({
                         <label><IoInformationCircleOutline /> Mô tả</label>
                         <textarea className={cx('inputModern')} rows={2} value={testInfo.description} onChange={(e) => setTestInfo({ ...testInfo, description: e.target.value })} />
                       </div>
+                    </Col>
+                    <Col md={6}>
+                      <Form.Check
+                        type="checkbox"
+                        id="create-test-shuffle-on-create"
+                        label="Xáo trộn thứ tự câu khi tạo đề (mọi người làm thấy cùng một thứ tự)"
+                        checked={testInfo.shuffleOnCreate}
+                        onChange={(e) => setTestInfo({ ...testInfo, shuffleOnCreate: e.target.checked })}
+                      />
+                    </Col>
+                    <Col md={6}>
+                      <Form.Check
+                        type="checkbox"
+                        id="create-test-shuffle-per-attempt"
+                        label="Xáo trộn thứ tự câu mỗi lượt làm (mỗi người, mỗi lần làm một thứ tự khác)"
+                        checked={testInfo.shuffleQuestions}
+                        onChange={(e) => setTestInfo({ ...testInfo, shuffleQuestions: e.target.checked })}
+                      />
                     </Col>
                   </>
                 )}

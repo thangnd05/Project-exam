@@ -24,6 +24,7 @@ public class TestAdminResponse {
     private String status;
     private Integer maxAttempts;
     private Long totalAttempts;
+    private Boolean shuffleQuestions;
 
     private String classId;
 

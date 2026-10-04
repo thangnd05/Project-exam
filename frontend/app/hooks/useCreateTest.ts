@@ -62,6 +62,10 @@ export interface TestInfoForm {
   examCategoryId: string;
 
   usageScope: QuestionUsageScope;
+  /** Xáo một lần thứ tự câu ngay khi tạo đề. */
+  shuffleOnCreate: boolean;
+  /** Xáo thứ tự câu theo từng lượt làm. */
+  shuffleQuestions: boolean;
 }
 
 export interface CreatorNotification {
@@ -140,6 +144,8 @@ export const useCreateTest = ({
     costCoins: '',
     examCategoryId: '',
     usageScope: QuestionUsageScope.PRACTICE,
+    shuffleOnCreate: false,
+    shuffleQuestions: false,
   });
 
   const [questions, setQuestions] = useState<DraftQuestion[]>([cloneEmptyQuestion()]);

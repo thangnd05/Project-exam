@@ -138,6 +138,21 @@ export function useTestSession() {
     }));
   }, [userTestId]);
 
+  // Đề xáo theo lượt: lượt làm mà thứ tự câu hiện tại đang khớp.
+  const orderedForRef = useRef<string | null>(null);
+
+  /** Đề bật xáo theo lượt: tải lại đề theo id lượt làm để nhận đúng thứ tự câu của lượt đó. */
+  const applyAttemptOrder = useCallback(
+    async (attemptId: string) => {
+      if (orderedForRef.current === attemptId) return;
+      const data = await getUserTestInfo(testId, { userTestId: attemptId, guestSessionId });
+      const enriched = await enrichTestWithPassageMedia({ ...data, parts: data.parts || [] });
+      orderedForRef.current = attemptId;
+      setTest((prev) => ({ ...prev, parts: enriched.parts }));
+    },
+    [testId, guestSessionId],
+  );
+
   const loadTest = useCallback(() => {
     pruneExpiredExamSessions();
 
@@ -157,10 +172,12 @@ export function useTestSession() {
       if (Object.keys(savedState.userAnswers).length > 0) pendingSinceRef.current = Date.now();
     }
 
-    getUserTestInfo(testId)
+    const savedAttemptId = savedState?.userTestId || readExamSessionId(sessionKey) || null;
+    getUserTestInfo(testId, { userTestId: savedAttemptId, guestSessionId })
       .then(async (testInfoData) => {
         const testData: ActiveTest = { ...testInfoData, parts: testInfoData.parts || [] };
         const enriched = await enrichTestWithPassageMedia(testData);
+        orderedForRef.current = testData.shuffleQuestions ? savedAttemptId : null;
         setTest(enriched);
 
         if (testData.status === 'LOGIN_REQUIRED') {
@@ -275,7 +292,12 @@ export function useTestSession() {
         mode: isPractice ? PRACTICE_MODE_PARAM : undefined,
         examPartIds: isPractice ? selectedPartIds : undefined,
       })
-        .then((data) => {
+        .then(async (data) => {
+          if (test.shuffleQuestions && data.userTestId) {
+            await applyAttemptOrder(data.userTestId).catch((err) =>
+              console.error('Failed to load shuffled question order:', err),
+            );
+          }
           setUserTestId(data.userTestId ?? null);
           writeExamSessionId(sessionKey, data.userTestId as string);
           if (!isPractice) setStartedAt(data.startedAt || null);
@@ -286,7 +308,15 @@ export function useTestSession() {
           else setStatus('error');
         });
     }
-  }, [status, test, sessionKey, isPractice, selectedPartIds, isGuest, guestCfg, holdStart, readyConfirmed]);
+  }, [status, test, sessionKey, isPractice, selectedPartIds, isGuest, guestCfg, holdStart, readyConfirmed, applyAttemptOrder]);
+
+  // Lượt làm khôi phục từ server (không có trong localStorage lúc tải đề): lấy lại đúng thứ tự câu.
+  useEffect(() => {
+    if (status !== 'active' || !userTestId || !test.shuffleQuestions) return;
+    applyAttemptOrder(userTestId).catch((err) =>
+      console.error('Failed to load shuffled question order:', err),
+    );
+  }, [status, userTestId, test.shuffleQuestions, applyAttemptOrder]);
 
   const confirmReady = useCallback(() => {
     setReadyConfirmed(true);

@@ -212,6 +212,36 @@ public class TestQuestionAssignmentService {
                 .build();
     }
 
+    /**
+     * Xáo một lần thứ tự câu trong từng part của đề rồi lưu lại display_order (mọi người làm đều thấy thứ tự mới).
+     * Câu cùng đoạn văn giữ liền nhau.
+     */
+    @Transactional
+    public void shuffleTestQuestionOrder(String testId, String currentUserId) {
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new NotFoundException("Đề không tồn tại: " + testId));
+        boolean isOwner = currentUserId != null && currentUserId.equals(test.getCreatedBy());
+        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.TEST_MANAGE)) {
+            throw new ForbiddenException("Bạn không có quyền sửa đề này.");
+        }
+
+        Random random = new Random();
+        for (TestPart part : testPartRepository.findByTestId(testId)) {
+            List<TestQuestion> links = testQuestionRepository.findByTestPartIdOrderByDisplayOrder(part.getTestPartId());
+            if (links.size() < 2) continue;
+            Map<String, String> passageByQuestionId = new HashMap<>();
+            questionRepository.findAllById(links.stream().map(TestQuestion::getQuestionId).toList())
+                    .forEach(q -> {
+                        if (q.getPassageId() != null) passageByQuestionId.put(q.getQuestionId(), q.getPassageId());
+                    });
+            List<TestQuestion> shuffled = TestQuestionOrdering.order(links, passageByQuestionId::get, random);
+            for (int i = 0; i < shuffled.size(); i++) {
+                shuffled.get(i).setDisplayOrder(i + 1);
+            }
+            testQuestionRepository.saveAll(shuffled);
+        }
+    }
+
     private List<Question> pickRandomQuestionsKeepingPassages(
             List<Question> candidates, Set<String> existingIds, int count) {
         LinkedHashMap<String, List<Question>> passageGroups = new LinkedHashMap<>();

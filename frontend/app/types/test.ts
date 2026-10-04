@@ -123,6 +123,8 @@ export interface TestResponse {
   costCoins?: number;
   owned?: boolean;
   locked?: boolean;
+  /** Xáo thứ tự câu theo từng lượt làm. */
+  shuffleQuestions?: boolean;
   parts?: TestPartResponse[];
 }
 
@@ -142,6 +144,7 @@ export interface TestAdminResponse {
   status?: TestStatus;
   maxAttempts?: number;
   totalAttempts?: number;
+  shuffleQuestions?: boolean;
   classId?: string;
   parts?: TestPartAdminResponse[];
 }
@@ -160,6 +163,7 @@ export interface CreateTestRequest {
   availableFrom?: string;
   availableTo?: string;
   costCoins?: number;
+  shuffleQuestions?: boolean;
 }
 
 export interface AddQuestionsToTestRequest {

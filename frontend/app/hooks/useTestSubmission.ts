@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fromDateTimeLocalInput } from '@/app/utils/format-date-time';
-import { createTest, importTestJson } from '@/app/apis/testApi';
+import { createTest, importTestJson, shuffleTestQuestions } from '@/app/apis/testApi';
 import { QuestionUsageScope } from '@/app/enums';
 import { createTestPart } from '@/app/apis/testPartApi';
 import {
@@ -228,12 +228,14 @@ export const useTestSubmission = ({
                         testInfo.costCoins && Number(testInfo.costCoins) > 0
                             ? Number(testInfo.costCoins)
                             : null,
+                    shuffleQuestions: testInfo.shuffleQuestions,
                 } as unknown as CreateTestRequest;
 
                 const testFile = effectiveTestJsonFile();
                 if (testFile) {
                     // Backend tự chia câu vào các phần thi và gắn tag, tất cả trong một transaction.
-                    await importTestJson(testFile, testPayload, QuestionUsageScope.EXAM);
+                    const imported = await importTestJson(testFile, testPayload, QuestionUsageScope.EXAM);
+                    if (testInfo.shuffleOnCreate) await shuffleTestQuestions(String(imported.testId));
                     return;
                 }
 
@@ -280,6 +282,7 @@ export const useTestSubmission = ({
                         }),
                     );
                 }
+                if (testInfo.shuffleOnCreate) await shuffleTestQuestions(String(newTestId));
             } else if (creatorType === CREATOR_TYPES.BULK && effectiveBankJsonFile()) {
                 // Gửi thẳng file: không gửi lại cả nghìn câu dưới dạng text trong form.
                 const formData = new FormData();
