@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 .section {
   position: relative;
   padding: clamp(48px, 6vw, 80px) clamp(20px, 4vw, 48px);
@@ -102,8 +104,7 @@
   color: var(--primary-text-hover);
   opacity: 0.55;
 
-  // Vàng nhạt mờ 55% trên nền tối bị ngả ô liu; dùng vàng thương hiệu đặc.
-  :global(:root[data-theme='dark']) & {
+  @include dark-theme {
     color: var(--primary);
     opacity: 0.9;
   }

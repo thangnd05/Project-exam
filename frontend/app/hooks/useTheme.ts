@@ -23,7 +23,6 @@ function applyTheme(theme: Theme) {
   root.setAttribute('data-bs-theme', theme);
 }
 
-// Nguồn sự thật là thuộc tính data-theme trên <html>, nên mọi nơi dùng hook đều đồng bộ với nhau.
 function subscribe(onChange: () => void) {
   const observer = new MutationObserver(onChange);
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
@@ -33,10 +32,6 @@ function subscribe(onChange: () => void) {
 const getSnapshot = (): Theme => (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
 const getServerSnapshot = (): Theme => 'light';
 
-/**
- * Theme hiện tại của trang. Script trong app/layout.tsx đã gắn data-theme lên <html> trước khi vẽ,
- * hook này chỉ đọc lại và cho phép đổi. Chưa chọn lần nào thì đi theo cài đặt của hệ điều hành.
- */
 export function useTheme() {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
@@ -53,9 +48,7 @@ export function useTheme() {
     applyTheme(next);
     try {
       window.localStorage.setItem(THEME_STORAGE_KEY, next);
-    } catch {
-      // Trình duyệt chặn storage: theme vẫn đổi trong phiên này.
-    }
+    } catch {}
   }, []);
 
   const toggleTheme = useCallback(() => {

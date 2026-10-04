@@ -1,4 +1,5 @@
 import { Inter, Playfair_Display } from 'next/font/google';
+import Script from 'next/script';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 import '@/app/assets/styles/GlobalStyles/GlobalStyles.scss';
@@ -61,15 +62,15 @@ export const viewport = {
   themeColor: '#000000',
 };
 
-// Gắn theme lên <html> trước khi trình duyệt vẽ trang để không bị nháy nền trắng khi dùng giao diện tối.
-// Khoá 'theme' phải khớp THEME_STORAGE_KEY trong app/hooks/useTheme.ts.
 const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}var d=document.documentElement;d.setAttribute('data-theme',t);d.setAttribute('data-bs-theme',t)}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="vi" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <Script id="theme-init" strategy="beforeInteractive">
+          {THEME_INIT_SCRIPT}
+        </Script>
       </head>
       <body>
         <noscript>Bạn cần bật JavaScript để dùng ứng dụng này.</noscript>

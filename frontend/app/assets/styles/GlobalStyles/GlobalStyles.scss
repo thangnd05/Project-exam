@@ -1,4 +1,5 @@
 @import 'normalize.css';
+@import '../mixins.scss';
 
 @mixin palette-light-raw {
   --brand-50-rgb: 250 247 240;
@@ -98,7 +99,6 @@
   --radius-lg: 1rem;
   --radius-xl: 20px;
 
-  /* Không đảo theo theme: dùng cho chữ/nền trên gradient vàng và các vùng vốn đã tối */
   --brand-deep-rgb: 125 103 44;
   --brand-deeper-rgb: 63 52 32;
   --brand-cream-rgb: 250 247 240;
@@ -106,14 +106,10 @@
 
   --body-rgb: 255 255 255;
   --surface-rgb: 255 255 255;
-  --scrollbar-thumb: rgb(0 0 0 / 0.15);
-  --scrollbar-thumb-hover: rgb(0 0 0 / 0.3);
+  --scrollbar-thumb: rgb(0 0 0 / 0.32);
+  --scrollbar-thumb-hover: rgb(0 0 0 / 0.5);
 }
 
-/*
- * Dark mode theo hướng dẫn Material Design: nền #121212 (không đen tuyền), thẻ nổi lên #1e1e1e,
- * chữ #E0E0E0 (không trắng tinh), màu nhấn hạ sáng/bớt rực để không chói trên nền tối.
- */
 @mixin palette-dark-raw {
   --brand-50-rgb: 38 35 28;
   --brand-100-rgb: 48 43 31;
@@ -172,23 +168,20 @@
 
   --glass-bg: rgb(30 30 30 / 0.78);
   --glass-border: rgb(255 255 255 / 0.08);
-  /* Chỉ khai báo ở dark: .theme-locked không ghi đè nên hero/footer vẫn nhận được giá trị này */
   --section-divider: rgb(var(--brand-500-rgb) / 0.18);
-  --scrollbar-thumb: rgb(255 255 255 / 0.22);
-  --scrollbar-thumb-hover: rgb(255 255 255 / 0.38);
+  --scrollbar-thumb: rgb(255 255 255 / 0.3);
+  --scrollbar-thumb-hover: rgb(255 255 255 / 0.48);
   --shadow-card: 0 14px 28px rgb(0 0 0 / 0.35), 0 10px 10px rgb(0 0 0 / 0.25);
   --primary-btn-shadow: 0 8px 18px rgb(0 0 0 / 0.35);
 
   @include dark-dim-accents;
 }
 
-/* Hạ sáng màu nhấn dùng chung cho cả trang tối lẫn các vùng giữ màu gốc (.theme-locked). */
 @mixin dark-dim-accents {
   --brand-500-rgb: 180 150 68;
   --brand-600-rgb: 150 124 54;
 }
 
-/* Bootstrap đọc màu từ các biến --bs-*; nối chúng vào token của app để modal, form, bảng, dropdown đổi theo theme. */
 @mixin bootstrap-bridge {
   --bs-body-bg: var(--bg-white);
   --bs-body-color: var(--text-color);
@@ -432,31 +425,26 @@
   @include theme-tokens;
 }
 
-/* data-theme được gắn lên <html> trước khi vẽ trang (xem app/layout.tsx) */
-:root[data-theme='dark'] {
+@include dark-theme-root {
   color-scheme: dark;
   @include palette-dark-raw;
   @include bootstrap-bridge;
+
+  .theme-locked {
+    color-scheme: light;
+    @include palette-light-raw;
+    @include theme-tokens;
+    @include bootstrap-bridge;
+    @include dark-dim-accents;
+
+    --surface-rgb: 228 226 221;
+    --body-rgb: 228 226 221;
+  }
+
+  img {
+    filter: brightness(0.9);
+  }
 }
-
-/* Vùng vốn đã tối (header, footer, hero) giữ nguyên bảng màu sáng để không bị đảo màu */
-:root[data-theme='dark'] .theme-locked {
-  color-scheme: light;
-  @include palette-light-raw;
-  @include theme-tokens;
-  @include bootstrap-bridge;
-  @include dark-dim-accents;
-
-  /* Nền trắng còn lại trong vùng giữ màu gốc (nút trắng trên banner, khung mockup) đổi sang trắng ngà cho đỡ chói */
-  --surface-rgb: 228 226 221;
-  --body-rgb: 228 226 221;
-}
-
-/* Ảnh chụp, ảnh bìa thường sáng: hạ nhẹ để không chói trên nền tối */
-:root[data-theme='dark'] img {
-  filter: brightness(0.9);
-}
-
 
 .shadow-md {
   box-shadow: var(--shadow-md) !important;
@@ -608,7 +596,6 @@ html *::-webkit-scrollbar-track {
   background-color: transparent;
 }
 
-// Chỉ Firefox: Chrome 121+ sẽ bỏ qua toàn bộ ::-webkit-scrollbar nếu thấy scrollbar-color.
 @supports (-moz-appearance: none) {
   html {
     scrollbar-color: var(--scrollbar-thumb) transparent;
@@ -747,7 +734,6 @@ li {
   }
 }
 
-/* Người dùng đã tắt chuyển động trong hệ điều hành: bỏ hiệu ứng nhấc, trượt, lặp vô hạn. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

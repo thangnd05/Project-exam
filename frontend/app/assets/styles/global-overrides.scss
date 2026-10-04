@@ -1,3 +1,4 @@
+@import './mixins.scss';
 
 .modal-content {
     border: none;
@@ -160,8 +161,7 @@ body * {
   }
 }
 
-/* Recharts vẽ màu trục, lưới, tooltip bằng thuộc tính SVG/inline style viết cứng; CSS ghi đè để đổi theo theme. */
-:root[data-theme='dark'] {
+@include dark-theme-root {
   .recharts-cartesian-grid line {
     stroke: var(--slate-200);
   }
