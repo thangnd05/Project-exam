@@ -138,10 +138,8 @@ export function useTestSession() {
     }));
   }, [userTestId]);
 
-  // Đề xáo theo lượt: lượt làm mà thứ tự câu hiện tại đang khớp.
   const orderedForRef = useRef<string | null>(null);
 
-  /** Đề bật xáo theo lượt: tải lại đề theo id lượt làm để nhận đúng thứ tự câu của lượt đó. */
   const applyAttemptOrder = useCallback(
     async (attemptId: string) => {
       if (orderedForRef.current === attemptId) return;
@@ -310,7 +308,6 @@ export function useTestSession() {
     }
   }, [status, test, sessionKey, isPractice, selectedPartIds, isGuest, guestCfg, holdStart, readyConfirmed, applyAttemptOrder]);
 
-  // Lượt làm khôi phục từ server (không có trong localStorage lúc tải đề): lấy lại đúng thứ tự câu.
   useEffect(() => {
     if (status !== 'active' || !userTestId || !test.shuffleQuestions) return;
     applyAttemptOrder(userTestId).catch((err) =>

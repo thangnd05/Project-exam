@@ -172,7 +172,6 @@ public class TestController {
         return ResponseEntity.ok(response);
     }
 
-    /** Xáo một lần thứ tự câu của đề (lưu vào display_order), câu cùng đoạn văn giữ liền nhau. */
     @PostMapping("/{testId}/shuffle-questions")
     public ResponseEntity<Void> shuffleQuestionOrder(
             @PathVariable String testId,

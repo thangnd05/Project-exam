@@ -212,10 +212,6 @@ public class TestQuestionAssignmentService {
                 .build();
     }
 
-    /**
-     * Xáo một lần thứ tự câu trong từng part của đề rồi lưu lại display_order (mọi người làm đều thấy thứ tự mới).
-     * Câu cùng đoạn văn giữ liền nhau.
-     */
     @Transactional
     public void shuffleTestQuestionOrder(String testId, String currentUserId) {
         Test test = testRepository.findById(testId)

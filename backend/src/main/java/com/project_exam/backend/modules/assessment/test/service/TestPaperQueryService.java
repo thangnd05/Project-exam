@@ -81,10 +81,6 @@ public class TestPaperQueryService {
         return testRepository.findById(id);
     }
 
-    /**
-     * @param attemptId      lượt làm cần thứ tự câu (đề bật xáo theo lượt); bỏ qua nếu không thuộc người gọi
-     * @param guestSessionId phiên guest, dùng để xác minh lượt làm của guest
-     */
     @Transactional
     public TestResponse getTestFullById(String testId, String currentUserId, String attemptId, String guestSessionId) {
         Test test = testRepository.findById(testId).orElseThrow(() -> new NotFoundException("Test not found"));
@@ -190,7 +186,6 @@ public class TestPaperQueryService {
         return getTestFullByIdAdmin(testId, null);
     }
 
-    /** @param orderAttemptId lượt làm để xếp câu đúng thứ tự người làm đã thấy (chỉ áp dụng khi đề bật xáo theo lượt) */
     public TestAdminResponse getTestFullByIdAdmin(String testId, String orderAttemptId) {
         Test test = testRepository.findById(testId)
                 .orElseThrow(() -> new NotFoundException("Test not found"));
@@ -208,10 +203,6 @@ public class TestPaperQueryService {
         return buildAdminTestResponse(test, totalAttempts, partResponses);
     }
 
-    /**
-     * Lượt làm quyết định thứ tự câu: lượt được chỉ định nếu đúng là của người gọi (user hoặc phiên guest),
-     * không thì lượt đang làm dở mới nhất của user. Null -> thứ tự gốc của đề.
-     */
     private String resolveOrderAttemptId(
             String testId, String currentUserId, String attemptId, String guestSessionId, UserTest latest) {
         if (attemptId != null && !attemptId.isBlank()) {
@@ -231,7 +222,6 @@ public class TestPaperQueryService {
         return null;
     }
 
-    /** Câu của part theo thứ tự hiển thị; có lượt làm thì xáo theo lượt đó (đề bật xáo theo lượt). */
     public static List<TestQuestion> orderPartQuestions(
             String testPartId, List<TestQuestion> ordered, Map<String, Question> questionMap, String orderAttemptId) {
         return TestQuestionOrdering.order(

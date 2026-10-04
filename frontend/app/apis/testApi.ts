@@ -72,10 +72,6 @@ export const getAdminTestById = (testId: string): Promise<TestAdminResponse> => 
   return axios.get(`${BASE_URL}/admintest/${testId}`).then((res) => res.data);
 };
 
-/**
- * Đề để làm bài. Đề bật xáo theo lượt: truyền `userTestId` (và `guestSessionId` nếu là guest)
- * để nhận đúng thứ tự câu của lượt làm đó.
- */
 export const getUserTestInfo = (
   testId: string,
   attempt?: { userTestId?: string | null; guestSessionId?: string | null },
@@ -85,7 +81,6 @@ export const getUserTestInfo = (
   return axios.get(`${BASE_URL}/usertest/${testId}`, { params, headers }).then((res) => res.data);
 };
 
-/** Xáo một lần thứ tự câu trong đề (lưu lại, mọi người làm đều thấy thứ tự mới). */
 export const shuffleTestQuestions = (testId: string): Promise<void> => {
   return axios.post(`${BASE_URL}/${testId}/shuffle-questions`).then(() => undefined);
 };

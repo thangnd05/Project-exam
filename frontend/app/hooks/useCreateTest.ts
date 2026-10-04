@@ -62,9 +62,7 @@ export interface TestInfoForm {
   examCategoryId: string;
 
   usageScope: QuestionUsageScope;
-  /** Xáo một lần thứ tự câu ngay khi tạo đề. */
   shuffleOnCreate: boolean;
-  /** Xáo thứ tự câu theo từng lượt làm. */
   shuffleQuestions: boolean;
 }
 

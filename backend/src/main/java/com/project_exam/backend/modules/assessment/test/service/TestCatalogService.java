@@ -138,7 +138,7 @@ public class TestCatalogService {
     public PageResponse<TestResponse> getAdminTestsByExamTypePaged(String examTypeId, int page, int size, String userId) {
         int safePage = Math.max(page, 0);
         int safeSize = size <= 0 ? 12 : Math.min(size, 100);
-        Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(safePage, safeSize);
 
         Set<String> adminIds = adminUserProvider.adminUserIds();
         if (adminIds.isEmpty()) return PageResponse.empty(safePage, safeSize);
@@ -150,10 +150,11 @@ public class TestCatalogService {
         examCategoryRepository.findByCode(QUICK_CHALLENGE_CODE)
                 .map(ExamCategory::getExamCategoryId)
                 .ifPresent(excludedCategoryIds::add);
-        Page<Test> testPage = excludedCategoryIds.isEmpty()
-                ? testRepository.findByExamTypeIdAndClassIdIsNullAndCreatedByIn(examTypeId, adminIds, pageable)
-                : testRepository.findByExamTypeExcludingCategories(
-                        examTypeId, adminIds, excludedCategoryIds, pageable);
+        if (excludedCategoryIds.isEmpty()) {
+            excludedCategoryIds.add("");
+        }
+        Page<Test> testPage = testRepository.findByExamTypeOrderByCollection(
+                examTypeId, adminIds, excludedCategoryIds, pageable);
 
         return summaryAssembler.toTestPageResponse(testPage, userId);
     }

@@ -67,7 +67,6 @@ public class Test {
     @Column(name = "cost_coins")
     private Integer costCoins;
 
-    /** Xáo thứ tự câu theo từng lượt làm. */
     @Column(name = "shuffle_questions", nullable = false)
     private boolean shuffleQuestions;
 

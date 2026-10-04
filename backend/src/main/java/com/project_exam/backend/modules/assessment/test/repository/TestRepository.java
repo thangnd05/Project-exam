@@ -34,9 +34,6 @@ public interface TestRepository extends JpaRepository<Test, String> {
 
     List<Test> findByClassIdIsNullAndCreatedByIn(Collection<String> createdByIds);
 
-    Page<Test> findByExamTypeIdAndClassIdIsNullAndCreatedByIn(
-            String examTypeId, Collection<String> createdByIds, Pageable pageable);
-
     Page<Test> findByClassIdIsNullAndCreatedByInAndCollectionIdIn(
             Collection<String> createdByIds, Collection<String> collectionIds, Pageable pageable);
 
@@ -46,17 +43,32 @@ public interface TestRepository extends JpaRepository<Test, String> {
     List<Test> findByExamTypeIdAndClassIdIsNullAndCreatedByInAndExamCategoryIdIn(
             String examTypeId, Collection<String> createdByIds, Collection<String> examCategoryIds);
 
-    @Query("""
+    @Query(value = """
             SELECT t FROM Test t
+            LEFT JOIN QuestionCollection c ON c.collectionId = t.collectionId
+            LEFT JOIN QuestionCollection pc ON pc.collectionId = c.parentId
+            WHERE t.examTypeId = :examTypeId
+              AND t.classId IS NULL
+              AND t.createdBy IN :createdByIds
+              AND (t.examCategoryId IS NULL OR t.examCategoryId NOT IN :excludedCategoryIds)
+            ORDER BY
+              CASE WHEN c.collectionId IS NULL THEN 1 ELSE 0 END,
+              COALESCE(pc.displayOrder, c.displayOrder, 2147483647),
+              CASE WHEN pc.collectionId IS NULL THEN 0 ELSE COALESCE(c.displayOrder, 2147483647) END,
+              c.name,
+              t.createdAt DESC
+            """,
+            countQuery = """
+            SELECT COUNT(t) FROM Test t
             WHERE t.examTypeId = :examTypeId
               AND t.classId IS NULL
               AND t.createdBy IN :createdByIds
               AND (t.examCategoryId IS NULL OR t.examCategoryId NOT IN :excludedCategoryIds)
             """)
-    Page<Test> findByExamTypeExcludingCategories(@Param("examTypeId") String examTypeId,
-                                                 @Param("createdByIds") Collection<String> createdByIds,
-                                                 @Param("excludedCategoryIds") Collection<String> excludedCategoryIds,
-                                                 Pageable pageable);
+    Page<Test> findByExamTypeOrderByCollection(@Param("examTypeId") String examTypeId,
+                                               @Param("createdByIds") Collection<String> createdByIds,
+                                               @Param("excludedCategoryIds") Collection<String> excludedCategoryIds,
+                                               Pageable pageable);
 
 
     long countByExamCategoryId(String examCategoryId);

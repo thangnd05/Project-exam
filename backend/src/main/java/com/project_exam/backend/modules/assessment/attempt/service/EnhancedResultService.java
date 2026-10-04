@@ -423,7 +423,6 @@ public class EnhancedResultService {
     }
 
     private TestLayout loadTestLayout(String testId) {
-        // Cùng thứ tự part với đề khi làm bài để số câu trong kết quả khớp màn làm bài.
         List<TestPart> parts = testPartRepository.findByTestIdOrderByExamPartDisplayOrder(testId);
         if (parts.isEmpty()) {
             return new TestLayout(List.of(), Map.of());

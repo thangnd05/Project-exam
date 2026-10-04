@@ -123,7 +123,6 @@ export interface TestResponse {
   costCoins?: number;
   owned?: boolean;
   locked?: boolean;
-  /** Xáo thứ tự câu theo từng lượt làm. */
   shuffleQuestions?: boolean;
   parts?: TestPartResponse[];
 }

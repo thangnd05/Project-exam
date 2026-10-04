@@ -16,7 +16,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestQuestionOrderingTest {
 
-    // q3, q4, q5 cùng đoạn văn P; còn lại là câu đơn.
     private static final Map<String, String> PASSAGES = Map.of("q3", "P", "q4", "P", "q5", "P");
 
     private static List<TestQuestion> part(int n) {
