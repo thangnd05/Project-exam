@@ -369,6 +369,7 @@ public class QuestionService {
             String classId,
             String chapterId,
             Question.UsageScope usageScope,
+            String collectionId,
             String currentUserId
     ) throws IOException {
         String resolvedExamPartId = firstNonBlank(examPartId, payload.getExamPartId());
@@ -384,6 +385,12 @@ public class QuestionService {
 
         Question.UsageScope resolvedScope =
                 usageScope != null ? usageScope : normalized.getUsageScope();
+
+        // Bộ đề chọn trên form áp cho câu nào trong file chưa ghi collectionId riêng.
+        if (collectionId != null && !collectionId.isBlank()) {
+            normalized.getQuestions().forEach(q -> applyDefaultCollection(q, collectionId));
+            normalized.getGroups().forEach(g -> g.getQuestions().forEach(q -> applyDefaultCollection(q, collectionId)));
+        }
 
         List<QuestionAdminResponse> responses = new ArrayList<>();
 
@@ -412,6 +419,12 @@ public class QuestionService {
         }
 
         return responses;
+    }
+
+    private static void applyDefaultCollection(NormalQuestionRequest question, String collectionId) {
+        if (question.getCollectionId() == null) {
+            question.setCollectionId(collectionId);
+        }
     }
 
     private String firstNonBlank(String preferred, String fallback) {

@@ -871,3 +871,121 @@
     background: var(--danger-bg, #fdecec);
     color: var(--danger-text, #b42318);
 }
+
+// Cảnh báo tag: dùng chung cho bản xem trước file JSON và khung soạn thảo câu hỏi.
+.tagWarningBadge {
+    display: inline-block;
+    margin: 0 8px;
+    padding: 1px 8px;
+    border-radius: 8px;
+    background: var(--warning-bg, #fff4e5);
+    color: var(--warning-text, #9a5b00);
+    border: 1px solid var(--warning-border, #f5c26b);
+    font-size: 1.1rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.jsonQuestionItem.hasTagIssue {
+    background: var(--warning-bg, #fff4e5);
+}
+
+.tagSummaryBar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    border: 1px solid var(--slate-200);
+    background: var(--slate-50);
+
+    &.hasIssue {
+        border-color: var(--warning-border, #f5c26b);
+        background: var(--warning-bg, #fff4e5);
+    }
+}
+
+.tagSummaryItem {
+    font-weight: 600;
+    font-size: var(--font-size-smd);
+
+    &.ok {
+        color: var(--slate-700);
+    }
+
+    &.warn {
+        color: var(--warning-text, #9a5b00);
+    }
+
+    &.danger {
+        color: var(--danger-text);
+    }
+}
+
+.tagFilterBtn {
+    margin-left: auto;
+    padding: 4px 12px;
+    border-radius: 10px;
+    border: 1px solid var(--slate-300);
+    background: #fff;
+    font-weight: 600;
+    font-size: 1.2rem;
+    cursor: pointer;
+
+    &:hover {
+        background: var(--slate-100);
+    }
+}
+
+.pager {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 8px 0 12px;
+}
+
+.pagerBtn {
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--slate-200);
+    background: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+
+    &:disabled {
+        opacity: 0.4;
+        cursor: default;
+    }
+
+    &:not(:disabled):hover {
+        background: var(--slate-100);
+    }
+}
+
+.pagerInfo {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.2rem;
+    color: var(--slate-600);
+
+    select {
+        padding: 2px 6px;
+        border-radius: 6px;
+        border: 1px solid var(--slate-300);
+    }
+}
+
+.jsonExplainToggle.danger {
+    color: var(--danger-text);
+}
+
+.jsonQuestionEditing {
+    list-style: none;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--slate-200);
+}

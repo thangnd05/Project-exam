@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fromDateTimeLocalInput } from '@/app/utils/format-date-time';
 import { createTest, importTestJson } from '@/app/apis/testApi';
@@ -9,6 +10,7 @@ import {
   createAndAttach,
   bulkCreateQuestions,
   bulkCreateQuestionGroups,
+  importJsonFile,
 } from '@/app/apis/questionApi';
 import { toast } from 'react-toastify';
 import { CREATOR_TYPES } from '@/app/hooks/useCreateTest';
@@ -37,12 +39,14 @@ export interface UseTestSubmissionOptions {
   groups: DraftGroup[];
   documentFile: File | null;
   testJsonFile: File | null;
+  bankJsonFile: File | null;
   examParts: any[];
   examTypeTags: any[];
   setQuestions: (questions: DraftQuestion[]) => void;
   setGroups: (groups: DraftGroup[]) => void;
   setDocumentFile: (file: File | null) => void;
   setTestJsonFile: (file: File | null) => void;
+  setBankJsonFile: (file: File | null) => void;
   setNotification: (notification: CreatorNotification) => void;
   emptyQuestion: DraftQuestion;
   createInitialGroup: () => DraftGroup;
@@ -57,17 +61,23 @@ export const useTestSubmission = ({
     groups,
     documentFile,
     testJsonFile,
+    bankJsonFile,
     examParts,
     examTypeTags,
     setQuestions,
     setGroups,
     setDocumentFile,
     setTestJsonFile,
+    setBankJsonFile,
     setNotification,
     emptyQuestion,
     createInitialGroup,
 }: UseTestSubmissionOptions) => {
     const queryClient = useQueryClient();
+    // File JSON dựng lại từ bản xem trước đã sửa, truyền vào lúc bấm lưu; ưu tiên hơn file gốc.
+    const jsonFileOverride = useRef<File | null>(null);
+    const effectiveTestJsonFile = () => jsonFileOverride.current ?? testJsonFile;
+    const effectiveBankJsonFile = () => jsonFileOverride.current ?? bankJsonFile;
 
     const invalidateQuestionBank = () => {
       queryClient.invalidateQueries({ queryKey: ['question-bank'] });
@@ -220,9 +230,10 @@ export const useTestSubmission = ({
                             : null,
                 } as unknown as CreateTestRequest;
 
-                if (testJsonFile) {
+                const testFile = effectiveTestJsonFile();
+                if (testFile) {
                     // Backend tự chia câu vào các phần thi và gắn tag, tất cả trong một transaction.
-                    await importTestJson(testJsonFile, testPayload, QuestionUsageScope.EXAM);
+                    await importTestJson(testFile, testPayload, QuestionUsageScope.EXAM);
                     return;
                 }
 
@@ -269,6 +280,17 @@ export const useTestSubmission = ({
                         }),
                     );
                 }
+            } else if (creatorType === CREATOR_TYPES.BULK && effectiveBankJsonFile()) {
+                // Gửi thẳng file: không gửi lại cả nghìn câu dưới dạng text trong form.
+                const formData = new FormData();
+                formData.append('file', effectiveBankJsonFile() as File);
+                await importJsonFile(formData, {
+                    examPartId: String(testInfo.examPartId),
+                    classId: mode === 'class' && classId ? String(classId) : undefined,
+                    chapterId: mode === 'class' && chapterId ? String(chapterId) : undefined,
+                    usageScope: testInfo.usageScope,
+                    collectionId: testInfo.collectionId ? String(testInfo.collectionId) : undefined,
+                });
             } else if (creatorType === CREATOR_TYPES.BULK) {
                 const formData = new FormData();
                 const payload = {
@@ -367,6 +389,7 @@ export const useTestSubmission = ({
                     message: 'Đã lưu câu hỏi vào kho!',
                 });
                 setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
+                setBankJsonFile(null);
             } else if (creatorType === CREATOR_TYPES.PASSAGE) {
                 setNotification({ type: 'success', message: 'Đã lưu thành công!' });
                 setGroups([createInitialGroup()]);
@@ -382,8 +405,9 @@ export const useTestSubmission = ({
         },
     });
 
-    const handleSubmit = async (creatorType: CreatorType) => {
-        if (creatorType === CREATOR_TYPES.TEST && testJsonFile) {
+    const handleSubmit = async (creatorType: CreatorType, jsonFile?: File | null) => {
+        jsonFileOverride.current = jsonFile ?? null;
+        if (creatorType === CREATOR_TYPES.TEST && effectiveTestJsonFile()) {
             // Đề từ JSON: phần thi lấy từ file, không kiểm tra câu nhập tay.
             if (!testInfo.title || !testInfo.examTypeId) {
                 toast.warning('Vui lòng nhập tiêu đề và chọn loại kỳ thi!', { autoClose: TOAST_VALIDATION_MS });
@@ -417,6 +441,16 @@ export const useTestSubmission = ({
         } else {
             if (!testInfo.examPartId) {
                 toast.warning('Vui lòng chọn phần thi!', { autoClose: TOAST_VALIDATION_MS });
+                return false;
+            }
+        }
+
+        if (creatorType === CREATOR_TYPES.BULK && effectiveBankJsonFile()) {
+            // File đã được backend kiểm tra ở bước xem trước; câu nhập tay không dùng tới.
+            try {
+                await mutation.mutateAsync(creatorType);
+                return true;
+            } catch {
                 return false;
             }
         }

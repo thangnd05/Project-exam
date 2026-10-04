@@ -44,6 +44,8 @@ type QuestionBlockProps = {
     collapsible?: boolean;
     isCollapsed?: boolean;
     onToggleCollapsed?: (index: number) => void;
+    /** Nhãn cảnh báo cạnh số câu, vd câu chưa có tag. */
+    tagWarning?: string | null;
 };
 
 const QuestionBlock = ({
@@ -65,6 +67,7 @@ const QuestionBlock = ({
     collapsible = false,
     isCollapsed = false,
     onToggleCollapsed,
+    tagWarning,
 }: QuestionBlockProps) => {
     const selectedTagIds = question.tagIds || [];
     const isMsq = question.questionType === 'MSQ';
@@ -83,9 +86,13 @@ const QuestionBlock = ({
                         {isCollapsed ? <ChevronRight size={20} /> : <ChevronDown size={20} />}
                         <h4 className={cx('groupTitle')}>Câu hỏi số {index + 1}</h4>
                         <span className={cx('groupSummaryBadge')}>{getQuestionSummary(question)}</span>
+                        {tagWarning && <span className={cx('tagWarningBadge')}>{tagWarning}</span>}
                     </button>
                 ) : (
-                    <b>Câu hỏi số {index + 1}</b>
+                    <b>
+                        Câu hỏi số {index + 1}
+                        {tagWarning && <span className={cx('tagWarningBadge')}>{tagWarning}</span>}
+                    </b>
                 )}
                 <div className="d-flex align-items-center gap-3">
                     <label className="d-flex align-items-center gap-1 mb-0" style={{ fontSize: '1.3rem', cursor: 'pointer' }} title="Cho phép nhiều đáp án đúng (chấm đúng-hết)">

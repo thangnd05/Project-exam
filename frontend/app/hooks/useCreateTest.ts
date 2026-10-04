@@ -147,6 +147,8 @@ export const useCreateTest = ({
   const [documentFile, setDocumentFile] = useState<File | null>(null);
   // File JSON tạo trọn đề (nhiều phần thi). Có file này thì tab TEST bỏ qua phần thi và câu nhập tay.
   const [testJsonFile, setTestJsonFile] = useState<File | null>(null);
+  // File JSON lưu thẳng vào kho ở tab BULK, không nạp vào khung soạn thảo (nghìn câu làm trang giật).
+  const [bankJsonFile, setBankJsonFile] = useState<File | null>(null);
   const [notification, setNotification] = useState<CreatorNotification>({});
 
   const { examTypes, examParts, questionCollections, availableTags: examTypeTags } = useBaseMetaData(testInfo.examTypeId);
@@ -168,12 +170,14 @@ export const useCreateTest = ({
     groups,
     documentFile,
     testJsonFile,
+    bankJsonFile,
     examParts,
     examTypeTags,
     setQuestions,
     setGroups,
     setDocumentFile,
     setTestJsonFile,
+    setBankJsonFile,
     setNotification,
     emptyQuestion,
     createInitialGroup,
@@ -470,7 +474,7 @@ export const useCreateTest = ({
     setGroups(newGroups);
   };
 
-  const handleSubmit = () => submitLogic(creatorType);
+  const handleSubmit = (jsonFile?: File | null) => submitLogic(creatorType, jsonFile);
 
   return {
     creatorType,
@@ -486,6 +490,8 @@ export const useCreateTest = ({
     setDocumentFile,
     testJsonFile,
     setTestJsonFile,
+    bankJsonFile,
+    setBankJsonFile,
     loading: isSubmitting,
     notification,
     handleExamTypeChange,

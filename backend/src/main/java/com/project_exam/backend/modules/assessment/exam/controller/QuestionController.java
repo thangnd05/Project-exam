@@ -255,11 +255,12 @@ public class QuestionController {
             @RequestParam(required = false) String classId,
             @RequestParam(required = false) String chapterId,
             @RequestParam(required = false) Question.UsageScope usageScope,
+            @RequestParam(required = false) String collectionId,
             HttpServletRequest httpRequest
     ) throws IOException {
         QuestionJsonImportRequest payload = questionJsonImportService.parse(rawJson);
         List<QuestionAdminResponse> responses = questionService.importQuestionsFromJson(
-                payload, examPartId, classId, chapterId, usageScope, authUtils.getUserId(httpRequest));
+                payload, examPartId, classId, chapterId, usageScope, collectionId, authUtils.getUserId(httpRequest));
         return ResponseEntity.status(HttpStatus.CREATED).body(QuestionImportResult.of(responses));
     }
 
@@ -274,11 +275,12 @@ public class QuestionController {
             @RequestParam(required = false) String classId,
             @RequestParam(required = false) String chapterId,
             @RequestParam(required = false) Question.UsageScope usageScope,
+            @RequestParam(required = false) String collectionId,
             HttpServletRequest httpRequest
     ) throws IOException {
         QuestionJsonImportRequest payload = questionJsonImportService.parse(file);
         List<QuestionAdminResponse> responses = questionService.importQuestionsFromJson(
-                payload, examPartId, classId, chapterId, usageScope, authUtils.getUserId(httpRequest));
+                payload, examPartId, classId, chapterId, usageScope, collectionId, authUtils.getUserId(httpRequest));
         return ResponseEntity.status(HttpStatus.CREATED).body(QuestionImportResult.of(responses));
     }
 

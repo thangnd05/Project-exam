@@ -35,6 +35,8 @@ export interface QuestionJsonImportParams {
   classId?: string;
   chapterId?: string;
   usageScope?: QuestionUsageScope;
+  /** Bộ đề áp cho câu trong file chưa ghi collectionId riêng. */
+  collectionId?: string;
 }
 
 export const getQuestionsByPart = (partId: string, params: QuestionBankFilterParams = {}): Promise<QuestionResponse[]> => {

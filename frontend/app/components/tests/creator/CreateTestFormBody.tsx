@@ -1,13 +1,13 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Row, Col, Alert } from 'react-bootstrap';
 import { getClassById } from '@/app/apis/classApi';
 import { getChapterById } from '@/app/apis/chapterApi';
 import { previewDocument, previewJsonFile, previewPassageDocument } from '@/app/apis/questionApi';
 import { previewTestJson } from '@/app/apis/testApi';
-import type { TestJsonImportPreviewResponse } from '@/app/types';
+import type { QuestionJsonImportPreviewResponse, TestJsonImportPreviewResponse } from '@/app/types';
 import {
   IoCalendarOutline,
   IoTimeOutline,
@@ -30,7 +30,11 @@ import QuestionBlock from './QuestionBlock';
 import CreatorTabs from './CreatorTabs';
 import FormFooter from './FormFooter';
 import CreateFromBankBody from './CreateFromBankBody';
-import JsonTestPreview from './JsonTestPreview';
+import JsonQuestionsPreview from './JsonQuestionsPreview';
+import type { EditQuestionHandler } from './JsonQuestionsPreview';
+import { applyQuestionEdit, buildImportFile, countQuestions } from './jsonPreviewEdit';
+import Pager, { PAGE_SIZE, pageCountOf } from './Pager';
+import { TAG_STATUS_LABEL, editorTagStatus } from './tagStatus';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
 import { buildCollectionTree } from '@/app/utils/collectionTree';
@@ -90,6 +94,8 @@ const CreateTestFormBody = ({
     setDocumentFile,
     testJsonFile,
     setTestJsonFile,
+    bankJsonFile,
+    setBankJsonFile,
     loading,
     notification,
     handleExamTypeChange,
@@ -133,6 +139,13 @@ const CreateTestFormBody = ({
     useState<(TestJsonImportPreviewResponse & { fileName: string }) | null>(null);
   const [testJsonChecking, setTestJsonChecking] = useState(false);
   const isTestJsonMode = activeCreatorType === CREATOR_TYPES.TEST && !!testJsonFile;
+  const [bankJsonPreview, setBankJsonPreview] =
+    useState<(QuestionJsonImportPreviewResponse & { fileName: string }) | null>(null);
+  const [bankJsonChecking, setBankJsonChecking] = useState(false);
+  const isBankJsonMode = activeCreatorType === CREATOR_TYPES.BULK && !!bankJsonPreview;
+  // Khung soạn thảo: phân trang và lọc câu thiếu tag.
+  const [editorPage, setEditorPage] = useState(0);
+  const [editorIssuesOnly, setEditorIssuesOnly] = useState(false);
   const examCategories = useExamCategories();
 
   useEffect(() => {
@@ -170,6 +183,26 @@ const CreateTestFormBody = ({
     });
   }, [questions.length]);
 
+  // Câu đã có nội dung mà chưa có tag (hoặc tag nạp từ file không khớp); câu trống chưa tính.
+  const editorTagIssues = useMemo(
+    () => questions
+      .map((q, i) => (q.questionText?.trim() && editorTagStatus(q) !== 'ok' ? i : -1))
+      .filter((i) => i >= 0),
+    [questions],
+  );
+  const editorTagWarning = (index: number) => {
+    const q = questions[index];
+    if (!q?.questionText?.trim()) return null;
+    const status = editorTagStatus(q);
+    return status === 'ok' ? null : TAG_STATUS_LABEL[status];
+  };
+  const editorIndexes = editorIssuesOnly && editorTagIssues.length > 0
+    ? editorTagIssues
+    : questions.map((_, i) => i);
+  const editorPageCount = pageCountOf(editorIndexes.length);
+  const editorPageSafe = Math.min(editorPage, editorPageCount - 1);
+  const editorPageIndexes = editorIndexes.slice(editorPageSafe * PAGE_SIZE, (editorPageSafe + 1) * PAGE_SIZE);
+
   const toggleQuestionCollapsed = (qIndex: number) => {
     setCollapsedQuestions((prev) => {
       const next = new Set(prev);
@@ -196,8 +229,55 @@ const CreateTestFormBody = ({
     return parts.join(' · ');
   };
 
+  /**
+   * Câu nạp từ JSON được sửa trực tiếp trên bản xem trước; lúc lưu mới dựng lại file từ dữ liệu
+   * đang xem (dựng mỗi lần gõ phím thì nghìn câu sẽ giật).
+   */
+  const buildEditedJsonFile = (): File | null => {
+    if (activeCreatorType === CREATOR_TYPES.TEST && testJsonFile && testJsonPreview?.valid) {
+      return buildImportFile(testJsonPreview.fileName, testJsonPreview.parts.map((p) => ({
+        questions: p.questions,
+        groups: p.groups,
+        examPartId: p.examPartId,
+      })));
+    }
+    if (activeCreatorType === CREATOR_TYPES.BULK && bankJsonFile && bankJsonPreview?.valid) {
+      return buildImportFile(bankJsonPreview.fileName, [{
+        questions: bankJsonPreview.questions || [],
+        groups: bankJsonPreview.groups || [],
+      }]);
+    }
+    return null;
+  };
+
+  /** Kiểm tra nhanh câu đã sửa trong bản xem trước trước khi gửi: trống nội dung hoặc chưa có đáp án đúng. */
+  const findInvalidJsonQuestions = (): number[] => {
+    const all = activeCreatorType === CREATOR_TYPES.TEST && testJsonPreview
+      ? testJsonPreview.parts.flatMap((p) => [...p.questions, ...p.groups.flatMap((g) => g.questions || [])])
+      : activeCreatorType === CREATOR_TYPES.BULK && bankJsonPreview
+        ? [...(bankJsonPreview.questions || []), ...(bankJsonPreview.groups || []).flatMap((g) => g.questions || [])]
+        : [];
+    return all
+      .map((q, i) => {
+        const correct = (q.answers || []).filter((a) => a.isCorrect).length;
+        const bad = !q.questionText?.trim() || correct === 0 || (q.questionType === 'MCQ' && correct > 1);
+        return bad ? i + 1 : 0;
+      })
+      .filter((n) => n > 0);
+  };
+
   const handleFormSubmit = async () => {
-    const success = await handleSubmit();
+    const editedFile = buildEditedJsonFile();
+    if (editedFile) {
+      const invalid = findInvalidJsonQuestions();
+      if (invalid.length > 0) {
+        toast.warning(
+          `Câu chưa có nội dung hoặc chưa chọn đúng đáp án đúng: ${invalid.slice(0, 15).join(', ')}${invalid.length > 15 ? ' ...' : ''}`,
+        );
+        return;
+      }
+    }
+    const success = await handleSubmit(editedFile);
     if (success) {
       toast.success(
         activeCreatorType === CREATOR_TYPES.TEST
@@ -376,6 +456,74 @@ const CreateTestFormBody = ({
     setTestJsonFile(null);
     setTestJsonPreview(null);
   };
+
+  /**
+   * Tab kho: file JSON không nạp vào khung soạn thảo (nghìn câu làm trang giật) mà xem trước
+   * chỉ đọc, lúc lưu gửi thẳng file lên /import/json.
+   */
+  const handleBankJsonFile = async (fileInput: File) => {
+    if (!testInfo.examPartId) {
+      toast.warning('Chọn phần thi trước khi upload file JSON.');
+      return;
+    }
+    setBankJsonChecking(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', fileInput);
+      const data = await previewJsonFile(formData);
+      setBankJsonPreview({ ...data, fileName: fileInput.name });
+      setBankJsonFile(data.valid ? fileInput : null);
+      if (data.valid) {
+        toast.success(`File hợp lệ: ${data.questionCount} câu.`);
+      }
+    } catch (error: any) {
+      setBankJsonFile(null);
+      setBankJsonPreview(null);
+      const message =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        'Không thể đọc file JSON.';
+      toast.error(message, { autoClose: 20000 });
+    } finally {
+      setBankJsonChecking(false);
+    }
+  };
+
+  const clearBankJson = () => {
+    setBankJsonFile(null);
+    setBankJsonPreview(null);
+  };
+
+  // Sửa/xoá câu trong bản xem trước: cập nhật dữ liệu đang xem và dựng lại file sẽ gửi đi.
+  const editBankQuestion: EditQuestionHandler = (_partKey, loc, question) => {
+    if (!bankJsonPreview) return;
+    const next = applyQuestionEdit(
+      { questions: bankJsonPreview.questions || [], groups: bankJsonPreview.groups || [] }, loc, question);
+    const total = countQuestions(next);
+    setBankJsonPreview({ ...bankJsonPreview, ...next, questionCount: total, groupCount: next.groups.length });
+    if (total === 0) setBankJsonFile(null);
+  };
+
+  const editTestQuestion: EditQuestionHandler = (partKey, loc, question) => {
+    if (!testJsonPreview) return;
+    const parts = testJsonPreview.parts
+      .map((p) => {
+        if (p.examPartId !== partKey) return p;
+        const next = applyQuestionEdit({ questions: p.questions, groups: p.groups }, loc, question);
+        return { ...p, ...next, questionCount: countQuestions(next), groupCount: next.groups.length };
+      })
+      .filter((p) => p.questionCount > 0);
+    const total = parts.reduce((n, p) => n + p.questionCount, 0);
+    setTestJsonPreview({ ...testJsonPreview, parts, questionCount: total });
+    if (total === 0) setTestJsonFile(null);
+  };
+
+  // Lưu thành công thì hook xoá file; bỏ luôn bản xem trước (giữ lại bảng lỗi của file hỏng).
+  useEffect(() => {
+    if (!bankJsonFile) {
+      setBankJsonPreview((prev) => (prev?.valid ? null : prev));
+    }
+  }, [bankJsonFile]);
 
   // Tạo đề thành công thì hook xoá file; bỏ luôn bảng tóm tắt (giữ lại bảng lỗi của file hỏng).
   useEffect(() => {
@@ -756,7 +904,7 @@ const CreateTestFormBody = ({
                     </Col>
                   </>
                 )}
-                {!isTestJsonMode && (
+                {!isTestJsonMode && !isBankJsonMode && (
                 <Col md={12}>
                   <div className={cx('formGroupModern')}>
                     <label>
@@ -811,13 +959,21 @@ const CreateTestFormBody = ({
                         type="file"
                         accept=".json,application/json"
                         className={cx('inputModern')}
-                        onChange={(e) => handleJsonFileChange(e, 'questions')}
+                        disabled={!testInfo.examPartId || bankJsonChecking}
+                        onChange={(e) => {
+                          const selectedFile = e.target.files?.[0] || null;
+                          e.target.value = '';
+                          if (selectedFile) handleBankJsonFile(selectedFile);
+                        }}
                       />
                       <small className="text-muted d-block mt-2">
-                        Nạp các câu trong <code>questions</code> của file JSON. Sai định dạng sẽ được
-                        báo chính xác vị trí thay vì đọc sai âm thầm. Xem file mẫu tại{' '}
-                        <code>docs/question-import-sample.json</code>.
+                        {testInfo.examPartId
+                          ? <>Xem trước câu hỏi và tag rồi lưu thẳng cả file vào kho (không giới hạn số câu).
+                            Sai định dạng sẽ được báo chính xác vị trí. Định dạng file:{' '}
+                            <code>docs/question-import-json.md</code>.</>
+                          : 'Chọn phần thi trước để upload file JSON.'}
                       </small>
+                      {bankJsonChecking && <small className="d-block mt-2">Đang kiểm tra file...</small>}
                     </div>
                   </Col>
                 )}
@@ -832,11 +988,50 @@ const CreateTestFormBody = ({
           <div className={cx('sectionTitle')}>
             2. Đề từ file JSON: {testJsonPreview.fileName}
           </div>
-          <JsonTestPreview preview={testJsonPreview} onClear={clearTestJson} availableTags={availableTags} />
+          <JsonQuestionsPreview
+            valid={testJsonPreview.valid}
+            errors={testJsonPreview.errors}
+            warnings={testJsonPreview.warnings}
+            parts={testJsonPreview.parts.map((p) => ({
+              key: p.examPartId,
+              name: p.examPartName,
+              questions: p.questions,
+              groups: p.groups,
+            }))}
+            availableTags={availableTags}
+            summary={<><strong>{testJsonPreview.questionCount}</strong> câu, chia vào <strong>{testJsonPreview.parts.length}</strong> phần thi. Đề chỉ lấy câu từ file này.</>}
+            onClear={clearTestJson}
+            clearLabel="Bỏ file JSON, nhập tay"
+            onEditQuestion={editTestQuestion}
+          />
         </>
       )}
 
-      {(activeCreatorType === CREATOR_TYPES.BULK || (activeCreatorType === CREATOR_TYPES.TEST && !testJsonPreview)) && (
+      {isBankJsonMode && bankJsonPreview && (
+        <>
+          <div className={cx('sectionTitle')}>
+            2. Câu hỏi từ file JSON: {bankJsonPreview.fileName}
+          </div>
+          <JsonQuestionsPreview
+            valid={bankJsonPreview.valid}
+            errors={bankJsonPreview.errors}
+            warnings={bankJsonPreview.warnings}
+            parts={[{
+              key: testInfo.examPartId,
+              name: examParts.find((p: any) => p.examPartId === testInfo.examPartId)?.name || 'Phần thi đã chọn',
+              questions: bankJsonPreview.questions || [],
+              groups: bankJsonPreview.groups || [],
+            }]}
+            availableTags={availableTags}
+            summary={<><strong>{bankJsonPreview.questionCount}</strong> câu sẽ được lưu vào kho của phần thi đã chọn.</>}
+            onClear={clearBankJson}
+            clearLabel="Bỏ file JSON, nhập tay"
+            onEditQuestion={editBankQuestion}
+          />
+        </>
+      )}
+
+      {((activeCreatorType === CREATOR_TYPES.BULK && !isBankJsonMode) || (activeCreatorType === CREATOR_TYPES.TEST && !testJsonPreview)) && (
         <>
           <div className={cx('sectionTitle')}>
             2. Danh sách câu hỏi ({questions.length})
@@ -847,11 +1042,32 @@ const CreateTestFormBody = ({
               thì tạo bấy nhiêu part.
             </small>
           )}
-          {questions.map((q, i) => (
+          {editorTagIssues.length > 0 && (
+            <div className={cx('tagSummaryBar', 'hasIssue')}>
+              <span className={cx('tagSummaryItem', 'warn')}>
+                ⚠ {editorTagIssues.length} câu chưa có tag hoặc tag không khớp:{' '}
+                {editorTagIssues.slice(0, 15).map((i) => `Câu ${i + 1}`).join(', ')}
+                {editorTagIssues.length > 15 ? ` và ${editorTagIssues.length - 15} câu khác` : ''}
+              </span>
+              <button
+                type="button"
+                className={cx('tagFilterBtn')}
+                onClick={() => {
+                  setEditorIssuesOnly((v) => !v);
+                  setEditorPage(0);
+                }}
+              >
+                {editorIssuesOnly ? 'Hiện tất cả câu' : 'Chỉ hiện các câu này'}
+              </button>
+            </div>
+          )}
+          <Pager page={editorPageSafe} pageCount={editorPageCount} onChange={setEditorPage} />
+          {editorPageIndexes.map((i) => (
             <QuestionBlock
               key={i}
-              question={q}
+              question={questions[i]}
               index={i}
+              tagWarning={editorTagWarning(i)}
               radioGroupPrefix="single-question"
               removeQuestionFn={removeQuestion}
               updateQuestionTextFn={updateQuestionText}
@@ -869,6 +1085,7 @@ const CreateTestFormBody = ({
               onToggleCollapsed={toggleQuestionCollapsed}
             />
           ))}
+          <Pager page={editorPageSafe} pageCount={editorPageCount} onChange={setEditorPage} />
         </>
       )}
 
@@ -1080,9 +1297,15 @@ const CreateTestFormBody = ({
       {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (
         <FormFooter
           loading={loading}
-          onAddQuestion={addQuestion}
+          onAddQuestion={() => {
+            addQuestion();
+            // Câu mới nằm cuối danh sách: chuyển tới trang cuối để thấy ngay.
+            setEditorIssuesOnly(false);
+            setEditorPage(pageCountOf(questions.length + 1) - 1);
+          }}
           onCancel={onCancel}
           onSubmit={handleFormSubmit}
+          showAddBtn={!isTestJsonMode && !isBankJsonMode && !testJsonPreview}
         />
       )}
 
