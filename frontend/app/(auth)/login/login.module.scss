@@ -2,10 +2,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 85vh;
   width: 100%;
   font-family: var(--font-family);
-  padding: 20px;
+  padding: 0 20px;
 }
 
 .mainCard {
@@ -177,6 +176,30 @@
     color: var(--white);
     opacity: 0.9;
   }
+}
+
+.panelBrand {
+  position: absolute;
+  top: 28px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--white);
+
+  &:hover {
+    color: var(--white);
+    opacity: 0.85;
+  }
+}
+
+.overlayLeft .panelBrand {
+  left: 32px;
+}
+
+.overlayRight .panelBrand {
+  right: 32px;
 }
 
 .overlayLeft {
@@ -451,8 +474,7 @@
     width: 100%;
     height: auto;
     min-height: auto;
-    border-radius: 0;
-    box-shadow: none;
+    max-width: 100%;
   }
 
   .overlayContainer {

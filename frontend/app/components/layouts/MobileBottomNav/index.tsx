@@ -50,8 +50,8 @@ function MobileBottomNav() {
   // const [showJoinModal, setShowJoinModal] = useState(false);
   // const [showCreateClassModal, setShowCreateClassModal] = useState(false);
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
-  const {longestStreak, streakReady} = useStreak();
-  const showStats = streakReady && longestStreak > 0;
+  const {streakReady} = useStreak();
+  const showStats = streakReady;
 
   const hidden = isHiddenRoute(pathname);
   const sheetOpen = activeSheet !== null;

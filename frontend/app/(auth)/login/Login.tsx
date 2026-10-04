@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { getApiBaseUrl } from '@/app/utils/mediaUrl';
@@ -21,7 +22,7 @@ import style from './login.module.scss';
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import { name } from '@/app/assets/images';
+import { imageAssets, name } from '@/app/assets/images';
 import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/components/Recaptcha/RecaptchaCheckbox';
 
 const cx = classNames.bind(style);
@@ -347,6 +348,10 @@ function Login() {
         <div className={cx('overlayContainer')}>
           <div className={cx('overlay')}>
             <div className={cx('overlayPanel', 'overlayLeft')}>
+              <Link href={routes.home} className={cx('panelBrand')} aria-label={`Về trang chủ ${name}`}>
+                <Image src={imageAssets.logoW} alt="" width={40} height={26} />
+                <span>{name}</span>
+              </Link>
               <h2>Chào mừng trở lại!</h2>
               <p>Để giữ kết nối với chúng tôi vui lòng đăng nhập bằng thông tin cá nhân của bạn</p>
               <button className={cx('ghost-btn')} id="signIn" onClick={() => { setIsSignUp(false); setMessage(''); }}>
@@ -354,6 +359,10 @@ function Login() {
               </button>
             </div>
             <div className={cx('overlayPanel', 'overlayRight')}>
+              <Link href={routes.home} className={cx('panelBrand')} aria-label={`Về trang chủ ${name}`}>
+                <Image src={imageAssets.logoW} alt="" width={40} height={26} />
+                <span>{name}</span>
+              </Link>
               <h2>Chào bạn!</h2>
               <p>Bắt đầu hành trình chinh phục cùng cộng đồng {name} ngay nào.</p>
               <button className={cx('ghost-btn')} id="signUp" onClick={() => { setIsSignUp(true); setMessage(''); }}>

@@ -75,9 +75,8 @@ function Header() {
   //   setShowClassMenu(nextShow);
   // };
 
-  // Chưa làm xong bài/ải nào thì chưa hiện chuỗi và xu, để người mới tập trung vào bài đầu tiên.
-  const {longestStreak, streakReady} = useStreak();
-  const showStats = Boolean(user) && streakReady && longestStreak > 0;
+  const {streakReady} = useStreak();
+  const showStats = Boolean(user) && streakReady;
 
   const statsWithHint = showStats && (
     <FirstTimeHint

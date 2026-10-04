@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Container } from 'react-bootstrap';
 import { FaFacebookF, FaInstagram, FaYoutube } from 'react-icons/fa';
 
-import { imageAssets } from '@/app/assets/images';
+import { imageAssets, name } from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
 
 import styles from './footer.module.scss';
@@ -83,7 +83,7 @@ function Footer() {
 
       <Container className={styles.container}>
         <div className={styles.bottom}>
-          <span className={styles.copyright}>© WinDe 2026. All rights reserved.</span>
+          <span className={styles.copyright}>© {name} Exam.. All rights reserved.</span>
         </div>
       </Container>
     </footer>
