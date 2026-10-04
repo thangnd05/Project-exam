@@ -8,6 +8,10 @@ const API_ORIGIN = (process.env.API_ORIGIN ?? '').replace(/\/$/, '');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  experimental: {
+    // Rewrite /api tới backend mặc định cắt sau ~30 giây; import vài nghìn câu hỏi có thể lâu hơn.
+    proxyTimeout: 300_000,
+  },
   allowedDevOrigins: ['127.0.0.1', 'localhost', '10.255.255.254', '*.local-origin.dev'],
   images: {
     remotePatterns: [

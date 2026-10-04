@@ -184,9 +184,99 @@ public class TagService {
         if (specs == null || specs.isEmpty() || examTypeId == null) {
             return new TagNameResolution(List.of(), List.of(), List.of());
         }
-        Map<String, String> partNames = partNamesOf(examTypeId);
+        return resolveAgainst(specs, tagRepository.findByExamTypeId(examTypeId), partNamesOf(examTypeId), examPartId);
+    }
+
+    /**
+     * Bộ tra tag cho cả một lượt import: tải tag và tên phần thi của kỳ thi đúng một lần, thay vì
+     * mỗi câu một lần. Mỗi truy vấn giữa chừng transaction còn bắt Hibernate flush và dò toàn bộ
+     * entity đang giữ, nên import nghìn câu mà tra lại từng câu sẽ chậm theo bình phương.
+     */
+    public ImportTagResolver importTagResolver(String examTypeId) {
+        if (examTypeId == null) {
+            return new ImportTagResolver(List.of(), Map.of());
+        }
+        return new ImportTagResolver(tagRepository.findByExamTypeId(examTypeId), partNamesOf(examTypeId));
+    }
+
+    public final class ImportTagResolver {
+        private final List<Tag> tags;
+        private final Map<String, String> partNames;
+        private final Map<String, Tag> byId = new HashMap<>();
+
+        private ImportTagResolver(List<Tag> tags, Map<String, String> partNames) {
+            this.tags = tags;
+            this.partNames = partNames;
+            tags.forEach(t -> byId.put(t.getTagId(), t));
+        }
+
+        /** Tag hợp lệ cho một câu thuộc {@code examPartId}; tag của phần thi khác bị bỏ, như filterTagIdsForExamPart. */
+        public List<Tag> resolve(String examPartId, Collection<String> tagIds, Collection<String> tagNames) {
+            List<String> ids = new ArrayList<>();
+            if (tagIds != null) {
+                tagIds.stream().filter(Objects::nonNull).forEach(ids::add);
+            }
+            if (examPartId != null && tagNames != null && !tagNames.isEmpty()) {
+                TagNameResolution resolution = resolveAgainst(tagNames, tags, partNames, examPartId);
+                if (!resolution.unmatched().isEmpty()) {
+                    log.warn("Import tags: bỏ qua {} spec không khớp tag có sẵn (examPart={}): {}",
+                            resolution.unmatched().size(), examPartId, resolution.unmatched());
+                }
+                if (!resolution.ambiguous().isEmpty()) {
+                    log.warn("Import tags: bỏ qua {} tag trùng tên (examPart={}): {}",
+                            resolution.ambiguous().size(), examPartId, resolution.ambiguous());
+                }
+                ids.addAll(resolution.ids());
+            }
+            if (ids.isEmpty()) {
+                return List.of();
+            }
+            // tagIds khai báo trực tiếp có thể thuộc kỳ thi khác (tag dùng chung): tra bổ sung một lần.
+            List<String> unknown = ids.stream().filter(id -> !byId.containsKey(id)).distinct().toList();
+            if (!unknown.isEmpty()) {
+                tagRepository.findAllById(unknown).forEach(t -> byId.put(t.getTagId(), t));
+            }
+
+            List<Tag> kept = new ArrayList<>();
+            List<String> dropped = new ArrayList<>();
+            for (String id : new LinkedHashSet<>(ids)) {
+                Tag t = byId.get(id);
+                if (t == null) continue;
+                if (isAllowedForPart(t, examPartId)) kept.add(t);
+                else dropped.add(t.getName());
+            }
+            if (!dropped.isEmpty()) {
+                log.warn("Import tags: bỏ qua {} tag không thuộc phần thi {}: {}", dropped.size(), examPartId, dropped);
+            }
+            return kept;
+        }
+    }
+
+    /**
+     * Gắn tag cho câu hỏi vừa tạo. Khác syncQuestionTags: không xoá tag cũ và không đọc lại câu
+     * hay tag, vì câu mới chưa có tag và tag đã được {@link ImportTagResolver} kiểm tra phần thi.
+     */
+    public List<TagResponse> attachTagsToNewQuestion(String questionId, List<Tag> tags) {
+        if (tags.isEmpty()) {
+            return List.of();
+        }
+        List<QuestionTag> links = tags.stream().map(tag -> {
+            QuestionTag qt = new QuestionTag();
+            qt.setQuestionId(questionId);
+            qt.setTagId(tag.getTagId());
+            return qt;
+        }).toList();
+        questionTagRepository.saveAll(links);
+        return tags.stream().map(tagMapper::toResponse).collect(Collectors.toList());
+    }
+
+    private TagNameResolution resolveAgainst(
+            Collection<String> specs, List<Tag> allTags, Map<String, String> partNames, String examPartId) {
+        if (specs == null || specs.isEmpty()) {
+            return new TagNameResolution(List.of(), List.of(), List.of());
+        }
         Map<String, List<Tag>> byName = new HashMap<>();
-        for (Tag t : tagRepository.findByExamTypeId(examTypeId)) {
+        for (Tag t : allTags) {
             if (t.getName() != null && isAllowedForPart(t, examPartId)) {
                 byName.computeIfAbsent(t.getName().trim().toLowerCase(Locale.ROOT),
                         k -> new ArrayList<>()).add(t);

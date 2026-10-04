@@ -10,6 +10,7 @@ import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionAdminResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionCreateRequest;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionJsonImportPreviewResponse;
+import com.project_exam.backend.modules.assessment.exam.dto.QuestionImportResult;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionJsonImportRequest;
 import com.project_exam.backend.modules.assessment.test.dto.QuestionResponse;
 import com.project_exam.backend.modules.assessment.exam.service.QuestionJsonImportService;
@@ -115,7 +116,7 @@ public class QuestionController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<List<QuestionAdminResponse>> createBulkQuestionsToBankNoPassage(
+    public ResponseEntity<QuestionImportResult> createBulkQuestionsToBankNoPassage(
             @RequestPart("request") String requestJson,
             HttpServletRequest httpRequest
     ) throws IOException {
@@ -129,7 +130,7 @@ public class QuestionController {
                         userId,
                         multipartRequest.getFileMap()
                 );
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+        return ResponseEntity.status(HttpStatus.CREATED).body(QuestionImportResult.of(responses));
     }
 
     @PostMapping(value = "/bulk-with-passage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -248,7 +249,7 @@ public class QuestionController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<List<QuestionAdminResponse>> importQuestionsFromJsonBody(
+    public ResponseEntity<QuestionImportResult> importQuestionsFromJsonBody(
             @RequestBody String rawJson,
             @RequestParam(required = false) String examPartId,
             @RequestParam(required = false) String classId,
@@ -259,7 +260,7 @@ public class QuestionController {
         QuestionJsonImportRequest payload = questionJsonImportService.parse(rawJson);
         List<QuestionAdminResponse> responses = questionService.importQuestionsFromJson(
                 payload, examPartId, classId, chapterId, usageScope, authUtils.getUserId(httpRequest));
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+        return ResponseEntity.status(HttpStatus.CREATED).body(QuestionImportResult.of(responses));
     }
 
     @PostMapping(
@@ -267,7 +268,7 @@ public class QuestionController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<List<QuestionAdminResponse>> importQuestionsFromJsonFile(
+    public ResponseEntity<QuestionImportResult> importQuestionsFromJsonFile(
             @RequestPart("file") MultipartFile file,
             @RequestParam(required = false) String examPartId,
             @RequestParam(required = false) String classId,
@@ -278,7 +279,7 @@ public class QuestionController {
         QuestionJsonImportRequest payload = questionJsonImportService.parse(file);
         List<QuestionAdminResponse> responses = questionService.importQuestionsFromJson(
                 payload, examPartId, classId, chapterId, usageScope, authUtils.getUserId(httpRequest));
-        return ResponseEntity.status(HttpStatus.CREATED).body(responses);
+        return ResponseEntity.status(HttpStatus.CREATED).body(QuestionImportResult.of(responses));
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -318,7 +319,7 @@ public class QuestionController {
             value = "/bulk-groups",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public ResponseEntity<List<QuestionAdminResponse>> createBulkGroups(
+    public ResponseEntity<QuestionImportResult> createBulkGroups(
             @RequestPart("request") String requestJson,
             HttpServletRequest httpRequest
     ) throws IOException {
@@ -333,7 +334,7 @@ public class QuestionController {
         List<QuestionAdminResponse> result =
                 questionService.createBulkGroups(request, authUtils.getUserId(httpRequest), files);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        return ResponseEntity.status(HttpStatus.CREATED).body(QuestionImportResult.of(result));
     }
 
 }

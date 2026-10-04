@@ -140,6 +140,12 @@ export interface QuestionJsonImportRequest {
   groups?: PassageQuestionGroupRequest[];
 }
 
+/** Kết quả tạo câu hỏi số lượng lớn: chỉ số câu và id, không trả lại nội dung câu. */
+export interface QuestionImportResult {
+  createdCount: number;
+  questionIds: string[];
+}
+
 export interface QuestionJsonImportPreviewResponse {
   valid: boolean;
   questionCount: number;

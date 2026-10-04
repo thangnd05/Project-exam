@@ -10,7 +10,7 @@ File mẫu: [question-import-sample.json](question-import-sample.json) (đầy �
 | Method | Path | Mô tả |
 | --- | --- | --- |
 | POST | `/api/questions/preview/json` | Dry-run: kiểm tra và trả về dữ liệu đã chuẩn hoá, **không ghi database** |
-| POST | `/api/questions/import/json` | Tạo câu hỏi vào ngân hàng đề |
+| POST | `/api/questions/import/json` | Tạo câu hỏi vào ngân hàng đề, trả về `{ createdCount, questionIds }` |
 
 Cả hai nhận 2 kiểu body:
 

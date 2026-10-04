@@ -10,6 +10,7 @@ import type {
   PageResponse,
   PassageQuestionGroupRequest,
   QuestionAdminResponse,
+  QuestionImportResult,
   QuestionCreateRequest,
   QuestionJsonImportPreviewResponse,
   QuestionJsonImportRequest,
@@ -82,14 +83,14 @@ export const previewJsonFile = (formData: FormData): Promise<QuestionJsonImportP
 export const importJson = (
   payload: QuestionJsonImportRequest | string,
   params: QuestionJsonImportParams,
-): Promise<QuestionAdminResponse[]> => {
+): Promise<QuestionImportResult> => {
   return axios.post(`${BASE_URL}/import/json`, payload, { ...JSON_BODY, params }).then((res) => res.data);
 };
 
 export const importJsonFile = (
   formData: FormData,
   params: QuestionJsonImportParams,
-): Promise<QuestionAdminResponse[]> => {
+): Promise<QuestionImportResult> => {
   return axios.post(`${BASE_URL}/import/json`, formData, { ...MULTIPART, params }).then((res) => res.data);
 };
 
@@ -101,11 +102,11 @@ export const createAndAttach = (formData: FormData): Promise<QuestionAdminRespon
   return axios.post(`${BASE_URL}/create-and-attach`, formData, MULTIPART).then((res) => res.data);
 };
 
-export const bulkCreateQuestions = (formData: FormData): Promise<QuestionAdminResponse[]> => {
+export const bulkCreateQuestions = (formData: FormData): Promise<QuestionImportResult> => {
   return axios.post(`${BASE_URL}/bulk`, formData, MULTIPART).then((res) => res.data);
 };
 
-export const bulkCreateQuestionGroups = (formData: FormData): Promise<QuestionAdminResponse[]> => {
+export const bulkCreateQuestionGroups = (formData: FormData): Promise<QuestionImportResult> => {
   return axios.post(`${BASE_URL}/bulk-groups`, formData, MULTIPART).then((res) => res.data);
 };
 
