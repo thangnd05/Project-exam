@@ -139,7 +139,7 @@ export const useCreateTest = ({
     collectionId: '',
     costCoins: '',
     examCategoryId: '',
-    usageScope: QuestionUsageScope.EXAM,
+    usageScope: QuestionUsageScope.PRACTICE,
   });
 
   const [questions, setQuestions] = useState<DraftQuestion[]>([cloneEmptyQuestion()]);

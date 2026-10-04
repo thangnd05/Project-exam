@@ -7,7 +7,7 @@ import {
   deleteQuestion,
   searchAdminQuestions,
 } from '@/app/apis/questionApi';
-import { getStandardExamTypes } from '@/app/apis/examTypeApi';
+import { getExamTypes } from '@/app/apis/examTypeApi';
 import { getExamPartsByExamType } from '@/app/apis/examPartApi';
 import { getTagsFlatByExamType } from '@/app/apis/tagApi';
 import type {
@@ -69,7 +69,7 @@ export function useAdminQuestionList(params: AdminQuestionSearchParams) {
 export function useQuestionFilterOptions(examTypeId: string) {
   const examTypesQuery = useQuery({
     queryKey: adminQuestionKeys.examTypes,
-    queryFn: getStandardExamTypes,
+    queryFn: getExamTypes,
     select: normalizeArray,
   });
 
