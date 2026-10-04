@@ -26,6 +26,37 @@
   flex-direction: column;
 }
 
+.page.embedded {
+  padding: 0;
+}
+
+.card.embedded {
+  max-width: 420px;
+  padding: 0;
+  background-color: transparent;
+  box-shadow: none;
+  animation: embeddedIn 0.35s ease;
+}
+
+@keyframes embeddedIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.back-button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
 .badge {
   width: 56px;
   height: 56px;

@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import classNames from 'classnames/bind';
-import {FiMail} from 'react-icons/fi';
-import {MdMarkEmailRead} from 'react-icons/md';
 import routes from '@/app/configs/Routes';
 import {useForgotPasswordMutation} from '@/app/hooks/useAuthActions';
 import style from '../_components/auth/AuthRecovery.module.scss';
@@ -18,7 +16,12 @@ function isEmailValid(value: string) {
   return EMAIL_PATTERN.test(value.trim());
 }
 
-function ForgotPassword() {
+type ForgotPasswordProps = {
+  embedded?: boolean;
+  onBack?: () => void;
+};
+
+function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
   const [email, setEmail] = useState('');
   const [formError, setFormError] = useState('');
   const [sentTo, setSentTo] = useState('');
@@ -85,6 +88,16 @@ function ForgotPassword() {
     await sendRequest(email.trim());
   };
 
+  const backToLogin = onBack ? (
+    <button type="button" className={cx('back-link', 'back-button')} onClick={onBack}>
+      Quay lại đăng nhập
+    </button>
+  ) : (
+    <Link href={routes.login} className={cx('back-link')}>
+      Quay lại đăng nhập
+    </Link>
+  );
+
   const handleResend = async () => {
     if (cooldown > 0 || isSubmitting) return;
     await sendRequest(sentTo);
@@ -92,11 +105,8 @@ function ForgotPassword() {
 
   if (sentTo) {
     return (
-      <div className={cx('page')}>
-        <div className={cx('card')}>
-          <div className={cx('badge', 'success')}>
-            <MdMarkEmailRead />
-          </div>
+      <div className={cx('page', { embedded })}>
+        <div className={cx('card', { embedded })}>
           <h1 className={cx('title')}>Kiểm tra hộp thư của bạn</h1>
           <p className={cx('subtitle')}>
             Nếu <strong>{sentTo}</strong> đang được dùng cho một tài khoản,
@@ -135,9 +145,7 @@ function ForgotPassword() {
 
           <p className={cx('footer')}>
             Không thấy email? Hãy kiểm tra cả mục Spam / Quảng cáo.
-            <Link href={routes.login} className={cx('back-link')}>
-              Quay lại đăng nhập
-            </Link>
+            {backToLogin}
           </p>
         </div>
       </div>
@@ -145,11 +153,8 @@ function ForgotPassword() {
   }
 
   return (
-    <div className={cx('page')}>
-      <div className={cx('card')}>
-        <div className={cx('badge')}>
-          <FiMail />
-        </div>
+    <div className={cx('page', { embedded })}>
+      <div className={cx('card', { embedded })}>
         <h1 className={cx('title')}>Quên mật khẩu</h1>
         <p className={cx('subtitle')}>
           Nhập email bạn đã đăng ký. Chúng tôi sẽ gửi cho bạn một liên kết để
@@ -181,9 +186,7 @@ function ForgotPassword() {
             <div className={cx('alert', 'alertError')}>{formError}</div>
           )}
 
-          <Link href={routes.login} className={cx('back-link')}>
-            Quay lại đăng nhập
-          </Link>
+          {backToLogin}
 
           <button
             type="submit"

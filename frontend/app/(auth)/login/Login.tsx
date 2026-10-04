@@ -23,6 +23,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { imageAssets, name } from '@/app/assets/images';
+import ForgotPassword from '../forgot/ForgotPassword';
 import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/components/Recaptcha/RecaptchaCheckbox';
 
 const cx = classNames.bind(style);
@@ -35,8 +36,45 @@ const OAUTH_ERROR_TEXT: Record<string, string> = {
   oauth2_timeout: 'Đăng nhập bằng Google mất quá nhiều thời gian. Vui lòng thử lại.',
 };
 
+const HIGHLIGHTS = [
+  { title: 'Đề sát format thật', text: 'Cấu trúc và thời gian như phòng thi' },
+  { title: 'Chấm điểm tự động', text: 'Có kết quả ngay sau khi nộp bài' },
+  { title: 'Chẩn đoán điểm yếu', text: 'Biết rõ phần nào cần ôn lại' },
+  { title: 'Lộ trình cá nhân hoá', text: 'Ôn đúng chỗ, không luyện mù quáng' },
+];
+
+function BrandLink({ className }: { className?: string }) {
+  return (
+    <Link href={routes.home} className={cx('brand', className)} aria-label={`Về trang chủ ${name}`}>
+      <Image src={imageAssets.logoW} alt="" width={40} height={26} />
+      <span>{name}</span>
+    </Link>
+  );
+}
+
+function BrandPanel() {
+  return (
+    <>
+      <BrandLink className={cx('panelBrand')} />
+      <div className={cx('pitch')}>
+        <h2>Học theo lộ trình riêng - Chạm tay đến mục tiêu</h2>
+        <ul className={cx('highlights')}>
+          {HIGHLIGHTS.map(({ title, text }) => (
+            <li key={title}>
+              <strong>{title}</strong>
+              <span>{text}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <p className={cx('panelCopyright')}>© {name} Exam. All rights reserved.</p>
+    </>
+  );
+}
+
 function Login() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
 
   const [loginIdentifier, setLoginIdentifier] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -170,208 +208,220 @@ function Login() {
     }
   };
 
+  const switchMode = (signUp: boolean) => {
+    setIsSignUp(signUp);
+    setShowForgot(false);
+    setMessage('');
+  };
+
+  const handleSocialClick = () => saveOAuthRedirect(getRedirectTarget(searchParams));
+
+  const socialButtons = (
+    <div className={cx('social-btns')}>
+      <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={handleSocialClick} aria-label="Đăng nhập bằng Google">
+        <FcGoogle size={24} />
+      </a>
+      <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')} onClick={handleSocialClick} aria-label="Đăng nhập bằng Facebook">
+        <FaFacebook size={24} color="#1877F2" />
+      </a>
+    </div>
+  );
+
+  const legalLinks = (
+    <nav className={cx('legal')} aria-label="Thông tin pháp lý">
+      <Link href={routes.service}>Điều khoản</Link>
+      <span className={cx('legal-divider')} aria-hidden="true">|</span>
+      <Link href={routes.policy}>Quyền riêng tư</Link>
+    </nav>
+  );
+
   return (
-    <div className={cx('splitContainer')}>
-      <div className={cx('mainCard', { 'signUpMode': isSignUp })}>
-
+    <div className={cx('authPage')}>
+      <div className={cx('mainCard', { signUpMode: isSignUp })}>
         <div className={cx('formContainer', 'signUpContainer')}>
-          <form onSubmit={handleRegister}>
-            <h1>Tạo tài khoản</h1>
-            <div className={cx('social-login')}>
-              <div className={cx('social-btns')}>
-                <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(searchParams))}><FcGoogle size={24} /></a>
-                <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(searchParams))}><FaFacebook size={24} color="#1877F2" /></a>
-              </div>
+          <div className={cx('formInner')}>
+            <BrandLink className={cx('mobileBrand')} />
+            <div className={cx('head')}>
+              <h1>Tạo tài khoản</h1>
+              <p>Bắt đầu hành trình chinh phục cùng cộng đồng {name}</p>
             </div>
+            {socialButtons}
 
-            <div className={cx('input-box')}>
-              <div className={cx('control')}>
+            <form onSubmit={handleRegister}>
+              <div className={cx('field')}>
+                <label htmlFor="reg-fullname">Họ và tên <span className={cx('required')}>*</span></label>
                 <input
                   id="reg-fullname"
                   type="text"
                   autoComplete="name"
-                  aria-label="Họ và tên"
-                  placeholder="Họ và tên"
+                  placeholder="Nhập họ và tên"
                   required
                   value={regFullName}
                   onChange={(e) => setRegFullName(e.target.value)}
                   disabled={loading}
                 />
               </div>
-            </div>
 
-            <div className={cx('input-box')}>
-              <div className={cx('control')}>
+              <div className={cx('field')}>
+                <label htmlFor="reg-email">Email <span className={cx('required')}>*</span></label>
                 <input
                   id="reg-email"
                   type="email"
                   autoComplete="email"
-                  aria-label="Email"
-                  placeholder="Email"
+                  placeholder="Nhập email"
                   required
                   value={regEmail}
                   onChange={(e) => setRegEmail(e.target.value)}
                   disabled={loading}
                 />
               </div>
-            </div>
 
-            <div className={cx('input-box')}>
-              <div className={cx('control')}>
+              <div className={cx('field')}>
+                <label htmlFor="reg-username">Tên đăng nhập <span className={cx('required')}>*</span></label>
                 <input
                   id="reg-username"
                   type="text"
                   autoComplete="username"
-                  aria-label="Tên đăng nhập"
-                  placeholder="Tên đăng nhập"
+                  placeholder="Nhập tên đăng nhập"
                   required
                   value={regUserName}
                   onChange={(e) => setRegUserName(e.target.value)}
                   disabled={loading}
                 />
               </div>
-            </div>
 
-            <div className={cx('input-box')}>
-              <div className={cx('control', 'has-toggle')}>
-                <input
-                  id="reg-password"
-                  type={showRegPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  aria-label="Mật khẩu"
-                  placeholder="Mật khẩu"
-                  required
-                  value={regPassword}
-                  onChange={(e) => setRegPassword(e.target.value)}
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  className={cx('password-toggle')}
-                  onClick={() => setShowRegPassword((prev) => !prev)}
-                  aria-label={showRegPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                >
-                  {showRegPassword ? <FiEyeOff /> : <FiEye />}
-                </button>
+              <div className={cx('field')}>
+                <label htmlFor="reg-password">Mật khẩu <span className={cx('required')}>*</span></label>
+                <div className={cx('control')}>
+                  <input
+                    id="reg-password"
+                    type={showRegPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    placeholder="Nhập mật khẩu"
+                    required
+                    value={regPassword}
+                    onChange={(e) => setRegPassword(e.target.value)}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    className={cx('password-toggle')}
+                    onClick={() => setShowRegPassword((prev) => !prev)}
+                    aria-label={showRegPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                  >
+                    {showRegPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div className={cx('agreement')}>
-              <RecaptchaCheckbox
-                ref={recaptchaRef}
-                siteKey={RECAPTCHA_SITE_KEY}
-                onChange={setRecaptchaToken}
-                className={cx('recaptchaBox')}
-              />
-            </div>
+              <div className={cx('agreement')}>
+                <RecaptchaCheckbox
+                  ref={recaptchaRef}
+                  siteKey={RECAPTCHA_SITE_KEY}
+                  onChange={setRecaptchaToken}
+                  className={cx('recaptchaBox')}
+                />
+              </div>
 
-            {isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}
-            <button type="submit" className={cx('login-btn')} disabled={loading}>
-              {loading && <span className={cx('loading-spinner')} />}
-              <span>{loading ? 'Đang xử lý...' : 'Đăng ký ngay'}</span>
-            </button>
-            <div className={cx('mobile-switch')}>
-              <span>Đã có tài khoản? </span>
-              <button type="button" style={{ textDecoration: 'none' }} onClick={() => { setIsSignUp(false); setMessage(''); }}>
-                Đăng nhập ngay
+              {isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}
+              <button type="submit" className={cx('login-btn')} disabled={loading}>
+                {loading && <span className={cx('loading-spinner')} />}
+                <span>{loading ? 'Đang xử lý...' : 'Đăng ký'}</span>
               </button>
-            </div>
-          </form>
+            </form>
+
+            <p className={cx('mode-switch')}>
+              Đã có tài khoản?{' '}
+              <button type="button" onClick={() => switchMode(false)}>Đăng nhập ngay</button>
+            </p>
+          </div>
+          {legalLinks}
         </div>
 
         <div className={cx('formContainer', 'signInContainer')}>
-          <form onSubmit={handleLogin}>
-            <h1>Đăng nhập</h1>
-            <div className={cx('social-login')}>
-              <div className={cx('social-btns')}>
-                <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(searchParams))}><FcGoogle size={24} /></a>
-                <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')} onClick={() => saveOAuthRedirect(getRedirectTarget(searchParams))}><FaFacebook size={24} color="#1877F2" /></a>
-              </div>
+          {showForgot ? (
+            <div className={cx('formInner')}>
+              <BrandLink className={cx('mobileBrand')} />
+              <ForgotPassword embedded onBack={() => setShowForgot(false)} />
             </div>
-            <div className={cx('input-box')}>
-              <div className={cx('control')}>
-                <input
-                  id="login-identifier"
-                  type="text"
-                  autoComplete="username"
-                  aria-label="Email hoặc tên đăng nhập"
-                  placeholder="Email hoặc tên đăng nhập"
-                  required
-                  value={loginIdentifier}
-                  onChange={(e) => setLoginIdentifier(e.target.value)}
-                  disabled={loading}
-                />
+          ) : (
+            <div className={cx('formInner')}>
+              <BrandLink className={cx('mobileBrand')} />
+              <div className={cx('head')}>
+                <h1>Đăng nhập tài khoản</h1>
+                <p>Chào mừng bạn quay lại với {name}</p>
               </div>
-            </div>
+              {socialButtons}
 
-            <div className={cx('input-box')}>
-              <div className={cx('control', 'has-toggle')}>
-                <input
-                  id="login-password"
-                  type={showLoginPassword ? 'text' : 'password'}
-                  autoComplete="current-password"
-                  aria-label="Mật khẩu"
-                  placeholder="Mật khẩu"
-                  required
-                  value={loginPassword}
-                  onChange={(e) => setLoginPassword(e.target.value)}
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  className={cx('password-toggle')}
-                  onClick={() => setShowLoginPassword((prev) => !prev)}
-                  aria-label={showLoginPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                >
-                  {showLoginPassword ? <FiEyeOff /> : <FiEye />}
+              <form onSubmit={handleLogin}>
+                <div className={cx('field')}>
+                  <label htmlFor="login-identifier">Email hoặc tên đăng nhập <span className={cx('required')}>*</span></label>
+                  <input
+                    id="login-identifier"
+                    type="text"
+                    autoComplete="username"
+                    placeholder="Nhập email hoặc tên đăng nhập"
+                    required
+                    value={loginIdentifier}
+                    onChange={(e) => setLoginIdentifier(e.target.value)}
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className={cx('field')}>
+                  <label htmlFor="login-password">Mật khẩu <span className={cx('required')}>*</span></label>
+                  <div className={cx('control')}>
+                    <input
+                      id="login-password"
+                      type={showLoginPassword ? 'text' : 'password'}
+                      autoComplete="current-password"
+                      placeholder="Nhập mật khẩu"
+                      required
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className={cx('password-toggle')}
+                      onClick={() => setShowLoginPassword((prev) => !prev)}
+                      aria-label={showLoginPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                    >
+                      {showLoginPassword ? <FiEyeOff /> : <FiEye />}
+                    </button>
+                  </div>
+                </div>
+
+                <button type="button" className={cx('forgot-link')} onClick={() => { setShowForgot(true); setMessage(''); }}>
+                  Quên mật khẩu?
                 </button>
-              </div>
+                {!isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}
+
+                <button type="submit" className={cx('login-btn')} disabled={loading}>
+                  {loading && <span className={cx('loading-spinner')} />}
+                  <span>{loading ? 'Đang đăng nhập...' : 'Đăng nhập'}</span>
+                </button>
+              </form>
+
+              <p className={cx('mode-switch')}>
+                Chưa có tài khoản?{' '}
+                <button type="button" onClick={() => switchMode(true)}>Đăng ký ngay</button>
+              </p>
             </div>
-
-            <Link href={routes.forgot} className={cx('forgot-link')}>Bạn quên mật khẩu?</Link>
-            {!isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}
-
-            <button type="submit" className={cx('login-btn')} disabled={loading}>
-              {loading && <span className={cx('loading-spinner')} />}
-              <span>{loading ? 'Đang đăng nhập...' : 'Đăng nhập ngay'}</span>
-            </button>
-
-            <div className={cx('mobile-switch')}>
-              <span>Chưa có tài khoản? </span>
-              <button type="button" style={{ textDecoration: 'none' }} onClick={() => { setIsSignUp(true); setMessage(''); }}>
-                Đăng ký ngay
-              </button>
-            </div>
-          </form>
+          )}
+          {legalLinks}
         </div>
 
-        <div className={cx('overlayContainer')}>
+        <div className={cx('overlayContainer', 'theme-locked')}>
           <div className={cx('overlay')}>
             <div className={cx('overlayPanel', 'overlayLeft')}>
-              <Link href={routes.home} className={cx('panelBrand')} aria-label={`Về trang chủ ${name}`}>
-                <Image src={imageAssets.logoW} alt="" width={40} height={26} />
-                <span>{name}</span>
-              </Link>
-              <h2>Chào mừng trở lại!</h2>
-              <p>Để giữ kết nối với chúng tôi vui lòng đăng nhập bằng thông tin cá nhân của bạn</p>
-              <button className={cx('ghost-btn')} id="signIn" onClick={() => { setIsSignUp(false); setMessage(''); }}>
-                Đăng nhập ngay
-              </button>
+              <BrandPanel />
             </div>
             <div className={cx('overlayPanel', 'overlayRight')}>
-              <Link href={routes.home} className={cx('panelBrand')} aria-label={`Về trang chủ ${name}`}>
-                <Image src={imageAssets.logoW} alt="" width={40} height={26} />
-                <span>{name}</span>
-              </Link>
-              <h2>Chào bạn!</h2>
-              <p>Bắt đầu hành trình chinh phục cùng cộng đồng {name} ngay nào.</p>
-              <button className={cx('ghost-btn')} id="signUp" onClick={() => { setIsSignUp(true); setMessage(''); }}>
-                Đăng ký ngay
-              </button>
+              <BrandPanel />
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

@@ -1,20 +1,20 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import {useCallback, useMemo, useState} from 'react';
-import {useQuery} from '@tanstack/react-query';
+import { useCallback, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
-import {motion} from 'framer-motion';
-import {getStandardExamTypes} from '@/app/apis/examTypeApi';
-import {getUserTarget} from '@/app/apis/userTargetApi';
-import {name as brandName} from '@/app/assets/images';
+import { motion } from 'framer-motion';
+import { getStandardExamTypes } from '@/app/apis/examTypeApi';
+import { getUserTarget } from '@/app/apis/userTargetApi';
+import { name as brandName } from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
-import {useAuth} from '@/app/hooks/useAuth';
-import {buildLoginUrl} from '@/app/utils/authRedirect';
-import {examTypeKeys} from '@/app/hooks/examTypeKeys';
-import type {ExamTypeResponse} from '@/app/types/exam-type';
-import type {QuickChallengeCardResponse} from '@/app/types/test';
+import { useAuth } from '@/app/hooks/useAuth';
+import { buildLoginUrl } from '@/app/utils/authRedirect';
+import { examTypeKeys } from '@/app/hooks/examTypeKeys';
+import type { ExamTypeResponse } from '@/app/types/exam-type';
+import type { QuickChallengeCardResponse } from '@/app/types/test';
 import styles from './HeroSection.module.scss';
-import {useQuickChallengeTests} from './hooks/useQuickChallengeTests';
+import { useQuickChallengeTests } from './hooks/useQuickChallengeTests';
 import QuickLeaderboard from './QuickLeaderboard';
 import QuickTestConfirmModal from './QuickTestConfirmModal';
 // Tạm ẩn vòng đề kiểm tra nhanh.
@@ -32,14 +32,14 @@ const normalizeExamTypes = (payload: any): ExamTypeResponse[] => {
 
 function HeroSection() {
   const router = useRouter();
-  const {isAuthenticated, loading: authLoading} = useAuth();
-  const {quickTests, isLoading: loading} = useQuickChallengeTests();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { quickTests, isLoading: loading } = useQuickChallengeTests();
   // const [activeIdx, setActiveIdx] = useState(0);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [pendingTest, setPendingTest] = useState<QuickChallengeCardResponse | null>(null);
   // const orbitRef = useRef<QuickTestOrbitHandle | null>(null);
 
-  const {data: examTypeCount = 0} = useQuery({
+  const { data: examTypeCount = 0 } = useQuery({
     queryKey: examTypeKeys.standard,
     queryFn: getStandardExamTypes,
     select: (payload) =>
@@ -169,15 +169,15 @@ function HeroSection() {
       <div className={cx('shell')}>
         <motion.div
           className={cx('copy')}
-          initial={{opacity: 0, y: 32}}
-          animate={{opacity: 1, y: 0}}
-          transition={{duration: 0.9, ease: [0.22, 1, 0.36, 1]}}
+          initial={{ opacity: 0, y: 32 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         >
           <p className={cx('brand')}>{brandName}</p>
           <h1 className={cx('headline')}>
-            Luyện thi chứng chỉ AWS
+            Từ nay đến ngày thi
             <br />
-            theo <span className={cx('accent')}>lộ trình</span> dành riêng bạn
+            <span className={cx('accent')}>lộ trình</span> dành riêng bạn
           </h1>
           <p className={cx('lede')}>
             Làm bài kiểm tra nhanh để biết điểm yếu, rồi ôn theo lộ trình sát đề thật.
@@ -209,9 +209,9 @@ function HeroSection() {
 
         <motion.div
           className={cx('stage', 'stageBoard')}
-          initial={{opacity: 0, scale: 0.92}}
-          animate={{opacity: 1, scale: 1}}
-          transition={{duration: 1.1, delay: 0.15, ease: [0.22, 1, 0.36, 1]}}
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
         >
           <QuickLeaderboard />
           {/* Tạm ẩn vòng đề kiểm tra nhanh.
