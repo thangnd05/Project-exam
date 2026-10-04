@@ -46,7 +46,7 @@
   }
 
   &.custom {
-    color: var(--primary);
+    color: var(--primary-text);
   }
 }
 
@@ -71,7 +71,7 @@
 
   &:hover {
     border-color: var(--primary);
-    color: var(--primary);
+    color: var(--primary-text);
   }
 
   &.active {
@@ -158,7 +158,7 @@
     border: 1px solid var(--primary);
     background: var(--hover-color);
     box-shadow: none;
-    color: var(--primary);
+    color: var(--primary-text);
 
     &:focus {
       border-color: var(--accent-act-color);
@@ -184,7 +184,7 @@
   padding: 0;
 
   &:hover {
-    color: var(--primary);
+    color: var(--primary-text);
   }
 }
 

@@ -39,8 +39,8 @@
   }
 
   &.active {
-    background: #fff;
-    color: var(--accent-color);
+    background: var(--bg-white);
+    color: var(--primary-text);
     box-shadow: 0 2px 8px var(--primary-alpha-15);
   }
 }
@@ -65,7 +65,7 @@
   border: 1px solid var(--border-color);
   border-radius: 18px;
   padding: 20px;
-  background: #fff;
+  background: var(--bg-white);
   box-shadow: var(--shadow-md);
 }
 
@@ -124,7 +124,7 @@
   padding: 6px 12px;
   border-radius: 999px;
   background: var(--primary-alpha-08);
-  color: var(--accent-color);
+  color: var(--primary-text);
   font-size: 1.35rem;
   font-weight: 600;
 
@@ -150,7 +150,7 @@
     svg {
       flex-shrink: 0;
       font-size: 1.8rem;
-      color: var(--accent-color);
+      color: var(--primary-text);
     }
   }
 }
@@ -221,7 +221,7 @@
   color: var(--text-secondary);
 
   strong {
-    color: var(--accent-color);
+    color: var(--primary-text);
   }
 }
 
@@ -258,7 +258,7 @@
 .guide-link {
   font-size: 1.4rem;
   font-weight: 600;
-  color: var(--accent-color);
+  color: var(--primary-text);
   text-decoration: none;
 
   &:hover {
@@ -329,7 +329,7 @@
   padding: 12px 14px;
   border: 1.5px solid var(--border-color);
   border-radius: 14px;
-  background: #fff;
+  background: var(--bg-white);
   cursor: pointer;
   text-align: left;
   transition: all 0.15s;
@@ -397,7 +397,7 @@
   margin-top: 18px;
   padding-top: 16px;
   border-top: 1px solid var(--border-color);
-  background: #fff;
+  background: var(--bg-white);
 }
 
 .summary {
@@ -405,7 +405,7 @@
   color: var(--text-secondary);
 
   strong {
-    color: var(--accent-color);
+    color: var(--primary-text);
     font-size: 1.7rem;
   }
 }

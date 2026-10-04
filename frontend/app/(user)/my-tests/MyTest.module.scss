@@ -8,7 +8,7 @@
 
   p {
     margin-top: 24px;
-    color: var(--accent-color);
+    color: var(--primary-text);
     font-weight: 800;
     font-size: 2rem;
   }
@@ -17,7 +17,7 @@
 .empty-state {
   text-align: center;
   padding: 80px 40px;
-  background: white;
+  background: var(--bg-white);
   border-radius: var(--radius-xl);
   border: 1px dashed var(--border-color);
   width: 100%;

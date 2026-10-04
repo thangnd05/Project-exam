@@ -5,6 +5,8 @@ $line: rgba(255, 255, 255, 0.1);
 .footer {
   color: #fff;
   background: var(--footer-bg);
+  // Chỉ có giá trị ở dark mode; giao diện sáng không cần vì nền trắng đã tương phản.
+  border-top: 1px solid var(--section-divider, transparent);
   padding-top: 64px;
 
   @media (max-width: 991px) {
@@ -66,7 +68,7 @@ $line: rgba(255, 255, 255, 0.1);
   height: 38px;
   padding: 5px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--bg-white);
 
   img {
     width: 100%;

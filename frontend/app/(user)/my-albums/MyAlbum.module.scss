@@ -75,7 +75,7 @@
     .index {
         font-weight: var(--font-weight-bold);
         font-size: 3.2rem;
-        color: var(--accent-color);
+        color: var(--primary-text);
         opacity: 0.25;
         transition: opacity 0.25s ease;
         line-height: 1;
@@ -134,7 +134,7 @@
         font-size: clamp(1.9rem, 2.2vw, 2.2rem);
         font-weight: 800;
         line-height: 1;
-        color: var(--primary);
+        color: var(--primary-text);
     }
 }.progress-stats {
     flex: 1;
@@ -166,7 +166,7 @@
         color: var(--text-secondary);
 
         strong {
-            color: var(--primary);
+            color: var(--primary-text);
             font-weight: 700;
         }
     }
@@ -189,7 +189,7 @@
 }.empty-state {
     text-align: center;
     padding: 80px 40px;
-    background: white;
+    background: var(--bg-white);
     border-radius: var(--radius-xl);
     border: 1px dashed var(--border-color);
 

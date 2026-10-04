@@ -47,12 +47,12 @@
     color: var(--text-secondary);
 
     &:hover {
-        color: var(--primary);
+        color: var(--primary-text);
     }
 
     &.active {
-        background: white;
-        color: var(--primary);
+        background: var(--bg-white);
+        color: var(--primary-text);
         box-shadow: var(--shadow-md);
     }
 
@@ -63,7 +63,7 @@
 }
 
 .table-container {
-    background: white;
+    background: var(--bg-white);
     padding: 0;
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -138,7 +138,7 @@
 
 .word-main {
     font-weight: 800;
-    color: var(--primary);
+    color: var(--primary-text);
     font-size: 1.8rem;
     text-transform: capitalize;
 
@@ -162,7 +162,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--primary);
+    color: var(--primary-text);
     cursor: pointer;
     transition: all 0.3s;
 
@@ -236,13 +236,13 @@
 }
 
 .flashcard-front {
-    background: white;
+    background: var(--bg-white);
     border: 1px solid var(--border-color);
 
     .word {
         font-size: 4rem;
         font-weight: 900;
-        color: var(--primary);
+        color: var(--primary-text);
         margin-bottom: 10px;
 
         @media (max-width: 576px) {
@@ -298,13 +298,13 @@
     width: 55px;
     height: 55px;
     border-radius: 50%;
-    background: white;
+    background: var(--bg-white);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2.4rem;
-    color: var(--primary);
+    color: var(--primary-text);
     transition: all 0.3s;
 
     &:hover:not(:disabled) {
@@ -333,7 +333,7 @@
 
     p {
         margin-top: 20px;
-        color: var(--primary);
+        color: var(--primary-text);
         font-weight: 700;
         font-size: 1.8rem;
     }

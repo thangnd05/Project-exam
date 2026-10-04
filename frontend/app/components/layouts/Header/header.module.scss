@@ -55,6 +55,7 @@
   align-items: center;
   justify-content: flex-end;
   flex-shrink: 0;
+  gap: 10px;
   z-index: 1;
 }
 
@@ -297,7 +298,7 @@
 .custom-dropdown {
   font-size: 1.6rem;
   min-width: 200px;
-  background: #fff;
+  background: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
@@ -309,7 +310,7 @@
     &:hover,
     &:focus {
       background: var(--hover-color);
-      color: var(--accent-color);
+      color: var(--primary-text);
     }
   }
 }
@@ -383,7 +384,7 @@
   font-size: 1.6rem;
   min-width: 200px;
   margin-top: 8px !important;
-  background: #fff;
+  background: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
@@ -407,7 +408,7 @@
     &:hover,
     &:focus {
       background: var(--hover-color);
-      color: var(--accent-color);
+      color: var(--primary-text);
     }
   }
 }

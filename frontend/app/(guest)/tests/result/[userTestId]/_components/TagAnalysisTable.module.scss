@@ -1,5 +1,5 @@
 .wrapper {
-  background: white;
+  background: var(--bg-white);
   border-radius: var(--radius-lg);
   padding: 28px;
   margin-top: 28px;
@@ -39,7 +39,7 @@
   &.active {
     background: rgb(var(--primary-rgb) / 0.06);
     border-color: var(--accent-color);
-    color: var(--accent-color);
+    color: var(--primary-text);
   }
 }
 

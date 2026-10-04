@@ -43,7 +43,7 @@ const PageHeader = ({
   children,
 }: PageHeaderProps) => {
   return (
-    <div className={cx('headerHero', { hasFooter: Boolean(footer), compact }, className)}>
+    <div className={cx('headerHero', 'theme-locked', { hasFooter: Boolean(footer), compact }, className)}>
       <div className={cx('heroMain')}>
         <div className={cx('heroContent')}>
           {label && <span className={cx('label', labelClassName)}>{label}</span>}

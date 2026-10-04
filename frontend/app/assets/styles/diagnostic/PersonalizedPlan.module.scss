@@ -253,7 +253,7 @@
 
 .badgePrimary {
   background: var(--primary-alpha-10);
-  color: var(--primary);
+  color: var(--primary-text);
   border-color: rgb(var(--primary-rgb) / 0.25);
 }
 
@@ -297,7 +297,7 @@
 
 .alertInfo {
   background: var(--primary-alpha-10);
-  color: var(--accent-color);
+  color: var(--primary-text);
   border-color: rgb(var(--primary-rgb) / 0.25);
 }
 
@@ -650,7 +650,7 @@
   margin-top: 0.3rem;
 
   strong {
-    color: var(--primary);
+    color: var(--primary-text);
   }
 }
 
@@ -920,7 +920,7 @@
   width: 12rem;
   padding: 0.2rem 0.5rem;
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.94);
+  background: rgb(var(--surface-rgb) / 0.94);
   font-size: var(--font-size-sm);
   line-height: 1.35;
   color: var(--text-secondary);
@@ -960,7 +960,7 @@
   transform: translateX(-50%);
   padding: 0.25rem 0.85rem;
   border-radius: 999px;
-  background: var(--brand-800);
+  background: var(--brand-deeper);
   color: var(--white);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
@@ -973,7 +973,7 @@
     left: 50%;
     transform: translateX(-50%);
     border: 0.5rem solid transparent;
-    border-top-color: var(--brand-800);
+    border-top-color: var(--brand-deeper);
   }
 }
 
@@ -1130,7 +1130,7 @@
   top: -0.2rem;
   bottom: -0.2rem;
   width: 2px;
-  background: var(--dark-color);
+  background: var(--surface-inverse);
   opacity: 0.55;
 }
 
@@ -1168,7 +1168,7 @@
 .resourceLink {
   font-size: var(--font-size-ssm);
   font-weight: var(--font-weight-semibold);
-  color: var(--primary);
+  color: var(--primary-text);
 
   &:hover {
     color: var(--brand-700);
@@ -1239,7 +1239,7 @@
     transform: translateY(-1px);
 
     .resourceTileIcon {
-      color: var(--primary);
+      color: var(--primary-text);
     }
   }
 }
@@ -1256,7 +1256,7 @@
   border: 1px solid var(--primary-alpha-20);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .resourceTileBody {
@@ -1617,7 +1617,7 @@
   height: 2.6rem;
   border-radius: 50%;
   background: var(--primary-alpha-10);
-  color: var(--primary);
+  color: var(--primary-text);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   display: flex;

@@ -11,7 +11,7 @@
 }
 
 .card {
-  background: #fff;
+  background: var(--bg-white);
   border: 1px solid var(--slate-200);
   border-radius: 16px;
   padding: 18px;
@@ -49,7 +49,7 @@
   padding: 11px 14px;
   background: var(--bg-white);
   font-size: 1.35rem;
-  color: var(--slate-900);
+  color: var(--text-color);
 }
 
 .includeChildrenToggle {
@@ -93,12 +93,12 @@
   text-align: left;
   font-size: 1.45rem;
   font-weight: 700;
-  color: var(--slate-900);
+  color: var(--text-color);
 }
 
 .partBadge {
   background: var(--brand-100);
-  color: var(--hover-accent);
+  color: var(--primary-text-hover);
   font-size: 1.2rem;
   font-weight: 700;
   border-radius: 999px;
@@ -109,7 +109,7 @@
 
 .partCardBody {
   border-top: 1px solid var(--slate-200);
-  background: #fff;
+  background: var(--bg-white);
   padding: 12px;
 }
 
@@ -164,7 +164,7 @@
 
 .questionText {
   flex: 1;
-  color: var(--slate-900);
+  color: var(--text-color);
   font-size: 1.35rem;
 }
 
@@ -255,6 +255,6 @@
 
 .mediaOpenLink {
   font-size: var(--font-size-smd);
-  color: var(--primary);
+  color: var(--primary-text);
   text-decoration: none;
 }

@@ -18,6 +18,7 @@ import {buildLoginUrl} from '@/app/utils/authRedirect';
 // import JoinClassModal from '@/app/components/JoinClassModal/JoinClassModal';
 // import CreateClassModal from '@/app/components/CreateClassModal/CreateClassModal';
 import CreateTestModal from '@/app/components/tests/CreateTestModal';
+import ThemeToggle from '@/app/components/ThemeToggle/ThemeToggle';
 import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import FirstTimeHint from '@/app/components/gamification/onboarding/FirstTimeHint';
@@ -133,7 +134,7 @@ function Header() {
   // };
 
   return (
-    <header className={cx('wrapper')}>
+    <header className={cx('wrapper', 'theme-locked')} data-bs-theme="light">
       <div className={cx('pill')}>
         <div className={cx('barRow')}>
           <div className={cx('zoneLeft')}>
@@ -247,6 +248,7 @@ function Header() {
           </nav>
 
           <div className={cx('zoneRight')}>
+            <ThemeToggle />
             {showStats && (
               <div className={cx('mobileHeaderActions')}>
                 <div className={cx('statsCluster')}>

@@ -39,7 +39,7 @@ const SOCIALS = [
 
 function Footer() {
   return (
-    <footer className={styles.footer}>
+    <footer className={`${styles.footer} theme-locked`}>
       <Container className={styles.container}>
         <div className={styles.top}>
           <div className={styles.brandCol}>

@@ -182,7 +182,7 @@
     padding: 0.2rem;
 
     &:hover {
-      color: var(--primary);
+      color: var(--primary-text);
     }
   }
 }
@@ -206,7 +206,7 @@
 
   &:hover {
     border-color: var(--primary);
-    color: var(--primary);
+    color: var(--primary-text);
   }
 }
 

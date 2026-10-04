@@ -43,13 +43,13 @@ const GRID_STROKE = '#e2e8f0';
 
 const TOOLTIP_STYLE = {
     contentStyle: {
-        background: 'rgba(255, 255, 255, 0.97)',
+        background: 'var(--bg-white)',
         border: 'none',
         borderRadius: 10,
         boxShadow: '0 6px 18px rgba(15, 23, 42, 0.12)',
-        color: '#1e293b',
+        color: 'var(--text-color)',
     },
-    labelStyle: { color: '#1e293b', fontWeight: 600, marginBottom: 4 },
+    labelStyle: { color: 'var(--text-color)', fontWeight: 600, marginBottom: 4 },
     cursor: { fill: 'rgba(148, 163, 184, 0.1)' },
 };
 

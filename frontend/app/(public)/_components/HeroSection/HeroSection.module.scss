@@ -8,6 +8,8 @@
   justify-content: center;
   padding: clamp(72px, 10vh, 120px) clamp(20px, 4vw, 48px) clamp(56px, 8vh, 88px);
   background: var(--hero-bg);
+  // Chỉ có giá trị ở dark mode; giao diện sáng không cần vì nền trắng đã tương phản.
+  border-bottom: 1px solid var(--section-divider, transparent);
   color: var(--text-on-dark);
   overflow: hidden;
 }

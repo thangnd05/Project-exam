@@ -27,13 +27,13 @@
 .title {
   font-size: var(--font-size-xl);
   font-weight: 700;
-  color: #212529;
+  color: var(--text-color);
   margin: 6px 0 4px;
 }
 
 .subtitle {
   font-size: var(--font-size-ssm);
-  color: #6c757d;
+  color: var(--text-secondary);
   margin: 0 auto 22px;
   max-width: 320px;
 }

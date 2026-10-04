@@ -130,7 +130,7 @@ function ExamTypeGrid() {
   };
 
   return (
-    <section id="exam-types" className={cx('section')} aria-label="Khám phá loại đề">
+    <section id="exam-types" className={cx('section', 'theme-locked')} aria-label="Khám phá loại đề">
       <div className={cx('atmosphere')} aria-hidden="true">
         <span className={cx('orb', 'orbA')} />
         <span className={cx('orb', 'orbB')} />

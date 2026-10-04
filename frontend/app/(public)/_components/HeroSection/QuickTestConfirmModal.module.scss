@@ -72,7 +72,7 @@
   height: 40px;
   border-radius: 12px;
   background: var(--surface-tint);
-  color: var(--primary);
+  color: var(--primary-text);
   font-size: 2rem;
 }
 
@@ -128,7 +128,7 @@
     font-weight: 600;
 
     svg {
-      color: var(--primary);
+      color: var(--primary-text);
       flex-shrink: 0;
     }
   }

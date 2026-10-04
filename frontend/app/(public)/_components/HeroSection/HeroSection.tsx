@@ -160,7 +160,7 @@ function HeroSection() {
   // const goNext = () => orbitRef.current?.goNext();
 
   return (
-    <section id="hero" className={cx('hero')}>
+    <section id="hero" className={cx('hero', 'theme-locked')}>
       <div className={cx('atmosphere')} aria-hidden="true">
         <span className={cx('orb', 'orbA')} />
         <span className={cx('orb', 'orbB')} />

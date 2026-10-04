@@ -1,7 +1,6 @@
 @import 'normalize.css';
 
-:root {
-
+@mixin palette-light-raw {
   --brand-50-rgb: 250 247 240;
   --brand-100-rgb: 243 235 218;
   --brand-150-rgb: 240 228 196;
@@ -14,7 +13,196 @@
   --brand-800-rgb: 63 52 32;
   --brand-900-rgb: 20 17 13;
   --text-on-dark-rgb: 232 228 220;
+  --slate-50-rgb: 248 250 252;
+  --slate-100-rgb: 241 245 249;
+  --slate-200-rgb: 226 232 240;
+  --slate-300-rgb: 203 213 225;
+  --slate-400-rgb: 148 163 184;
+  --slate-500-rgb: 100 116 139;
+  --slate-600-rgb: 71 85 105;
+  --slate-700-rgb: 51 65 85;
+  --slate-800-rgb: 30 41 59;
+  --slate-900-rgb: 15 23 42;
+  --slate-950-rgb: 2 6 23;
+  --gray-50-rgb: 249 250 251;
+  --gray-100-rgb: 243 244 246;
+  --gray-200-rgb: 229 231 235;
+  --gray-300-rgb: 209 213 219;
+  --gray-400-rgb: 156 163 175;
+  --gray-500-rgb: 107 114 128;
+  --gray-600-rgb: 75 85 99;
+  --gray-700-rgb: 55 65 81;
+  --gray-800-rgb: 31 41 55;
+  --gray-900-rgb: 17 24 39;
+  --red-50-rgb: 254 242 242;
+  --red-100-rgb: 254 226 226;
+  --red-200-rgb: 254 202 202;
+  --red-400-rgb: 248 113 113;
+  --red-500-rgb: 239 68 68;
+  --red-600-rgb: 220 38 38;
+  --red-700-rgb: 185 28 28;
+  --orange-50-rgb: 255 247 237;
+  --orange-100-rgb: 255 237 213;
+  --orange-500-rgb: 249 115 22;
+  --orange-600-rgb: 234 88 12;
+  --orange-700-rgb: 194 65 12;
+  --green-50-rgb: 240 253 244;
+  --green-100-rgb: 220 252 231;
+  --green-200-rgb: 187 247 208;
+  --green-500-rgb: 34 197 94;
+  --green-600-rgb: 22 163 74;
+  --green-700-rgb: 21 128 61;
+  --green-800-rgb: 22 101 52;
+  --violet-500-rgb: 139 92 246;
+  --black: #000;
+  --white: #fff;
+  --ink: #161823;
+  --on-hero-muted: rgb(255 255 255 / 0.85);
+  --on-hero-subtle: rgb(255 255 255 / 0.72);
+  --on-hero-soft: rgb(255 255 255 / 0.15);
+  --on-hero-border: rgb(255 255 255 / 0.28);
+  --on-hero-track: rgb(255 255 255 / 0.25);
+  --primary-btn-shadow: 0 8px 18px rgb(0 0 0 / 0.08);
+  --primary-btn-shadow-disabled: 0 4px 10px rgb(0 0 0 / 0.06);
+  --glass-bg: rgb(255 255 255 / 0.7);
+  --glass-border: rgb(255 255 255 / 0.5);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-card: 0 14px 28px rgb(0 0 0 / 0.05), 0 10px 10px rgb(0 0 0 / 0.05);
+  --font-weight: 600;
+  --font-size: 2rem;
+  --padding-top: 1rem;
+  --font-size-xs: 0.75rem;
+  --font-size-xs2: 1.1rem;
+  --font-size-sm: 1.2rem;
+  --font-size-smd: 1.3rem;
+  --font-size-ssm: 1.4rem;
+  --font-size-md: 1.5rem;
+  --font-size-base: 1.6rem;
+  --font-size-lg: 1.8rem;
+  --font-size-xl: 2rem;
+  --font-size-xxl: 2.2rem;
+  --font-size-2xl: 2.4rem;
+  --font-size-2xxl: 2.8rem;
+  --font-size-3xl: 3rem;
+  --font-size-4xl: 3.6rem;
+  --font-size-5xl: 4.8rem;
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 20px;
 
+  /* Không đảo theo theme: dùng cho chữ/nền trên gradient vàng và các vùng vốn đã tối */
+  --brand-deep-rgb: 125 103 44;
+  --brand-deeper-rgb: 63 52 32;
+  --brand-cream-rgb: 250 247 240;
+  --surface-inverse-rgb: 30 41 59;
+
+  --body-rgb: 255 255 255;
+  --surface-rgb: 255 255 255;
+  --scrollbar-thumb: rgb(0 0 0 / 0.15);
+  --scrollbar-thumb-hover: rgb(0 0 0 / 0.3);
+}
+
+/*
+ * Dark mode theo hướng dẫn Material Design: nền #121212 (không đen tuyền), thẻ nổi lên #1e1e1e,
+ * chữ #E0E0E0 (không trắng tinh), màu nhấn hạ sáng/bớt rực để không chói trên nền tối.
+ */
+@mixin palette-dark-raw {
+  --brand-50-rgb: 38 35 28;
+  --brand-100-rgb: 48 43 31;
+  --brand-150-rgb: 56 50 34;
+  --brand-200-rgb: 80 70 44;
+  --brand-300-rgb: 80 70 44;
+  --brand-400-rgb: 150 126 62;
+  --brand-700-rgb: 212 188 126;
+  --brand-800-rgb: 228 214 176;
+
+  --slate-50-rgb: 37 37 37;
+  --slate-100-rgb: 44 44 44;
+  --slate-200-rgb: 58 58 58;
+  --slate-300-rgb: 78 78 78;
+  --slate-400-rgb: 128 128 128;
+  --slate-500-rgb: 158 158 158;
+  --slate-600-rgb: 176 176 176;
+  --slate-700-rgb: 200 200 200;
+  --slate-800-rgb: 214 214 214;
+
+  --gray-50-rgb: 37 37 37;
+  --gray-100-rgb: 44 44 44;
+  --gray-200-rgb: 58 58 58;
+  --gray-300-rgb: 78 78 78;
+  --gray-400-rgb: 128 128 128;
+  --gray-500-rgb: 158 158 158;
+  --gray-600-rgb: 176 176 176;
+  --gray-700-rgb: 200 200 200;
+  --gray-800-rgb: 214 214 214;
+  --gray-900-rgb: 224 224 224;
+
+  --red-50-rgb: 48 30 30;
+  --red-100-rgb: 62 34 34;
+  --red-200-rgb: 92 46 46;
+  --red-500-rgb: 211 84 84;
+  --red-600-rgb: 190 64 64;
+  --red-700-rgb: 239 154 154;
+
+  --green-50-rgb: 27 42 32;
+  --green-100-rgb: 30 52 38;
+  --green-200-rgb: 42 78 55;
+  --green-500-rgb: 52 160 94;
+  --green-600-rgb: 42 140 80;
+  --green-700-rgb: 129 199 132;
+  --green-800-rgb: 165 214 167;
+
+  --orange-50-rgb: 48 36 26;
+  --orange-100-rgb: 64 46 28;
+  --orange-500-rgb: 222 120 52;
+  --orange-600-rgb: 204 100 40;
+  --orange-700-rgb: 255 183 77;
+
+  --ink: #e0e0e0;
+  --body-rgb: 18 18 18;
+  --surface-rgb: 30 30 30;
+
+  --glass-bg: rgb(30 30 30 / 0.78);
+  --glass-border: rgb(255 255 255 / 0.08);
+  /* Chỉ khai báo ở dark: .theme-locked không ghi đè nên hero/footer vẫn nhận được giá trị này */
+  --section-divider: rgb(var(--brand-500-rgb) / 0.18);
+  --scrollbar-thumb: rgb(255 255 255 / 0.22);
+  --scrollbar-thumb-hover: rgb(255 255 255 / 0.38);
+  --shadow-card: 0 14px 28px rgb(0 0 0 / 0.35), 0 10px 10px rgb(0 0 0 / 0.25);
+  --primary-btn-shadow: 0 8px 18px rgb(0 0 0 / 0.35);
+
+  @include dark-dim-accents;
+}
+
+/* Hạ sáng màu nhấn dùng chung cho cả trang tối lẫn các vùng giữ màu gốc (.theme-locked). */
+@mixin dark-dim-accents {
+  --brand-500-rgb: 180 150 68;
+  --brand-600-rgb: 150 124 54;
+}
+
+/* Bootstrap đọc màu từ các biến --bs-*; nối chúng vào token của app để modal, form, bảng, dropdown đổi theo theme. */
+@mixin bootstrap-bridge {
+  --bs-body-bg: var(--bg-white);
+  --bs-body-color: var(--text-color);
+  --bs-emphasis-color: var(--text-color);
+  --bs-secondary-color: var(--text-secondary);
+  --bs-secondary-bg: var(--slate-100);
+  --bs-tertiary-bg: var(--slate-50);
+  --bs-border-color: var(--border-color);
+  --bs-heading-color: inherit;
+  --toastify-color-light: var(--bg-white);
+  --toastify-text-color-light: var(--text-color);
+}
+
+@mixin theme-tokens {
   --brand-50: rgb(var(--brand-50-rgb));
   --brand-100: rgb(var(--brand-100-rgb));
   --brand-150: rgb(var(--brand-150-rgb));
@@ -27,7 +215,6 @@
   --brand-800: rgb(var(--brand-800-rgb));
   --brand-900: rgb(var(--brand-900-rgb));
   --text-on-dark: rgb(var(--text-on-dark-rgb));
-
   --gold-100-rgb: var(--brand-100-rgb);
   --gold-200-rgb: var(--brand-200-rgb);
   --gold-400-rgb: var(--brand-400-rgb);
@@ -40,18 +227,6 @@
   --gold-500: var(--brand-500);
   --gold-600: var(--brand-600);
   --gold-700: var(--brand-700);
-
-  --slate-50-rgb: 248 250 252;
-  --slate-100-rgb: 241 245 249;
-  --slate-200-rgb: 226 232 240;
-  --slate-300-rgb: 203 213 225;
-  --slate-400-rgb: 148 163 184;
-  --slate-500-rgb: 100 116 139;
-  --slate-600-rgb: 71 85 105;
-  --slate-700-rgb: 51 65 85;
-  --slate-800-rgb: 30 41 59;
-  --slate-900-rgb: 15 23 42;
-  --slate-950-rgb: 2 6 23;
   --slate-50: rgb(var(--slate-50-rgb));
   --slate-100: rgb(var(--slate-100-rgb));
   --slate-200: rgb(var(--slate-200-rgb));
@@ -63,17 +238,6 @@
   --slate-800: rgb(var(--slate-800-rgb));
   --slate-900: rgb(var(--slate-900-rgb));
   --slate-950: rgb(var(--slate-950-rgb));
-
-  --gray-50-rgb: 249 250 251;
-  --gray-100-rgb: 243 244 246;
-  --gray-200-rgb: 229 231 235;
-  --gray-300-rgb: 209 213 219;
-  --gray-400-rgb: 156 163 175;
-  --gray-500-rgb: 107 114 128;
-  --gray-600-rgb: 75 85 99;
-  --gray-700-rgb: 55 65 81;
-  --gray-800-rgb: 31 41 55;
-  --gray-900-rgb: 17 24 39;
   --gray-50: rgb(var(--gray-50-rgb));
   --gray-100: rgb(var(--gray-100-rgb));
   --gray-200: rgb(var(--gray-200-rgb));
@@ -84,14 +248,6 @@
   --gray-700: rgb(var(--gray-700-rgb));
   --gray-800: rgb(var(--gray-800-rgb));
   --gray-900: rgb(var(--gray-900-rgb));
-
-  --red-50-rgb: 254 242 242;
-  --red-100-rgb: 254 226 226;
-  --red-200-rgb: 254 202 202;
-  --red-400-rgb: 248 113 113;
-  --red-500-rgb: 239 68 68;
-  --red-600-rgb: 220 38 38;
-  --red-700-rgb: 185 28 28;
   --red-50: rgb(var(--red-50-rgb));
   --red-100: rgb(var(--red-100-rgb));
   --red-200: rgb(var(--red-200-rgb));
@@ -99,18 +255,11 @@
   --red-500: rgb(var(--red-500-rgb));
   --red-600: rgb(var(--red-600-rgb));
   --red-700: rgb(var(--red-700-rgb));
-
-  --orange-50-rgb: 255 247 237;
-  --orange-100-rgb: 255 237 213;
-  --orange-500-rgb: 249 115 22;
-  --orange-600-rgb: 234 88 12;
-  --orange-700-rgb: 194 65 12;
   --orange-50: rgb(var(--orange-50-rgb));
   --orange-100: rgb(var(--orange-100-rgb));
   --orange-500: rgb(var(--orange-500-rgb));
   --orange-600: rgb(var(--orange-600-rgb));
   --orange-700: rgb(var(--orange-700-rgb));
-
   --amber-50-rgb: var(--orange-50-rgb);
   --amber-100-rgb: var(--orange-100-rgb);
   --amber-200-rgb: var(--orange-100-rgb);
@@ -125,19 +274,10 @@
   --amber-500: var(--orange-500);
   --amber-600: var(--orange-600);
   --amber-700: var(--orange-700);
-
   --yellow-500-rgb: var(--brand-500-rgb);
   --yellow-600-rgb: var(--brand-600-rgb);
   --yellow-500: var(--brand-500);
   --yellow-600: var(--brand-600);
-
-  --green-50-rgb: 240 253 244;
-  --green-100-rgb: 220 252 231;
-  --green-200-rgb: 187 247 208;
-  --green-500-rgb: 34 197 94;
-  --green-600-rgb: 22 163 74;
-  --green-700-rgb: 21 128 61;
-  --green-800-rgb: 22 101 52;
   --green-50: rgb(var(--green-50-rgb));
   --green-100: rgb(var(--green-100-rgb));
   --green-200: rgb(var(--green-200-rgb));
@@ -145,7 +285,6 @@
   --green-600: rgb(var(--green-600-rgb));
   --green-700: rgb(var(--green-700-rgb));
   --green-800: rgb(var(--green-800-rgb));
-
   --emerald-50-rgb: var(--green-50-rgb);
   --emerald-100-rgb: var(--green-100-rgb);
   --emerald-200-rgb: var(--green-200-rgb);
@@ -162,7 +301,6 @@
   --emerald-600: var(--green-600);
   --emerald-700: var(--green-700);
   --emerald-800: var(--green-800);
-
   --teal-50-rgb: var(--brand-50-rgb);
   --teal-200-rgb: var(--brand-200-rgb);
   --teal-500-rgb: var(--brand-500-rgb);
@@ -177,7 +315,6 @@
   --teal-700: var(--brand-700);
   --teal-900: var(--brand-900);
   --teal-950: var(--brand-900);
-
   --sky-50-rgb: var(--brand-50-rgb);
   --sky-100-rgb: var(--brand-100-rgb);
   --sky-200-rgb: var(--brand-200-rgb);
@@ -186,62 +323,52 @@
   --sky-100: var(--brand-100);
   --sky-200: var(--brand-200);
   --sky-700: var(--brand-700);
-
   --indigo-50-rgb: var(--brand-50-rgb);
   --indigo-200-rgb: var(--brand-200-rgb);
   --indigo-50: var(--brand-50);
   --indigo-200: var(--brand-200);
-
-  --violet-500-rgb: 139 92 246;
   --violet-500: rgb(var(--violet-500-rgb));
-
-  --black: #000;
-  --white: #fff;
-
   --warm-input: var(--brand-50);
   --warm-hover: var(--brand-100);
   --warm-border: var(--brand-200);
   --warm-border-strong: var(--brand-400);
   --warm-tag-bg: var(--brand-50);
-  --ink: #161823;
-
   --primary: var(--brand-500);
   --primary-color: var(--brand-500);
   --accent-color: var(--brand-500);
   --accent-act-color: var(--brand-200);
   --hover-accent: var(--brand-600);
   --primary-rgb: var(--brand-500-rgb);
-
+  --primary-text: var(--brand-700);
+  --primary-text-hover: var(--brand-800);
   --brand-unique: var(--brand-200);
   --brand-unique-hover: var(--brand-400);
-
   --premium-gradient: var(--primary-gradient);
   --premium-shadow: 0 4px 12px rgb(var(--brand-600-rgb) / 0.32);
   --premium-on-gradient: var(--text-on-brand);
   --premium-badge-bg: linear-gradient(135deg, var(--brand-100) 0%, var(--brand-200) 100%);
   --premium-badge-text: var(--brand-700);
   --premium-badge-border: var(--brand-400);
-
   --hero-bg: var(--brand-900);
   --footer-bg: var(--brand-900);
   --dark-color: var(--slate-800);
   --text-on-dark-muted: rgb(var(--text-on-dark-rgb) / 0.72);
   --text-on-brand: var(--brand-900);
-
   --on-primary-gradient: var(--text-on-brand);
-  --on-primary-gradient-muted: var(--brand-800);
-  --on-primary-gradient-subtle: var(--brand-700);
+  --on-primary-gradient-muted: rgb(var(--brand-deeper-rgb));
+  --on-primary-gradient-subtle: rgb(var(--brand-deep-rgb));
   --on-primary-gradient-soft: rgb(var(--brand-900-rgb) / 0.08);
-  --on-primary-gradient-border: rgb(var(--brand-700-rgb) / 0.35);
+  --on-primary-gradient-border: rgb(var(--brand-deep-rgb) / 0.35);
   --on-primary-gradient-track: rgb(var(--brand-900-rgb) / 0.18);
-  --on-primary-gradient-fill: var(--brand-800);
-  --on-primary-gradient-cta: var(--brand-800);
-
+  --on-primary-gradient-fill: rgb(var(--brand-deeper-rgb));
+  --on-primary-gradient-cta: rgb(var(--brand-deeper-rgb));
   --text-color: var(--ink);
   --text-secondary: var(--slate-500);
-
-  --bg-body: var(--white);
-  --bg-white: var(--white);
+  --bg-body: rgb(var(--body-rgb));
+  --bg-white: rgb(var(--surface-rgb));
+  --surface-inverse: rgb(var(--surface-inverse-rgb));
+  --brand-deep: rgb(var(--brand-deep-rgb));
+  --brand-deeper: rgb(var(--brand-deeper-rgb));
   --input-bg: var(--warm-input);
   --border-color: var(--warm-border);
   --border-strong: var(--warm-border-strong);
@@ -250,7 +377,6 @@
   --author-tag-bg: var(--warm-tag-bg);
   --author-tag-text: var(--brand-700);
   --author-tag-border: var(--brand-200);
-
   --success: var(--green-600);
   --success-rgb: var(--green-600-rgb);
   --success-50: var(--green-50);
@@ -263,7 +389,6 @@
   --success-bg: var(--green-100);
   --success-text: var(--green-800);
   --success-border: var(--green-200);
-
   --warning: var(--orange-600);
   --warning-rgb: var(--orange-600-rgb);
   --warning-50: var(--orange-50);
@@ -272,13 +397,10 @@
   --warning-bg: var(--orange-50);
   --warning-text: var(--orange-700);
   --warning-border: var(--orange-100);
-
   --danger-bg: var(--red-50);
   --danger-text: var(--red-700);
   --danger-border: var(--red-200);
-
   --chart-2: var(--violet-500);
-
   --primary-alpha-08: rgb(var(--brand-500-rgb) / 0.08);
   --primary-alpha-10: rgb(var(--brand-500-rgb) / 0.1);
   --primary-alpha-15: rgb(var(--brand-500-rgb) / 0.15);
@@ -286,74 +408,55 @@
   --primary-alpha-28: rgb(var(--brand-500-rgb) / 0.28);
   --primary-alpha-35: rgb(var(--brand-500-rgb) / 0.35);
   --primary-alpha-45: rgb(var(--brand-500-rgb) / 0.45);
-
   --primary-gradient: linear-gradient(135deg, var(--brand-200) 0%, var(--brand-500) 52%, var(--brand-600) 100%);
-  --header-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-500) 50%, var(--brand-700) 100%);
-  --on-header: var(--brand-50);
-
-  --hero-gradient: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-500) 100%);
+  --header-gradient: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-500) 50%, rgb(var(--brand-deep-rgb)) 100%);
+  --on-header: rgb(var(--brand-cream-rgb));
+  --hero-gradient: linear-gradient(135deg, rgb(var(--brand-deep-rgb)) 0%, var(--brand-500) 100%);
   --hero-shadow: 0 12px 30px var(--primary-alpha-28);
   --on-hero: var(--white);
-  --on-hero-muted: rgb(255 255 255 / 0.85);
-  --on-hero-subtle: rgb(255 255 255 / 0.72);
-  --on-hero-soft: rgb(255 255 255 / 0.15);
-  --on-hero-border: rgb(255 255 255 / 0.28);
-  --on-hero-track: rgb(255 255 255 / 0.25);
-
   --brand-surface: var(--primary);
-
   --primary-btn-bg: var(--bg-white);
   --primary-btn-fg: var(--brand-700);
   --primary-btn-fg-hover: var(--brand-600);
-  --primary-btn-shadow: 0 8px 18px rgb(0 0 0 / 0.08);
   --primary-btn-shadow-hover: 0 12px 24px rgb(0 0 0 / 0.15), 0 0 0 3px var(--primary-alpha-20);
-  --primary-btn-shadow-disabled: 0 4px 10px rgb(0 0 0 / 0.06);
-
   --bs-primary: var(--primary);
-  --bs-link-color: var(--primary);
-  --bs-link-hover-color: var(--hover-accent);
-
-  --glass-bg: rgb(255 255 255 / 0.7);
-  --glass-border: rgb(255 255 255 / 0.5);
+  --bs-link-color: var(--primary-text);
+  --bs-link-hover-color: var(--primary-text-hover);
   --surface-shadow: 0 8px 32px 0 var(--primary-alpha-10);
-
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-card: 0 14px 28px rgb(0 0 0 / 0.05), 0 10px 10px rgb(0 0 0 / 0.05);
-
   --font-family: var(--font-inter), sans-serif;
-  --font-weight: 600;
-  --font-size: 2rem;
-  --padding-top: 1rem;
-
-  --font-size-xs: 0.75rem;
-  --font-size-xs2: 1.1rem;
-  --font-size-sm: 1.2rem;
-  --font-size-smd: 1.3rem;
-  --font-size-ssm: 1.4rem;
-  --font-size-md: 1.5rem;
-  --font-size-base: 1.6rem;
-  --font-size-lg: 1.8rem;
-  --font-size-xl: 2rem;
-  --font-size-xxl: 2.2rem;
-  --font-size-2xl: 2.4rem;
-  --font-size-2xxl: 2.8rem;
-  --font-size-3xl: 3rem;
-  --font-size-4xl: 3.6rem;
-  --font-size-5xl: 4.8rem;
-
-  --font-weight-light: 300;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 20px;
 }
+
+:root {
+  color-scheme: light;
+  @include palette-light-raw;
+  @include theme-tokens;
+}
+
+/* data-theme được gắn lên <html> trước khi vẽ trang (xem app/layout.tsx) */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  @include palette-dark-raw;
+  @include bootstrap-bridge;
+}
+
+/* Vùng vốn đã tối (header, footer, hero) giữ nguyên bảng màu sáng để không bị đảo màu */
+:root[data-theme='dark'] .theme-locked {
+  color-scheme: light;
+  @include palette-light-raw;
+  @include theme-tokens;
+  @include bootstrap-bridge;
+  @include dark-dim-accents;
+
+  /* Nền trắng còn lại trong vùng giữ màu gốc (nút trắng trên banner, khung mockup) đổi sang trắng ngà cho đỡ chói */
+  --surface-rgb: 228 226 221;
+  --body-rgb: 228 226 221;
+}
+
+/* Ảnh chụp, ảnh bìa thường sáng: hạ nhẹ để không chói trên nền tối */
+:root[data-theme='dark'] img {
+  filter: brightness(0.9);
+}
+
 
 .shadow-md {
   box-shadow: var(--shadow-md) !important;
@@ -484,18 +587,32 @@ img {
   height: auto;
 }
 
+html::-webkit-scrollbar,
 html *::-webkit-scrollbar {
   border-radius: 0;
   width: 8px;
 }
 
+html::-webkit-scrollbar-thumb,
 html *::-webkit-scrollbar-thumb {
   border-radius: 4px;
-  background-color: rgba(0, 0, 0, 0.15);
+  background-color: var(--scrollbar-thumb);
+
+  &:hover {
+    background-color: var(--scrollbar-thumb-hover);
+  }
 }
 
+html::-webkit-scrollbar-track,
 html *::-webkit-scrollbar-track {
   background-color: transparent;
+}
+
+// Chỉ Firefox: Chrome 121+ sẽ bỏ qua toàn bộ ::-webkit-scrollbar nếu thấy scrollbar-color.
+@supports (-moz-appearance: none) {
+  html {
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
 }
 
 button,
@@ -530,7 +647,7 @@ a {
   transition: color 0.2s;
 
   &:hover {
-    color: var(--accent-color);
+    color: var(--primary-text);
   }
 }
 
@@ -604,7 +721,7 @@ li {
 
 .text-info,
 .text-primary {
-  color: var(--primary) !important;
+  color: var(--primary-text) !important;
 }
 
 .tag-badge {
@@ -627,5 +744,17 @@ li {
 
   &:hover {
     background-color: var(--success-600) !important;
+  }
+}
+
+/* Người dùng đã tắt chuyển động trong hệ điều hành: bỏ hiệu ứng nhấc, trượt, lặp vô hạn. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

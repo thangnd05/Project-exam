@@ -14,7 +14,7 @@
 }
 
 .content {
-    background: #ffffff;
+    background: var(--bg-white);
     width: 95%;
     max-width: 480px;
     border-radius: 24px;
@@ -96,7 +96,7 @@
 
         &.primary {
             background: var(--brand-100);
-            color: var(--primary);
+            color: var(--primary-text);
         }
 
         &.danger {

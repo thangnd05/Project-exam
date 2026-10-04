@@ -1,7 +1,7 @@
 @import 'app/assets/styles/mixins.scss';
 
 .class-card {
-  background: white;
+  background: var(--bg-white);
   border-radius: var(--radius-lg);
   padding: 24px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -84,7 +84,7 @@
   &:hover {
     background: var(--brand-50);
     border-color: var(--primary);
-    color: var(--primary);
+    color: var(--primary-text);
   }
 
   &:active {
@@ -117,8 +117,8 @@
 .btn-manage-members {
   margin-top: 10px;
   width: 100%;
-  background: white;
-  color: var(--primary);
+  background: var(--bg-white);
+  color: var(--primary-text);
   padding: 10px;
   border-radius: 12px;
   font-weight: 600;

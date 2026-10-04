@@ -1,8 +1,8 @@
 .section {
   position: relative;
   padding: clamp(48px, 6vw, 80px) clamp(20px, 4vw, 48px);
-  background: #fff;
-  color: var(--slate-900);
+  background: var(--bg-white);
+  color: var(--text-color);
 }
 
 .inner {
@@ -32,7 +32,7 @@
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.15;
-  color: var(--slate-900);
+  color: var(--text-color);
 }
 
 .subtitle {
@@ -99,8 +99,14 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1;
-  color: var(--brand-600);
+  color: var(--primary-text-hover);
   opacity: 0.55;
+
+  // Vàng nhạt mờ 55% trên nền tối bị ngả ô liu; dùng vàng thương hiệu đặc.
+  :global(:root[data-theme='dark']) & {
+    color: var(--primary);
+    opacity: 0.9;
+  }
 }
 
 .stepTitle {
@@ -109,7 +115,7 @@
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.15;
-  color: var(--slate-900);
+  color: var(--text-color);
 }
 
 .stepText {
@@ -126,5 +132,5 @@
   font-size: 1.2rem;
   font-weight: 600;
   color: #fff;
-  background: var(--brand-700);
+  background: var(--brand-deep);
 }

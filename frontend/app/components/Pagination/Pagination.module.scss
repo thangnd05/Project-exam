@@ -11,7 +11,7 @@
   height: 44px;
   border-radius: 12px;
   border: 1px solid var(--border-color);
-  background: white;
+  background: var(--bg-white);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,7 +23,7 @@
 
   &:hover:not(.disabled):not(.active) {
     border-color: var(--primary);
-    color: var(--primary);
+    color: var(--primary-text);
     background-color: var(--hover-color);
   }
 

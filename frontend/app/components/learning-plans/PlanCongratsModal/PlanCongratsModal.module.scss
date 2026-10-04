@@ -16,7 +16,7 @@
   width: min(46rem, 100%);
   overflow: hidden;
   border-radius: 20px;
-  background: #fff;
+  background: var(--bg-white);
   box-shadow: 0 24px 64px rgb(var(--brand-900-rgb) / 0.35);
   text-align: center;
   animation: popIn 0.35s cubic-bezier(0.22, 1.2, 0.36, 1);
@@ -141,7 +141,7 @@
   line-height: 1.5;
 
   strong {
-    color: var(--slate-900);
+    color: var(--text-color);
   }
 }
 
@@ -173,7 +173,7 @@
   padding: 1rem 2rem;
   border: 1px solid var(--gray-300);
   border-radius: 10px;
-  background: #fff;
+  background: var(--bg-white);
   color: var(--slate-600);
   font-size: 1.5rem;
   font-weight: 600;

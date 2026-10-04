@@ -52,7 +52,7 @@
   margin-bottom: 10px;
 
   &:hover {
-    transform: translateY(-4px);
+    transform: translateY(-2px);
     border-color: var(--primary-alpha-35);
     box-shadow: 0 16px 32px var(--primary-alpha-10);
   }
@@ -106,13 +106,13 @@
 .user-name {
   font-size: var(--font-size-ssm);
   font-weight: 700;
-  color: #2d3748;
+  color: var(--text-color);
   margin: 0;
 }
 
 .user-role {
   font-size: var(--font-size-sm);
-  color: #718096;
+  color: var(--text-secondary);
   margin-bottom: 4px;
   white-space: nowrap;
 }
@@ -124,7 +124,7 @@
   margin-bottom: 16px;
 
   .star-filled {
-    color: var(--primary);
+    color: var(--primary-text);
     font-size: 1.4rem;
   }
 
@@ -190,14 +190,14 @@
 
         &.slick-active button:before {
           opacity: 1 !important;
-          color: var(--accent-color) !important;
+          color: var(--primary-text) !important;
           font-size: var(--font-size-ssm) !important;
           transform: none;
         }
 
         &:hover button:before {
           opacity: 0.8 !important;
-          color: var(--accent-color) !important;
+          color: var(--primary-text) !important;
           transform: scale(1.1);
         }
       }
@@ -217,7 +217,7 @@
       }
 
       &:hover:before {
-        color: var(--accent-color);
+        color: var(--primary-text);
         opacity: 1;
       }
     }

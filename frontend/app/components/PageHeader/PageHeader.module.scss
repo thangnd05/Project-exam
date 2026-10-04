@@ -165,7 +165,7 @@
   :global(.btn-primary) {
     display: inline-flex;
     align-items: center;
-    background: #fff;
+    background: var(--bg-white);
     border: none;
     border-radius: 12px;
     font-weight: var(--font-weight-semibold);
@@ -178,8 +178,8 @@
     &:hover,
     &:focus,
     &:active {
-      background: #fff;
-      color: var(--brand-600);
+      background: var(--bg-white);
+      color: var(--primary-text-hover);
       transform: translateY(-2px);
       box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
     }
@@ -196,7 +196,7 @@
   border-radius: 14px;
   font-size: var(--font-size-base);
   font-weight: 700;
-  background: #fff;
+  background: var(--bg-white);
   color: var(--brand-700);
   border: none;
   cursor: pointer;
@@ -207,7 +207,7 @@
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    color: var(--brand-600);
+    color: var(--primary-text-hover);
   }
 
   @media (max-width: 576px) {
@@ -266,7 +266,7 @@
   }
 
   &.active {
-    background: white;
+    background: var(--bg-white);
     color: var(--brand-700);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transform: scale(1.05);

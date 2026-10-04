@@ -6,8 +6,8 @@
   padding: 4px 12px;
   border-radius: 999px;
   border: 1px solid transparent;
-  background: #f1f3f5;
-  color: #adb5bd;
+  background: var(--slate-100);
+  color: var(--slate-400);
   font-weight: 700;
   font-size: var(--font-size-md);
   user-select: none;
@@ -38,7 +38,7 @@
   &.recoverable {
     position: relative;
     cursor: pointer;
-    color: #343a40;
+    color: var(--text-color);
 
     &::after {
       content: '';
@@ -53,7 +53,7 @@
     }
 
     &:hover {
-      background: #e9ecef;
+      background: var(--slate-100);
     }
   }
 
