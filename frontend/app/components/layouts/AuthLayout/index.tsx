@@ -12,6 +12,7 @@ const cx = classNames.bind(styles);
 
 function AuthLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const showBrand = pathname !== routes.forgot && pathname !== routes.reset;
 
   return (
     <div className={cx('shell')}>
@@ -19,10 +20,12 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
       <div className={cx('glow', 'glowB')} aria-hidden="true" />
 
       <header className={cx('top', { brandInCard: pathname === routes.login })}>
-        <Link href={routes.home} className={cx('brand')} aria-label={`Về trang chủ ${name}`}>
-          <Image src={imageAssets.logoW} alt="" width={44} height={28} priority />
-          <span>{name}</span>
-        </Link>
+        {showBrand && (
+          <Link href={routes.home} className={cx('brand')} aria-label={`Về trang chủ ${name}`}>
+            <Image src={imageAssets.logoW} alt="" width={44} height={28} priority />
+            <span>{name}</span>
+          </Link>
+        )}
       </header>
 
       <main className={cx('content')}>{children}</main>

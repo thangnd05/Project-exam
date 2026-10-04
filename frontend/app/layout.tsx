@@ -62,7 +62,7 @@ export const viewport = {
   themeColor: '#000000',
 };
 
-const THEME_INIT_SCRIPT = `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}var d=document.documentElement;d.setAttribute('data-theme',t);d.setAttribute('data-bs-theme',t)}catch(e){}})();`;
+const THEME_INIT_SCRIPT = `(function(){try{if(localStorage.getItem('theme')==='dark'){var d=document.documentElement;d.setAttribute('data-theme','dark');d.setAttribute('data-bs-theme','dark')}}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

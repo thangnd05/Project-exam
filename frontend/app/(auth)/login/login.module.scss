@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 .splitContainer {
   display: flex;
   justify-content: center;
@@ -8,7 +10,11 @@
 }
 
 .mainCard {
-  background-color: var(--bg-white);
+  background-color: var(--brand-50);
+
+  @include dark-theme {
+    background-color: var(--bg-white);
+  }
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
   position: relative;
@@ -134,7 +140,7 @@
 }
 
 .overlay {
-  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-act-color) 100%);
+  background: linear-gradient(135deg, var(--brand-600) 0%, var(--brand-deep) 100%);
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -181,6 +187,7 @@
 .panelBrand {
   position: absolute;
   top: 28px;
+  left: 32px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -194,13 +201,6 @@
   }
 }
 
-.overlayLeft .panelBrand {
-  left: 32px;
-}
-
-.overlayRight .panelBrand {
-  right: 32px;
-}
 
 .overlayLeft {
   transform: translateX(-20%);

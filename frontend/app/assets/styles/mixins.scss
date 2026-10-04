@@ -123,22 +123,10 @@
   :root[data-theme='dark'] {
     @content;
   }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme='light']) {
-      @content;
-    }
-  }
 }
 
 @mixin dark-theme {
   :global(:root[data-theme='dark']) & {
     @content;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :global(:root:not([data-theme='light'])) & {
-      @content;
-    }
   }
 }

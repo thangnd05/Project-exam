@@ -1,5 +1,7 @@
 /* Style dùng chung cho luồng khôi phục mật khẩu: /forgot và /reset. */
 
+@import 'app/assets/styles/mixins.scss';
+
 .page {
   display: flex;
   justify-content: center;
@@ -12,7 +14,11 @@
 .card {
   width: 100%;
   max-width: 460px;
-  background-color: var(--bg-white);
+  background-color: var(--brand-50);
+
+  @include dark-theme {
+    background-color: var(--bg-white);
+  }
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
   padding: 40px 36px;

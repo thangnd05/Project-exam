@@ -1,21 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
 export type Theme = 'light' | 'dark';
 
 export const THEME_STORAGE_KEY = 'theme';
-
-const DARK_QUERY = '(prefers-color-scheme: dark)';
-
-function readStoredTheme(): Theme | null {
-  try {
-    const value = window.localStorage.getItem(THEME_STORAGE_KEY);
-    return value === 'light' || value === 'dark' ? value : null;
-  } catch {
-    return null;
-  }
-}
 
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
@@ -34,15 +23,6 @@ const getServerSnapshot = (): Theme => 'light';
 
 export function useTheme() {
   const theme = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-
-  useEffect(() => {
-    const media = window.matchMedia(DARK_QUERY);
-    const onSystemChange = (event: MediaQueryListEvent) => {
-      if (!readStoredTheme()) applyTheme(event.matches ? 'dark' : 'light');
-    };
-    media.addEventListener('change', onSystemChange);
-    return () => media.removeEventListener('change', onSystemChange);
-  }, []);
 
   const setTheme = useCallback((next: Theme) => {
     applyTheme(next);
