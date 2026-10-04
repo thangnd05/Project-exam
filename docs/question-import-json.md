@@ -102,10 +102,38 @@ Sai một chỗ thì **cả file bị từ chối** (import chạy trong một t
 - `FILL_BLANK`: >= 1 đáp án; không đánh dấu đáp án đúng thì coi tất cả là đáp án được chấp nhận.
 - `ESSAY`: đáp án không bắt buộc; nếu có, chỉ đáp án đầu tiên được lưu làm bài mẫu.
 - Nhãn đáp án trùng nhau trong cùng một câu -> lỗi.
-- Tối đa 1000 câu mỗi lần import.
 
 Suy ra `questionType` khi bỏ trống: không có đáp án -> `ESSAY`; >= 2 đáp án đúng -> `MSQ`;
 còn lại -> `MCQ`. Mỗi lần suy ra đều kèm một cảnh báo trong `warnings`.
+
+## Tạo trọn một đề từ JSON (nhiều phần thi)
+
+Trên UI: modal **Khởi tạo bài thi** > tab **Tạo đề thi**, chọn **Loại kỳ thi** (không cần chọn phần
+thi), nhập tiêu đề rồi upload file vào ô *"Hoặc tạo trọn đề từ file JSON"*. Màn hình hiện bảng số câu
+theo từng phần thi, kèm cảnh báo tag không khớp; bấm tạo đề là xong.
+
+| Method | Path | Mô tả |
+| --- | --- | --- |
+| POST | `/api/tests/import/json/preview?examTypeId=<id>` | Dry-run: số câu mỗi phần thi, lỗi, cảnh báo tag không khớp |
+| POST | `/api/tests/import/json?usageScope=EXAM` | Tạo đề, tạo câu hỏi và gắn vào đề trong **một transaction**. Câu chỉ thuộc đề, không vào kho (giống nhập tay) |
+
+Cả hai nhận `multipart/form-data`: part `file` là file JSON. Endpoint import thêm part `request` là
+JSON của thông tin đề (`title`, `examTypeId`, `durationMinutes`, `collectionId`... giống `POST /api/tests`).
+
+File dùng đúng format ở trên. Phần thi của mỗi câu xác định theo thứ tự:
+
+1. `examPart` (alias `part`) của câu: tên phần thi (không phân biệt hoa thường) hoặc id.
+2. Với nhóm passage: `examPart` của nhóm. Nếu nhóm không khai báo thì mọi câu trong nhóm phải chỉ về cùng một phần thi.
+3. Tiền tố tag dạng `"Phần thi > Tag"`, ví dụ `"Secure Architectures > IAM / AWS-STS (...)"`.
+4. Loại kỳ thi chỉ có một phần thi thì mọi câu thuộc phần đó.
+
+Câu không xác định được phần thi, `examPart` sai tên, hay tag của một câu chỉ về nhiều phần thi
+khác nhau đều bị báo lỗi kèm vị trí. Mỗi phần thi có câu sẽ thành một part của đề, xếp theo thứ tự
+hiển thị của phần thi. Trong part, câu giữ thứ tự trong file (câu độc lập trước, nhóm sau). Tag
+được tìm trong đúng phần thi của câu; tag chưa có trong hệ thống bị bỏ qua và được liệt kê ở preview.
+
+Ví dụ: [saa-c03/exam-sample-65.json](saa-c03/exam-sample-65.json) là đề 65 câu lấy từ 4 file domain SAA-C03.
+Không giới hạn số câu, chỉ giới hạn 5MB mỗi file.
 
 ## Round-trip với file Word
 

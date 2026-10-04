@@ -755,3 +755,119 @@
     font-weight: 700;
     white-space: nowrap;
 }
+
+// Xem trước đề tạo từ file JSON: dùng lại thẻ phần thi của tab kho, thêm đáp án và tag.
+.jsonQuestionList {
+    max-height: none;
+    overflow: visible;
+    padding: 0;
+}
+
+.jsonQuestionItem {
+    border-bottom: 1px solid var(--slate-200);
+    border-radius: 0;
+    padding: 14px 4px;
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.jsonQuestionBody {
+    flex: 1;
+    min-width: 0;
+}
+
+.jsonTypeBadge {
+    display: inline-block;
+    margin-right: 8px;
+    padding: 1px 8px;
+    border-radius: 8px;
+    background: var(--brand-100);
+    color: var(--hover-accent);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.jsonAnswerList {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+}
+
+.jsonAnswer {
+    padding: 6px 10px;
+    margin-bottom: 4px;
+    border-radius: 8px;
+    border: 1px solid var(--slate-200);
+    font-size: var(--font-size-smd);
+    color: var(--slate-700);
+    line-height: 1.4;
+
+    &.correct {
+        background: var(--success-bg);
+        border-color: var(--success-border);
+        color: var(--success-text);
+    }
+}
+
+.jsonQuestionMeta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.jsonTagChip {
+    padding: 2px 10px;
+    border-radius: 10px;
+    background: var(--slate-100);
+    color: var(--slate-600);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.jsonExplainToggle {
+    border: none;
+    background: transparent;
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 4px;
+}
+
+.jsonExplanation {
+    margin-top: 6px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--slate-50);
+    font-size: var(--font-size-smd);
+    color: var(--slate-700);
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+.jsonPassageGroup {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--slate-300);
+}
+
+.jsonPassageContent {
+    margin: 6px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--slate-50);
+    white-space: pre-line;
+}
+
+.jsonQuestionTags {
+    margin-top: 10px;
+}
+
+.jsonTagChip.missing {
+    background: var(--danger-bg, #fdecec);
+    color: var(--danger-text, #b42318);
+}

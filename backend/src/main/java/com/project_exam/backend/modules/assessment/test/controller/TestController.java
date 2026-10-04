@@ -26,13 +26,22 @@ import com.project_exam.backend.modules.assessment.test.service.TestAccessServic
 import com.project_exam.backend.modules.assessment.test.service.TestCommandService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project_exam.backend.modules.assessment.exam.domain.Question;
+import com.project_exam.backend.modules.assessment.exam.dto.QuestionJsonImportRequest;
+import com.project_exam.backend.modules.assessment.exam.service.QuestionJsonImportService;
+import com.project_exam.backend.modules.assessment.test.dto.TestJsonImportPreviewResponse;
+import com.project_exam.backend.modules.assessment.test.service.TestJsonImportService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
@@ -51,6 +60,9 @@ public class TestController {
     private final TestCommandService testCommandService;
     private final AuthUtils authUtils;
     private final ClassAccessGuard classAccessGuard;
+    private final TestJsonImportService testJsonImportService;
+    private final QuestionJsonImportService questionJsonImportService;
+    private final ObjectMapper objectMapper;
 
     @GetMapping
     public ResponseEntity<List<TestResponse>> getAllTests() {
@@ -102,37 +114,35 @@ public class TestController {
             HttpServletRequest httpRequest
     ) {
         String currentUserId = authUtils.getUserId(httpRequest);
+        Test savedTest = testCommandService.createTest(request, currentUserId);
+        TestResponse response = testSummaryAssembler.buildUserTestSummary(savedTest, currentUserId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
-        if (request.getClassId() != null) {
-            classAccessGuard.requireTeacher(request.getClassId(), currentUserId);
-            classAccessGuard.requireChapterInClass(request.getChapterId(), request.getClassId());
-        } else if (request.getChapterId() != null) {
+    @PostMapping(value = "/import/json/preview", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<TestJsonImportPreviewResponse> previewImportJson(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam String examTypeId
+    ) throws IOException {
+        QuestionJsonImportRequest payload = questionJsonImportService.parse(file);
+        return ResponseEntity.ok(testJsonImportService.preview(payload, examTypeId));
+    }
 
-            throw new com.project_exam.backend.shared.exception.BadRequestException(
-                    "Khi có chapterId thì phải có classId.");
-        }
-        Test test = new Test();
-        test.setTitle(request.getTitle());
-        test.setDescription(request.getDescription());
-        test.setExamTypeId(request.getExamTypeId());
-        test.setDurationMinutes(request.getDurationMinutes());
-        test.setBannerUrl(request.getBannerUrl());
-        test.setMaxAttempts(request.getMaxAttempts());
-        test.setClassId(request.getClassId());
-        test.setChapterId(request.getChapterId());
-        test.setExamCategoryId(testCommandService.sanitizeExamCategoryId(request.getExamCategoryId()));
-        test.setCollectionId(request.getCollectionId());
-        test.setAvailableFrom(request.getAvailableFrom());
-        test.setAvailableTo(request.getAvailableTo());
-
-        if (request.getCostCoins() != null
-                && authUtils.hasPermission(PermissionCatalog.TEST_MANAGE_PRICING)
-                && request.getClassId() == null) {
-            test.setCostCoins(request.getCostCoins());
-        }
-        test.setCreatedBy(currentUserId);
-        test.setCreatedAt(Instant.now());
-        Test savedTest = testCommandService.save(test);
+    /**
+     * Tạo trọn một đề từ file JSON: câu hỏi được chia vào các phần thi theo `examPart`
+     * hoặc tiền tố tag "Phần thi > Tag", mỗi phần thi thành một test part.
+     */
+    @PostMapping(value = "/import/json", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<TestResponse> importJson(
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("request") String requestJson,
+            @RequestParam(required = false) Question.UsageScope usageScope,
+            HttpServletRequest httpRequest
+    ) throws IOException {
+        CreateTestRequest request = objectMapper.readValue(requestJson, CreateTestRequest.class);
+        QuestionJsonImportRequest payload = questionJsonImportService.parse(file);
+        String currentUserId = authUtils.getUserId(httpRequest);
+        Test savedTest = testJsonImportService.importTest(request, payload, usageScope, currentUserId);
         TestResponse response = testSummaryAssembler.buildUserTestSummary(savedTest, currentUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

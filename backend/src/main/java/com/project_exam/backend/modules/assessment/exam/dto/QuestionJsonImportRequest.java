@@ -30,6 +30,10 @@ public class QuestionJsonImportRequest {
 
     @Data
     public static class JsonGroup {
+        /** Tên hoặc id phần thi, chỉ dùng khi tạo đề từ JSON. Bỏ trống sẽ lấy từ câu hỏi trong nhóm. */
+        @JsonAlias("part")
+        private String examPart;
+
         private JsonPassage passage;
         private List<JsonQuestion> questions;
     }
@@ -57,6 +61,13 @@ public class QuestionJsonImportRequest {
 
         private String explanation;
         private String collectionId;
+
+        /**
+         * Tên hoặc id phần thi, chỉ dùng khi tạo đề từ JSON. Bỏ trống sẽ lấy từ tiền tố tag
+         * dạng "Phần thi > Tag". Import vào kho câu hỏi bỏ qua trường này.
+         */
+        @JsonAlias("part")
+        private String examPart;
 
         private List<String> tagIds;
 

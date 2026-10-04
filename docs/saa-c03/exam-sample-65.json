@@ -1,0 +1,1961 @@
+{
+  "version": 1,
+  "usageScope": "EXAM",
+  "questions": [
+    {
+      "questionType": "MCQ",
+      "questionText": "A security engineer is editing an Amazon S3 bucket policy and tries to add the ARN of an IAM group named DataAnalysts to the Principal element so that every member of the group can read the bucket. The policy is rejected. The bucket and the group are in the same AWS account. What should the engineer do to give the group members read access?",
+      "explanation": "Phân tích đề: IAM group không phải là principal nên không thể xuất hiện trong phần tử Principal của resource-based policy; bucket và group cùng account.\n(A) ĐÚNG: Gắn identity-based policy cho phép s3:GetObject (và s3:ListBucket nếu cần) lên group; mọi user trong group thừa hưởng quyền. Trong cùng account, chỉ cần identity policy hoặc resource policy cho phép là đủ.\n(B) SAI: Service-linked role do dịch vụ AWS tạo và quản lý cho chính dịch vụ đó, không dùng để gom người dùng và không thay thế được việc cấp quyền cho group.\n(C) SAI: Unique ID của group (AGPA...) cũng không hợp lệ trong Principal; group không bao giờ là principal dù viết theo ARN hay ID.\n(D) SAI: ACL của S3 chỉ nhận grantee là canonical user ID hoặc nhóm định sẵn của S3, không nhận IAM group; ACL cũng là cơ chế cũ nên tránh.\nĐáp án đúng: A\nĐiểm cần nhớ: IAM group chỉ là nơi gắn policy chung cho nhiều user; group không assume được và không đặt được làm Principal.",
+      "tagNames": [
+        "Secure Architectures > IAM / AWS-STS (Identity and Access Management / Security Token Service)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Attach an identity-based policy allowing s3:GetObject and s3:ListBucket to the DataAnalysts group.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create a service-linked role for Amazon S3 and add each analyst as a trusted entity of the role.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Replace the group ARN with the group's unique ID in the Principal element of the bucket policy.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Add the group to the bucket ACL as a grantee with READ permission instead of using a bucket policy.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company with no existing identity provider wants its 300 employees to sign in once and then open the AWS Management Console for any of its 15 AWS accounts, as well as Salesforce and Microsoft 365, from a single web portal. Which AWS service should the company use?",
+      "explanation": "Phân tích đề: Nhân viên (workforce), đăng nhập một lần, vào nhiều AWS account và cả ứng dụng SaaS từ một portal, chưa có IdP nào.\n(A) ĐÚNG: IAM Identity Center dùng Identity Center directory làm kho người dùng, cấp quyền vào từng account qua permission set và account assignment, đồng thời có application assignment SAML cho Salesforce và Microsoft 365; tất cả hiện trên AWS access portal.\n(B) SAI: Cognito user pool dành cho người dùng cuối của ứng dụng do công ty tự xây, không cấp quyền vào AWS Console đa account qua permission set.\n(C) SAI: Simple AD chỉ là thư mục kiểu AD cơ bản, không phải cổng SSO đa account và không dùng được làm identity source cho IAM Identity Center.\n(D) SAI: IAM User ở từng account tạo ra credential dài hạn rải rác, không có SSO và không phủ được ứng dụng SaaS.\nĐáp án đúng: A\nĐiểm cần nhớ: Workforce cần SSO vào nhiều AWS account và ứng dụng SaaS từ một portal => IAM Identity Center; chưa có IdP thì dùng Identity Center directory mặc định.",
+      "tagNames": [
+        "Secure Architectures > IAM-Identity-Center / AWS-Directory-Service (Federation and SSO)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "IAM Identity Center with its built-in directory and SAML application assignments",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Amazon Cognito user pools with a hosted UI and an app client for each application",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "AWS Directory Service Simple AD with the directory access URL enabled for employees",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "IAM users in every account, organized with IAM groups for each job function",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A retail company is launching a mobile shopping app that is expected to reach several million customers. Customers must be able to sign up with an email address, verify it, and reset forgotten passwords. Which AWS service should the company use to manage these customer identities?",
+      "explanation": "Phân tích đề: Người dùng là khách hàng (end-user) của app mobile, quy mô hàng triệu, cần sign-up, xác minh email, quên mật khẩu. Từ khóa: customer identity => Cognito User Pool.\n(A) ĐÚNG: User Pool là thư mục người dùng managed cho end-user: tự đăng ký, xác minh email/phone, quên mật khẩu, MFA, mở rộng tới hàng triệu user và trả JWT cho app.\n(B) SAI: IAM user dành cho người/dịch vụ quản trị và truy cập AWS, mỗi account giới hạn 5.000 IAM user, không có luồng sign-up hay xác minh email cho khách hàng.\n(C) SAI: Managed Microsoft AD là thư mục doanh nghiệp, không có sẵn sign-up tự phục vụ cho khách hàng, phải tự xây giao diện và tốn chi phí vận hành cao.\n(D) SAI: IAM Identity Center phục vụ workforce (nhân viên) truy cập nhiều AWS account và ứng dụng doanh nghiệp, không dành cho khách hàng tự đăng ký vào app mobile.\nĐáp án đúng: A\nĐiểm cần nhớ: End-user của app web/mobile => Cognito User Pool; người/dịch vụ quản trị AWS => IAM; nhân viên nhiều account => IAM Identity Center.",
+      "tagNames": [
+        "Secure Architectures > Amazon-Cognito"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Use a Cognito user pool as the customer directory for sign-up, sign-in, and recovery.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create an IAM user for each customer and enforce an account-wide IAM password policy.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Deploy AWS Managed Microsoft AD and store every customer as a directory user account.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Use IAM Identity Center with its built-in identity store to hold every customer account.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company wants every new Amazon EBS volume created in its AWS account to be encrypted at rest, even when engineers forget to select encryption when they launch instances. Which solution meets this requirement with the LEAST operational effort?",
+      "explanation": "Phân tích đề: Mọi volume EBS mới phải được mã hóa kể cả khi người dùng quên chọn, yêu cầu công vận hành thấp nhất. Từ khóa: 'every new volume', 'LEAST operational effort'.\n(A) ĐÚNG: EBS encryption by default là thiết lập theo account và theo Region; khi bật, mọi volume mới (và snapshot tạo từ đó) tự động được mã hóa bằng key mặc định (aws/ebs hoặc customer managed key bạn chọn) mà không cần người dùng làm gì thêm.\n(B) SAI: Rule AWS Config kèm remediation xóa volume là cách phản ứng sau khi sự việc xảy ra, có thể xóa nhầm dữ liệu và tốn công xây dựng hơn nhiều so với một thiết lập có sẵn.\n(C) SAI: Amazon Data Lifecycle Manager chỉ tự động tạo và giữ snapshot, không mã hóa volume gốc đang chạy.\n(D) SAI: Rotation trên aws/ebs do AWS tự quản lý và không liên quan tới việc volume có được mã hóa hay không; volume tạo mà không bật mã hóa vẫn không được mã hóa.\nĐáp án đúng: A\nĐiểm cần nhớ: 'Mọi EBS volume mới phải được mã hóa' => bật EBS encryption by default ở từng Region; thiết lập này không mã hóa lại các volume đã có.",
+      "tagNames": [
+        "Secure Architectures > AWS-KMS / ACM (Encryption Keys and Certificates)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Enable EBS encryption by default in each AWS Region that the account uses and set the default KMS key.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create an AWS Config rule with remediation that deletes any unencrypted EBS volume after it is created.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Configure Amazon Data Lifecycle Manager to create encrypted snapshots of every new volume.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Enable automatic key rotation on the AWS managed key aws/ebs for the account.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company runs a reporting application on Amazon EC2 instances. The application uploads files to an Amazon S3 bucket in the same AWS account. A developer proposes storing an IAM user's access key ID and secret access key in AWS Secrets Manager so that the application can retrieve them at runtime. What should a solutions architect recommend instead?",
+      "explanation": "Phân tích đề: EC2 gọi một dịch vụ AWS khác (S3) trong cùng account. Thực chất đề hỏi: có nên lưu access key ở đâu đó không.\n(A) SAI: User data có thể đọc được bởi người có quyền xem thuộc tính instance, và ciphertext trong đó vẫn là access key dài hạn, không giải quyết gốc vấn đề.\n(B) SAI: Lưu access key vào Secrets Manager kèm Lambda xoay vẫn giữ long-term credential, tốn công viết và vận hành Lambda, trong khi IAM role loại bỏ hoàn toàn nhu cầu này.\n(C) SAI: Parameter Store SecureString chỉ đổi chỗ lưu access key; vẫn là long-term credential và còn không có rotation tích hợp.\n(D) ĐÚNG: IAM role gắn vào instance qua instance profile cung cấp credential tạm thời, được tự động xoay qua instance metadata. Không có long-term access key nào cần lưu, xoay hay bảo vệ.\nĐáp án đúng: D\nĐiểm cần nhớ: Dịch vụ AWS gọi dịch vụ AWS thì dùng IAM role. Secrets Manager dành cho secret không thể thay bằng role như mật khẩu database hoặc API key của bên thứ ba.",
+      "tagNames": [
+        "Secure Architectures > AWS-Secrets-Manager"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Encrypt the access keys with an AWS KMS key and place the ciphertext in the instance user data.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Store the access keys in Secrets Manager and write a custom Lambda function that rotates them every 30 days.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Store the access keys as SecureString parameters in AWS Systems Manager Parameter Store.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Attach an IAM role with the required S3 permissions to the instances through an instance profile.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A startup creates a new Amazon S3 bucket and uploads objects without configuring any encryption settings and without sending any encryption headers. A security reviewer asks whether these objects are encrypted at rest. What is the correct answer?",
+      "explanation": "Phân tích đề: Bucket mới, không cấu hình mã hóa, không gửi header. Từ khóa: trạng thái mã hóa mặc định của S3.\n(A) SAI: Client-side encryption là tùy chọn bổ sung do khách hàng tự làm, không phải điều kiện để object được mã hóa at rest.\n(B) SAI: Từ tháng 1/2023, S3 không còn lưu object ở dạng không mã hóa; không cần bật default encryption thì object vẫn được mã hóa.\n(C) ĐÚNG: S3 tự động áp dụng SSE-S3 (AES-256, key do S3 quản lý) làm mức mã hóa cơ bản cho mọi object mới, kể cả khi client không gửi header x-amz-server-side-encryption.\n(D) SAI: Mặc định là SSE-S3, không phải SSE-KMS với key aws/s3; SSE-KMS chỉ được dùng khi bạn cấu hình default encryption hoặc gửi header aws:kms.\nĐáp án đúng: C\nĐiểm cần nhớ: Mọi object mới trên S3 đều được mã hóa SSE-S3 mặc định; các chính sách ép mã hóa ngày nay chủ yếu nhằm ép đúng LOẠI mã hóa (ví dụ SSE-KMS), không phải ép có hay không.",
+      "tagNames": [
+        "Secure Architectures > S3-Encryption-Policies"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "The objects are encrypted only if the uploading client uses the AWS Encryption SDK before each upload.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "The objects remain unencrypted until default encryption is explicitly enabled on the bucket.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "The objects are encrypted with SSE-S3, which S3 applies automatically as the base level of encryption.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "The objects are encrypted with SSE-KMS using the AWS managed key aws/s3 as the service default.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A web server's security group allows inbound TCP 443 from 0.0.0.0/0. To lock the server down, an administrator deleted every outbound rule from that security group. No network ACL changes were made. Which statement describes the resulting behavior?",
+      "explanation": "Phân tích đề: Security group chỉ còn inbound 443, không còn outbound rule nào. Cần hiểu tính stateful của security group ảnh hưởng thế nào tới traffic phản hồi và traffic do instance chủ động khởi tạo.\n(A) SAI: Security group là stateful nên gói phản hồi của kết nối inbound đã được cho phép sẽ tự động được đi ra, không bị đánh giá bởi outbound rule, kể cả trên ephemeral port.\n(B) SAI: Không cần outbound rule cho dải 1024-65535 với security group; nhu cầu mở ephemeral port chỉ xuất hiện với network ACL vốn stateless.\n(C) ĐÚNG: Kết nối HTTPS do client khởi tạo được security group ghi nhớ (connection tracking) nên response tự đi ra. Tuy nhiên kết nối mới do chính instance khởi tạo phải khớp một outbound rule; không còn rule nào nên mọi kết nối đi ra mới bị từ chối.\n(D) SAI: Kết nối mới đi ra phải khớp outbound rule; khi đã xóa hết outbound rule thì instance không thể chủ động gọi ra ngoài.\nĐáp án đúng: C\nĐiểm cần nhớ: Security group stateful: response của kết nối đã được phép luôn tự đi qua; outbound rule chỉ quyết định các kết nối mới do instance khởi tạo.",
+      "tagNames": [
+        "Secure Architectures > VPC-Traffic-Control"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Clients can no longer complete HTTPS sessions because response packets to ephemeral ports are now denied.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Clients can complete HTTPS sessions only after an outbound rule for TCP 1024-65535 is added to the group again.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Clients can still complete HTTPS sessions, but the instance can no longer initiate new outbound connections.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Clients can still complete HTTPS sessions, and the instance can still start outbound connections to any address.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A solutions architect creates a gateway VPC endpoint for Amazon S3 in a VPC. The architect needs to explain to the security team how traffic from instances is steered to the endpoint. How does a gateway endpoint direct traffic to Amazon S3?",
+      "explanation": "Phân tích đề: Hỏi cơ chế hoạt động của gateway endpoint, khác với interface endpoint.\n(A) SAI: Gateway endpoint không tạo bản ghi DNS nào; tên S3 vẫn phân giải như bình thường, chỉ đường đi thay đổi nhờ route.\n(B) SAI: Tạo ENI có private IP trong subnet là cơ chế của interface endpoint (PrivateLink), không phải gateway endpoint.\n(C) SAI: Gateway endpoint không dùng NAT hay dịch địa chỉ; nó chỉ là một target định tuyến trong route table.\n(D) ĐÚNG: Khi gắn gateway endpoint vào route table, AWS thêm route có đích là managed prefix list của S3 (pl-xxxx) và target là endpoint (vpce-xxxx); subnet dùng route table đó sẽ gửi traffic S3 qua endpoint.\nĐáp án đúng: D\nĐiểm cần nhớ: Gateway endpoint = một ROUTE (prefix list -> vpce) trong route table; quên gắn route table là lỗi kinh điển.",
+      "tagNames": [
+        "Secure Architectures > VPC-Endpoint (Virtual Private Cloud Endpoint)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "It creates a private hosted zone record that maps the S3 domain name to internal addresses.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "It places an elastic network interface with a private IP address in each selected subnet.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "It translates instance private addresses to AWS-owned public addresses before forwarding.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "It adds a route with the S3 prefix list as the destination to the associated route tables.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company runs a web application behind an Application Load Balancer. Logs show that an aggressive scraping tool always identifies itself with a distinctive User-Agent header value. The company wants to block every request that contains this value. Which solution meets this requirement?",
+      "explanation": "Phân tích đề: Cần chặn request dựa trên nội dung HTTP header (User-Agent), tức là lọc ở tầng 7 cho một ALB.\n(A) ĐÚNG: AWS WAF web ACL gắn trực tiếp vào ALB, rule string match (hoặc regex match) trên header User-Agent sẽ đánh giá từng HTTP request và trả về block khi khớp giá trị của công cụ scraping.\n(B) SAI: Security group chỉ có rule allow theo IP/port/protocol, không có rule deny và không đọc nội dung HTTP.\n(C) SAI: Network ACL chỉ lọc theo IP, port, protocol ở tầng 3/4 và không đọc được HTTP header nên không thể khớp giá trị User-Agent.\n(D) SAI: Shield Advanced tập trung chống DDoS; Shield Response Team hỗ trợ khi có sự kiện DDoS chứ không phải cơ chế để chặn vĩnh viễn một User-Agent cụ thể, và chi phí subscription rất cao cho nhu cầu đơn giản này.\nĐáp án đúng: A\nĐiểm cần nhớ: Mọi điều kiện dựa trên nội dung HTTP (header, URI, query string, body) đều là việc của AWS WAF; SG/NACL chỉ hiểu IP và port.",
+      "tagNames": [
+        "Secure Architectures > AWS-Network-Protection"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create an AWS WAF web ACL with a string match rule on the User-Agent header and associate it with the ALB.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Add a rule to the ALB security group that denies inbound requests carrying that User-Agent header.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Add a deny entry to the network ACL of the ALB subnets that matches the User-Agent value.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Subscribe to AWS Shield Advanced for the ALB and ask the Shield Response Team to block the scraping tool permanently.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A small company has never created an AWS CloudTrail trail and has never enabled AWS Config. Three weeks ago, someone deleted a security group in the us-east-1 Region. The company wants to find out which IAM user performed the deletion. What can the company use to get this information?",
+      "explanation": "Phân tích đề: Chưa có trail, chưa bật Config; sự kiện xảy ra 3 tuần trước (dưới 90 ngày) và DeleteSecurityGroup là management event.\n(A) SAI: Config chỉ ghi configuration item khi configuration recorder đang chạy; account chưa từng bật Config nên không có lịch sử nào.\n(B) SAI: CloudTrail luôn bật sẵn Event history cho mọi account mà không cần tạo trail; trail chỉ cần khi muốn lưu lâu hơn 90 ngày, có data events hoặc xuất ra S3.\n(C) SAI: CloudWatch metrics đo hiệu năng/vận hành, không ghi lại API call và không có dimension theo tên API như vậy.\n(D) ĐÚNG: Event history ghi miễn phí management events 90 ngày gần nhất theo từng Region; lọc theo EventName = DeleteSecurityGroup sẽ thấy userIdentity của người xóa.\nĐáp án đúng: D\nĐiểm cần nhớ: CloudTrail Event history luôn bật, giữ 90 ngày management events theo từng Region; muốn lâu hơn hoặc cần data events thì tạo trail hoặc event data store.",
+      "tagNames": [
+        "Secure Architectures > AWS-Audit-Logging"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "The AWS Config configuration timeline for the deleted security group in the us-east-1 Region.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Nothing, because CloudTrail records API activity only after a trail has been created and is delivering log files to Amazon S3.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Amazon CloudWatch metrics for the VPC, filtered on the DeleteSecurityGroup dimension.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "The CloudTrail Event history in the us-east-1 Region, which keeps the last 90 days of management events.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company plans to enable Amazon GuardDuty in its production account. The account does not have VPC Flow Logs enabled, and no AWS CloudTrail trail has been created. The security team asks what must be set up first so that GuardDuty can analyze network and API activity. What should a solutions architect tell the team?",
+      "explanation": "Phân tích đề: Account chưa bật VPC Flow Logs và chưa có trail CloudTrail; hỏi GuardDuty cần gì để phân tích hoạt động mạng và API.\n(A) SAI: GuardDuty không nhận DNS log qua CloudWatch agent; nguồn DNS lõi đến từ Route 53 Resolver mà GuardDuty tự thu thập.\n(B) SAI: Trail CloudTrail vẫn hữu ích cho audit, nhưng GuardDuty không cần trail hay quyền đọc bucket của trail để phân tích management events.\n(C) SAI: GuardDuty không đọc Flow Logs do bạn tạo; tự tạo Flow Logs gửi vào CloudWatch Logs chỉ tốn thêm chi phí mà GuardDuty vẫn không dùng tới.\n(D) ĐÚNG: GuardDuty lấy dữ liệu từ luồng độc lập, trùng lặp của VPC Flow Logs, DNS logs và CloudTrail management events ngay khi được bật; không cần bật Flow Logs hay tạo trail, không cần agent.\nĐáp án đúng: D\nĐiểm cần nhớ: GuardDuty là dịch vụ managed, bật một click là chạy: ba nguồn lõi (Flow Logs, DNS, CloudTrail management events) được thu thập độc lập, bạn không cần tự bật hay trả tiền lưu các log đó.",
+      "tagNames": [
+        "Secure Architectures > Threat-Detection (GuardDuty / Inspector / Macie / Security Hub)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Install the CloudWatch agent on every EC2 instance so that GuardDuty can receive DNS query logs.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create a multi-Region CloudTrail trail and grant GuardDuty read access to the trail's S3 bucket.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Create VPC Flow Logs for every VPC and publish them to CloudWatch Logs before enabling GuardDuty.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Enable GuardDuty only, because it consumes independent streams of flow log, DNS, and CloudTrail data.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company deploys Amazon EC2 instances with AWS CloudFormation. The templates hardcode Amazon Linux 2023 AMI IDs for each Region, and the IDs become outdated every month. The company wants every stack deployment to use the latest Amazon Linux 2023 AMI automatically. Which solution meets this requirement with the LEAST operational overhead?",
+      "explanation": "Phân tích đề: Cần luôn lấy AMI Amazon Linux 2023 mới nhất khi deploy CloudFormation, không muốn tự duy trì danh sách AMI ID theo Region; từ khóa LEAST operational overhead.\n(A) SAI: Custom resource gọi DescribeImages chạy được nhưng phải viết, bảo trì và phân quyền cho Lambda, nhiều công hơn so với dùng public parameter có sẵn.\n(B) ĐÚNG: AWS công bố public parameter trong Parameter Store (ví dụ /aws/service/ami-amazon-linux-latest/...) luôn trỏ tới AMI mới nhất. Tham số template kiểu AWS::SSM::Parameter::Value<AWS::EC2::Image::Id> được CloudFormation resolve lúc tạo/cập nhật stack, không cần code hay dữ liệu tự quản.\n(C) SAI: Secrets Manager dành cho dữ liệu bí mật cần bảo vệ/rotate; AMI ID không phải bí mật và AWS không công bố AMI mới nhất vào Secrets Manager, nên vẫn phải tự cập nhật secret.\n(D) SAI: Mappings theo Region cộng Lambda cập nhật hằng tháng vẫn là tự duy trì dữ liệu AMI, thêm code và pipeline commit template, tốn công vận hành.\nĐáp án đúng: B\nĐiểm cần nhớ: Muốn AMI mới nhất trong CloudFormation hãy dùng public parameter của Parameter Store với kiểu tham số AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>.",
+      "tagNames": [
+        "Secure Architectures > AWS-Systems-Manager"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create a Lambda-backed custom resource that calls DescribeImages on every deployment and returns the newest matching image ID to the template.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Use a parameter of type AWS::SSM::Parameter::Value<AWS::EC2::Image::Id> whose default is the Amazon Linux 2023 public parameter path.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Store the AMI IDs in AWS Secrets Manager and reference the secret with a dynamic reference that resolves during stack creation.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Maintain a Mappings section for each Region and update it monthly with a scheduled AWS Lambda function that commits the new AMI IDs.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "An application in the Analytics account runs under an IAM role and must copy objects from an Amazon S3 bucket in the Sales account into a bucket in the Analytics account by using a single CopyObject request. The team configured the application to assume a role in the Sales account, but the copy failed because that session could not write to the Analytics bucket. Which solution meets the requirement with the FEWEST changes?",
+      "explanation": "Phân tích đề: Một request CopyObject cần đồng thời quyền đọc nguồn (Sales) và ghi đích (Analytics). Khi assume role sang Sales, phiên mới chỉ có quyền của role đó, bỏ lại quyền gốc ở Analytics.\n(A) SAI: Lỗi không liên quan tới thời hạn credential; tăng session duration không cho phiên Sales quyền ghi bucket Analytics.\n(B) SAI: Role chaining quay lại role Analytics lại làm mất quyền của phiên Sales, vẫn không có danh tính nào giữ cả hai quyền.\n(C) SAI: AWS RAM không hỗ trợ chia sẻ S3 bucket; chia sẻ bucket cross-account dùng bucket policy hoặc access point.\n(D) ĐÚNG: Giữ ứng dụng chạy bằng role của chính nó (đã có quyền ghi bucket Analytics), cấp quyền đọc qua bucket policy của Sales cho role đó và thêm s3:GetObject vào identity policy của role. Với resource-based policy, principal vẫn giữ quyền gốc nên một danh tính có đủ cả hai phía.\nĐáp án đúng: D\nĐiểm cần nhớ: Assume role = đổi hẳn danh tính và mất quyền cũ; resource-based policy cho phép giữ nguyên danh tính và quyền gốc, hợp với thao tác cần quyền ở cả hai account.",
+      "tagNames": [
+        "Secure Architectures > IAM / AWS-STS (Identity and Access Management / Security Token Service)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Increase the maximum session duration of the Sales role so the copy completes before expiration.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Chain a second AssumeRole call from the Sales session back to the Analytics role before copying.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Share the Sales bucket with the Analytics account by creating a resource share in AWS RAM.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Allow the application role to read in the Sales bucket policy and use that role without AssumeRole.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company runs AWS Managed Microsoft AD for the domain corp.example.com in a shared services VPC. Workloads in 20 other VPCs, connected through a transit gateway, must resolve the domain so that EC2 instances can join it. The VPCs must continue to use the Amazon Route 53 Resolver for all other names. Which solution meets these requirements with the LEAST operational overhead?",
+      "explanation": "Phân tích đề: 20 VPC cần phân giải riêng tên miền AD, các tên khác vẫn qua Route 53 Resolver, vận hành ít nhất.\n(A) SAI: Đổi DHCP options set để mọi truy vấn đi qua DNS của directory vi phạm yêu cầu giữ Route 53 Resolver cho các tên khác và phải sửa ở từng VPC.\n(B) ĐÚNG: Route 53 Resolver outbound endpoint kèm forwarding rule cho corp.example.com trỏ tới IP DNS của directory chỉ chuyển tiếp đúng tên miền AD; chia sẻ rule qua AWS RAM và gắn vào các VPC là xong, mọi tên khác vẫn do Resolver xử lý.\n(C) SAI: Inbound endpoint dùng để nhận truy vấn từ bên ngoài vào Resolver, sai chiều so với nhu cầu VPC workload hỏi tên miền AD.\n(D) SAI: Private hosted zone chép tay bản ghi domain controller (SRV, A) sẽ lỗi thời khi directory thay đổi và phải bảo trì thủ công.\nĐáp án đúng: B\nĐiểm cần nhớ: Cho nhiều VPC phân giải tên miền của Managed AD => Resolver outbound endpoint + forwarding rule chia sẻ qua RAM.",
+      "tagNames": [
+        "Secure Architectures > IAM-Identity-Center / AWS-Directory-Service (Federation and SSO)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Change the DHCP options set in every VPC so that the directory DNS servers answer all DNS queries for the instances",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create a Resolver outbound endpoint and a forwarding rule for the domain to the directory DNS IPs, and share the rule with AWS RAM",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Create a Resolver inbound endpoint in each workload VPC and point the directory's conditional forwarders to those endpoints",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Create a Route 53 private hosted zone for the domain, copy the domain controller records into it, and associate it with all VPCs",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A B2B marketplace uses an Amazon Cognito user pool with self-service sign-up enabled. Only people whose email domain belongs to an approved partner company may register. The list of approved domains is stored in an Amazon DynamoDB table and changes every week. Which solution enforces this requirement with the LEAST operational overhead?",
+      "explanation": "Phân tích đề: Chặn đăng ký ngay từ đầu dựa trên danh sách động trong DynamoDB, ít vận hành => Lambda trigger chạy trước khi tạo user.\n(A) SAI: Post confirmation chạy sau khi user đã được tạo và xác nhận, người dùng không hợp lệ vẫn tồn tại trong một khoảng thời gian, sai cách kiểm soát.\n(B) SAI: Tạo thủ công mọi user là vận hành nặng nhất, trái với yêu cầu LEAST operational overhead.\n(C) ĐÚNG: Pre sign-up chạy trước khi Cognito tạo user; Lambda tra DynamoDB và ném lỗi để từ chối domain không được duyệt, danh sách thay đổi chỉ cần sửa bảng.\n(D) SAI: WAF không đọc bảng DynamoDB và việc duy trì rule khớp email trong body theo danh sách thay đổi hằng tuần vừa khó vừa dễ sót.\nĐáp án đúng: C\nĐiểm cần nhớ: Kiểm tra/từ chối trước khi tạo user => Pre sign-up; hành động sau khi user xác nhận => Post confirmation.",
+      "tagNames": [
+        "Secure Architectures > Amazon-Cognito"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Add a Post confirmation Lambda trigger that deletes users whose domains are not in the table.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Disable self-service sign-up and have administrators create every partner user in the console.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Add a Pre sign-up Lambda trigger that rejects sign-ups whose email domain is not in the table.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Associate an AWS WAF web ACL with the user pool that blocks unapproved domains in request bodies.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company's domain example.com is registered and hosted with a third-party DNS provider, not Amazon Route 53. The company wants a public ACM certificate for its Amazon CloudFront distribution that renews automatically, without anyone approving emails each year. Moving DNS hosting to Route 53 is not allowed this year. What should the solutions architect do?",
+      "explanation": "Phân tích đề: DNS ở nhà cung cấp bên ngoài, cert cho CloudFront, muốn tự gia hạn không cần duyệt email. Từ khóa: 'third-party DNS provider', 'renews automatically', 'CloudFront'.\n(A) SAI: ACM chỉ tự tạo bản ghi validation khi hosted zone nằm trong Route 53 của cùng account; với DNS bên thứ ba phải tự thêm CNAME.\n(B) SAI: Cert import vào ACM không bao giờ được ACM tự gia hạn, sẽ lại hết hạn nếu không import lại.\n(C) SAI: Email validation luôn đòi người nhận bấm duyệt mỗi lần gia hạn; chuyển tiếp hộp thư không loại bỏ thao tác thủ công.\n(D) ĐÚNG: DNS validation hoạt động với bất kỳ nhà cung cấp DNS nào; chỉ cần tạo thủ công bản ghi CNAME mà ACM đưa ra. Cert phải yêu cầu ở us-east-1 vì dùng cho CloudFront, và ACM tự gia hạn miễn là CNAME còn đó.\nĐáp án đúng: D\nĐiểm cần nhớ: DNS validation không bắt buộc Route 53; Route 53 chỉ giúp tạo CNAME bằng một click. Cert cho CloudFront luôn ở us-east-1.",
+      "tagNames": [
+        "Secure Architectures > AWS-KMS / ACM (Encryption Keys and Certificates)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Request the certificate with DNS validation and let ACM create the validation record at the third-party provider.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Import a certificate bought from the DNS provider's certificate authority into ACM so that ACM renews it.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Request the certificate with email validation and forward the domain admin mailbox to a shared team alias.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Request the certificate in us-east-1 with DNS validation and create the provided CNAME at the current DNS provider.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company is launching a new Amazon RDS for MySQL DB instance. The security team requires that the master user password is generated by AWS, is never visible to administrators during provisioning, and is rotated automatically. The team wants to avoid deploying or maintaining any rotation Lambda functions. What should a solutions architect do?",
+      "explanation": "Phân tích đề: Mật khẩu master do AWS sinh, không ai thấy, tự xoay, và không muốn quản lý Lambda rotation.\n(A) SAI: Tạo secret với rotation Lambda từ template single-user vẫn phải triển khai và duy trì một Lambda function (dù được dựng sẵn), trái yêu cầu.\n(B) SAI: IAM database authentication là cách xác thực bổ sung; DB instance vẫn luôn có master user password, không thể bỏ đi, nên vẫn cần quản lý mật khẩu này.\n(C) ĐÚNG: Bật tùy chọn để RDS quản lý master user password trong Secrets Manager (ManageMasterUserPassword). RDS tự sinh mật khẩu, lưu vào secret do RDS quản lý và bật managed rotation (mặc định 7 ngày) mà không cần Lambda do khách hàng quản lý.\n(D) SAI: RDS không đọc mật khẩu master từ Parameter Store; ngoài ra Parameter Store không có rotation.\nĐáp án đúng: C\nĐiểm cần nhớ: RDS/Aurora (và Redshift) có thể tự quản lý mật khẩu master trong Secrets Manager với managed rotation, không cần Lambda: ít công vận hành nhất.",
+      "tagNames": [
+        "Secure Architectures > AWS-Secrets-Manager"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create a secret that uses a rotation Lambda function deployed from the RDS single-user rotation template.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Enable IAM database authentication and remove the master user password from the DB instance entirely.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Enable the RDS option to manage the master user password in Secrets Manager when creating the instance.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Store a generated password in a Parameter Store SecureString parameter that the DB instance references.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MSQ",
+      "questionText": "A data lake bucket in Amazon S3 is shared by more than 40 application teams, and each team needs different permissions on different prefixes. The bucket policy is approaching its size limit, and every change risks breaking access for other teams. The company wants each team's access to be managed independently while keeping a single bucket. Which TWO actions should a solutions architect take?",
+      "explanation": "Phân tích đề: Một bucket dùng chung cho nhiều team, bucket policy sắp chạm giới hạn kích thước (20 KB), cần quản lý quyền từng team độc lập mà vẫn giữ một bucket.\n(A) SAI: Mỗi bucket chỉ có một bucket policy duy nhất; không thể gắn nhiều bucket policy.\n(B) ĐÚNG: Để access point hoạt động, bucket policy phải cho phép; cách chuẩn là ủy quyền kiểm soát truy cập cho các access point thuộc account chủ bucket (điều kiện s3:DataAccessPointAccount), khi đó bucket policy gọn và ổn định.\n(C) ĐÚNG: Mỗi S3 Access Point có hostname và access point policy riêng; tạo một access point cho mỗi team với policy giới hạn prefix của team đó giúp tách quyền và thay đổi không ảnh hưởng team khác.\n(D) SAI: Tách thành nhiều bucket và replicate dữ liệu dùng chung làm tăng chi phí lưu trữ, phức tạp đồng bộ và trái yêu cầu giữ một bucket.\n(E) SAI: ACL là cơ chế cũ, hạt thô, AWS khuyến nghị tắt; không cấp quyền theo prefix linh hoạt được.\nĐáp án đúng: B và C\nĐiểm cần nhớ: Bucket dùng chung cho nhiều ứng dụng, bucket policy quá lớn => S3 Access Points (mỗi app một policy) + bucket policy ủy quyền cho access point.",
+      "tagNames": [
+        "Secure Architectures > S3-Encryption-Policies"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Split the bucket policy into multiple bucket policies attached to the same bucket, one for each team.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Update the bucket policy to delegate access control to access points owned by the bucket owner's account.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Create a separate S3 access point for each team with an access point policy scoped to that team's prefix.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Create a separate bucket for each team and use S3 Same-Region Replication to copy shared data between them.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "E",
+          "answerText": "Enable ACLs on the bucket and grant each team's IAM role READ permission on the objects that it needs.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "An application in the App VPC (account 111111111111) runs in an Auto Scaling group, so instance IP addresses change frequently. It must connect to an Amazon RDS for PostgreSQL DB instance in the Data VPC (account 222222222222). Both VPCs are in the same Region and are connected by a VPC peering connection with correct routes. The database team wants to allow only the application instances and does not want to maintain IP address lists. What should the solutions architect do?",
+      "explanation": "Phân tích đề: Nguồn là Auto Scaling (IP thay đổi), khác account nhưng cùng Region qua peering; chỉ cho phép đúng app, không duy trì danh sách IP.\n(A) SAI: Mở TCP 5432 cho toàn CIDR của App VPC chạy được nhưng cho phép mọi tài nguyên khác trong VPC đó truy cập DB, vi phạm least privilege.\n(B) ĐÚNG: Với peering cùng Region, security group có thể tham chiếu security group của VPC peer (kèm account ID của peer, dạng 111111111111/sg-xxxx). Instance mới do Auto Scaling tạo ra gắn app security group sẽ tự động được phép, không cần cập nhật IP.\n(C) SAI: Network ACL chỉ hiểu CIDR, không thể dùng security group làm nguồn của rule.\n(D) SAI: Prefix list chứa IP hiện tại của instance phải cập nhật liên tục mỗi khi Auto Scaling thay instance, trái với yêu cầu không duy trì danh sách IP.\nĐáp án đúng: B\nĐiểm cần nhớ: Tham chiếu security group qua VPC peering được hỗ trợ trong cùng Region (kể cả khác account); khác Region thì không.",
+      "tagNames": [
+        "Secure Architectures > VPC-Traffic-Control"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Add an inbound rule to the DB security group that allows TCP 5432 from the entire App VPC CIDR block.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Add an inbound rule to the DB security group that references the application security group of the peer account.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Add a network ACL rule on the database subnets that uses the application security group as the traffic source.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Create a prefix list of the current application instance IP addresses and reference it in the DB security group.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company runs a Linux-based web application on Amazon EC2. The operations team wants to create Amazon CloudWatch alarms on memory utilization and on the percentage of root volume disk space used, but these metrics do not appear in the AWS/EC2 namespace. What should a solutions architect do?",
+      "explanation": "Phân tích đề: Cần metric RAM và dung lượng đĩa đã dùng trên EC2; namespace AWS/EC2 không có sẵn các metric này.\n(A) SAI: CloudTrail data events ghi lại lời gọi API, không đo mức sử dụng bộ nhớ hay dung lượng đĩa bên trong OS.\n(B) ĐÚNG: Unified CloudWatch agent chạy trong hệ điều hành nên đọc được mem_used_percent, disk_used_percent… và đẩy lên namespace CWAgent; sau đó tạo alarm bình thường.\n(C) SAI: Detailed monitoring chỉ tăng tần suất metric mặc định (CPU, network, disk I/O, status check) từ 5 phút xuống 1 phút, không thêm metric RAM hay disk space.\n(D) SAI: Compute Optimizer là dịch vụ khuyến nghị right-size; nó còn cần chính CloudWatch agent để có dữ liệu RAM chứ không tự publish metric RAM.\nĐáp án đúng: B\nĐiểm cần nhớ: Hypervisor không nhìn thấy bên trong guest OS, nên RAM, disk space, swap, process đều cần CloudWatch agent.",
+      "tagNames": [
+        "Resilient Architectures > AWS-CloudWatch"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create an AWS CloudTrail trail with data events enabled for the EBS volumes attached to the instances.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Install and configure the unified CloudWatch agent on the instances to collect memory and disk space metrics.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Enable detailed monitoring on the instances so that memory and disk space metrics are published every minute.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Opt in to AWS Compute Optimizer so that it publishes memory and disk space metrics to CloudWatch.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A startup has containerized its REST API. The engineering team does not want to select instance types, patch operating systems, or scale a fleet of container hosts. They only want to declare CPU and memory for each copy of the container. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Chạy container nhưng không chọn instance type, không vá OS, không scale host, chỉ khai báo CPU/RAM cho mỗi bản container => container serverless.\n(A) ĐÚNG: Amazon ECS với AWS Fargate chỉ yêu cầu khai báo CPU/memory ở mức task; AWS cung cấp và quản lý toàn bộ hạ tầng bên dưới, không có host để vá hay scale.\n(B) SAI: Tự cài Docker trên EC2 trong Auto Scaling group là mức tự quản cao nhất: phải lo OS, runtime container, scaling và điều phối.\n(C) SAI: ECS với EC2 launch type vẫn chạy trên cụm EC2 trong account của bạn; đội phải chọn instance type, vá AMI và scale cụm host.\n(D) SAI: EKS với self-managed node group vẫn yêu cầu quản lý node EC2 (AMI, vá lỗi, nâng cấp), trái với yêu cầu không quản lý host.\nĐáp án đúng: A\nĐiểm cần nhớ: Container + không muốn quản lý server/instance => ECS (hoặc EKS) trên Fargate; chỉ khai báo CPU/memory cho task.",
+      "tagNames": [
+        "Resilient Architectures > Managed-Compute (ECS / EKS / Fargate)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Run the API as an Amazon ECS service that uses the AWS Fargate launch type.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Install Docker on Amazon EC2 instances in an Auto Scaling group behind a load balancer.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Run the API on Amazon ECS with the EC2 launch type and a cluster Auto Scaling group.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Run the API on Amazon EKS with a self-managed node group of EC2 instances.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A retail company runs a custom TCP order daemon on one Amazon EC2 instance in a single Availability Zone. When that instance or the Availability Zone fails, stores cannot submit orders. A solutions architect must provide one DNS name that sends connections to instances in two Availability Zones. The protocol is not HTTP. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Giao thức TCP thuần, cần một DNS name và chịu lỗi hai Availability Zone. Không có nội dung HTTP để định tuyến.\n(A) SAI: Gateway Load Balancer chèn thiết bị bảo mật bằng GENEVE, không phải cân bằng tải ứng dụng TCP cho cửa hàng.\n(B) SAI: Application Load Balancer không nhận giao thức TCP tùy biến, không có listener UDP hay path cho daemon không phải HTTP, và Lambda target không chạy tiến trình TCP này.\n(C) ĐÚNG: Network Load Balancer làm việc ở tầng 4 cho TCP, đứng trước Auto Scaling group rải instance ở hai AZ, nên một DNS name vẫn phục vụ khi một instance hoặc một AZ lỗi.\n(D) SAI: Thêm một instance rồi đổi IP thủ công không phải điểm truy cập duy nhất và không tự loại máy hỏng.\nĐáp án đúng: C\nĐiểm cần nhớ: TCP hoặc UDP, không cần đọc HTTP, thì chọn Network Load Balancer và rải target trên nhiều AZ.",
+      "tagNames": [
+        "Resilient Architectures > ELB (Application / Network Load Balancer)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create a Gateway Load Balancer and add a listener rule that forwards store traffic to the order daemon.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create an Application Load Balancer path rule for the order daemon and register that process as a Lambda target.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Register instances from an Auto Scaling group in two Availability Zones with a Network Load Balancer TCP listener.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Add a second instance in another Availability Zone and have each store fail over by editing the server IP address.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A streaming company wants an Auto Scaling group to launch a mix of On-Demand and Spot instances and to keep earlier instance configurations so an AMI change can be reversed. Which resource should define the instance configuration?",
+      "explanation": "Phân tích đề: Cần trộn On-Demand với Spot và giữ các bản cấu hình để quay lại AMI cũ.\n(A) ĐÚNG: Launch template có versioning và là nền để gắn mixed instances policy, nên vừa trộn Spot với On-Demand vừa đổi default version khi cần hoàn tác AMI.\n(B) SAI: Tạo lại cả Auto Scaling group mỗi lần đổi AMI gây gián đoạn và không lưu lịch sử cấu hình theo version.\n(C) SAI: Launch configuration không có version và không gắn mixed instances policy, nên không đáp ứng cả hai yêu cầu.\n(D) SAI: Capacity Reservation giữ chỗ On-Demand cho một instance type, không định nghĩa AMI, security group hay tỷ lệ Spot.\nĐáp án đúng: A\nĐiểm cần nhớ: Muốn version và trộn On-Demand với Spot thì dùng launch template; launch configuration không làm được hai việc này.",
+      "tagNames": [
+        "Resilient Architectures > AWS-Auto-Scaling"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "A launch template with versions, referenced by a mixed instances policy that sets the On-Demand and Spot split.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "A replacement Auto Scaling group that is created from scratch each time the AMI identifier changes.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "A launch configuration that stores numbered versions and mixes On-Demand with Spot in one group.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "An On-Demand Capacity Reservation that resizes each running instance to the next larger type.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company hosts one status page on a single Amazon EC2 instance that has an Elastic IP address. The page does not need a percentage split, a standby site, or health-based removal. Which Amazon Route 53 configuration should a solutions architect use?",
+      "explanation": "Phân tích đề: Một EC2 với Elastic IP, không cần chia tỉ lệ, không cần standby, không cần loại endpoint theo health check.\n(A) ĐÚNG: Simple routing trả về đúng địa chỉ đó và là policy dành cho một tài nguyên không cần định tuyến thông minh.\n(B) SAI: Latency routing dùng để so sánh độ trễ giữa nhiều Region; một Region duy nhất không có gì để so.\n(C) SAI: Geoproximity kèm bias 0 trong traffic flow dùng khi muốn kéo traffic theo vị trí địa lý, không phải khi chỉ có một máy.\n(D) SAI: Failover bắt buộc có primary và secondary; trỏ secondary vào cùng Elastic IP không tạo thêm năng lực và thừa so với yêu cầu.\nĐáp án đúng: A\nĐiểm cần nhớ: Một endpoint, không health check và không chia traffic thì dùng simple routing. Simple routing không gắn được health check.",
+      "tagNames": [
+        "Resilient Architectures > Amazon-Route-53"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Use a simple routing record that points the name at the instance Elastic IP address.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Use a latency record and set its Region to the Region where that single instance runs.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Use a geoproximity traffic policy with a bias of zero toward the instance Region.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Use failover routing with a secondary record that points at the same Elastic IP address.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A hospital stores diagnostic images in an Amazon S3 Standard bucket. An auditor asks how those objects are protected if one Availability Zone fails, and what durability S3 Standard is designed to provide. Which statement should a solutions architect give?",
+      "explanation": "Phân tích đề: Auditor hỏi độ bền và khả năng chịu mất một AZ của S3 Standard, không phải chi phí lớp lưu trữ.\n(A) SAI: S3 Standard không gom dữ liệu vào một AZ. AWS Backup tạo bản sao theo lịch, không phải cơ chế độ bền sẵn có của lớp này.\n(B) SAI: S3 là object storage. Bucket không nằm trên Amazon EBS, nên snapshot EBS không phải lớp bảo vệ của object.\n(C) SAI: Amazon S3 không tự đồng bộ object sang Region khác. Muốn có bản ở Region thứ hai phải cấu hình replication, và việc đó là bất đồng bộ.\n(D) ĐÚNG: S3 Standard lưu object trên tối thiểu 3 Availability Zone và được thiết kế cho độ bền 99.999999999% (11 số 9). Mất một AZ không làm mất object.\nĐáp án đúng: D\nĐiểm cần nhớ: S3 Standard được thiết kế 11 số 9 và trải trên tối thiểu 3 AZ. One Zone-IA và S3 Express One Zone không có tính chất đó.",
+      "tagNames": [
+        "Resilient Architectures > Amazon-S3 (Simple Storage Service)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Objects are kept in one Availability Zone, and an AWS Backup plan copies the bucket to a second Availability Zone every night.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Objects reside on the Amazon EBS volume that backs the bucket, so an EBS snapshot covers an Availability Zone failure.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Objects are synchronously mirrored by Amazon S3 to a second Region, which removes the need for any replication rule.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Objects are stored across at least three Availability Zones and are designed for 99.999999999% durability.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company stores shared Linux configuration files on Amazon EFS. An engineer created the file system as One Zone in a single Availability Zone to lower the storage bill. The files must remain available if that Availability Zone is impaired. What should a solutions architect explain?",
+      "explanation": "Phân tích đề: File system là EFS One Zone; dữ liệu phải còn truy cập được khi đúng AZ đó suy giảm.\n(A) SAI: One Zone chỉ gắn một mount target trong AZ đã chọn. Không thêm mount target ở AZ khác trên cùng file system để biến nó thành multi-AZ.\n(B) SAI: Lifecycle chuyển file sang Infrequent Access hoặc Archive trên cùng file system, cùng mô hình AZ. Việc này không nhân bản sang AZ khác.\n(C) SAI: Kiểu One Zone hay Regional chọn lúc tạo, không đổi tại chỗ. Console không nâng file system hiện có lên Regional mà giữ nguyên dữ liệu.\n(D) ĐÚNG: One Zone lưu dữ liệu trong một Availability Zone. AZ đó suy giảm thì file system có thể mất khả dụng. Muốn chịu lỗi AZ phải dùng file system Regional, dữ liệu nằm dư thừa trên nhiều AZ.\nĐáp án đúng: D\nĐiểm cần nhớ: EFS One Zone rẻ hơn nhưng gắn một AZ. Production cần sống sót khi mất AZ thì tạo EFS Regional.",
+      "tagNames": [
+        "Resilient Architectures > Amazon-EFS / Amazon-FSx (Shared File Storage)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Add mount targets in other AZs on this One Zone file system so clients fail over with no data copy.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Enable lifecycle management so files move to Infrequent Access, which writes a spare copy into every other AZ.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Switch this file system from One Zone to Regional in the console so existing bytes are spread across AZs in place.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "One Zone keeps data in a single AZ, so an impairment there can make the files unavailable.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A team is new to AWS Backup and asks what a backup vault is used for when they protect Amazon EBS volumes and Amazon RDS databases. Which description is correct?",
+      "explanation": "Phân tích đề: Hỏi vault dùng để làm gì: kho chứa recovery point, khác với policy lịch, SCP, hay bản sao đang chạy.\n(A) SAI: SCP chỉ đặt trần quyền. SCP không lưu recovery point và không thay thế backup vault.\n(B) SAI: S3 Object Lock khóa object trong bucket, không phải nơi AWS Backup cất recovery point của EBS hay RDS.\n(C) SAI: Multi-AZ là sẵn sàng cho instance đang chạy. Vault giữ bản sao theo thời điểm để khôi phục dữ liệu cũ.\n(D) ĐÚNG: Backup vault là kho lưu recovery point, mã hóa bằng KMS. Plan quyết định lịch; vault là nơi giữ bản sao.\nĐáp án đúng: D\nĐiểm cần nhớ: Backup vault là kho recovery point đã mã hóa. Plan, SCP và Multi-AZ làm việc khác.",
+      "tagNames": [
+        "Resilient Architectures > AWS-Backup"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "An AWS Organizations service control policy that denies deleting backups in every member account from the management account.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "An Amazon S3 bucket policy that versions objects and applies S3 Object Lock legal hold to every EC2 snapshot stored as a user object.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "A Multi-AZ Amazon RDS standby that fails over in place so the application does not need a stored recovery point.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "An encrypted container that stores recovery points produced by the backup jobs in that Region.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A city library runs its catalog on Amazon RDS for MariaDB in a single Availability Zone. The city requires another copy in a different Availability Zone that receives each committed write before the commit succeeds, and Amazon RDS must switch to that copy automatically if the primary host fails. Which approach meets this requirement?",
+      "explanation": "Phân tích đề: Cần bản sao khác AZ, nhận ghi đã commit trước khi commit trả về, và RDS tự chuyển khi host primary hỏng. Đó là Multi-AZ DB instance.\n(A) ĐÚNG: Multi-AZ DB instance tạo standby ở AZ khác, replicate synchronous, và khi primary hỏng RDS tự failover, cập nhật DNS của cùng endpoint.\n(B) SAI: Read replica replicate asynchronous, không nhận ghi trước khi commit hoàn tất, và không tự failover; phải promote thủ công nên có thể mất giao dịch chưa kịp replicate.\n(C) SAI: Cross-Region automated backup replication phục vụ restore ở Region khác, không phải standby trong AZ khác và không tự chuyển khi host hỏng.\n(D) SAI: Snapshot tay là bản chụp tại một thời điểm, không replicate từng commit và không tự động thay primary.\nĐáp án đúng: A\nĐiểm cần nhớ: Synchronous + standby + automatic failover trong cùng Region = Multi-AZ DB instance.",
+      "tagNames": [
+        "Resilient Architectures > RDS-Multi-AZ-and-Read-Replicas"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Enable a Multi-AZ DB instance deployment so RDS keeps a synchronous standby in a second Availability Zone.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Create an in-Region read replica in a second Availability Zone and promote it from a runbook if the primary host fails.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Turn on cross-Region automated backup replication and restore a new DB instance in the second Availability Zone after a host failure.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Copy a manual snapshot to a second Region every night and restore it if the primary host fails.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A municipal permit office runs Amazon Aurora MySQL with a writer in one Availability Zone and a reader in another. The writer Availability Zone fails. A reviewer says the cluster volume is gone and the latest snapshot must be restored before any new permits can be saved. What should a solutions architect explain?",
+      "explanation": "Phân tích đề: Writer mất AZ nhưng đã có reader ở AZ khác; volume Aurora tách khỏi compute.\n(A) SAI: Chuyển sổ phép sang DynamoDB vừa đổi mô hình dữ liệu vừa không khôi phục cụm Aurora đang chạy.\n(B) ĐÚNG: Aurora promote reader còn khỏe thành writer. Dữ liệu đã commit nằm trên cluster volume dùng chung (6 bản sao trên 3 AZ), không phải trên đĩa riêng của instance writer vừa mất, nên không cần restore snapshot để tìm lại dữ liệu.\n(C) SAI: Restore snapshot ra cluster mới làm thời gian gián đoạn dài và tạo endpoint mới, trong khi volume hiện tại vẫn còn và replica đã có thể được promote.\n(D) SAI: Aurora không có tùy chọn Multi-AZ kiểu standby không đọc của RDS, và standby đó cũng không dựng lại volume từ binary log sau khi mất AZ.\nĐáp án đúng: B\nĐiểm cần nhớ: Hỏng instance writer không xóa cluster volume. Có Aurora Replica ở AZ khác thì Aurora promote replica đó, không restore snapshot.",
+      "tagNames": [
+        "Resilient Architectures > Amazon-Aurora"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Load the latest snapshot into a new Amazon DynamoDB table and accept permit writes there until the Aurora volume is rebuilt.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "A healthy reader in the other Availability Zone is promoted to writer, and committed data stays on the shared six-copy cluster volume.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Restore the latest snapshot to a new cluster in a remaining Availability Zone and repoint every permit application before writes resume.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Turn on the RDS Multi-AZ option so a non-readable standby can rebuild the Aurora volume from binary logs after the Availability Zone loss.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company is moving a key-value product catalog from a self-managed database on a single Amazon EC2 instance to Amazon DynamoDB. The catalog must remain available if one Availability Zone in the Region fails. What must a solutions architect configure to meet this requirement?",
+      "explanation": "Phân tích đề: Chỉ cần chịu được lỗi một AZ trong cùng Region với DynamoDB; từ khóa là tính sẵn sàng có sẵn của dịch vụ.\n(A) SAI: Global table thêm replica ở Region khác, phục vụ DR đa Region và ghi active-active; nó không cần thiết cho yêu cầu chỉ chịu lỗi một AZ và làm tăng chi phí replicated write.\n(B) SAI: DynamoDB không có tùy chọn Multi-AZ standby hay chọn subnet như Amazon RDS; đây là khái niệm của RDS bị áp sai dịch vụ.\n(C) ĐÚNG: DynamoDB tự động nhân bản dữ liệu đồng bộ trên nhiều AZ trong Region ngay khi ghi, nên bảng vẫn phục vụ khi một AZ gặp sự cố mà không cần cấu hình thêm gì.\n(D) SAI: DAX là cache đọc, không phải lớp lưu trữ; triển khai DAX nhiều node chỉ giữ cache sẵn sàng chứ không quyết định độ bền của bảng.\nĐáp án đúng: C\nĐiểm cần nhớ: DynamoDB mặc định chịu lỗi AZ (dữ liệu nằm trên nhiều AZ); chỉ khi cần chịu lỗi cả Region mới nghĩ tới global tables.",
+      "tagNames": [
+        "Resilient Architectures > Amazon-DynamoDB"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create a global table and add a replica in a second AWS Region.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Enable the Multi-AZ standby option and select subnets in two AZs for the table.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Nothing extra, because the table data is already replicated across AZs.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Deploy a DAX cluster with nodes spread across three Availability Zones.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A media company keeps video metadata in an in-memory cache. If the Availability Zone that holds the cache fails, the metadata must stay available and a standby copy must be promoted without an operator rebuilding the cache from the database. Which option meets this requirement?",
+      "explanation": "Phân tích đề: Mất cả AZ không được làm trống cache; cần bản standby được promote tự động.\n(A) SAI: MemoryDB là database bền tương thích Redis, phù hợp khi dữ liệu là nguồn sự thật. Đề chỉ cần cache chịu lỗi AZ và có thể dựng lại từ database.\n(B) SAI: DAX chỉ tăng tốc DynamoDB và không đứng trước một kho metadata tổng quát được.\n(C) SAI: Rải node Memcached qua nhiều AZ chỉ giới hạn lượng key mất trên node thuộc AZ lỗi; Memcached node-based không có replica để promote nên phần key trên node hỏng vẫn mất.\n(D) ĐÚNG: ElastiCache for Valkey (cùng mô hình với Redis OSS) hỗ trợ replica và Multi-AZ automatic failover. Replica đặt ở AZ khác được promote, primary endpoint giữ nguyên tên.\nĐáp án đúng: D\nĐiểm cần nhớ: Cần sống sót khi mất AZ và được promote tự động => Valkey hoặc Redis OSS với replica khác AZ và Multi-AZ. Memcached node-based không có replica.",
+      "tagNames": [
+        "Resilient Architectures > Amazon-ElastiCache"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Amazon MemoryDB deployed as the metadata cache in front of the catalog database",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "A DynamoDB Accelerator cluster placed in front of the catalog database",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Amazon ElastiCache for Memcached with nodes in three Availability Zones and Auto Discovery enabled",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Amazon ElastiCache for Valkey with Multi-AZ automatic failover and a replica in another AZ",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company runs a checkout API that calls a payment service directly. During payment deployments, customers receive errors and abandon carts. The company wants to accept checkouts while the payment service is unavailable and complete payment after it recovers. Which approach meets this requirement?",
+      "explanation": "Phân tích đề: Checkout đang gọi payment đồng bộ nên lúc payment deploy hoặc sập thì request fail ngay. Cần nhận checkout và xử lý thanh toán sau.\n(A) SAI: Thêm AZ và ALB giúp instance khỏe nhận traffic, nhưng lời gọi đồng bộ vẫn fail khi cả dịch vụ payment đang deploy hoặc trả lỗi. Không có buffer để hoàn tất sau.\n(B) SAI: ElastiCache có thể eviction hoặc mất dữ liệu khi restart, không phải hàng đợi bền cho giao dịch chưa thanh toán.\n(C) ĐÚNG: Checkout ghi message vào queue rồi trả lời khách. Worker payment pull khi dịch vụ sống lại, nên message không mất trong lúc deploy.\n(D) SAI: Email thủ công không nhận checkout tự động trong lúc deploy và không chịu được lưu lượng thật.\nĐáp án đúng: C\nĐiểm cần nhớ: Tách producer và consumer bằng SQS khi một bên sập hoặc đang deploy: message nằm trong queue cho đến khi consumer xử lý xong và xóa.",
+      "tagNames": [
+        "Resilient Architectures > Amazon-SQS (Simple Queue Service)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Add a second payment fleet in another Availability Zone behind an Application Load Balancer with connection draining.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Store unpaid carts in Amazon ElastiCache and have the payment service read that cache after each deployment.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Place an Amazon SQS queue between checkout and the payment workers.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Publish an Amazon SNS email to operators so they can type failed checkouts into the payment console.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A clinic books appointments in one application. Each booking must reach the patient email list and a billing worker at the same time. The application must make one publish call. Which service should a solutions architect use?",
+      "explanation": "Phân tích đề: Một sự kiện phải được đẩy tới email và một worker, publisher chỉ gọi một lần.\n(A) ĐÚNG: SNS standard topic nhận một lần Publish rồi đẩy bản sao tới subscription email và subscription SQS cho billing.\n(B) SAI: Một SQS queue chỉ để một consumer lấy message; queue không gửi email và không fan-out thành hai bản độc lập.\n(C) SAI: Kinesis Data Streams là luồng để nhiều consumer đọc theo iterator, không phải kênh gửi email lịch hẹn.\n(D) SAI: EventBridge Scheduler chạy theo lịch, không nhận sự kiện booking từ ứng dụng để đẩy email và queue.\nĐáp án đúng: A\nĐiểm cần nhớ: Một sự kiện cần đẩy tới nhiều đích, trong đó có email, là bài toán SNS standard topic.",
+      "tagNames": [
+        "Resilient Architectures > Amazon-SNS (Simple Notification Service)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "An Amazon SNS standard topic with email and Amazon SQS subscriptions.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "One Amazon SQS queue that both the mail gateway and the billing worker poll.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "An Amazon Kinesis Data Stream that emails patients from each shard iterator.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "An Amazon EventBridge Scheduler schedule that starts billing and email every minute.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company wants an AWS Lambda function to run automatically every time any Amazon EC2 instance in its account changes to the stopped state. The company does not want to poll the EC2 API. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: cần phản ứng tự động khi EC2 đổi trạng thái sang stopped, không polling. EC2 tự phát sự kiện 'EC2 Instance State-change Notification' lên default event bus.\n(A) SAI: Alarm CloudWatch trên CPUUtilization không phản ánh trạng thái stopped một cách tin cậy (instance dừng thì metric chỉ ngừng gửi), và vẫn chỉ gửi email chứ không gọi Lambda theo sự kiện.\n(B) SAI: Lịch chạy Lambda mỗi 5 phút gọi DescribeInstances chính là polling mà đề muốn tránh, lại có độ trễ tới 5 phút.\n(C) ĐÚNG: Rule trên default event bus với event pattern source aws.ec2, detail-type 'EC2 Instance State-change Notification', detail.state = stopped sẽ gọi Lambda ngay khi sự kiện xảy ra, không cần code polling.\n(D) SAI: AWS Config ghi lại thay đổi cấu hình tài nguyên phục vụ audit; trạng thái running/stopped không phải mục tiêu của Config rule và cách này phức tạp hơn nhiều.\nĐáp án đúng: C\nĐiểm cần nhớ: Sự kiện thay đổi trạng thái của dịch vụ AWS (EC2, ECS, ASG...) đi vào default event bus; chỉ cần rule + event pattern để phản ứng.",
+      "tagNames": [
+        "Resilient Architectures > Amazon-EventBridge"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create an Amazon CloudWatch alarm on the CPUUtilization metric of each instance that publishes to an Amazon SNS topic when the instance is stopped.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Schedule the function to run every 5 minutes, call DescribeInstances for all instances, and compare each instance state with the previous run.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Create an Amazon EventBridge rule on the default event bus that matches EC2 state-change events for the stopped state and targets the function.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Enable AWS Config with a custom rule that evaluates every EC2 instance and invokes the function whenever an instance is found in the stopped state.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company has ordered an AWS Direct Connect dedicated connection, but the provider says the cross-connect will take several weeks. The company needs private connectivity from its data center to a VPC within the next two days to start a migration. Which solution meets this requirement?",
+      "explanation": "Phân tích đề: Direct Connect cần hàng tuần để kéo cáp, nhưng cần kết nối trong 2 ngày => cần giải pháp dựng trong vài phút, dùng tạm trong lúc chờ DX.\n(A) SAI: Transit Gateway chỉ là router logic trong AWS; tạo Transit Gateway không tạo ra đường truyền từ data center, vẫn cần VPN hoặc DX gắn vào.\n(B) SAI: AWS Client VPN dành cho từng người dùng cá nhân kết nối bằng phần mềm client, không phải kết nối site-to-site giữa cả data center với VPC.\n(C) ĐÚNG: Site-to-Site VPN dựng trong vài phút qua Internet, có 2 tunnel IPsec tới Virtual Private Gateway hoặc Transit Gateway, dùng làm đường tạm và sau này giữ làm backup cho DX.\n(D) SAI: VPC peering chỉ nối hai VPC với nhau trong mạng AWS, không thể peering với mạng on-premises.\nĐáp án đúng: C\nĐiểm cần nhớ: Cần kết nối ngay trong vài phút => Site-to-Site VPN; Direct Connect mất hàng tuần tới hàng tháng để cung cấp.",
+      "tagNames": [
+        "Resilient Architectures > AWS-Direct-Connect / AWS-Transit-Gateway (Hybrid and Multi-VPC Networking)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create a transit gateway, attach the VPC, and route the data center prefixes to the attachment.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Deploy an AWS Client VPN endpoint in the VPC and connect the data center router to it.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Create an AWS Site-to-Site VPN over the internet to a virtual private gateway on the VPC.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Create a VPC peering connection between the VPC and the data center network range.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A payments API was accepting checkouts again 8 minutes after its primary Region failed. Orders placed during the previous 40 minutes were missing. The business objectives are an RTO of 30 minutes and an RPO of 5 minutes. Which objective was missed?",
+      "explanation": "Phân tích đề: Dịch vụ sống lại sau 8 phút (trong RTO 30 phút) nhưng mất 40 phút đơn hàng mới, trong khi RPO chỉ là 5 phút.\n(A) SAI: 8 phút gián đoạn vẫn nằm trong RTO 30 phút, nên mục tiêu thời gian khôi phục không bị phá.\n(B) ĐÚNG: RPO là lượng dữ liệu mới tối đa được phép mất, đo bằng thời gian. Mất 40 phút đơn hàng đã vượt RPO 5 phút.\n(C) SAI: Backup còn trong console không xóa việc 40 phút đơn hàng đã biến mất khỏi hệ thống phục hồi.\n(D) SAI: Mất dữ liệu không tự làm RTO thất bại. RTO chỉ xét lúc nào dịch vụ dùng được trở lại, và mốc đó là 8 phút.\nĐáp án đúng: B\nĐiểm cần nhớ: RTO là được chết bao lâu. RPO là được mất bao nhiêu dữ liệu gần nhất. Hai số độc lập với nhau.",
+      "tagNames": [
+        "Resilient Architectures > AWS-DR-Strategies"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "The RTO was missed because eight minutes of checkout downtime sits outside the 30-minute recovery window, and the missing orders are a reporting delay.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "The RPO was missed because 40 minutes of committed orders were lost after the API returned.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Neither objective was missed because the API was reachable again inside 30 minutes and the primary Region backups were still listed in the console.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Both objectives were missed because lost orders mean the service was not restored until operators rebuilt the missing rows by hand.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A media company runs a CPU-bound subtitle renderer on Amazon EC2. Profiling shows each job saturates its cores and uses about 2 GiB of RAM per vCPU. Which instance family matches this profile?",
+      "explanation": "Phân tích đề: Job render bão hòa CPU và chỉ cần khoảng 2 GiB RAM mỗi vCPU. Phải chọn họ có đúng tỉ lệ đó.\n(A) ĐÚNG: Họ C có tỉ lệ khoảng 2 GiB RAM trên mỗi vCPU, khớp job CPU-bound đang bão hòa core.\n(B) SAI: Họ T dành cho tải thấp, có spike ngắn. Render bão hòa CPU suốt phiên làm việc sẽ đốt CPU credit hoặc phát sinh phí surplus credit.\n(C) SAI: Họ R khoảng 8 GiB RAM mỗi vCPU. Job chỉ dùng khoảng 2 GiB nên phần RAM thừa bị trả tiền nhưng không phục vụ nút thắt CPU.\n(D) SAI: Họ I tối ưu IOPS của NVMe cục bộ. Đề không nghẽn đĩa; chọn họ I làm lệch tỉ lệ CPU và RAM của job render.\nĐáp án đúng: A\nĐiểm cần nhớ: CPU-bound khoảng 2 GiB RAM/vCPU thì chọn họ C. Thấy chữ RAM chưa đủ để nhảy sang họ R.",
+      "tagNames": [
+        "High-Performing Architectures > EC2-Instance-Selection (Instance Families / Graviton / Placement Groups / Accelerators)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Run the subtitle renderer on compute-optimized C family instances that match this profile.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Run the subtitle renderer on burstable T family instances and enable unlimited mode for the length of every render window.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Run the subtitle renderer on memory-optimized R family instances so each core is given several times more RAM than the profile needs.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Run the subtitle renderer on storage-optimized I family instances and stripe the local NVMe volumes as scratch space for fonts and frames.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "An insurer runs an AWS Lambda function that compresses claim PDFs. The function has 256 MB of memory. Amazon CloudWatch shows each invocation takes about 7 seconds and uses the CPU for nearly the whole run. The team wants a shorter duration. What should a solutions architect do?",
+      "explanation": "Phân tích đề: Hàm nén PDF đang bão hòa CPU ở 256 MB; cần giảm duration. Trên Lambda, CPU tăng theo memory.\n(A) SAI: Đưa hàm vào VPC và đi NAT Gateway chỉ thêm đường mạng, không cấp thêm CPU cho tác vụ nén đang nghẽn.\n(B) SAI: Kéo timeout tới 15 phút không làm vòng lặp nén chạy nhanh hơn; reserved concurrency bằng 1 còn giới hạn song song và làm hàng đợi lâu hơn.\n(C) SAI: SnapStart không hỗ trợ Node.js 20, và snapshot cũng không biến một hàm đang hết CPU thành chạy nhanh hơn trên đường warm.\n(D) ĐÚNG: Tăng memory khiến Lambda cấp thêm CPU cho cùng hàm, nên tác vụ CPU-bound như nén PDF chạy ngắn hơn.\nĐáp án đúng: D\nĐiểm cần nhớ: Lambda không có nút chỉnh CPU riêng; muốn nhiều CPU hơn thì tăng memory, tối đa 10240 MB.",
+      "tagNames": [
+        "High-Performing Architectures > AWS-Lambda"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Attach the function to a private subnet and send its traffic through a NAT Gateway for more throughput.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Raise the timeout to 15 minutes and set reserved concurrency to 1 so each PDF gets a dedicated environment.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Enable SnapStart on the Node.js 20 runtime and publish a version so compression is restored from a snapshot.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Increase the function memory setting so that Lambda allocates proportionally more CPU to each invocation.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A mapping company keeps map tiles on an Amazon EBS volume attached to an EC2 instance in us-west-2a. A replacement instance must run in us-west-2b. Attaching the existing volume to that instance fails. Which action makes the data available in us-west-2b?",
+      "explanation": "Phân tích đề: Volume EBS gắn với một Availability Zone; không attach sang instance ở AZ khác.\n(A) ĐÚNG: Snapshot là bản sao cấp Region. Tạo volume mới từ snapshot và chọn us-west-2b thì dữ liệu nằm đúng AZ của instance mới.\n(B) SAI: EBS không export thành object trong bucket rồi gắn lại như instance store; instance store cũng không nhận dữ liệu theo cách đó và mất khi stop.\n(C) SAI: Multi-Attach không dùng cho gp3 và không kéo một volume sang AZ khác; mọi instance gắn volume phải cùng AZ với volume.\n(D) SAI: ModifyVolume đổi được dung lượng, loại volume, IOPS và throughput, không có thuộc tính để chuyển Availability Zone.\nĐáp án đúng: A\nĐiểm cần nhớ: Muốn đưa dữ liệu EBS sang AZ khác: snapshot, rồi tạo volume mới ở AZ đích.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-EBS-SSD (Elastic Block Store - Solid State Drive)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create an EBS snapshot of the volume, then create a new volume from that snapshot in us-west-2b and attach it.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Copy the volume into an Amazon S3 bucket and import the object as an instance store disk in us-west-2b.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Enable Multi-Attach on the current volume and attach that same volume to the instance in us-west-2b.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Call ModifyVolume to set the volume Availability Zone to us-west-2b, then attach the volume to the new instance.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A podcast studio uploads 2 GB WAV masters to an Amazon S3 bucket in the same city. The laptop uses a single PUT. When Wi-Fi drops near the end, the whole upload starts over. Which change should a solutions architect recommend?",
+      "explanation": "Phân tích đề: File 2 GB trên Wi-Fi hay rớt; một PUT phải làm lại từ đầu. Bucket cùng thành phố nên không cần đường truyền toàn cầu.\n(A) SAI: Replication chạy sau khi object đã nằm ở bucket nguồn; nó không làm upload 2 GB chịu được mất kết nối.\n(B) ĐÚNG: Multipart chia object thành nhiều part, upload song song và chỉ gửi lại part bị rớt, nên không làm lại cả file 2 GB.\n(C) SAI: Studio cùng thành phố với bucket nên Transfer Acceleration không xử lý việc một PUT bị rớt phải gửi lại toàn bộ.\n(D) SAI: Storage class không đổi cách PUT hoạt động và không cho phép gửi lại từng phần sau khi Wi-Fi rớt.\nĐáp án đúng: B\nĐiểm cần nhớ: Object trên 100 MB nên multipart upload; trên 5 GB thì bắt buộc. Part đã được S3 nhận không phải gửi lại.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-S3 (Simple Storage Service)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Turn on Cross-Region Replication and upload each master to a second Region closer to the studio.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Use multipart upload so a failed part can be sent again.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Enable S3 Transfer Acceleration and keep sending each master as one PUT from the studio.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Store the masters in S3 Glacier Instant Retrieval so S3 accepts the upload in smaller internal pieces.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A media company stores shared website files on Amazon EFS. Editors open and save small files all day, and they complain when save latency rises. Which performance mode should a solutions architect choose for this file system?",
+      "explanation": "Phân tích đề: Workload sửa file nhỏ, nhạy latency, cần performance mode có độ trễ mỗi thao tác thấp nhất.\n(A) SAI: Performance mode chọn lúc tạo file system và không đổi sau, càng không tự chuyển theo giờ. File system chỉ có một performance mode.\n(B) SAI: Max I/O không gắn được với Elastic throughput. Kết hợp này không tạo được, và Max I/O cũng không làm save nhanh hơn.\n(C) SAI: Max I/O tăng độ trễ mỗi thao tác so với General Purpose. Mode này dành cho tải song song chấp nhận latency cao hơn, trái nhu cầu của editor.\n(D) ĐÚNG: General Purpose có độ trễ mỗi thao tác thấp nhất và là mode AWS khuyên dùng cho mọi file system, kể cả web và CMS.\nĐáp án đúng: D\nĐiểm cần nhớ: General Purpose là performance mode mặc định, độ trễ mỗi thao tác thấp nhất. Max I/O là đời trước, độ trễ cao hơn, và không dùng cùng Elastic throughput.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-EFS (Elastic File System)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "A second performance mode on the same file system that switches to Max I/O during business hours.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Max I/O performance mode together with Elastic throughput so saves stay fast during the day.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Max I/O performance mode, because it lowers per-operation latency for small saves.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "General Purpose performance mode, which has the lowest per-operation latency of the EFS modes.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A satellite-imaging lab runs Linux jobs on many Amazon EC2 instances. The jobs need shared POSIX storage with sub-millisecond latency and aggregate throughput in the hundreds of gigabytes per second. Which service meets this performance profile?",
+      "explanation": "Phân tích đề: Nhiều EC2 Linux cần POSIX dùng chung, độ trễ dưới một millisecond và thông lượng tổng hàng trăm GB/s.\n(A) SAI: EFS Elastic Throughput co giãn NFS cho Linux, nhưng độ trễ thường ở mức vài millisecond và không nhằm vào lớp thông lượng hàng trăm GB/s của bài toán gắn chặt.\n(B) SAI: OpenZFS cho NFS độ trễ thấp ở mức hàng chục GB/s, không phải lớp hàng trăm GB/s với client Lustre song song.\n(C) SAI: Mountpoint for S3 đọc object với thông lượng cao nhưng không phải file system POSIX đầy đủ với độ trễ dưới một millisecond.\n(D) ĐÚNG: FSx for Lustre phục vụ HPC và IO song song: độ trễ dưới một millisecond và thông lượng tổng hàng trăm GB/s khi nhiều client cùng đọc.\nĐáp án đúng: D\nĐiểm cần nhớ: Hàng trăm GB/s, sub-millisecond và POSIX song song trên Linux là bài toán của FSx for Lustre, không phải EFS hay OpenZFS.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-FSx (File System x)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Use Amazon EFS in Elastic Throughput mode and mount it with NFS from every Linux instance.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Use Amazon FSx for OpenZFS and spread the job across NFS clients in several Availability Zones.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Use Mountpoint for Amazon S3 on each instance so objects are read straight from the imagery bucket.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Use Amazon FSx for Lustre for the shared working set, mounted with the Lustre client on each node.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A logistics company is replacing self-managed MySQL. The managed database must stay MySQL-compatible, deliver higher throughput on comparable hardware, and let readers see commits within milliseconds without keeping a full extra copy of the data on each reader. Which service meets these requirements?",
+      "explanation": "Phân tích đề: Cần tương thích MySQL, thông lượng cao hơn, reader thấy commit trong vài mili giây và không nhân bản full storage cho từng reader.\n(A) SAI: DocumentDB tương thích MongoDB, không phải engine MySQL nên ứng dụng không nối được như cũ.\n(B) SAI: RDS MySQL read replica có storage riêng và nhận thay đổi qua binary log bất đồng bộ, nên lag dễ tăng khi ghi nhiều và tốn thêm bản sao dữ liệu.\n(C) SAI: DynamoDB là kho key-value, không chạy SQL MySQL và không giữ join, transaction như schema hiện tại.\n(D) ĐÚNG: Aurora MySQL tách compute khỏi storage dùng chung. Aurora Replica áp redo log trên volume đó nên lag đọc thường ở mức mili giây, không cần volume riêng chứa bản sao đầy đủ.\nĐáp án đúng: D\nĐiểm cần nhớ: Replica của Aurora dùng chung volume nên lag đọc rất thấp; read replica của RDS có đĩa riêng và lag của replication bất đồng bộ.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-Aurora"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Amazon DocumentDB with replica instances and a MongoDB-compatible document model for the existing relational schema.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Amazon RDS for MySQL with binary-log read replicas, each on its own storage volume.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Amazon DynamoDB global tables, with each MySQL entity rewritten as an item collection and joins moved into application code.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Amazon Aurora MySQL-Compatible Edition with Aurora Replicas that read from the shared six-copy cluster storage volume.",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company runs an order application on Amazon RDS for MySQL. On weekday afternoons, product-browsing SELECT statements push DB CPU to about 85 percent and checkout writes slow down. The browsing queries can use data that is a few seconds old. Which change relieves the writer while leaving the write path in place?",
+      "explanation": "Phân tích đề: CPU trên writer tăng vì SELECT duyệt đơn, dữ liệu cũ vài giây được chấp nhận, đường ghi cần giữ ổn định.\n(A) ĐÚNG: Read replica phục vụ SELECT trên endpoint riêng, gỡ CPU đọc khỏi writer; INSERT/UPDATE của checkout vẫn vào primary.\n(B) SAI: Standby của Multi-AZ DB instance không nhận kết nối ứng dụng, nên toàn bộ SELECT vẫn chạy trên writer và CPU đọc không giảm.\n(C) SAI: CloudFront cache HTTP, không cache giao thức MySQL và không trả kết quả SELECT cho ứng dụng đang mở connection tới RDS.\n(D) SAI: RDS Proxy gom kết nối tới đúng instance đích; nó không giảm CPU của các câu SELECT nặng đang chạy trên writer.\nĐáp án đúng: A\nĐiểm cần nhớ: Read replica dùng để chia tải đọc. Standby Multi-AZ DB instance, RDS Proxy và CloudFront không gánh CPU của SELECT trên writer.",
+      "tagNames": [
+        "High-Performing Architectures > RDS-Read-Replica (Relational Database Service - Read Replica)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create an in-Region read replica and route the browsing SELECT statements to the replica endpoint while checkout writes stay on the writer.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Convert the DB instance to a standard Multi-AZ deployment and keep every browsing query on the current writer endpoint so the standby can share the CPU.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Place an Amazon CloudFront distribution in front of the DB instance so the browsing SELECT results are cached at the edge.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Put an RDS Proxy on the writer endpoint so the same browsing SELECT statements share pooled connections and consume less CPU.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A gaming backend must store and fetch player profiles by player ID. Lookups are key-value with no joins, latency must stay in the single-digit milliseconds at any scale, and the team wants the least infrastructure to operate. Which service meets these requirements?",
+      "explanation": "Phân tích đề: Cần key-value theo player ID, độ trễ mili-giây một chữ số ở mọi quy mô, không JOIN, ít hạ tầng phải giữ.\n(A) SAI: Lookup theo khóa chính trên RDS có thể nhanh, nhưng vẫn phải quản lý instance, connection pool và replica, nặng hơn mức cần cho key-value thuần.\n(B) SAI: Redis cho độ trễ rất thấp nhưng là cache phải vận hành cluster; snapshot theo giờ không phải cơ chế bền vững mặc định cho hồ sơ người chơi.\n(C) ĐÚNG: DynamoDB là NoSQL key-value serverless, GetItem thường ở mức single-digit millisecond và không phải vận hành máy chủ.\n(D) SAI: S3 hợp với object lớn, không phải kho key-value độ trễ thấp; S3 Select còn đọc object rồi lọc, không dành cho lookup hồ sơ hàng triệu lần.\nĐáp án đúng: C\nĐiểm cần nhớ: Key-value, scale lớn, single-digit millisecond, không quản lý server là tín hiệu chọn DynamoDB. Cần SQL hoặc JOIN thì dùng RDS hay Aurora.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-DynamoDB"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Store the profiles in Amazon RDS for PostgreSQL and add a read replica plus a connection pool on Amazon EC2.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Store the profiles in Amazon ElastiCache for Redis OSS and rely on hourly snapshots as the durable copy.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Store the profiles in Amazon DynamoDB with player ID as the partition key.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Store each profile as an object in Amazon S3 and read it with S3 Select on every game request.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A product page runs the same lookup for a product id thousands of times per minute against Amazon Aurora. Aurora CPU is high, and the page needs sub-millisecond responses for that repeated lookup. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cùng một lookup lặp lại rất nhiều, Aurora đang quá tải, cần độ trễ dưới một mili-giây.\n(A) ĐÚNG: ElastiCache giữ kết quả trong RAM. Lần sau trùng khóa thì trả thẳng từ bộ nhớ, không chạy lại SQL, nên vừa giảm CPU Aurora vừa đạt độ trễ rất thấp.\n(B) SAI: CloudFront cache nội dung HTTP ở edge. Aurora không phải origin HTTP cho từng lookup trong VPC, và CDN không thay lớp cache truy vấn.\n(C) SAI: Read replica vẫn thực thi SQL trên đĩa mỗi lượt xem. Nó chia tải đọc nhưng không đưa lookup lặp lại xuống mức sub-millisecond.\n(D) SAI: Athena quét dữ liệu trên S3 theo lô, độ trễ tính bằng giây, không phải đường đọc nóng của trang sản phẩm.\nĐáp án đúng: A\nĐiểm cần nhớ: Query đọc lặp lại, cần sub-millisecond và giảm tải database thì đặt ElastiCache phía trước, không thêm reader hay đưa SQL ra CDN.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-ElastiCache"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Cache the repeated product lookup in Amazon ElastiCache.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Serve the lookup from Amazon CloudFront by using the Aurora cluster as a custom origin.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Add Aurora read replicas and run the same SQL through the reader endpoint on every page view.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Unload the product rows to Amazon S3 and query them with Amazon Athena on each page view.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A media company stores public product images in an Amazon S3 bucket in eu-central-1. Shoppers in South America and Asia wait several seconds for images that are requested again and again. Which solution reduces that wait?",
+      "explanation": "Phân tích đề: Ảnh public, lặp lại, người xem ở xa bucket; cần giảm độ trễ bằng cache gần user.\n(A) SAI: Global Accelerator định tuyến TCP/UDP tới ALB, NLB hoặc EIP và không cache object. Thêm ALB chỉ để proxy từng ảnh vẫn làm origin chịu mọi request.\n(B) SAI: ElastiCache nằm trong Region của ứng dụng, không phải CDN cho trình duyệt, và không có endpoint để gán vào URL ảnh.\n(C) ĐÚNG: CloudFront cache object ở edge location gần shopper. Những lần sau được phục vụ từ edge, không phải kéo lại từ eu-central-1.\n(D) SAI: S3 Transfer Acceleration tối ưu đường upload hoặc download thẳng vào S3 qua mạng AWS, không giữ bản cache để phục vụ lặp lại cho người xem khác.\nĐáp án đúng: C\nĐiểm cần nhớ: Nội dung HTTP cache được, người xem toàn cầu, muốn giảm tải origin thì dùng CloudFront.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-CloudFront"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Put Global Accelerator in front of a new load balancer that proxies each image request to the bucket.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Place an ElastiCache for Redis node in eu-central-1 and point each image URL at that node.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Serve the images from a CloudFront distribution that uses the bucket as the origin.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Enable S3 Transfer Acceleration and give shoppers the bucket accelerate endpoint for every image.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "Medical devices in remote clinics open a proprietary TCP session and can store two public IPv4 addresses in firmware. Those stored addresses must keep working after a new AWS Region is added for capacity. Which design meets this requirement?",
+      "explanation": "Phân tích đề: Thiết bị chỉ lưu được hai địa chỉ IPv4 công cộng và địa chỉ đó phải còn đúng sau khi thêm Region.\n(A) ĐÚNG: Hai địa chỉ anycast gắn với accelerator, không gắn với từng Region. Thêm endpoint group không buộc cập nhật firmware.\n(B) SAI: Multivalue trả về nhiều địa chỉ Regional, danh sách phình ra khi thêm Region hoặc AZ, trái với hai địa chỉ cố định trong firmware.\n(C) SAI: CloudFront không cấp hai địa chỉ ổn định cho TCP tùy biến, và prefix list rất lớn, thay đổi theo thời gian, không nhét vừa hai ô nhớ trong firmware.\n(D) SAI: Elastic IP của NLB là địa chỉ theo AZ trong một Region. Region mới nghĩa là thêm địa chỉ, không phải cặp anycast toàn cầu.\nĐáp án đúng: A\nĐiểm cần nhớ: Standard accelerator cấp hai địa chỉ IPv4 anycast tĩnh. Thêm endpoint group ở Region mới không đổi hai địa chỉ này.",
+      "tagNames": [
+        "High-Performing Architectures > AWS-Global-Accelerator"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Front the Regional load balancers with AWS Global Accelerator, store its two static anycast IPv4 addresses, and add an endpoint group for each new Region.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Publish a Route 53 multivalue answer of every Regional Network Load Balancer address and ship new firmware whenever a Region or Availability Zone is added.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Put Amazon CloudFront in front of the TCP service and allowlist the CloudFront managed prefix list, planning a firmware update whenever Amazon changes that list.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Allocate an Elastic IP on a Network Load Balancer in each Availability Zone and update the devices when a second Region comes online.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A retail company wants a managed entry point for mobile microservice calls that publishes HTTPS endpoints, applies throttling, and charges per request. They do not want to operate proxy servers. Which service should a solutions architect choose?",
+      "explanation": "Phân tích đề: Cần cổng HTTPS managed, có throttling, tính phí theo request, và không tự vận hành proxy.\n(A) ĐÚNG: API Gateway phát hành endpoint HTTPS, throttle theo stage hoặc usage plan, và tính phí theo số request mà không cần chạy server proxy.\n(B) SAI: App Mesh điều khiển traffic giữa service trong mesh, không phải cổng public có throttling và tính phí theo request cho client bên ngoài.\n(C) SAI: Tự chạy NGINX trên EC2 vẫn phải vá, scale và theo dõi proxy, trái yêu cầu không vận hành server.\n(D) SAI: CloudFront là CDN để cache và phân phối nội dung, không phát hành stage, usage plan hay lớp quản lý API.\nĐáp án đúng: A\nĐiểm cần nhớ: API Gateway là lớp quản lý API. ALB cân bằng tới compute. CloudFront là CDN. App Mesh không thay cổng API public.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-API-Gateway"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Use Amazon API Gateway with stage throttling and usage plans as the managed HTTPS entry point for the services.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Run AWS App Mesh on the ECS services and publish the virtual gateway through a public Network Load Balancer.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Deploy NGINX on Amazon EC2 behind an Application Load Balancer and scale that proxy fleet with an Auto Scaling group.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Put Amazon CloudFront in front of the microservice load balancers and cache every dynamic response for one day.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A logistics company collects package-scan events for two applications. Both applications must read every event, and either application must be able to reread events from earlier in the same day after a restart. Which service should store the events?",
+      "explanation": "Phân tích đề: Hai ứng dụng cùng đọc full stream và đọc lại trong ngày, nên cần retention và nhiều consumer độc lập.\n(A) SAI: Amazon Data Firehose không giữ shard iterator và không cho hai ứng dụng đọc lại luồng gốc sau khi đã giao dữ liệu.\n(B) SAI: SQS standard xóa message sau khi một worker xử lý xong. Hai poller tranh nhau message, không phải hai bản sao có thứ tự để đọc lại.\n(C) ĐÚNG: Kinesis Data Streams giữ record theo retention. Mỗi ứng dụng là một consumer riêng, mở lại iterator trong khoảng thời gian còn lưu.\n(D) SAI: SNS đẩy thông báo tới subscriber, không phải log có retention để rewind theo thời gian.\nĐáp án đúng: C\nĐiểm cần nhớ: Nhiều consumer đọc full stream và cần đọc lại thì dùng Kinesis Data Streams. Firehose không replay, SQS không phát lại cùng một message cho nhiều reader.",
+      "tagNames": [
+        "High-Performing Architectures > Amazon-Kinesis / Amazon-Data-Firehose (Streaming)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Amazon Data Firehose with a one-day buffer interval before it writes objects to Amazon S3.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "An Amazon SQS standard queue that both applications poll, with message retention set to one day.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Amazon Kinesis Data Streams with retention that covers the same-day replay window.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "An Amazon SNS topic with one subscription per application and a one-day delivery retry policy.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A media company runs an AWS Glue crawler over raw video-metadata JSON in Amazon S3. The crawler succeeds and creates a table in the AWS Glue Data Catalog. A manager expects the catalog to hold a second copy of every JSON object so analysts can still query if the bucket is emptied. What does the Data Catalog store?",
+      "explanation": "Phân tích đề: Crawler chạy xong và tạo bảng; quản lý tưởng catalog đang giữ một bản sao dữ liệu JSON.\n(A) SAI: Crawler không đổi định dạng file. JSON vẫn nằm nguyên; Parquet chỉ xuất hiện nếu có ETL job hoặc CTAS.\n(B) ĐÚNG: Glue Data Catalog là metastore: nó lưu database, table, schema, partition và đường dẫn S3, không lưu các dòng dữ liệu. Xóa object trên S3 thì query không còn dữ liệu để đọc.\n(C) SAI: Catalog không nhân bản object. Dung lượng S3 không đổi sau crawler vì không có bản sao nào được ghi vào catalog.\n(D) SAI: Kết quả query của Athena mới là file CSV ở query result location trên S3. Crawler không xuất CSV vào catalog.\nĐáp án đúng: B\nĐiểm cần nhớ: Glue Data Catalog chỉ là metadata trỏ tới dữ liệu trên S3. Muốn đổi format phải chạy Glue ETL hoặc Athena CTAS, không phải crawler.",
+      "tagNames": [
+        "High-Performing Architectures > AWS-Glue / Amazon-Athena (Analytics)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "A Hive-compatible Parquet conversion that replaces the source JSON objects in the same prefix.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Only table metadata such as column names, data types, partitions, and the S3 location of the data.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "A compressed replica of every JSON object, detached from the original bucket so queries survive deletion.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "The CSV export of the last crawler run, kept inside the catalog for Athena to reopen offline.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A bank mobile app must reject onboarding selfies that are printed photos or screen replays, and must accept a selfie when the customer is physically present. The bank has no machine learning engineers. Which solution meets this requirement?",
+      "explanation": "Phân tích đề: Selfie onboarding cần chặn ảnh in và video phát lại, ngân hàng không có kỹ sư ML.\n(A) SAI: CompareFaces chỉ đo độ giống giữa hai ảnh. Ảnh in hoặc ảnh chiếu trên màn hình vẫn có thể điểm cao vì API này không kiểm tra người có mặt thật.\n(B) ĐÚNG: Amazon Rekognition Face Liveness trả điểm tin cậy rằng khuôn mặt thật đang ở trước camera, gọi API là dùng, không phải tự huấn luyện mô hình.\n(C) SAI: Textract trích chữ, bảng và form từ tài liệu. Trích chữ thành công không chứng minh khách hàng đang sống trước camera.\n(D) SAI: SageMaker buộc tự xây, huấn luyện và host mô hình trên GPU, trái ràng buộc không có kỹ sư ML và tốn vận hành hơn API có sẵn.\nĐáp án đúng: B\nĐiểm cần nhớ: Chống ảnh in hoặc replay khi xác minh danh tính thì dùng Amazon Rekognition Face Liveness. CompareFaces chỉ so hai ảnh.",
+      "tagNames": [
+        "High-Performing Architectures > AI-ML-Services (Rekognition / Comprehend Medical)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Call Amazon Rekognition CompareFaces against a stock photo, then store the similarity score in Amazon DynamoDB for every onboarding attempt.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Use Amazon Rekognition Face Liveness, embedding the Amplify FaceLivenessDetector component in the app to check each onboarding selfie.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Send the selfie to Amazon Textract AnalyzeDocument and treat a successful text extraction as proof that a live customer is present.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Train a custom anti-spoof classifier in Amazon SageMaker, host it on a GPU endpoint, and route every onboarding selfie from the mobile app to that endpoint.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company wants a service that recommends specific alternative Amazon EC2 instance types for each running instance and shows the projected CPU utilization and a performance risk rating for every recommended option. Which AWS service provides this information?",
+      "explanation": "Phân tích đề: Cần gợi ý instance type thay thế cụ thể cho từng EC2, kèm projected utilization và performance risk cho mỗi lựa chọn.\n(A) SAI: AWS Trusted Advisor chỉ gắn cờ các instance có mức sử dụng thấp dựa trên ngưỡng CPU/network đơn giản, không đề xuất instance type cụ thể kèm projected utilization.\n(B) ĐÚNG: AWS Compute Optimizer dùng machine learning phân tích lịch sử metric CloudWatch, đưa ra tối đa vài recommendation option cho mỗi instance, mỗi lựa chọn đều có projected utilization, estimated savings và performance risk.\n(C) SAI: Amazon CloudWatch Application Insights giúp giám sát và chẩn đoán sự cố ứng dụng (SQL Server, .NET…), không phải công cụ rightsizing.\n(D) SAI: AWS Cost Anomaly Detection phát hiện chi tiêu bất thường bằng ML, không phân tích utilization để đề xuất instance type.\nĐáp án đúng: B\nĐiểm cần nhớ: Recommendation option + projected utilization + performance risk là dấu hiệu nhận biết AWS Compute Optimizer.",
+      "tagNames": [
+        "Cost-Optimized Architectures > AWS-Compute-Optimizer"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "AWS Trusted Advisor with its Low Utilization Amazon EC2 Instances check",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "AWS Compute Optimizer",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Amazon CloudWatch Application Insights for the instance fleet",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "AWS Cost Anomaly Detection with a service-level monitor for Amazon EC2",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A product service reads items from an Amazon DynamoDB table that uses provisioned capacity. Each item is 6 KB. The service performs 100 eventually consistent GetItem requests per second. How many read capacity units (RCUs) must be provisioned to support this workload without throttling?",
+      "explanation": "Phân tích đề: Item 6 KB, 100 lần đọc/giây, eventually consistent. Cần nhớ 1 RCU = 1 strongly consistent read/giây cho item tối đa 4 KB, hoặc 2 eventually consistent read/giây.\n(A) ĐÚNG: 6 KB làm tròn lên 8 KB = 2 đơn vị 4 KB. Strongly consistent cần 2 RCU/lần đọc, eventually consistent chỉ cần một nửa = 1 RCU/lần đọc. 100 lần/giây x 1 RCU = 100 RCU.\n(B) SAI: 200 RCU là con số cho strongly consistent read (2 RCU mỗi lần); đề nói rõ eventually consistent nên đang cấp dư gấp đôi.\n(C) SAI: 600 RCU là cách tính sai, coi mỗi KB là 1 RCU (nhầm với đơn vị 1 KB của WCU).\n(D) SAI: 50 RCU là kết quả nếu làm tròn item về 4 KB (1 RCU strongly consistent) rồi chia đôi; nhưng 6 KB phải làm tròn lên 8 KB chứ không phải 4 KB.\nĐáp án đúng: A\nĐiểm cần nhớ: Đọc làm tròn lên bội số 4 KB, ghi làm tròn lên bội số 1 KB. Eventually consistent tốn một nửa RCU so với strongly consistent, transactional read tốn gấp đôi.",
+      "tagNames": [
+        "Cost-Optimized Architectures > Amazon-DynamoDB"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "100 RCUs",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "200 RCUs",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "600 RCUs",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "50 RCUs",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A veterinary hospital network stores X-ray images in Amazon S3. After the first visit, each image is typically viewed only once or twice a year during follow-up appointments, but it must appear on screen immediately when a veterinarian opens the patient record. The images are the only copy and must be kept for several years. Which storage class is the MOST cost-effective for images older than 60 days?",
+      "explanation": "Phân tích đề: Truy cập vài lần mỗi năm, phải hiển thị ngay (mili-giây), dữ liệu duy nhất cần độ bền nhiều AZ, lưu nhiều năm. Từ khóa 'rất ít đọc nhưng cần ngay' chỉ thẳng Glacier Instant Retrieval.\n(A) SAI: S3 Glacier Flexible Retrieval phải gửi yêu cầu restore và chờ từ vài phút (Expedited) tới vài giờ, không thể hiện ảnh ngay khi mở hồ sơ.\n(B) ĐÚNG: S3 Glacier Instant Retrieval lưu ở tối thiểu 3 AZ, trả dữ liệu trong mili-giây bằng GET thông thường, giá lưu trữ thấp hơn Standard-IA. Phí truy xuất theo GB cao hơn nhưng chỉ phát sinh vài lần mỗi năm, thời gian lưu tối thiểu 90 ngày không là vấn đề vì ảnh giữ nhiều năm.\n(C) SAI: S3 One Zone-IA chỉ lưu ở một AZ; ảnh X-quang là bản duy nhất nên mất AZ là mất dữ liệu vĩnh viễn.\n(D) SAI: S3 Standard-IA đáp ứng mili-giây nhưng giá lưu trữ cao hơn Glacier Instant Retrieval đáng kể; nó hợp với truy cập khoảng một lần mỗi tháng, không phải một đến hai lần mỗi năm.\nĐáp án đúng: B\nĐiểm cần nhớ: Vài lần mỗi năm + cần mili-giây => Glacier Instant Retrieval; khoảng một lần mỗi tháng + mili-giây => Standard-IA.",
+      "tagNames": [
+        "Cost-Optimized Architectures > S3-Storage-Classes-and-Lifecycle (Intelligent-Tiering / Glacier)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "S3 Glacier Flexible Retrieval",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "S3 Glacier Instant Retrieval",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "S3 One Zone-Infrequent Access",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "S3 Standard-IA",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A QA team runs automated integration tests on Amazon EC2 Linux instances. Each test run lasts about 10 minutes, runs a few times per day at unpredictable times, and must not be interrupted before it completes. The team does not want any long-term commitment. Which purchasing option is the MOST cost-effective?",
+      "explanation": "Phân tích đề: Tải ngắn (10 phút), thời điểm không đoán trước, không được bị ngắt giữa chừng, không muốn cam kết dài hạn.\n(A) SAI: RI 1 năm tính phí cho mọi giờ trong kỳ hạn dù máy chỉ chạy vài lần 10 phút mỗi ngày, nên phần lớn bị lãng phí và vẫn là cam kết dài hạn.\n(B) SAI: Spot rẻ nhất nhưng AWS có thể thu hồi với cảnh báo 2 phút, vi phạm yêu cầu test không được bị ngắt.\n(C) ĐÚNG: On-Demand không cam kết, không bị ngắt; với Linux tính tiền theo giây (tối thiểu 60 giây) nên chỉ trả cho đúng khoảng 10 phút mỗi lần chạy rồi terminate.\n(D) SAI: Compute Savings Plan cũng là cam kết 1 năm theo $/giờ; giờ nào không dùng hết cam kết thì mất, không phù hợp tải rời rạc và ngắn.\nĐáp án đúng: C\nĐiểm cần nhớ: Tải ngắn, không đoán trước, không chịu ngắt và không muốn cam kết => On-Demand (Linux tính theo giây, tối thiểu 60 giây).",
+      "tagNames": [
+        "Cost-Optimized Architectures > EC2-Purchasing-Options (Reserved / Savings Plans / Spot / Capacity Reservation)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Purchase a one-year No Upfront Standard Reserved Instance sized for the test instance type",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Launch Spot Instances for each test run and terminate them when the run finishes",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Launch On-Demand Instances for each run, billed per second, and terminate them afterward",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Purchase a one-year Compute Savings Plan with a commitment equal to the hourly cost of one instance",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company uses a single standalone AWS account. A cloud engineer has an IAM role with the AdministratorAccess managed policy, but every page in the Billing and Cost Management console, including Cost Explorer, returns an access denied message. What should be done so that the engineer can view billing data?",
+      "explanation": "Phân tích đề: IAM role đã có AdministratorAccess nhưng vẫn bị chặn ở Billing console. Từ khóa: quyền IAM đủ nhưng vẫn bị từ chối, nghĩa là thiếu một cài đặt cấp account.\n(A) SAI: AdministratorAccess đã bao gồm mọi action kể cả Billing; gắn thêm policy không giải quyết được khi cài đặt cấp account vẫn đang chặn IAM identity.\n(B) SAI: Cost allocation tag chỉ quyết định dữ liệu nào được phân bổ theo tag trong báo cáo, không phải cơ chế cấp quyền vào Billing console.\n(C) ĐÚNG: Mặc định chỉ root user xem được Billing. Root phải bật 'IAM user and role access to Billing information' trong Account settings; từ đó IAM identity có quyền phù hợp mới mở được Billing, Cost Explorer, Budgets.\n(D) SAI: Billing và Cost Explorer là giao diện toàn cục, không có chuyện đổi Region để mở khóa quyền truy cập.\nĐáp án đúng: C\nĐiểm cần nhớ: Quyền IAM thôi chưa đủ để xem Billing: root user phải bật 'IAM user and role access to Billing information' trước, sau đó IAM policy mới có hiệu lực.",
+      "tagNames": [
+        "Cost-Optimized Architectures > Cost-Visibility-and-Governance (Cost Explorer / Budgets / Allocation Tags / FinOps)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Attach an additional AWS managed billing policy to the role because AdministratorAccess excludes billing actions",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Activate the AWS-generated cost allocation tags so that the role can read tagged billing data",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Sign in as the root user and activate IAM user and role access to Billing information in Account settings",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Switch the console to the us-east-1 Region, where the Cost Explorer data for the account is stored",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company runs an application on an Amazon EC2 instance and an Amazon RDS for MySQL Single-AZ DB instance. Both resources are in the same Availability Zone and communicate by using private IP addresses. A finance analyst asks how the traffic between them is billed. What should a solutions architect tell the analyst?",
+      "explanation": "Phân tích đề: EC2 và RDS cùng một AZ, giao tiếp bằng private IP. Từ khóa: cùng AZ + private IP.\n(A) ĐÚNG: Dữ liệu giữa EC2 và RDS trong cùng AZ qua private IP được miễn phí truyền dữ liệu. Chỉ khi hai tài nguyên nằm ở AZ khác nhau hoặc đi qua public IP thì mới phát sinh phí.\n(B) SAI: Endpoint RDS có tên DNS public nhưng từ trong VPC phân giải ra private IP; hơn nữa hai tài nguyên cùng Region nên không có phí inter-Region.\n(C) SAI: Traffic này không đi ra Internet nên không thể tính theo đơn giá data transfer out ra Internet; trong cùng AZ qua private IP cả hai chiều đều miễn phí.\n(D) SAI: Phí inter-AZ chỉ áp dụng khi dữ liệu đi qua hai AZ khác nhau; RDS là dịch vụ managed không làm thay đổi quy tắc tính phí theo vị trí.\nĐáp án đúng: A\nĐiểm cần nhớ: Cùng AZ + private IP = miễn phí. Khác AZ = tính phí mỗi chiều. Khác Region = đắt hơn nữa.",
+      "tagNames": [
+        "Cost-Optimized Architectures > Network-Costs (Data Transfer / VPC Endpoint)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "There is no data transfer charge for this traffic because both resources are in the same Availability Zone.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "The traffic is billed at the inter-Region rate because RDS endpoints are resolved through public DNS.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Only the traffic from the DB instance back to the EC2 instance is billed, at the internet data transfer out rate.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "The traffic is billed at the inter-Availability Zone rate in each direction because RDS is a managed service.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A CPU-intensive AWS Lambda function is configured with 128 MB of memory and often runs for several seconds. AWS Compute Optimizer marks the function as not optimized because memory is under-provisioned and recommends a larger memory size with a similar or lower estimated cost. A developer does not understand how more memory can cost the same or less. Which explanation is correct?",
+      "explanation": "Phân tích đề: Lambda CPU-bound, memory thấp, Compute Optimizer khuyên tăng memory nhưng chi phí không tăng.\n(A) ĐÚNG: Lambda cấp CPU tỉ lệ thuận với memory; hàm CPU-bound khi tăng memory sẽ chạy nhanh hơn đáng kể, nên tổng GB-second (memory x duration) có thể bằng hoặc thấp hơn, đồng thời giảm latency.\n(B) SAI: Tăng timeout chỉ cho phép hàm chạy lâu hơn, không làm hàm chạy nhanh hơn hay rẻ hơn.\n(C) SAI: Reserved concurrency giới hạn/đảm bảo số lượng thực thi đồng thời, không thay đổi đơn giá hay thời gian chạy.\n(D) SAI: Provisioned concurrency giải quyết cold start và tính thêm phí, không liên quan đến việc tăng memory giảm chi phí.\nĐáp án đúng: A\nĐiểm cần nhớ: Với Lambda, memory quyết định cả CPU; recommendation tăng memory không đồng nghĩa với tăng chi phí.",
+      "tagNames": [
+        "Cost-Optimized Architectures > AWS-Compute-Optimizer"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Lambda allocates CPU in proportion to memory, so the function finishes faster and uses fewer GB-seconds",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "More memory also raises the timeout limit, so fewer invocations fail and are retried",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "More memory reserves concurrency for the function, which lowers the price per request",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "More memory lets Lambda enable provisioned concurrency at no charge, which removes cold starts",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "An IoT platform writes sensor readings to a single Amazon DynamoDB table that is provisioned for peak write traffic. Almost all queries target readings from the current month, readings from previous months are read occasionally for 12 months, and data older than 12 months must be archived to Amazon S3. The single table keeps growing, and its provisioned capacity cannot be reduced because new writes arrive constantly. Which design is MOST cost-effective?",
+      "explanation": "Phân tích đề: Dữ liệu time-series: tháng hiện tại nóng (ghi và đọc nhiều), các tháng trước nguội, quá 12 tháng phải lưu trữ ở S3. Một bảng duy nhất buộc toàn bộ dữ liệu cùng chịu mức capacity cao.\n(A) ĐÚNG: Mẫu 'một bảng mỗi kỳ' (table per month): bảng tháng hiện tại cấp capacity cao; khi sang tháng mới, giảm mạnh capacity của bảng cũ (có thể đổi sang Standard-IA); bảng quá 12 tháng thì Export to S3 rồi xóa bảng, xóa bảng không tốn WCU như xóa từng item.\n(B) SAI: Bật DAX chỉ giảm RCU cho đọc lặp lại; không giảm WCU của lượng ghi liên tục, không giảm chi phí lưu trữ và không giải quyết lưu trữ sang S3.\n(C) SAI: Global table thêm replica ở Region khác chỉ nhân đôi chi phí ghi và lưu trữ, không liên quan tới dữ liệu nguội.\n(D) SAI: Chuyển cả bảng sang Standard-IA làm tăng đơn giá ghi cho dữ liệu tháng hiện tại, vốn đang ghi rất nhiều; phần tiết kiệm lưu trữ có thể bị bù trừ.\nĐáp án đúng: A\nĐiểm cần nhớ: Với time-series, tách bảng theo kỳ để mỗi bảng có capacity/table class riêng; hết hạn thì export và DeleteTable, rẻ hơn xóa từng item.",
+      "tagNames": [
+        "Cost-Optimized Architectures > Amazon-DynamoDB"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Create one table per month, lower the capacity of older tables, and export then delete tables past 12 months.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Add a DynamoDB Accelerator (DAX) cluster so that repeated queries on current-month data are served from cache.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Convert the table to a global table and send queries for older months to a replica in a lower-cost Region.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Change the single table to the Standard-Infrequent Access table class to lower the storage cost of old data.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A media company restores old footage from S3 Glacier Flexible Retrieval by using Bulk retrievals. Restores finish at unpredictable times during the night. A transcoding workflow must start automatically as soon as each individual object becomes readable, and engineers do not want to poll the objects. Which solution meets these requirements?",
+      "explanation": "Phân tích đề: Cần kích hoạt xử lý ngay khi từng object restore xong, không polling.\n(A) ĐÚNG: S3 Event Notifications hỗ trợ sự kiện s3:ObjectRestore:Completed, phát ra khi bản tạm đã sẵn sàng; gửi tới Lambda, SQS, SNS hoặc qua EventBridge để khởi động transcoding cho từng object.\n(B) SAI: Chạy HeadObject định kỳ để đọc header x-amz-restore chính là polling mà đề muốn tránh, tốn request và có độ trễ.\n(C) SAI: CloudTrail ghi lại lời gọi RestoreObject lúc bắt đầu yêu cầu, không phải lúc restore hoàn tất; kích hoạt theo sự kiện này sẽ chạy khi object chưa đọc được.\n(D) SAI: Lifecycle rule không có hành động 'khi restore xong'; lifecycle chỉ chuyển tầng hoặc xóa theo tuổi object.\nĐáp án đúng: A\nĐiểm cần nhớ: Restore có ba sự kiện: ObjectRestore:Post (bắt đầu), ObjectRestore:Completed (sẵn sàng đọc), ObjectRestore:Delete (bản tạm hết hạn).",
+      "tagNames": [
+        "Cost-Optimized Architectures > S3-Storage-Classes-and-Lifecycle (Intelligent-Tiering / Glacier)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Configure an S3 event notification for s3:ObjectRestore:Completed that invokes the workflow.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Schedule a Lambda function every 10 minutes to call HeadObject and check the x-amz-restore header.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Create an EventBridge rule for the RestoreObject API call recorded by AWS CloudTrail and start the workflow.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Add a lifecycle rule action that invokes the workflow when a restored copy becomes available.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company runs an Amazon ECS cluster on EC2 container instances that are Spot Instances. The services sit behind an Application Load Balancer. When a Spot Instance receives an interruption notice, its tasks are stopped abruptly and ECS does not start replacement tasks until the instance is gone. The company wants ECS to move tasks off the instance as soon as the interruption notice arrives, with minimal custom code. What should a solutions architect do?",
+      "explanation": "Phân tích đề: ECS trên EC2 Spot, muốn khi có Interruption Notice thì ECS tự rút task sớm, ít code tùy biến.\n(A) SAI: Capacity Rebalancing là tính năng của Auto Scaling Group, không phải của target group ALB, và không điều khiển việc drain task ECS.\n(B) SAI: Hibernate giữ RAM trên chính instance đó nhưng service vẫn gián đoạn tới khi capacity quay lại; không di chuyển task sang instance khác.\n(C) SAI: minimum healthy percent áp dụng cho quá trình deployment, không làm ECS phản ứng với cảnh báo thu hồi Spot.\n(D) ĐÚNG: Đặt ECS_ENABLE_SPOT_INSTANCE_DRAINING=true trong cấu hình ECS container agent; khi agent nhận Spot Interruption Notice, container instance chuyển sang trạng thái DRAINING, ECS dừng đặt task mới, khởi chạy task thay thế ở instance khác và deregister task khỏi target group.\nĐáp án đúng: D\nĐiểm cần nhớ: ECS trên EC2 Spot => bật ECS_ENABLE_SPOT_INSTANCE_DRAINING để agent tự chuyển instance sang DRAINING khi có cảnh báo 2 phút.",
+      "tagNames": [
+        "Cost-Optimized Architectures > EC2-Purchasing-Options (Reserved / Savings Plans / Spot / Capacity Reservation)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Enable Capacity Rebalancing on the Application Load Balancer target group that the ECS services use",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Configure the Spot Instances to hibernate on interruption so that ECS tasks resume on the same instance",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Raise the ECS service minimum healthy percent to 200 so replacement tasks start before any interruption",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Set ECS_ENABLE_SPOT_INSTANCE_DRAINING to true in the ECS container agent configuration on each instance",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "A company runs a shared Amazon EKS cluster on Amazon EC2 nodes for eight application teams, each deployed in its own Kubernetes namespace. Finance wants the monthly EC2 cost of the cluster allocated to each team based on the CPU and memory their pods actually request and use, and delivered in the company's existing billing data export. What is the MOST operationally efficient solution?",
+      "explanation": "Phân tích đề: Cluster EKS dùng chung, cần chia chi phí EC2 theo pod/namespace dựa trên CPU và memory, xuất trong billing export. Từ khóa: split cost allocation data.\n(A) SAI: Tách node group cho từng team làm giảm mật độ sử dụng, tăng chi phí và phá vỡ mục đích cluster dùng chung.\n(B) SAI: Node chạy pod của nhiều team cùng lúc, tag trên node chỉ gán cả chi phí node cho một team, không chia được theo mức dùng của pod.\n(C) SAI: Tự vận hành công cụ trong cluster tốn công hơn và dữ liệu nằm ngoài billing export có sẵn mà finance đang dùng.\n(D) ĐÚNG: Split cost allocation data cho EKS (và ECS) chia chi phí instance EC2 xuống cấp pod theo CPU, memory request và usage, đưa các cột phân bổ vào CUR. Có thể group theo namespace hoặc label để chargeback mà không tự xây công cụ.\nĐáp án đúng: D\nĐiểm cần nhớ: Chia chi phí cluster ECS/EKS dùng chung theo task/pod: bật split cost allocation data trong Cost Management preferences, dữ liệu xuất hiện trong CUR.",
+      "tagNames": [
+        "Cost-Optimized Architectures > Cost-Visibility-and-Governance (Cost Explorer / Budgets / Allocation Tags / FinOps)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Run one dedicated managed node group per team so each team's nodes can be tagged and billed separately",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Tag every EC2 worker node with the Team tag and group the Cost Explorer view by that tag",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Deploy a self-managed cost monitoring tool in the cluster and export its reports to Amazon S3 each month",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Opt in to split cost allocation data for Amazon EKS and include it in the Cost and Usage Report export",
+          "isCorrect": true
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "An analytics platform in AWS sends about 300 TB of processed results each month to a company's data center over an AWS Site-to-Site VPN connection. The volume is steady and predictable, and it is expected to grow. Finance identifies data transfer out as the largest cost line. Which solution will MOST reduce this cost?",
+      "explanation": "Phân tích đề: 300 TB mỗi tháng từ AWS về on-premises, ổn định và tăng dần, đang dùng VPN qua Internet. Chi phí lớn nhất là data transfer out.\n(A) ĐÚNG: Với khối lượng lớn và ổn định, Direct Connect có đơn giá data transfer out thấp hơn đáng kể so với Internet; phí port theo giờ được bù lại nhờ 300 TB mỗi tháng.\n(B) SAI: Transfer Acceleration cộng thêm phí mỗi GB trên data transfer out, chỉ làm hóa đơn đắt hơn.\n(C) SAI: ECMP qua nhiều tunnel chỉ tăng băng thông; đơn giá data transfer out Internet giữ nguyên, lại cộng phí xử lý của transit gateway.\n(D) SAI: Accelerated VPN chạy qua Global Accelerator, thêm phí accelerator và DT-Premium, còn data transfer out vẫn theo đơn giá Internet.\nĐáp án đúng: A\nĐiểm cần nhớ: Khối lượng lớn, ổn định giữa on-premises và AWS => Direct Connect, đơn giá egress thấp hơn VPN qua Internet.",
+      "tagNames": [
+        "Cost-Optimized Architectures > Network-Costs (Data Transfer / VPC Endpoint)"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "Establish an AWS Direct Connect connection and send the results over it at the lower Direct Connect data transfer out rate.",
+          "isCorrect": true
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "Enable S3 Transfer Acceleration on the result bucket and let the data center download the objects through it.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "Add more VPN tunnels behind a transit gateway and use ECMP to spread the traffic across them.",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "Convert the connection to an Accelerated Site-to-Site VPN so that the traffic travels over the AWS global network instead of the public internet.",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "questionType": "MCQ",
+      "questionText": "AWS Compute Optimizer classifies an Amazon EC2 instance as Over-provisioned. What does this finding indicate?",
+      "explanation": "Phân tích đề: Hỏi ý nghĩa finding Over-provisioned của EC2 trong Compute Optimizer.\n(A) SAI: Trạng thái cân bằng giữa chi phí và hiệu năng là Optimized, không cần hành động.\n(B) SAI: Instance gần như không hoạt động trong suốt lookback thuộc nhóm recommendation Idle, gợi ý stop hoặc terminate thay vì đổi size.\n(C) SAI: Mô tả này là Under-provisioned: ít nhất một thông số không đáp ứng yêu cầu, cần upsize.\n(D) ĐÚNG: Over-provisioned nghĩa là ít nhất một thông số (CPU, memory, network, EBS…) có thể giảm mà vẫn đáp ứng yêu cầu hiệu năng; có thể downsize để tiết kiệm chi phí.\nĐáp án đúng: D\nĐiểm cần nhớ: Over-provisioned -> downsize để tiết kiệm; Under-provisioned -> upsize để bảo đảm hiệu năng; Optimized -> giữ nguyên.",
+      "tagNames": [
+        "Cost-Optimized Architectures > AWS-Compute-Optimizer"
+      ],
+      "answers": [
+        {
+          "answerLabel": "A",
+          "answerText": "The instance type balances cost and performance well and no change is recommended",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "B",
+          "answerText": "The instance showed almost no activity during the lookback period and should be stopped",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "C",
+          "answerText": "At least one specification does not meet the workload's performance needs, so the instance should be upsized",
+          "isCorrect": false
+        },
+        {
+          "answerLabel": "D",
+          "answerText": "At least one specification can be sized down while still meeting the workload's performance needs",
+          "isCorrect": true
+        }
+      ]
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import type {
   QuickChallengeCardResponse,
   TestAdminResponse,
   TestCollectionResponse,
+  TestJsonImportPreviewResponse,
   TestPartSummaryResponse,
   TestResponse,
 } from '@/app/types';
@@ -81,6 +82,30 @@ export const getTestPartsSummary = (testId: string): Promise<TestPartSummaryResp
 
 export const createTest = (payload: CreateTestRequest): Promise<TestResponse> => {
   return axios.post(BASE_URL, payload).then((res) => res.data);
+};
+
+const MULTIPART = { headers: { 'Content-Type': 'multipart/form-data' } };
+
+/** Dry-run: chia câu trong file JSON vào các phần thi của loại kỳ thi, không ghi database. */
+export const previewTestJson = (file: File, examTypeId: string): Promise<TestJsonImportPreviewResponse> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return axios
+    .post(`${BASE_URL}/import/json/preview?examTypeId=${encodeURIComponent(examTypeId)}`, formData, MULTIPART)
+    .then((res) => res.data);
+};
+
+/** Tạo trọn đề từ file JSON: mỗi phần thi có câu trong file thành một part của đề. */
+export const importTestJson = (
+  file: File,
+  payload: CreateTestRequest,
+  usageScope?: string,
+): Promise<TestResponse> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('request', JSON.stringify(payload));
+  const query = usageScope ? `?usageScope=${encodeURIComponent(usageScope)}` : '';
+  return axios.post(`${BASE_URL}/import/json${query}`, formData, MULTIPART).then((res) => res.data);
 };
 
 export const updateTest = (testId: string, payload: CreateTestRequest): Promise<TestResponse> => {

@@ -59,6 +59,7 @@ export interface TestInfoForm {
   availableTo: string;
   collectionId: string;
   costCoins: string;
+  examCategoryId: string;
 
   usageScope: QuestionUsageScope;
 }
@@ -137,19 +138,25 @@ export const useCreateTest = ({
     availableTo: '',
     collectionId: '',
     costCoins: '',
+    examCategoryId: '',
     usageScope: QuestionUsageScope.EXAM,
   });
 
   const [questions, setQuestions] = useState<DraftQuestion[]>([cloneEmptyQuestion()]);
   const [groups, setGroups] = useState<DraftGroup[]>([createInitialGroup()]);
   const [documentFile, setDocumentFile] = useState<File | null>(null);
+  // File JSON tạo trọn đề (nhiều phần thi). Có file này thì tab TEST bỏ qua phần thi và câu nhập tay.
+  const [testJsonFile, setTestJsonFile] = useState<File | null>(null);
   const [notification, setNotification] = useState<CreatorNotification>({});
 
   const { examTypes, examParts, questionCollections, availableTags: examTypeTags } = useBaseMetaData(testInfo.examTypeId);
-  // Chỉ hiện tag dùng chung hoặc thuộc phần thi đang chọn.
+  // Tab tạo đề không chọn phần thi: hiện tag mọi phần thi, tag của câu quyết định câu vào part nào.
+  // Các tab còn lại chỉ hiện tag dùng chung hoặc thuộc phần thi đang chọn.
   const availableTags = useMemo(
-    () => examTypeTags.filter((t: any) => !t.examPartId || t.examPartId === testInfo.examPartId),
-    [examTypeTags, testInfo.examPartId],
+    () => creatorType === CREATOR_TYPES.TEST
+      ? examTypeTags
+      : examTypeTags.filter((t: any) => !t.examPartId || t.examPartId === testInfo.examPartId),
+    [creatorType, examTypeTags, testInfo.examPartId],
   );
 
   const { handleSubmit: submitLogic, isSubmitting } = useTestSubmission({
@@ -160,9 +167,13 @@ export const useCreateTest = ({
     questions,
     groups,
     documentFile,
+    testJsonFile,
+    examParts,
+    examTypeTags,
     setQuestions,
     setGroups,
     setDocumentFile,
+    setTestJsonFile,
     setNotification,
     emptyQuestion,
     createInitialGroup,
@@ -473,6 +484,8 @@ export const useCreateTest = ({
     setGroups,
     documentFile,
     setDocumentFile,
+    testJsonFile,
+    setTestJsonFile,
     loading: isSubmitting,
     notification,
     handleExamTypeChange,

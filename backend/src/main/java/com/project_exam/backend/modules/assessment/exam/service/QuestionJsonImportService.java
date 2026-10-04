@@ -47,8 +47,6 @@ public class QuestionJsonImportService {
 
     private static final long MAX_FILE_SIZE_BYTES = 5L * 1024 * 1024;
 
-    private static final int MAX_TOTAL_QUESTIONS = 1000;
-
     private static final List<String> DEFAULT_LABELS =
             List.of("A", "B", "C", "D", "E", "F", "G", "H", "I", "J");
 
@@ -128,18 +126,6 @@ public class QuestionJsonImportService {
 
         if (flatQuestions.isEmpty() && groups.isEmpty()) {
             result.errors.add("File không có câu hỏi nào (cần 'questions' hoặc 'groups').");
-            return result;
-        }
-
-        int total = flatQuestions.size()
-                + groups.stream()
-                .filter(Objects::nonNull)
-                .map(QuestionJsonImportRequest.JsonGroup::getQuestions)
-                .mapToInt(list -> list == null ? 0 : list.size())
-                .sum();
-        if (total > MAX_TOTAL_QUESTIONS) {
-            result.errors.add("File có " + total + " câu hỏi, vượt giới hạn "
-                    + MAX_TOTAL_QUESTIONS + " câu mỗi lần import.");
             return result;
         }
 

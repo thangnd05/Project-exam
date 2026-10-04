@@ -2,10 +2,10 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fromDateTimeLocalInput } from '@/app/utils/format-date-time';
-import { createTest } from '@/app/apis/testApi';
+import { createTest, importTestJson } from '@/app/apis/testApi';
+import { QuestionUsageScope } from '@/app/enums';
 import { createTestPart } from '@/app/apis/testPartApi';
 import {
-  createAndAttachDocument,
   createAndAttach,
   bulkCreateQuestions,
   bulkCreateQuestionGroups,
@@ -36,9 +36,13 @@ export interface UseTestSubmissionOptions {
   questions: DraftQuestion[];
   groups: DraftGroup[];
   documentFile: File | null;
+  testJsonFile: File | null;
+  examParts: any[];
+  examTypeTags: any[];
   setQuestions: (questions: DraftQuestion[]) => void;
   setGroups: (groups: DraftGroup[]) => void;
   setDocumentFile: (file: File | null) => void;
+  setTestJsonFile: (file: File | null) => void;
   setNotification: (notification: CreatorNotification) => void;
   emptyQuestion: DraftQuestion;
   createInitialGroup: () => DraftGroup;
@@ -52,9 +56,13 @@ export const useTestSubmission = ({
     questions,
     groups,
     documentFile,
+    testJsonFile,
+    examParts,
+    examTypeTags,
     setQuestions,
     setGroups,
     setDocumentFile,
+    setTestJsonFile,
     setNotification,
     emptyQuestion,
     createInitialGroup,
@@ -80,6 +88,50 @@ export const useTestSubmission = ({
             return false;
         }
         return hasAtLeastOneCorrectAnswer(question);
+    };
+
+    /**
+     * Tab tạo đề không chọn phần thi: mỗi câu vào phần thi của tag đã chọn (hoặc tiền tố
+     * "Phần thi > Tag" của tag nạp từ Word). Mỗi phần thi có câu thành một part, theo thứ tự phần thi.
+     */
+    const assignQuestionsToParts = () => {
+        const tagPartById = new Map<string, string>();
+        examTypeTags.forEach((t: any) => {
+            if (t.examPartId) tagPartById.set(String(t.tagId), String(t.examPartId));
+        });
+        const partIdByName = new Map<string, string>();
+        examParts.forEach((p: any) => partIdByName.set(String(p.name).trim().toLowerCase(), String(p.examPartId)));
+
+        const byPart = new Map<string, DraftQuestion[]>();
+        const errors: string[] = [];
+        questions.forEach((q, index) => {
+            if (!hasValidManualQuestion(q)) return;
+            const partIds = new Set<string>();
+            (q.tagIds || []).forEach((id) => {
+                const partId = tagPartById.get(String(id));
+                if (partId) partIds.add(partId);
+            });
+            (q.tagNames || []).forEach((spec) => {
+                const gt = spec.indexOf('>');
+                const partId = gt >= 0 ? partIdByName.get(spec.slice(0, gt).trim().toLowerCase()) : undefined;
+                if (partId) partIds.add(partId);
+            });
+            if (partIds.size === 0 && examParts.length === 1) {
+                partIds.add(String(examParts[0].examPartId));
+            }
+            if (partIds.size !== 1) {
+                errors.push(`Câu ${index + 1}${partIds.size === 0 ? ' (chưa có tag của phần thi nào)' : ' (tag thuộc nhiều phần thi)'}`);
+                return;
+            }
+            const partId = [...partIds][0];
+            if (!byPart.has(partId)) byPart.set(partId, []);
+            byPart.get(partId)!.push(q);
+        });
+
+        const partGroups = examParts
+            .map((p: any) => ({ examPartId: String(p.examPartId), questions: byPart.get(String(p.examPartId)) || [] }))
+            .filter((g) => g.questions.length > 0);
+        return { partGroups, errors };
     };
 
     const validateCorrectAnswerSelection = (creatorType: CreatorType) => {
@@ -141,8 +193,7 @@ export const useTestSubmission = ({
     const mutation = useMutation({
         mutationFn: async (creatorType: CreatorType) => {
             if (creatorType === CREATOR_TYPES.TEST) {
-                const manualQuestions = questions.filter(hasValidManualQuestion);
-                const testData = await createTest({
+                const testPayload = {
                     title: testInfo.title,
                     description: testInfo.description,
                     examTypeId: String(testInfo.examTypeId),
@@ -161,63 +212,63 @@ export const useTestSubmission = ({
                     chapterId: mode === 'class' ? String(chapterId) : null,
 
                     collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
+                    examCategoryId: testInfo.examCategoryId || null,
 
                     costCoins:
                         testInfo.costCoins && Number(testInfo.costCoins) > 0
                             ? Number(testInfo.costCoins)
                             : null,
-                } as unknown as CreateTestRequest);
-                const newTestId = testData.testId || (testData as any).id;
-                const partData = await createTestPart({
-                    testId: String(newTestId),
-                    examPartId: String(testInfo.examPartId),
-                    numQuestions: manualQuestions.length,
-                });
-                const newPartId = partData.testPartId || (partData as any).id;
+                } as unknown as CreateTestRequest;
 
-                if (documentFile) {
-                    const documentFormData = new FormData();
-                    documentFormData.append('file', documentFile);
-                    documentFormData.append('testPartId', String(newPartId));
-                    if (mode === 'class' && classId) {
-                        documentFormData.append('classId', String(classId));
-                    }
-                    if (mode === 'class' && chapterId) {
-                        documentFormData.append('chapterId', String(chapterId));
-                    }
-                    await createAndAttachDocument(documentFormData);
+                if (testJsonFile) {
+                    // Backend tự chia câu vào các phần thi và gắn tag, tất cả trong một transaction.
+                    await importTestJson(testJsonFile, testPayload, QuestionUsageScope.EXAM);
+                    return;
                 }
 
-                await Promise.all(
-                    manualQuestions.map((q) => {
-                        const formData = new FormData();
-                        const hasMedia = q.mediaFiles && q.mediaFiles.length > 0;
-                        const hasMediaUrl = !!q.mediaUrl?.trim();
-                        const passageType = q.passageType || 'LISTENING';
-                        const payload = {
-                            testPartId: String(newPartId),
-                            questionText: q.questionText,
-                            questionType: q.questionType,
-                            classId: mode === 'class' ? String(classId) : null,
-                            chapterId: mode === 'class' ? String(chapterId) : null,
-                            answers: q.answers,
-                            collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
-                            explanation: q.explanation?.trim() || null,
-                            tagIds: q.tagIds?.length > 0 ? q.tagIds : null,
-                            tagNames: q.tagNames?.length > 0 ? q.tagNames : null,
-                            passage: (hasMedia || hasMediaUrl)
-                                ? { passageType, content: '', mediaUrl: q.mediaUrl?.trim() || null }
-                                : null,
-                        };
-                        formData.append('request', JSON.stringify(payload));
-                        if (hasMedia) {
-                            q.mediaFiles.forEach((file, i) =>
-                                formData.append(`file${i}`, file),
-                            );
-                        }
-                        return createAndAttach(formData);
-                    }),
-                );
+                const { partGroups } = assignQuestionsToParts();
+                const testData = await createTest(testPayload);
+                const newTestId = testData.testId || (testData as any).id;
+
+                for (const { examPartId, questions: partQuestions } of partGroups) {
+                    const partData = await createTestPart({
+                        testId: String(newTestId),
+                        examPartId,
+                        numQuestions: partQuestions.length,
+                    });
+                    const newPartId = partData.testPartId || (partData as any).id;
+
+                    await Promise.all(
+                        partQuestions.map((q) => {
+                            const formData = new FormData();
+                            const hasMedia = q.mediaFiles && q.mediaFiles.length > 0;
+                            const hasMediaUrl = !!q.mediaUrl?.trim();
+                            const passageType = q.passageType || 'LISTENING';
+                            const payload = {
+                                testPartId: String(newPartId),
+                                questionText: q.questionText,
+                                questionType: q.questionType,
+                                classId: mode === 'class' ? String(classId) : null,
+                                chapterId: mode === 'class' ? String(chapterId) : null,
+                                answers: q.answers,
+                                collectionId: testInfo.collectionId ? String(testInfo.collectionId) : null,
+                                explanation: q.explanation?.trim() || null,
+                                tagIds: q.tagIds?.length > 0 ? q.tagIds : null,
+                                tagNames: q.tagNames?.length > 0 ? q.tagNames : null,
+                                passage: (hasMedia || hasMediaUrl)
+                                    ? { passageType, content: '', mediaUrl: q.mediaUrl?.trim() || null }
+                                    : null,
+                            };
+                            formData.append('request', JSON.stringify(payload));
+                            if (hasMedia) {
+                                q.mediaFiles.forEach((file, i) =>
+                                    formData.append(`file${i}`, file),
+                                );
+                            }
+                            return createAndAttach(formData);
+                        }),
+                    );
+                }
             } else if (creatorType === CREATOR_TYPES.BULK) {
                 const formData = new FormData();
                 const payload = {
@@ -309,6 +360,7 @@ export const useTestSubmission = ({
                 });
                 setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
                 setDocumentFile(null);
+                setTestJsonFile(null);
             } else if (creatorType === CREATOR_TYPES.BULK) {
                 setNotification({
                     type: 'success',
@@ -331,9 +383,35 @@ export const useTestSubmission = ({
     });
 
     const handleSubmit = async (creatorType: CreatorType) => {
+        if (creatorType === CREATOR_TYPES.TEST && testJsonFile) {
+            // Đề từ JSON: phần thi lấy từ file, không kiểm tra câu nhập tay.
+            if (!testInfo.title || !testInfo.examTypeId) {
+                toast.warning('Vui lòng nhập tiêu đề và chọn loại kỳ thi!', { autoClose: TOAST_VALIDATION_MS });
+                return false;
+            }
+            try {
+                await mutation.mutateAsync(creatorType);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
         if (creatorType === CREATOR_TYPES.TEST) {
-            if (!testInfo.title || !testInfo.examTypeId || !testInfo.examPartId) {
-                toast.warning('Vui lòng điền đủ thông tin!', { autoClose: TOAST_VALIDATION_MS });
+            if (!testInfo.title || !testInfo.examTypeId) {
+                toast.warning('Vui lòng nhập tiêu đề và chọn loại kỳ thi!', { autoClose: TOAST_VALIDATION_MS });
+                return false;
+            }
+            const { partGroups, errors } = assignQuestionsToParts();
+            if (errors.length > 0) {
+                toast.warning(
+                    `Chọn tag của đúng một phần thi cho mỗi câu để biết câu thuộc phần nào: ${errors.slice(0, 5).join(', ')}${errors.length > 5 ? ` và ${errors.length - 5} câu khác` : ''}`,
+                    { autoClose: TOAST_VALIDATION_MS },
+                );
+                return false;
+            }
+            if (partGroups.length === 0) {
+                toast.warning('Đề chưa có câu hỏi nào có đáp án đúng.', { autoClose: TOAST_VALIDATION_MS });
                 return false;
             }
         } else {

@@ -18,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import com.project_exam.backend.shared.exception.BadRequestException;
+
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -33,6 +36,37 @@ public class TestCommandService {
     private final ExamCategoryRepository examCategoryRepository;
 
     public Test save(Test test) {
+        return testRepository.save(test);
+    }
+
+    public Test createTest(CreateTestRequest request, String currentUserId) {
+        if (request.getClassId() != null) {
+            classAccessGuard.requireTeacher(request.getClassId(), currentUserId);
+            classAccessGuard.requireChapterInClass(request.getChapterId(), request.getClassId());
+        } else if (request.getChapterId() != null) {
+            throw new BadRequestException("Khi có chapterId thì phải có classId.");
+        }
+        Test test = new Test();
+        test.setTitle(request.getTitle());
+        test.setDescription(request.getDescription());
+        test.setExamTypeId(request.getExamTypeId());
+        test.setDurationMinutes(request.getDurationMinutes());
+        test.setBannerUrl(request.getBannerUrl());
+        test.setMaxAttempts(request.getMaxAttempts());
+        test.setClassId(request.getClassId());
+        test.setChapterId(request.getChapterId());
+        test.setExamCategoryId(sanitizeExamCategoryId(request.getExamCategoryId()));
+        test.setCollectionId(request.getCollectionId());
+        test.setAvailableFrom(request.getAvailableFrom());
+        test.setAvailableTo(request.getAvailableTo());
+
+        if (request.getCostCoins() != null
+                && authUtils.hasPermission(PermissionCatalog.TEST_MANAGE_PRICING)
+                && request.getClassId() == null) {
+            test.setCostCoins(request.getCostCoins());
+        }
+        test.setCreatedBy(currentUserId);
+        test.setCreatedAt(Instant.now());
         return testRepository.save(test);
     }
 

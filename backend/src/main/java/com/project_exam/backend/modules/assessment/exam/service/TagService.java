@@ -164,8 +164,25 @@ public class TagService {
      * Chỉ xét tag dùng chung hoặc thuộc đúng phần thi {@code examPartId}; ưu tiên tag của phần thi.
      */
     public List<String> resolveTagIdsByNames(Collection<String> specs, String examTypeId, String examPartId) {
+        TagNameResolution resolution = resolveTagNames(specs, examTypeId, examPartId);
+        if (!resolution.unmatched().isEmpty()) {
+            log.warn("Import tags: bỏ qua {} spec không khớp tag có sẵn (examType={}, examPart={}): {}",
+                    resolution.unmatched().size(), examTypeId, examPartId, resolution.unmatched());
+        }
+        if (!resolution.ambiguous().isEmpty()) {
+            log.warn("Import tags: bỏ qua {} tag trùng tên (examPart={}): {}",
+                    resolution.ambiguous().size(), examPartId, resolution.ambiguous());
+        }
+        return resolution.ids();
+    }
+
+    /** Kết quả resolve tag theo tên, kèm các spec không khớp hoặc trùng tên để báo cho người dùng. */
+    public record TagNameResolution(List<String> ids, List<String> unmatched, List<String> ambiguous) {
+    }
+
+    public TagNameResolution resolveTagNames(Collection<String> specs, String examTypeId, String examPartId) {
         if (specs == null || specs.isEmpty() || examTypeId == null) {
-            return List.of();
+            return new TagNameResolution(List.of(), List.of(), List.of());
         }
         Map<String, String> partNames = partNamesOf(examTypeId);
         Map<String, List<Tag>> byName = new HashMap<>();
@@ -211,15 +228,7 @@ public class TagService {
             }
             if (!ids.contains(chosen.getTagId())) ids.add(chosen.getTagId());
         }
-        if (!unmatched.isEmpty()) {
-            log.warn("Import tags: bỏ qua {} spec không khớp tag có sẵn (examType={}, examPart={}): {}",
-                    unmatched.size(), examTypeId, examPartId, unmatched);
-        }
-        if (!ambiguous.isEmpty()) {
-            log.warn("Import tags: bỏ qua {} tag trùng tên (examPart={}): {}",
-                    ambiguous.size(), examPartId, ambiguous);
-        }
-        return ids;
+        return new TagNameResolution(ids, unmatched, ambiguous);
     }
 
     private boolean isAllowedForPart(Tag tag, String examPartId) {

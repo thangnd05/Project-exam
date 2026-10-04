@@ -6,6 +6,8 @@ import { Row, Col, Alert } from 'react-bootstrap';
 import { getClassById } from '@/app/apis/classApi';
 import { getChapterById } from '@/app/apis/chapterApi';
 import { previewDocument, previewJsonFile, previewPassageDocument } from '@/app/apis/questionApi';
+import { previewTestJson } from '@/app/apis/testApi';
+import type { TestJsonImportPreviewResponse } from '@/app/types';
 import {
   IoCalendarOutline,
   IoTimeOutline,
@@ -21,12 +23,14 @@ import { Trash, PlusCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useCreateTest, CREATOR_TYPES } from '@/app/hooks/useCreateTest';
+import { useExamCategories } from '@/app/hooks/useExamCategories';
 import type { CreatorType, DraftGroup, DraftQuestion } from '@/app/hooks/useCreateTest';
 import CoinPriceField from '@/app/components/tests/CoinPriceField';
 import QuestionBlock from './QuestionBlock';
 import CreatorTabs from './CreatorTabs';
 import FormFooter from './FormFooter';
 import CreateFromBankBody from './CreateFromBankBody';
+import JsonTestPreview from './JsonTestPreview';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
 import { buildCollectionTree } from '@/app/utils/collectionTree';
@@ -84,6 +88,8 @@ const CreateTestFormBody = ({
     setGroups,
     documentFile,
     setDocumentFile,
+    testJsonFile,
+    setTestJsonFile,
     loading,
     notification,
     handleExamTypeChange,
@@ -123,6 +129,11 @@ const CreateTestFormBody = ({
   const [bulkPassageFile, setBulkPassageFile] = useState<File | null>(null);
   const [collapsedGroups, setCollapsedGroups] = useState<Set<number>>(() => new Set());
   const [collapsedQuestions, setCollapsedQuestions] = useState<Set<number>>(() => new Set());
+  const [testJsonPreview, setTestJsonPreview] =
+    useState<(TestJsonImportPreviewResponse & { fileName: string }) | null>(null);
+  const [testJsonChecking, setTestJsonChecking] = useState(false);
+  const isTestJsonMode = activeCreatorType === CREATOR_TYPES.TEST && !!testJsonFile;
+  const examCategories = useExamCategories();
 
   useEffect(() => {
     if (mode === 'class' && classId) {
@@ -330,6 +341,54 @@ const CreateTestFormBody = ({
       toast.info(message, { autoClose: 10000 });
     }
   };
+
+  /**
+   * Tab TEST: file JSON tạo trọn đề. Không nạp vào form nháp mà gửi lên backend chia câu theo
+   * phần thi (trường examPart hoặc tag "Phần thi > Tag"), rồi hiện bảng tóm tắt để kiểm tra.
+   */
+  const handleTestJsonFile = async (fileInput: File) => {
+    if (!testInfo.examTypeId) {
+      toast.warning('Chọn loại kỳ thi trước khi upload file JSON.');
+      return;
+    }
+    setTestJsonChecking(true);
+    try {
+      const data = await previewTestJson(fileInput, testInfo.examTypeId);
+      setTestJsonPreview({ ...data, fileName: fileInput.name });
+      setTestJsonFile(data.valid ? fileInput : null);
+      if (data.valid) {
+        toast.success(`File hợp lệ: ${data.questionCount} câu, chia vào ${data.parts.length} phần thi.`);
+      }
+    } catch (error: any) {
+      setTestJsonFile(null);
+      setTestJsonPreview(null);
+      const message =
+        error.response?.data?.detail ||
+        error.response?.data?.message ||
+        'Không thể đọc file JSON.';
+      toast.error(message, { autoClose: 20000 });
+    } finally {
+      setTestJsonChecking(false);
+    }
+  };
+
+  const clearTestJson = () => {
+    setTestJsonFile(null);
+    setTestJsonPreview(null);
+  };
+
+  // Tạo đề thành công thì hook xoá file; bỏ luôn bảng tóm tắt (giữ lại bảng lỗi của file hỏng).
+  useEffect(() => {
+    if (!testJsonFile) {
+      setTestJsonPreview((prev) => (prev?.valid ? null : prev));
+    }
+  }, [testJsonFile]);
+
+  // Đổi loại kỳ thi thì phần thi đổi theo, kết quả chia cũ không còn đúng.
+  useEffect(() => {
+    clearTestJson();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [testInfo.examTypeId]);
 
   /** Nạp file JSON vào form nháp. Mục tiêu 'questions' cho câu lẻ, 'groups' cho nhóm theo passage. */
   const handlePreviewFromJson = async (fileInput: File, target: 'questions' | 'groups') => {
@@ -563,7 +622,7 @@ const CreateTestFormBody = ({
                 </Col>
               </>
             )}
-            <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 3 : 4}>
+            <Col md={4}>
               <div className={cx('formGroupModern')}>
                 <label>Loại kỳ thi</label>
                 <select className={cx('inputModern')} value={testInfo.examTypeId} onChange={(e) => handleExamTypeChange(e.target.value)}>
@@ -573,7 +632,9 @@ const CreateTestFormBody = ({
                 </select>
               </div>
             </Col>
-            <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 3 : 4}>
+            {/* Tab tạo đề không chọn phần thi: câu được xếp vào phần thi theo tag. */}
+            {activeCreatorType !== CREATOR_TYPES.TEST && (
+            <Col md={4}>
               <div className={cx('formGroupModern')}>
                 <label>Phần thi *</label>
                 <select className={cx('inputModern')} value={testInfo.examPartId} onChange={(e) => setTestInfo({ ...testInfo, examPartId: e.target.value })} disabled={!testInfo.examTypeId}>
@@ -582,8 +643,9 @@ const CreateTestFormBody = ({
                 </select>
               </div>
             </Col>
+            )}
             {activeCreatorType === CREATOR_TYPES.TEST && (
-              <Col md={3}>
+              <Col md={4}>
                 <div className={cx('formGroupModern')}>
                   <label><IoLibraryOutline /> Bộ đề (Collection)</label>
                   <select className={cx('inputModern')} value={testInfo.collectionId || ''} onChange={(e) => setTestInfo({ ...testInfo, collectionId: e.target.value })}>
@@ -636,26 +698,44 @@ const CreateTestFormBody = ({
               <>
                 {activeCreatorType === CREATOR_TYPES.TEST && (
                   <>
-                    <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 3 : 4}>
+                    <Col md={4}>
                       <div className={cx('formGroupModern')}>
                         <label><IoTimeOutline /> Thời gian (phút)</label>
                         <input type="number" className={cx('inputModern')} value={testInfo.durationMinutes} onChange={(e) => setTestInfo({ ...testInfo, durationMinutes: e.target.value })} />
                       </div>
                     </Col>
-                    <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 3 : 4}>
+                    <Col md={4}>
                       <div className={cx('formGroupModern')}>
                         <label><IoRocketOutline /> Lượt làm tối đa</label>
                         <input type="number" className={cx('inputModern')} value={testInfo.maxAttempts} onChange={(e) => setTestInfo({ ...testInfo, maxAttempts: e.target.value })} />
                       </div>
                     </Col>
                     <CoinPriceField
-                      md={3}
+                      md={4}
                       isPublic={mode !== 'class'}
                       value={testInfo.costCoins}
                       onChange={(v) => setTestInfo({ ...testInfo, costCoins: v })}
                       groupClassName={cx('formGroupModern')}
                       inputClassName={cx('inputModern')}
                     />
+                    <Col md={mode === 'class' ? 8 : 4}>
+                      <div className={cx('formGroupModern')}>
+                        <label>Phân loại bài thi (tuỳ chọn)</label>
+                        <select
+                          className={cx('inputModern')}
+                          value={testInfo.examCategoryId}
+                          onChange={(e) => setTestInfo({ ...testInfo, examCategoryId: e.target.value })}
+                          aria-label="Phân loại bài thi"
+                        >
+                          <option value="">-- Không phân loại --</option>
+                          {examCategories.map((c) => (
+                            <option key={c.examCategoryId} value={c.examCategoryId}>
+                              {c.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </Col>
                     <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 6 : 4}>
                       <div className={cx('formGroupModern')}>
                         <label><IoCalendarOutline /> Thời gian bắt đầu</label>
@@ -676,6 +756,7 @@ const CreateTestFormBody = ({
                     </Col>
                   </>
                 )}
+                {!isTestJsonMode && (
                 <Col md={12}>
                   <div className={cx('formGroupModern')}>
                     <label>
@@ -696,33 +777,76 @@ const CreateTestFormBody = ({
                     )}
                   </div>
                 </Col>
-                <Col md={12}>
-                  <div className={cx('formGroupModern')}>
-                    <label>Hoặc upload file JSON (chính xác hơn, không cần đoán cấu trúc)</label>
-                    <input
-                      type="file"
-                      accept=".json,application/json"
-                      className={cx('inputModern')}
-                      onChange={(e) => handleJsonFileChange(e, 'questions')}
-                    />
-                    <small className="text-muted d-block mt-2">
-                      Nạp các câu trong <code>questions</code> của file JSON. Sai định dạng sẽ được
-                      báo chính xác vị trí thay vì đọc sai âm thầm. Xem file mẫu tại{' '}
-                      <code>docs/question-import-sample.json</code>.
-                    </small>
-                  </div>
-                </Col>
+                )}
+                {activeCreatorType === CREATOR_TYPES.TEST ? (
+                  <Col md={12}>
+                    <div className={cx('formGroupModern')}>
+                      <label>Hoặc tạo trọn đề từ file JSON (nhiều phần thi, kèm tag)</label>
+                      <input
+                        type="file"
+                        accept=".json,application/json"
+                        className={cx('inputModern')}
+                        disabled={!testInfo.examTypeId || testJsonChecking}
+                        onChange={(e) => {
+                          const selectedFile = e.target.files?.[0] || null;
+                          e.target.value = '';
+                          if (selectedFile) handleTestJsonFile(selectedFile);
+                        }}
+                      />
+                      <small className="text-muted d-block mt-2">
+                        {testInfo.examTypeId
+                          ? <>Chỉ cần chọn loại kỳ thi. Mỗi câu được xếp vào phần thi theo trường <code>examPart</code> hoặc
+                            tiền tố tag <code>&quot;Phần thi &gt; Tag&quot;</code>, mỗi phần thi thành một part của đề.
+                            Định dạng file: <code>docs/question-import-json.md</code>.</>
+                          : 'Chọn loại kỳ thi trước để upload file JSON.'}
+                      </small>
+                      {testJsonChecking && <small className="d-block mt-2">Đang kiểm tra file...</small>}
+                    </div>
+                  </Col>
+                ) : (
+                  <Col md={12}>
+                    <div className={cx('formGroupModern')}>
+                      <label>Hoặc upload file JSON (chính xác hơn, không cần đoán cấu trúc)</label>
+                      <input
+                        type="file"
+                        accept=".json,application/json"
+                        className={cx('inputModern')}
+                        onChange={(e) => handleJsonFileChange(e, 'questions')}
+                      />
+                      <small className="text-muted d-block mt-2">
+                        Nạp các câu trong <code>questions</code> của file JSON. Sai định dạng sẽ được
+                        báo chính xác vị trí thay vì đọc sai âm thầm. Xem file mẫu tại{' '}
+                        <code>docs/question-import-sample.json</code>.
+                      </small>
+                    </div>
+                  </Col>
+                )}
               </>
             )}
           </Row>
         </div>
       )}
 
-      {(activeCreatorType === CREATOR_TYPES.TEST || activeCreatorType === CREATOR_TYPES.BULK) && (
+      {activeCreatorType === CREATOR_TYPES.TEST && testJsonPreview && (
+        <>
+          <div className={cx('sectionTitle')}>
+            2. Đề từ file JSON: {testJsonPreview.fileName}
+          </div>
+          <JsonTestPreview preview={testJsonPreview} onClear={clearTestJson} availableTags={availableTags} />
+        </>
+      )}
+
+      {(activeCreatorType === CREATOR_TYPES.BULK || (activeCreatorType === CREATOR_TYPES.TEST && !testJsonPreview)) && (
         <>
           <div className={cx('sectionTitle')}>
             2. Danh sách câu hỏi ({questions.length})
           </div>
+          {activeCreatorType === CREATOR_TYPES.TEST && (
+            <small className="text-muted d-block mb-3">
+              Mỗi câu chọn tag của một phần thi, câu sẽ được xếp vào phần thi đó. Đề có bao nhiêu phần thi
+              thì tạo bấy nhiêu part.
+            </small>
+          )}
           {questions.map((q, i) => (
             <QuestionBlock
               key={i}

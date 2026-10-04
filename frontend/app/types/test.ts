@@ -1,5 +1,11 @@
 import { QuestionBankScope, QuestionType, QuestionUsageScope, TestStatus } from '@/app/enums';
-import type { PassageMediaResponse, PassageResponse, QuestionGroupAdminResponse } from './question';
+import type {
+  NormalQuestionRequest,
+  PassageMediaResponse,
+  PassageQuestionGroupRequest,
+  PassageResponse,
+  QuestionGroupAdminResponse,
+} from './question';
 
 export interface AnswerResponse {
   answerId: string;
@@ -55,6 +61,23 @@ export interface TestPartSummaryResponse {
   skillName?: string;
   questionCount?: number;
   displayOrder?: number;
+}
+
+export interface TestJsonImportPartSummary {
+  examPartId: string;
+  examPartName: string;
+  questionCount: number;
+  groupCount: number;
+  questions: NormalQuestionRequest[];
+  groups: PassageQuestionGroupRequest[];
+}
+
+export interface TestJsonImportPreviewResponse {
+  valid: boolean;
+  questionCount: number;
+  errors: string[];
+  warnings: string[];
+  parts: TestJsonImportPartSummary[];
 }
 
 export interface TestPartRequest {
