@@ -17,7 +17,7 @@
 }
 
 .modalContent {
-  background: #ffffff;
+  background: var(--bg-white);
   width: 100%;
   max-width: 1200px;
   max-height: 90vh;
@@ -169,7 +169,7 @@
   :global(.form-control:focus),
   :global(.form-select:focus) {
     border-color: var(--accent-color);
-    background-color: #fff;
+    background-color: var(--bg-white);
     box-shadow: 0 0 0 4px var(--primary-alpha-10);
   }
 

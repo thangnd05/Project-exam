@@ -128,7 +128,7 @@
     border-radius: 12px;
     font-size: var(--font-size-base);
     font-family: var(--font-family);
-    background: white;
+    background: var(--bg-white);
     transition: all 0.3s;
     color: var(--text-color);
 
@@ -151,7 +151,7 @@
 }
 
 .tabs-container {
-  background: white;
+  background: var(--bg-white);
   border-radius: var(--radius-xl);
   padding: 24px 28px;
   box-shadow: var(--shadow-card);

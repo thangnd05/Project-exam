@@ -32,5 +32,6 @@ export * from './useStreak';
 export * from './useTargetAchieved';
 export * from './useTargetDashboard';
 export * from './useTestSubmission';
+export * from './useTheme';
 export * from './useUpdateQuestion';
 

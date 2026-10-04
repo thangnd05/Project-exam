@@ -39,7 +39,7 @@
   }
 
   &.active {
-    background: #fff;
+    background: var(--bg-white);
     color: var(--primary-text);
     box-shadow: 0 2px 8px var(--primary-alpha-15);
   }
@@ -65,7 +65,7 @@
   border: 1px solid var(--border-color);
   border-radius: 18px;
   padding: 20px;
-  background: #fff;
+  background: var(--bg-white);
   box-shadow: var(--shadow-md);
 }
 
@@ -329,7 +329,7 @@
   padding: 12px 14px;
   border: 1.5px solid var(--border-color);
   border-radius: 14px;
-  background: #fff;
+  background: var(--bg-white);
   cursor: pointer;
   text-align: left;
   transition: all 0.15s;
@@ -397,7 +397,7 @@
   margin-top: 18px;
   padding-top: 16px;
   border-top: 1px solid var(--border-color);
-  background: #fff;
+  background: var(--bg-white);
 }
 
 .summary {

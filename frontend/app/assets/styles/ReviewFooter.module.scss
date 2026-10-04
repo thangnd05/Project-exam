@@ -19,7 +19,7 @@
 }
 
 .navCard {
-  background: white;
+  background: var(--bg-white);
   border: 1px solid var(--slate-200);
   border-radius: 16px;
   box-shadow: var(--shadow-card);
@@ -121,7 +121,7 @@
 }
 
 .footerButtons {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgb(var(--surface-rgb) / 0.95);
   backdrop-filter: blur(8px);
   border-top: 1px solid var(--slate-200);
   box-shadow: 0 -4px 20px rgb(var(--slate-900-rgb) / 0.06);
@@ -147,7 +147,7 @@
   padding: 10px 18px;
   border-radius: 999px;
   border: 2px solid var(--primary);
-  background: white;
+  background: var(--bg-white);
   color: var(--primary-text);
   font-weight: 700;
   font-size: 1.4rem;

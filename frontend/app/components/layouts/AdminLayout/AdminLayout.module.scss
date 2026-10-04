@@ -297,7 +297,7 @@ $transition: all 0.3s ease;
     &:focus {
         outline: none;
         border-color: $primary;
-        background: white;
+        background: var(--bg-white);
         box-shadow: 0 0 0 3px rgb(var(--primary-rgb) / 0.1);
     }
 

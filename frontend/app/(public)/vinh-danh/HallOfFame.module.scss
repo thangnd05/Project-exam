@@ -30,7 +30,7 @@
 }
 
 .tabActive {
-  color: var(--brand-900);
+  color: var(--text-color);
   background: linear-gradient(145deg, var(--brand-150), var(--brand-200));
   border-color: transparent;
 }
@@ -44,7 +44,7 @@
   text-decoration: none;
 
   &:hover {
-    color: var(--brand-900);
+    color: var(--text-color);
   }
 }
 
@@ -113,7 +113,7 @@
 .rank1,
 .rank2,
 .rank3 {
-  color: var(--brand-900);
+  color: var(--text-color);
   background: linear-gradient(145deg, var(--brand-150), var(--brand-200));
 }
 
@@ -137,7 +137,7 @@
   place-items: center;
   font-size: 1.2rem;
   font-weight: 800;
-  color: var(--brand-900);
+  color: var(--text-color);
   background: linear-gradient(145deg, var(--brand-150), var(--brand-200));
 }
 
@@ -147,7 +147,7 @@
 
 .score {
   font-weight: 800;
-  color: var(--brand-900);
+  color: var(--text-color);
 }
 
 .streak {

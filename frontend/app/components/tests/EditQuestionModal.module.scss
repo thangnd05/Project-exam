@@ -42,7 +42,7 @@
 }
 
 .formGroup {
-  background: #ffffff;
+  background: var(--bg-white);
   padding: 20px;
   border-radius: 14px;
   border: 2px solid var(--slate-200);
@@ -81,11 +81,11 @@
     border-color: var(--primary);
     outline: none;
     box-shadow: 0 0 0 0.2rem var(--primary-alpha-15);
-    background-color: #fff;
+    background-color: var(--bg-white);
   }
 
   &:disabled {
-    background-color: #e9ecef;
+    background-color: var(--slate-100);
     cursor: not-allowed;
   }
 }
@@ -99,7 +99,7 @@
 .existingMediaCard {
   border: 1px solid var(--slate-200);
   border-radius: 10px;
-  background: #ffffff;
+  background: var(--bg-white);
   padding: 10px;
 }
 

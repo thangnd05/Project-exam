@@ -12,7 +12,7 @@
 }
 
 .tableContainer {
-  background: white;
+  background: var(--bg-white);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
@@ -217,7 +217,7 @@
 .emptyState {
   text-align: center;
   padding: 80px 40px;
-  background: white;
+  background: var(--bg-white);
   border-radius: var(--radius-xl);
   border: 2px dashed var(--slate-300);
 

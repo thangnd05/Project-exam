@@ -17,7 +17,7 @@
 }
 
 .modalContent {
-    background: #ffffff;
+    background: var(--bg-white);
     width: 90%;
     max-width: 550px;
     border-radius: 24px;
@@ -27,7 +27,7 @@
 }
 
 .header {
-    background: #fff;
+    background: var(--bg-white);
     padding: 24px 30px;
     border-bottom: 1px solid var(--slate-100);
     display: flex;
@@ -112,7 +112,7 @@
         }
 
         .starInactive {
-            color: #cbd5e0;
+            color: var(--slate-400);
         }
 
         .starActive:hover,
@@ -143,7 +143,7 @@
         &:focus {
             outline: none;
             border-color: var(--accent-color);
-            background: #fff;
+            background: var(--bg-white);
             box-shadow: 0 0 0 4px var(--primary-alpha-10);
         }
     }

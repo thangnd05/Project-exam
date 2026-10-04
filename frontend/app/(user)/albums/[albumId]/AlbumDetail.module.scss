@@ -51,7 +51,7 @@
     }
 
     &.active {
-        background: white;
+        background: var(--bg-white);
         color: var(--primary-text);
         box-shadow: var(--shadow-md);
     }
@@ -63,7 +63,7 @@
 }
 
 .table-container {
-    background: white;
+    background: var(--bg-white);
     padding: 0;
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -236,7 +236,7 @@
 }
 
 .flashcard-front {
-    background: white;
+    background: var(--bg-white);
     border: 1px solid var(--border-color);
 
     .word {
@@ -298,7 +298,7 @@
     width: 55px;
     height: 55px;
     border-radius: 50%;
-    background: white;
+    background: var(--bg-white);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
     display: flex;
     align-items: center;

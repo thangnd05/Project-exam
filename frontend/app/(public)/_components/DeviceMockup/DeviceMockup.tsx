@@ -9,7 +9,7 @@ const cx = classNames.bind(styles);
 
 function BrowserPlaceholder() {
   return (
-    <div className={cx('browser')} aria-hidden="true">
+    <div className={cx('browser', 'theme-locked')} aria-hidden="true">
       <div className={cx('chrome')}>
         <span className={cx('trafficDot', 'red')} />
         <span className={cx('trafficDot', 'amber')} />
@@ -48,7 +48,7 @@ export default function DeviceMockup({src, alt = '', className}: DeviceMockupPro
   const showImg = src && !imgFailed;
 
   return (
-    <div className={cx('viewport', className)}>
+    <div className={cx('viewport', 'theme-locked', className)}>
       <span className={cx('glow')} aria-hidden="true" />
       <span className={cx('shadow')} aria-hidden="true" />
       <div className={cx('laptop')}>

@@ -159,3 +159,23 @@ body * {
     visibility: hidden;
   }
 }
+
+/* Recharts vẽ màu trục, lưới, tooltip bằng thuộc tính SVG/inline style viết cứng; CSS ghi đè để đổi theo theme. */
+:root[data-theme='dark'] {
+  .recharts-cartesian-grid line {
+    stroke: var(--slate-200);
+  }
+
+  .recharts-cartesian-axis-tick-value,
+  .recharts-polar-angle-axis-tick-value,
+  .recharts-legend-item-text {
+    fill: var(--text-secondary);
+    color: var(--text-secondary) !important;
+  }
+
+  .recharts-default-tooltip {
+    background: var(--bg-white) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color);
+  }
+}

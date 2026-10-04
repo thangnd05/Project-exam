@@ -13,7 +13,7 @@
 }
 
 .header {
-  background: #fff;
+  background: var(--bg-white);
   padding: 24px 30px;
   border-bottom: 1px solid var(--slate-100);
   display: flex;
@@ -151,7 +151,7 @@
 .inputControl:focus {
   outline: none;
   border-color: var(--accent-color);
-  background: #fff;
+  background: var(--bg-white);
   box-shadow: 0 0 0 4px var(--primary-alpha-10);
 }
 

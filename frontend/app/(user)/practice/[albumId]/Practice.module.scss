@@ -209,7 +209,7 @@ $transition: all 0.3s ease;
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: white;
+    background: var(--bg-white);
     border: 3px solid rgba(255, 255, 255, 0.5);
     display: flex;
     align-items: center;
@@ -220,7 +220,7 @@ $transition: all 0.3s ease;
 
     &:hover {
         transform: scale(1.1);
-        background: rgba(255, 255, 255, 0.95);
+        background: rgb(var(--surface-rgb) / 0.95);
         box-shadow: $shadow-lg;
     }
 

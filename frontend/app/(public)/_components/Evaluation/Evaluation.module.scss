@@ -106,13 +106,13 @@
 .user-name {
   font-size: var(--font-size-ssm);
   font-weight: 700;
-  color: #2d3748;
+  color: var(--text-color);
   margin: 0;
 }
 
 .user-role {
   font-size: var(--font-size-sm);
-  color: #718096;
+  color: var(--text-secondary);
   margin-bottom: 4px;
   white-space: nowrap;
 }
