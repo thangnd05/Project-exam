@@ -15,7 +15,7 @@
   padding: 0;
   border: none;
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-text);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
 
@@ -36,7 +36,7 @@
   padding: 12px 16px;
   border-radius: var(--radius-md);
   background: var(--primary-alpha-10);
-  color: var(--accent-color);
+  color: var(--primary-text);
   font-size: var(--font-size-base);
   line-height: 1.55;
 }.markdownBody {
@@ -147,7 +147,7 @@
 
   &:hover {
     border-color: var(--primary);
-    color: var(--primary);
+    color: var(--primary-text);
   }
 
   &.primary {

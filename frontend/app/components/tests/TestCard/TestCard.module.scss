@@ -14,7 +14,7 @@
     min-height: 300px;
 
     &:hover {
-        transform: translateY(-4px);
+        transform: translateY(-2px);
         box-shadow: 0 12px 26px rgb(var(--slate-900-rgb) / 0.12);
         border-color: var(--slate-300);
     }
@@ -231,7 +231,7 @@
 }
 
 .status-locked {
-    color: var(--hover-accent) !important;
+    color: var(--primary-text-hover) !important;
     background: rgb(var(--primary-rgb) / 0.18) !important;
     border-color: rgb(var(--primary-rgb) / 0.35) !important;
 }

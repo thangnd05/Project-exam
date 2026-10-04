@@ -179,7 +179,7 @@
     &:focus,
     &:active {
       background: #fff;
-      color: var(--brand-600);
+      color: var(--primary-text-hover);
       transform: translateY(-2px);
       box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
     }
@@ -207,7 +207,7 @@
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    color: var(--brand-600);
+    color: var(--primary-text-hover);
   }
 
   @media (max-width: 576px) {

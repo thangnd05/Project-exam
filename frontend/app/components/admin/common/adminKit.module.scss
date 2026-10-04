@@ -20,7 +20,7 @@
 
     &:focus-within {
       .searchIcon {
-        color: var(--primary);
+        color: var(--primary-text);
       }
     }
   }
@@ -107,7 +107,7 @@
 
     &.bg-primary {
       background-color: var(--brand-50) !important;
-      color: var(--hover-accent) !important;
+      color: var(--primary-text-hover) !important;
       border-color: var(--brand-100);
     }
 
@@ -175,7 +175,7 @@
 
   &:hover:not(:disabled):not(.active) {
     border-color: var(--primary);
-    color: var(--primary);
+    color: var(--primary-text);
     background: var(--slate-50);
     transform: translateY(-1px);
   }
@@ -222,7 +222,7 @@
     cursor: pointer;
 
     &:hover {
-      color: var(--primary);
+      color: var(--primary-text);
       background: var(--brand-50);
       border-color: var(--brand-200);
       transform: translateY(-1px);
@@ -299,7 +299,7 @@
 
   &:hover {
     border-color: var(--primary) !important;
-    color: var(--primary) !important;
+    color: var(--primary-text) !important;
     background-color: var(--slate-50) !important;
   }
 
@@ -333,7 +333,7 @@
     }
 
     &:global(.active) {
-      color: var(--primary);
+      color: var(--primary-text);
       border-bottom-color: var(--primary);
       background: transparent;
     }

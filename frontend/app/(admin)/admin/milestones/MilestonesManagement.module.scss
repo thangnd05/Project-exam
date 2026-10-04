@@ -94,7 +94,7 @@
 
   .partPercent {
     font-weight: var(--font-weight-semibold);
-    color: var(--primary);
+    color: var(--primary-text);
   }
 }
 
@@ -203,7 +203,7 @@
   color: var(--text-secondary);
 
   .over & {
-    color: var(--primary);
+    color: var(--primary-text);
   }
 
   .under & {

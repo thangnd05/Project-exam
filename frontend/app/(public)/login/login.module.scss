@@ -331,7 +331,7 @@
   font-weight: 500;
 
   &:hover {
-    color: var(--accent-color);
+    color: var(--primary-text);
     text-decoration: none;
   }
 }
@@ -381,7 +381,7 @@
 
   &:hover {
     background-color: var(--white);
-    color: var(--accent-color);
+    color: var(--primary-text);
     transform: scale(1.05);
   }
 }
@@ -407,7 +407,7 @@
   }
 
   &.info {
-    color: var(--accent-color);
+    color: var(--primary-text);
     background: var(--primary-alpha-10);
     border: 1px solid var(--primary-alpha-20);
   }
@@ -432,7 +432,7 @@
   button {
     background: none;
     border: none;
-    color: var(--accent-color);
+    color: var(--primary-text);
     font-weight: 700;
     text-decoration: underline;
     cursor: pointer;

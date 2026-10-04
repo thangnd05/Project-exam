@@ -34,7 +34,7 @@
 
   &.visible:hover {
     background: transparent;
-    color: var(--primary);
+    color: var(--primary-text);
     transform: translateY(-2px) scale(1);
     box-shadow: 0 6px 12px var(--primary-alpha-28);
   }

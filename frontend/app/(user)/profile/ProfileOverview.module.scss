@@ -125,7 +125,7 @@
 }
 
 .verifiedText {
-  color: var(--accent-color);
+  color: var(--primary-text);
   font-weight: 600;
 }
 
@@ -171,7 +171,7 @@
 
   &:hover {
     background: var(--brand-50);
-    color: var(--accent-color);
+    color: var(--primary-text);
   }
 }
 
@@ -203,7 +203,7 @@
   border-radius: 14px;
   font-size: var(--font-size-xxl);
   background: var(--brand-50);
-  color: var(--accent-color);
+  color: var(--primary-text);
 }
 
 .statInfo {
@@ -396,7 +396,7 @@
 .targetScore {
   font-size: 1.6rem;
   font-weight: 800;
-  color: var(--accent-color);
+  color: var(--primary-text);
   white-space: nowrap;
 
   .achieved & {

@@ -71,7 +71,7 @@
 }
 
 .rankNumberTopTen {
-  color: var(--brand-600);
+  color: var(--primary-text-hover);
 }
 
 .scoreBadge {
@@ -81,7 +81,7 @@
   font-weight: 800;
   font-size: 1.6rem;
   background: var(--brand-50);
-  color: var(--primary);
+  color: var(--primary-text);
   border: 1px solid var(--brand-100);
 }
 
@@ -208,7 +208,7 @@
 
   p {
     margin-top: 16px;
-    color: var(--primary);
+    color: var(--primary-text);
     font-weight: 700;
     font-size: 1.8rem;
   }

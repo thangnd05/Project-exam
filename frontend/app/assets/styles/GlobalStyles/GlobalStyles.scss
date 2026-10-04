@@ -211,6 +211,8 @@
   --accent-act-color: var(--brand-200);
   --hover-accent: var(--brand-600);
   --primary-rgb: var(--brand-500-rgb);
+  --primary-text: var(--brand-700);
+  --primary-text-hover: var(--brand-800);
 
   --brand-unique: var(--brand-200);
   --brand-unique-hover: var(--brand-400);
@@ -310,8 +312,8 @@
   --primary-btn-shadow-disabled: 0 4px 10px rgb(0 0 0 / 0.06);
 
   --bs-primary: var(--primary);
-  --bs-link-color: var(--primary);
-  --bs-link-hover-color: var(--hover-accent);
+  --bs-link-color: var(--primary-text);
+  --bs-link-hover-color: var(--primary-text-hover);
 
   --glass-bg: rgb(255 255 255 / 0.7);
   --glass-border: rgb(255 255 255 / 0.5);
@@ -530,7 +532,7 @@ a {
   transition: color 0.2s;
 
   &:hover {
-    color: var(--accent-color);
+    color: var(--primary-text);
   }
 }
 
@@ -604,7 +606,7 @@ li {
 
 .text-info,
 .text-primary {
-  color: var(--primary) !important;
+  color: var(--primary-text) !important;
 }
 
 .tag-badge {
@@ -627,5 +629,17 @@ li {
 
   &:hover {
     background-color: var(--success-600) !important;
+  }
+}
+
+/* Người dùng đã tắt chuyển động trong hệ điều hành: bỏ hiệu ứng nhấc, trượt, lặp vô hạn. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

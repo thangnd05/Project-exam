@@ -51,7 +51,7 @@
 
     tr:hover td {
         background-color: var(--hover-color);
-        color: var(--accent-color);
+        color: var(--primary-text);
     }
 }
 
@@ -96,7 +96,7 @@
     }
 
     &.edit {
-        color: var(--accent-color);
+        color: var(--primary-text);
 
         &:hover {
             background: var(--primary-alpha-08);

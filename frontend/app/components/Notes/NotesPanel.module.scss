@@ -31,7 +31,7 @@
   border: 1px dashed var(--border-color);
   border-radius: var(--radius-md);
   background: transparent;
-  color: var(--primary);
+  color: var(--primary-text);
   font-size: 1.5rem;
   font-weight: 700;
   cursor: pointer;
@@ -148,7 +148,7 @@
   }
 
   &:hover {
-    color: var(--primary);
+    color: var(--primary-text);
     border-color: var(--primary);
   }
 
@@ -216,7 +216,7 @@
   }
 
   &:hover {
-    color: var(--primary);
+    color: var(--primary-text);
   }
 }
 

@@ -112,7 +112,7 @@
         display: block;
         font-size: 1.6rem;
         font-weight: 700;
-        color: var(--accent-color);
+        color: var(--primary-text);
         text-transform: uppercase;
         letter-spacing: 1px;
         margin-bottom: 8px;
@@ -125,7 +125,7 @@
         background-clip: text;
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        color: var(--primary);
+        color: var(--primary-text);
         line-height: 1;
         letter-spacing: -1px;
         margin: 0 auto;
@@ -197,10 +197,10 @@
     }
 
     &.total {
-        color: var(--primary);
+        color: var(--primary-text);
 
         .stat-val {
-            color: var(--primary);
+            color: var(--primary-text);
         }
     }
 }

@@ -40,12 +40,12 @@
 
   &:hover,
   &:focus-visible {
-    color: var(--accent-color);
+    color: var(--primary-text);
     text-decoration: none;
   }
 
   &.active {
-    color: var(--accent-color);
+    color: var(--primary-text);
   }
 }
 
@@ -226,7 +226,7 @@
   border-bottom: 1px solid var(--slate-50);
 
   &:hover {
-    color: var(--accent-color);
+    color: var(--primary-text);
     text-decoration: none;
   }
 }
@@ -269,7 +269,7 @@
 
   &:hover {
     border-color: var(--accent-color);
-    color: var(--accent-color);
+    color: var(--primary-text);
   }
 }
 

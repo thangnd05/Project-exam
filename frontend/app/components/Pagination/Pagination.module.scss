@@ -23,7 +23,7 @@
 
   &:hover:not(.disabled):not(.active) {
     border-color: var(--primary);
-    color: var(--primary);
+    color: var(--primary-text);
     background-color: var(--hover-color);
   }
 

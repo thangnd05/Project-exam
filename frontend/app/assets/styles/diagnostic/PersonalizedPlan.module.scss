@@ -253,7 +253,7 @@
 
 .badgePrimary {
   background: var(--primary-alpha-10);
-  color: var(--primary);
+  color: var(--primary-text);
   border-color: rgb(var(--primary-rgb) / 0.25);
 }
 
@@ -297,7 +297,7 @@
 
 .alertInfo {
   background: var(--primary-alpha-10);
-  color: var(--accent-color);
+  color: var(--primary-text);
   border-color: rgb(var(--primary-rgb) / 0.25);
 }
 
@@ -650,7 +650,7 @@
   margin-top: 0.3rem;
 
   strong {
-    color: var(--primary);
+    color: var(--primary-text);
   }
 }
 
@@ -1168,7 +1168,7 @@
 .resourceLink {
   font-size: var(--font-size-ssm);
   font-weight: var(--font-weight-semibold);
-  color: var(--primary);
+  color: var(--primary-text);
 
   &:hover {
     color: var(--brand-700);
@@ -1239,7 +1239,7 @@
     transform: translateY(-1px);
 
     .resourceTileIcon {
-      color: var(--primary);
+      color: var(--primary-text);
     }
   }
 }
@@ -1256,7 +1256,7 @@
   border: 1px solid var(--primary-alpha-20);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
-  color: var(--primary);
+  color: var(--primary-text);
 }
 
 .resourceTileBody {
@@ -1617,7 +1617,7 @@
   height: 2.6rem;
   border-radius: 50%;
   background: var(--primary-alpha-10);
-  color: var(--primary);
+  color: var(--primary-text);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-bold);
   display: flex;

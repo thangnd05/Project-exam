@@ -40,7 +40,7 @@
         gap: 12px;
 
         svg {
-            color: var(--accent-color);
+            color: var(--primary-text);
             font-size: 2rem;
         }
 
@@ -108,7 +108,7 @@
         }
 
         .starActive {
-            color: var(--primary);
+            color: var(--primary-text);
         }
 
         .starInactive {
@@ -157,7 +157,7 @@
         gap: 6px;
 
         svg {
-            color: var(--primary);
+            color: var(--primary-text);
         }
     }
 }

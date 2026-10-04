@@ -98,7 +98,7 @@
 
 .partBadge {
   background: var(--brand-100);
-  color: var(--hover-accent);
+  color: var(--primary-text-hover);
   font-size: 1.2rem;
   font-weight: 700;
   border-radius: 999px;
@@ -255,6 +255,6 @@
 
 .mediaOpenLink {
   font-size: var(--font-size-smd);
-  color: var(--primary);
+  color: var(--primary-text);
   text-decoration: none;
 }

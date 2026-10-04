@@ -34,7 +34,7 @@
   gap: 8px;
   font-weight: 800;
   font-size: var(--font-size-md);
-  color: var(--primary);
+  color: var(--primary-text);
   margin-bottom: 14px;
 }
 
@@ -82,7 +82,7 @@
   &.answered {
     background: var(--brand-50);
     border-color: var(--brand-300);
-    color: var(--primary);
+    color: var(--primary-text);
   }
 }
 
@@ -148,7 +148,7 @@
   border-radius: 999px;
   border: 2px solid var(--primary);
   background: white;
-  color: var(--primary);
+  color: var(--primary-text);
   font-weight: 700;
   font-size: 1.4rem;
   cursor: pointer;
