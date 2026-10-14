@@ -52,7 +52,14 @@ const fetchTestResult = async (
   // Bài luyện theo phần: danh sách Part đã luyện; null với bài thi thử.
   const practicePartIds = isMockAttempt(metaData) ? null : (metaData.practicePartIds ?? []);
 
-  return { result, testId: metaData.testId ?? null, canReview, enhanced, practicePartIds };
+  return {
+    result,
+    testId: metaData.testId ?? null,
+    testTitle: testData.title ?? null,
+    canReview,
+    enhanced,
+    practicePartIds,
+  };
 };
 
 export function useTestResult(
@@ -70,6 +77,7 @@ export function useTestResult(
   return {
     result: query.data?.result ?? null,
     testId: query.data?.testId ?? null,
+    testTitle: query.data?.testTitle ?? null,
     canReview: query.data?.canReview ?? false,
     enhanced: query.data?.enhanced ?? null,
     practicePartIds: query.data?.practicePartIds ?? null,

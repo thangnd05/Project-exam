@@ -4,13 +4,12 @@ import {useQuery} from '@tanstack/react-query';
 import {keepPreviousData} from '@/app/configs/queryClient';
 
 import {
-  createEvaluation,
   deleteEvaluation,
-  getEvaluations,
-  updateEvaluation,
+  getAdminEvaluations,
+  getEvaluationStatsByTest,
 } from '@/app/apis/evaluationApi';
 import {useCrudMutations} from '@/app/hooks/useAdminCrud';
-import type {EvaluationRequest, EvaluationResponse, PageResponse} from '@/app/types';
+import type {EvaluationResponse, PageResponse} from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export interface AdminEvaluation {
@@ -20,6 +19,8 @@ export interface AdminEvaluation {
   created_at: string | null;
   user_id: string;
   username: string;
+  test_id: string | null;
+  test_title: string | null;
 }
 
 interface EvaluationListParams {
@@ -27,11 +28,13 @@ interface EvaluationListParams {
   size: number;
   keyword: string;
   rating: number | string;
+  testId: string;
 }
 
 export const evaluationKeys = {
-  all: ['evaluations'] as const,
-  list: (params: EvaluationListParams) => ['evaluations', 'list', params] as const,
+  all: ['admin-evaluations'] as const,
+  list: (params: EvaluationListParams) => ['admin-evaluations', 'list', params] as const,
+  stats: ['admin-evaluations', 'stats'] as const,
 };
 
 const normalizeEvaluation = (evaluation: EvaluationResponse): AdminEvaluation => ({
@@ -41,6 +44,8 @@ const normalizeEvaluation = (evaluation: EvaluationResponse): AdminEvaluation =>
   created_at: evaluation.createdAt || null,
   user_id: evaluation.userId ? String(evaluation.userId) : '',
   username: evaluation.username || 'Ẩn danh',
+  test_id: evaluation.testId ?? null,
+  test_title: evaluation.testTitle ?? null,
 });
 
 const normalizePage = (evaluationPage: PageResponse<EvaluationResponse>) => ({
@@ -49,15 +54,16 @@ const normalizePage = (evaluationPage: PageResponse<EvaluationResponse>) => ({
   totalPages: Math.max(evaluationPage?.totalPages || 1, 1),
 });
 
-export function useAdminEvaluations({page, size, keyword, rating}: EvaluationListParams) {
+export function useAdminEvaluations({page, size, keyword, rating, testId}: EvaluationListParams) {
   const query = useQuery({
-    queryKey: evaluationKeys.list({page, size, keyword, rating}),
+    queryKey: evaluationKeys.list({page, size, keyword, rating, testId}),
     queryFn: () =>
-      getEvaluations({
+      getAdminEvaluations({
         page: Math.max(page - 1, 0),
         size,
         keyword,
         rating,
+        testId,
       }),
     placeholderData: keepPreviousData,
     select: normalizePage,
@@ -72,13 +78,24 @@ export function useAdminEvaluations({page, size, keyword, rating}: EvaluationLis
   };
 }
 
+export function useEvaluationStats() {
+  const query = useQuery({
+    queryKey: evaluationKeys.stats,
+    queryFn: getEvaluationStatsByTest,
+  });
+
+  return {
+    stats: query.data ?? EMPTY_LIST,
+    isLoading: query.isLoading,
+    isError: query.isError,
+  };
+}
+
 export function useEvaluationMutations() {
-  const {createMutation, updateMutation, deleteMutation} = useCrudMutations({
+  const {deleteMutation} = useCrudMutations({
     queryKey: evaluationKeys.all,
-    create: (payload: EvaluationRequest) => createEvaluation(payload),
-    update: ({id, payload}: {id: string; payload: EvaluationRequest}) => updateEvaluation(id, payload),
     remove: (id: string) => deleteEvaluation(id),
   });
 
-  return {createMutation, updateMutation, deleteMutation};
+  return {deleteMutation};
 }

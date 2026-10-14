@@ -221,9 +221,6 @@ function ProfileOverview() {
                   <button onClick={() => router.push(routes.personalQuestionBank)} className={cx('actionBtn')}>
                     <span>Ngân hàng câu hỏi</span>
                   </button>
-                  <button onClick={() => setActiveSection('evaluations')} className={cx('actionBtn')}>
-                    <span>Đánh giá của tôi</span>
-                  </button>
                   <button onClick={() => setActiveSection('posts')} className={cx('actionBtn')}>
                     <span>Bài viết của tôi</span>
                   </button>

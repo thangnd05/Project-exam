@@ -21,12 +21,14 @@ import { isBeginnerLevel } from "@/app/utils/learnerLevel";
 import { getScoreScale } from "@/app/utils/scoreScale";
 import { buildPlanFromTestUrl } from "@/app/utils/planFromTest";
 import { useTestResult } from "./_hooks/useTestResult";
+import { useTestEvaluationPrompt } from "./_hooks/useTestEvaluationPrompt";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";
 import CertificateBanner from "./_components/CertificateBanner";
 import GuestSaveBanner from "./_components/GuestSaveBanner";
 import ReadinessGauge from "./_components/ReadinessGauge";
 import RecoveryPlan from "./_components/RecoveryPlan";
 import TagAnalysisTable from "./_components/TagAnalysisTable";
+import TestEvaluationModal from "./_components/TestEvaluationModal";
 import styles from "./TestResult.module.scss";
 
 const cx = classNames.bind(styles);
@@ -41,10 +43,17 @@ const TestResult = () => {
     [isGuest],
   );
 
-  const { result, testId, enhanced, canReview, practicePartIds, isLoading, isError } =
+  const { result, testId, testTitle, enhanced, canReview, practicePartIds, isLoading, isError } =
     useTestResult(userTestId, isGuest, guestCfg, !authLoading);
 
   const isPractice = practicePartIds !== null;
+
+  // Chỉ hỏi đánh giá đề khi user đã đăng nhập và làm full (không phải luyện theo phần).
+  const evaluationPrompt = useTestEvaluationPrompt({
+    userTestId,
+    testId,
+    enabled: !authLoading && isAuthenticated && !isLoading && !isError && !isPractice,
+  });
   const practiceParts = useMemo(
     () => (isPractice
       ? (enhanced?.partBreakdown ?? []).filter((p) => practicePartIds!.includes(p.examPartId))
@@ -257,6 +266,14 @@ const TestResult = () => {
 
         {enhanced && <TagAnalysisTable enhanced={enhanced} userTestId={userTestId} />}
       </Container>
+
+      <TestEvaluationModal
+        show={evaluationPrompt.show}
+        testTitle={testTitle}
+        onDismiss={evaluationPrompt.dismiss}
+        onAlreadyEvaluated={evaluationPrompt.markEvaluated}
+        submitMutation={evaluationPrompt.submitMutation}
+      />
     </div>
   );
 };

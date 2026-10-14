@@ -9,7 +9,9 @@ import lombok.Data;
 
 @Data
 public class EvaluationRequest {
-    @NotBlank(message = "Nội dung đánh giá không được để trống")
+    @NotBlank(message = "Thiếu đề cần đánh giá")
+    private String testId;
+
     @Size(max = 2000, message = "Nội dung đánh giá tối đa 2000 ký tự")
     private String content;
 

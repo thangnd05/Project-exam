@@ -144,18 +144,33 @@ export interface QuickLeaderboardResponse {
 }
 
 export interface EvaluationRequest {
-  content: string;
+  testId: string;
   rating: number;
+  content?: string;
 }
 
 export interface EvaluationResponse {
   id: string;
-  content?: string;
+  content?: string | null;
   rating?: number;
   createdAt?: string;
   userId?: string;
   username?: string;
   avatarUrl?: string;
+  testId?: string | null;
+  testTitle?: string | null;
+}
+
+export interface EvaluationStatusResponse {
+  evaluated: boolean;
+}
+
+export interface EvaluationTestStats {
+  testId: string;
+  testTitle: string;
+  count: number;
+  averageRating: number;
+  lowRatingCount: number;
 }
 
 export interface ClaimGuestTestsResponse {

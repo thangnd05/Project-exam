@@ -1,19 +1,25 @@
 package com.project_exam.backend.modules.assessment.attempt.service;
-import com.project_exam.backend.shared.security.PermissionCatalog;
 
+import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.exception.ForbiddenException;
 import com.project_exam.backend.shared.exception.NotFoundException;
 
+import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationRequest;
+import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationStatusResponse;
+import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationTestStatsResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationResponse;
 import com.project_exam.backend.modules.assessment.attempt.domain.Evaluation;
 import com.project_exam.backend.modules.assessment.attempt.mapper.EvaluationMapper;
+import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
+import com.project_exam.backend.modules.assessment.test.domain.Test;
+import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
 import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.assessment.attempt.repository.EvaluationRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
-import com.project_exam.backend.shared.util.AuthUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,44 +28,66 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+/**
+ * Đánh giá đề sau khi làm full: mỗi user một lần cho mỗi đề, chỉ admin xem được.
+ */
 @Service
 @RequiredArgsConstructor
 public class EvaluationService {
 
+    /** Giá trị lọc testId để lấy các đánh giá chung cũ (không gắn đề). */
+    public static final String GENERAL_FILTER = "general";
+
     private final EvaluationRepository evaluationRepository;
     private final UserRepository userRepository;
-    private final AuthUtils authUtils;
+    private final TestRepository testRepository;
+    private final UserTestRepository userTestRepository;
     private final EvaluationMapper evaluationMapper;
 
-    private EvaluationResponse toResponse(Evaluation e) {
-
-        User user = userRepository.findById(e.getUserId())
-                .orElseThrow(() -> new NotFoundException("User not found"));
-
-        return evaluationMapper.toResponse(e, user);
-    }
-
     public EvaluationResponse create(String currentUserId, EvaluationRequest request) {
+        String testId = request.getTestId();
+        Test test = testRepository.findById(testId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy đề"));
+
+        int completedFull = userTestRepository.countCompletedExcludingMode(
+                currentUserId, testId, UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE);
+        if (completedFull == 0) {
+            throw new ForbiddenException("Bạn cần hoàn thành đề ở chế độ làm full trước khi đánh giá.");
+        }
+        if (evaluationRepository.existsByUserIdAndTestId(currentUserId, testId)) {
+            throw new ConflictException("Bạn đã đánh giá đề này rồi.");
+        }
 
         Evaluation evaluation = new Evaluation();
         evaluation.setUserId(currentUserId);
-        evaluation.setContent(request.getContent());
+        evaluation.setTestId(testId);
+        String content = request.getContent();
+        evaluation.setContent(content == null || content.isBlank() ? null : content.trim());
         evaluation.setRating(request.getRating());
 
-        Evaluation saved = evaluationRepository.save(evaluation);
+        Evaluation saved;
+        try {
+            saved = evaluationRepository.saveAndFlush(evaluation);
+        } catch (DataIntegrityViolationException e) {
+            // Hai request gửi cùng lúc: unique index (user_id, test_id) chặn bản thứ hai.
+            throw new ConflictException("Bạn đã đánh giá đề này rồi.");
+        }
 
-        return toResponse(saved);
+        User user = userRepository.findById(currentUserId).orElse(null);
+        return evaluationMapper.toResponse(saved, user, test);
     }
 
-    public List<EvaluationResponse> getAll() {
-        return evaluationRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public EvaluationStatusResponse getStatus(String currentUserId, String testId) {
+        return new EvaluationStatusResponse(evaluationRepository.existsByUserIdAndTestId(currentUserId, testId));
     }
 
-    public PageResponse<EvaluationResponse> getAllPaged(Integer page, Integer size, String keyword, Integer rating) {
+    public PageResponse<EvaluationResponse> getAllPaged(Integer page, Integer size, String keyword,
+                                                        Integer rating, String testId) {
         int safePage = page == null || page < 0 ? 0 : page;
         int safeSize = size == null || size <= 0 ? 20 : Math.min(size, 100);
 
@@ -77,50 +105,33 @@ public class EvaluationService {
             specification = specification.and((root, query, cb) -> cb.equal(root.get("rating"), rating));
         }
 
+        if (testId != null && !testId.isBlank()) {
+            specification = GENERAL_FILTER.equals(testId)
+                    ? specification.and((root, query, cb) -> cb.isNull(root.get("testId")))
+                    : specification.and((root, query, cb) -> cb.equal(root.get("testId"), testId));
+        }
+
         Page<Evaluation> evaluationPage = evaluationRepository.findAll(specification, pageable);
 
-        return PageResponse.from(evaluationPage, this::toResponse);
+        Map<String, User> users = userRepository.findAllById(evaluationPage.getContent().stream()
+                        .map(Evaluation::getUserId).collect(Collectors.toSet()))
+                .stream().collect(Collectors.toMap(User::getUserId, Function.identity()));
+        Map<String, Test> tests = testRepository.findAllById(evaluationPage.getContent().stream()
+                        .map(Evaluation::getTestId).filter(Objects::nonNull).collect(Collectors.toSet()))
+                .stream().collect(Collectors.toMap(Test::getTestId, Function.identity()));
+
+        return PageResponse.from(evaluationPage, e ->
+                evaluationMapper.toResponse(e, users.get(e.getUserId()),
+                        e.getTestId() != null ? tests.get(e.getTestId()) : null));
     }
 
-    public List<EvaluationResponse> getByUser(String userId) {
-        return evaluationRepository.findByUserId(userId)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public List<EvaluationTestStatsResponse> getStatsByTest() {
+        return evaluationRepository.findStatsByTest();
     }
 
-    public List<EvaluationResponse> getMyEvaluations(String currentUserId) {
-        return evaluationRepository.findByUserIdOrderByCreatedAtDesc(currentUserId)
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
-    public EvaluationResponse update(String id, EvaluationRequest request, String currentUserId) {
+    public void delete(String id) {
         Evaluation evaluation = evaluationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Evaluation not found"));
-        boolean isOwner = currentUserId != null && currentUserId.equals(evaluation.getUserId());
-        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.EVALUATION_MANAGE)) {
-            throw new ForbiddenException("Bạn không có quyền sửa đánh giá này.");
-        }
-        if (request.getContent() != null) evaluation.setContent(request.getContent());
-        if (request.getRating() != null) evaluation.setRating(request.getRating());
-        return toResponse(evaluationRepository.save(evaluation));
-    }
-
-    public EvaluationResponse getById(String id) {
-        Evaluation evaluation = evaluationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Evaluation not found"));
-        return toResponse(evaluation);
-    }
-
-    public void delete(String id, String currentUserId) {
-        Evaluation evaluation = evaluationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Evaluation not found"));
-        boolean isOwner = currentUserId != null && currentUserId.equals(evaluation.getUserId());
-        if (!isOwner && !authUtils.hasPermission(PermissionCatalog.EVALUATION_MANAGE)) {
-            throw new ForbiddenException("Bạn không có quyền xoá đánh giá này.");
-        }
         evaluationRepository.delete(evaluation);
     }
 }

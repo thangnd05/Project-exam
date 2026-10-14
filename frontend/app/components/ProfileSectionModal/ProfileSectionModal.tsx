@@ -1,7 +1,6 @@
 'use client';
 
 import BaseModal from '@/app/components/modal/BaseModal';
-import MyEvaluationsPage from './MyEvaluationsPage';
 import MyPostsPage from './MyPostsPage';
 import SavedPostsPage from './SavedPostsPage';
 
@@ -11,7 +10,6 @@ type SectionConfig = {
 };
 
 const SECTIONS: Record<string, SectionConfig> = {
-  evaluations: { title: 'Đánh giá của tôi', Component: MyEvaluationsPage },
   posts: { title: 'Bài viết của tôi', Component: MyPostsPage },
   saved: { title: 'Bài đã lưu', Component: SavedPostsPage },
 };

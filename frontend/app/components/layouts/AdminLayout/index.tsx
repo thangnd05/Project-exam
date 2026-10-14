@@ -85,7 +85,7 @@ const adminRouteGroups = [
     items: [
       {path: routes.adminCategories, icon: <Folder size={20} />, label: 'Danh mục'},
       {path: routes.adminPosts, icon: <FileText size={20} />, label: 'Duyệt bài viết'},
-      {path: routes.adminEvaluations, icon: <MessageSquareWarning size={20} />, label: 'Duyệt đánh giá'},
+      {path: routes.adminEvaluations, icon: <MessageSquareWarning size={20} />, label: 'Đánh giá đề'},
     ],
   },
   {

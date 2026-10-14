@@ -1,8 +1,8 @@
 package com.project_exam.backend.modules.assessment.attempt.controller;
 
 import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationRequest;
-import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationResponse;
+import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationStatusResponse;
 import com.project_exam.backend.modules.assessment.attempt.service.EvaluationService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,8 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+/** Phía học viên chỉ gửi đánh giá và hỏi đã đánh giá đề chưa; xem/xoá nằm ở EvaluationAdminController. */
 @RestController
 @RequestMapping("/api/evaluations")
 @RequiredArgsConstructor
@@ -32,46 +31,12 @@ public class EvaluationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    @GetMapping
-    public ResponseEntity<List<EvaluationResponse>> getAll() {
-        return ResponseEntity.ok(evaluationService.getAll());
-    }
-
-    @GetMapping("/paged")
-    public ResponseEntity<PageResponse<EvaluationResponse>> getAllPaged(
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "20") Integer size,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Integer rating
-    ) {
-        return ResponseEntity.ok(evaluationService.getAllPaged(page, size, keyword, rating));
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<EvaluationResponse> getById(@PathVariable String id) {
-        return ResponseEntity.ok(evaluationService.getById(id));
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<List<EvaluationResponse>> getMyEvaluations(HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
-        return ResponseEntity.ok(evaluationService.getMyEvaluations(userId));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<EvaluationResponse> update(
-            @PathVariable String id,
-            @Valid @RequestBody EvaluationRequest request,
-            HttpServletRequest httpRequest
+    @GetMapping("/status")
+    public ResponseEntity<EvaluationStatusResponse> getStatus(
+            HttpServletRequest httpRequest,
+            @RequestParam String testId
     ) {
         String userId = authUtils.getUserId(httpRequest);
-        return ResponseEntity.ok(evaluationService.update(id, request, userId));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id, HttpServletRequest httpRequest) {
-        String userId = authUtils.getUserId(httpRequest);
-        evaluationService.delete(id, userId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(evaluationService.getStatus(userId, testId));
     }
 }

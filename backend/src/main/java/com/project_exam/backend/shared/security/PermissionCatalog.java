@@ -80,7 +80,7 @@ public final class PermissionCatalog {
             new Def(TEST_MANAGE, G_TEST, "Quản lý mọi bài kiểm tra (ghi đè quyền sở hữu)"),
             new Def(TEST_MANAGE_PRICING, G_TEST, "Đặt giá xu cho bài kiểm tra công khai"),
             new Def(ATTEMPT_MANAGE, G_TEST, "Xem/quản lý lượt làm bài của mọi người"),
-            new Def(EVALUATION_MANAGE, G_TEST, "Quản lý mọi đánh giá (ghi đè quyền sở hữu)"),
+            new Def(EVALUATION_MANAGE, G_TEST, "Xem và quản lý đánh giá đề của học viên"),
 
             new Def(POST_MODERATE, G_CONTENT, "Kiểm duyệt bài viết (đổi trạng thái, xóa bài người khác)"),
             new Def(POST_CATEGORY_MANAGE, G_CONTENT, "Quản lý danh mục bài viết"),

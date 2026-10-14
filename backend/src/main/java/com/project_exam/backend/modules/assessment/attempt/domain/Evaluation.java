@@ -19,7 +19,8 @@ import java.time.Instant;
 @Entity
 @Table(name = "evaluation", schema = "assessment",
         indexes = {
-                @Index(name = "idx_evaluation_user_id", columnList = "user_id")
+                @Index(name = "idx_evaluation_user_id", columnList = "user_id"),
+                @Index(name = "idx_evaluation_test_id", columnList = "test_id")
         })
 @SQLDelete(sql = "UPDATE assessment.evaluation SET deleted_at = now() WHERE id = ?")
 @SQLRestriction("deleted_at IS NULL")
@@ -32,7 +33,11 @@ public class Evaluation {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    // null = đánh giá chung cũ, không gắn với đề nào
+    @Column(name = "test_id")
+    private String testId;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Column(nullable = false)

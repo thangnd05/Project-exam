@@ -23,4 +23,7 @@ public class EvaluationResponse {
     private String userId;
     private String username;
     private String avatarUrl;
+
+    private String testId;
+    private String testTitle;
 }
