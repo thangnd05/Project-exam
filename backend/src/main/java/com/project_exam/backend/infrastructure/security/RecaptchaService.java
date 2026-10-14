@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -19,7 +20,17 @@ public class RecaptchaService {
 
     private static final String VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify";
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private static final int CONNECT_TIMEOUT_MS = 3_000;
+    private static final int READ_TIMEOUT_MS = 5_000;
+
+    private final RestTemplate restTemplate;
+
+    public RecaptchaService() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(CONNECT_TIMEOUT_MS);
+        factory.setReadTimeout(READ_TIMEOUT_MS);
+        this.restTemplate = new RestTemplate(factory);
+    }
 
     @Value("${app.recaptcha.enabled:false}")
     private boolean enabled;
