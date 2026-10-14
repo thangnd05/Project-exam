@@ -2,6 +2,7 @@ package com.project_exam.backend.modules.assessment.exam.domain;
 
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
+import com.project_exam.backend.modules.assessment.test.cache.TestPaperCacheEvictListener;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(TestPaperCacheEvictListener.class)
 public class PassageMedia {
 
     @Id

@@ -2,6 +2,7 @@ package com.project_exam.backend.modules.assessment.test.domain;
 
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
+import com.project_exam.backend.modules.assessment.test.cache.TestPaperCacheEvictListener;
 import lombok.*;
 
 @Entity
@@ -14,6 +15,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(TestPaperCacheEvictListener.class)
 public class TestQuestion {
 
     @Id

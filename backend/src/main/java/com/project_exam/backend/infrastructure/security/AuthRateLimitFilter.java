@@ -18,6 +18,10 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
 
     private static final long WINDOW_MS = 60_000L;
 
+    // Quá số key này thì dọn các IP đã hết cửa sổ; nếu vẫn quá (bị dội từ rất nhiều IP) thì xoá hết
+    // để RAM không tăng mãi, giống VisitRateLimiter.
+    private static final int MAX_KEYS = 50_000;
+
     private static final Map<String, Integer> LIMITS = Map.of(
             "/api/auth/login", 10,
             "/api/auth/register", 5,
@@ -25,7 +29,10 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
             "/api/auth/reset-password", 5,
             "/api/auth/reset-password/check", 20,
             "/api/auth/change-password", 5,
-            "/api/auth/refresh", 30
+            "/api/auth/refresh", 30,
+            // Khách tạo lượt thi không cần đăng nhập, đổi X-Guest-Session là ra dòng mới trong DB.
+            // Đặt rộng vì cả lớp học / quán net có thể dùng chung một IP.
+            "/api/user-tests/guest", 30
             // [TẮT XÁC THỰC EMAIL] , "/api/auth/verify", 10
     );
 
@@ -45,6 +52,10 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
         String ip = clientIp(request);
         String key = ip + "|" + path;
         long now = System.currentTimeMillis();
+
+        if (hits.size() > MAX_KEYS) {
+            evictStale(now);
+        }
 
         Deque<Long> dq = hits.computeIfAbsent(key, k -> new ArrayDeque<>());
         synchronized (dq) {
@@ -67,6 +78,18 @@ public class AuthRateLimitFilter extends OncePerRequestFilter {
         }
 
         chain.doFilter(request, response);
+    }
+
+    private void evictStale(long now) {
+        hits.entrySet().removeIf(entry -> {
+            Deque<Long> dq = entry.getValue();
+            synchronized (dq) {
+                return dq.isEmpty() || (now - dq.peekLast()) > WINDOW_MS;
+            }
+        });
+        if (hits.size() > MAX_KEYS) {
+            hits.clear();
+        }
     }
 
     private String clientIp(HttpServletRequest request) {

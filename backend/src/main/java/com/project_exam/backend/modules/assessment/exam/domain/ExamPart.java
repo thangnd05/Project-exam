@@ -6,6 +6,7 @@ import java.time.Instant;
 
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
+import com.project_exam.backend.modules.assessment.test.cache.TestPaperCacheEvictListener;
 import lombok.*;
 
 @Entity
@@ -19,6 +20,7 @@ import lombok.*;
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE assessment.exam_parts SET deleted_at = now() WHERE exam_part_id = ?")
 @SQLRestriction("deleted_at IS NULL")
+@EntityListeners(TestPaperCacheEvictListener.class)
 public class ExamPart {
 
     @Id

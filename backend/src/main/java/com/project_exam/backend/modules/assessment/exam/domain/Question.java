@@ -5,6 +5,7 @@ import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.*;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
+import com.project_exam.backend.modules.assessment.test.cache.TestPaperCacheEvictListener;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -26,6 +27,7 @@ import java.util.List;
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE assessment.questions SET deleted_at = now() WHERE question_id = ?")
 @SQLRestriction("deleted_at IS NULL")
+@EntityListeners(TestPaperCacheEvictListener.class)
 public class Question {
 
     @Id

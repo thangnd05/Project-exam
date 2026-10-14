@@ -22,6 +22,7 @@ import com.project_exam.backend.modules.assessment.exam.repository.PassageReposi
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.SkillRepository;
 import com.project_exam.backend.modules.assessment.exam.service.AnswerService;
+import com.project_exam.backend.modules.assessment.test.cache.TestPaperCache;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.domain.TestPart;
 import com.project_exam.backend.modules.assessment.test.domain.TestQuestion;
@@ -76,6 +77,7 @@ public class TestPaperQueryService {
     private final PassageMediaRepository passageMediaRepository;
     private final PassageMediaMapper passageMediaMapper;
     private final TestMapper testMapper;
+    private final TestPaperCache testPaperCache;
 
     public Optional<Test> getTestById(String id) {
         return testRepository.findById(id);
@@ -124,16 +126,16 @@ public class TestPaperQueryService {
             return buildLimitExceededResponse(test, attemptsUsed, remaining, totalAttempts);
         }
 
-        TestUserDataBundle data = loadUserTestData(testId);
-        if (data.testParts().isEmpty()) {
-            return buildEmptyUserTestResponse(test, maxAttempts, attemptsUsed, remaining);
-        }
-
         String orderAttemptId = test.isShuffleQuestions()
                 ? resolveOrderAttemptId(testId, currentUserId, attemptId, guestSessionId, latest)
                 : null;
 
-        List<TestPartResponse> partResponses = buildUserPartResponses(data, orderAttemptId);
+        List<TestPartResponse> partResponses = orderAttemptId == null
+                ? testPaperCache.getParts(testId, () -> buildUserPartResponses(loadUserTestData(testId), null))
+                : buildUserPartResponses(loadUserTestData(testId), orderAttemptId);
+        if (partResponses.isEmpty()) {
+            return buildEmptyUserTestResponse(test, maxAttempts, attemptsUsed, remaining);
+        }
 
         return buildUserTestResponse(test, maxAttempts, attemptsUsed, remaining, totalAttempts, partResponses);
     }
