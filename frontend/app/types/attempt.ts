@@ -105,6 +105,8 @@ export interface EnhancedResultResponse {
   examCategoryCode?: string;
   examTypeId?: string;
   scoringMethod?: string;
+  scoreMin?: number;
+  scoreMax?: number;
   partBreakdown?: PartBreakdownResponse[];
   percentage: number;
   readinessScore: number;

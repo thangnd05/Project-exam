@@ -24,6 +24,8 @@ const emptyForm: ExamTypeFormState = {
   image_url: '',
   duration_minutes: '',
   scoring_method: 'DEFAULT',
+  score_min: '0',
+  score_max: '100',
   flexible: false,
   parent_id: '',
 };
@@ -35,6 +37,8 @@ type ExamTypeItem = {
   image_url: string;
   duration_minutes: number | '';
   scoring_method: string;
+  score_min: number;
+  score_max: number;
   flexible: boolean;
   parent_id: string;
   parent_name: string;
@@ -50,6 +54,8 @@ const mapExamTypeFromApi = (item: ExamTypeResponse): ExamTypeItem => ({
   image_url: item.imageUrl || '',
   duration_minutes: item.durationMinutes ?? '',
   scoring_method: item.scoringMethod || 'DEFAULT',
+  score_min: item.scoreMin ?? 0,
+  score_max: item.scoreMax ?? 100,
   flexible: Boolean(item.flexible),
   parent_id: item.parentId ? String(item.parentId) : '',
   parent_name: item.parentName || '',
@@ -66,6 +72,8 @@ const buildExamTypePayload = (formState: ExamTypeFormState, {hasChildren}: {hasC
     imageUrl: formState.image_url.trim(),
     durationMinutes,
     scoringMethod: formState.scoring_method,
+    scoreMin: Number(formState.score_min),
+    scoreMax: Number(formState.score_max),
     flexible: Boolean(formState.flexible),
 
     parentId: hasChildren ? '' : (formState.parent_id || ''),
@@ -118,7 +126,7 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
           <span className={cx('collectionName', {root: level === 0})}>{node.name}</span>
           {hasChildren && <span className={cx('childCount')}>{node.children!.length} loại con</span>}
           {node.flexible && <Badge bg="info">Linh hoạt</Badge>}
-          <Badge bg="primary">{node.scoring_method}</Badge>
+          <Badge bg="primary">{node.scoring_method} · {node.score_min}–{node.score_max}</Badge>
           {node.duration_minutes !== '' && node.duration_minutes != null && (
             <span className={cx('description')}>{node.duration_minutes} phút</span>
           )}
@@ -258,6 +266,8 @@ function ExamTypesManagement() {
       image_url: examType.image_url || '',
       duration_minutes: examType.duration_minutes ?? '',
       scoring_method: examType.scoring_method || 'DEFAULT',
+      score_min: String(examType.score_min),
+      score_max: String(examType.score_max),
       flexible: Boolean(examType.flexible),
       parent_id: examType.parent_id || '',
     });
@@ -275,6 +285,12 @@ function ExamTypesManagement() {
     }
     if (durationValue && (!Number.isFinite(parsedDuration) || (parsedDuration as number) <= 0)) {
       setErrorMessage('Thời lượng phải là số lớn hơn 0 hoặc để trống.');
+      return;
+    }
+    const scoreMin = Number(String(formState.score_min).trim());
+    const scoreMax = Number(String(formState.score_max).trim());
+    if (!Number.isInteger(scoreMin) || !Number.isInteger(scoreMax) || scoreMin < 0 || scoreMin >= scoreMax) {
+      setErrorMessage('Thang điểm không hợp lệ: cần 0 ≤ điểm tối thiểu < điểm tối đa.');
       return;
     }
 

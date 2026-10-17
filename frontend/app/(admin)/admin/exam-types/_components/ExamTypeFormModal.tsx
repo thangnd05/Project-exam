@@ -5,10 +5,8 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 
 const scoringMethodOptions = [
-  'DEFAULT',
-  'TOEIC_SCALE',
-  'IELTS_BAND',
-  'AWS_SCALE',
+  {value: 'DEFAULT', label: 'Tuyến tính theo thang tối thiểu–tối đa'},
+  {value: 'TOEIC_SCALE', label: 'Quy đổi theo bảng (TOEIC)'},
 ];
 
 export type ExamTypeFormState = {
@@ -17,6 +15,8 @@ export type ExamTypeFormState = {
   image_url: string;
   duration_minutes: number | string;
   scoring_method: string;
+  score_min: number | string;
+  score_max: number | string;
   flexible: boolean;
   parent_id: string;
 };
@@ -144,12 +144,37 @@ function ExamTypeFormModal({
           }
         >
           {scoringMethodOptions.map((item) => (
-            <option key={item} value={item}>
-              {item}
+            <option key={item.value} value={item.value}>
+              {item.label}
             </option>
           ))}
         </Form.Select>
+        <Form.Text muted>
+          {formState.scoring_method === 'TOEIC_SCALE'
+            ? 'Điểm quy đổi theo bảng; thang dưới đây chỉ dùng để hiển thị.'
+            : 'Điểm = tối thiểu + (số câu đúng / tổng số câu) × (tối đa − tối thiểu).'}
+        </Form.Text>
       </Form.Group>
+      <div className="d-flex gap-3 mb-3">
+        <Form.Group className="flex-fill">
+          <Form.Label>Điểm tối thiểu</Form.Label>
+          <Form.Control
+            type="number"
+            min={0}
+            value={formState.score_min}
+            onChange={(event) => onChangeField('score_min', event.target.value)}
+          />
+        </Form.Group>
+        <Form.Group className="flex-fill">
+          <Form.Label>Điểm tối đa</Form.Label>
+          <Form.Control
+            type="number"
+            min={1}
+            value={formState.score_max}
+            onChange={(event) => onChangeField('score_max', event.target.value)}
+          />
+        </Form.Group>
+      </div>
       <Form.Group>
         <Form.Check
           type="switch"

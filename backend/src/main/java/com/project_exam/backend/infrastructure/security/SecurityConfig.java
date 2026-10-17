@@ -50,6 +50,41 @@ public class SecurityConfig {
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
     private final AuthRateLimitFilter authRateLimitFilter;
     private final RefreshTokenStore refreshTokenStore;
+    private final AuthCookieWriter authCookieWriter;
+
+    // Danh sách endpoint permitAll — PublicEndpointApprovalTest đọc trực tiếp các hằng số này,
+    // nên chỉ cần sửa ở đây là test đối chiếu đúng cấu hình thật.
+    static final String[] PUBLIC_POST_ENDPOINTS = {
+            "/api/auth/**",
+            "/api/analytics/visit"
+    };
+
+    static final String[] PUBLIC_GET_ENDPOINTS = {
+            "/api/auth/reset-password/check",
+            "/api/exam-types/**",
+            "/api/exam-categories/**",
+            "/api/exam-parts/**",
+            "/api/skills/**",
+            "/api/scoring-conversions/**",
+            "/api/tests/**",
+            // [TẮT XÁC THỰC EMAIL] "/api/auth/verify",
+            "/api/posts/**",
+            "/api/categories/**",
+            "/api/tags/**",
+            "/api/recovery-resources/**",
+            "/api/milestones/**",
+            "/api/certificates/verify/**",
+            "/api/certificates/public",
+            "/api/user-tests/full-mock/leaderboard",
+            "/api/streak/leaderboard"
+    };
+
+    static final String[] GUEST_ENDPOINTS = {
+            "/api/user-tests/guest",
+            "/api/user-tests/guest/**",
+            "/api/user-tests/*/guest-submit",
+            "/api/user-answers/guest/**"
+    };
 
     @Value("${app.frontend.origin}")
     private String frontendOrigin;
@@ -61,7 +96,8 @@ public class SecurityConfig {
             UserRepository userRepository,
             com.fasterxml.jackson.databind.ObjectMapper objectMapper,
             AuthRateLimitFilter authRateLimitFilter,
-            RefreshTokenStore refreshTokenStore
+            RefreshTokenStore refreshTokenStore,
+            AuthCookieWriter authCookieWriter
     ) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
@@ -70,6 +106,7 @@ public class SecurityConfig {
         this.objectMapper = objectMapper;
         this.authRateLimitFilter = authRateLimitFilter;
         this.refreshTokenStore = refreshTokenStore;
+        this.authCookieWriter = authCookieWriter;
     }
 
     @Bean
@@ -130,34 +167,9 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/admin/**").authenticated()
 
-                        .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/auth/reset-password/check",
-                                "/api/exam-types/**",
-                                "/api/exam-categories/**",
-                                "/api/exam-parts/**",
-                                "/api/skills/**",
-                                "/api/scoring-conversions/**",
-                                "/api/tests/**",
-                                // [TẮT XÁC THỰC EMAIL] "/api/auth/verify",
-                                "/api/posts/**",
-                                "/api/categories/**",
-                                "/api/tags/**",
-                                "/api/recovery-resources/**",
-                                "/api/milestones/**",
-                                "/api/certificates/verify/**",
-                                "/api/certificates/public",
-                                "/api/user-tests/full-mock/leaderboard",
-                                "/api/streak/leaderboard").permitAll()
-
-                        .requestMatchers(
-                                "/api/user-tests/guest",
-                                "/api/user-tests/guest/**",
-                                "/api/user-tests/*/guest-submit",
-                                "/api/user-answers/guest/**"
-                        ).permitAll()
-
-                        .requestMatchers(HttpMethod.POST, "/api/analytics/visit").permitAll()
+                        .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()
+                        .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll()
+                        .requestMatchers(GUEST_ENDPOINTS).permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -178,26 +190,18 @@ public class SecurityConfig {
                                     .authorities(authentication.getAuthorities())
                                     .build();
 
-                            Map<String, Object> claims = new HashMap<>();
-                            claims.put("userId", user.getUserId());
-
                             String familyId = java.util.UUID.randomUUID().toString();
                             String jti = java.util.UUID.randomUUID().toString();
                             refreshTokenStore.createFamily(user.getUserId(), familyId, jti);
 
+                            // "fid" bắt buộc để logout thu hồi được refresh-token family (giống AuthService.login).
+                            Map<String, Object> claims = new HashMap<>();
+                            claims.put("userId", user.getUserId());
+                            claims.put("fid", familyId);
+
                             String accessToken = jwtService.generateToken(userDetails, claims);
                             String refreshToken = jwtService.generateRefreshToken(userDetails, familyId, jti);
-
-                            String sameSiteAttr = isProduction ? "; SameSite=None; Secure" : "; SameSite=Lax";
-                            String accessCookie = "accessToken=" + accessToken
-                                    + "; HttpOnly; Path=/; Max-Age=" + (24 * 60 * 60)
-                                    + sameSiteAttr;
-                            String refreshCookie = "refreshToken=" + refreshToken
-                                    + "; HttpOnly; Path=/api/auth/refresh; Max-Age=" + (7 * 24 * 60 * 60)
-                                    + sameSiteAttr;
-
-                            response.addHeader("Set-Cookie", accessCookie);
-                            response.addHeader("Set-Cookie", refreshCookie);
+                            authCookieWriter.writeTokens(response, accessToken, refreshToken);
                             SecurityContextHolder.clearContext();
                             response.sendRedirect(frontendOrigin + "/oauth2/redirect");
                         })

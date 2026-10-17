@@ -36,15 +36,15 @@ public class TestScorer {
     private final ScoringConversionRepository scoringConversionRepository;
 
     public int scoreFullTest(List<UserAnswer> userAnswers, Test test, ExamType examType, int totalQuestionsInTest) {
-        String scoringMethod = examType.getScoringMethod() != null
-                ? examType.getScoringMethod().toLowerCase() : "default";
-        if ("toeic_scale".equalsIgnoreCase(scoringMethod)) {
+        if (usesConversionTable(examType)) {
             return scoreToeicOptimal(userAnswers, test, examType);
         }
-        if ("aws_scale".equalsIgnoreCase(scoringMethod)) {
-            return scoreAwsScale(userAnswers, totalQuestionsInTest);
-        }
-        return scoreDefault(userAnswers, totalQuestionsInTest);
+        return scoreLinear(userAnswers, totalQuestionsInTest, examType);
+    }
+
+    /** TOEIC_SCALE quy đổi theo bảng scoring_conversions; các loại khác chấm tuyến tính theo thang min–max. */
+    public static boolean usesConversionTable(ExamType examType) {
+        return "TOEIC_SCALE".equalsIgnoreCase(examType.getScoringMethod());
     }
 
     public int scoreToeicForSkills(List<UserAnswer> userAnswers, ExamType examType, Set<String> skillIds) {
@@ -85,34 +85,30 @@ public class TestScorer {
         return totalScore;
     }
 
-    public int scoreDefault(List<UserAnswer> userAnswers, int totalQuestionsInTest) {
-        if (userAnswers.isEmpty()) {
-            return 0;
-        }
-        List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
-        int totalQuestions = totalQuestionsInTest > 0 ? totalQuestionsInTest
-                : (int) uniqueAnswers.stream().map(UserAnswer::getQuestionId).distinct().count();
-        if (totalQuestions == 0) {
-            return 0;
-        }
-        int correctCount = countCorrectAnswers(uniqueAnswers);
-
-        return (int) Math.round((double) correctCount / totalQuestions * 100);
+    /** Điểm = min + (đúng / tổng) × (max − min), thang min–max lấy theo loại kỳ thi. */
+    public int scoreLinear(List<UserAnswer> userAnswers, int totalQuestionsInTest, ExamType examType) {
+        int min = examType.getScoreMin() != null ? examType.getScoreMin() : 0;
+        int max = examType.getScoreMax() != null ? examType.getScoreMax() : 100;
+        return scoreLinear(userAnswers, totalQuestionsInTest, min, max);
     }
 
-    public int scoreAwsScale(List<UserAnswer> userAnswers, int totalQuestionsInTest) {
+    public int scorePercent(List<UserAnswer> userAnswers, int totalQuestionsInTest) {
+        return scoreLinear(userAnswers, totalQuestionsInTest, 0, 100);
+    }
+
+    private int scoreLinear(List<UserAnswer> userAnswers, int totalQuestionsInTest, int min, int max) {
         if (userAnswers.isEmpty()) {
-            return 100;
+            return min;
         }
         List<UserAnswer> uniqueAnswers = deduplicateByQuestionId(userAnswers);
         int totalQuestions = totalQuestionsInTest > 0 ? totalQuestionsInTest
                 : (int) uniqueAnswers.stream().map(UserAnswer::getQuestionId).distinct().count();
         if (totalQuestions == 0) {
-            return 100;
+            return min;
         }
         int correctCount = countCorrectAnswers(uniqueAnswers);
-        int score = 100 + (int) Math.round((double) correctCount / totalQuestions * 900);
-        return Math.max(100, Math.min(1000, score));
+        int score = min + (int) Math.round((double) correctCount / totalQuestions * (max - min));
+        return Math.max(min, Math.min(max, score));
     }
 
     private int countCorrectAnswers(List<UserAnswer> uniqueAnswers) {
@@ -156,9 +152,11 @@ public class TestScorer {
                 .stream()
                 .collect(Collectors.groupingBy(Answer::getQuestionId));
 
-        Set<String> allExamPartIds = questions.stream().map(Question::getExamPartId).collect(Collectors.toSet());
+        Set<String> allExamPartIds = questions.stream()
+                .map(Question::getExamPartId).filter(Objects::nonNull).collect(Collectors.toSet());
         List<ExamPart> examParts = examPartRepository.findAllById(allExamPartIds);
         Map<String, String> examPartToSkillIdMap = examParts.stream()
+                .filter(ep -> ep.getSkillId() != null)
                 .collect(Collectors.toMap(ExamPart::getExamPartId, ExamPart::getSkillId));
 
         Map<String, Integer> skillCorrectCount = new HashMap<>();

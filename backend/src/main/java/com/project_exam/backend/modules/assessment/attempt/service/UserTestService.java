@@ -244,21 +244,16 @@ public class UserTestService {
     }
 
     private int scorePractice(UserTest userTest, List<UserAnswer> userAnswers, ExamType examType) {
-        String scoringMethod = examType.getScoringMethod() != null
-                ? examType.getScoringMethod().toLowerCase() : "default";
         int practiceTotal = countQuestionsForPractice(userTest);
 
-        if ("toeic_scale".equalsIgnoreCase(scoringMethod)) {
+        if (TestScorer.usesConversionTable(examType)) {
             Set<String> fullyPracticedSkillIds = getFullyPracticedSkillIds(userTest);
             if (!fullyPracticedSkillIds.isEmpty()) {
                 return testScorer.scoreToeicForSkills(userAnswers, examType, fullyPracticedSkillIds);
             }
-            return testScorer.scoreDefault(userAnswers, practiceTotal);
+            return testScorer.scorePercent(userAnswers, practiceTotal);
         }
-        if ("aws_scale".equalsIgnoreCase(scoringMethod)) {
-            return testScorer.scoreAwsScale(userAnswers, practiceTotal);
-        }
-        return testScorer.scoreDefault(userAnswers, practiceTotal);
+        return testScorer.scoreLinear(userAnswers, practiceTotal, examType);
     }
 
     private Set<String> getFullyPracticedSkillIds(UserTest userTest) {

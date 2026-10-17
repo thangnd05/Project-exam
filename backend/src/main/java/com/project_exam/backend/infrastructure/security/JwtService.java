@@ -22,6 +22,10 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
+    private static final String TOKEN_TYPE_CLAIM = "type";
+    private static final String ACCESS_TOKEN_TYPE = "access";
+    private static final String REFRESH_TOKEN_TYPE = "refresh";
+
     @Value("${jwt.secret}")
     private String secretKey;
 
@@ -41,8 +45,10 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails, Map<String, Object> extraClaims) {
+        Map<String, Object> claims = new HashMap<>(extraClaims);
+        claims.put(TOKEN_TYPE_CLAIM, ACCESS_TOKEN_TYPE);
         return Jwts.builder()
-                .setClaims(extraClaims)
+                .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
@@ -56,7 +62,7 @@ public class JwtService {
 
     public String generateRefreshToken(UserDetails userDetails, String familyId, String jti) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("type", "refresh");
+        claims.put(TOKEN_TYPE_CLAIM, REFRESH_TOKEN_TYPE);
         claims.put("fid", familyId);
         return Jwts.builder()
                 .setClaims(claims)
@@ -107,10 +113,20 @@ public class JwtService {
 
     public boolean isRefreshToken(String token) {
         Claims claims = extractAllClaims(token);
-        if (claims == null) return false;
+        return claims != null && isRefreshClaims(claims);
+    }
 
-        String type = (String) claims.get("type");
-        return "refresh".equals(type);
+    /**
+     * Access token hợp lệ để xác thực request. Token cấp trước khi có claim "type"
+     * vẫn được chấp nhận để không đăng xuất người dùng khi deploy; chỉ chặn refresh token.
+     */
+    public boolean isAccessToken(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims != null && !isRefreshClaims(claims);
+    }
+
+    private boolean isRefreshClaims(Claims claims) {
+        return REFRESH_TOKEN_TYPE.equals(claims.get(TOKEN_TYPE_CLAIM));
     }
 
     private boolean isTokenExpired(String token) {
@@ -156,11 +172,16 @@ public String resolveToken(HttpServletRequest request) {
             throw new UnauthorizedException("Không tìm thấy token truy cập.");
         }
 
+        Claims claims;
         try {
-            return extractAllClaims(token);
+            claims = extractAllClaims(token);
         } catch (Exception e) {
             throw new UnauthorizedException("Token không hợp lệ hoặc đã hết hạn.");
         }
+        if (claims == null || isRefreshClaims(claims)) {
+            throw new UnauthorizedException("Token không hợp lệ hoặc đã hết hạn.");
+        }
+        return claims;
     }
 
 }

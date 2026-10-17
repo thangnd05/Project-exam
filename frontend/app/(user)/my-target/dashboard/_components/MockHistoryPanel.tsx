@@ -13,6 +13,7 @@ import {
   formatHourMinute24,
 } from '@/app/utils/format-date-time';
 import type { EnhancedResultResponse } from '@/app/types';
+import type { ScoreScaleSource } from '@/app/utils/scoreScale';
 import dynamic from 'next/dynamic';
 import type { MockChartPoint } from './MockHistoryCharts';
 import { useMockHistory } from '../_hooks/useMockHistory';
@@ -50,10 +51,10 @@ function formatDuration(seconds: number | null | undefined): string {
 type MockHistoryPanelProps = {
   examTypeId: string;
   examTypeName?: string;
-  scoringMethod?: string | null;
+  scaleSource?: ScoreScaleSource | null;
 };
 
-function MockHistoryPanel({ examTypeId, examTypeName, scoringMethod }: MockHistoryPanelProps) {
+function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistoryPanelProps) {
   const [tableOpen, setTableOpen] = useState(false);
   const [page, setPage] = useState(0);
 
@@ -179,7 +180,7 @@ function MockHistoryPanel({ examTypeId, examTypeName, scoringMethod }: MockHisto
             targetScore={targetScore}
             loading={chartLoading}
             examTypeName={examTypeName || ''}
-            scoringMethod={scoringMethod}
+            scaleSource={scaleSource}
           />
         )}
 

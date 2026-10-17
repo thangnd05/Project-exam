@@ -16,6 +16,8 @@ public class ExamTypeResponse {
     private String imageUrl;
     private Integer durationMinutes;
     private String scoringMethod;
+    private Integer scoreMin;
+    private Integer scoreMax;
     private Boolean flexible;
 
     private String parentId;

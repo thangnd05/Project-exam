@@ -21,24 +21,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PublicEndpointApprovalTest {
 
-    private static final List<String[]> PERMIT_ALL = List.of(
-            new String[]{"POST", "/api/auth/**"},
-            new String[]{"GET", "/api/exam-types/**"},
-            new String[]{"GET", "/api/exam-categories/**"},
-            new String[]{"GET", "/api/evaluations/**"},
-            new String[]{"GET", "/api/tests/**"},
-            new String[]{"GET", "/api/posts/**"},
-            new String[]{"GET", "/api/categories/**"},
-            new String[]{"GET", "/api/tags/**"},
-            new String[]{"GET", "/api/recovery-resources/**"},
-            new String[]{"GET", "/api/milestones/**"},
-            new String[]{"GET", "/api/certificates/verify/**"},
-            new String[]{"*", "/api/user-tests/guest"},
-            new String[]{"*", "/api/user-tests/guest/**"},
-            new String[]{"*", "/api/user-tests/*/guest-submit"},
-            new String[]{"*", "/api/user-answers/guest/**"},
-            new String[]{"POST", "/api/analytics/visit"}
-    );
+    // Đọc thẳng từ SecurityConfig để không bị lệch với cấu hình thật.
+    private static final List<String[]> PERMIT_ALL = Stream.of(
+            rules("POST", SecurityConfig.PUBLIC_POST_ENDPOINTS),
+            rules("GET", SecurityConfig.PUBLIC_GET_ENDPOINTS),
+            rules("*", SecurityConfig.GUEST_ENDPOINTS)
+    ).flatMap(rules -> rules).toList();
+
+    private static Stream<String[]> rules(String verb, String[] patterns) {
+        return Stream.of(patterns).map(pattern -> new String[]{verb, pattern});
+    }
 
     private static final Set<String> APPROVED_PUBLIC_ENDPOINTS = Set.of(
 
@@ -49,6 +41,7 @@ class PublicEndpointApprovalTest {
             "POST /api/auth/forgot-password",
             "POST /api/auth/reset-password",
             "POST /api/auth/change-password",
+            "GET /api/auth/reset-password/check",
 
             "GET /api/exam-types",
             "GET /api/exam-types/standard",
@@ -59,7 +52,13 @@ class PublicEndpointApprovalTest {
             "GET /api/exam-categories",
             "GET /api/exam-categories/{id}",
             "GET /api/exam-categories/by-code/{code}",
-            "GET /api/tags/tree/{examTypeId}",
+            "GET /api/exam-parts",
+            "GET /api/exam-parts/{id}",
+            "GET /api/exam-parts/by-exam-type/{examTypeId}",
+            "GET /api/skills",
+            "GET /api/skills/{id}",
+            "GET /api/scoring-conversions",
+            "GET /api/scoring-conversions/{id}",
             "GET /api/tags/flat/{examTypeId}",
             "GET /api/tags/question/{questionId}",
             "GET /api/milestones",
@@ -82,10 +81,6 @@ class PublicEndpointApprovalTest {
             "GET /api/posts/{postId}/save",
             "GET /api/categories",
             "GET /api/categories/{id}",
-            "GET /api/evaluations",
-            "GET /api/evaluations/paged",
-            "GET /api/evaluations/me",
-            "GET /api/evaluations/{id}",
 
             "GET /api/tests",
             "GET /api/tests/my",
@@ -113,6 +108,10 @@ class PublicEndpointApprovalTest {
             "GET /api/user-answers/guest/user-test/{userTestId}/result/enhanced",
 
             "GET /api/certificates/verify/{code}",
+            "GET /api/certificates/public",
+
+            "GET /api/user-tests/full-mock/leaderboard",
+            "GET /api/streak/leaderboard",
 
             "POST /api/analytics/visit"
     );

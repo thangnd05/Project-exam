@@ -21,6 +21,7 @@ import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.rbac.repository.RolePermissionRepository;
 import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
+import com.project_exam.backend.infrastructure.security.AuthCookieWriter;
 import com.project_exam.backend.infrastructure.security.CustomUserDetailsService;
 import com.project_exam.backend.infrastructure.security.JwtService;
 import com.project_exam.backend.infrastructure.security.RecaptchaService;
@@ -41,7 +42,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -75,6 +75,7 @@ public class AuthService {
     private final MailService mailService;
     private final RecaptchaService recaptchaService;
     private final RefreshTokenStore refreshTokenStore;
+    private final AuthCookieWriter authCookieWriter;
 
     @Value("${app.frontend.origin}")
     private String frontendOrigin;
@@ -105,8 +106,7 @@ public class AuthService {
 
         String accessToken = jwtService.generateToken(userDetails, claims);
         String refreshToken = jwtService.generateRefreshToken(userDetails, familyId, jti);
-        setAccessTokenCookie(accessToken, response);
-        setRefreshTokenCookie(refreshToken, response);
+        authCookieWriter.writeTokens(response, accessToken, refreshToken);
 
         return enrichWithRoleAndPermissions(userMapper.toResponse(user), user.getRoleId());
     }
@@ -160,8 +160,7 @@ public class AuthService {
 
         String newAccessToken = jwtService.generateToken(userDetails, claims);
         String newRefreshToken = jwtService.generateRefreshToken(userDetails, familyId, effectiveJti);
-        setAccessTokenCookie(newAccessToken, response);
-        setRefreshTokenCookie(newRefreshToken, response);
+        authCookieWriter.writeTokens(response, newAccessToken, newRefreshToken);
 
         return AuthMessageResponse.builder().message("Cấp access token mới thành công").build();
     }
@@ -182,55 +181,9 @@ public class AuthService {
         boolean isSecure = frontendOrigin != null && frontendOrigin.startsWith("https");
         String sameSiteAttr = isSecure ? "; SameSite=None; Secure" : "; SameSite=Lax";
 
-        response.addHeader("Set-Cookie", buildAccessTokenCookie("", 0));
-        response.addHeader("Set-Cookie", buildRefreshTokenCookie("", 0));
+        authCookieWriter.clearTokens(response);
         response.addHeader("Set-Cookie", "JSESSIONID=; HttpOnly; Path=/; Max-Age=0" + sameSiteAttr);
         response.addHeader("Set-Cookie", "XSRF-TOKEN=; Path=/; Max-Age=0" + sameSiteAttr);
-    }
-
-    private void setAccessTokenCookie(String accessToken, HttpServletResponse response) {
-        String encodedToken = URLEncoder.encode(accessToken, StandardCharsets.UTF_8);
-        int cookieMax = (int) ((jwtService.extractClaim(accessToken, Claims::getExpiration).getTime() - System.currentTimeMillis()) / 1000);
-        if (cookieMax <= 0) cookieMax = 3600;
-        response.addHeader("Set-Cookie", buildAccessTokenCookie(encodedToken, cookieMax));
-    }
-
-    private String buildAccessTokenCookie(String cookieValue, int cookieMaxAge) {
-        boolean isSecure = frontendOrigin != null && frontendOrigin.startsWith("https");
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("accessToken=").append(cookieValue)
-          .append("; HttpOnly; Path=/; Max-Age=").append(cookieMaxAge);
-
-        if (isSecure) {
-            sb.append("; SameSite=None; Secure");
-        } else {
-            sb.append("; SameSite=Lax");
-        }
-        return sb.toString();
-    }
-
-    private void setRefreshTokenCookie(String refreshToken, HttpServletResponse response) {
-        String encodedToken = URLEncoder.encode(refreshToken, StandardCharsets.UTF_8);
-        int cookieMax = (int) ((jwtService.extractClaim(refreshToken, Claims::getExpiration).getTime()
-                - System.currentTimeMillis()) / 1000);
-        if (cookieMax <= 0) cookieMax = 7 * 24 * 3600;
-        response.addHeader("Set-Cookie", buildRefreshTokenCookie(encodedToken, cookieMax));
-    }
-
-    private String buildRefreshTokenCookie(String cookieValue, int cookieMaxAge) {
-        boolean isSecure = frontendOrigin != null && frontendOrigin.startsWith("https");
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("refreshToken=").append(cookieValue)
-          .append("; HttpOnly; Path=/api/auth/refresh; Max-Age=").append(cookieMaxAge);
-
-        if (isSecure) {
-            sb.append("; SameSite=None; Secure");
-        } else {
-            sb.append("; SameSite=Lax");
-        }
-        return sb.toString();
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {

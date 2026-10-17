@@ -3,16 +3,23 @@ export type ScoreScale = {
   min: number;
   max: number;
 
+  // true: chấm tuyến tính theo tỉ lệ câu đúng; false: quy đổi theo bảng (TOEIC_SCALE).
   scaled: boolean;
 };
 
-export const DEFAULT_SCORE_SCALE: ScoreScale = { min: 0, max: 990, scaled: false };
-export const AWS_SCORE_SCALE: ScoreScale = { min: 100, max: 1000, scaled: true };
+// Thang điểm lấy từ exam type (scoreMin/scoreMax do admin cấu hình).
+export type ScoreScaleSource = {
+  scoringMethod?: string | null;
+  scoreMin?: number | null;
+  scoreMax?: number | null;
+};
 
-export function getScoreScale(scoringMethod?: string | null): ScoreScale {
-  return (scoringMethod || '').toUpperCase() === 'AWS_SCALE'
-    ? AWS_SCORE_SCALE
-    : DEFAULT_SCORE_SCALE;
+export function getScoreScale(source?: ScoreScaleSource | null): ScoreScale {
+  return {
+    min: source?.scoreMin ?? 0,
+    max: source?.scoreMax ?? 100,
+    scaled: (source?.scoringMethod || '').toUpperCase() !== 'TOEIC_SCALE',
+  };
 }
 
 export function scoreToPercent(score: number | string, scale: ScoreScale): number {

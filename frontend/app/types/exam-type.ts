@@ -4,6 +4,8 @@ export interface ExamTypeRequest {
   imageUrl?: string;
   durationMinutes?: number;
   scoringMethod?: string;
+  scoreMin?: number;
+  scoreMax?: number;
   flexible?: boolean;
   parentId?: string;
 }
@@ -15,6 +17,8 @@ export interface ExamTypeResponse {
   imageUrl?: string;
   durationMinutes?: number;
   scoringMethod?: string;
+  scoreMin?: number;
+  scoreMax?: number;
   flexible?: boolean;
   parentId?: string;
   parentName?: string;

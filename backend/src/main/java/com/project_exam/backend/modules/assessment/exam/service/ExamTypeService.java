@@ -63,6 +63,9 @@ public class ExamTypeService {
         type.setImageUrl(request.getImageUrl());
         type.setDurationMinutes(request.getDurationMinutes());
         type.setScoringMethod(request.getScoringMethod() != null ? request.getScoringMethod() : "DEFAULT");
+        if (request.getScoreMin() != null) type.setScoreMin(request.getScoreMin());
+        if (request.getScoreMax() != null) type.setScoreMax(request.getScoreMax());
+        validateScoreScale(type);
         type.setFlexible(Boolean.TRUE.equals(request.getFlexible()));
         type.setParentId(resolveParentId(request.getParentId(), null));
         type = examTypeRepository.save(type);
@@ -77,6 +80,9 @@ public class ExamTypeService {
         if (request.getImageUrl() != null) type.setImageUrl(request.getImageUrl());
         if (request.getDurationMinutes() != null) type.setDurationMinutes(request.getDurationMinutes());
         if (request.getScoringMethod() != null) type.setScoringMethod(request.getScoringMethod());
+        if (request.getScoreMin() != null) type.setScoreMin(request.getScoreMin());
+        if (request.getScoreMax() != null) type.setScoreMax(request.getScoreMax());
+        validateScoreScale(type);
         if (request.getFlexible() != null) type.setFlexible(request.getFlexible());
 
         if (request.getParentId() != null) {
@@ -115,6 +121,14 @@ public class ExamTypeService {
         }
         Long childCount = examTypeRepository.countByParentId(t.getExamTypeId());
         return examTypeMapper.toResponse(t, parentName, childCount);
+    }
+
+    private void validateScoreScale(ExamType type) {
+        int min = type.getScoreMin();
+        int max = type.getScoreMax();
+        if (min < 0 || min >= max) {
+            throw new BadRequestException("Thang điểm không hợp lệ: cần 0 ≤ điểm tối thiểu < điểm tối đa.");
+        }
     }
 
     private String resolveParentId(String rawParentId, String selfId) {

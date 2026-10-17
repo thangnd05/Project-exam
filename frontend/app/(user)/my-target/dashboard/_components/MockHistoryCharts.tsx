@@ -16,7 +16,7 @@ import {
 } from 'recharts';
 import styles from './MockHistoryPanel.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
-import { getScoreScale } from '@/app/utils/scoreScale';
+import { getScoreScale, type ScoreScaleSource } from '@/app/utils/scoreScale';
 
 const cx = classNames.bind(styles);
 
@@ -79,7 +79,7 @@ type MockHistoryChartsProps = {
   loading?: boolean;
   examTypeName?: string;
 
-  scoringMethod?: string | null;
+  scaleSource?: ScoreScaleSource | null;
 };
 
 function MockHistoryCharts({
@@ -87,9 +87,9 @@ function MockHistoryCharts({
   targetScore,
   loading,
   examTypeName,
-  scoringMethod,
+  scaleSource,
 }: MockHistoryChartsProps) {
-  const scoreScale = getScoreScale(scoringMethod);
+  const scoreScale = getScoreScale(scaleSource);
   const scores = chartData
     .map((p) => p.totalScore)
     .filter((v) => v != null);

@@ -103,6 +103,8 @@ public class EnhancedResultService {
                 : null;
         String examTypeName = examType != null ? examType.getName() : null;
         String scoringMethod = examType != null ? examType.getScoringMethod() : null;
+        Integer scoreMin = examType != null ? examType.getScoreMin() : null;
+        Integer scoreMax = examType != null ? examType.getScoreMax() : null;
 
         String examCategoryCode = null;
         if (test.getExamCategoryId() != null) {
@@ -120,6 +122,7 @@ public class EnhancedResultService {
                     .correct(0).wrong(0).total(0).totalScore(userTest.getTotalScore() != null ? (long) userTest.getTotalScore() : 0L)
                     .examTypeId(test.getExamTypeId())
                     .scoringMethod(scoringMethod)
+                    .scoreMin(scoreMin).scoreMax(scoreMax)
                     .partBreakdown(List.of())
                     .build();
         }
@@ -249,6 +252,8 @@ public class EnhancedResultService {
                 .examCategoryCode(examCategoryCode)
                 .examTypeId(test.getExamTypeId())
                 .scoringMethod(scoringMethod)
+                .scoreMin(scoreMin)
+                .scoreMax(scoreMax)
                 .hasTarget(hasTarget)
                 .isTargetMet(isTargetMetResult)
                 .targetScore(targetScore)

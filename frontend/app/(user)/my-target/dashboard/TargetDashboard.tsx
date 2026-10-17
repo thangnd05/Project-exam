@@ -265,7 +265,7 @@ function TargetDashboard() {
         <MockHistoryPanel
           examTypeId={examTypeId}
           examTypeName={examTypeName}
-          scoringMethod={selectedExamType?.scoringMethod}
+          scaleSource={selectedExamType}
         />
       )}
 

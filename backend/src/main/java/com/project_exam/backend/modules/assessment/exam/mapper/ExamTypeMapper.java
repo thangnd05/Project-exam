@@ -19,6 +19,8 @@ public class ExamTypeMapper {
                 .imageUrl(t.getImageUrl())
                 .durationMinutes(t.getDurationMinutes())
                 .scoringMethod(t.getScoringMethod())
+                .scoreMin(t.getScoreMin())
+                .scoreMax(t.getScoreMax())
                 .flexible(Boolean.TRUE.equals(t.getFlexible()))
                 .parentId(t.getParentId())
                 .parentName(parentName)

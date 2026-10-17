@@ -8,6 +8,7 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
@@ -120,6 +121,19 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return buildErrorResponse(HttpStatus.FORBIDDEN, "Tài khoản đã bị khóa hoặc chưa được kích hoạt", request);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiErrorResponse> handleAccessDeniedException(
+            AccessDeniedException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("AccessDeniedException at {}: {}", request.getRequestURI(), ex.getMessage());
+        // @PreAuthorize ném "Access Denied" mặc định — thay bằng thông báo tiếng Việt.
+        String message = ex.getMessage() != null && !ex.getMessage().isBlank() && !"Access Denied".equals(ex.getMessage())
+                ? ex.getMessage()
+                : "Bạn không có quyền thực hiện thao tác này";
+        return buildErrorResponse(HttpStatus.FORBIDDEN, message, request);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

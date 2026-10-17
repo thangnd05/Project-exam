@@ -20,6 +20,8 @@ public class EnhancedResultResponse {
     private String examTypeId;
 
     private String scoringMethod;
+    private Integer scoreMin;
+    private Integer scoreMax;
 
     private List<PartBreakdownResponse> partBreakdown;
 

@@ -3,16 +3,12 @@
 import { useCallback, useMemo } from 'react';
 
 import {
-  AWS_SCORE_SCALE,
   getScoreScale,
   scoreToPercent,
+  type ScoreScaleSource,
 } from '@/app/utils/scoreScale';
 
-const SCALE_MIN = AWS_SCORE_SCALE.min;
-const SCALE_MAX = AWS_SCORE_SCALE.max;
-const SCALE_SPAN = SCALE_MAX - SCALE_MIN;
-
-type ExamTypeLike = { examTypeId: string | number; scoringMethod?: string | null; [key: string]: any };
+type ExamTypeLike = ScoreScaleSource & { examTypeId: string | number; [key: string]: any };
 type ExamPartLike = {
   examPartId: string;
   name?: string | null;
@@ -61,9 +57,12 @@ export default function useMilestoneScoring({
     [examTypes, selectedExamTypeId],
   );
   const scoringMethod = (selectedExamType?.scoringMethod || 'DEFAULT').toUpperCase();
-  const scale = getScoreScale(scoringMethod);
+  const scale = useMemo(() => getScoreScale(selectedExamType), [selectedExamType]);
   const isScaled = scale.scaled;
   const maxScore = scale.max;
+  const SCALE_MIN = scale.min;
+  const SCALE_MAX = scale.max;
+  const SCALE_SPAN = SCALE_MAX - SCALE_MIN;
 
   const getPartTotal = useCallback(
     (examPartId: string) =>
@@ -135,7 +134,7 @@ export default function useMilestoneScoring({
 
       return { totalScore, skillDetails };
     },
-    [isScaled, examParts, scoringConversions, skills, selectedExamTypeId],
+    [isScaled, SCALE_MIN, SCALE_MAX, SCALE_SPAN, examParts, scoringConversions, skills, selectedExamTypeId],
   );
 
   const formatEstimateDetail = useCallback(
@@ -147,7 +146,7 @@ export default function useMilestoneScoring({
             .map((s) => `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`)
             .join(' | ');
     },
-    [],
+    [SCALE_MIN, SCALE_MAX],
   );
 
   return {

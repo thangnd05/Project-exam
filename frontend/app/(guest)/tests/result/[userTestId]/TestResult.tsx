@@ -64,7 +64,7 @@ const TestResult = () => {
   const loading = authLoading || isLoading;
   const error = isError ? "Không thể tải kết quả bài thi này" : "";
 
-  const scoreScale = getScoreScale(enhanced?.scoringMethod);
+  const scoreScale = getScoreScale(enhanced);
 
   const isQuickChallenge = enhanced?.examCategoryCode === 'QUICK_CHALLENGE';
   const [isBeginner, setIsBeginner] = useState(false);

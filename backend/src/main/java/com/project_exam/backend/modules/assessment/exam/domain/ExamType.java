@@ -39,6 +39,12 @@ public class ExamType {
     @Column(name = "scoring_method", nullable = false, length = 50)
     private String scoringMethod = "DEFAULT";
 
+    @Column(name = "score_min", nullable = false)
+    private Integer scoreMin = 0;
+
+    @Column(name = "score_max", nullable = false)
+    private Integer scoreMax = 100;
+
     @Column(name = "flexible")
     private Boolean flexible = Boolean.FALSE;
 
