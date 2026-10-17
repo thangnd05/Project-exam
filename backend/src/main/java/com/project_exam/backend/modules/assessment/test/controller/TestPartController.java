@@ -22,11 +22,6 @@ public class TestPartController {
     private final TestPartService testPartService;
     private final AuthUtils authUtils;
 
-    @GetMapping
-    public ResponseEntity<List<TestPartSimpleResponse>> getAllTestParts() {
-        return ResponseEntity.ok(testPartService.findAllResponses());
-    }
-
     @GetMapping("/by-test/{testId}")
     public ResponseEntity<List<TestPartSimpleResponse>> getTestPartsByTestId(@PathVariable String testId) {
         return ResponseEntity.ok(testPartService.findResponsesByTestId(testId));

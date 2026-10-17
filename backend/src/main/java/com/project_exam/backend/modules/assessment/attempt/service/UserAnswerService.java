@@ -54,16 +54,6 @@ public class UserAnswerService {
         return userAnswerMapper.toResponse(userAnswer);
     }
 
-    public List<UserAnswer> findAll() {
-        return userAnswerRepository.findAll();
-    }
-
-    public List<UserAnswerResponse> findAllResponses() {
-        return findAll().stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
     public Optional<UserAnswer> findById(String id) {
         return userAnswerRepository.findById(id);
     }
@@ -111,15 +101,6 @@ public class UserAnswerService {
                 .toList();
     }
 
-    public List<UserAnswer> findByQuestionId(String questionId) {
-        return userAnswerRepository.findByQuestionId(questionId);
-    }
-
-    public List<UserAnswerResponse> findResponsesByQuestionId(String questionId) {
-        return findByQuestionId(questionId).stream()
-                .map(this::toResponse)
-                .toList();
-    }
 
     public UserAnswer save(UserAnswer userAnswer) {
         return userAnswerRepository.save(userAnswer);

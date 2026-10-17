@@ -12,7 +12,6 @@ import java.util.Optional;
 @Repository
 public interface UserAnswerRepository extends JpaRepository<UserAnswer, String> {
     List<UserAnswer> findByUserTestId(String userTestId);
-    List<UserAnswer> findByQuestionId(String questionId);
     Optional<UserAnswer> findByUserTestIdAndQuestionId(String userTestId, String questionId);
 
     @Modifying

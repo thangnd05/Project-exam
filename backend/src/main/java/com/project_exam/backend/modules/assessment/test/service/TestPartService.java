@@ -34,16 +34,6 @@ public class TestPartService {
         return testMapper.toTestPartSimpleResponse(testPart);
     }
 
-    public List<TestPart> findAll() {
-        return testPartRepository.findAll();
-    }
-
-    public List<TestPartSimpleResponse> findAllResponses() {
-        return findAll().stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
     public Optional<TestPart> findById(String id) {
         return testPartRepository.findById(id);
     }

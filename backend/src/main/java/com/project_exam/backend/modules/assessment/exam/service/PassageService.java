@@ -8,7 +8,6 @@ import com.project_exam.backend.modules.assessment.exam.repository.PassageReposi
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -31,22 +30,8 @@ public class PassageService {
         return passage;
     }
 
-    public List<Passage> findAll() {
-        return passageRepository.findAll();
-    }
-
-    public List<PassageResponse> findAllResponses() {
-        return findAll().stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
     public Optional<Passage> findById(String id) {
         return passageRepository.findById(id);
-    }
-
-    public Optional<PassageResponse> findResponseById(String id) {
-        return findById(id).map(this::toResponse);
     }
 
     public Passage save(Passage passage) {
