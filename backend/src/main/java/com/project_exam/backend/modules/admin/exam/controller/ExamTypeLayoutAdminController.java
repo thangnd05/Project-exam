@@ -4,22 +4,21 @@ import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeLayoutReques
 import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeLayoutResponse;
 import com.project_exam.backend.modules.assessment.exam.service.ExamTypeLayoutService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.shared.security.RequirePermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequirePermission(PermissionCatalog.EXAM_TYPE_LAYOUT_MANAGE)
 @RequestMapping("/api/admin/exam-types")
 @RequiredArgsConstructor
 public class ExamTypeLayoutAdminController {
 
     private final ExamTypeLayoutService layoutService;
-    private final AuthUtils authUtils;
 
     @GetMapping("/{examTypeId}/layout/own")
     public ResponseEntity<ExamTypeLayoutResponse> getOwnLayout(@PathVariable String examTypeId) {
-        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_LAYOUT_MANAGE);
         ExamTypeLayoutResponse res = layoutService.getOwn(examTypeId);
         return res == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(res);
     }
@@ -29,7 +28,6 @@ public class ExamTypeLayoutAdminController {
             @PathVariable String examTypeId,
             @RequestBody ExamTypeLayoutRequest request
     ) {
-        authUtils.requirePermission(PermissionCatalog.EXAM_TYPE_LAYOUT_MANAGE);
         return ResponseEntity.ok(layoutService.upsert(examTypeId, request));
     }
 }

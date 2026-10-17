@@ -129,10 +129,11 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         log.warn("AccessDeniedException at {}: {}", request.getRequestURI(), ex.getMessage());
-        // @PreAuthorize ném "Access Denied" mặc định — thay bằng thông báo tiếng Việt.
+        // @RequirePermission/@PreAuthorize ném "Access Denied" mặc định — thay bằng thông báo tiếng Việt
+        // (giữ đúng câu của ForbiddenException trước đây để frontend hiển thị như cũ).
         String message = ex.getMessage() != null && !ex.getMessage().isBlank() && !"Access Denied".equals(ex.getMessage())
                 ? ex.getMessage()
-                : "Bạn không có quyền thực hiện thao tác này";
+                : "Bạn không có quyền thực hiện thao tác này.";
         return buildErrorResponse(HttpStatus.FORBIDDEN, message, request);
     }
 

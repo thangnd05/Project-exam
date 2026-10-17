@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceRequ
 import com.project_exam.backend.modules.assessment.exam.dto.RecoveryResourceResponse;
 import com.project_exam.backend.modules.assessment.exam.service.RecoveryResourceService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.security.RequirePermission;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
+@RequirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE)
 @RequestMapping("/api/admin/recovery-resources")
 @RequiredArgsConstructor
 public class RecoveryResourceAdminController {
@@ -30,7 +32,6 @@ public class RecoveryResourceAdminController {
             @RequestPart(value = "file", required = false) MultipartFile file,
             HttpServletRequest httpRequest
     ) throws IOException {
-        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         RecoveryResourceRequest request = objectMapper.readValue(requestJson, RecoveryResourceRequest.class);
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -43,7 +44,6 @@ public class RecoveryResourceAdminController {
             @RequestPart("request") String requestJson,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws IOException {
-        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         RecoveryResourceRequest request = objectMapper.readValue(requestJson, RecoveryResourceRequest.class);
         return ResponseEntity.ok(resourceService.updateResource(resourceId, request, file));
     }
@@ -53,13 +53,11 @@ public class RecoveryResourceAdminController {
             @PathVariable String resourceId,
             @RequestBody RecoveryResourceRequest request
     ) throws IOException {
-        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         return ResponseEntity.ok(resourceService.updateResource(resourceId, request, null));
     }
 
     @DeleteMapping("/{resourceId}")
     public ResponseEntity<Void> deleteResource(@PathVariable String resourceId) {
-        authUtils.requirePermission(PermissionCatalog.RECOVERY_RESOURCE_MANAGE);
         resourceService.deleteResource(resourceId);
         return ResponseEntity.noContent().build();
     }

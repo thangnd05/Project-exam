@@ -10,6 +10,7 @@ import com.project_exam.backend.modules.system.mail.dto.MailAudienceOptionRespon
 import com.project_exam.backend.modules.system.mail.service.EmailAdminService;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.security.RequirePermission;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequirePermission(PermissionCatalog.EMAIL_MANAGE)
 @RequestMapping("/api/admin/emails")
 @RequiredArgsConstructor
 public class EmailAdminController {
@@ -30,7 +32,6 @@ public class EmailAdminController {
 
     @GetMapping("/auto")
     public ResponseEntity<List<EmailResponse>> getAutoEmails() {
-        authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         return ResponseEntity.ok(emailAdminService.findAuto());
     }
 
@@ -39,7 +40,6 @@ public class EmailAdminController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         return ResponseEntity.ok(emailAdminService.findManual(page, size));
     }
 
@@ -49,20 +49,17 @@ public class EmailAdminController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         return ResponseEntity.ok(emailAdminService.findRecipients(emailId, page, size));
     }
 
     @GetMapping("/audience")
     public ResponseEntity<List<MailAudienceOptionResponse>> getAudienceOptions() {
-        authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         return ResponseEntity.ok(emailAdminService.findAudienceOptions());
     }
 
     @PostMapping
     public ResponseEntity<EmailResponse> createManual(@Valid @RequestBody EmailSaveRequest request,
                                                       HttpServletRequest httpRequest) {
-        authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(emailAdminService.createManual(request, authUtils.getUserId(httpRequest)));
     }
@@ -71,14 +68,12 @@ public class EmailAdminController {
     public ResponseEntity<EmailResponse> update(@PathVariable String emailId,
                                                 @Valid @RequestBody EmailSaveRequest request,
                                                 HttpServletRequest httpRequest) {
-        authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         return ResponseEntity.ok(
                 emailAdminService.update(emailId, request, authUtils.getUserId(httpRequest)));
     }
 
     @DeleteMapping("/{emailId}")
     public ResponseEntity<Void> delete(@PathVariable String emailId) {
-        authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         emailAdminService.delete(emailId);
         return ResponseEntity.noContent().build();
     }
@@ -87,21 +82,18 @@ public class EmailAdminController {
     public ResponseEntity<EmailResponse> send(@PathVariable String emailId,
                                               @Valid @RequestBody EmailSendRequest request,
                                               HttpServletRequest httpRequest) {
-        authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         return ResponseEntity.ok(emailAdminService.send(
                 emailId, request.getUserIds(), authUtils.getUserId(httpRequest)));
     }
 
     @PostMapping("/{emailId}/retry-failed")
     public ResponseEntity<EmailResponse> retryFailed(@PathVariable String emailId) {
-        authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         return ResponseEntity.ok(emailAdminService.retryFailed(emailId));
     }
 
     @PostMapping("/preview")
     public ResponseEntity<EmailPreviewResponse> preview(@Valid @RequestBody EmailPreviewRequest request,
                                                         HttpServletRequest httpRequest) {
-        authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         return ResponseEntity.ok(
                 emailAdminService.preview(request, authUtils.getUserId(httpRequest)));
     }
@@ -110,7 +102,6 @@ public class EmailAdminController {
     public ResponseEntity<Void> testSend(@PathVariable String emailId,
                                          @Valid @RequestBody EmailPreviewRequest request,
                                          HttpServletRequest httpRequest) {
-        authUtils.requirePermission(PermissionCatalog.EMAIL_MANAGE);
         emailAdminService.testSend(emailId, request, authUtils.getUserId(httpRequest));
         return ResponseEntity.accepted().build();
     }

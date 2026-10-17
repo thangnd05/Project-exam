@@ -4,6 +4,7 @@ import com.project_exam.backend.modules.posts.post.dto.PostResponse;
 import com.project_exam.backend.modules.posts.post.dto.UpdatePostStatusRequest;
 import com.project_exam.backend.modules.posts.post.service.PostService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
+import com.project_exam.backend.shared.security.RequirePermission;
 import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequirePermission(PermissionCatalog.POST_MODERATE)
 @RequestMapping("/api/admin/posts")
 @RequiredArgsConstructor
 public class PostAdminController {
@@ -24,7 +26,6 @@ public class PostAdminController {
             @RequestBody UpdatePostStatusRequest request,
             HttpServletRequest httpRequest
     ) {
-        authUtils.requirePermission(PermissionCatalog.POST_MODERATE);
         String userId = authUtils.getUserId(httpRequest);
         return ResponseEntity.ok(postService.updatePostStatus(id, request.getStatus(), userId));
     }

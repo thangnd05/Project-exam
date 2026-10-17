@@ -9,7 +9,7 @@ import com.project_exam.backend.modules.assessment.exam.service.AdminQuestionSer
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.shared.security.RequirePermission;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,13 +23,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequirePermission(PermissionCatalog.QUESTION_MANAGE)
 @RequestMapping("/api/admin/questions")
 @RequiredArgsConstructor
 public class QuestionAdminController {
 
     private final QuestionService questionService;
     private final AdminQuestionService adminQuestionService;
-    private final AuthUtils authUtils;
 
     @GetMapping("/search")
     public ResponseEntity<PageResponse<AdminQuestionListItemResponse>> search(
@@ -44,7 +44,6 @@ public class QuestionAdminController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size
     ) {
-        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         return ResponseEntity.ok(adminQuestionService.search(
                 examTypeId, examPartId, collectionId, tagId, usageScope, questionType, isBank,
                 keyword, page, size));
@@ -54,14 +53,12 @@ public class QuestionAdminController {
     public ResponseEntity<BulkUpdateQuestionsResponse> bulkUpdate(
             @Valid @RequestBody BulkUpdateQuestionsRequest request
     ) {
-        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         return ResponseEntity.ok(adminQuestionService.bulkUpdate(request));
     }
 
     @Deprecated
     @GetMapping("/all")
     public ResponseEntity<List<QuestionAdminResponse>> getAll() {
-        authUtils.requirePermission(PermissionCatalog.QUESTION_MANAGE);
         return ResponseEntity.ok(questionService.findAllAdminSummaries());
     }
 }

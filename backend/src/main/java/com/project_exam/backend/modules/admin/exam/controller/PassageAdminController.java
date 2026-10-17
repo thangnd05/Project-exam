@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.PassageResponse;
 import com.project_exam.backend.modules.assessment.exam.service.PassageService;
 import com.project_exam.backend.shared.exception.NotFoundException;
 import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.shared.security.RequirePermission;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,18 +13,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequirePermission(PermissionCatalog.PASSAGE_MANAGE)
 @RequestMapping("/api/admin/passages")
 @RequiredArgsConstructor
 public class PassageAdminController {
 
     private final PassageService passageService;
-    private final AuthUtils authUtils;
 
     @PostMapping
     public ResponseEntity<PassageResponse> createPassage(
             @Valid @RequestBody PassageRequest request
     ) {
-        authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(passageService.create(request));
     }
 
@@ -33,7 +32,6 @@ public class PassageAdminController {
             @PathVariable String id,
             @Valid @RequestBody PassageRequest request
     ) {
-        authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
         PassageResponse response = passageService.update(id, request)
                 .orElseThrow(() -> new NotFoundException("Passage không tồn tại"));
         return ResponseEntity.ok(response);
@@ -41,7 +39,6 @@ public class PassageAdminController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePassage(@PathVariable String id) {
-        authUtils.requirePermission(PermissionCatalog.PASSAGE_MANAGE);
         if (passageService.findById(id).isEmpty()) {
             throw new NotFoundException("Passage không tồn tại");
         }

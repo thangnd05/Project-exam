@@ -5,7 +5,7 @@ import com.project_exam.backend.modules.assessment.attempt.dto.EvaluationTestSta
 import com.project_exam.backend.modules.assessment.attempt.service.EvaluationService;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.shared.security.RequirePermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequirePermission(PermissionCatalog.EVALUATION_MANAGE)
 @RequestMapping("/api/admin/evaluations")
 @RequiredArgsConstructor
 public class EvaluationAdminController {
 
     private final EvaluationService evaluationService;
-    private final AuthUtils authUtils;
 
     @GetMapping
     public ResponseEntity<PageResponse<EvaluationResponse>> getAllPaged(
@@ -28,19 +28,16 @@ public class EvaluationAdminController {
             @RequestParam(required = false) Integer rating,
             @RequestParam(required = false) String testId
     ) {
-        authUtils.requirePermission(PermissionCatalog.EVALUATION_MANAGE);
         return ResponseEntity.ok(evaluationService.getAllPaged(page, size, keyword, rating, testId));
     }
 
     @GetMapping("/stats")
     public ResponseEntity<List<EvaluationTestStatsResponse>> getStatsByTest() {
-        authUtils.requirePermission(PermissionCatalog.EVALUATION_MANAGE);
         return ResponseEntity.ok(evaluationService.getStatsByTest());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
-        authUtils.requirePermission(PermissionCatalog.EVALUATION_MANAGE);
         evaluationService.delete(id);
         return ResponseEntity.noContent().build();
     }

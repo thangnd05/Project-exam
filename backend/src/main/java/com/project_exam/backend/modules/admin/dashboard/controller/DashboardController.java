@@ -7,7 +7,7 @@ import com.project_exam.backend.modules.admin.dashboard.dto.MonthlyPerformanceRe
 import com.project_exam.backend.modules.admin.dashboard.dto.TrafficLocationsResponse;
 import com.project_exam.backend.modules.admin.dashboard.service.DashboardService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.shared.security.RequirePermission;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -22,36 +22,32 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestController
+@RequirePermission(PermissionCatalog.DASHBOARD_VIEW)
 @RequestMapping("/api/admin/dashboard")
 @RequiredArgsConstructor
 public class DashboardController {
 
     private final DashboardService dashboardService;
-    private final AuthUtils authUtils;
 
     @GetMapping("/stats")
     public ResponseEntity<DashboardStatsResponse> getStats() {
-        authUtils.requirePermission(PermissionCatalog.DASHBOARD_VIEW);
         return ResponseEntity.ok(dashboardService.getStats());
     }
 
     @GetMapping("/monthly-performance")
     public ResponseEntity<MonthlyPerformanceResponse> getMonthlyPerformance(
             @RequestParam(required = false) Integer year) {
-        authUtils.requirePermission(PermissionCatalog.DASHBOARD_VIEW);
         return ResponseEntity.ok(dashboardService.getMonthlyPerformance(year));
     }
 
     @GetMapping("/content-insights")
     public ResponseEntity<ContentInsightsResponse> getContentInsights() {
-        authUtils.requirePermission(PermissionCatalog.DASHBOARD_VIEW);
         return ResponseEntity.ok(dashboardService.getContentInsights());
     }
 
     @GetMapping("/traffic-locations")
     public ResponseEntity<TrafficLocationsResponse> getTrafficLocations(
             @RequestParam(required = false) String month) {
-        authUtils.requirePermission(PermissionCatalog.DASHBOARD_VIEW);
         YearMonth parsed = null;
         if (month != null && !month.isBlank()) {
             try {
@@ -66,7 +62,6 @@ public class DashboardController {
     @GetMapping("/traffic-heatmap")
     public ResponseEntity<List<DayHours>> getTrafficHeatmap(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        authUtils.requirePermission(PermissionCatalog.DASHBOARD_VIEW);
         return ResponseEntity.ok(dashboardService.getTrafficHeatmap(endDate));
     }
 }

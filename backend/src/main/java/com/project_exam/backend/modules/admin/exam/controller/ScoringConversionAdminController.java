@@ -4,7 +4,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.ScoringConversionReq
 import com.project_exam.backend.modules.assessment.exam.dto.ScoringConversionResponse;
 import com.project_exam.backend.modules.assessment.exam.service.ScoringConversionService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
-import com.project_exam.backend.shared.util.AuthUtils;
+import com.project_exam.backend.shared.security.RequirePermission;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,18 +13,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequirePermission(PermissionCatalog.SCORING_CONVERSION_MANAGE)
 @RequestMapping("/api/admin/scoring-conversions")
 @RequiredArgsConstructor
 public class ScoringConversionAdminController {
 
     private final ScoringConversionService scoringConversionService;
-    private final AuthUtils authUtils;
 
     @PostMapping
     public ResponseEntity<ScoringConversionResponse> create(
             @Valid @RequestBody ScoringConversionRequest request
     ) {
-        authUtils.requirePermission(PermissionCatalog.SCORING_CONVERSION_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(scoringConversionService.create(request));
     }
 
@@ -32,7 +31,6 @@ public class ScoringConversionAdminController {
     public ResponseEntity<List<ScoringConversionResponse>> createBulk(
             @RequestBody List<ScoringConversionRequest> requests
     ) {
-        authUtils.requirePermission(PermissionCatalog.SCORING_CONVERSION_MANAGE);
         return ResponseEntity.status(HttpStatus.CREATED).body(scoringConversionService.createBulk(requests));
     }
 
@@ -41,13 +39,11 @@ public class ScoringConversionAdminController {
             @PathVariable String id,
             @Valid @RequestBody ScoringConversionRequest request
     ) {
-        authUtils.requirePermission(PermissionCatalog.SCORING_CONVERSION_MANAGE);
         return ResponseEntity.ok(scoringConversionService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
-        authUtils.requirePermission(PermissionCatalog.SCORING_CONVERSION_MANAGE);
         scoringConversionService.delete(id);
         return ResponseEntity.noContent().build();
     }
