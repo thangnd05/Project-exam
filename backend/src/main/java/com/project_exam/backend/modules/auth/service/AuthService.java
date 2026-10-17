@@ -133,7 +133,7 @@ public class AuthService {
 
         UserDetails userDetails;
         try {
-            userDetails = customUserDetailsService.loadUserByUsername(username);
+            userDetails = customUserDetailsService.loadUserByEmail(username);
         } catch (UsernameNotFoundException e) {
             // Tài khoản đã bị xoá (mềm) sau khi cấp token.
             throw new UnauthorizedException("Tài khoản không còn tồn tại");

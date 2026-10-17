@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,8 +30,10 @@ public class AuditLogService {
     private final AuditLogMapper auditLogMapper;
     private static final List<String> LOGIN_ACTIONS = List.of("LOGIN", "LOGOUT");
 
-    public AuditLog save(AuditLog auditLog) {
-        return auditLogRepository.save(auditLog);
+    // Ghi nền để request không phải chờ thêm 1 lệnh INSERT (và giữ kết nối DB lâu hơn).
+    @Async("auditExecutor")
+    public void save(AuditLog auditLog) {
+        auditLogRepository.save(auditLog);
     }
 
     public PageResponse<AuditLogResponse> getRecentLogs(String userId, int page, int size) {

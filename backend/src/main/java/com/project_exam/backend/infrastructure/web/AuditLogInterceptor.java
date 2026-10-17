@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.time.Instant;
 import java.util.Set;
 
 @Component
@@ -21,7 +22,8 @@ public class AuditLogInterceptor implements HandlerInterceptor {
     private static final Set<String> SKIP_POST_ENDPOINTS = Set.of(
             "/api/analytics/visit",
             "/api/auth/refresh",
-            "/api/user-answers/batch"
+            "/api/user-answers/batch",
+            "/api/user-answers/guest/batch"
     );
 
     private final AuditLogService auditLogService;
@@ -59,6 +61,8 @@ public class AuditLogInterceptor implements HandlerInterceptor {
         int statusCode = response.getStatus();
         auditLog.setStatusCode(statusCode);
         auditLog.setSuccess(statusCode >= 200 && statusCode < 400);
+        // Ghi nền có thể trễ một chút: chốt thời điểm ngay lúc request kết thúc.
+        auditLog.setCreatedAt(Instant.now());
 
         auditLogService.save(auditLog);
     }

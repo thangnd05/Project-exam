@@ -84,6 +84,44 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     List<UserTest> findByUserIdAndTestIdOrderByStartedAtDesc(String userId, String testId);
     List<UserTest> findByTestIdAndStatus(String testId, UserTest.Status status);
 
+    interface LeaderboardRow {
+        String getUserTestId();
+        String getUserId();
+        Long getRank();
+        Long getTotal();
+    }
+
+    // Bảng xếp hạng tính ngay trong DB: mỗi người lấy lượt tốt nhất (điểm cao, rồi làm nhanh),
+    // xếp hạng toàn bộ nhưng chỉ trả về top :limit cùng dòng của :userId, kèm tổng số người.
+    @Query(value = """
+            WITH best AS (
+                SELECT DISTINCT ON (ut.user_id)
+                       ut.user_test_id, ut.user_id, ut.total_score,
+                       ut.finished_at - ut.started_at AS taken
+                FROM assessment.user_tests ut
+                WHERE ut.test_id = :testId
+                  AND ut.status = :status
+                  AND (ut.mode IS NULL OR ut.mode <> :practiceMode)
+                  AND ut.deleted_at IS NULL
+                ORDER BY ut.user_id, ut.total_score DESC NULLS LAST, taken ASC NULLS LAST, ut.user_test_id
+            ), ranked AS (
+                SELECT b.user_test_id, b.user_id,
+                       ROW_NUMBER() OVER (ORDER BY b.total_score DESC NULLS LAST, b.taken ASC NULLS LAST,
+                                                   b.user_test_id) AS rn,
+                       COUNT(*) OVER () AS total
+                FROM best b
+            )
+            SELECT r.user_test_id AS "userTestId", r.user_id AS "userId", r.rn AS "rank", r.total AS "total"
+            FROM ranked r
+            WHERE r.rn <= :limit OR r.user_id = :userId
+            ORDER BY r.rn
+            """, nativeQuery = true)
+    List<LeaderboardRow> findLeaderboardRows(@Param("testId") String testId,
+                                             @Param("status") String status,
+                                             @Param("practiceMode") String practiceMode,
+                                             @Param("userId") String userId,
+                                             @Param("limit") int limit);
+
     @Query("""
             SELECT ut FROM UserTest ut
             WHERE ut.status = :status

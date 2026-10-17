@@ -861,49 +861,45 @@ public class UserTestService {
             return leaderboardMapper.toEmpty();
         }
 
-        List<UserTest> list = userTestRepository.findByTestIdAndStatus(testId, UserTest.Status.COMPLETED).stream()
-                .filter(u -> u.getMode() != UserTest.Mode.PRACTICE)
-                .toList();
-        Map<String, UserTest> bestAttemptByUser = new HashMap<>();
-        for (UserTest attempt : list) {
-            String userId = attempt.getUserId();
-            UserTest currentBest = bestAttemptByUser.get(userId);
-
-            if (currentBest == null || isBetterAttempt(attempt, currentBest)) {
-                bestAttemptByUser.put(userId, attempt);
-            }
+        // Lọc lượt tốt nhất + xếp hạng làm trong DB, chỉ kéo về top + dòng của mình
+        // thay vì nạp mọi lượt thi của đề vào RAM. "" thay null để Postgres không phải đoán kiểu tham số.
+        List<UserTestRepository.LeaderboardRow> rows = userTestRepository.findLeaderboardRows(
+                testId,
+                UserTest.Status.COMPLETED.name(),
+                UserTest.Mode.PRACTICE.name(),
+                currentUserId != null ? currentUserId : "",
+                LEADERBOARD_TOP_LIMIT);
+        if (rows.isEmpty()) {
+            return leaderboardMapper.toResponse(new ArrayList<>(), null, 0);
         }
-        Map<String, String> userNameById = loadUserNames(bestAttemptByUser.values());
 
-        List<UserTestResponse> ranked = bestAttemptByUser.values().stream()
-                .map(u -> userTestMapper.toResponse(u, test.getExamTypeId(), userNameById.get(u.getUserId())))
-                .sorted(
-                        Comparator
-                                .comparing(UserTestResponse::getTotalScore, Comparator.nullsLast(Comparator.reverseOrder()))
-                                .thenComparing(UserTestResponse::getDurationTaken, Comparator.nullsLast(Comparator.naturalOrder()))
-                )
-                .collect(Collectors.toList());
+        Map<String, UserTest> attemptById = userTestRepository
+                .findAllById(rows.stream().map(UserTestRepository.LeaderboardRow::getUserTestId).toList())
+                .stream()
+                .collect(Collectors.toMap(UserTest::getUserTestId, u -> u));
+        Map<String, String> userNameById = loadUserNames(attemptById.values());
 
+        List<UserTestResponse> entries = new ArrayList<>();
         TestLeaderboardResponse.MyRank me = null;
-        if (currentUserId != null) {
-            for (int i = 0; i < ranked.size(); i++) {
-                UserTestResponse r = ranked.get(i);
-                if (currentUserId.equals(r.getUserId())) {
-                    me = leaderboardMapper.toMyRank(
-                            i + 1,
-                            r.getUserTestId(),
-                            r.getTotalScore(),
-                            r.getDurationTaken());
-                    break;
-                }
+        for (UserTestRepository.LeaderboardRow row : rows) {
+            UserTest attempt = attemptById.get(row.getUserTestId());
+            if (attempt == null) continue;
+            UserTestResponse response = userTestMapper.toResponse(
+                    attempt, test.getExamTypeId(), userNameById.get(attempt.getUserId()));
+
+            if (row.getRank() <= LEADERBOARD_TOP_LIMIT) {
+                entries.add(response);
+            }
+            if (currentUserId != null && currentUserId.equals(row.getUserId())) {
+                me = leaderboardMapper.toMyRank(
+                        row.getRank().intValue(),
+                        response.getUserTestId(),
+                        response.getTotalScore(),
+                        response.getDurationTaken());
             }
         }
 
-        List<UserTestResponse> entries = ranked.size() > LEADERBOARD_TOP_LIMIT
-                ? new ArrayList<>(ranked.subList(0, LEADERBOARD_TOP_LIMIT))
-                : ranked;
-
-        return leaderboardMapper.toResponse(entries, me, ranked.size());
+        return leaderboardMapper.toResponse(entries, me, rows.get(0).getTotal().intValue());
     }
 
     private void requireLeaderboardViewAccess(Test test, String currentUserId) {
@@ -924,19 +920,6 @@ public class UserTestService {
         if (!isTeacher && !isMember) {
             throw new ForbiddenException("Bạn không thuộc lớp này nên không xem được bảng xếp hạng.");
         }
-    }
-
-    private boolean isBetterAttempt(UserTest candidate, UserTest currentBest) {
-        int candidateScore = candidate.getTotalScore() != null ? candidate.getTotalScore() : Integer.MIN_VALUE;
-        int currentBestScore = currentBest.getTotalScore() != null ? currentBest.getTotalScore() : Integer.MIN_VALUE;
-
-        if (candidateScore != currentBestScore) {
-            return candidateScore > currentBestScore;
-        }
-
-        Long candidateDuration = getDurationTaken(candidate);
-        Long currentBestDuration = getDurationTaken(currentBest);
-        return candidateDuration < currentBestDuration;
     }
 
     private long getDurationTaken(UserTest userTest) {

@@ -65,12 +65,25 @@ public class CustomUserDetailsService implements UserDetailsService {
         //     throw new UsernameNotFoundException("Tài khoản chưa được xác thực qua email.");
         // }
 
-        Role role = roleRepository.findById(user.getRoleId())
+        return toUserDetails(user);
+    }
+
+    // Subject của access/refresh token luôn là email: tra thẳng theo email, khỏi thử username trước
+    // (lần thử đó luôn trượt và tốn thêm 1 query cho mọi request đã đăng nhập).
+    public UserDetails loadUserByEmail(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("Không tìm thấy người dùng với: " + email));
+        return toUserDetails(user);
+    }
+
+    private UserDetails toUserDetails(User user) {
+        RoleAuthorityCache.RoleAuthorities role = roleAuthorityCache.authoritiesOf(user.getRoleId())
                 .orElseThrow(() -> new NotFoundException("Không tìm thấy Role ID: " + user.getRoleId()));
 
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleName().toUpperCase()));
-        for (String code : roleAuthorityCache.permissionCodesOf(role.getRoleId())) {
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.roleName().toUpperCase()));
+        for (String code : role.permissionCodes()) {
             authorities.add(new SimpleGrantedAuthority(code));
         }
 

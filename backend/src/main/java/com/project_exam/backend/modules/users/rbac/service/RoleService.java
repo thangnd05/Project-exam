@@ -67,6 +67,8 @@ public class RoleService {
         }
         if (request.getDescription() != null) role.setDescription(request.getDescription());
         role = roleRepository.save(role);
+        // Tên role nằm trong RoleAuthorityCache (dùng làm ROLE_xxx): đổi tên thì xoá cache.
+        roleAuthorityCache.invalidateAfterCommit(id);
         return toResponse(role);
     }
 

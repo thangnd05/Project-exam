@@ -20,11 +20,6 @@ public class VocabularyAlbumController {
     private final VocabularyAlbumService service;
     private final AuthUtils authUtils;
 
-    @GetMapping
-    public ResponseEntity<List<VocabularyAlbumResponse>> getAll() {
-        return ResponseEntity.ok(service.findAll());
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<VocabularyAlbumResponse> getById(@PathVariable String id) {
         return ResponseEntity.ok(service.findById(id));

@@ -20,11 +20,6 @@ public class VocabularyController {
     private final GeminiService geminiService;
     private final AuthUtils authUtils;
 
-    @GetMapping
-    public ResponseEntity<List<VocabularyResponse>> getAll() {
-        return ResponseEntity.ok(service.findAll());
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<VocabularyResponse> getById(@PathVariable String id) {
         return ResponseEntity.ok(service.findById(id));
