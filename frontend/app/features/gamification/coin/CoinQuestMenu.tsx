@@ -6,9 +6,9 @@ import classNames from 'classnames/bind';
 
 import {getMyQuests, QUESTS_QUERY_KEY} from '@/app/apis/questApi';
 import {useAuth} from '@/app/hooks/useAuth';
-import CoinBadge from './CoinBadge';
-import QuestModal from './QuestModal';
-import style from './CoinQuestMenu.module.scss';
+import CoinBadge from '@/app/features/gamification/coin/CoinBadge';
+import QuestModal from '@/app/features/gamification/coin/QuestModal';
+import style from '@/app/features/gamification/coin/CoinQuestMenu.module.scss';
 
 const cx = classNames.bind(style);
 

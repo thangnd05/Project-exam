@@ -3,9 +3,9 @@
 import {Form} from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
-import TagSelector from '@/app/components/TagSelector/TagSelector';
+import TagSelector from '@/app/features/tests/TagSelector/TagSelector';
 import type {TagResponse} from '@/app/types';
-import type {RecoveryExamTypeOption} from '../_hooks/useRecoveryResources';
+import type {RecoveryExamTypeOption} from '@/app/(admin)/admin/recovery-resources/_hooks/useRecoveryResources';
 
 export interface RecoveryResourceFormState {
   title: string;

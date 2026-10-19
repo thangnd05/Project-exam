@@ -15,11 +15,11 @@ import {
 import { toast } from 'react-toastify';
 
 import BaseModal from '@/app/components/modal/BaseModal';
-import RecoveryResourceLink from '@/app/components/RecoveryResourceLink/RecoveryResourceLink';
+import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
 import { getTestPartsSummary } from '@/app/apis/testApi';
 import { getResourcesByParts } from '@/app/apis/recoveryResourceApi';
 import type { TestPartSummaryResponse, TestResponse } from '@/app/types';
-import styles from './TestModeModal.module.scss';
+import styles from '@/app/features/tests/TestModeModal/TestModeModal.module.scss';
 
 const cx = classNames.bind(styles);
 

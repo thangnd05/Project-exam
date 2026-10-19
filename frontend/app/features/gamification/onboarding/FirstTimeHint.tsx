@@ -4,7 +4,7 @@ import {useEffect, useRef, useState} from 'react';
 import type {ReactNode} from 'react';
 import {Overlay, Popover} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import styles from './FirstTimeHint.module.scss';
+import styles from '@/app/features/gamification/onboarding/FirstTimeHint.module.scss';
 
 const cx = classNames.bind(styles);
 

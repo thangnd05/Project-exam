@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { switchPlan } from '@/app/apis/learningPlanApi';
-import { invalidatePlanQueries } from '@/app/components/learning-plans/hooks/plan-cache';
+import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache';
 
 type UseSwitchPlanOptions = {
   onSuccess?: (...args: unknown[]) => void;

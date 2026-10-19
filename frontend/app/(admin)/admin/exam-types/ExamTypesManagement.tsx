@@ -10,11 +10,11 @@ import routes from '@/app/configs/Routes';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ExamTypeFormModal, {type ExamTypeFormState} from './_components/ExamTypeFormModal';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
 import {useAdminExamTypes} from '@/app/(admin)/admin/exam-types/_hooks/useAdminExamTypes';
 import type {ExamTypeResponse} from '@/app/types';
 
-import styles from '@/app/(admin)/admin/question-collections/QuestionCollectionsManagement.module.scss';
+import styles from '@/app/(admin)/_components/common/adminTree.module.scss';
 
 const cx = classNames.bind(styles);
 

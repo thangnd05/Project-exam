@@ -5,7 +5,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {getExamTypes} from '@/app/apis/examTypeApi';
 import {getExamPartsByExamType} from '@/app/apis/examPartApi';
 import {createTag, deleteTag, getTagsFlatByExamType, updateTag} from '@/app/apis/tagApi';
-import {examTypeKeys} from '@/app/hooks/useExamTypes';
+import {examTypeKeys} from '@/app/features/exam-types/hooks/useExamTypes';
 import type {ExamPartResponse, TagRequest, TagResponse} from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 

@@ -11,11 +11,11 @@ import {
   IoPeopleOutline,
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
-import styles from './TestManagementTable.module.scss';
-import {getTestStatus} from '@/app/utils/testStatusHelper';
-import type {TestStatusInfo} from '@/app/utils/testStatusHelper';
-import EditTestModal from '@/app/components/tests/EditTestModal';
-import type {EditableTest} from '@/app/components/tests/EditTestModal';
+import styles from '@/app/features/tests/TestManagementTable/TestManagementTable.module.scss';
+import {getTestStatus} from '@/app/features/tests/testStatusHelper';
+import type {TestStatusInfo} from '@/app/features/tests/testStatusHelper';
+import EditTestModal from '@/app/features/tests/EditTestModal';
+import type {EditableTest} from '@/app/features/tests/EditTestModal';
 import type {TestResponse} from '@/app/types';
 
 const cx = classNames.bind(styles);

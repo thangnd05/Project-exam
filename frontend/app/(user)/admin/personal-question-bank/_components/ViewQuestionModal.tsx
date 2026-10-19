@@ -5,7 +5,7 @@ import {Spinner, Alert} from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {toast} from 'react-toastify';
-import {useQuestionDetail} from '@/app/components/tests/hooks/useQuestionDetail';
+import {useQuestionDetail} from '@/app/features/tests/hooks/useQuestionDetail';
 import classNames from 'classnames/bind';
 import {
   CheckCircle,
@@ -15,9 +15,9 @@ import {
   getExtraTextContents,
   getPassageMediaItems,
   PassageMediaList,
-} from '@/app/components/tests/passageMedia';
-import styles from '@/app/components/tests/EditQuestionModal.module.scss';
-import createStyles from '@/app/components/tests/CreateTestModal.module.scss';
+} from '@/app/features/tests/passageMedia';
+import styles from '@/app/features/tests/EditQuestionModal.module.scss';
+import createStyles from '@/app/features/tests/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 const cxCreate = classNames.bind(createStyles);

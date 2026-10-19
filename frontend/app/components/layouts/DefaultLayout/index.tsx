@@ -5,10 +5,10 @@ import {useLayoutEffect, useRef} from 'react';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
 import styles from './DefaultLayout.module.scss';
-import Header from '../Header';
-import Footer from '../Footer';
-import ScrollToTop from '../ScrollToTop';
-import MobileBottomNav from '../MobileBottomNav';
+import Header from '@/app/components/layouts/Header';
+import Footer from '@/app/components/layouts/Footer';
+import ScrollToTop from '@/app/components/layouts/ScrollToTop';
+import MobileBottomNav from '@/app/components/layouts/MobileBottomNav';
 
 const cx = classNames.bind(styles);
 

@@ -6,8 +6,8 @@ import classNames from 'classnames/bind';
 import { Award, Maximize2 } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
-import { usePublicCertificates } from '@/app/components/certificates/hooks/useCertificates';
+import CertificateCanvas from '@/app/features/certificates/CertificateCanvas/CertificateCanvas';
+import { usePublicCertificates } from '@/app/features/certificates/hooks/useCertificates';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import CertificatePreviewModal from './CertificatePreviewModal';
 import styles from './CertificateWall.module.scss';

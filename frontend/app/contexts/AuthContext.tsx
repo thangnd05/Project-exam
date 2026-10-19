@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { queryClient } from '@/app/configs/queryClient';
 import { getCurrentUser, logout as logoutRequest } from '@/app/apis/authApi';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
-import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
+import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
 import routes from '@/app/configs/Routes';
 
 export type AuthUser = {

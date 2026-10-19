@@ -7,12 +7,12 @@ import {Check, Pencil, Plus, Trash2, X} from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import useMilestoneScoring from '@/app/components/my-target/hooks/useMilestoneScoring';
+import useMilestoneScoring from '@/app/features/my-target/hooks/useMilestoneScoring';
 import {
   AdminFieldError,
   AdminPageHeader,
   AdminToolbar,
-} from '@/app/components/admin/common';
+} from '@/app/(admin)/_components/common';
 import type {ExamPartResponse, MilestoneResponse, PartRequirementResponse} from '@/app/types';
 import {useMilestones} from './_hooks/useMilestones';
 import styles from './MilestonesManagement.module.scss';

@@ -2,7 +2,7 @@
 
 import classNames from 'classnames/bind';
 import type {CosmeticResponse} from '@/app/types';
-import styles from './AvatarWithCosmetic.module.scss';
+import styles from '@/app/features/gamification/cosmetic/AvatarWithCosmetic.module.scss';
 
 const cx = classNames.bind(styles);
 

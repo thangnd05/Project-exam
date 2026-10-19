@@ -6,9 +6,9 @@ import type {
   ExamPart,
   ExamQuestion,
   QuestionIndexMap,
-} from '@/app/components/exam-layout/examLayoutTypes';
-import type { LayoutConfig } from '@/app/components/exam-layout/layoutSchema';
-import { isListeningStep, passageHasAudio } from './passageUtils';
+} from '@/app/features/exam-layout/examLayoutTypes';
+import type { LayoutConfig } from '@/app/features/exam-layout/layoutSchema';
+import { isListeningStep, passageHasAudio } from '@/app/(guest-exam)/tests/[testId]/start/_lib/passageUtils';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 type UseExamFlowNavigationParams = {

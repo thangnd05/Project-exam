@@ -8,15 +8,15 @@ import {useAdminCosmetics} from './_hooks/useAdminCosmetics';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
+import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import images from '@/app/assets/images';
 import {
   AdminFieldError,
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/components/admin/common';
-import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+} from '@/app/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
 import {CosmeticType} from '@/app/enums';
 import type {CosmeticResponse} from '@/app/types';
 

@@ -1,5 +1,5 @@
-import { getRecoveryResourceLinkProps } from '@/app/utils/recoveryResource';
-import type { RecoveryResourceLike } from '@/app/utils/recoveryResource';
+import { getRecoveryResourceLinkProps } from '@/app/features/resources/recoveryResource';
+import type { RecoveryResourceLike } from '@/app/features/resources/recoveryResource';
 import { getApiBaseUrl } from '@/app/utils/mediaUrl';
 
 const API_BASE = getApiBaseUrl();

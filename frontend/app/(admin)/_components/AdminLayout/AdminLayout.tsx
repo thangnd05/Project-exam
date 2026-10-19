@@ -38,7 +38,7 @@ import {
 import routes from '@/app/configs/Routes';
 import { adminPermissionByPath } from '@/app/configs/adminPermissions';
 import { useAuth } from '@/app/hooks/useAuth';
-import styles from './AdminLayout.module.scss';
+import styles from '@/app/(admin)/_components/AdminLayout/AdminLayout.module.scss';
 
 const cx = classNames.bind(styles);
 

@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
 import classNames from 'classnames/bind';
-import RecoveryResourceLink from '@/app/components/RecoveryResourceLink/RecoveryResourceLink';
+import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '@/app/utils/format-date-time';
 import { useTaskHistory } from './_hooks/useTaskHistory';
-import { taskDisplayName, taskStatusLabel } from '@/app/utils/planLabels';
+import { taskDisplayName, taskStatusLabel } from '@/app/features/learning-plans/planLabels';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { SessionStatus } from '@/app/enums';
 

@@ -3,7 +3,7 @@
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 
-import styles from '@/app/components/exam-layout/TestStart.module.scss';
+import styles from '@/app/features/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);
 

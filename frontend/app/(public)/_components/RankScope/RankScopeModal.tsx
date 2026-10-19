@@ -5,7 +5,7 @@ import {Modal} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {FiX} from 'react-icons/fi';
 
-import type {Vendor} from '@/app/utils/certificationMeta';
+import type {Vendor} from '@/app/(public)/_lib/certificationMeta';
 import {displayName, initials, useRankBoard} from './useRankBoard';
 import styles from './RankScopeModal.module.scss';
 

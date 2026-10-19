@@ -7,10 +7,10 @@ import classNames from 'classnames/bind';
 
 import routes from '@/app/configs/Routes';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
-import QuickTestConfirmModal from '../HeroSection/QuickTestConfirmModal';
-import QuickTestPickerModal from '../HeroSection/QuickTestPickerModal';
-import {useQuickChallengeTests} from '../HeroSection/hooks/useQuickChallengeTests';
-import {useQuickTestLauncher} from '../HeroSection/hooks/useQuickTestLauncher';
+import QuickTestConfirmModal from '@/app/(public)/_components/HeroSection/QuickTestConfirmModal';
+import QuickTestPickerModal from '@/app/(public)/_components/HeroSection/QuickTestPickerModal';
+import {useQuickChallengeTests} from '@/app/(public)/_components/HeroSection/hooks/useQuickChallengeTests';
+import {useQuickTestLauncher} from '@/app/(public)/_components/HeroSection/hooks/useQuickTestLauncher';
 import styles from './CertificationOrbit.module.scss';
 
 const cx = classNames.bind(styles);

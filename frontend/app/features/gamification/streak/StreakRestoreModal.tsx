@@ -5,10 +5,10 @@ import classNames from 'classnames/bind';
 import { Flame, CircleDollarSign } from 'lucide-react';
 
 import BaseModal from '@/app/components/modal/BaseModal';
-import { useStreak } from '@/app/components/gamification/streak/hooks/useStreak';
-import { useCoins } from '@/app/components/gamification/coin/hooks/useCoins';
-import { useRestoreStreak } from '@/app/components/gamification/streak/hooks/useRestoreStreak';
-import styles from './StreakRestoreModal.module.scss';
+import { useStreak } from '@/app/features/gamification/streak/hooks/useStreak';
+import { useCoins } from '@/app/features/gamification/coin/hooks/useCoins';
+import { useRestoreStreak } from '@/app/features/gamification/streak/hooks/useRestoreStreak';
+import styles from '@/app/features/gamification/streak/StreakRestoreModal.module.scss';
 
 const cx = classNames.bind(styles);
 

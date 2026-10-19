@@ -1,7 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
-import styles from '../TargetDashboard.module.scss';
+import styles from '@/app/(user)/my-target/dashboard/TargetDashboard.module.scss';
 
 const cx = classNames.bind(styles);
 

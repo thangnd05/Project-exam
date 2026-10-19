@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { getPlanById, getTaskSessions } from '@/app/apis/learningPlanApi';
-import { planDetailKeys } from '@/app/components/learning-plans/hooks/usePlanDetail';
+import { planDetailKeys } from '@/app/features/learning-plans/hooks/usePlanDetail';
 import type { TaskSessionHistoryResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 

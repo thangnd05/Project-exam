@@ -8,13 +8,13 @@ import { motion, type Variants } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
 import { IoEyeOutline, IoHeartOutline, IoChatbubbleOutline, IoBookmarkOutline, IoSearchOutline, IoEllipsisVertical, IoPencilOutline, IoTrashOutline, IoChevronBackOutline, IoChevronForwardOutline, IoImageOutline } from 'react-icons/io5';
 import { toast } from 'react-toastify';
-import { fetchPostById } from '@/app/components/posts/hooks/usePosts';
-import CreatePostModal from '@/app/components/CreatePostModal/CreatePostModal';
+import { fetchPostById } from '@/app/features/posts/hooks/usePosts';
+import CreatePostModal from '@/app/features/posts/CreatePostModal/CreatePostModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import routes from '@/app/configs/Routes';
-import { useMyPosts } from './useMyPosts';
+import { useMyPosts } from '@/app/features/posts/ProfileSectionModal/useMyPosts';
 import type { PostResponse, PostSummaryResponse } from '@/app/types';
-import styles from './PostsListPage.module.scss';
+import styles from '@/app/features/posts/ProfileSectionModal/PostsListPage.module.scss';
 
 const cx = classNames.bind(styles);
 

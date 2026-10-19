@@ -1,5 +1,5 @@
 import { PassageType, QuestionType } from '@/app/enums';
-import type { ExamPart, ExamQuestion, QuestionIndexMap } from '@/app/components/exam-layout/examLayoutTypes';
+import type { ExamPart, ExamQuestion, QuestionIndexMap } from '@/app/features/exam-layout/examLayoutTypes';
 
 export const sampleExamData: { visibleParts: ExamPart[] } = {
   visibleParts: [

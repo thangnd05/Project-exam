@@ -3,7 +3,7 @@
 import classNames from 'classnames/bind';
 import type { QuestionAdminResponse } from '@/app/types';
 
-import styles from './EditQuestionModal.module.scss';
+import styles from '@/app/features/tests/EditQuestionModal.module.scss';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
 
 const cx = classNames.bind(styles);

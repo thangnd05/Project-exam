@@ -13,7 +13,7 @@ import { getQuestionCollections } from '@/app/apis/questionCollectionApi';
 import {
   getCollectionWithDescendantIds,
   isParentCollection,
-} from '@/app/utils/collectionTree';
+} from '@/app/features/tests/collectionTree';
 import type {
   ChapterResponse,
   ExamPartResponse,

@@ -3,8 +3,8 @@
 import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import classNames from 'classnames/bind';
-import PlanResultView from '@/app/components/learning-plans/PlanResultView/PlanResultView';
-import { toPlanResult } from '@/app/utils/planResult';
+import PlanResultView from '@/app/features/learning-plans/PlanResultView/PlanResultView';
+import { toPlanResult } from '@/app/features/learning-plans/planResult';
 import { usePlanSessionReview } from './_hooks/usePlanSessionReview';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 

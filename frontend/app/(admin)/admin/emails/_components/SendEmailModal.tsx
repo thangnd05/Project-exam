@@ -6,9 +6,9 @@ import {toast} from 'react-toastify';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
-import {AdminFieldError} from '@/app/components/admin/common';
+import {AdminFieldError} from '@/app/(admin)/_components/common';
 import type {EmailResponse} from '@/app/types';
-import {useEmailAudience, useEmailMutations} from '../_hooks/useAdminEmails';
+import {useEmailAudience, useEmailMutations} from '@/app/(admin)/admin/emails/_hooks/useAdminEmails';
 
 const PREMIUM_FILTERS = [
   {value: 'ALL', label: 'Tất cả'},

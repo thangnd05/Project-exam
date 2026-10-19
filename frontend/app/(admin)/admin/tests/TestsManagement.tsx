@@ -11,7 +11,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/components/admin/common';
+} from '@/app/(admin)/_components/common';
 import { useAdminTests } from './_hooks/useAdminTests';
 import type { ExamTypeResponse, TestAdminResponse } from '@/app/types';
 

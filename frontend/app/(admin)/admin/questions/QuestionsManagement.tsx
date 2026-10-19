@@ -11,14 +11,14 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '@/app/components/admin/common';
-import type { AdminTableColumn } from '@/app/components/admin/common/AdminTable';
+} from '@/app/(admin)/_components/common';
+import type { AdminTableColumn } from '@/app/(admin)/_components/common/AdminTable';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import EditQuestionModal from '@/app/components/tests/EditQuestionModal';
+import EditQuestionModal from '@/app/features/tests/EditQuestionModal';
 import { UNCLASSIFIED_COLLECTION } from '@/app/apis/questionApi';
-import { useQuestionCollections } from '@/app/components/tests/hooks/useQuestionCollections';
-import { buildCollectionTree } from '@/app/utils/collectionTree';
+import { useQuestionCollections } from '@/app/features/tests/hooks/useQuestionCollections';
+import { buildCollectionTree } from '@/app/features/tests/collectionTree';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { QuestionType, QuestionUsageScope } from '@/app/enums';
 import type {

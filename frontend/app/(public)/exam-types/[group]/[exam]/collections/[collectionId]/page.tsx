@@ -1,6 +1,6 @@
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
-import TestByCollection from '../../../collections/[collectionId]/TestByCollection';
-import { examCollectionMetadata, requireExamType } from '../../../_lib/examTypeRoute';
+import TestByCollection from '@/app/(public)/exam-types/[group]/_components/TestByCollection';
+import { examCollectionMetadata, requireExamType } from '@/app/(public)/exam-types/[group]/_lib/examTypeRoute';
 
 type Props = { params: Promise<{ group: string; exam: string; collectionId: string }> };
 

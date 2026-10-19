@@ -7,14 +7,14 @@ import { IoBookOutline, IoChevronDownOutline, IoChevronUpOutline } from 'react-i
 import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import type { NormalQuestionRequest, PassageQuestionGroupRequest } from '@/app/types';
-import type { DraftQuestion } from '@/app/components/tests/creator/hooks/useCreateTest';
-import Pager, { PAGE_SIZE, pageCountOf } from './Pager';
-import QuestionBlock from './QuestionBlock';
-import { TAG_STATUS_LABEL, previewTagStatus, resolveQuestionTags, shortTag } from './tagStatus';
-import type { TagStatus } from './tagStatus';
-import { fromDraftQuestion, toDraftQuestion } from './jsonPreviewEdit';
-import type { PreviewLocation } from './jsonPreviewEdit';
-import styles from '../CreateTestModal.module.scss';
+import type { DraftQuestion } from '@/app/features/tests/creator/hooks/useCreateTest';
+import Pager, { PAGE_SIZE, pageCountOf } from '@/app/features/tests/creator/Pager';
+import QuestionBlock from '@/app/features/tests/creator/QuestionBlock';
+import { TAG_STATUS_LABEL, previewTagStatus, resolveQuestionTags, shortTag } from '@/app/features/tests/creator/tagStatus';
+import type { TagStatus } from '@/app/features/tests/creator/tagStatus';
+import { fromDraftQuestion, toDraftQuestion } from '@/app/features/tests/creator/jsonPreviewEdit';
+import type { PreviewLocation } from '@/app/features/tests/creator/jsonPreviewEdit';
+import styles from '@/app/features/tests/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 

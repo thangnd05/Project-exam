@@ -14,13 +14,13 @@ import {
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 import { useAuth } from '@/app/hooks/useAuth';
-import { useCosmetics } from '@/app/components/gamification/cosmetic/hooks/useCosmetics';
-import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
+import { useCosmetics } from '@/app/features/gamification/cosmetic/hooks/useCosmetics';
+import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
 import styles from './PostDetail.module.scss';
-import { postsKeys, usePostDetail, usePostComments, useRelatedPosts } from '@/app/components/posts/hooks/usePosts';
+import { postsKeys, usePostDetail, usePostComments, useRelatedPosts } from '@/app/features/posts/hooks/usePosts';
 import { useAddComment, useUpdateComment, useDeleteComment } from './_hooks/useComments';
 import { useToggleReact, useToggleSavePost } from './_hooks/usePostReactions';
 import { ReactType } from '@/app/enums';

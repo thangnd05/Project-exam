@@ -4,7 +4,7 @@ import { Spinner } from 'react-bootstrap';
 import { PlusCircle } from 'lucide-react';
 import { IoRocketOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
-import styles from '../CreateTestModal.module.scss';
+import styles from '@/app/features/tests/CreateTestModal.module.scss';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);

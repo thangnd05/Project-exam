@@ -17,8 +17,8 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '@/app/components/admin/common';
-import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+} from '@/app/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
 import styles from './UsersManagement.module.scss';
 
 const cx = classNames.bind(styles);

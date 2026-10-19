@@ -4,10 +4,10 @@ import {useQueries, useQuery} from '@tanstack/react-query';
 
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
 import {getQuickChallengeLeaderboard} from '@/app/apis/userTestApi';
-import {examTypeKeys} from '@/app/hooks/examTypeKeys';
+import {examTypeKeys} from '@/app/features/exam-types/examTypeKeys';
 import type {QuickLeaderboardEntry} from '@/app/types/attempt';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
-import {badgeUrl, parseCode, parseVendor, type Vendor} from '@/app/utils/certificationMeta';
+import {badgeUrl, parseCode, parseVendor, type Vendor} from '@/app/(public)/_lib/certificationMeta';
 
 export type RankExam = {
   examTypeId: string;

@@ -6,7 +6,7 @@ import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
-import { isPracticeAttempt } from '@/app/utils/planLabels';
+import { isPracticeAttempt } from '@/app/features/learning-plans/planLabels';
 import type { PlanResponse, UserTestResponse } from '@/app/types';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 

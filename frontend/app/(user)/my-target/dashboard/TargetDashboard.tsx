@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
-import { sortPartsByLookup } from '@/app/utils/partOrder';
+import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
+import { sortPartsByLookup } from '@/app/features/exam-types/partOrder';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import {
@@ -13,11 +13,11 @@ import {
   setExamParam,
   useNormalizeExamParam,
   withExam,
-} from '@/app/hooks/useExamParam';
+} from '@/app/features/exam-types/hooks/useExamParam';
 import MockHistoryPanel from './_components/MockHistoryPanel';
 import TargetDashboardPartChart, { type PartChartRow } from './_components/TargetDashboardPartChart';
-import { useTargetDashboard } from '@/app/components/my-target/hooks/useTargetDashboard';
-import { getReadinessClassName, getReadinessLabel } from '@/app/utils/readiness-label';
+import { useTargetDashboard } from '@/app/features/my-target/hooks/useTargetDashboard';
+import { getReadinessClassName, getReadinessLabel } from '@/app/features/my-target/readiness-label';
 import { LearningPlanStatus } from '@/app/enums';
 import pageStyles from './TargetDashboard.module.scss';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';

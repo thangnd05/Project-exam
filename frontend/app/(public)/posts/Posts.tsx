@@ -5,13 +5,13 @@ import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info, Newspaper, Bookmark } from 'lucide-react';
-import { usePosts } from '@/app/components/posts/hooks/usePosts';
+import { usePosts } from '@/app/features/posts/hooks/usePosts';
 import routes from '@/app/configs/Routes';
-import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
+import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import Pagination from '@/app/components/Pagination/Pagination';
-import CreatePostModal from '@/app/components/CreatePostModal/CreatePostModal';
-import ProfileSectionModal from '@/app/components/ProfileSectionModal/ProfileSectionModal';
+import CreatePostModal from '@/app/features/posts/CreatePostModal/CreatePostModal';
+import ProfileSectionModal from '@/app/features/posts/ProfileSectionModal/ProfileSectionModal';
 import styles from './posts.module.scss';
 
 const cx = classNames.bind(styles);

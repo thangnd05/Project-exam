@@ -17,9 +17,9 @@ import {
 
 import { useAuth } from "@/app/hooks/useAuth";
 import { getGuestSessionId, guestHeaders } from "@/app/utils/guestSession";
-import { isBeginnerLevel } from "@/app/utils/learnerLevel";
-import { getScoreScale } from "@/app/utils/scoreScale";
-import { buildPlanFromTestUrl } from "@/app/utils/planFromTest";
+import { isBeginnerLevel } from "@/app/features/learning-plans/learnerLevel";
+import { getScoreScale } from "@/app/features/exam-types/scoreScale";
+import { buildPlanFromTestUrl } from "@/app/(guest)/tests/result/[userTestId]/_lib/planFromTest";
 import { useTestResult } from "./_hooks/useTestResult";
 import { useTestEvaluationPrompt } from "./_hooks/useTestEvaluationPrompt";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";

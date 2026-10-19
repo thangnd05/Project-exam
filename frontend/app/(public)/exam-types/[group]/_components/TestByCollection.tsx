@@ -6,9 +6,9 @@ import { Spinner } from 'react-bootstrap';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 import routes from '@/app/configs/Routes';
 
-import TestListContainer from '@/app/components/tests/TestListContainer/TestListContainer';
+import TestListContainer from '@/app/features/tests/TestListContainer/TestListContainer';
 import Pagination from '@/app/components/Pagination/Pagination';
-import { useCollectionTests, useCollectionName } from './_hooks/useCollectionTests';
+import { useCollectionTests, useCollectionName } from '@/app/(public)/exam-types/[group]/_hooks/useCollectionTests';
 
 const PAGE_SIZE = 12;
 

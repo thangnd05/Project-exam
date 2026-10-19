@@ -14,10 +14,10 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '@/app/components/admin/common';
-import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+} from '@/app/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
 import type {EmailResponse} from '@/app/types';
-import styles from '@/app/components/admin/common/adminKit.module.scss';
+import styles from '@/app/(admin)/_components/common/adminKit.module.scss';
 import EmailEditorModal from './_components/EmailEditorModal';
 import EmailRecipientsModal from './_components/EmailRecipientsModal';
 import SendEmailModal from './_components/SendEmailModal';

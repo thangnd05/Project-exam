@@ -1,11 +1,11 @@
 'use client';
 
-import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
+import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { useCreateClass } from '@/app/components/classes/hooks/useMyClasses';
+import { useCreateClass } from '@/app/features/classes/hooks/useMyClasses';
 import classNames from 'classnames/bind';
 import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import { useAuth } from '@/app/hooks/useAuth';

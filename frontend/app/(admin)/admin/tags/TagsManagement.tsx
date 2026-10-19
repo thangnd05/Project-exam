@@ -7,7 +7,7 @@ import {ChevronDown, ChevronRight, Edit, FileText, Plus, Trash2} from 'lucide-re
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import TagFormModal, {type TagFormState} from './_components/TagFormModal';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
 import {useAdminExamTypesForTags, useExamPartsForTags, useTagList, useTags, type AdminTag} from './_hooks/useTags';
 import type {TagRequest, TagResponse} from '@/app/types';
 import styles from './TagsManagement.module.scss';

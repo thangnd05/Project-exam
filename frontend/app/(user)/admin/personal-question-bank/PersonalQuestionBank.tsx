@@ -13,14 +13,14 @@ import {
   Trash2,
 } from 'lucide-react';
 import classNames from 'classnames/bind';
-import { useBaseMetaData } from '@/app/components/tests/creator/hooks/useBaseMetaData';
+import { useBaseMetaData } from '@/app/features/tests/creator/hooks/useBaseMetaData';
 import { useHasPermission } from '@/app/hooks/usePermission';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import { getQuestionDisplayNumber } from '@/app/utils/questionNumber';
-import { buildCollectionTree } from '@/app/utils/collectionTree';
-import EditQuestionModal from '@/app/components/tests/EditQuestionModal';
+import { getQuestionDisplayNumber } from '@/app/features/tests/questionNumber';
+import { buildCollectionTree } from '@/app/features/tests/collectionTree';
+import EditQuestionModal from '@/app/features/tests/EditQuestionModal';
 import ViewQuestionModal from './_components/ViewQuestionModal';
 import { PermissionCode } from '@/app/enums';
 import { useDeleteQuestion } from './_hooks/useDeleteQuestion';

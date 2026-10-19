@@ -16,9 +16,9 @@ import {
 } from 'lucide-react';
 import classNames from 'classnames/bind';
 
-import {useExamTypeById} from '@/app/hooks/useExamTypes';
+import {useExamTypeById} from '@/app/features/exam-types/hooks/useExamTypes';
 import {useOwnExamTypeLayout, useUpdateExamTypeLayout} from '@/app/(admin)/admin/exam-types/_hooks/useAdminExamTypes';
-import { resolveLayoutConfig } from '@/app/components/exam-layout/resolveLayoutConfig';
+import { resolveLayoutConfig } from '@/app/features/exam-layout/resolveLayoutConfig';
 import {
   defaultLayoutConfig,
   BLOCK_META,
@@ -26,14 +26,14 @@ import {
   ZONES,
   BLOCK_TYPES,
   ADDABLE_BLOCK_TYPES,
-} from '@/app/components/exam-layout/layoutSchema';
-import type { LayoutBlock, LayoutConfig } from '@/app/components/exam-layout/layoutSchema';
-import ExamLayoutRenderer from '@/app/components/exam-layout/ExamLayoutRenderer';
+} from '@/app/features/exam-layout/layoutSchema';
+import type { LayoutBlock, LayoutConfig } from '@/app/features/exam-layout/layoutSchema';
+import ExamLayoutRenderer from '@/app/features/exam-layout/ExamLayoutRenderer';
 import {
   sampleExamData,
   sampleAllQuestions,
   sampleQuestionIndexMap,
-} from '@/app/components/exam-layout/sampleExamData';
+} from '@/app/(admin)/admin/exam-types/[examTypeId]/layout/_lib/sampleExamData';
 import styles from './ExamTypeLayoutEditor.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
 

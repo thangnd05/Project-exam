@@ -7,11 +7,11 @@ import {motion} from 'framer-motion';
 import type {Variants} from 'framer-motion';
 import {IoListOutline, IoGridOutline} from 'react-icons/io5';
 
-import styles from './TestListContainer.module.scss';
+import styles from '@/app/features/tests/TestListContainer/TestListContainer.module.scss';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import PageHeaderViewToggle from '@/app/components/PageHeader/PageHeaderViewToggle';
-import TestCard from '@/app/components/tests/TestCard/TestCard';
-import TestManagementTable from '@/app/components/tests/TestManagementTable/TestManagementTable';
+import TestCard from '@/app/features/tests/TestCard/TestCard';
+import TestManagementTable from '@/app/features/tests/TestManagementTable/TestManagementTable';
 import type {TestResponse} from '@/app/types';
 
 const cx = classNames.bind(styles);

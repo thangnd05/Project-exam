@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import Loading from '@/app/components/Loading/Loading';
-import AuthLayout from '@/app/components/layouts/AuthLayout';
+import AuthLayout from '@/app/(auth)/_components/AuthLayout/AuthLayout';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (

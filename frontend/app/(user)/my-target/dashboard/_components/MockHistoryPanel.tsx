@@ -13,10 +13,10 @@ import {
   formatHourMinute24,
 } from '@/app/utils/format-date-time';
 import type { EnhancedResultResponse } from '@/app/types';
-import type { ScoreScaleSource } from '@/app/utils/scoreScale';
+import type { ScoreScaleSource } from '@/app/features/exam-types/scoreScale';
 import dynamic from 'next/dynamic';
 import type { MockChartPoint } from './MockHistoryCharts';
-import { useMockHistory } from '../_hooks/useMockHistory';
+import { useMockHistory } from '@/app/(user)/my-target/dashboard/_hooks/useMockHistory';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);

@@ -8,13 +8,13 @@ import classNames from 'classnames/bind';
 import {CircleDollarSign, Clock, CheckCircle2} from 'lucide-react';
 
 import {getMyQuests, QUESTS_QUERY_KEY} from '@/app/apis/questApi';
-import {useCoins} from '@/app/components/gamification/coin/hooks/useCoins';
-import {useClaimQuest} from '@/app/components/gamification/coin/hooks/useClaimQuest';
+import {useCoins} from '@/app/features/gamification/coin/hooks/useCoins';
+import {useClaimQuest} from '@/app/features/gamification/coin/hooks/useClaimQuest';
 import BaseModal from '@/app/components/modal/BaseModal';
-import CosmeticShop from '@/app/components/gamification/cosmetic/CosmeticShop';
+import CosmeticShop from '@/app/features/gamification/cosmetic/CosmeticShop';
 import {QuestConditionType} from '@/app/enums';
 import type {UserQuestResponse} from '@/app/types';
-import styles from './QuestModal.module.scss';
+import styles from '@/app/features/gamification/coin/QuestModal.module.scss';
 
 const cx = classNames.bind(styles);
 

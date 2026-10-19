@@ -3,7 +3,7 @@
 import {useQuery} from '@tanstack/react-query';
 
 import {getExamTypeById} from '@/app/apis/examTypeApi';
-import {examTypeKeys} from '@/app/hooks/examTypeKeys';
+import {examTypeKeys} from '@/app/features/exam-types/examTypeKeys';
 import type {ExamTypeResponse} from '@/app/types';
 
 export {examTypeKeys};

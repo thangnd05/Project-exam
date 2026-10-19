@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { useCrudMutations } from '@/app/(admin)/admin/_hooks/useAdminCrud';
+import { useCrudMutations } from '@/app/(admin)/_hooks/useAdminCrud';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getExamParts } from '@/app/apis/examPartApi';
 import { getSkills } from '@/app/apis/skillApi';

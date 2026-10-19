@@ -1,6 +1,6 @@
 'use client';
 
-import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
+import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
@@ -13,13 +13,13 @@ import {
   IoRibbonOutline,
   IoChevronDown,
 } from 'react-icons/io5';
-import TestCard from '@/app/components/tests/TestCard/TestCard';
+import TestCard from '@/app/features/tests/TestCard/TestCard';
 import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
-import { withExam } from '@/app/hooks/useExamParam';
+import { withExam } from '@/app/features/exam-types/hooks/useExamParam';
 
 import style from './TestByExamType.module.scss';
-import TestListContainer from '@/app/components/tests/TestListContainer/TestListContainer';
+import TestListContainer from '@/app/features/tests/TestListContainer/TestListContainer';
 import Pagination from '@/app/components/Pagination/Pagination';
 import { useTestsByExamType } from './_hooks/useTestsByExamType';
 

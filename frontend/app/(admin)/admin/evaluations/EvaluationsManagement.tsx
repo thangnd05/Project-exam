@@ -14,8 +14,8 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '@/app/components/admin/common';
-import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+} from '@/app/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
 import {EVALUATION_GENERAL_FILTER} from '@/app/apis/evaluationApi';
 import type {EvaluationTestStats} from '@/app/types';
 import {

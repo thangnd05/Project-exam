@@ -15,33 +15,11 @@ export type TestStatusInfo = {
   canStart: boolean;
 };
 
-export const formatCountdown = (ms: number): string => {
+const formatCountdown = (ms: number): string => {
     const totalSeconds = Math.floor(ms / 1000);
     const m = Math.floor(totalSeconds / 60);
     const s = totalSeconds % 60;
     return `${m}p ${s}s`;
-};
-
-export const formatDateTime = (dateStr: string | null | undefined): string => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleString('vi-VN', {
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-    });
-};
-
-export const formatFullDateTime = (dateStr: string | null | undefined): string => {
-    if (!dateStr) return '-';
-    return new Date(dateStr).toLocaleString('vi-VN', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-    });
 };
 
 export const getTestStatus = (

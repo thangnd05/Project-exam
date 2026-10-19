@@ -7,10 +7,10 @@ import classNames from 'classnames/bind';
 import { FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
 import { MdCheckCircle, MdErrorOutline } from 'react-icons/md';
 import routes from '@/app/configs/Routes';
-import { useResetPasswordMutation, useResetTokenQuery } from '@/app/components/auth/hooks/useAuthActions';
+import { useResetPasswordMutation, useResetTokenQuery } from '@/app/features/auth/hooks/useAuthActions';
 import type { ResetTokenInvalidReason } from '@/app/types';
-import style from '../_components/auth/AuthRecovery.module.scss';
-import { PASSWORD_HINT, isPasswordValid } from '../_components/auth/passwordRules';
+import style from '@/app/(auth)/_components/auth/AuthRecovery.module.scss';
+import { PASSWORD_HINT, isPasswordValid } from '@/app/(auth)/_components/auth/passwordRules';
 
 const cx = classNames.bind(style);
 

@@ -15,8 +15,8 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/components/admin/common';
-import styles from '@/app/components/admin/common/adminKit.module.scss';
+} from '@/app/(admin)/_components/common';
+import styles from '@/app/(admin)/_components/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 import {useScoringConversion, type ScoringRuleItem} from './_hooks/useScoringConversion';

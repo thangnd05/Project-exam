@@ -6,7 +6,7 @@ import {
   getScoreScale,
   scoreToPercent,
   type ScoreScaleSource,
-} from '@/app/utils/scoreScale';
+} from '@/app/features/exam-types/scoreScale';
 
 type ExamTypeLike = ScoreScaleSource & { examTypeId: string | number; [key: string]: any };
 type ExamPartLike = {

@@ -6,11 +6,11 @@ import {toast} from 'react-toastify';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import {AdminFieldError, AdminTable, StatCard, StatCardGroup} from '@/app/components/admin/common';
-import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import {AdminFieldError, AdminTable, StatCard, StatCardGroup} from '@/app/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
 import {EmailStatus, EmailType} from '@/app/enums';
 import type {EmailRecipientResponse, EmailResponse} from '@/app/types';
-import {useEmailMutations, useEmailRecipients} from '../_hooks/useAdminEmails';
+import {useEmailMutations, useEmailRecipients} from '@/app/(admin)/admin/emails/_hooks/useAdminEmails';
 
 const PAGE_SIZE = 20;
 

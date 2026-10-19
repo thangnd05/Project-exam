@@ -5,34 +5,34 @@ import dynamic from 'next/dynamic';
 import { Row, Col, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
-import { TopTestsTable } from '@/app/components/admin/ContentInsightsTables';
-import { TopCountriesList } from '@/app/components/admin/TopCountriesList';
-import { AdminPageHeader } from '@/app/components/admin/common';
-import OverviewCard from '@/app/components/admin/OverviewCard';
+import { TopTestsTable } from '@/app/(admin)/_components/ContentInsightsTables';
+import { TopCountriesList } from '@/app/(admin)/_components/TopCountriesList';
+import { AdminPageHeader } from '@/app/(admin)/_components/common';
+import OverviewCard from '@/app/(admin)/_components/OverviewCard';
 import {
     useDashboardStats,
     useMonthlyPerformance,
     useContentInsights,
     useTrafficLocations,
-} from '@/app/(admin)/admin/_hooks/useDashboardStats';
+} from '@/app/(admin)/_hooks/useDashboardStats';
 
 import styles from './Analytics.module.scss';
 
 const cx = classNames.bind(styles);
 
 const MonthlyActivityCombo = dynamic(
-    () => import('@/app/components/admin/AdminCharts').then((m) => m.MonthlyActivityCombo),
+    () => import('@/app/(admin)/_components/AdminCharts').then((m) => m.MonthlyActivityCombo),
     { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },
 );
 const MonthlyNewUsersLine = dynamic(
-    () => import('@/app/components/admin/AdminCharts').then((m) => m.MonthlyNewUsersLine),
+    () => import('@/app/(admin)/_components/AdminCharts').then((m) => m.MonthlyNewUsersLine),
     { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },
 );
 const ExamTypeDonut = dynamic(
-    () => import('@/app/components/admin/AdminCharts').then((m) => m.ExamTypeDonut),
+    () => import('@/app/(admin)/_components/AdminCharts').then((m) => m.ExamTypeDonut),
     { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },
 );
-const LocationsMap = dynamic(() => import('@/app/components/admin/LocationsMap'), {
+const LocationsMap = dynamic(() => import('@/app/(admin)/_components/LocationsMap'), {
     ssr: false,
     loading: () => <Spinner animation="border" size="sm" />,
 });

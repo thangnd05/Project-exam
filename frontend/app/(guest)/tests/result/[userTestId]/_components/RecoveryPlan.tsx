@@ -3,9 +3,9 @@
 import { useRouter } from 'next/navigation';
 import { IoCalendarOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
-import { buildPracticeRecoveryMessage, buildRecoveryMessage } from '@/app/utils/readiness-label';
+import { buildPracticeRecoveryMessage, buildRecoveryMessage } from '@/app/features/my-target/readiness-label';
 import type { PartBreakdownResponse } from '@/app/types';
-import { buildPlanFromTestUrl, buildGeneratePlanUrl } from '@/app/utils/planFromTest';
+import { buildPlanFromTestUrl, buildGeneratePlanUrl } from '@/app/(guest)/tests/result/[userTestId]/_lib/planFromTest';
 import styles from './Result.module.scss';
 
 const cx = classNames.bind(styles);

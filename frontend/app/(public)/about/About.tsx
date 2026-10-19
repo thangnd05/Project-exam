@@ -1,6 +1,6 @@
 'use client';
 
-import styles from '../policy/poliSer.module.scss';
+import styles from '@/app/(public)/_components/poliSer.module.scss';
 import classNames from 'classnames/bind';
 import {name} from '@/app/assets/images';
 

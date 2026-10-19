@@ -5,7 +5,7 @@ import classNames from 'classnames/bind';
 import { useQuery } from '@tanstack/react-query';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import { useAuth } from '@/app/hooks/useAuth';
-import { withExam } from '@/app/hooks/useExamParam';
+import { withExam } from '@/app/features/exam-types/hooks/useExamParam';
 import type { ExamTypeResponse } from '@/app/types/exam-type';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 

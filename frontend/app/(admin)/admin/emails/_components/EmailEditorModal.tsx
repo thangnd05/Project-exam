@@ -10,10 +10,10 @@ import RichTextEditor from '@/app/components/RichTextEditor/RichTextEditor';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import {AdminFieldError} from '@/app/components/admin/common';
+import {AdminFieldError} from '@/app/(admin)/_components/common';
 import {EmailType} from '@/app/enums';
 import type {EmailResponse} from '@/app/types';
-import {useEmailMutations} from '../_hooks/useAdminEmails';
+import {useEmailMutations} from '@/app/(admin)/admin/emails/_hooks/useAdminEmails';
 import styles from './EmailEditorModal.module.scss';
 
 const cx = classNames.bind(styles);

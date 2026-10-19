@@ -1,5 +1,5 @@
 import { getPassageMediaByPassageId } from '@/app/apis/passageMediaApi';
-import type { ExamFlowStep } from '@/app/components/exam-layout/examLayoutTypes';
+import type { ExamFlowStep } from '@/app/features/exam-layout/examLayoutTypes';
 
 export const hasMediaList = (p: any) => {
   const list = p?.passageMedias ?? p?.passageMediaList ?? p?.passage_media;

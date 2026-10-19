@@ -4,8 +4,8 @@ import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 
 import BaseModal from '@/app/components/modal/BaseModal';
-import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
-import { useCertificateVerification } from '@/app/components/certificates/hooks/useCertificates';
+import CertificateCanvas from '@/app/features/certificates/CertificateCanvas/CertificateCanvas';
+import { useCertificateVerification } from '@/app/features/certificates/hooks/useCertificates';
 import { CertificateVerifyState } from '@/app/enums';
 import { getCertificateStateView } from './certificateStateView';
 import styles from './CertificatePreviewModal.module.scss';

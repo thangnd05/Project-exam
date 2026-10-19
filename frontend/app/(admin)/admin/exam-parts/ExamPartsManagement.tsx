@@ -14,7 +14,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/components/admin/common';
+} from '@/app/(admin)/_components/common';
 import styles from './ExamPartsManagement.module.scss';
 
 const cx = classNames.bind(styles);

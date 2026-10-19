@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { Spinner, Button } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { IoLockClosedOutline, IoAlertCircleOutline, IoPlayCircleOutline } from 'react-icons/io5';
-import { useExamTypeById } from '@/app/hooks/useExamTypes';
+import { useExamTypeById } from '@/app/features/exam-types/hooks/useExamTypes';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
-import styles from '@/app/components/exam-layout/TestStart.module.scss';
+import styles from '@/app/features/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);
 

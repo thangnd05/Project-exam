@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createNote, updateNote } from '@/app/apis/noteApi';
-import { noteKeys } from '@/app/components/Notes/useNotes';
+import { noteKeys } from '@/app/features/notes/hooks/useNotes';
 import type { NoteRequest, NoteResponse } from '@/app/types';
 
 type SaveNoteVariables = { noteId: string | null; payload: NoteRequest };

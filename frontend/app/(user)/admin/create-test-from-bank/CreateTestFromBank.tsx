@@ -15,11 +15,11 @@ import {
   Settings,
   Shuffle,
 } from 'lucide-react';
-import CoinPriceField from '@/app/components/tests/CoinPriceField';
-import { useBaseMetaData } from '@/app/components/tests/creator/hooks/useBaseMetaData';
-import { durationMinutesFromExamType } from '@/app/hooks/useExamTypes';
-import { getQuestionDisplayNumber } from '@/app/utils/questionNumber';
-import EditQuestionModal from '@/app/components/tests/EditQuestionModal';
+import CoinPriceField from '@/app/features/tests/CoinPriceField';
+import { useBaseMetaData } from '@/app/features/tests/creator/hooks/useBaseMetaData';
+import { durationMinutesFromExamType } from '@/app/features/exam-types/hooks/useExamTypes';
+import { getQuestionDisplayNumber } from '@/app/features/tests/questionNumber';
+import EditQuestionModal from '@/app/features/tests/EditQuestionModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import {
@@ -27,9 +27,9 @@ import {
   SELECTION_MODES,
   defaultPartConfig,
   groupQuestionsByPassage,
-} from '@/app/components/tests/creator/hooks/useBankTestBuilder';
-import type { PartConfigMap } from '@/app/components/tests/creator/hooks/useBankTestBuilder';
-import { useExamCategories } from '@/app/components/tests/creator/hooks/useExamCategories';
+} from '@/app/features/tests/creator/hooks/useBankTestBuilder';
+import type { PartConfigMap } from '@/app/features/tests/creator/hooks/useBankTestBuilder';
+import { useExamCategories } from '@/app/features/tests/creator/hooks/useExamCategories';
 import {
   emptyTestInfo,
   useCreateTestFromBank,

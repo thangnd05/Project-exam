@@ -3,21 +3,21 @@
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { generatePlanKeys } from '@/app/components/learning-plans/hooks/useGeneratePlan';
-import { invalidatePlanQueries } from '@/app/components/learning-plans/hooks/plan-cache';
+import { generatePlanKeys } from '@/app/features/learning-plans/hooks/useGeneratePlan';
+import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache';
 import { toast } from 'react-toastify';
 import { checkActiveUserTest, startUserTest, submitUserTest } from '@/app/apis/userTestApi';
 import { getAnswersByUserTest, batchSaveAnswers, sendAnswersOnExit } from '@/app/apis/userAnswerApi';
 import { getUserTestInfo, purchaseTestAccess } from '@/app/apis/testApi';
 import { getExamTypeLayout } from '@/app/apis/examTypeApi';
-import { resolveLayoutConfig } from '@/app/components/exam-layout/resolveLayoutConfig';
-import { defaultLayoutConfig } from '@/app/components/exam-layout/layoutSchema';
-import type { ExamUserAnswers } from '@/app/components/exam-layout/examLayoutTypes';
+import { resolveLayoutConfig } from '@/app/features/exam-layout/resolveLayoutConfig';
+import { defaultLayoutConfig } from '@/app/features/exam-layout/layoutSchema';
+import type { ExamUserAnswers } from '@/app/features/exam-layout/examLayoutTypes';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { useAuth } from '@/app/hooks/useAuth';
-import { useStreak } from '@/app/components/gamification/streak/hooks/useStreak';
-import { useStreakRestoreGate } from '@/app/components/gamification/streak/hooks/useStreakRestoreGate';
-import { useCoins } from '@/app/components/gamification/coin/hooks/useCoins';
+import { useStreak } from '@/app/features/gamification/streak/hooks/useStreak';
+import { useStreakRestoreGate } from '@/app/features/gamification/streak/hooks/useStreakRestoreGate';
+import { useCoins } from '@/app/features/gamification/coin/hooks/useCoins';
 import { getOrCreateGuestSessionId, guestHeaders } from '@/app/utils/guestSession';
 import {
   clearExamSession,
@@ -36,7 +36,7 @@ import type {
   UserAnswerRequest,
   UserAnswerResponse,
 } from '@/app/types';
-import { enrichTestWithPassageMedia } from './passageUtils';
+import { enrichTestWithPassageMedia } from '@/app/(guest-exam)/tests/[testId]/start/_lib/passageUtils';
 import { useExamFlowNavigation } from './useExamFlowNavigation';
 
 type ActiveTest = Omit<TestResponse, 'testId' | 'status'> & {

@@ -1,33 +1,32 @@
-# Kiến trúc Frontend - Next.js App Router (chuẩn route-colocated)
+# Kiến trúc Frontend - Next.js App Router (route-colocated + features)
 
-> Cấu trúc theo đúng chuẩn của `edusoft-lms`: mọi thứ nằm trong `app/`, code của một
-> trang sống ngay cạnh route của trang đó, chỉ thứ **dùng chung thật sự** mới lên tầng chia sẻ.
+> Mọi thứ nằm trong `app/`. Code của một trang sống ngay cạnh route của trang đó; code nghiệp
+> vụ dùng chung giữa nhiều route nằm ở `app/features/<domain>/`; chỉ UI và hạ tầng không thuộc
+> domain nào mới nằm ở `app/components/`, `app/hooks/`, `app/utils/`.
 
 ## 1. Nguyên tắc
 
-Không còn thư mục `src/`, cũng không còn `features/`. Một màn hình = một thư mục route,
-bên trong có đủ page + component + hook của riêng nó. Cần dùng lại ở nơi khác thì mới
-nâng lên `app/components` / `app/hooks` / `app/utils`.
+Một màn hình = một thư mục route, bên trong có đủ page + component + hook của riêng nó.
+Khác với `src/features/` của cấu trúc cũ, `app/features/` **không chứa page** - nó chỉ chứa
+component/hook nghiệp vụ mà nhiều route cùng dùng.
 
-Thang bậc tái sử dụng: `_components/` của route → `app/components/` → (nếu sau này tách
-package dùng chung nhiều app thì mới tính tiếp).
+Mọi thứ (component, hook, hàm) đặt ở nơi **gần nhất** chứa đủ mọi chỗ dùng nó:
 
-Hook đi theo cùng thang đó, đặt ở nơi **gần nhất** chứa đủ mọi chỗ dùng nó:
-
-1. Chỉ một route (hoặc một nhánh route) dùng → `_hooks/` của route/nhánh đó
-   (vd. `(admin)/admin/_hooks/useAdminCrud.ts` cho mọi trang quản trị).
-2. Chỉ một component dùng chung dùng → `hooks/` trong thư mục component đó
-   (vd. `components/CreatePostModal/hooks/useSavePost.ts`).
-3. Hook nghiệp vụ của một domain, dùng ở nhiều route/nhóm route → `components/<domain>/hooks/`
-   (vd. `components/learning-plans/hooks/usePlanDetail.ts`). Route group tách một domain ra
-   nhiều nhánh (`(guest)/my-target` và `(user)/my-target`) nên domain không có route nào làm
-   "nhà" chung - thư mục domain trong `components/` đóng vai trò đó.
-   Hook đọc context của một domain cũng theo domain đó (vd. `useStreak` nằm ở
-   `components/gamification/streak/hooks/`), dù context vẫn khai ở `app/contexts/`.
-4. Chỉ hạ tầng không thuộc domain nào mới vào `app/hooks/`: người dùng hiện tại và quyền
-   (`useAuth`, `usePermission`), tiện ích thuần (`useDebouncedValue`, `useMounted`), state trên URL (`useSearchParamsState`, `useExamParam`), và phần đọc của danh
-   mục loại đề mà mọi nhóm route đều dùng (`useExamTypes`, `examTypeKeys`). Phần CRUD của danh
-   mục đó thuộc trang admin (`(admin)/admin/exam-types/_hooks/`).
+1. Chỉ một route (hoặc một nhánh route) dùng → `_components/`, `_hooks/`, `_lib/` của
+   route/nhánh đó. Dùng chung cho cả một route group thì đặt ở cấp group
+   (`(admin)/_components`, `(admin)/_hooks/useAdminCrud.ts`, `(public)/_components`) để thư
+   mục URL bên dưới (`(admin)/admin/`) chỉ còn route con.
+2. Chỉ một component dùng → `hooks/` trong thư mục component đó
+   (vd. `features/posts/CreatePostModal/hooks/useSavePost.ts`).
+3. Nghiệp vụ của một domain, dùng ở nhiều route/nhóm route → `app/features/<domain>/`
+   (component ở thư mục PascalCase, hook ở `hooks/`; vd. `features/learning-plans/hooks/usePlanDetail.ts`).
+   Route group tách một domain ra nhiều nhánh (`(guest)/my-target` và `(user)/my-target`)
+   nên domain không có route nào làm "nhà" chung - `features/<domain>` đóng vai trò đó.
+   Hook đọc context của một domain cũng theo domain đó (vd. `features/gamification/streak/hooks/useStreak.ts`),
+   còn context vẫn khai ở `app/contexts/` vì `providers.tsx` lắp tất cả provider một chỗ.
+4. Không thuộc domain nào mới vào tầng chung: UI kit ở `app/components/` (`Button`, `modal`,
+   `layouts`...), hook hạ tầng ở `app/hooks/` (`useAuth`, `usePermission`, `useDebouncedValue`,
+   `useMounted`, `useSearchParamsState`), hàm thuần ở `app/utils/`.
 
 ## 2. Cấu trúc thư mục
 
@@ -44,20 +43,21 @@ frontend/
                                 # mỗi nhóm có layout.tsx + loading.tsx + error.tsx
     apis/                       # axiosClient + 40 *Api.ts (typed Promise<T>)
     assets/                     # ảnh + styles/ (GlobalStyles, mixins, global-overrides)
-    components/                 # UI dùng chung ≥2 route
-      layouts/                  #   DefaultLayout, AdminLayout, Header, Footer, ...
-      admin/                    #   adminKit (AdminTable, StatCard, AdminTabs...) + widget analytics
-      tests/  exam-layout/      #   thành phần đề thi & engine layout làm bài
-      gamification/  learning-plans/  modal/  Button/  ...
-      <domain>/hooks/           #   hook nghiệp vụ theo domain: learning-plans, tests, my-target,
-                                #   certificates, classes, posts, auth, gamification/<x>
+    components/                 # UI kit không thuộc domain nào: Button, modal, Loading, Pagination,
+                                #   PageHeader, MediaImage, RichTextEditor, ErrorView, NotFound, ...
+      layouts/                  #   DefaultLayout + Header, Footer, MobileBottomNav... (AdminLayout,
+                                #   AuthLayout chỉ một nhóm dùng nên ở (admin)/_components, (auth)/_components)
+    features/                   # nghiệp vụ dùng chung ≥2 route, mỗi domain một thư mục:
+      <domain>/                 #   <Component>/ + hooks/ (+ file .ts thuần như examTypeKeys, plan-cache)
+                                #   auth, certificates, classes, exam-layout, exam-types, gamification/<x>,
+                                #   learning-plans, my-target, notes, posts, resources, tests
     hooks/                      # chỉ hook hạ tầng không thuộc domain nào (xem mục 1)
     configs/                    # Routes.ts, adminPermissions.ts (dùng enum PermissionCode), queryClient.ts
     contexts/                   # Auth/Coin/Cosmetic/Streak context
     enums/                      # enum mirror backend (QuestionType, TestStatus, ...)
     types/                      # interface mirror DTO backend, theo domain + index.ts barrel
     utils/                      # hàm thuần dùng chung
-    constants/ helpers/ interfaces/   # placeholder theo chuẩn, dùng khi cần
+    constants/                  # hằng số dùng chung, kể cả cho server component (theme.ts)
   next.config.mjs  tsconfig.json  package.json
 ```
 
@@ -70,6 +70,7 @@ frontend/
   TênMàn.module.scss
   _components/        # component chỉ route này dùng (PascalCase)
   _hooks/             # hook chỉ route này dùng (use-*.ts)
+  _lib/               # hàm thuần / dữ liệu chỉ route này dùng (không phải hook)
   [id]/ create/ ...   # route con lặp lại đúng bộ trên
 ```
 
@@ -98,10 +99,11 @@ mang tên nó, không còn hàng chục `index.js` trùng tên như cấu trúc 
 
 | Cần tìm | Vào đâu |
 |---|---|
-| Component/hook chỉ một trang dùng | `_components/`, `_hooks/` ngay trong thư mục trang |
-| Component dùng ≥2 nơi | `app/components/` (mỗi component một thư mục, không có barrel) |
-| Hook nghiệp vụ dùng ≥2 nơi | `app/components/<domain>/hooks/` |
-| Hook chỉ khu admin dùng (vd. `useAdminCrud`) | `app/(admin)/admin/_hooks/` |
+| Component/hook/hàm chỉ một trang dùng | `_components/`, `_hooks/`, `_lib/` ngay trong thư mục trang; nhiều trang con cùng dùng thì đặt ở thư mục cha gần nhất |
+| Component/hook nghiệp vụ dùng ≥2 route | `app/features/<domain>/` (hook ở `hooks/`) |
+| UI dùng chung không thuộc domain | `app/components/` (mỗi component một thư mục, không có barrel) |
+| Component chỉ khu admin dùng (adminKit, widget analytics) | `app/(admin)/_components/` |
+| Hook chỉ khu admin dùng (vd. `useAdminCrud`) | `app/(admin)/_hooks/` |
 | Hook hạ tầng (user hiện tại, quyền, util, URL state) | `app/hooks/` (không có barrel) |
 | Hàm gọi API | `app/apis/<tên>Api.ts` |
 | Kiểu dữ liệu backend trả về | `app/types/` |
@@ -123,7 +125,7 @@ mang tên nó, không còn hàng chục `index.js` trùng tên như cấu trúc 
     và URI đó phải được khai trong Google Cloud Console.
 - **Chặn đăng nhập hai lớp.** `proxy.ts` (tên mới của `middleware.ts` từ Next 16) chỉ xem có
   cookie `accessToken` hay không rồi đá về `/login?from=...`, bỏ được cú nháy spinner.
-  `AuthGuard` vẫn giữ vì nó mới là chỗ kiểm quyền chi tiết (`requiredPermission`) và xử lý
+  `AuthGuard` (`features/auth/AuthGuard`) vẫn giữ vì nó mới là chỗ kiểm quyền chi tiết (`requiredPermission`) và xử lý
   được trường hợp access token hết hạn nhưng refresh token còn sống.
   - Đổi/bổ sung route cần đăng nhập thì phải sửa `matcher` trong `proxy.ts`, nó không tự
     suy ra từ nhóm route.

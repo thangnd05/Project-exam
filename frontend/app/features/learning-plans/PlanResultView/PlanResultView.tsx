@@ -3,11 +3,11 @@
 import { useMemo } from 'react';
 import classNames from 'classnames/bind';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
-import ReviewQuestionCard from '@/app/components/Review/ReviewQuestionCard';
-import ReviewFooterNav from '@/app/components/Review/ReviewFooterNav';
+import ReviewQuestionCard from '@/app/features/tests/Review/ReviewQuestionCard';
+import ReviewFooterNav from '@/app/features/tests/Review/ReviewFooterNav';
 import { QuestionType } from '@/app/enums';
 import type { SessionReviewItem } from '@/app/types';
-import type { PlanResultData } from '@/app/utils/planResult';
+import type { PlanResultData } from '@/app/features/learning-plans/planResult';
 
 const cx = classNames.bind(styles);
 

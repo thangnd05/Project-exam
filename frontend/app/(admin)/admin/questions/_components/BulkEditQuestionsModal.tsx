@@ -6,11 +6,11 @@ import { Save } from 'lucide-react';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
-import { buildCollectionTree } from '@/app/utils/collectionTree';
+import { buildCollectionTree } from '@/app/features/tests/collectionTree';
 import { QuestionUsageScope } from '@/app/enums';
 import type { BulkUpdateQuestionsRequest, QuestionCollectionResponse } from '@/app/types';
 
-import styles from '../QuestionsManagement.module.scss';
+import styles from '@/app/(admin)/admin/questions/QuestionsManagement.module.scss';
 
 const cx = classNames.bind(styles);
 

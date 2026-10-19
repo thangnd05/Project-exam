@@ -5,12 +5,12 @@ import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { IoPersonCircleOutline, IoCameraOutline } from 'react-icons/io5';
 import { Spinner } from 'react-bootstrap';
-import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
+import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import commonModalStyles from '@/app/components/modal/CommonFormModal.module.scss';
 import styles from './UpdateProfileModal.module.scss';
-import { useMyInfo, useUpdateProfile } from '../_hooks/useUpdateProfile';
+import { useMyInfo, useUpdateProfile } from '@/app/(user)/dashboard/_hooks/useUpdateProfile';
 
 const cmx = classNames.bind(commonModalStyles);
 const cx = classNames.bind(styles);

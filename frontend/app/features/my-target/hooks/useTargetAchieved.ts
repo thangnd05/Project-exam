@@ -5,7 +5,7 @@ import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import { getEnhancedResult } from '@/app/apis/enhancedResultApi';
-import { isMockAttempt } from '@/app/utils/planLabels';
+import { isMockAttempt } from '@/app/features/learning-plans/planLabels';
 import type {
   EnhancedResultResponse,
   ExamTypeResponse,

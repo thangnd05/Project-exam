@@ -4,7 +4,7 @@ import { Form, Row, Col } from 'react-bootstrap';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
-import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
+import CertificateCanvas from '@/app/features/certificates/CertificateCanvas/CertificateCanvas';
 import type { ExamTypeResponse } from '@/app/types';
 
 export interface CertificateTemplateFormState {

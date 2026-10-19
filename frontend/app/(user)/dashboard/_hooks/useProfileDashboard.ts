@@ -6,7 +6,7 @@ import { getProfileOverview, getMyActivity } from '@/app/apis/userApi';
 import { getExamTypes } from '@/app/apis/examTypeApi';
 import { getExamParts } from '@/app/apis/examPartApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
-import { sortPartsByLookup } from '@/app/utils/partOrder';
+import { sortPartsByLookup } from '@/app/features/exam-types/partOrder';
 import type {
   ExamPartResponse,
   ExamTypeResponse,

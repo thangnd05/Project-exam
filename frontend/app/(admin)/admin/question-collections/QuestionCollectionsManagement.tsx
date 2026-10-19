@@ -8,9 +8,9 @@ import classNames from 'classnames/bind';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
 import {useAdminQuestionCollections, type CollectionItem} from './_hooks/useAdminQuestionCollections';
-import styles from './QuestionCollectionsManagement.module.scss';
+import styles from '@/app/(admin)/_components/common/adminTree.module.scss';
 
 const cx = classNames.bind(styles);
 

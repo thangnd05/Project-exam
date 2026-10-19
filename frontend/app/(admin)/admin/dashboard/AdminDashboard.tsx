@@ -5,10 +5,10 @@ import { Row, Col, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
-import TrafficHeatmap from '@/app/components/admin/TrafficHeatmap';
-import OverviewCard from '@/app/components/admin/OverviewCard';
+import TrafficHeatmap from '@/app/(admin)/_components/TrafficHeatmap';
+import OverviewCard from '@/app/(admin)/_components/OverviewCard';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
-import { useDashboardStats, useTrafficHeatmap } from '@/app/(admin)/admin/_hooks/useDashboardStats';
+import { useDashboardStats, useTrafficHeatmap } from '@/app/(admin)/_hooks/useDashboardStats';
 
 const localISODate = (d: Date = new Date()) => {
     const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);

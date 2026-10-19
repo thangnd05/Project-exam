@@ -8,11 +8,11 @@ import {Container} from 'react-bootstrap';
 
 import {getExamTypes} from '@/app/apis/examTypeApi';
 import {getAllResources} from '@/app/apis/recoveryResourceApi';
-import RecoveryResourceLink from '@/app/components/RecoveryResourceLink/RecoveryResourceLink';
-import {examTypeKeys} from '@/app/hooks/examTypeKeys';
+import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
+import {examTypeKeys} from '@/app/features/exam-types/examTypeKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import type {RecoveryResourceResponse} from '@/app/types/resource';
-import {VENDORS, badgeUrl, parseCode, parseVendor, type Vendor} from '@/app/utils/certificationMeta';
+import {VENDORS, badgeUrl, parseCode, parseVendor, type Vendor} from '@/app/(public)/_lib/certificationMeta';
 
 import styles from './ResourceLibrary.module.scss';
 

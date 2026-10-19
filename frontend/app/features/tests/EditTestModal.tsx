@@ -8,10 +8,10 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import { getAdminTestById, shuffleTestQuestions, updateTest } from '@/app/apis/testApi';
 import { getExamTypes } from '@/app/apis/examTypeApi';
-import { durationMinutesFromExamType } from '@/app/hooks/useExamTypes';
+import { durationMinutesFromExamType } from '@/app/features/exam-types/hooks/useExamTypes';
 import { getExamCategories } from '@/app/apis/examCategoryApi';
 import { getQuestionCollections } from '@/app/apis/questionCollectionApi';
-import { buildCollectionTree } from '@/app/utils/collectionTree';
+import { buildCollectionTree } from '@/app/features/tests/collectionTree';
 import { useHasPermission } from '@/app/hooks/usePermission';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -23,10 +23,10 @@ import {
   IoRocketOutline,
   IoShuffleOutline,
 } from 'react-icons/io5';
-import EditQuestionModal from '@/app/components/tests/EditQuestionModal';
+import EditQuestionModal from '@/app/features/tests/EditQuestionModal';
 import { PermissionCode } from '@/app/enums';
 import type { CreateTestRequest, TestAdminResponse, TestResponse } from '@/app/types';
-import createModalStyles from './CreateTestModal.module.scss';
+import createModalStyles from '@/app/features/tests/CreateTestModal.module.scss';
 
 const cxCreate = classNames.bind(createModalStyles);
 

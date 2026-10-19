@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
-import { useCreateChapter } from '../_hooks/useChaptersOfClass';
+import { useCreateChapter } from '@/app/(user)/class/[classId]/chapters/_hooks/useChaptersOfClass';
 import { toast } from 'react-toastify';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';

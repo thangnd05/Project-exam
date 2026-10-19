@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
-import { fetchCurrentUser } from '@/app/components/auth/hooks/useAuthActions';
-import { claimGuestAfterLogin, takeOAuthRedirect } from '@/app/utils/authRedirect';
+import { fetchCurrentUser } from '@/app/features/auth/hooks/useAuthActions';
+import { claimGuestAfterLogin, takeOAuthRedirect } from '@/app/features/auth/authRedirect';
 
 // Quá thời gian này mà chưa lấy được tài khoản thì trả về trang đăng nhập, không để người dùng đứng chờ mãi.
 const SYNC_TIMEOUT_MS = 15000;

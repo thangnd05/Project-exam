@@ -7,7 +7,7 @@ import {getUserTarget} from '@/app/apis/userTargetApi';
 import routes from '@/app/configs/Routes';
 import {useAuth} from '@/app/hooks/useAuth';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
-import {buildLoginUrl} from '@/app/utils/authRedirect';
+import {buildLoginUrl} from '@/app/features/auth/authRedirect';
 
 // Luồng bắt đầu đề kiểm tra nhanh, dùng chung cho hero trang chủ và kho kỳ thi:
 // chọn đề -> hộp xác nhận trình độ -> vào làm bài hoặc sinh lộ trình theo syllabus.

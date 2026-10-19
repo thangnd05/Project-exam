@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { getResourceById, viewResourceContent } from '@/app/apis/recoveryResourceApi';
-import { isMarkdownResource } from '@/app/utils/recoveryResource';
+import { isMarkdownResource } from '@/app/features/resources/recoveryResource';
 import { getApiBaseUrl } from '@/app/utils/mediaUrl';
 import type { RecoveryResourceResponse } from '@/app/types';
 

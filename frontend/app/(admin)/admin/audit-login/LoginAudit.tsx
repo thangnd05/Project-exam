@@ -4,8 +4,8 @@ import { useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
 
 import {formatDateTime} from '@/app/utils/format-date-time';
-import {AdminPageHeader, AdminTable, AdminToolbar} from '@/app/components/admin/common';
-import type {AdminTableColumn} from '@/app/components/admin/common/AdminTable';
+import {AdminPageHeader, AdminTable, AdminToolbar} from '@/app/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
 import {useLoginAudit, type LoginAuditRow} from './_hooks/useLoginAudit';
 
 function LoginAudit() {

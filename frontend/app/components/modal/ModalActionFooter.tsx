@@ -2,7 +2,7 @@
 
 import classNames from 'classnames/bind';
 import styles from './CommonFormModal.module.scss';
-import ButtonPrime from '../Button/ButtonPrime';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);
 

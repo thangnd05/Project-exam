@@ -4,7 +4,7 @@ import classNames from 'classnames/bind';
 
 import MediaImage from '@/app/components/MediaImage/MediaImage';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
-import styles from '@/app/components/exam-layout/examLayout.module.scss';
+import styles from '@/app/features/exam-layout/examLayout.module.scss';
 
 const cx = classNames.bind(styles);
 

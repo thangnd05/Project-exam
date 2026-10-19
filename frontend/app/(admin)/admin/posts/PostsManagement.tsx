@@ -10,9 +10,9 @@ import routes from '@/app/configs/Routes';
 import useDebouncedValue from '@/app/hooks/useDebouncedValue';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
-import { AdminPageHeader, AdminTable, AdminToolbar } from '@/app/components/admin/common';
-import type { AdminTableColumn } from '@/app/components/admin/common/AdminTable';
-import styles from '@/app/components/admin/common/adminKit.module.scss';
+import { AdminPageHeader, AdminTable, AdminToolbar } from '@/app/(admin)/_components/common';
+import type { AdminTableColumn } from '@/app/(admin)/_components/common/AdminTable';
+import styles from '@/app/(admin)/_components/common/adminKit.module.scss';
 import { PostStatus } from '@/app/enums';
 import type { PostSummaryResponse } from '@/app/types';
 

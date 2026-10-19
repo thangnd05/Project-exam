@@ -13,17 +13,17 @@ import images, {imageAssets} from '@/app/assets/images';
 import classNames from 'classnames/bind';
 import {useAuth} from '@/app/hooks/useAuth';
 import routes from '@/app/configs/Routes';
-import {buildLoginUrl} from '@/app/utils/authRedirect';
-// import JoinClassModal from '@/app/components/classes/JoinClassModal/JoinClassModal';
-// import CreateClassModal from '@/app/components/classes/CreateClassModal/CreateClassModal';
-import CreateTestModal from '@/app/components/tests/CreateTestModal';
-import ThemeToggle from '@/app/components/ThemeToggle/ThemeToggle';
-import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
-import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
-import FirstTimeHint from '@/app/components/gamification/onboarding/FirstTimeHint';
-import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
-import {useCosmetics} from '@/app/components/gamification/cosmetic/hooks/useCosmetics';
-import {useStreak} from '@/app/components/gamification/streak/hooks/useStreak';
+import {buildLoginUrl} from '@/app/features/auth/authRedirect';
+// import JoinClassModal from '@/app/features/classes/JoinClassModal/JoinClassModal';
+// import CreateClassModal from '@/app/features/classes/CreateClassModal/CreateClassModal';
+import CreateTestModal from '@/app/features/tests/CreateTestModal';
+import ThemeToggle from '@/app/components/layouts/Header/ThemeToggle/ThemeToggle';
+import StreakBadge from '@/app/features/gamification/streak/StreakBadge';
+import CoinQuestMenu from '@/app/features/gamification/coin/CoinQuestMenu';
+import FirstTimeHint from '@/app/features/gamification/onboarding/FirstTimeHint';
+import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
+import {useCosmetics} from '@/app/features/gamification/cosmetic/hooks/useCosmetics';
+import {useStreak} from '@/app/features/gamification/streak/hooks/useStreak';
 
 const cx = classNames.bind(style);
 

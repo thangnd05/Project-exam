@@ -3,7 +3,7 @@
 import ReactDOM from 'react-dom';
 import classNames from 'classnames/bind';
 import { Trophy, X } from 'lucide-react';
-import styles from './PlanCongratsModal.module.scss';
+import styles from '@/app/features/learning-plans/PlanCongratsModal/PlanCongratsModal.module.scss';
 
 const cx = classNames.bind(styles);
 

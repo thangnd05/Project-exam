@@ -8,12 +8,12 @@ import { IoClipboardOutline, IoLockClosedOutline, IoSchoolOutline, IoStatsChartO
 import dynamic from 'next/dynamic';
 import ChangePasswordModal from './_components/ChangePasswordModal';
 import UpdateProfileModal from './_components/UpdateProfileModal';
-import ProfileSectionModal from '@/app/components/ProfileSectionModal/ProfileSectionModal';
+import ProfileSectionModal from '@/app/features/posts/ProfileSectionModal/ProfileSectionModal';
 import styles from './ProfileOverview.module.scss';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
-import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
-import { useCosmetics } from '@/app/components/gamification/cosmetic/hooks/useCosmetics';
+import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
+import { useCosmetics } from '@/app/features/gamification/cosmetic/hooks/useCosmetics';
 import {
   useProfileOverview,
   useMyTargets,

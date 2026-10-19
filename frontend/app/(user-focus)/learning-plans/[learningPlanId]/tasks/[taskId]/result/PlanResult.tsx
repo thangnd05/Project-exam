@@ -3,11 +3,11 @@
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
-import PlanCongratsModal, { markCongratsSeen } from '@/app/components/learning-plans/PlanCongratsModal/PlanCongratsModal';
-import PlanResultView from '@/app/components/learning-plans/PlanResultView/PlanResultView';
-import { toPlanResult } from '@/app/utils/planResult';
+import PlanCongratsModal, { markCongratsSeen } from '@/app/features/learning-plans/PlanCongratsModal/PlanCongratsModal';
+import PlanResultView from '@/app/features/learning-plans/PlanResultView/PlanResultView';
+import { toPlanResult } from '@/app/features/learning-plans/planResult';
 import { usePlanResult } from './_hooks/usePlanResult';
-import { usePlanDetail } from '@/app/components/learning-plans/hooks/usePlanDetail';
+import { usePlanDetail } from '@/app/features/learning-plans/hooks/usePlanDetail';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { PlanStage } from '@/app/enums';
 

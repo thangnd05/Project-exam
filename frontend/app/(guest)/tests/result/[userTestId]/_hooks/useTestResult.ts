@@ -6,7 +6,7 @@ import { getUserTestMeta } from '@/app/apis/userTestApi';
 import { getResultByUserTest } from '@/app/apis/userAnswerApi';
 import { getUserTestInfo } from '@/app/apis/testApi';
 import { getEnhancedResult, getGuestEnhancedResult } from '@/app/apis/enhancedResultApi';
-import { isMockAttempt } from '@/app/utils/planLabels';
+import { isMockAttempt } from '@/app/features/learning-plans/planLabels';
 import type { EnhancedResultResponse, ResultSummaryResponse } from '@/app/types';
 
 export type TestResultSummary = ResultSummaryResponse & {

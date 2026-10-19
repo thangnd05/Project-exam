@@ -10,12 +10,12 @@ import { toast } from 'react-toastify';
 import {
   useLoginMutation,
   useRegisterMutation,
-} from '@/app/components/auth/hooks/useAuthActions';
+} from '@/app/features/auth/hooks/useAuthActions';
 import {
   getRedirectTarget,
   saveOAuthRedirect,
   claimGuestAfterLogin,
-} from '@/app/utils/authRedirect';
+} from '@/app/features/auth/authRedirect';
 import routes from '@/app/configs/Routes';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
@@ -23,7 +23,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { FiArrowLeft, FiArrowRight, FiAtSign, FiEye, FiEyeOff, FiLock, FiMail, FiUser } from 'react-icons/fi';
 import { imageAssets, name } from '@/app/assets/images';
-import ForgotPassword from '../forgot/ForgotPassword';
+import ForgotPassword from '@/app/(auth)/_components/auth/ForgotPassword';
 import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/(auth)/login/_components/Recaptcha/RecaptchaCheckbox';
 
 const cx = classNames.bind(style);

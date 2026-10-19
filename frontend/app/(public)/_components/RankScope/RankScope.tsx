@@ -9,11 +9,11 @@ import {FiArrowRight, FiRefreshCw} from 'react-icons/fi';
 
 import routes from '@/app/configs/Routes';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
-import type {Vendor} from '@/app/utils/certificationMeta';
-import QuickTestConfirmModal from '../HeroSection/QuickTestConfirmModal';
-import QuickTestPickerModal from '../HeroSection/QuickTestPickerModal';
-import {useQuickChallengeTests} from '../HeroSection/hooks/useQuickChallengeTests';
-import {useQuickTestLauncher} from '../HeroSection/hooks/useQuickTestLauncher';
+import type {Vendor} from '@/app/(public)/_lib/certificationMeta';
+import QuickTestConfirmModal from '@/app/(public)/_components/HeroSection/QuickTestConfirmModal';
+import QuickTestPickerModal from '@/app/(public)/_components/HeroSection/QuickTestPickerModal';
+import {useQuickChallengeTests} from '@/app/(public)/_components/HeroSection/hooks/useQuickChallengeTests';
+import {useQuickTestLauncher} from '@/app/(public)/_components/HeroSection/hooks/useQuickTestLauncher';
 import RankScopeModal from './RankScopeModal';
 import {RANK_BOARD_KEY, displayName, initials, useRankBoard} from './useRankBoard';
 import styles from './RankScope.module.scss';

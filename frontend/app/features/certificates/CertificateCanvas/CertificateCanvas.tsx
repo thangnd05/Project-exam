@@ -3,7 +3,7 @@
 import classNames from 'classnames/bind';
 
 import type { CertificateDesign } from '@/app/types';
-import styles from './CertificateCanvas.module.scss';
+import styles from '@/app/features/certificates/CertificateCanvas/CertificateCanvas.module.scss';
 
 const cx = classNames.bind(styles);
 

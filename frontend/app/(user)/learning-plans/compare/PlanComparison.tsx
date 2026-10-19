@@ -2,16 +2,16 @@
 
 import Link from 'next/link';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
-import { examTypeIdFromParams, setExamParam, useNormalizeExamParam } from '@/app/hooks/useExamParam';
+import { examTypeIdFromParams, setExamParam, useNormalizeExamParam } from '@/app/features/exam-types/hooks/useExamParam';
 
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
+import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import dynamic from 'next/dynamic';
 import { usePlanComparison } from './_hooks/usePlanComparison';
-import { planStageLabel, planStatusLabel, planStatusVariant } from '@/app/utils/planLabels';
+import { planStageLabel, planStatusLabel, planStatusVariant } from '@/app/features/learning-plans/planLabels';
 import pageStyles from './PlanComparison.module.scss';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { LearningPlanStatus } from '@/app/enums';

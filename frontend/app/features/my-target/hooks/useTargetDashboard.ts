@@ -7,8 +7,8 @@ import { getExamParts } from '@/app/apis/examPartApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import { getEnhancedResult } from '@/app/apis/enhancedResultApi';
-import { sortByPartOrder } from '@/app/utils/partOrder';
-import { isMockAttempt } from '@/app/utils/planLabels';
+import { sortByPartOrder } from '@/app/features/exam-types/partOrder';
+import { isMockAttempt } from '@/app/features/learning-plans/planLabels';
 import type {
   EnhancedResultResponse,
   PlanResponse,

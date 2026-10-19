@@ -14,8 +14,8 @@ import classNames from 'classnames/bind';
 import styles from './ClassListContainer.module.scss';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import PageHeaderViewToggle from '@/app/components/PageHeader/PageHeaderViewToggle';
-import ClassCard from '../ClassCard/ClassCard';
-import ClassManagementTable from '../ClassManagementTable/ClassManagementTable';
+import ClassCard from '@/app/(user)/my-classes/_components/ClassCard/ClassCard';
+import ClassManagementTable from '@/app/(user)/my-classes/_components/ClassManagementTable/ClassManagementTable';
 import type { ClassStudentResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);

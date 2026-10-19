@@ -6,20 +6,20 @@ import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
+import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import {
   examTypeIdFromParams,
   setExamParam,
   useNormalizeExamParam,
   withExam,
-} from '@/app/hooks/useExamParam';
+} from '@/app/features/exam-types/hooks/useExamParam';
 import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import styles from './UserTarget.module.scss';
-import { sortPartsByLookup } from '@/app/utils/partOrder';
-import useMilestoneScoring from '@/app/components/my-target/hooks/useMilestoneScoring';
+import { sortPartsByLookup } from '@/app/features/exam-types/partOrder';
+import useMilestoneScoring from '@/app/features/my-target/hooks/useMilestoneScoring';
 import { useAuth } from '@/app/hooks/useAuth';
-import { buildLoginUrl } from '@/app/utils/authRedirect';
+import { buildLoginUrl } from '@/app/features/auth/authRedirect';
 import type { MilestoneResponse } from '@/app/types';
 import { useCurrentUserTarget, useUserTargetData } from './_hooks/useUserTargetData';
 import {

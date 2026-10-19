@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { AxiosRequestConfig } from 'axios';
 import { updateQuestion } from '@/app/apis/questionApi';
-import { questionDetailKeys } from '@/app/components/tests/hooks/useQuestionDetail';
+import { questionDetailKeys } from '@/app/features/tests/hooks/useQuestionDetail';
 import type { QuestionAdminResponse, QuestionCreateRequest } from '@/app/types';
 
 export type UpdateQuestionVariables = {

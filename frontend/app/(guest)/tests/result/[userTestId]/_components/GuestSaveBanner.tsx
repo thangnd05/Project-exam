@@ -9,9 +9,9 @@ import { IoArrowForward, IoExitOutline, IoTrashOutline } from 'react-icons/io5';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
-import { buildLoginUrl } from '@/app/utils/authRedirect';
+import { buildLoginUrl } from '@/app/features/auth/authRedirect';
 import { clearGuestSessionId, setGuestClaimIntent } from '@/app/utils/guestSession';
-import { buildGeneratePlanUrl, buildTargetUrl } from '@/app/utils/planFromTest';
+import { buildGeneratePlanUrl, buildTargetUrl } from '@/app/(guest)/tests/result/[userTestId]/_lib/planFromTest';
 import promptStyles from './GuestSaveBanner.module.scss';
 
 const px = classNames.bind(promptStyles);

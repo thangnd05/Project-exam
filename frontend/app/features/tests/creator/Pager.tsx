@@ -1,7 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
-import styles from '../CreateTestModal.module.scss';
+import styles from '@/app/features/tests/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 

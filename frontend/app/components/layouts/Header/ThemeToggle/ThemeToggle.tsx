@@ -2,8 +2,8 @@
 
 import { Moon, Sun } from 'lucide-react';
 import classNames from 'classnames/bind';
-import { useTheme } from '@/app/components/ThemeToggle/hooks/useTheme';
-import styles from './ThemeToggle.module.scss';
+import { useTheme } from '@/app/components/layouts/Header/ThemeToggle/hooks/useTheme';
+import styles from '@/app/components/layouts/Header/ThemeToggle/ThemeToggle.module.scss';
 
 const cx = classNames.bind(styles);
 

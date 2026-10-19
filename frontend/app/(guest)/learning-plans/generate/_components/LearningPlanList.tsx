@@ -7,21 +7,21 @@ import { toast } from 'react-toastify';
 import { IoSwapHorizontalOutline } from 'react-icons/io5';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import { useLearningPlanList } from '../_hooks/useLearningPlanList';
-import { useDeletePlan } from '../_hooks/useDeletePlan';
-import { useSwitchPlan } from '../_hooks/useSwitchPlan';
-import { useResyncPlan } from '@/app/components/learning-plans/hooks/useResyncPlan';
-import { withExam } from '@/app/hooks/useExamParam';
+import { useLearningPlanList } from '@/app/(guest)/learning-plans/generate/_hooks/useLearningPlanList';
+import { useDeletePlan } from '@/app/(guest)/learning-plans/generate/_hooks/useDeletePlan';
+import { useSwitchPlan } from '@/app/(guest)/learning-plans/generate/_hooks/useSwitchPlan';
+import { useResyncPlan } from '@/app/features/learning-plans/hooks/useResyncPlan';
+import { withExam } from '@/app/features/exam-types/hooks/useExamParam';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import {
   buildResyncMessage,
   planStageLabel,
   planStatusLabel,
   planStatusVariant,
-} from '@/app/utils/planLabels';
+} from '@/app/features/learning-plans/planLabels';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { LearningPlanStatus } from '@/app/enums';
-import type { PlanListItem } from '../_hooks/useLearningPlanList';
+import type { PlanListItem } from '@/app/(guest)/learning-plans/generate/_hooks/useLearningPlanList';
 
 const cx = classNames.bind(styles);
 

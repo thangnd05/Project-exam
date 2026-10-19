@@ -5,8 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
-import { useTargetAchieved } from '@/app/components/my-target/hooks/useTargetAchieved';
-import { examTypeIdFromParams, useNormalizeExamParam, withExam } from '@/app/hooks/useExamParam';
+import { useTargetAchieved } from '@/app/features/my-target/hooks/useTargetAchieved';
+import { examTypeIdFromParams, useNormalizeExamParam, withExam } from '@/app/features/exam-types/hooks/useExamParam';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 

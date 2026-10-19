@@ -1,5 +1,5 @@
-import { defaultLayoutConfig, BLOCK_TYPES } from '@/app/components/exam-layout/layoutSchema';
-import type { LayoutBlock, LayoutConfig } from '@/app/components/exam-layout/layoutSchema';
+import { defaultLayoutConfig, BLOCK_TYPES } from '@/app/features/exam-layout/layoutSchema';
+import type { LayoutBlock, LayoutConfig } from '@/app/features/exam-layout/layoutSchema';
 
 export function resolveLayoutConfig(raw: unknown): LayoutConfig {
   const parsed = parseRaw(raw);

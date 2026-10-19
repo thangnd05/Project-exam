@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toggleReact, toggleSavePost } from '@/app/apis/postApi';
-import { savedPostsKeys } from '@/app/components/posts/hooks/useSavedPosts';
+import { savedPostsKeys } from '@/app/features/posts/hooks/useSavedPosts';
 import type { ReactSummaryResponse, SavedPostStatusResponse } from '@/app/types';
 import { ReactType } from '@/app/enums';
 

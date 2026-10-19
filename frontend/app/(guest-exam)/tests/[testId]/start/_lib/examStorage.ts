@@ -1,4 +1,4 @@
-import type { ExamUserAnswers } from '@/app/components/exam-layout/examLayoutTypes';
+import type { ExamUserAnswers } from '@/app/features/exam-layout/examLayoutTypes';
 
 const ID_PREFIX = 'userTest-';
 const STATE_PREFIX = 'userTestState-';

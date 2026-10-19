@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import Loading from '@/app/components/Loading/Loading';
 
-import AuthGuard from '@/app/components/AuthGuard/AuthGuard';
+import AuthGuard from '@/app/features/auth/AuthGuard/AuthGuard';
 import DefaultLayout from '@/app/components/layouts/DefaultLayout';
 
 export default function Layout({ children }: { children: React.ReactNode }) {

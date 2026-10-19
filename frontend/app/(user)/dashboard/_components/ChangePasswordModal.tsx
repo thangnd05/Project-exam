@@ -2,7 +2,7 @@
 
 import {useState} from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import { useChangePassword } from '../_hooks/useChangePassword';
+import { useChangePassword } from '@/app/(user)/dashboard/_hooks/useChangePassword';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';

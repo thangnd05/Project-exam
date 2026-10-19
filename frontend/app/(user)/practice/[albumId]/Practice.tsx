@@ -3,9 +3,9 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { getTtsUrl } from '@/app/utils/mediaUrl';
-import { useStreak } from '@/app/components/gamification/streak/hooks/useStreak';
-import { useStreakRestoreGate } from '@/app/components/gamification/streak/hooks/useStreakRestoreGate';
-import StreakRestoreModal from '@/app/components/gamification/streak/StreakRestoreModal';
+import { useStreak } from '@/app/features/gamification/streak/hooks/useStreak';
+import { useStreakRestoreGate } from '@/app/features/gamification/streak/hooks/useStreakRestoreGate';
+import StreakRestoreModal from '@/app/features/gamification/streak/StreakRestoreModal';
 import {
   useCheckPracticeAnswer,
   useGeneratePracticeQuestion,

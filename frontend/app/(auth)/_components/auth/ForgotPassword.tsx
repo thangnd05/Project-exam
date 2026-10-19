@@ -4,8 +4,8 @@ import Link from 'next/link';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import classNames from 'classnames/bind';
 import routes from '@/app/configs/Routes';
-import {useForgotPasswordMutation} from '@/app/components/auth/hooks/useAuthActions';
-import style from '../_components/auth/AuthRecovery.module.scss';
+import {useForgotPasswordMutation} from '@/app/features/auth/hooks/useAuthActions';
+import style from '@/app/(auth)/_components/auth/AuthRecovery.module.scss';
 
 const cx = classNames.bind(style);
 

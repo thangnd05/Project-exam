@@ -7,7 +7,7 @@ import { getSkills } from '@/app/apis/skillApi';
 import { getScoringConversions } from '@/app/apis/scoringConversionApi';
 import { getMilestones } from '@/app/apis/milestoneApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
-import { sortByPartOrder } from '@/app/utils/partOrder';
+import { sortByPartOrder } from '@/app/features/exam-types/partOrder';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const userTargetKeys = {

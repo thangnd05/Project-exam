@@ -11,7 +11,7 @@ import classNames from 'classnames/bind';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
-import {setLearnerLevel} from '@/app/utils/learnerLevel';
+import {setLearnerLevel} from '@/app/features/learning-plans/learnerLevel';
 import styles from './QuickTestConfirmModal.module.scss';
 
 const cx = classNames.bind(styles);

@@ -7,7 +7,7 @@ import classNames from 'classnames/bind';
 
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import GatedAudioPlayer from '@/app/components/exam-layout/blocks/GatedAudioPlayer';
+import GatedAudioPlayer from '@/app/features/exam-layout/blocks/GatedAudioPlayer';
 import { MediaType, PassageType, QuestionType } from '@/app/enums';
 import type { PassageMediaResponse } from '@/app/types';
 import type {
@@ -18,9 +18,9 @@ import type {
   ExamQuestion,
   ExamUserAnswers,
   QuestionIndexMap,
-} from '@/app/components/exam-layout/examLayoutTypes';
-import type { LayoutQuestionArea } from '@/app/components/exam-layout/layoutSchema';
-import styles from '@/app/components/exam-layout/TestStart.module.scss';
+} from '@/app/features/exam-layout/examLayoutTypes';
+import type { LayoutQuestionArea } from '@/app/features/exam-layout/layoutSchema';
+import styles from '@/app/features/exam-layout/TestStart.module.scss';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
 
 const cx = classNames.bind(styles);

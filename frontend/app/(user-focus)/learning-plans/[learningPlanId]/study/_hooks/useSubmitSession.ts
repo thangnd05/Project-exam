@@ -2,8 +2,8 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { submitSession } from '@/app/apis/learningPlanApi';
-import { planDetailKeys } from '@/app/components/learning-plans/hooks/usePlanDetail';
-import { invalidatePlanQueries } from '@/app/components/learning-plans/hooks/plan-cache';
+import { planDetailKeys } from '@/app/features/learning-plans/hooks/usePlanDetail';
+import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache';
 import type { SubmitSessionAnswerItem, SubmitSessionResponse } from '@/app/types';
 
 type SubmitSessionVariables = {

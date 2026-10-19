@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deletePassageMedia } from '@/app/apis/passageMediaApi';
-import { questionDetailKeys } from '@/app/components/tests/hooks/useQuestionDetail';
+import { questionDetailKeys } from '@/app/features/tests/hooks/useQuestionDetail';
 
 export type DeletePassageMediaVariables = {
   mediaId: string;

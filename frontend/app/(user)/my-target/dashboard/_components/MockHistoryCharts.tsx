@@ -16,7 +16,7 @@ import {
 } from 'recharts';
 import styles from './MockHistoryPanel.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
-import { getScoreScale, type ScoreScaleSource } from '@/app/utils/scoreScale';
+import { getScoreScale, type ScoreScaleSource } from '@/app/features/exam-types/scoreScale';
 
 const cx = classNames.bind(styles);
 

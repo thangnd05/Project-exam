@@ -13,19 +13,15 @@ import {
     IoLogInOutline,
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
-import styles from './TestCard.module.scss';
-import {
-    getTestStatus,
-    calculateAllowedTime,
-    formatDateTime,
-    formatFullDateTime,
-} from '@/app/utils/testStatusHelper';
-import TestModeModal from '@/app/components/tests/TestModeModal/TestModeModal';
-import type { TestModeSelection } from '@/app/components/tests/TestModeModal/TestModeModal';
+import styles from '@/app/features/tests/TestCard/TestCard.module.scss';
+import {getTestStatus, calculateAllowedTime} from '@/app/features/tests/testStatusHelper';
+import {formatDayMonthTime, formatFullDateTime} from '@/app/utils/format-date-time';
+import TestModeModal from '@/app/features/tests/TestModeModal/TestModeModal';
+import type { TestModeSelection } from '@/app/features/tests/TestModeModal/TestModeModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { useAuth } from '@/app/hooks/useAuth';
-import { useGuestAllowedCategories } from '@/app/components/tests/TestCard/hooks/useGuestAllowedCategories';
-import { buildLoginUrl } from '@/app/utils/authRedirect';
+import { useGuestAllowedCategories } from '@/app/features/tests/TestCard/hooks/useGuestAllowedCategories';
+import { buildLoginUrl } from '@/app/features/auth/authRedirect';
 import type { TestResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
@@ -168,12 +164,12 @@ function TestCard({ test, countdowns }: TestCardProps) {
 
                     <div className={cx('info-item')}>
                         <IoCalendarOutline />
-                        <span>Ngày mở: <strong>{formatDateTime(test.availableFrom)}</strong></span>
+                        <span>Ngày mở: <strong>{formatDayMonthTime(test.availableFrom)}</strong></span>
                     </div>
 
                     <div className={cx('info-item')}>
                         <IoHourglassOutline />
-                        <span>Hạn nộp: <strong>{formatDateTime(test.availableTo)}</strong></span>
+                        <span>Hạn nộp: <strong>{formatDayMonthTime(test.availableTo)}</strong></span>
                     </div>
                 </div>
 

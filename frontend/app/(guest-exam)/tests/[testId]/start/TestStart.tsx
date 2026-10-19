@@ -5,10 +5,10 @@ import { useState } from 'react';
 import classNames from 'classnames/bind';
 import TestStateScreens from './_components/TestStateScreens';
 import { useTestSession } from './_hooks/useTestSession';
-import ExamLayoutRenderer from '@/app/components/exam-layout/ExamLayoutRenderer';
-import StreakRestoreModal from '@/app/components/gamification/streak/StreakRestoreModal';
+import ExamLayoutRenderer from '@/app/features/exam-layout/ExamLayoutRenderer';
+import StreakRestoreModal from '@/app/features/gamification/streak/StreakRestoreModal';
 import BaseModal from '@/app/components/modal/BaseModal';
-import styles from '@/app/components/exam-layout/TestStart.module.scss';
+import styles from '@/app/features/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);
 

@@ -15,10 +15,10 @@ import {
 import BaseModal from '@/app/components/modal/BaseModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { formatDateTime } from '@/app/utils/format-date-time';
-import { useNotes } from '@/app/components/Notes/useNotes';
-import { useSaveNote } from '@/app/components/Notes/useSaveNote';
+import { useNotes } from '@/app/features/notes/hooks/useNotes';
+import { useSaveNote } from '@/app/features/notes/hooks/useSaveNote';
 import type { NoteResponse } from '@/app/types';
-import styles from './NotesPanel.module.scss';
+import styles from '@/app/features/notes/NotesPanel.module.scss';
 
 const cx = classNames.bind(styles);
 

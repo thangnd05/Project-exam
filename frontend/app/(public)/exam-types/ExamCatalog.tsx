@@ -8,12 +8,12 @@ import {IoAlertCircleOutline, IoDocumentTextOutline, IoSearchOutline} from 'reac
 
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
 import {buildExamTypeDetailPath} from '@/app/configs/Routes';
-import {examTypeKeys} from '@/app/hooks/examTypeKeys';
+import {examTypeKeys} from '@/app/features/exam-types/examTypeKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
-import QuickTestConfirmModal from '../_components/HeroSection/QuickTestConfirmModal';
-import {useQuickChallengeTests} from '../_components/HeroSection/hooks/useQuickChallengeTests';
-import {useQuickTestLauncher} from '../_components/HeroSection/hooks/useQuickTestLauncher';
+import QuickTestConfirmModal from '@/app/(public)/_components/HeroSection/QuickTestConfirmModal';
+import {useQuickChallengeTests} from '@/app/(public)/_components/HeroSection/hooks/useQuickChallengeTests';
+import {useQuickTestLauncher} from '@/app/(public)/_components/HeroSection/hooks/useQuickTestLauncher';
 import {
   LEVELS,
   VENDORS,
@@ -23,7 +23,7 @@ import {
   parseVendor,
   type Level,
   type Vendor,
-} from '@/app/utils/certificationMeta';
+} from '@/app/(public)/_lib/certificationMeta';
 import styles from './ExamCatalog.module.scss';
 
 const cx = classNames.bind(styles);

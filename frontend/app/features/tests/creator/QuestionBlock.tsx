@@ -3,9 +3,9 @@
 import { Row, Col, Button } from 'react-bootstrap';
 import { PlusCircle, Trash, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
-import styles from '../CreateTestModal.module.scss';
-import TagSelector from '@/app/components/TagSelector/TagSelector';
-import type { DraftQuestion } from '@/app/components/tests/creator/hooks/useCreateTest';
+import styles from '@/app/features/tests/CreateTestModal.module.scss';
+import TagSelector from '@/app/features/tests/TagSelector/TagSelector';
+import type { DraftQuestion } from '@/app/features/tests/creator/hooks/useCreateTest';
 
 const cx = classNames.bind(styles);
 

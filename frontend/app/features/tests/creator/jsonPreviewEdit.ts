@@ -1,6 +1,6 @@
 import type { NormalQuestionRequest, PassageQuestionGroupRequest, PassageRequest } from '@/app/types';
-import type { DraftQuestion } from '@/app/components/tests/creator/hooks/useCreateTest';
-import { resolveQuestionTags } from './tagStatus';
+import type { DraftQuestion } from '@/app/features/tests/creator/hooks/useCreateTest';
+import { resolveQuestionTags } from '@/app/features/tests/creator/tagStatus';
 
 /** Vị trí của câu trong một phần thi: câu độc lập (groupIndex null) hoặc câu trong nhóm đoạn văn. */
 export type PreviewLocation = { groupIndex: number | null; index: number };

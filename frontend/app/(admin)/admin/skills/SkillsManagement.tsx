@@ -13,7 +13,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/components/admin/common';
+} from '@/app/(admin)/_components/common';
 
 const defaultFormState = {
   name: '',

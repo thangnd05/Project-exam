@@ -7,8 +7,8 @@ import { Award, ExternalLink } from 'lucide-react';
 
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
-import { useMyCertificates } from '@/app/components/certificates/hooks/useCertificates';
+import CertificateCanvas from '@/app/features/certificates/CertificateCanvas/CertificateCanvas';
+import { useMyCertificates } from '@/app/features/certificates/hooks/useCertificates';
 import { CertificateStatus } from '@/app/enums';
 import styles from './MyCertificates.module.scss';
 

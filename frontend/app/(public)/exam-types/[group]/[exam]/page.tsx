@@ -1,5 +1,5 @@
-import TestByExamType from '../TestByExamType';
-import { examTypeMetadata, requireExamType } from '../_lib/examTypeRoute';
+import TestByExamType from '@/app/(public)/exam-types/[group]/TestByExamType';
+import { examTypeMetadata, requireExamType } from '@/app/(public)/exam-types/[group]/_lib/examTypeRoute';
 
 // Kỳ thi thuộc nhóm cha: /exam-types/aws/saa-c03.
 type Props = { params: Promise<{ group: string; exam: string }> };

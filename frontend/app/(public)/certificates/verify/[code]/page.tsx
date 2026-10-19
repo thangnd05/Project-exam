@@ -1,4 +1,4 @@
-import CertificateVerify from '../CertificateVerify';
+import CertificateVerify from '@/app/(public)/certificates/verify/CertificateVerify';
 
 export function generateMetadata() {
   const title = 'Xác thực chứng chỉ';

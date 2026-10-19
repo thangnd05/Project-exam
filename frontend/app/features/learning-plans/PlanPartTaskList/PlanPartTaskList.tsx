@@ -14,11 +14,11 @@ import {
   Sparkles,
   Trophy,
 } from 'lucide-react';
-import RecoveryResourceLink from '@/app/components/RecoveryResourceLink/RecoveryResourceLink';
+import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
 import InfoTip from '@/app/components/InfoTip/InfoTip';
-import { TERM_TIPS } from '@/app/utils/termTips';
+import { TERM_TIPS } from '@/app/features/learning-plans/termTips';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
-import { taskCurrentAccuracy, taskGapToPass, taskUnpassedAttempts } from '@/app/components/learning-plans/PlanPartTaskList/taskProgress';
+import { taskCurrentAccuracy, taskGapToPass, taskUnpassedAttempts } from '@/app/features/learning-plans/PlanPartTaskList/taskProgress';
 import { TaskStatus } from '@/app/enums';
 import type { PlanPartGroupResponse, PlanTaskResponse } from '@/app/types';
 import {
@@ -26,7 +26,7 @@ import {
   TASK_STATUS,
   isCapstoneTask,
   taskDisplayName,
-} from '@/app/utils/planLabels';
+} from '@/app/features/learning-plans/planLabels';
 
 const cx = classNames.bind(styles);
 

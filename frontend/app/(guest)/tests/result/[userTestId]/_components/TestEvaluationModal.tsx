@@ -9,7 +9,7 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import type { EvaluationRequest, EvaluationResponse } from '@/app/types';
-import styles from '@/app/components/modal/PortalFormModal.module.scss';
+import styles from '@/app/(guest)/tests/result/[userTestId]/_components/TestEvaluationModal.module.scss';
 
 const cx = classNames.bind(styles);
 

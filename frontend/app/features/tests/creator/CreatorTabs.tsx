@@ -1,9 +1,9 @@
 'use client';
 
 import classNames from 'classnames/bind';
-import styles from '../CreateTestModal.module.scss';
-import { CREATOR_TYPES } from '@/app/components/tests/creator/hooks/useCreateTest';
-import type { CreatorType } from '@/app/components/tests/creator/hooks/useCreateTest';
+import styles from '@/app/features/tests/CreateTestModal.module.scss';
+import { CREATOR_TYPES } from '@/app/features/tests/creator/hooks/useCreateTest';
+import type { CreatorType } from '@/app/features/tests/creator/hooks/useCreateTest';
 
 const cx = classNames.bind(styles);
 

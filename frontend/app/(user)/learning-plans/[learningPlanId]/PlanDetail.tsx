@@ -10,17 +10,17 @@ import MockStageGuide from './_components/MockStageGuide';
 import PlanCongratsModal, {
   congratsSeenKey,
   markCongratsSeen,
-} from '@/app/components/learning-plans/PlanCongratsModal/PlanCongratsModal';
-import PlanPartTaskList from '@/app/components/learning-plans/PlanPartTaskList/PlanPartTaskList';
-import { usePlanDetail } from '@/app/components/learning-plans/hooks/usePlanDetail';
-import { useResyncPlan } from '@/app/components/learning-plans/hooks/useResyncPlan';
+} from '@/app/features/learning-plans/PlanCongratsModal/PlanCongratsModal';
+import PlanPartTaskList from '@/app/features/learning-plans/PlanPartTaskList/PlanPartTaskList';
+import { usePlanDetail } from '@/app/features/learning-plans/hooks/usePlanDetail';
+import { useResyncPlan } from '@/app/features/learning-plans/hooks/useResyncPlan';
 import {
   buildResyncMessage,
   planStageLabel,
   planStatusLabel,
   taskDisplayName,
-} from '@/app/utils/planLabels';
-import { TERM_TIPS } from '@/app/utils/termTips';
+} from '@/app/features/learning-plans/planLabels';
+import { TERM_TIPS } from '@/app/features/learning-plans/termTips';
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';

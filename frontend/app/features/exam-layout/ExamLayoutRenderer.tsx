@@ -6,15 +6,15 @@ import { Container } from 'react-bootstrap';
 import { IoGridOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 
-import TestStartDashboard from '@/app/components/tests/TestStartDashboard';
-import QuestionAreaBlock from '@/app/components/exam-layout/blocks/QuestionAreaBlock';
-import TimerBlock from '@/app/components/exam-layout/blocks/TimerBlock';
-import ProgressBlock from '@/app/components/exam-layout/blocks/ProgressBlock';
-import SubmitBlock from '@/app/components/exam-layout/blocks/SubmitBlock';
-import QuestionNavBlock from '@/app/components/exam-layout/blocks/QuestionNavBlock';
-import BannerBlock from '@/app/components/exam-layout/blocks/BannerBlock';
-import { BLOCK_TYPES, ZONES } from '@/app/components/exam-layout/layoutSchema';
-import type { LayoutBlock, LayoutConfig, LayoutTheme } from '@/app/components/exam-layout/layoutSchema';
+import TestStartDashboard from '@/app/features/tests/TestStartDashboard';
+import QuestionAreaBlock from '@/app/features/exam-layout/blocks/QuestionAreaBlock';
+import TimerBlock from '@/app/features/exam-layout/blocks/TimerBlock';
+import ProgressBlock from '@/app/features/exam-layout/blocks/ProgressBlock';
+import SubmitBlock from '@/app/features/exam-layout/blocks/SubmitBlock';
+import QuestionNavBlock from '@/app/features/exam-layout/blocks/QuestionNavBlock';
+import BannerBlock from '@/app/features/exam-layout/blocks/BannerBlock';
+import { BLOCK_TYPES, ZONES } from '@/app/features/exam-layout/layoutSchema';
+import type { LayoutBlock, LayoutConfig, LayoutTheme } from '@/app/features/exam-layout/layoutSchema';
 import type {
   AnswerChangeHandler,
   ExamFlowStep,
@@ -22,9 +22,9 @@ import type {
   ExamQuestion,
   ExamUserAnswers,
   QuestionIndexMap,
-} from '@/app/components/exam-layout/examLayoutTypes';
-import pageStyles from '@/app/components/exam-layout/TestStart.module.scss';
-import zoneStyles from '@/app/components/exam-layout/examLayout.module.scss';
+} from '@/app/features/exam-layout/examLayoutTypes';
+import pageStyles from '@/app/features/exam-layout/TestStart.module.scss';
+import zoneStyles from '@/app/features/exam-layout/examLayout.module.scss';
 
 const cx = classNames.bind(pageStyles);
 const zx = classNames.bind(zoneStyles);

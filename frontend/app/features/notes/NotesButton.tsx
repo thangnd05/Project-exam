@@ -4,8 +4,8 @@ import { useState } from 'react';
 import classNames from 'classnames/bind';
 
 import { useAuth } from '@/app/hooks/useAuth';
-import NotesPanel from './NotesPanel';
-import styles from './NotesButton.module.scss';
+import NotesPanel from '@/app/features/notes/NotesPanel';
+import styles from '@/app/features/notes/NotesButton.module.scss';
 import { FaNoteSticky } from 'react-icons/fa6';
 
 const cx = classNames.bind(styles);

@@ -2,9 +2,9 @@
 
 import classNames from 'classnames/bind';
 import BaseModal from '@/app/components/modal/BaseModal';
-import CreateTestFormBody from './creator/CreateTestFormBody';
-import type { CreateTestMode } from './creator/CreateTestFormBody';
-import styles from './CreateTestModal.module.scss';
+import CreateTestFormBody from '@/app/features/tests/creator/CreateTestFormBody';
+import type { CreateTestMode } from '@/app/features/tests/creator/CreateTestFormBody';
+import styles from '@/app/features/tests/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
 

@@ -3,17 +3,17 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
-import { examTypeIdFromParams, setExamParam, useNormalizeExamParam } from '@/app/hooks/useExamParam';
+import { examTypeIdFromParams, setExamParam, useNormalizeExamParam } from '@/app/features/exam-types/hooks/useExamParam';
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import LearningPlanList from './_components/LearningPlanList';
-import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
-import { isPracticeAttempt } from '@/app/utils/planLabels';
-import { getLearnerLevel } from '@/app/utils/learnerLevel';
+import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
+import { isPracticeAttempt } from '@/app/features/learning-plans/planLabels';
+import { getLearnerLevel } from '@/app/features/learning-plans/learnerLevel';
 import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
-import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
+import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import type { PlanResponse } from '@/app/types';
@@ -24,7 +24,7 @@ import {
   useGeneratePlanMutation,
   useGenerateSyllabusPlanMutation,
   useUserTarget,
-} from '@/app/components/learning-plans/hooks/useGeneratePlan';
+} from '@/app/features/learning-plans/hooks/useGeneratePlan';
 
 type PlanSource = 'DIAGNOSIS' | 'SYLLABUS';
 

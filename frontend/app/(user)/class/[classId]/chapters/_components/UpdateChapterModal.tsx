@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect, useState} from 'react';
-import { useUpdateChapter } from '../_hooks/useChaptersOfClass';
+import { useUpdateChapter } from '@/app/(user)/class/[classId]/chapters/_hooks/useChaptersOfClass';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';

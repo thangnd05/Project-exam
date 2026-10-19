@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import { Badge } from 'react-bootstrap';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
-import styles from './TagSelector.module.scss';
+import styles from '@/app/features/tests/TagSelector/TagSelector.module.scss';
 
 const cx = classNames.bind(styles);
 

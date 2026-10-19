@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import classNames from 'classnames/bind';
-import styles from './AuthLayout.module.scss';
+import styles from '@/app/(auth)/_components/AuthLayout/AuthLayout.module.scss';
 import { name } from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
 

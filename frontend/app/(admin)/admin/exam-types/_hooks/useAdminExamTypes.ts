@@ -10,8 +10,8 @@ import {
   updateExamType,
   updateExamTypeLayout,
 } from '@/app/apis/examTypeApi';
-import {useAdminCrud} from '@/app/(admin)/admin/_hooks/useAdminCrud';
-import {examTypeKeys} from '@/app/hooks/examTypeKeys';
+import {useAdminCrud} from '@/app/(admin)/_hooks/useAdminCrud';
+import {examTypeKeys} from '@/app/features/exam-types/examTypeKeys';
 import type {ExamTypeLayoutResponse, ExamTypeRequest, ExamTypeResponse} from '@/app/types';
 
 export function useAdminExamTypes() {

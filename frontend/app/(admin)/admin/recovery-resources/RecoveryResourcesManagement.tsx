@@ -9,9 +9,9 @@ import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import RecoveryResourceFormModal, {
   type RecoveryResourceFormState,
 } from './_components/RecoveryResourceFormModal';
-import RecoveryResourceLink from '@/app/components/RecoveryResourceLink/RecoveryResourceLink';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
-import {isMarkdownResource} from '@/app/utils/recoveryResource';
+import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
+import {isMarkdownResource} from '@/app/features/resources/recoveryResource';
 import type {RecoveryResourceResponse, TagResponse} from '@/app/types';
 import {useRecoveryResources, useTagsByExamType} from './_hooks/useRecoveryResources';
 import styles from './RecoveryResourcesManagement.module.scss';
