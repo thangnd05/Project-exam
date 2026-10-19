@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '@/app/assets/styles/GlobalStyles/GlobalStyles.scss';
 import '@/app/assets/styles/global-overrides.scss';
 import Providers from './providers';
+import { THEME_STORAGE_KEY } from '@/app/constants/theme';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -68,7 +69,7 @@ export const viewport = {
 // Bảng màu đang dùng: 'frost' (FrostScope) hoặc 'gold' (bảng màu vàng gốc).
 const PALETTE = 'frost';
 
-const THEME_INIT_SCRIPT = `(function(){try{if(localStorage.getItem('theme')==='dark'){var d=document.documentElement;d.setAttribute('data-theme','dark');d.setAttribute('data-bs-theme','dark')}}catch(e){}})();`;
+const THEME_INIT_SCRIPT = `(function(){try{if(localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)})==='dark'){var d=document.documentElement;d.setAttribute('data-theme','dark');d.setAttribute('data-bs-theme','dark')}}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

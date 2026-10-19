@@ -1,10 +1,9 @@
 'use client';
 
 import { useCallback, useSyncExternalStore } from 'react';
+import { THEME_STORAGE_KEY } from '@/app/constants/theme';
 
 export type Theme = 'light' | 'dark';
-
-export const THEME_STORAGE_KEY = 'theme';
 
 function applyTheme(theme: Theme) {
   const root = document.documentElement;

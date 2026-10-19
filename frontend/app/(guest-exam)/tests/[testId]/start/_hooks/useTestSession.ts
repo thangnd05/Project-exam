@@ -26,8 +26,8 @@ import {
   readExamSessionState,
   writeExamSessionId,
   writeExamSessionState,
-} from '@/app/utils/examStorage';
-import { clockMark, serverNowMs, syncServerClock } from '@/app/utils/serverClock';
+} from '@/app/(guest-exam)/tests/[testId]/start/_lib/examStorage';
+import { clockMark, serverNowMs, syncServerClock } from '@/app/(guest-exam)/tests/[testId]/start/_lib/serverClock';
 import type { UserTestMode } from '@/app/enums';
 import type {
   ActiveUserTestResponse,

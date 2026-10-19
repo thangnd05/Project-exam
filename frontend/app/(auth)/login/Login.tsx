@@ -24,7 +24,7 @@ import { FaFacebook } from "react-icons/fa";
 import { FiArrowLeft, FiArrowRight, FiAtSign, FiEye, FiEyeOff, FiLock, FiMail, FiUser } from 'react-icons/fi';
 import { imageAssets, name } from '@/app/assets/images';
 import ForgotPassword from '../forgot/ForgotPassword';
-import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/components/Recaptcha/RecaptchaCheckbox';
+import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/(auth)/login/_components/Recaptcha/RecaptchaCheckbox';
 
 const cx = classNames.bind(style);
 

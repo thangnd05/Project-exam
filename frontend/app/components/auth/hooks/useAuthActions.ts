@@ -22,12 +22,8 @@ import type {
   ResetTokenStatus,
   UserResponse,
 } from '@/app/types';
-import { CURRENT_USER_QUERY_KEY } from '@/app/contexts/AuthContext';
 
-export const authKeys = {
-  currentUser: CURRENT_USER_QUERY_KEY,
-  resetToken: (token: string) => ['auth', 'reset-token', token] as const,
-};
+const resetTokenKey = (token: string) => ['auth', 'reset-token', token] as const;
 
 export function useLoginMutation(
   options: Omit<UseMutationOptions<UserResponse, any, LoginRequest>, 'mutationFn'> = {},
@@ -71,22 +67,12 @@ export function useResetTokenQuery(
   options: Omit<UseQueryOptions<ResetTokenStatus>, 'queryKey' | 'queryFn'> = {},
 ) {
   return useQuery({
-    queryKey: authKeys.resetToken(token),
+    queryKey: resetTokenKey(token),
     queryFn: () => checkResetToken(token),
     enabled: Boolean(token),
     retry: false,
     staleTime: 0,
     refetchOnWindowFocus: false,
-    ...options,
-  });
-}
-
-export function useCurrentUserQuery(
-  options: Omit<UseQueryOptions<UserResponse>, 'queryKey' | 'queryFn'> = {},
-) {
-  return useQuery({
-    queryKey: authKeys.currentUser,
-    queryFn: getCurrentUser,
     ...options,
   });
 }

@@ -18,7 +18,7 @@ import RecoveryResourceLink from '@/app/components/RecoveryResourceLink/Recovery
 import InfoTip from '@/app/components/InfoTip/InfoTip';
 import { TERM_TIPS } from '@/app/utils/termTips';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
-import { taskCurrentAccuracy, taskGapToPass, taskUnpassedAttempts } from '@/app/utils/taskProgress';
+import { taskCurrentAccuracy, taskGapToPass, taskUnpassedAttempts } from '@/app/components/learning-plans/PlanPartTaskList/taskProgress';
 import { TaskStatus } from '@/app/enums';
 import type { PlanPartGroupResponse, PlanTaskResponse } from '@/app/types';
 import {
