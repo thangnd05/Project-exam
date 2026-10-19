@@ -30,11 +30,7 @@ export function useTheme() {
     } catch {}
   }, []);
 
-  const toggleTheme = useCallback(() => {
-    setTheme(getSnapshot() === 'dark' ? 'light' : 'dark');
-  }, [setTheme]);
-
-  return { theme, setTheme, toggleTheme };
+  return { theme, setTheme };
 }
 
 export default useTheme;

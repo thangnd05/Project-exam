@@ -17,8 +17,7 @@ import {buildLoginUrl} from '@/app/features/auth/authRedirect';
 // import JoinClassModal from '@/app/features/classes/JoinClassModal/JoinClassModal';
 // import CreateClassModal from '@/app/features/classes/CreateClassModal/CreateClassModal';
 import CreateTestModal from '@/app/features/tests/CreateTestModal';
-import ThemeToggle from '@/app/components/layouts/Header/ThemeToggle/ThemeToggle';
-import PaletteToggle from '@/app/components/layouts/Header/ThemeToggle/PaletteToggle';
+import AppearanceMenu from '@/app/components/layouts/Header/ThemeToggle/AppearanceMenu';
 import StreakBadge from '@/app/features/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/features/gamification/coin/CoinQuestMenu';
 import FirstTimeHint from '@/app/features/gamification/onboarding/FirstTimeHint';
@@ -321,8 +320,14 @@ function Header() {
           </nav>
 
           <div className={cx('zoneRight')}>
-            <PaletteToggle className={cx('themeToggle')} />
-            <ThemeToggle className={cx('themeToggle')} />
+            <AppearanceMenu
+              classes={{
+                toggle: cx('themeToggle'),
+                menu: cx('custom-dropdown'),
+                label: cx('dropdownLabel'),
+                divider: cx('dropdownDivider'),
+              }}
+            />
             {showStats && (
               <div className={cx('mobileHeaderActions')}>
                 <div className={cx('statsCluster')}>

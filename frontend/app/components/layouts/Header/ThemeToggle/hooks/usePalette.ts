@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useSyncExternalStore } from 'react';
-import { DEFAULT_PALETTE, isPalette, PALETTE_STORAGE_KEY, PALETTES, type Palette } from '@/app/constants/theme';
+import { DEFAULT_PALETTE, isPalette, PALETTE_STORAGE_KEY, type Palette } from '@/app/constants/theme';
 
 function subscribe(onChange: () => void) {
   const observer = new MutationObserver(onChange);
@@ -25,12 +25,7 @@ export function usePalette() {
     } catch {}
   }, []);
 
-  const cyclePalette = useCallback(() => {
-    const index = PALETTES.indexOf(getSnapshot());
-    setPalette(PALETTES[(index + 1) % PALETTES.length]);
-  }, [setPalette]);
-
-  return { palette, setPalette, cyclePalette };
+  return { palette, setPalette };
 }
 
 export default usePalette;
