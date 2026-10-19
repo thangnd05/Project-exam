@@ -8,11 +8,7 @@ import {createTag, deleteTag, getTagsFlatByExamType, updateTag} from '@/app/apis
 import {examTypeKeys} from '@/app/features/exam-types/hooks/useExamTypes';
 import type {ExamPartResponse, TagRequest, TagResponse} from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
-
-export const tagKeys = {
-  all: ['admin-tags'],
-  byExamType: (examTypeId?: string | null) => ['admin-tags', examTypeId ?? null],
-};
+import {tagKeys, examPartKeys} from '@/app/configs/queryKeys';
 
 export interface AdminTag extends TagResponse {
   name: string;
@@ -58,7 +54,7 @@ export function useAdminExamTypesForTags() {
 
 export function useTagList(examTypeId?: string) {
   const query = useQuery({
-    queryKey: [...tagKeys.byExamType(examTypeId), 'flat'],
+    queryKey: tagKeys.flat(examTypeId),
     queryFn: () => getTagsFlatByExamType(examTypeId as string),
     enabled: !!examTypeId,
   });
@@ -72,7 +68,7 @@ export function useTagList(examTypeId?: string) {
 
 export function useExamPartsForTags(examTypeId?: string) {
   const query = useQuery({
-    queryKey: ['admin-tags-exam-parts', examTypeId ?? null],
+    queryKey: examPartKeys.byExamType(examTypeId),
     queryFn: () => getExamPartsByExamType(examTypeId as string),
     enabled: !!examTypeId,
     select: (list): ExamPartResponse[] =>

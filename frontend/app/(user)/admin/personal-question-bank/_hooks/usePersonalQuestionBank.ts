@@ -21,6 +21,7 @@ import type {
   QuestionResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {questionCollectionKeys, classChapterKeys} from '@/app/configs/queryKeys';
 
 export const BANK_SCOPE = {
   ADMIN: 'admin',
@@ -31,9 +32,9 @@ export const BANK_SCOPE = {
 export type BankScope = (typeof BANK_SCOPE)[keyof typeof BANK_SCOPE];
 
 export const questionBankKeys = {
-  collections: ['question-bank', 'collections'],
+  collections: questionCollectionKeys.all,
   myClasses: ['question-bank', 'my-classes'],
-  chapters: (classId?: string) => ['question-bank', 'chapters', classId],
+  chapters: classChapterKeys.byClass,
   chapterCount: (classId?: string, chapterId?: string) => ['question-bank', 'chapter-count', classId, chapterId],
   chapterQuestions: (classId?: string, chapterId?: string) => ['question-bank', 'chapter-questions', classId, chapterId],
   partQuestions: (partId?: string, scope?: string) => ['question-bank', 'part-questions', partId, scope],

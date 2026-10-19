@@ -11,9 +11,10 @@ import {
 import { getClassById } from '@/app/apis/classApi';
 import type { ChapterRequest, ChapterResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {classChapterKeys} from '@/app/configs/queryKeys';
 
 export const chapterKeys = {
-  list: (classId: string) => ['chapters', classId],
+  list: classChapterKeys.byClass,
   classInfo: (classId: string) => ['class-info', classId],
 };
 

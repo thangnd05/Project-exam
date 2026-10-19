@@ -9,6 +9,7 @@ import { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { isPracticeAttempt } from '@/app/features/learning-plans/planLabels';
 import type { PlanResponse, UserTestResponse } from '@/app/types';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
+import {completedUserTestKeys} from '@/app/configs/queryKeys';
 
 const cx = classNames.bind(styles);
 
@@ -27,7 +28,7 @@ type MockStageGuideProps = {
 
 function MockStageGuide({ plan }: MockStageGuideProps) {
   const testsQuery = useQuery({
-    queryKey: ['completed-user-tests', plan.examTypeId],
+    queryKey: completedUserTestKeys.byExamType(plan.examTypeId),
     queryFn: () => getMyCompletedUserTests(plan.examTypeId),
     enabled: !!plan.examTypeId,
   });

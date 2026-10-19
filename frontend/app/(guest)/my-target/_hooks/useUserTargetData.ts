@@ -9,14 +9,15 @@ import { getMilestones } from '@/app/apis/milestoneApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import { sortByPartOrder } from '@/app/features/exam-types/partOrder';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys, examPartKeys, skillKeys, scoringConversionKeys, milestoneKeys, userTargetKeys as targetKeys} from '@/app/configs/queryKeys';
 
 export const userTargetKeys = {
-  examTypes: ['standard-exam-types'],
-  examParts: ['exam-parts'],
-  skills: ['skills'],
-  scoringConversions: ['scoring-conversions'],
-  milestones: (examTypeId?: string) => ['milestones', examTypeId],
-  current: (examTypeId?: string) => ['user-target', examTypeId],
+  examTypes: examTypeKeys.standard,
+  examParts: examPartKeys.all,
+  skills: skillKeys.all,
+  scoringConversions: scoringConversionKeys.list,
+  milestones: milestoneKeys.list,
+  current: targetKeys.byExamType,
 };
 
 const asArray = <T>(data: T[] | { content?: T[] } | null | undefined): T[] =>

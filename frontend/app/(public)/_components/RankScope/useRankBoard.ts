@@ -4,7 +4,7 @@ import {useQueries, useQuery} from '@tanstack/react-query';
 
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
 import {getQuickChallengeLeaderboard} from '@/app/apis/userTestApi';
-import {examTypeKeys} from '@/app/features/exam-types/examTypeKeys';
+import {examTypeKeys} from '@/app/configs/queryKeys';
 import type {QuickLeaderboardEntry} from '@/app/types/attempt';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import {badgeUrl, parseCode, parseVendor, type Vendor} from '@/app/(public)/_lib/certificationMeta';

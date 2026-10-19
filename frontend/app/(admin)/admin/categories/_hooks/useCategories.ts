@@ -8,10 +8,7 @@ import {
 } from '@/app/apis/postApi';
 import { useAdminCrud } from '@/app/(admin)/_hooks/useAdminCrud';
 import type { CategoryRequest, CategoryResponse } from '@/app/types';
-
-export const categoriesKeys = {
-    all: ['admin-categories'],
-};
+import {postCategoryKeys} from '@/app/configs/queryKeys';
 
 export interface AdminCategory extends CategoryResponse {
     name: string;
@@ -19,7 +16,7 @@ export interface AdminCategory extends CategoryResponse {
 
 export function useCategories() {
     const crud = useAdminCrud({
-        queryKey: categoriesKeys.all,
+        queryKey: postCategoryKeys.all,
         list: getCategories,
         create: (payload: CategoryRequest) => createCategory(payload),
         update: ({ id, payload }: { id: string; payload: CategoryRequest }) => updateCategory(id, payload),

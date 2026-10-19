@@ -5,6 +5,7 @@ import { keepPreviousData } from '@/app/configs/queryClient';
 import { getMyPosts, getCategories, deletePost } from '@/app/apis/postApi';
 import type { CategoryResponse, PageResponse, PostSummaryResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {postCategoryKeys} from '@/app/configs/queryKeys';
 
 interface MyPostsParams {
   page?: number;
@@ -16,7 +17,7 @@ interface MyPostsParams {
 export const myPostsKeys = {
   all: ['my-posts'],
   list: (params: MyPostsParams) => ['my-posts', 'list', params],
-  categories: ['post-categories'],
+  categories: postCategoryKeys.all,
 };
 
 const normalizePage = (data: PageResponse<PostSummaryResponse>) => ({

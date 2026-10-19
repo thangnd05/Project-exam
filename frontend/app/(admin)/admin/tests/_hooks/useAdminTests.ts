@@ -12,12 +12,13 @@ import type {
   UserResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys} from '@/app/configs/queryKeys';
 
 const USERS_PARAMS = { page: 0, size: 200 };
 
 export const adminTestsKeys = {
   tests: ['admin-tests'],
-  examTypes: ['admin-exam-types'],
+  examTypes: examTypeKeys.all,
   users: (params: typeof USERS_PARAMS) => ['admin-users', params],
 };
 

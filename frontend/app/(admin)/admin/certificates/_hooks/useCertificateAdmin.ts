@@ -19,6 +19,7 @@ import type {
   ExamTypeResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys} from '@/app/configs/queryKeys';
 
 export interface IssuedCertificateParams {
   examTypeId?: string;
@@ -30,7 +31,7 @@ export interface IssuedCertificateParams {
 
 export const certificateAdminKeys = {
   templates: ['admin-certificates', 'templates'] as const,
-  examTypes: ['admin-certificates', 'exam-types'] as const,
+  examTypes: examTypeKeys.standard,
   issued: (params: IssuedCertificateParams) => ['admin-certificates', 'issued', params] as const,
 };
 

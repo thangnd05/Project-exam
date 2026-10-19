@@ -15,13 +15,14 @@ import {
 } from '@/app/apis/milestoneApi';
 import type { MilestoneRequest } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys, examPartKeys, skillKeys, scoringConversionKeys, milestoneKeys} from '@/app/configs/queryKeys';
 
 export const milestonesKeys = {
-  examTypes: ['admin-milestones', 'exam-types'] as const,
-  examParts: ['admin-milestones', 'exam-parts'] as const,
-  skills: ['admin-milestones', 'skills'] as const,
-  scoring: ['admin-milestones', 'scoring'] as const,
-  list: (examTypeId?: string) => ['admin-milestones', 'list', examTypeId] as const,
+  examTypes: examTypeKeys.standard,
+  examParts: examPartKeys.all,
+  skills: skillKeys.all,
+  scoring: scoringConversionKeys.list,
+  list: milestoneKeys.list,
 };
 
 const normalizeArray = <T,>(data: T[] | { content?: T[] } | null | undefined): T[] =>
@@ -60,7 +61,7 @@ export function useMilestones(examTypeFilter: string) {
   });
 
   const { createMutation, updateMutation, deleteMutation } = useCrudMutations({
-    queryKey: ['admin-milestones', 'list'],
+    queryKey: milestoneKeys.all,
     create: (payload: MilestoneRequest) => apiCreateMilestone(payload),
     update: ({ id, payload }: { id: string; payload: MilestoneRequest }) => apiUpdateMilestone(id, payload),
     remove: (id: string) => apiDeleteMilestone(id),

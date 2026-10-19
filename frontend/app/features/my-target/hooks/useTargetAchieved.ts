@@ -13,9 +13,10 @@ import type {
   UserTestResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys} from '@/app/configs/queryKeys';
 
 export const targetAchievedKeys = {
-  examTypes: ['exam-types', 'standard'],
+  examTypes: examTypeKeys.standard,
   detail: (examTypeId?: string) => ['target-achieved', examTypeId],
 };
 

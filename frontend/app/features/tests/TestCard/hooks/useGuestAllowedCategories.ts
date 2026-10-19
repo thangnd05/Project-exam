@@ -3,11 +3,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { getExamCategories } from '@/app/apis/examCategoryApi';
 import type { TestResponse } from '@/app/types';
+import {examCategoryKeys} from '@/app/configs/queryKeys';
 
 // Danh sách loại đề cho phép khách làm, dùng chung cho mọi thẻ đề nên chỉ gọi API một lần.
 export function useGuestAllowedCategories(enabled = true) {
   const { data, isSuccess } = useQuery({
-    queryKey: ['exam-categories', 'guest-allowed'],
+    queryKey: examCategoryKeys.all,
     queryFn: getExamCategories,
     enabled,
     staleTime: 10 * 60 * 1000,

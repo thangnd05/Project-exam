@@ -7,6 +7,7 @@ import { getExamPartsByExamType } from '@/app/apis/examPartApi';
 import { getTagsFlatByExamType } from '@/app/apis/tagApi';
 import { sortByPartOrder } from '@/app/features/exam-types/partOrder';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys, questionCollectionKeys, examPartKeys, tagKeys} from '@/app/configs/queryKeys';
 
 const normalizeList = (payload: any): any[] => {
     if (Array.isArray(payload)) {
@@ -22,10 +23,10 @@ const normalizeList = (payload: any): any[] => {
 };
 
 export const baseMetaKeys = {
-    examTypes: ['base-meta', 'exam-types'],
-    questionCollections: ['base-meta', 'question-collections'],
-    examParts: (examTypeId: string | number | null | undefined) => ['base-meta', 'exam-parts', examTypeId],
-    tagsFlat: (examTypeId: string | number | null | undefined) => ['base-meta', 'tags-flat', examTypeId],
+    examTypes: examTypeKeys.all,
+    questionCollections: questionCollectionKeys.all,
+    examParts: examPartKeys.byExamType,
+    tagsFlat: tagKeys.flat,
 };
 
 export const useBaseMetaData = (examTypeId?: string | number | null) => {

@@ -18,17 +18,13 @@ import type {
   SkillResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys, skillKeys, scoringConversionKeys} from '@/app/configs/queryKeys';
 
-export const scoringConversionKeys = {
-  examTypes: ['scoring-conversion', 'exam-types'],
-  skills: ['scoring-conversion', 'skills'],
-  rules: (skillId?: string, examTypeId?: string) => [
-    'scoring-conversion',
-    'rules',
-    skillId ?? 'all',
-    examTypeId ?? 'all',
-  ],
-};
+// Không chọn skill thì gọi getScoringConversions() (bỏ qua examTypeId) nên dùng key danh sách chung.
+const rulesKey = (skillId?: string, examTypeId?: string) =>
+  skillId && skillId !== 'all'
+    ? scoringConversionKeys.bySkill(skillId, examTypeId)
+    : scoringConversionKeys.list;
 
 export type ScoringExamTypeOption = {
   exam_type_id: string;
@@ -77,19 +73,19 @@ export function useScoringConversion(activeSkillId: string, examTypeFilter: stri
   const queryClient = useQueryClient();
 
   const examTypesQuery = useQuery({
-    queryKey: scoringConversionKeys.examTypes,
+    queryKey: examTypeKeys.all,
     queryFn: getExamTypes,
     select: normalizeExamTypes,
   });
 
   const skillsQuery = useQuery({
-    queryKey: scoringConversionKeys.skills,
+    queryKey: skillKeys.all,
     queryFn: getSkills,
     select: normalizeSkills,
   });
 
   const rulesQuery = useQuery({
-    queryKey: scoringConversionKeys.rules(activeSkillId, examTypeFilter),
+    queryKey: rulesKey(activeSkillId, examTypeFilter),
     queryFn: () =>
       activeSkillId && activeSkillId !== 'all'
         ? getScoringConversionsBySkill(activeSkillId, examTypeFilter)
@@ -98,7 +94,7 @@ export function useScoringConversion(activeSkillId: string, examTypeFilter: stri
   });
 
   const invalidateRules = () =>
-    queryClient.invalidateQueries({queryKey: ['scoring-conversion', 'rules']});
+    queryClient.invalidateQueries({queryKey: scoringConversionKeys.all});
 
   const createMutation = useMutation({
     mutationFn: (payload: ScoringConversionRequest) => createScoringConversion(payload),

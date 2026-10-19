@@ -8,8 +8,8 @@ import {
 import type { UserTargetRequest } from '@/app/types';
 import { targetDashboardKeys } from '@/app/features/my-target/hooks/useTargetDashboard';
 import { targetAchievedKeys } from '@/app/features/my-target/hooks/useTargetAchieved';
-import { generatePlanKeys } from '@/app/features/learning-plans/hooks/useGeneratePlan';
 import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache';
+import {userTargetKeys} from '@/app/configs/queryKeys';
 
 type MutationCallbacks = {
   onSuccess?: (...args: any[]) => void;
@@ -19,8 +19,7 @@ type MutationCallbacks = {
 const invalidateTargetQueries = (qc: QueryClient, examTypeId?: string) => {
   qc.invalidateQueries({ queryKey: targetDashboardKeys.dashboard(examTypeId) });
   qc.invalidateQueries({ queryKey: targetAchievedKeys.detail(examTypeId) });
-  qc.invalidateQueries({ queryKey: generatePlanKeys.target(examTypeId) });
-  qc.invalidateQueries({ queryKey: ['user-target', examTypeId] });
+  qc.invalidateQueries({ queryKey: userTargetKeys.byExamType(examTypeId) });
   invalidatePlanQueries(qc);
 };
 

@@ -3,10 +3,7 @@
 import {createSkill, deleteSkill, getSkills, updateSkill} from '@/app/apis/skillApi';
 import {useAdminCrud} from '@/app/(admin)/_hooks/useAdminCrud';
 import type {SkillRequest, SkillResponse} from '@/app/types';
-
-export const skillKeys = {
-  list: () => ['admin-skills'],
-};
+import {skillKeys} from '@/app/configs/queryKeys';
 
 export type SkillItem = {
   skill_id: string;
@@ -22,7 +19,7 @@ const mapSkillFromApi = (skill: SkillResponse): SkillItem => ({
 
 export function useSkills() {
   const crud = useAdminCrud({
-    queryKey: skillKeys.list(),
+    queryKey: skillKeys.all,
     list: getSkills,
     create: (payload: SkillRequest) => createSkill(payload),
     update: ({skillId, payload}: {skillId: string; payload: SkillRequest}) => updateSkill(skillId, payload),

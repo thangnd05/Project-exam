@@ -7,15 +7,16 @@ import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import type { UserTargetResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys, userTargetKeys} from '@/app/configs/queryKeys';
 
 export const CHART_FETCH_LIMIT = 25;
 
 export const mockHistoryKeys = {
-  examTypes: ['exam-types', 'standard'],
+  examTypes: examTypeKeys.standard,
   chart: (examTypeId?: string) => ['mock-history-chart', examTypeId || ''],
   table: (examTypeId: string | undefined, page: number, size: number) =>
     ['mock-history-table', examTypeId || '', page, size],
-  userTarget: (examTypeId?: string) => ['user-target', examTypeId],
+  userTarget: userTargetKeys.byExamType,
 };
 
 const selectTargetScore = (data: UserTargetResponse) =>

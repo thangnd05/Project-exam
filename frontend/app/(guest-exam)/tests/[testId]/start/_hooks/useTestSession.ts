@@ -3,7 +3,6 @@
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { generatePlanKeys } from '@/app/features/learning-plans/hooks/useGeneratePlan';
 import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache';
 import { toast } from 'react-toastify';
 import { checkActiveUserTest, startUserTest, submitUserTest } from '@/app/apis/userTestApi';
@@ -38,6 +37,7 @@ import type {
 } from '@/app/types';
 import { enrichTestWithPassageMedia } from '@/app/(guest-exam)/tests/[testId]/start/_lib/passageUtils';
 import { useExamFlowNavigation } from './useExamFlowNavigation';
+import {examTypeKeys, completedUserTestKeys} from '@/app/configs/queryKeys';
 
 type ActiveTest = Omit<TestResponse, 'testId' | 'status'> & {
   testId?: string;
@@ -93,7 +93,7 @@ export function useTestSession() {
   const queryClient = useQueryClient();
   // Bài vừa nộp phải hiện ngay ở trang sinh lộ trình và dashboard mục tiêu.
   const invalidateAfterSubmit = () => {
-    queryClient.invalidateQueries({ queryKey: generatePlanKeys.userTests });
+    queryClient.invalidateQueries({ queryKey: completedUserTestKeys.all });
     invalidatePlanQueries(queryClient);
   };
   const searchParams = useSearchParams();
@@ -150,7 +150,7 @@ export function useTestSession() {
   }, [test.parts, isPractice, selectedPartIds]);
 
   const { data: layoutConfig = defaultLayoutConfig } = useQuery({
-    queryKey: ['exam-type-layout', test?.examTypeId],
+    queryKey: examTypeKeys.resolvedLayout(test?.examTypeId),
     queryFn: async () => {
       try {
         const res = await getExamTypeLayout(test.examTypeId as string);

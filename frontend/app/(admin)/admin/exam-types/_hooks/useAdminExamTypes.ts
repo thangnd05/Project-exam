@@ -11,7 +11,7 @@ import {
   updateExamTypeLayout,
 } from '@/app/apis/examTypeApi';
 import {useAdminCrud} from '@/app/(admin)/_hooks/useAdminCrud';
-import {examTypeKeys} from '@/app/features/exam-types/examTypeKeys';
+import {examTypeKeys} from '@/app/configs/queryKeys';
 import type {ExamTypeLayoutResponse, ExamTypeRequest, ExamTypeResponse} from '@/app/types';
 
 export function useAdminExamTypes() {
@@ -35,7 +35,7 @@ export function useAdminExamTypes() {
 
 export function useOwnExamTypeLayout(examTypeId?: string) {
   const query = useQuery({
-    queryKey: examTypeKeys.layout(examTypeId),
+    queryKey: examTypeKeys.ownLayout(examTypeId),
     queryFn: () => getOwnExamTypeLayout(examTypeId as string),
     enabled: !!examTypeId,
   });

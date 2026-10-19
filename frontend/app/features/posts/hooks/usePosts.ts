@@ -5,6 +5,7 @@ import { keepPreviousData } from '@/app/configs/queryClient';
 import { getPosts, getCategories, getPostById, getComments } from '@/app/apis/postApi';
 import type { CategoryResponse, PageResponse, PostSummaryResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {postCategoryKeys} from '@/app/configs/queryKeys';
 
 const PAGE_SIZE = 9;
 
@@ -16,7 +17,7 @@ interface PostListFilter {
 }
 
 export const postsKeys = {
-  categories: ['post-categories'],
+  categories: postCategoryKeys.all,
   list: (params: PostListFilter) => ['posts', params],
   detail: (postId?: string) => ['post', postId],
   comments: (postId?: string) => ['post', postId, 'comments'],

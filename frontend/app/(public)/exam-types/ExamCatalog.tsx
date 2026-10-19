@@ -8,7 +8,7 @@ import {IoAlertCircleOutline, IoDocumentTextOutline, IoSearchOutline} from 'reac
 
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
 import {buildExamTypeDetailPath} from '@/app/configs/Routes';
-import {examTypeKeys} from '@/app/features/exam-types/examTypeKeys';
+import {examTypeKeys} from '@/app/configs/queryKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
 import QuickTestConfirmModal from '@/app/(public)/_components/HeroSection/QuickTestConfirmModal';

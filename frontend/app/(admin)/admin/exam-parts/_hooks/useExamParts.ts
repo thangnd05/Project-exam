@@ -13,11 +13,12 @@ import { getExamTypes } from '@/app/apis/examTypeApi';
 import { getSkills } from '@/app/apis/skillApi';
 import type { ExamPartRequest, ExamPartResponse, ExamTypeResponse, SkillResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examPartKeys, examTypeKeys, skillKeys} from '@/app/configs/queryKeys';
 
 export const examPartsKeys = {
-  examParts: ['exam-parts'],
-  examTypes: ['exam-types'],
-  skills: ['skills'],
+  examParts: examPartKeys.all,
+  examTypes: examTypeKeys.all,
+  skills: skillKeys.all,
 };
 
 export type ExamPartItem = {

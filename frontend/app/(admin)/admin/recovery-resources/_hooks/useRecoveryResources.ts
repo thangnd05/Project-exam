@@ -18,6 +18,7 @@ import type {
   RecoveryResourceResponse,
   TagResponse,
 } from '@/app/types';
+import {examTypeKeys, tagKeys} from '@/app/configs/queryKeys';
 
 export interface RecoveryExamTypeOption {
   id?: string;
@@ -26,8 +27,8 @@ export interface RecoveryExamTypeOption {
 
 export const recoveryResourceKeys = {
   resources: ['recovery-resources'] as const,
-  examTypes: ['recovery-exam-types'] as const,
-  tags: (examTypeId?: string) => ['recovery-tags-flat', examTypeId ?? null] as const,
+  examTypes: examTypeKeys.all,
+  tags: tagKeys.flat,
 };
 
 const EMPTY: never[] = [];

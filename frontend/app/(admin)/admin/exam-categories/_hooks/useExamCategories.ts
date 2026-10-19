@@ -8,10 +8,7 @@ import {
 } from '@/app/apis/examCategoryApi';
 import {useAdminCrud} from '@/app/(admin)/_hooks/useAdminCrud';
 import type {ExamCategoryRequest, ExamCategoryResponse} from '@/app/types';
-
-export const examCategoryKeys = {
-  list: () => ['exam-categories'],
-};
+import {examCategoryKeys} from '@/app/configs/queryKeys';
 
 export type ExamCategoryItem = {
   examCategoryId: string;
@@ -35,7 +32,7 @@ const mapFromApi = (item: ExamCategoryResponse): ExamCategoryItem => ({
 
 export function useExamCategories() {
   const crud = useAdminCrud({
-    queryKey: examCategoryKeys.list(),
+    queryKey: examCategoryKeys.all,
     list: getExamCategories,
     create: (payload: ExamCategoryRequest) => createExamCategory(payload),
     update: ({id, payload}: {id: string; payload: ExamCategoryRequest}) => updateExamCategory(id, payload),

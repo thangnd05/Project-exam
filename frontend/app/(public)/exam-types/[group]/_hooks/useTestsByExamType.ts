@@ -13,12 +13,13 @@ import type {
   TestResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys} from '@/app/configs/queryKeys';
 
 const PAGE_SIZE = 12;
 
 export const examTypeTestsKeys = {
   tests: (id?: string, page?: number) => ['examtype-tests', id, page],
-  name: (id?: string) => ['examtype-name', id],
+  name: examTypeKeys.detail,
   children: (id?: string) => ['examtype-children', id],
   certificateExams: (id?: string) => ['examtype-certificate-exams', id],
 };

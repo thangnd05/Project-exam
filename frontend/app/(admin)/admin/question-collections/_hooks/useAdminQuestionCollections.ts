@@ -1,6 +1,6 @@
 'use client';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createQuestionCollection,
   deleteQuestionCollection,
@@ -14,11 +14,7 @@ import type {
   QuestionCollectionResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
-
-export const questionCollectionKeys = {
-  all: ['admin-question-collections'],
-  examTypes: ['admin-question-collections', 'exam-types'],
-};
+import {questionCollectionKeys, examTypeKeys} from '@/app/configs/queryKeys';
 
 export type CollectionItem = {
   collection_id: string;
@@ -62,20 +58,26 @@ export function useAdminQuestionCollections() {
   });
 
   const examTypesQuery = useQuery({
-    queryKey: questionCollectionKeys.examTypes,
+    queryKey: examTypeKeys.all,
     queryFn: getExamTypes,
     select: normalizeExamTypes,
   });
 
+  const queryClient = useQueryClient();
+  const invalidateCollections = () => queryClient.invalidateQueries({ queryKey: questionCollectionKeys.all });
+
   const createMutation = useMutation({
     mutationFn: (payload: QuestionCollectionRequest) => createQuestionCollection(payload),
+    onSuccess: invalidateCollections,
   });
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: QuestionCollectionRequest }) =>
       updateQuestionCollection(id, payload),
+    onSuccess: invalidateCollections,
   });
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteQuestionCollection(id),
+    onSuccess: invalidateCollections,
   });
 
   return {

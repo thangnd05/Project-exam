@@ -19,13 +19,14 @@ import type {
   TagResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys, examPartKeys, tagKeys} from '@/app/configs/queryKeys';
 
 export const adminQuestionKeys = {
   root: ['admin-questions'] as const,
   list: (params: AdminQuestionSearchParams) => ['admin-questions', 'list', params] as const,
-  examTypes: ['admin-questions', 'exam-types'] as const,
-  parts: (examTypeId: string) => ['admin-questions', 'parts', examTypeId] as const,
-  tags: (examTypeId: string) => ['admin-questions', 'tags', examTypeId] as const,
+  examTypes: examTypeKeys.all,
+  parts: examPartKeys.byExamType,
+  tags: tagKeys.flat,
 };
 
 const normalizeArray = <T,>(data: T[] | { content?: T[] } | null | undefined): T[] =>

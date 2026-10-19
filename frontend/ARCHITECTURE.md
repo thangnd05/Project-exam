@@ -52,7 +52,8 @@ frontend/
                                 #   auth, certificates, classes, exam-layout, exam-types, gamification/<x>,
                                 #   learning-plans, my-target, notes, posts, resources, tests
     hooks/                      # chỉ hook hạ tầng không thuộc domain nào (xem mục 1)
-    configs/                    # Routes.ts, adminPermissions.ts (dùng enum PermissionCode), queryClient.ts
+    configs/                    # Routes.ts, adminPermissions.ts (dùng enum PermissionCode), queryClient.ts,
+                                #   queryKeys.ts (query key của tài nguyên đọc ở nhiều nơi)
     contexts/                   # Auth/Coin/Cosmetic/Streak context
     enums/                      # enum mirror backend (QuestionType, TestStatus, ...)
     types/                      # interface mirror DTO backend, theo domain + index.ts barrel
@@ -87,7 +88,8 @@ mà không tự biến thành URL.
 | Component chính | `'use client'`, `export default`, tên trùng thư mục route, bỏ hậu tố `Page` |
 | File `.ts` không phải component | camelCase như hiện có (`useTestSession.ts`, `planLabels.ts`) |
 | Style | SCSS module cạnh component; cấm hex/rgba literal - dùng token trong GlobalStyles |
-| Server state | TanStack Query, `queryFn` gọi hàm trong `app/apis/` |
+| Server state | TanStack Query, `queryFn` gọi hàm trong `app/apis/`, không dùng `useEffect` + `useState` để fetch |
+| Query key | Tài nguyên được đọc ở ≥2 nơi phải dùng key trong `app/configs/queryKeys.ts` (một gốc cho mỗi tài nguyên, mutation invalidate gốc). Cùng key thì cùng `queryFn`; biến đổi dữ liệu đặt trong `select` |
 | Kiểu dữ liệu API | lấy từ `@/app/types`, enum từ `@/app/enums` (mirror DTO backend) |
 
 ## 4. Tra nhanh: tìm code ở đâu

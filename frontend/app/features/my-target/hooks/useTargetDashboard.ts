@@ -16,10 +16,11 @@ import type {
   UserTestResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys, examPartKeys} from '@/app/configs/queryKeys';
 
 export const targetDashboardKeys = {
-  examTypes: ['exam-types', 'standard'],
-  examParts: ['exam-parts'],
+  examTypes: examTypeKeys.standard,
+  examParts: examPartKeys.all,
   dashboard: (examTypeId?: string) => ['target-dashboard', examTypeId],
 };
 

@@ -9,11 +9,12 @@ import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache'
 import { LearningPlanStatus } from '@/app/enums';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys, completedUserTestKeys, userTargetKeys} from '@/app/configs/queryKeys';
 
 export const generatePlanKeys = {
-  examTypes: ['generate-plan', 'exam-types'],
-  userTests: ['generate-plan', 'completed-user-tests'],
-  target: (examTypeId?: string) => ['generate-plan', 'user-target', examTypeId],
+  examTypes: examTypeKeys.standard,
+  userTests: completedUserTestKeys.byExamType(),
+  target: userTargetKeys.byExamType,
 };
 
 const asArray = <T>(data: T[]): T[] => (Array.isArray(data) ? data : []);

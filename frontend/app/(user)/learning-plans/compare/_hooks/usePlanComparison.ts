@@ -4,9 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import {examTypeKeys} from '@/app/configs/queryKeys';
 
 export const planComparisonKeys = {
-  examTypes: () => ['exam-types', 'standard'],
+  examTypes: () => examTypeKeys.standard,
   plans: (examTypeId?: string) => ['learning-plans', examTypeId],
 };
 
