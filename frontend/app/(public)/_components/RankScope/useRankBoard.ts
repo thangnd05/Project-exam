@@ -8,7 +8,6 @@ import {examTypeKeys} from '@/app/hooks/examTypeKeys';
 import type {QuickLeaderboardEntry} from '@/app/types/attempt';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import {badgeUrl, parseCode, parseVendor, type Vendor} from '@/app/utils/certificationMeta';
-import {quickLeaderboardKeys} from '../HeroSection/hooks/useQuickLeaderboard';
 
 export type RankExam = {
   examTypeId: string;
@@ -21,7 +20,9 @@ export type RankExam = {
 export type RankRow = {entry: QuickLeaderboardEntry; exam: RankExam};
 
 // Tiền tố query key chung của mọi bảng xếp hạng Full Mock, dùng để làm mới tất cả cùng lúc.
-export const RANK_BOARD_KEY = quickLeaderboardKeys.list(0)[0];
+export const RANK_BOARD_KEY = 'full-mock-leaderboard';
+
+const rankBoardKey = (limit: number, examTypeId: string) => [RANK_BOARD_KEY, examTypeId, limit] as const;
 
 const normalizeExamTypes = (payload: unknown): ExamTypeResponse[] => {
   if (Array.isArray(payload)) return payload;
@@ -71,7 +72,7 @@ export function useRankBoard(limit: number, enabled = true) {
 
   const boards = useQueries({
     queries: exams.map((exam) => ({
-      queryKey: quickLeaderboardKeys.list(limit, exam.examTypeId),
+      queryKey: rankBoardKey(limit, exam.examTypeId),
       queryFn: () => getQuickChallengeLeaderboard(limit, exam.examTypeId),
       enabled,
     })),

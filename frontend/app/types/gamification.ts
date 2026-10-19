@@ -123,15 +123,3 @@ export interface StreakRecoverConfigResponse {
   active?: boolean;
 }
 
-export interface StreakLeaderboardEntry {
-  rank: number;
-  displayName: string;
-  userName?: string | null;
-  avatarUrl?: string | null;
-  longestStreak: number;
-}
-
-export interface StreakLeaderboardResponse {
-  entries: StreakLeaderboardEntry[];
-  totalParticipants: number;
-}
