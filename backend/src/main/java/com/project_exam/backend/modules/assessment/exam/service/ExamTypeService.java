@@ -15,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -56,9 +59,16 @@ public class ExamTypeService {
         return toResponse(type);
     }
 
+    public ExamTypeResponse findBySlug(String slug) {
+        ExamType type = examTypeRepository.findBySlug(slug.toLowerCase(Locale.ROOT))
+                .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
+        return toResponse(type);
+    }
+
     public ExamTypeResponse create(ExamTypeRequest request) {
         ExamType type = new ExamType();
         type.setName(request.getName());
+        type.setSlug(validateSlug(request.getSlug(), null));
         type.setDescription(request.getDescription());
         type.setImageUrl(request.getImageUrl());
         type.setDurationMinutes(request.getDurationMinutes());
@@ -76,6 +86,8 @@ public class ExamTypeService {
         ExamType type = examTypeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
         if (request.getName() != null) type.setName(request.getName());
+        // Đổi tên không đổi slug để link cũ còn dùng được; chỉ đổi khi admin gửi slug.
+        if (request.getSlug() != null) type.setSlug(validateSlug(request.getSlug(), id));
         if (request.getDescription() != null) type.setDescription(request.getDescription());
         if (request.getImageUrl() != null) type.setImageUrl(request.getImageUrl());
         if (request.getDurationMinutes() != null) type.setDurationMinutes(request.getDurationMinutes());
@@ -113,14 +125,36 @@ public class ExamTypeService {
     }
 
     private ExamTypeResponse toResponse(ExamType t) {
-        String parentName = null;
-        if (t.getParentId() != null) {
-            parentName = examTypeRepository.findById(t.getParentId())
-                    .map(ExamType::getName)
-                    .orElse(null);
-        }
+        ExamType parent = t.getParentId() == null
+                ? null
+                : examTypeRepository.findById(t.getParentId()).orElse(null);
         Long childCount = examTypeRepository.countByParentId(t.getExamTypeId());
-        return examTypeMapper.toResponse(t, parentName, childCount);
+        return examTypeMapper.toResponse(t, parent, childCount);
+    }
+
+    private static final Pattern SLUG_PATTERN = Pattern.compile("^[a-z0-9]+(-[a-z0-9]+)*$");
+
+    /** Trùng tên trang con cố định trên frontend thì URL của kỳ thi bị trang đó che mất: /exam-types/aws/collections/... */
+    private static final Set<String> RESERVED_SLUGS = Set.of("collections");
+
+    /** Slug do admin nhập: chữ thường, số, gạch ngang (vd "saa-c03"), không trùng kỳ thi khác. */
+    private String validateSlug(String slug, String selfId) {
+        if (slug == null || slug.isBlank()) {
+            throw new BadRequestException("Slug không được để trống.");
+        }
+        if (slug.length() > 100 || !SLUG_PATTERN.matcher(slug).matches()) {
+            throw new BadRequestException("Slug chỉ gồm chữ thường không dấu, số và gạch ngang, vd: saa-c03.");
+        }
+        if (RESERVED_SLUGS.contains(slug)) {
+            throw new BadRequestException("Slug \"" + slug + "\" trùng đường dẫn hệ thống, hãy chọn slug khác.");
+        }
+        boolean taken = selfId == null
+                ? examTypeRepository.existsBySlug(slug)
+                : examTypeRepository.existsBySlugAndExamTypeIdNot(slug, selfId);
+        if (taken) {
+            throw new ConflictException("Slug đã được dùng: " + slug);
+        }
+        return slug;
     }
 
     private void validateScoreScale(ExamType type) {

@@ -1,7 +1,7 @@
 'use client';
 
 import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
@@ -24,8 +24,8 @@ import { useTestsByExamType } from './_hooks/useTestsByExamType';
 
 const cx = classNames.bind(style);
 
-function TestByExamType() {
-  const { examTypeId } = useParams<{ examTypeId: string }>();
+// examTypeId do server tra từ slug trên URL (/exam-types/aws/saa-c03) rồi truyền xuống.
+function TestByExamType({ examTypeId }: { examTypeId: string }) {
   const router = useRouter();
   const { user } = useAuth();
 
@@ -78,7 +78,7 @@ function TestByExamType() {
               key={child.examTypeId}
               type="button"
               className={cx('folder-card')}
-              onClick={() => router.push(buildExamTypeDetailPath(child.examTypeId))}
+              onClick={() => router.push(buildExamTypeDetailPath(child))}
             >
               <span className={cx('folder-card-icon')}>
                 <IoSchoolOutline />

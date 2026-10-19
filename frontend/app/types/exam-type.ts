@@ -1,5 +1,7 @@
 export interface ExamTypeRequest {
   name?: string;
+  /** Bắt buộc khi tạo, vd "saa-c03". Khi sửa: bỏ qua thì giữ nguyên. */
+  slug?: string;
   description?: string;
   imageUrl?: string;
   durationMinutes?: number;
@@ -13,6 +15,8 @@ export interface ExamTypeRequest {
 export interface ExamTypeResponse {
   examTypeId: string;
   name?: string;
+  /** Định danh trong URL, vd "saa-c03". */
+  slug?: string;
   description?: string;
   imageUrl?: string;
   durationMinutes?: number;
@@ -22,6 +26,7 @@ export interface ExamTypeResponse {
   flexible?: boolean;
   parentId?: string;
   parentName?: string;
+  parentSlug?: string;
   childCount?: number;
 }
 

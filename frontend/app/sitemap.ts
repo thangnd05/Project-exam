@@ -6,6 +6,7 @@ import type {
   RecoveryResourceResponse,
 } from '@/app/types';
 import { fetchPublicJson } from '@/app/utils/serverApi';
+import { buildExamTypeDetailPath } from '@/app/configs/Routes';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -36,7 +37,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const examTypeEntries: MetadataRoute.Sitemap = (examTypes || []).map((examType) => ({
-    url: `${SITE_URL}/exam-types/${examType.examTypeId}`,
+    url: `${SITE_URL}${buildExamTypeDetailPath(examType)}`,
     changeFrequency: 'weekly',
     priority: 0.8,
   }));

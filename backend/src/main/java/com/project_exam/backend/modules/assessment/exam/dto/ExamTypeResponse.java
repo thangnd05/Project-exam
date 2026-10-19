@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class ExamTypeResponse {
     private String examTypeId;
     private String name;
+    private String slug;
     private String description;
     private String imageUrl;
     private Integer durationMinutes;
@@ -23,6 +24,8 @@ public class ExamTypeResponse {
     private String parentId;
 
     private String parentName;
+
+    private String parentSlug;
 
     private Long childCount;
 }

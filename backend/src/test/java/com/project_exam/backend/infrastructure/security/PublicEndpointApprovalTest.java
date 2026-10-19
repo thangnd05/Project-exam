@@ -46,6 +46,7 @@ class PublicEndpointApprovalTest {
             "GET /api/exam-types",
             "GET /api/exam-types/standard",
             "GET /api/exam-types/flexible",
+            "GET /api/exam-types/by-slug/{slug}",
             "GET /api/exam-types/{id}",
             "GET /api/exam-types/{id}/children",
             "GET /api/exam-types/{examTypeId}/layout",

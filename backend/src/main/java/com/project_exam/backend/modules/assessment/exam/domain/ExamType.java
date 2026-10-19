@@ -27,6 +27,10 @@ public class ExamType {
     @Column(nullable = false, length = 100)
     private String name;
 
+    /** Định danh trong URL (vd "saa-c03"), duy nhất giữa các kỳ thi chưa xoá. */
+    @Column(nullable = false, length = 100)
+    private String slug;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 

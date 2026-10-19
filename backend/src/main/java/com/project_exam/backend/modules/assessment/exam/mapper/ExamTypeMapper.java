@@ -11,10 +11,11 @@ public class ExamTypeMapper {
         return toResponse(t, null, 0L);
     }
 
-    public ExamTypeResponse toResponse(ExamType t, String parentName, Long childCount) {
+    public ExamTypeResponse toResponse(ExamType t, ExamType parent, Long childCount) {
         return ExamTypeResponse.builder()
                 .examTypeId(t.getExamTypeId())
                 .name(t.getName())
+                .slug(t.getSlug())
                 .description(t.getDescription())
                 .imageUrl(t.getImageUrl())
                 .durationMinutes(t.getDurationMinutes())
@@ -23,7 +24,8 @@ public class ExamTypeMapper {
                 .scoreMax(t.getScoreMax())
                 .flexible(Boolean.TRUE.equals(t.getFlexible()))
                 .parentId(t.getParentId())
-                .parentName(parentName)
+                .parentName(parent != null ? parent.getName() : null)
+                .parentSlug(parent != null ? parent.getSlug() : null)
                 .childCount(childCount)
                 .build();
     }

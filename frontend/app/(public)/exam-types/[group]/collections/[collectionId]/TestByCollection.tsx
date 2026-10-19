@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
 import { IoDocumentTextOutline } from 'react-icons/io5';
-import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
+import routes from '@/app/configs/Routes';
 
 import TestListContainer from '@/app/components/tests/TestListContainer/TestListContainer';
 import Pagination from '@/app/components/Pagination/Pagination';
@@ -12,11 +12,14 @@ import { useCollectionTests, useCollectionName } from './_hooks/useCollectionTes
 
 const PAGE_SIZE = 12;
 
-function TestByCollection() {
-  const { examTypeId, collectionId } = useParams<{
-    examTypeId: string;
-    collectionId: string;
-  }>();
+type TestByCollectionProps = {
+  // Server tra từ slug trên URL rồi truyền xuống, kèm đường dẫn quay lại trang kỳ thi.
+  examTypeId: string;
+  examHref: string;
+};
+
+function TestByCollection({ examTypeId, examHref }: TestByCollectionProps) {
+  const { collectionId } = useParams<{ collectionId: string }>();
   const router = useRouter();
 
   const [countdowns, setCountdowns] = useState<Record<string, number>>({});
@@ -61,8 +64,7 @@ function TestByCollection() {
     </div>
   );
 
-  const goBack = () =>
-    router.push(examTypeId ? buildExamTypeDetailPath(examTypeId) : routes.home);
+  const goBack = () => router.push(examHref || routes.home);
 
   return (
     <TestListContainer

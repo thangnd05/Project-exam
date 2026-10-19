@@ -20,6 +20,7 @@ const cx = classNames.bind(styles);
 
 const emptyForm: ExamTypeFormState = {
   name: '',
+  slug: '',
   description: '',
   image_url: '',
   duration_minutes: '',
@@ -33,6 +34,7 @@ const emptyForm: ExamTypeFormState = {
 type ExamTypeItem = {
   exam_type_id: string;
   name: string;
+  slug: string;
   description: string;
   image_url: string;
   duration_minutes: number | '';
@@ -50,6 +52,7 @@ type ExamTypeNode = ExamTypeItem & {children?: ExamTypeNode[]};
 const mapExamTypeFromApi = (item: ExamTypeResponse): ExamTypeItem => ({
   exam_type_id: String(item.examTypeId),
   name: item.name || '',
+  slug: item.slug || '',
   description: item.description || '',
   image_url: item.imageUrl || '',
   duration_minutes: item.durationMinutes ?? '',
@@ -68,6 +71,7 @@ const buildExamTypePayload = (formState: ExamTypeFormState, {hasChildren}: {hasC
 
   return {
     name: formState.name.trim(),
+    slug: formState.slug.trim(),
     description: formState.description.trim(),
     imageUrl: formState.image_url.trim(),
     durationMinutes,
@@ -124,7 +128,8 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
             {level === 0 ? <FolderTree size={16} /> : <Library size={15} />}
           </span>
           <span className={cx('collectionName', {root: level === 0})}>{node.name}</span>
-          {hasChildren && <span className={cx('childCount')}>{node.children!.length} loại con</span>}
+          {node.slug && <code className={cx('description')}>/{node.slug}</code>}
+          {hasChildren &&<span className={cx('childCount')}>{node.children!.length} loại con</span>}
           {node.flexible && <Badge bg="info">Linh hoạt</Badge>}
           <Badge bg="primary">{node.scoring_method} · {node.score_min}–{node.score_max}</Badge>
           {node.duration_minutes !== '' && node.duration_minutes != null && (
@@ -262,6 +267,7 @@ function ExamTypesManagement() {
     setEditingTypeId(examType.exam_type_id);
     setFormState({
       name: examType.name,
+      slug: examType.slug || '',
       description: examType.description || '',
       image_url: examType.image_url || '',
       duration_minutes: examType.duration_minutes ?? '',
@@ -281,6 +287,10 @@ function ExamTypesManagement() {
 
     if (!normalizedName) {
       setErrorMessage('Tên loại kỳ thi không được để trống.');
+      return;
+    }
+    if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(formState.slug.trim())) {
+      setErrorMessage('Slug bắt buộc, chỉ gồm chữ thường không dấu, số và gạch ngang, vd: saa-c03.');
       return;
     }
     if (durationValue && (!Number.isFinite(parsedDuration) || (parsedDuration as number) <= 0)) {

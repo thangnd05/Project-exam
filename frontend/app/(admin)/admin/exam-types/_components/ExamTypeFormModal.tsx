@@ -11,6 +11,7 @@ const scoringMethodOptions = [
 
 export type ExamTypeFormState = {
   name: string;
+  slug: string;
   description: string;
   image_url: string;
   duration_minutes: number | string;
@@ -66,6 +67,18 @@ function ExamTypeFormModal({
           value={formState.name}
           onChange={(event) => onChangeField('name', event.target.value)}
         />
+      </Form.Group>
+      <Form.Group className="mb-3">
+        <Form.Label>Slug (đường dẫn)</Form.Label>
+        <Form.Control
+          value={formState.slug}
+          placeholder="vd: saa-c03"
+          onChange={(event) => onChangeField('slug', event.target.value)}
+        />
+        <Form.Text muted>
+          Dùng trong URL, vd /exam-types/aws/saa-c03. Chỉ gồm chữ thường không dấu, số và gạch ngang.
+          {isEditing ? ' Đổi slug thì link dạng slug cũ sẽ không mở được nữa.' : ''}
+        </Form.Text>
       </Form.Group>
       <Form.Group className="mb-3">
         <Form.Label>Mô tả</Form.Label>

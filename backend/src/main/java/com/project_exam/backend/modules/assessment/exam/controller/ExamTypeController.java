@@ -30,6 +30,11 @@ public class ExamTypeController {
         return ResponseEntity.ok(examTypeService.findFlexible());
     }
 
+    @GetMapping("/by-slug/{slug}")
+    public ResponseEntity<ExamTypeResponse> getExamTypeBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(examTypeService.findBySlug(slug));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ExamTypeResponse> getExamTypeById(@PathVariable String id) {
         return ResponseEntity.ok(examTypeService.findById(id));

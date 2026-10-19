@@ -215,7 +215,7 @@ function ExamCatalog() {
       <div className={cx('grid')}>
         {visible.map((item) => {
           const {exam, code, title} = item;
-          const href = buildExamTypeDetailPath(exam.examTypeId);
+          const href = buildExamTypeDetailPath(exam);
           const quick = quickByExam.get(exam.examTypeId);
           const tag = vendorTag(item);
           const levelLabel = LEVELS.find((l) => l.id === item.level)?.label;

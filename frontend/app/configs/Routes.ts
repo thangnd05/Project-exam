@@ -7,12 +7,8 @@ const routes = {
   policy: '/policy',
   service: '/service',
 
-  testStart: '/tests/:testId/start',
-  testResult: '/tests/result/:userTestId',
-  testReview: '/tests/result/:userTestId/review',
   classChapterPage: '/class/:classId/chapters',
 
-  createTestFromBank: '/admin/create-test-from-bank',
   personalQuestionBank: '/admin/personal-question-bank',
 
   adminDashboard: '/admin/dashboard',
@@ -28,7 +24,6 @@ const routes = {
   adminRecoveryResources: '/admin/recovery-resources',
   adminExamCategories: '/admin/exam-categories',
   adminExamParts: '/admin/exam-parts',
-  adminClasses: '/admin/classes',
   adminTests: '/admin/tests',
   adminCategories: '/admin/categories',
   adminQuestions: '/admin/questions',
@@ -46,29 +41,16 @@ const routes = {
   adminCertificates: '/admin/certificates',
 
   testHistory: '/tests/history/:testId',
-  testLeaderboard: '/tests/leaderboard/:testId',
   examTypes: '/exam-types',
   resources: '/resources',
-  examTypeDetail: '/exam-types/:examTypeId',
-  examTypeCollection: '/exam-types/:examTypeId/collections/:collectionId',
 
   myCertificates: '/my-certificates',
-  certificateDetail: '/certificates/:certificateId',
   certificateVerifyHome: '/certificates/verify',
-  certificateVerify: '/certificates/verify/:code',
 
   learningPlans: '/learning-plans',
   generatePlan: '/learning-plans/generate',
-  planCompare: '/learning-plans/compare',
-  planDetail: '/learning-plans/:learningPlanId',
-  planStudy: '/learning-plans/:learningPlanId/study',
-  planResult: '/learning-plans/:learningPlanId/tasks/:taskId/result',
-  taskHistory: '/learning-plans/:learningPlanId/tasks/:taskId/history',
-  planSessionReview: '/learning-plans/:learningPlanId/sessions/:sessionId/review',
 
   myAlbums: '/my-albums',
-  albumDelta: '/albums/:albumId',
-  vocaPratice: '/practice/:albumId',
 
   myClasses: '/my-classes',
   classChapterTests: '/classes/:classId/chapters/:chapterId/tests',
@@ -80,27 +62,45 @@ const routes = {
   profile: '/profile',
   myTarget: '/my-target',
   targetDashboard: '/my-target/dashboard',
-  mockHistory: '/my-target/mocks',
-  targetAchieved: '/my-target/achieved',
-
-  oauth2Redirect: '/oauth2/redirect',
 
   notFoundPage: '/not-found',
 } as const;
 
 export type RouteKey = keyof typeof routes;
 
-export function buildExamTypeDetailPath(examTypeId: string | number | null | undefined): string {
-  if (!examTypeId) return routes.home;
-  return `/exam-types/${encodeURIComponent(examTypeId)}`;
+type ExamTypeRef =
+  | string
+  | number
+  | null
+  | undefined
+  | { examTypeId?: string | null; slug?: string | null; parentSlug?: string | null };
+
+// Có slug thì dùng đường dẫn slug (/exam-types/aws/saa-c03); chỉ có id thì dùng /exam-types/<id>,
+// trang chi tiết sẽ tự chuyển hướng 308 sang đường dẫn slug.
+function examTypeSegment(exam: ExamTypeRef): string {
+  if (exam && typeof exam === 'object') {
+    if (exam.slug) {
+      return exam.parentSlug
+        ? `${encodeURIComponent(exam.parentSlug)}/${encodeURIComponent(exam.slug)}`
+        : encodeURIComponent(exam.slug);
+    }
+    return exam.examTypeId ? encodeURIComponent(exam.examTypeId) : '';
+  }
+  return exam ? encodeURIComponent(exam) : '';
+}
+
+export function buildExamTypeDetailPath(exam: ExamTypeRef): string {
+  const segment = examTypeSegment(exam);
+  return segment ? `/exam-types/${segment}` : routes.home;
 }
 
 export function buildExamTypeCollectionPath(
-  examTypeId: string | number | null | undefined,
+  exam: ExamTypeRef,
   collectionId: string | number | null | undefined,
 ): string {
-  if (!examTypeId || !collectionId) return routes.home;
-  return `/exam-types/${encodeURIComponent(examTypeId)}/collections/${encodeURIComponent(collectionId)}`;
+  const segment = examTypeSegment(exam);
+  if (!segment || !collectionId) return routes.home;
+  return `/exam-types/${segment}/collections/${encodeURIComponent(collectionId)}`;
 }
 
 export default routes;

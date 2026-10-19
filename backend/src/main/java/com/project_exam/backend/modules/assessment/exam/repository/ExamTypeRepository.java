@@ -7,9 +7,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ExamTypeRepository extends JpaRepository<ExamType, String> {
+
+    Optional<ExamType> findBySlug(String slug);
+
+    boolean existsBySlug(String slug);
+
+    boolean existsBySlugAndExamTypeIdNot(String slug, String examTypeId);
 
     @Query("SELECT e FROM ExamType e WHERE e.flexible IS NULL OR e.flexible = false")
     List<ExamType> findStandard();

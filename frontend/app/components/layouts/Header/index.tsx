@@ -69,8 +69,12 @@ function isLightBehind(pill: HTMLElement): boolean {
   return false;
 }
 
+// Đi qua route group khác (vd (guest) -> (user)) thì layout và Header mount lại từ đầu;
+// nhớ kết quả lần đo trước để header không chớp về nền tối rồi mới đổi lại.
+let lastOnLight = false;
+
 function useLightBehind(pillRef: React.RefObject<HTMLElement | null>, pathname: string) {
-  const [onLight, setOnLight] = useState(false);
+  const [onLight, setOnLight] = useState(() => lastOnLight);
 
   useEffect(() => {
     const pill = pillRef.current;
@@ -81,7 +85,8 @@ function useLightBehind(pillRef: React.RefObject<HTMLElement | null>, pathname: 
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        setOnLight(isLightBehind(pill));
+        lastOnLight = isLightBehind(pill);
+        setOnLight(lastOnLight);
       });
     };
 
