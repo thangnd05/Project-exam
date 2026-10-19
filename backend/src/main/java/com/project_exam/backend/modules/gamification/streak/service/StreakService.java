@@ -11,7 +11,9 @@ import com.project_exam.backend.modules.gamification.streak.repository.UserStrea
 import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
 import com.project_exam.backend.shared.exception.BadRequestException;
+import com.project_exam.backend.infrastructure.cache.CacheNames;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -121,6 +123,7 @@ public class StreakService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(cacheNames = CacheNames.STREAK_LEADERBOARD, key = "#limit", sync = true)
     public StreakLeaderboardResponse getLeaderboard(int limit) {
         int safeLimit = Math.min(Math.max(limit, 1), LEADERBOARD_TOP_LIMIT);
         List<UserStreak> ranked = userStreakRepository.findRankedByLongestStreak(PageRequest.of(0, safeLimit));

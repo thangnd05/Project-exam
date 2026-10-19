@@ -136,6 +136,8 @@ export function useTestSession() {
   const [preCountdown, setPreCountdown] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const submittingRef = useRef(false);
+  // Effect tạo lượt làm chạy lại mỗi khi deps đổi (hoặc 2 lần ở StrictMode) trong lúc request đầu chưa trả về.
+  const startingRef = useRef(false);
   const [status, setStatus] = useState('loading');
   // Bài thi tính giờ phải bấm "Bắt đầu" ở màn sẵn sàng rồi mới tạo lượt làm, lúc đó đồng hồ mới chạy.
   const [readyConfirmed, setReadyConfirmed] = useState(isPractice);
@@ -367,6 +369,8 @@ export function useTestSession() {
         setStatus('ready');
         return;
       }
+      if (startingRef.current) return;
+      startingRef.current = true;
       const requestedAt = clockMark();
       startUserTest(test.testId, isGuest, guestCfg, {
         mode: isPractice ? PRACTICE_MODE_PARAM : undefined,
@@ -387,6 +391,9 @@ export function useTestSession() {
         .catch((err) => {
           if (err.response?.status === 403) setStatus('no-attempts');
           else setStatus('error');
+        })
+        .finally(() => {
+          startingRef.current = false;
         });
     }
   }, [status, test, sessionKey, isPractice, selectedPartIds, isGuest, guestCfg, holdStart, readyConfirmed, applyAttemptOrder]);

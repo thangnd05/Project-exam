@@ -9,7 +9,9 @@ import com.project_exam.backend.modules.assessment.test.repository.TestRepositor
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.exception.NotFoundException;
+import com.project_exam.backend.infrastructure.cache.CacheNames;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -23,6 +25,7 @@ public class ExamCategoryService {
     private final ExamCategoryMapper examCategoryMapper;
     private final TestRepository testRepository;
 
+    @Cacheable(cacheNames = CacheNames.EXAM_CATEGORIES, key = "'all'", sync = true)
     public List<ExamCategoryResponse> findAll() {
         return examCategoryRepository.findAll().stream()
                 .sorted(Comparator

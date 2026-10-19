@@ -26,3 +26,19 @@
     outline-offset: 2px;
   }
 }
+
+// Màu cố định của từng bảng màu, không lấy từ --brand-* vì biến đó đổi theo bảng màu đang bật.
+.swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 2px solid currentColor;
+}
+
+.swatch-frost {
+  background: rgb(119 187 221);
+}
+
+.swatch-gold {
+  background: rgb(201 168 75);
+}

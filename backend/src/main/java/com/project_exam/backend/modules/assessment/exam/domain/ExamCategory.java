@@ -4,6 +4,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.cache.CatalogCacheEvictListener;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
@@ -15,6 +16,7 @@ import java.time.Instant;
 @NoArgsConstructor @AllArgsConstructor
 @SQLDelete(sql = "UPDATE assessment.exam_categories SET deleted_at = now() WHERE exam_category_id = ?")
 @SQLRestriction("deleted_at IS NULL")
+@EntityListeners(CatalogCacheEvictListener.class)
 public class ExamCategory {
 
     @Id

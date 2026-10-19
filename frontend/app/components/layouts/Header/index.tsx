@@ -18,6 +18,7 @@ import {buildLoginUrl} from '@/app/features/auth/authRedirect';
 // import CreateClassModal from '@/app/features/classes/CreateClassModal/CreateClassModal';
 import CreateTestModal from '@/app/features/tests/CreateTestModal';
 import ThemeToggle from '@/app/components/layouts/Header/ThemeToggle/ThemeToggle';
+import PaletteToggle from '@/app/components/layouts/Header/ThemeToggle/PaletteToggle';
 import StreakBadge from '@/app/features/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/features/gamification/coin/CoinQuestMenu';
 import FirstTimeHint from '@/app/features/gamification/onboarding/FirstTimeHint';
@@ -320,6 +321,7 @@ function Header() {
           </nav>
 
           <div className={cx('zoneRight')}>
+            <PaletteToggle className={cx('themeToggle')} />
             <ThemeToggle className={cx('themeToggle')} />
             {showStats && (
               <div className={cx('mobileHeaderActions')}>

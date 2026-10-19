@@ -13,7 +13,9 @@ import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepos
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestPartRepository;
+import com.project_exam.backend.infrastructure.cache.CacheNames;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,12 +30,14 @@ public class ExamPartService {
     private final QuestionRepository questionRepository;
     private final TestPartRepository testPartRepository;
 
+    @Cacheable(cacheNames = CacheNames.EXAM_PARTS, key = "'all'", sync = true)
     public List<ExamPartResponse> findAll() {
         return examPartRepository.findAllOrdered().stream()
                 .map(examPartMapper::toResponse)
                 .toList();
     }
 
+    @Cacheable(cacheNames = CacheNames.EXAM_PARTS, key = "'type:' + #examTypeId", sync = true)
     public List<ExamPartResponse> findByExamTypeId(String examTypeId) {
         return examPartRepository.findByExamTypeId(examTypeId).stream()
                 .map(examPartMapper::toResponse)

@@ -5,7 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '@/app/assets/styles/GlobalStyles/GlobalStyles.scss';
 import '@/app/assets/styles/global-overrides.scss';
 import Providers from './providers';
-import { THEME_STORAGE_KEY } from '@/app/constants/theme';
+import { DEFAULT_PALETTE, PALETTE_STORAGE_KEY, PALETTES, THEME_STORAGE_KEY } from '@/app/constants/theme';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -66,17 +66,15 @@ export const viewport = {
   themeColor: '#101820',
 };
 
-// Bảng màu đang dùng: 'frost' (FrostScope) hoặc 'gold' (bảng màu vàng gốc).
-const PALETTE = 'frost';
-
-const THEME_INIT_SCRIPT = `(function(){try{if(localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)})==='dark'){var d=document.documentElement;d.setAttribute('data-theme','dark');d.setAttribute('data-bs-theme','dark')}}catch(e){}})();`;
+// Áp theme sáng/tối và bảng màu đã lưu trước khi vẽ trang để không nháy màu mặc định.
+const THEME_INIT_SCRIPT = `(function(){try{var d=document.documentElement;if(localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)})==='dark'){d.setAttribute('data-theme','dark');d.setAttribute('data-bs-theme','dark')}var p=localStorage.getItem(${JSON.stringify(PALETTE_STORAGE_KEY)});if(${JSON.stringify(PALETTES)}.indexOf(p)>-1){d.setAttribute('data-palette',p)}}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="vi"
       className={`${inter.variable} ${playfair.variable}`}
-      data-palette={PALETTE}
+      data-palette={DEFAULT_PALETTE}
       suppressHydrationWarning
     >
       <head>

@@ -11,7 +11,9 @@ import com.project_exam.backend.modules.assessment.exam.mapper.ExamTypeMapper;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamPartRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
+import com.project_exam.backend.infrastructure.cache.CacheNames;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,24 +30,29 @@ public class ExamTypeService {
     private final ExamPartRepository examPartRepository;
     private final TestRepository testRepository;
 
+    // Mỗi phần tử tốn thêm 2 truy vấn (cha, số con) và trang nào cũng gọi nên cache cả danh sách.
+    @Cacheable(cacheNames = CacheNames.EXAM_TYPES, key = "'all'", sync = true)
     public List<ExamTypeResponse> findAll() {
         return examTypeRepository.findAll().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
+    @Cacheable(cacheNames = CacheNames.EXAM_TYPES, key = "'standard'", sync = true)
     public List<ExamTypeResponse> findStandard() {
         return examTypeRepository.findStandard().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
+    @Cacheable(cacheNames = CacheNames.EXAM_TYPES, key = "'flexible'", sync = true)
     public List<ExamTypeResponse> findFlexible() {
         return examTypeRepository.findFlexible().stream()
                 .map(this::toResponse)
                 .toList();
     }
 
+    @Cacheable(cacheNames = CacheNames.EXAM_TYPES, key = "'children:' + #parentId", sync = true)
     public List<ExamTypeResponse> findChildren(String parentId) {
         return examTypeRepository.findByParentId(parentId).stream()
                 .map(this::toResponse)
@@ -53,12 +60,15 @@ public class ExamTypeService {
                 .toList();
     }
 
+    @Cacheable(cacheNames = CacheNames.EXAM_TYPE, key = "'id:' + #id", sync = true)
     public ExamTypeResponse findById(String id) {
         ExamType type = examTypeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));
         return toResponse(type);
     }
 
+    @Cacheable(cacheNames = CacheNames.EXAM_TYPE,
+            key = "'slug:' + #slug.toLowerCase(T(java.util.Locale).ROOT)", sync = true)
     public ExamTypeResponse findBySlug(String slug) {
         ExamType type = examTypeRepository.findBySlug(slug.toLowerCase(Locale.ROOT))
                 .orElseThrow(() -> new NotFoundException("Exam type không tồn tại"));

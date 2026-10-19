@@ -46,6 +46,8 @@ import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRe
 import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 import com.project_exam.backend.modules.classroom.member.repository.ClassMemberRepository;
 import org.springframework.transaction.annotation.Transactional;
+import com.project_exam.backend.infrastructure.cache.CacheNames;
+import org.springframework.cache.annotation.Cacheable;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -412,6 +414,7 @@ public class UserTestService {
         boolean isPractice = mode == UserTest.Mode.PRACTICE;
         String practicePartIds = isPractice ? normalizeParts(examPartIds) : null;
 
+        userTestRepository.lockStartOf(userId, testId);
         Optional<UserTest> existing = isPractice
                 ? userTestRepository
                         .findTopByUserIdAndTestIdAndStatusAndModeAndPracticePartIdsOrderByStartedAtDesc(
@@ -548,6 +551,7 @@ public class UserTestService {
             throw new ForbiddenException("Bài trả phí yêu cầu đăng nhập và mở khoá bằng xu.");
         }
 
+        userTestRepository.lockStartOf(guestSessionId, testId);
         Optional<UserTest> existing = userTestRepository.findActiveGuestUserTest(
                 guestSessionId, testId, UserTest.Status.IN_PROGRESS);
         if (existing.isPresent() && !finalizeIfExpired(existing.get())) {
@@ -693,6 +697,7 @@ public class UserTestService {
                 .collect(Collectors.toList());
     }
 
+    @Cacheable(cacheNames = CacheNames.HALL_OF_FAME, key = "#examTypeId + ':' + #limit", sync = true)
     @Transactional(readOnly = true)
     public QuickLeaderboardResponse getQuickChallengeLeaderboard(int limit, String examTypeId) {
         int safeLimit = Math.min(Math.max(limit, 1), LEADERBOARD_TOP_LIMIT);

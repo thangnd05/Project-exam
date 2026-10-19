@@ -3,11 +3,14 @@ package com.project_exam.backend.modules.assessment.attempt.dto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.jackson.Jacksonized;
 
 import java.util.List;
 
+// Jacksonized: đọc lại được từ cache Redis.
 @Getter
 @Builder
+@Jacksonized
 @AllArgsConstructor
 public class QuickLeaderboardResponse {
     private List<Entry> entries;
@@ -15,6 +18,7 @@ public class QuickLeaderboardResponse {
 
     @Getter
     @Builder
+    @Jacksonized
     @AllArgsConstructor
     public static class Entry {
         private int rank;

@@ -51,6 +51,14 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
                                                @Param("testId") String testId,
                                                @Param("status") UserTest.Status status);
 
+    /**
+     * Khoá theo người làm (user hoặc phiên khách) + đề tới hết transaction: bấm "Bắt đầu" hai lần
+     * hay mở hai tab cùng lúc thì request sau chờ, rồi thấy và dùng lại lượt request trước vừa tạo.
+     */
+    @Query(value = "SELECT 1 FROM pg_advisory_xact_lock(hashtext('user-test-start:' || :ownerId || ':' || :testId))",
+            nativeQuery = true)
+    Integer lockStartOf(@Param("ownerId") String ownerId, @Param("testId") String testId);
+
     List<UserTest> findByGuestSessionId(String guestSessionId);
     List<UserTest> findByGuestSessionIdAndTestIdOrderByStartedAtDesc(String guestSessionId, String testId);
 

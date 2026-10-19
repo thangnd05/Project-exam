@@ -5,6 +5,7 @@ import org.hibernate.annotations.SQLRestriction;
 import java.time.Instant;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.cache.CatalogCacheEvictListener;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
@@ -18,6 +19,7 @@ import lombok.*;
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE assessment.exam_types SET deleted_at = now() WHERE exam_type_id = ?")
 @SQLRestriction("deleted_at IS NULL")
+@EntityListeners(CatalogCacheEvictListener.class)
 public class ExamType {
 
     @Id
