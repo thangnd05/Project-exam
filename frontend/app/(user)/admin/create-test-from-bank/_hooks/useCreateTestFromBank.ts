@@ -2,6 +2,7 @@
 
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import { isAxiosError } from 'axios';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '@/app/apis/testApi';
 import { createTestPart } from '@/app/apis/testPartApi';
 import { fromDateTimeLocalInput } from '@/app/utils/format-date-time';
@@ -80,7 +81,7 @@ export function useCreateTestFromBank({
             : null,
       } as unknown as CreateTestRequest);
 
-      const newTestId = testData.testId ?? (testData as any).id;
+      const newTestId = testData.testId ?? (testData as { id?: string }).id;
       if (!newTestId) throw new Error('Không nhận được testId từ server.');
 
       for (const part of partsToAdd) {
@@ -93,7 +94,7 @@ export function useCreateTestFromBank({
           examPartId: String(part.examPartId),
           numQuestions,
         });
-        const newPartId = partData.testPartId ?? (partData as any).id;
+        const newPartId = partData.testPartId ?? (partData as { id?: string }).id;
         if (!newPartId) throw new Error(`Không nhận được testPartId cho part ${part.name}.`);
 
         if (cfg.mode === SELECTION_MODES.RANDOM || cfg.mode === SELECTION_MODES.SEQUENTIAL) {
@@ -118,8 +119,9 @@ export function useCreateTestFromBank({
       setTestInfo((prev) => ({ ...prev, title: '', description: '' }));
       toast.success('Đã tạo đề thi từ kho câu hỏi!');
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message ?? error.response?.data ?? error.message;
+    onError: (error: Error) => {
+      const data: unknown = isAxiosError(error) ? error.response?.data : undefined;
+      const msg = (data as { message?: unknown } | null | undefined)?.message ?? data ?? error.message;
       setNotification({
         type: 'danger',
         message: 'Lỗi: ' + (typeof msg === 'string' ? msg : JSON.stringify(msg)),

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { getQuestionsByPart } from '@/app/apis/questionApi';
 import type { QuestionBankScope } from '@/app/enums';
 import type { QuestionResponse } from '@/app/types';
@@ -31,6 +31,9 @@ export interface PartConfig {
 }
 
 export type PartConfigMap = Record<string, PartConfig>;
+
+/** Cặp (trường, giá trị) đúng kiểu của PartConfig. */
+export type PartConfigFieldUpdate = { [K in keyof PartConfig]: [field: K, value: PartConfig[K]] }[keyof PartConfig];
 
 export interface BankLoadParams {
   classId?: string;
@@ -81,7 +84,7 @@ export function useBankTestBuilder({ getScopedQuestions }: UseBankTestBuilderOpt
   const scopeOf = (cfg: PartConfig | undefined): BankQuestion[] =>
     getScopedQuestions ? getScopedQuestions(cfg) : cfg?.bankQuestions || [];
 
-  const updatePartConfig = (examPartId: string, field: string, value: any) => {
+  const updatePartConfig = (examPartId: string, ...[field, value]: PartConfigFieldUpdate) => {
     setPartConfigs((prev) => ({
       ...prev,
       [examPartId]: { ...prev[examPartId], [field]: value } as PartConfig,
@@ -95,26 +98,36 @@ export function useBankTestBuilder({ getScopedQuestions }: UseBankTestBuilderOpt
     }));
   };
 
+  // Đổi bộ lọc (nguồn/chương/phạm vi) khi request cũ chưa về thì response cũ có thể về sau và ghi
+  // đè danh sách mới. Đánh số request theo từng part và chỉ nhận response của request mới nhất.
+  const latestRequestRef = useRef<Record<string, number>>({});
+
   const loadQuestionsForPart = (examPartId: string, params: BankLoadParams = {}) => {
+    const requestId = (latestRequestRef.current[examPartId] ?? 0) + 1;
+    latestRequestRef.current[examPartId] = requestId;
+    // Part không còn trong form (đã đổi loại đề) thì cũng bỏ qua, không thêm lại vào partConfigs.
+    const applyIfLatest = (patch: Partial<PartConfig>) => {
+      if (latestRequestRef.current[examPartId] !== requestId) return;
+      setPartConfigs((prev) =>
+        prev[examPartId] ? { ...prev, [examPartId]: { ...prev[examPartId], ...patch } } : prev,
+      );
+    };
+
     setPartConfigs((prev) => ({
       ...prev,
       [examPartId]: { ...prev[examPartId], loading: true },
     }));
     return getQuestionsByPart(examPartId, params)
       .then((data) => {
-        const raw = data as any;
-        const list: BankQuestion[] = Array.isArray(raw) ? raw : raw?.data ?? raw?.questions ?? [];
-        setPartConfigs((prev) => ({
-          ...prev,
-          [examPartId]: { ...prev[examPartId], bankQuestions: list, loading: false },
-        }));
+        // Phòng API bọc danh sách trong { data } hoặc { questions }.
+        const raw: unknown = data;
+        const wrapped = raw as { data?: BankQuestion[]; questions?: BankQuestion[] } | null;
+        const list: BankQuestion[] = Array.isArray(raw) ? raw : wrapped?.data ?? wrapped?.questions ?? [];
+        applyIfLatest({ bankQuestions: list, loading: false });
       })
       .catch((err) => {
         console.error(err);
-        setPartConfigs((prev) => ({
-          ...prev,
-          [examPartId]: { ...prev[examPartId], bankQuestions: [], loading: false },
-        }));
+        applyIfLatest({ bankQuestions: [], loading: false });
       });
   };
 

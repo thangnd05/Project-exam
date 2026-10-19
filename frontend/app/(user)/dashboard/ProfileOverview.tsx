@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import { Alert, Spinner } from 'react-bootstrap';
 import { IoClipboardOutline, IoLockClosedOutline, IoSchoolOutline, IoStatsChartOutline } from 'react-icons/io5';
@@ -88,11 +88,11 @@ function ProfileOverview() {
     ? 'Không tải được thông tin hồ sơ. Vui lòng thử lại sau.'
     : '';
 
-  useEffect(() => {
-    if (!activity) return;
+  // Chưa chọn tháng/năm thì lấy theo kỳ mà backend trả về (điều chỉnh state ngay khi render).
+  if (activity) {
     if (!selectedMonth && activity.month) setSelectedMonth(activity.month);
     if (!selectedYear && activity.year) setSelectedYear(activity.year);
-  }, [activity, selectedMonth, selectedYear]);
+  }
 
   const fullName = useMemo(() => {
     if (!profileOverview) return '';

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { isAxiosError } from 'axios';
 import classNames from 'classnames/bind';
 import { FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
 import { MdCheckCircle, MdErrorOutline } from 'react-icons/md';
@@ -91,6 +92,7 @@ function ResetPassword() {
   useEffect(() => {
     if (urlToken) {
       storeToken(urlToken);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- đồng bộ với sessionStorage + gỡ token khỏi URL (hệ thống ngoài), chỉ chạy được ở client
       setToken(urlToken);
       router.replace(routes.reset, { scroll: false });
       return;
@@ -149,15 +151,16 @@ function ResetPassword() {
       });
       clearStoredToken();
       setDone(true);
-    } catch (err: any) {
-      const status = err?.response?.status;
+    } catch (err) {
+      const response = isAxiosError<{ message?: string }>(err) ? err.response : undefined;
+      const status = response?.status;
       if (status === 429) {
         setFormError('Bạn thao tác quá nhanh. Vui lòng chờ một lát rồi thử lại.');
         return;
       }
       setFormError(
-        err?.response?.data?.message ||
-          (err?.response
+        response?.data?.message ||
+          (response
             ? 'Không đặt lại được mật khẩu. Vui lòng thử lại.'
             : 'Không thể kết nối đến máy chủ. Kiểm tra kết nối mạng của bạn.'),
       );

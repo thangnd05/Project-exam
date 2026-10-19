@@ -15,6 +15,7 @@ import routes from '@/app/configs/Routes';
 import { useMyPosts } from '@/app/features/posts/ProfileSectionModal/useMyPosts';
 import type { PostResponse, PostSummaryResponse } from '@/app/types';
 import styles from '@/app/features/posts/ProfileSectionModal/PostsListPage.module.scss';
+import MediaImage from '@/app/components/MediaImage/MediaImage';
 
 const cx = classNames.bind(styles);
 
@@ -101,7 +102,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
       const fullPost = await fetchPostById(postId);
       setEditingPost(fullPost);
       setShowEditModal(true);
-    } catch (error) {
+    } catch {
       toast.error('Không tải được nội dung bài viết để chỉnh sửa.');
     } finally {
       setActionLoadingId(null);
@@ -121,7 +122,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
       await deleteMutation.mutateAsync(postId);
       toast.success('Đã xóa bài viết');
       setDeletingPost(null);
-    } catch (error) {
+    } catch {
       toast.error('Không thể xóa bài viết. Vui lòng thử lại.');
     } finally {
       setActionLoadingId(null);
@@ -259,11 +260,15 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
                 >
                   <Link href={detailUrl} className={cx('thumbnailLink')}>
                     {post.thumbnailUrl ? (
-                      <img
+                      <MediaImage
+                        cover
                         src={post.thumbnailUrl}
-                        alt={post.title}
+                        alt={post.title ?? ''}
                         className={cx('thumbnail')}
                         referrerPolicy="no-referrer"
+                        width={400}
+                        height={225}
+                        sizes="400px"
                       />
                     ) : (
                       <div className={cx('thumbnailPlaceholder')}>

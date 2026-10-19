@@ -91,6 +91,7 @@ mà không tự biến thành URL.
 | Server state | TanStack Query, `queryFn` gọi hàm trong `app/apis/`, không dùng `useEffect` + `useState` để fetch |
 | Query key | Tài nguyên được đọc ở ≥2 nơi phải dùng key trong `app/configs/queryKeys.ts` (một gốc cho mỗi tài nguyên, mutation invalidate gốc). Cùng key thì cùng `queryFn`; biến đổi dữ liệu đặt trong `select` |
 | Kiểu dữ liệu API | lấy từ `@/app/types`, enum từ `@/app/enums` (mirror DTO backend) |
+| Lỗi API | `catch (error)` / `onError: (error: ApiError)` (không `any`), lấy thông báo bằng `getApiErrorMessage(error, fallback)` trong `app/utils/apiError.ts` (đọc `message` → `detail` → `error`) |
 
 ## 4. Tra nhanh: tìm code ở đâu
 

@@ -5,6 +5,8 @@ import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { useChangePassword } from '@/app/(user)/dashboard/_hooks/useChangePassword';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
+import {isAxiosError} from 'axios';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import commonModalStyles from '@/app/components/modal/CommonFormModal.module.scss';
@@ -86,9 +88,11 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
           resetForm();
         },
         onError: (error) => {
+          // Backend có thể trả { message } hoặc một chuỗi thuần.
+          const data: unknown = isAxiosError(error) ? error.response?.data : undefined;
           const apiMessage =
-            error.response?.data?.message ||
-            error.response?.data ||
+            getApiErrorMessage(error, '') ||
+            (typeof data === 'string' && data) ||
             'Đổi mật khẩu thất bại. Vui lòng thử lại.';
           toast.error(apiMessage);
         },

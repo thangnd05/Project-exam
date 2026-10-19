@@ -8,21 +8,20 @@ import {
   type ScoreScaleSource,
 } from '@/app/features/exam-types/scoreScale';
 
-type ExamTypeLike = ScoreScaleSource & { examTypeId: string | number; [key: string]: any };
+type ExamTypeLike = ScoreScaleSource & { examTypeId: string | number };
 type ExamPartLike = {
   examPartId: string;
   name?: string | null;
   defaultNumQuestions?: number | null;
   skillId?: string;
-  [key: string]: any;
 };
-type SkillLike = { skillId: string; name?: string | null; [key: string]: any };
+type SkillLike = { skillId: string; name?: string | null };
+// Khớp ScoringConversionResponse (các trường đều optional) — thiếu số liệu thì coi như 0.
 type ConversionLike = {
-  examTypeId: string | number;
-  skillId: string;
-  numCorrect: number;
-  convertedScore: number;
-  [key: string]: any;
+  examTypeId?: string | number;
+  skillId?: string;
+  numCorrect?: number;
+  convertedScore?: number;
 };
 
 export type ScoreEstimate = {
@@ -38,14 +37,14 @@ export const percentToNum = (percent: number | string, total: number): number =>
 export const numToPercent = (num: number | string, total: number): number =>
   total > 0 ? Math.round((Number(num) / total) * 100) : 0;
 
-export default function useMilestoneScoring({
+export default function useMilestoneScoring<TExamType extends ExamTypeLike = ExamTypeLike>({
   examTypes = [],
   examParts = [],
   skills = [],
   scoringConversions = [],
   selectedExamTypeId = '',
 }: {
-  examTypes?: ExamTypeLike[];
+  examTypes?: TExamType[];
   examParts?: ExamPartLike[];
   skills?: SkillLike[];
   scoringConversions?: ConversionLike[];
@@ -118,18 +117,19 @@ export default function useMilestoneScoring({
       for (const [skillId, numCorrect] of Object.entries(correctBySkill)) {
         const skillConversions = relevantConversions
           .filter((c) => c.skillId === skillId)
-          .sort((a, b) => a.numCorrect - b.numCorrect);
+          .sort((a, b) => (a.numCorrect ?? 0) - (b.numCorrect ?? 0));
         if (skillConversions.length === 0) continue;
 
         let matched = skillConversions[0];
         for (const c of skillConversions) {
-          if (c.numCorrect <= numCorrect) matched = c;
+          if ((c.numCorrect ?? 0) <= numCorrect) matched = c;
           else break;
         }
 
         const skillName = skills.find((s) => s.skillId === skillId)?.name || skillId;
-        totalScore += matched.convertedScore;
-        skillDetails.push({ skillName, numCorrect, convertedScore: matched.convertedScore });
+        const convertedScore = matched.convertedScore ?? 0;
+        totalScore += convertedScore;
+        skillDetails.push({ skillName, numCorrect, convertedScore });
       }
 
       return { totalScore, skillDetails };

@@ -13,6 +13,8 @@ import {
   AdminToolbar,
 } from '@/app/(admin)/_components/common';
 import {useExamCategories, type ExamCategoryItem} from './_hooks/useExamCategories';
+import type {ExamCategoryRequest} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 
 const emptyForm: ExamCategoryFormState = {
   code: '',
@@ -23,10 +25,10 @@ const emptyForm: ExamCategoryFormState = {
   displayOrder: 0,
 };
 
-const buildPayload = (formState: ExamCategoryFormState) => ({
+const buildPayload = (formState: ExamCategoryFormState): ExamCategoryRequest => ({
   code: formState.code.trim(),
   name: formState.name.trim(),
-  description: formState.description?.trim() || null,
+  description: formState.description?.trim() || undefined,
   guestAllowed: !!formState.guestAllowed,
   certificateEligible: !!formState.certificateEligible,
   displayOrder: Number(formState.displayOrder) || 0,
@@ -102,7 +104,7 @@ function ExamCategoriesManagement() {
 
     setErrorMessage('');
     try {
-      const payload = buildPayload(formState) as any;
+      const payload = buildPayload(formState);
       if (editingId) {
         await updateMutation.mutateAsync({id: editingId, payload});
       } else {
@@ -110,12 +112,8 @@ function ExamCategoriesManagement() {
       }
       setShowFormModal(false);
       resetForm();
-    } catch (error: any) {
-      const msg =
-        error.response?.data?.message ||
-        error.response?.data ||
-        'Không thể lưu phân loại bài thi. Vui lòng thử lại.';
-      setErrorMessage(typeof msg === 'string' ? msg : JSON.stringify(msg));
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu phân loại bài thi. Vui lòng thử lại.'));
     }
   };
 
@@ -125,7 +123,7 @@ function ExamCategoriesManagement() {
     try {
       await deleteMutation.mutateAsync(deletingItem.examCategoryId);
       setDeletingItem(null);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể xóa phân loại này.');
     }
   };

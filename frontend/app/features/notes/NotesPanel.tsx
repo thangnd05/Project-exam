@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -39,13 +39,17 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
   const saveMutation = useSaveNote();
   const saving = saveMutation.isPending;
 
-  useEffect(() => {
-    if (show) return;
-    setView('list');
-    setEditingId(null);
-    setDraft(EMPTY_DRAFT);
-    setConfirmingId(null);
-  }, [show]);
+  // Đóng panel thì reset về danh sách (điều chỉnh state ngay khi render, không cần effect).
+  const [prevShow, setPrevShow] = useState(show);
+  if (show !== prevShow) {
+    setPrevShow(show);
+    if (!show) {
+      setView('list');
+      setEditingId(null);
+      setDraft(EMPTY_DRAFT);
+      setConfirmingId(null);
+    }
+  }
 
   const openEditor = (note: NoteResponse | null) => {
     setEditingId(note?.noteId ?? null);

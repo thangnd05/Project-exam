@@ -13,11 +13,15 @@ import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 type MutationCallbacks<T> = {
   onSuccess?: (data: T, ...rest: unknown[]) => void;
-  onError?: (err: any) => void;
+  onError?: (err: Error) => void;
 };
 
-const normalizeAlbums = (data: VocabularyAlbumResponse[]): VocabularyAlbumResponse[] =>
-  Array.isArray(data) ? data : ((data as any)?.content ?? []);
+// API có thể trả mảng trực tiếp hoặc bọc trong { content } (phân trang).
+const normalizeAlbums = (data: unknown): VocabularyAlbumResponse[] => {
+  if (Array.isArray(data)) return data;
+  const content = (data as { content?: unknown } | null | undefined)?.content;
+  return Array.isArray(content) ? content : [];
+};
 
 export function useMyAlbums() {
   const qc = useQueryClient();

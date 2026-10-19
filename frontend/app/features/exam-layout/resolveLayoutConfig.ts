@@ -27,13 +27,14 @@ function ensureQuestionNav(blocks: LayoutBlock[]): LayoutBlock[] {
   return defaultNav ? [defaultNav, ...blocks] : blocks;
 }
 
-function parseRaw(raw: unknown): any {
+// Dữ liệu thô từ API/JSON chưa được kiểm tra — chỉ tin các trường sau khi kiểm tra ở resolveLayoutConfig.
+function parseRaw(raw: unknown): Partial<LayoutConfig> | null {
   if (!raw) return null;
 
   const source =
-    typeof raw === 'object' && raw !== null && 'config' in raw ? (raw as any).config : raw;
+    typeof raw === 'object' && raw !== null && 'config' in raw ? (raw as { config?: unknown }).config : raw;
   if (!source) return null;
-  if (typeof source === 'object') return source;
+  if (typeof source === 'object') return source as Partial<LayoutConfig>;
   if (typeof source === 'string') {
     try {
       return JSON.parse(source);

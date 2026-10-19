@@ -37,7 +37,7 @@ function TestHistory() {
   if (isLoading) {
     return (
       <div className={cx('loading-box')}>
-        <Spinner animation="grow" variant="primary" size={'lg' as any} />
+        <Spinner animation="grow" variant="primary" />
         <p>Đang lục lại nhật ký học tập...</p>
       </div>
     );

@@ -99,6 +99,7 @@ function ExamTypeFormModal({
         />
         {formState.image_url ? (
           <div className="mt-2">
+            {/* eslint-disable-next-line @next/next/no-img-element -- xem trước URL admin dán vào, host bất kỳ, có onError ẩn ảnh lỗi */}
             <img
               src={formState.image_url}
               alt="Xem trước ảnh"

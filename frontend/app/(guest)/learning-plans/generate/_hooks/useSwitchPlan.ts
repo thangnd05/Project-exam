@@ -6,7 +6,7 @@ import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache'
 
 type UseSwitchPlanOptions = {
   onSuccess?: (...args: unknown[]) => void;
-  onError?: (err: any) => void;
+  onError?: (err: unknown) => void;
 };
 
 export function useSwitchPlan({ onSuccess, onError }: UseSwitchPlanOptions = {}) {

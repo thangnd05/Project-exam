@@ -111,7 +111,7 @@ function TestLeaderboard() {
 
         {loading ? (
           <div className={cx('loadingBox')}>
-            <Spinner animation="grow" variant="primary" size={'lg' as any} />
+            <Spinner animation="grow" variant="primary" />
             <p>Đang tải bảng xếp hạng...</p>
           </div>
         ) : errorMessage ? (

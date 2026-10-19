@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Spinner } from 'react-bootstrap';
 import {
@@ -36,6 +36,7 @@ import {
 } from '@/app/(admin)/admin/exam-types/[examTypeId]/layout/_lib/sampleExamData';
 import styles from './ExamTypeLayoutEditor.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 
 const cx = classNames.bind(styles);
 
@@ -93,11 +94,14 @@ function ExamTypeLayoutEditor() {
 
   const { layout, isLoading: loading } = useOwnExamTypeLayout(examTypeId);
 
-  useEffect(() => {
+  // Nạp lại cấu hình mỗi khi layout từ server thay đổi
+  const [prevLayout, setPrevLayout] = useState<typeof layout>(undefined);
+  if (layout !== prevLayout) {
+    setPrevLayout(layout);
     if (layout !== undefined) {
       setConfig(resolveLayoutConfig(layout));
     }
-  }, [layout]);
+  }
 
   const updateBlocks = useCallback((fn: (blocks: LayoutBlock[]) => LayoutBlock[]) => {
     setConfig((c: LayoutConfig) => ({ ...c, blocks: normalizeOrders(fn(c.blocks)) }));
@@ -187,8 +191,8 @@ function ExamTypeLayoutEditor() {
       {examTypeId, config: JSON.stringify(config)},
       {
         onSuccess: () => toast.success('Đã lưu giao diện làm bài cho loại đề này.'),
-        onError: (err: any) =>
-          toast.error(err?.response?.data?.message || 'Lưu thất bại. Vui lòng thử lại.'),
+        onError: (err: unknown) =>
+          toast.error(getApiErrorMessage(err, 'Lưu thất bại. Vui lòng thử lại.')),
       },
     );
   }, [config, examTypeId, saveLayout]);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {ChevronDown, ChevronRight, Edit, FileText, Plus, Trash2} from 'lucide-react';
@@ -10,6 +10,7 @@ import TagFormModal, {type TagFormState} from './_components/TagFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
 import {useAdminExamTypesForTags, useExamPartsForTags, useTagList, useTags, type AdminTag} from './_hooks/useTags';
 import type {TagRequest, TagResponse} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 import styles from './TagsManagement.module.scss';
 
 const cx = classNames.bind(styles);
@@ -114,7 +115,7 @@ function PartGroupNode({group, isExpanded, searchTerm, onToggle, onAddToPart, on
 }
 
 function TagsManagement() {
-  const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
+  const [chosenExamTypeId, setSelectedExamTypeId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingTagId, setEditingTagId] = useState<string | null>(null);
@@ -125,6 +126,8 @@ function TagsManagement() {
   const [collapsedKeys, setCollapsedKeys] = useState<Set<string>>(new Set());
 
   const { examTypes = [] } = useAdminExamTypesForTags();
+  // Chưa chọn thì mặc định loại kỳ thi đầu tiên
+  const selectedExamTypeId = chosenExamTypeId || examTypes[0]?.id || '';
   const {tags, isLoading: loading, isError: tagLoadError} = useTagList(selectedExamTypeId);
   const {examParts} = useExamPartsForTags(selectedExamTypeId);
 
@@ -147,18 +150,6 @@ function TagsManagement() {
   const {createMutation, updateMutation, deleteMutation} = useTags();
   const submitting =
     createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
-
-  useEffect(() => {
-    if (examTypes.length > 0 && !selectedExamTypeId) {
-      setSelectedExamTypeId(examTypes[0].id);
-    }
-  }, [examTypes, selectedExamTypeId]);
-
-  useEffect(() => {
-    if (tagLoadError) {
-      setErrorMessage('Không thể tải danh sách tag.');
-    }
-  }, [tagLoadError]);
 
   const toggleGroup = useCallback((key: string) => {
     setCollapsedKeys((prev) => {
@@ -247,9 +238,8 @@ function TagsManagement() {
         return next;
       });
     };
-    const onError = (error: any) => {
-      const apiMessage = error?.response?.data?.message;
-      setErrorMessage(apiMessage || 'Không thể lưu tag. Vui lòng thử lại.');
+    const onError = (error: unknown) => {
+      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu tag. Vui lòng thử lại.'));
     };
 
     if (editingTagId) {
@@ -298,7 +288,7 @@ function TagsManagement() {
         </Form.Select>
       </AdminToolbar>
 
-      <AdminFieldError message={errorMessage} />
+      <AdminFieldError message={errorMessage || (tagLoadError ? 'Không thể tải danh sách tag.' : '')} />
 
       <div className={cx('treeWrapper')}>
         <div className={cx('treeToolbar')}>

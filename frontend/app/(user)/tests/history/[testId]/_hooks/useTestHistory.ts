@@ -11,8 +11,12 @@ export const testHistoryKeys = {
   info: (testId?: string) => ['test-info', testId],
 };
 
-const normalizeAttempts = (payload: any): UserTestResponse[] =>
-  Array.isArray(payload) ? payload : Array.isArray(payload?.data) ? payload.data : [];
+// API có thể trả mảng trực tiếp hoặc bọc trong { data }.
+const normalizeAttempts = (payload: unknown): UserTestResponse[] => {
+  if (Array.isArray(payload)) return payload;
+  const inner = (payload as { data?: unknown } | null | undefined)?.data;
+  return Array.isArray(inner) ? inner : [];
+};
 
 export function useTestHistory(testId?: string) {
   const attemptsQuery = useQuery({

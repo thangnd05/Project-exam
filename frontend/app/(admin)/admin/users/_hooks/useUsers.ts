@@ -39,18 +39,16 @@ export const usersKeys = {
   roles: () => ['admin-roles'],
 };
 
-const normalizeUser = (user: any): AdminUserRow => ({
-  user_id: String(user.userId ?? user.user_id ?? user.id ?? ''),
-  user_name: user.userName ?? user.user_name ?? user.username ?? '',
-  full_name: user.fullName ?? user.full_name ?? user.username ?? '',
+// UserResponse của backend hiện chưa có createdAt nên cột ngày tạo luôn trống
+const normalizeUser = (user: UserResponse & {createdAt?: string}): AdminUserRow => ({
+  user_id: String(user.id ?? ''),
+  user_name: user.userName ?? '',
+  full_name: user.fullName ?? '',
   email: user.email ?? '',
-  role_id: String(user.roleId ?? user.role_id ?? ''),
-  verified:
-    typeof user.verified === 'boolean'
-      ? user.verified
-      : user.isVerified ?? null,
-  is_premium: user.isPremium === true || user.is_premium === true,
-  created_at: user.createdAt ?? user.created_at ?? null,
+  role_id: String(user.roleId ?? ''),
+  verified: typeof user.verified === 'boolean' ? user.verified : null,
+  is_premium: user.isPremium === true,
+  created_at: user.createdAt ?? null,
 });
 
 const normalizeUsersPage = (userPage: PageResponse<UserResponse>) => ({

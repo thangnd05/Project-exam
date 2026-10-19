@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { Edit, Trash2 } from 'lucide-react';
@@ -97,9 +97,12 @@ function QuestionsManagement() {
 
   const resetToFirstPage = () => setPage(0);
 
-  useEffect(() => {
+  // Đổi bộ lọc/trang thì bỏ chọn
+  const [prevParams, setPrevParams] = useState(params);
+  if (params !== prevParams) {
+    setPrevParams(params);
     setSelectedIds(new Set());
-  }, [params]);
+  }
 
   const pageIds = questions.map((q) => q.questionId);
   const allOnPageSelected = pageIds.length > 0 && pageIds.every((id) => selectedIds.has(id));

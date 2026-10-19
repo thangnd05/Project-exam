@@ -9,14 +9,14 @@ import styles from '@/app/assets/styles/ReviewFooter.module.scss';
 const cx = classNames.bind(styles);
 
 type ReviewFooterNavItem = {
-  id: any;
+  id: string;
   status?: string;
 };
 
 type ReviewFooterNavProps = {
   items?: ReviewFooterNavItem[];
   correctCount?: number;
-  onSelect?: (id: any) => void;
+  onSelect?: (id: string) => void;
 };
 
 function ReviewFooterNav({ items = [], correctCount = 0, onSelect }: ReviewFooterNavProps) {
@@ -24,7 +24,7 @@ function ReviewFooterNav({ items = [], correctCount = 0, onSelect }: ReviewFoote
 
   if (items.length === 0) return null;
 
-  const pick = (id: any) => {
+  const pick = (id: string) => {
     onSelect?.(id);
     setOpen(false);
   };

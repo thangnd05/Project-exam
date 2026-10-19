@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { IoPersonCircleOutline, IoCameraOutline } from 'react-icons/io5';
@@ -11,6 +11,7 @@ import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import commonModalStyles from '@/app/components/modal/CommonFormModal.module.scss';
 import styles from './UpdateProfileModal.module.scss';
 import { useMyInfo, useUpdateProfile } from '@/app/(user)/dashboard/_hooks/useUpdateProfile';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 
 const cmx = classNames.bind(commonModalStyles);
 const cx = classNames.bind(styles);
@@ -37,22 +38,25 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const resetForm = useCallback(() => {
-    setFormValues({ fullName: '', email: '', userName: '' });
-    setAvatarFile(null);
-    setAvatarPreview('');
-  }, []);
-
-  useEffect(() => {
-    if (show && userInfo) {
+  // Mở modal (hoặc thông tin vừa tải xong) thì nạp form; đóng modal thì xoá form.
+  // Điều chỉnh state ngay khi render thay cho effect.
+  const seedKey = show ? userInfo : null;
+  const [seededFor, setSeededFor] = useState<typeof userInfo>(null);
+  if (seedKey !== seededFor) {
+    setSeededFor(seedKey);
+    if (seedKey) {
       setFormValues({
-        fullName: userInfo.fullName || '',
-        email: userInfo.email || '',
-        userName: userInfo.userName || ''
+        fullName: seedKey.fullName || '',
+        email: seedKey.email || '',
+        userName: seedKey.userName || ''
       });
-      setAvatarPreview(userInfo.avatarUrl || '');
+      setAvatarPreview(seedKey.avatarUrl || '');
+    } else if (!show) {
+      setFormValues({ fullName: '', email: '', userName: '' });
+      setAvatarFile(null);
+      setAvatarPreview('');
     }
-  }, [show, userInfo]);
+  }
 
   useEffect(() => {
     if (show && isError) {
@@ -61,11 +65,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
     }
   }, [show, isError, onHide]);
 
-  useEffect(() => {
-    if (!show) {
-      resetForm();
-    }
-  }, [show, resetForm]);
 
   const updateField = (fieldName: string, fieldValue: string) => {
     setFormValues((prev) => ({
@@ -107,7 +106,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
       return;
     }
 
-    const userId = (userInfo as any)?.userId;
+    const userId = userInfo?.id;
 
     if (!userId) {
       toast.error('Lỗi dữ liệu. Không tìm thấy ID người dùng.');
@@ -138,8 +137,8 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
         onUpdateSuccess();
       }
       closeModal();
-    } catch (error: any) {
-      const apiMessage = error.response?.data?.message || 'Cập nhật thất bại. Vui lòng thử lại.';
+    } catch (error) {
+      const apiMessage = getApiErrorMessage(error, 'Cập nhật thất bại. Vui lòng thử lại.');
       toast.error(apiMessage);
     }
   };

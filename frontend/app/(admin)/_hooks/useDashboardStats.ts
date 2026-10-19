@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import {
   getContentInsights,
@@ -58,7 +58,7 @@ export function useMonthlyPerformance(year?: number) {
     queryKey: dashboardKeys.monthlyPerformance(year),
     queryFn: () => getMonthlyPerformance(year),
     staleTime: 60 * 1000,
-    ...({keepPreviousData: true} as any),
+    placeholderData: keepPreviousData,
   });
 
   return {
@@ -89,7 +89,7 @@ export function useTrafficLocations(month?: string) {
     queryKey: dashboardKeys.trafficLocations(month),
     queryFn: () => getTrafficLocations(month),
     staleTime: 60 * 1000,
-    ...({keepPreviousData: true} as any),
+    placeholderData: keepPreviousData,
   });
 
   return {
@@ -107,7 +107,7 @@ export function useTrafficHeatmap(endDate?: string) {
     queryKey: dashboardKeys.trafficHeatmap(endDate),
     queryFn: () => getTrafficHeatmap(endDate),
     staleTime: 30 * 1000,
-    ...({keepPreviousData: true} as any),
+    placeholderData: keepPreviousData,
   });
 
   return {

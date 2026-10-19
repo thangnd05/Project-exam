@@ -3,6 +3,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { uploadPostImage, createPost, updatePost } from '@/app/apis/postApi';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 
 const DEFAULT_THUMBNAIL_URL =
   'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1350&q=80';
@@ -49,7 +50,7 @@ export function useSavePost({ onSuccess }: { onSuccess?: () => void } = {}) {
             const data = await uploadPostImage(imgFormData);
             const cloudUrl = data.url;
             finalContent = finalContent.split(img.base64Url).join(cloudUrl);
-          } catch (error) {
+          } catch {
             toast.error(` Lỗi tải ảnh ${img.file.name} lên Cloudinary!`);
           }
         }
@@ -80,9 +81,9 @@ export function useSavePost({ onSuccess }: { onSuccess?: () => void } = {}) {
     onSuccess: () => {
       if (onSuccess) onSuccess();
     },
-    onError: (err: any, variables) => {
+    onError: (err, variables) => {
       toast.error(
-        err.response?.data?.message || (variables.isEditing ? 'Lỗi khi cập nhật bài viết!' : 'Lỗi khi đăng bài viết!'),
+        getApiErrorMessage(err, variables.isEditing ? 'Lỗi khi cập nhật bài viết!' : 'Lỗi khi đăng bài viết!'),
       );
     },
   });

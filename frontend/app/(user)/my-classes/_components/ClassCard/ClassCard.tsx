@@ -40,7 +40,7 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
     try {
       await copyToClipboard(classQr);
       toast.success('Đã copy mã lớp!');
-    } catch (error) {
+    } catch {
       toast.error('Copy mã lớp thất bại');
     }
   };

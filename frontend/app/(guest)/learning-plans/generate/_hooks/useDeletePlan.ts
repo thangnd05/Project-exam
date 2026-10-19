@@ -6,7 +6,7 @@ import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache'
 
 type UseDeletePlanOptions = {
   onSuccess?: (...args: unknown[]) => void;
-  onError?: (err: any) => void;
+  onError?: (err: unknown) => void;
 };
 
 export function useDeletePlan({ onSuccess, onError }: UseDeletePlanOptions = {}) {

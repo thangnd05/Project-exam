@@ -15,6 +15,7 @@ import {
   resetPassword,
 } from '@/app/apis/authApi';
 import type {
+  ApiError,
   AuthMessageResponse,
   LoginRequest,
   RegisterRequest,
@@ -26,7 +27,7 @@ import type {
 const resetTokenKey = (token: string) => ['auth', 'reset-token', token] as const;
 
 export function useLoginMutation(
-  options: Omit<UseMutationOptions<UserResponse, any, LoginRequest>, 'mutationFn'> = {},
+  options: Omit<UseMutationOptions<UserResponse, ApiError, LoginRequest>, 'mutationFn'> = {},
 ) {
   return useMutation({
     mutationFn: login,
@@ -35,7 +36,7 @@ export function useLoginMutation(
 }
 
 export function useRegisterMutation(
-  options: Omit<UseMutationOptions<AuthMessageResponse, any, RegisterRequest>, 'mutationFn'> = {},
+  options: Omit<UseMutationOptions<AuthMessageResponse, ApiError, RegisterRequest>, 'mutationFn'> = {},
 ) {
   return useMutation({
     mutationFn: register,
@@ -44,7 +45,7 @@ export function useRegisterMutation(
 }
 
 export function useForgotPasswordMutation(
-  options: Omit<UseMutationOptions<AuthMessageResponse, any, string>, 'mutationFn'> = {},
+  options: Omit<UseMutationOptions<AuthMessageResponse, ApiError, string>, 'mutationFn'> = {},
 ) {
   return useMutation({
     mutationFn: forgotPassword,
@@ -53,7 +54,7 @@ export function useForgotPasswordMutation(
 }
 
 export function useResetPasswordMutation(
-  options: Omit<UseMutationOptions<AuthMessageResponse, any, ResetPasswordRequest>, 'mutationFn'> = {},
+  options: Omit<UseMutationOptions<AuthMessageResponse, ApiError, ResetPasswordRequest>, 'mutationFn'> = {},
 ) {
   return useMutation({
     mutationFn: resetPassword,

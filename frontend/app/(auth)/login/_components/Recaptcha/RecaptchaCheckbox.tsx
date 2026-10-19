@@ -2,18 +2,25 @@
 
 import {forwardRef, useEffect, useImperativeHandle, useRef} from 'react';
 
+// Phần API của grecaptcha mà component dùng tới.
+type Grecaptcha = {
+  ready: (cb: () => void) => void;
+  render: (container: HTMLElement, params: Record<string, unknown>) => number;
+  reset: (widgetId?: number) => void;
+};
+
 declare global {
   interface Window {
-    grecaptcha?: any;
+    grecaptcha?: Grecaptcha;
   }
 }
 
 const SCRIPT_ID = 'google-recaptcha-script';
 const SCRIPT_SRC = 'https://www.google.com/recaptcha/api.js?render=explicit&hl=vi';
 
-let scriptPromise: Promise<any> | null = null;
+let scriptPromise: Promise<Grecaptcha> | null = null;
 
-function loadRecaptchaScript(): Promise<any> {
+function loadRecaptchaScript(): Promise<Grecaptcha> {
   if (window.grecaptcha?.render) {
     return Promise.resolve(window.grecaptcha);
   }
@@ -26,7 +33,8 @@ function loadRecaptchaScript(): Promise<any> {
     const script = (existing || document.createElement('script')) as HTMLScriptElement;
 
     const handleLoad = () => {
-      window.grecaptcha.ready(() => resolve(window.grecaptcha));
+      const grecaptcha = window.grecaptcha;
+      grecaptcha?.ready(() => resolve(grecaptcha));
     };
 
     script.addEventListener('load', handleLoad);

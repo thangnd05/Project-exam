@@ -17,6 +17,7 @@ function ExamTypeLogo({ examTypeId }: { examTypeId?: string }) {
 
   if (!src || failed) return <IoPlayCircleOutline size={80} color="var(--primary)" />;
   return (
+    // eslint-disable-next-line @next/next/no-img-element -- logo do admin tải lên, host tuỳ ý và cần onError để hiện icon thay thế
     <img
       className={cx('ready-logo')}
       src={src}

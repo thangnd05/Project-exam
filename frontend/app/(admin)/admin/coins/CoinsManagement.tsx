@@ -16,6 +16,7 @@ import {
 } from '@/app/(admin)/_components/common';
 import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
 import type {CoinWalletResponse} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 import { useAdminCoins, useCoinUserOptions } from './_hooks/useAdminCoins';
 
 interface CoinFormState {
@@ -103,9 +104,9 @@ function CoinsManagement() {
       setShowModal(false);
       resetForm();
     };
-    const onError = (error: any) =>
+    const onError = (error: unknown) =>
       setErrorMessage(
-        error?.response?.data?.message || 'Không thể lưu ví xu. Vui lòng thử lại.',
+        getApiErrorMessage(error, 'Không thể lưu ví xu. Vui lòng thử lại.'),
       );
 
     if (editingWallet) {
@@ -126,7 +127,7 @@ function CoinsManagement() {
       return;
     }
     setErrorMessage('');
-    deleteMutation.mutate(deletingWallet.userId, {
+    deleteMutation.mutate(deletingWallet.userId as string, {
       onSuccess: () => setDeletingWallet(null),
       onError: () => setErrorMessage('Không thể xóa ví xu.'),
     });

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import { useTargetAchieved } from '@/app/features/my-target/hooks/useTargetAchieved';
@@ -14,7 +14,7 @@ const cx = classNames.bind(styles);
 
 function TargetAchieved() {
   const searchParams = useSearchParams();
-  // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ở effect dưới.
+  // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ngay khi danh sách về (xem bên dưới).
   const [examTypeId, setExamTypeId] = useState('');
 
   const { examTypes, target, latestMock, enhanced, isLoading: loading, error } =
@@ -22,11 +22,10 @@ function TargetAchieved() {
 
   useNormalizeExamParam(examTypes);
 
-  useEffect(() => {
-    if (!examTypeId && examTypes.length > 0) {
-      setExamTypeId(examTypeIdFromParams(searchParams, examTypes) || examTypes[0].examTypeId);
-    }
-  }, [examTypes, examTypeId, searchParams]);
+  // Danh sách kỳ thi về thì chọn kỳ thi theo ?exam= hoặc kỳ đầu tiên (điều chỉnh state ngay khi render).
+  if (!examTypeId && examTypes.length > 0) {
+    setExamTypeId(examTypeIdFromParams(searchParams, examTypes) || examTypes[0].examTypeId);
+  }
 
   const enhancedMatches =
     enhanced && (!enhanced.examTypeId || enhanced.examTypeId === examTypeId);

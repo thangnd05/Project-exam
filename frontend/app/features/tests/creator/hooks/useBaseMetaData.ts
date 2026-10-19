@@ -7,9 +7,13 @@ import { getExamPartsByExamType } from '@/app/apis/examPartApi';
 import { getTagsFlatByExamType } from '@/app/apis/tagApi';
 import { sortByPartOrder } from '@/app/features/exam-types/partOrder';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import type { ExamPartResponse, ExamTypeResponse, QuestionCollectionResponse, TagResponse } from '@/app/types';
 import {examTypeKeys, questionCollectionKeys, examPartKeys, tagKeys} from '@/app/configs/queryKeys';
 
-const normalizeList = (payload: any): any[] => {
+// API có thể trả mảng trực tiếp hoặc bọc trong { data } / { content }
+type ListPayload<T> = T[] | { data?: T[]; content?: T[] } | null | undefined;
+
+const normalizeList = <T,>(payload: ListPayload<T>): T[] => {
     if (Array.isArray(payload)) {
         return payload;
     }
@@ -33,27 +37,27 @@ export const useBaseMetaData = (examTypeId?: string | number | null) => {
     const examTypesQuery = useQuery({
         queryKey: baseMetaKeys.examTypes,
         queryFn: getExamTypes,
-        select: normalizeList,
+        select: normalizeList<ExamTypeResponse>,
     });
 
     const questionCollectionsQuery = useQuery({
         queryKey: baseMetaKeys.questionCollections,
         queryFn: getQuestionCollections,
-        select: normalizeList,
+        select: normalizeList<QuestionCollectionResponse>,
     });
 
     const examPartsQuery = useQuery({
         queryKey: baseMetaKeys.examParts(examTypeId),
         queryFn: () => getExamPartsByExamType(String(examTypeId)),
         enabled: !!examTypeId,
-        select: (data: any) => sortByPartOrder(normalizeList(data)),
+        select: (data: ExamPartResponse[]) => sortByPartOrder(normalizeList(data)),
     });
 
     const availableTagsQuery = useQuery({
         queryKey: baseMetaKeys.tagsFlat(examTypeId),
         queryFn: () => getTagsFlatByExamType(String(examTypeId)),
         enabled: !!examTypeId,
-        select: (tags: any) => (Array.isArray(tags) ? tags : []),
+        select: (tags: TagResponse[]) => (Array.isArray(tags) ? tags : []),
     });
 
     return {

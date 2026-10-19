@@ -25,6 +25,7 @@ import { useAddComment, useUpdateComment, useDeleteComment } from './_hooks/useC
 import { useToggleReact, useToggleSavePost } from './_hooks/usePostReactions';
 import { ReactType } from '@/app/enums';
 import type { CommentResponse } from '@/app/types';
+import MediaImage from '@/app/components/MediaImage/MediaImage';
 
 const Slider = dynamic(() => import('react-slick'), { ssr: false });
 
@@ -51,6 +52,12 @@ function PostDetail() {
   const [replyContent, setReplyContent] = useState('');
   const [replyIndentPx, setReplyIndentPx] = useState(40);
   const [expandedReplies, setExpandedReplies] = useState<Record<string, boolean>>({});
+  // Đổi bài viết thì thu gọn lại các luồng trả lời; tải lại bình luận (sau khi trả lời/sửa) thì giữ nguyên.
+  const [expandedForPost, setExpandedForPost] = useState(postId);
+  if (expandedForPost !== postId) {
+    setExpandedForPost(postId);
+    setExpandedReplies({});
+  }
 
   const { post, isLoading: loading, isError, refetch } = usePostDetail(postId);
   const { comments = [] } = usePostComments(postId);
@@ -73,13 +80,15 @@ function PostDetail() {
   const isReacting = reactMutation.isPending;
   const isSaving = saveMutation.isPending;
 
-  useEffect(() => {
-    if (!post) return;
+  // Nạp trạng thái like/lưu cục bộ mỗi khi chuyển sang bài viết khác (điều chỉnh state ngay khi render).
+  const [seededPostId, setSeededPostId] = useState<string | null>(null);
+  if (post && post.id !== seededPostId) {
+    setSeededPostId(post.id);
     setLiked(post.currentUserReactType === ReactType.LIKE);
     setLikeCount(post.reactCounts?.LIKE || 0);
     setBookmarked(!!post.currentUserSaved);
     setSaveCount(post.saveCount || 0);
-  }, [post?.id]);
+  }
 
   const skipFirstCosmeticSync = useRef(true);
   useEffect(() => {
@@ -105,10 +114,6 @@ function PostDetail() {
     window.addEventListener('resize', updateIndent);
     return () => window.removeEventListener('resize', updateIndent);
   }, []);
-
-  useEffect(() => {
-    setExpandedReplies({});
-  }, [comments]);
 
   const sliderSettings = {
     dots: true,
@@ -334,7 +339,7 @@ function PostDetail() {
                 setReplyContent('');
               }}>Trả lời</button>
               <span className={cx('time')}>{new Date(comment.createdAt ?? '').toLocaleString('vi-VN')}</span>
-              {user && (user as any).id === comment.userId && (
+              {user && user.userId === comment.userId && (
                 <>
                   <button onClick={() => {
                     setEditingCommentId(comment.id);
@@ -520,7 +525,14 @@ function PostDetail() {
                   <div key={rel.id} className={cx('sliderItem')}>
                     <div className={cx('relatedCard')} onClick={() => router.push(routes.postDetail.replace(':postId', rel.id))}>
                       <div className={cx('imgWrap')}>
-                        <img src={rel.thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=400&q=80'} alt={rel.title} />
+                        <MediaImage
+                          cover
+                          src={rel.thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=400&q=80'}
+                          alt={rel.title ?? ''}
+                          width={400}
+                          height={225}
+                          sizes="400px"
+                        />
                       </div>
                       <span className="text-primary fw-bold small mb-2 d-block">{rel.categories?.[0]?.name || 'Blog'}</span>
                       <h4>{rel.title}</h4>

@@ -17,6 +17,7 @@ import ChapterManagementTable from './_components/ChapterManagementTable/Chapter
 import routes from '@/app/configs/Routes';
 import { useChaptersOfClass } from './_hooks/useChaptersOfClass';
 import type { ChapterResponse } from '@/app/types';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 
 const cx = classNames.bind(styles);
 
@@ -68,11 +69,8 @@ const ChapterOfClass = () => {
     try {
       await deleteChapterMutation.mutateAsync(selectedChapter.chapterId);
       toast.success('Xóa chương thành công!');
-    } catch (error: any) {
-      toast.error(
-        error.response?.data?.message ||
-        'Không thể xóa chương. Vui lòng thử lại.',
-      );
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Không thể xóa chương. Vui lòng thử lại.'));
     } finally {
       setShowDeleteChapter(false);
       setSelectedChapter(null);

@@ -15,8 +15,8 @@ interface UpdateCommentVariables {
 }
 
 interface MutationCallbacks<TData, TVariables> {
-  onSuccess?: (data: TData, variables: TVariables, ...rest: any[]) => void;
-  onError?: (error: Error, variables: TVariables, ...rest: any[]) => void;
+  onSuccess?: (data: TData, variables: TVariables, ...rest: unknown[]) => void;
+  onError?: (error: Error, variables: TVariables, ...rest: unknown[]) => void;
 }
 
 export function useAddComment({ onSuccess, onError }: MutationCallbacks<CommentResponse, AddCommentVariables> = {}) {

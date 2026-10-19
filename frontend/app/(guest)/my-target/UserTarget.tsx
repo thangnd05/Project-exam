@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
@@ -54,12 +54,13 @@ function UserTarget() {
 
   useNormalizeExamParam(examTypes);
 
-  useEffect(() => {
-    const examTypeIdFromQuery = examTypeIdFromParams(searchParams, examTypes);
-    if (examTypeIdFromQuery) {
-      setSelectedExamTypeId(examTypeIdFromQuery);
-    }
-  }, [searchParams, examTypes]);
+  // Kỳ thi trên URL đổi (hoặc slug vừa dịch được ra id) thì chọn theo URL.
+  const examTypeIdFromQuery = examTypeIdFromParams(searchParams, examTypes);
+  const [prevExamTypeIdFromQuery, setPrevExamTypeIdFromQuery] = useState('');
+  if (examTypeIdFromQuery !== prevExamTypeIdFromQuery) {
+    setPrevExamTypeIdFromQuery(examTypeIdFromQuery);
+    if (examTypeIdFromQuery) setSelectedExamTypeId(examTypeIdFromQuery);
+  }
 
   // Được điều hướng tới đây chỉ để đặt mục tiêu thì giữ đúng bước tiếp theo của luồng cũ.
   const nextAfterTarget = useMemo(() => {
@@ -82,17 +83,28 @@ function UserTarget() {
     examTypes,
     examParts,
     skills,
-    scoringConversions: scoringConversions as any,
+    // ScoringConversionResponse để các trường optional, hook chấm điểm khai báo bắt buộc.
+    scoringConversions,
     selectedExamTypeId,
   });
 
-  useEffect(() => {
+  // Đổi kỳ thi hoặc mục tiêu đã lưu vừa tải xong thì điền lại form theo mục tiêu đó.
+  const [syncedTarget, setSyncedTarget] = useState<{
+    examTypeId: string;
+    target: typeof target;
+    isError: boolean;
+  } | null>(null);
+  if (
+    !syncedTarget ||
+    syncedTarget.examTypeId !== selectedExamTypeId ||
+    syncedTarget.target !== target ||
+    syncedTarget.isError !== targetIsError
+  ) {
+    setSyncedTarget({ examTypeId: selectedExamTypeId, target, isError: targetIsError });
     if (!selectedExamTypeId) {
       setTargetScore('');
       setCustomParts({});
-      return;
-    }
-    if (target?.hasTarget) {
+    } else if (target?.hasTarget) {
       setTargetScore(String(target.targetScore || ''));
       const cp: Record<string, number> = {};
       (target.partRequirements || []).forEach((p) => {
@@ -103,29 +115,36 @@ function UserTarget() {
       setTargetScore('');
       setCustomParts({});
     }
-  }, [selectedExamTypeId, target, targetIsError]);
+  }
 
   // Người mới chưa biết đặt bao nhiêu: chọn sẵn mức gợi ý ở giữa, mỗi kỳ thi chỉ gợi ý một lần.
   const [suggestedFor, setSuggestedFor] = useState('');
-  useEffect(() => {
-    if (!selectedExamTypeId || suggestedFor === selectedExamTypeId) return;
-    if (isAuthenticated && (!target || target.hasTarget)) return;
-    if (targetScore || milestones.length === 0) return;
+  if (
+    selectedExamTypeId &&
+    suggestedFor !== selectedExamTypeId &&
+    !(isAuthenticated && (!target || target.hasTarget)) &&
+    !targetScore &&
+    milestones.length > 0
+  ) {
     const sorted = milestones
       .filter((m) => !m.examTypeId || m.examTypeId === selectedExamTypeId)
       .sort((a, b) => (a.milestoneScore ?? 0) - (b.milestoneScore ?? 0));
     const middle = sorted[Math.floor((sorted.length - 1) / 2)];
-    if (middle?.milestoneScore == null) return;
-    setTargetScore(String(middle.milestoneScore));
-    setSuggestedFor(selectedExamTypeId);
-  }, [selectedExamTypeId, suggestedFor, target, targetScore, milestones, isAuthenticated]);
+    if (middle?.milestoneScore != null) {
+      setTargetScore(String(middle.milestoneScore));
+      setSuggestedFor(selectedExamTypeId);
+    }
+  }
 
   const matchedMilestone = useMemo<MilestoneResponse | null>(() => {
     if (!targetScore) return null;
     return milestones.find((m) => m.milestoneScore === Number(targetScore)) || null;
   }, [targetScore, milestones]);
 
-  const filteredParts = examParts.filter((p) => p.examTypeId === selectedExamTypeId);
+  const filteredParts = useMemo(
+    () => examParts.filter((p) => p.examTypeId === selectedExamTypeId),
+    [examParts, selectedExamTypeId],
+  );
   const partRequirements = useMemo(() => {
     if (!targetScore || filteredParts.length === 0) return [];
     if (matchedMilestone && matchedMilestone.partRequirements) {
@@ -140,7 +159,7 @@ function UserTarget() {
       examPartId: p.examPartId,
       requiredPercentage: evenPct,
     }));
-  }, [targetScore, matchedMilestone, filteredParts]);
+  }, [targetScore, matchedMilestone, filteredParts, evenPctForScore]);
 
   const handleSave = () => {
     if (!targetScore || !selectedExamTypeId) {

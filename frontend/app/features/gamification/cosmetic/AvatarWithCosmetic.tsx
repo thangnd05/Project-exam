@@ -25,8 +25,8 @@ function resolveStyle(frame?: CosmeticLike | null) {
 }
 
 type AvatarWithCosmeticProps = {
-  src?: any;
-  fallbackSrc?: any;
+  src?: string | null;
+  fallbackSrc?: string | null;
   alt?: string;
   name?: string | null;
   size?: number;
@@ -74,8 +74,9 @@ function AvatarWithCosmetic({
       {initial}
     </span>
   ) : (
+    // eslint-disable-next-line @next/next/no-img-element -- avatar từ host bất kỳ (Google, upload...), cần onError đổi sang ảnh dự phòng
     <img
-      src={src || fallbackSrc}
+      src={src || fallbackSrc || undefined}
       alt={alt}
       className={cx('img')}
       style={{width: size, height: size}}
@@ -105,6 +106,7 @@ function AvatarWithCosmetic({
       </span>
 
       {isImage && (
+        // eslint-disable-next-line @next/next/no-img-element -- khung do admin dán URL từ host bất kỳ, overlay trang trí
         <img
           src={frame?.imageUrl}
           alt=""
@@ -122,6 +124,7 @@ function AvatarWithCosmetic({
 
       {badge &&
         (badge.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- huy hiệu do admin dán URL từ host bất kỳ, ảnh trang trí nhỏ
           <img
             src={badge.imageUrl}
             alt=""

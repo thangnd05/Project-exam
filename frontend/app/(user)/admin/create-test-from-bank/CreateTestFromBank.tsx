@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {
@@ -29,6 +29,7 @@ import {
   groupQuestionsByPassage,
 } from '@/app/features/tests/creator/hooks/useBankTestBuilder';
 import type { PartConfigMap } from '@/app/features/tests/creator/hooks/useBankTestBuilder';
+import type { ExamPartResponse } from '@/app/types';
 import { useExamCategories } from '@/app/features/tests/creator/hooks/useExamCategories';
 import {
   emptyTestInfo,
@@ -68,20 +69,26 @@ const CreateTestFromBank = () => {
     setNotification,
   });
 
-  useEffect(() => {
-    if (!testInfo.examTypeId || !examParts?.length) {
+  // Đổi loại đề (hoặc danh sách part về) thì khởi tạo lại cấu hình và tải câu hỏi cho từng part.
+  // useEffectEvent: luôn dùng loadQuestionsForPart/setPartConfigs mới nhất mà không làm effect chạy lại.
+  const initPartConfigs = useEffectEvent((examTypeId: string, parts: ExamPartResponse[]) => {
+    if (!examTypeId || !parts.length) {
       setPartConfigs((prev) => (Object.keys(prev).length ? {} : prev));
       return;
     }
     const initial: PartConfigMap = {};
-    examParts.forEach((p: any) => {
+    parts.forEach((p) => {
       initial[p.examPartId] = { ...defaultPartConfig(), expanded: false, loading: true };
     });
     setPartConfigs(initial);
 
-    examParts.forEach((part: any) => {
+    parts.forEach((part) => {
       loadQuestionsForPart(part.examPartId);
     });
+  });
+
+  useEffect(() => {
+    initPartConfigs(testInfo.examTypeId, examParts);
   }, [testInfo.examTypeId, examParts]);
 
   const handleEditQuestionSuccess = () => {
@@ -121,11 +128,11 @@ const CreateTestFromBank = () => {
   };
 
   const totalSelected = (examParts || []).reduce(
-    (sum: number, p: any) => sum + getPartEffectiveCount(p.examPartId),
+    (sum: number, p) => sum + getPartEffectiveCount(p.examPartId),
     0,
   );
   const hasAnyPartWithQuestions = (examParts || []).some(
-    (p: any) => getPartEffectiveCount(p.examPartId) > 0,
+    (p) => getPartEffectiveCount(p.examPartId) > 0,
   );
 
   return (
@@ -200,7 +207,7 @@ const CreateTestFromBank = () => {
                     aria-label="Loại kỳ thi"
                   >
                     <option value="">-- Chọn --</option>
-                    {(examTypes || []).map((t: any) => (
+                    {examTypes.map((t) => (
                       <option key={t.examTypeId} value={t.examTypeId}>
                         {t.name}
                       </option>
@@ -278,7 +285,7 @@ const CreateTestFromBank = () => {
                 không chọn lẻ từng câu.
               </p>
 
-              {(examParts || []).map((part: any) => {
+              {examParts.map((part) => {
                 const cfg = partConfigs[part.examPartId] ?? defaultPartConfig();
                 const count = getPartEffectiveCount(part.examPartId);
                 const maxInBank = (cfg.bankQuestions || []).length;

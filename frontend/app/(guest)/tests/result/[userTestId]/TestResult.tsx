@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Container, Spinner, Alert } from "react-bootstrap";
 import { toast } from "react-toastify";
 import classNames from "classnames/bind";
@@ -16,6 +16,7 @@ import {
 } from "react-icons/io5";
 
 import { useAuth } from "@/app/hooks/useAuth";
+import { useMounted } from "@/app/hooks/useMounted";
 import { getGuestSessionId, guestHeaders } from "@/app/utils/guestSession";
 import { isBeginnerLevel } from "@/app/features/learning-plans/learnerLevel";
 import { getScoreScale } from "@/app/features/exam-types/scoreScale";
@@ -67,11 +68,9 @@ const TestResult = () => {
   const scoreScale = getScoreScale(enhanced);
 
   const isQuickChallenge = enhanced?.examCategoryCode === 'QUICK_CHALLENGE';
-  const [isBeginner, setIsBeginner] = useState(false);
-
-  useEffect(() => {
-    setIsBeginner(Boolean(isQuickChallenge) && isBeginnerLevel(enhanced?.examTypeId));
-  }, [isQuickChallenge, enhanced?.examTypeId]);
+  // Trình độ tự khai nằm ở localStorage: chỉ đọc sau khi mount để không lệch hydration.
+  const mounted = useMounted();
+  const isBeginner = mounted && Boolean(isQuickChallenge) && isBeginnerLevel(enhanced?.examTypeId);
 
   const formatTime = (start?: string, end?: string) => {
     if (!start || !end) return "--:--";

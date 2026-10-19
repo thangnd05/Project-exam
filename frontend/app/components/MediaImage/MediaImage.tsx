@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 
-const OPTIMIZED_HOSTS = new Set(['res.cloudinary.com']);
+// Phải khớp images.remotePatterns trong next.config.mjs.
+const OPTIMIZED_HOSTS = new Set(['res.cloudinary.com', 'lh3.googleusercontent.com']);
 
 const canOptimize = (src: string) => {
   try {
@@ -20,6 +21,10 @@ type MediaImageProps = {
   height?: number;
   sizes?: string;
   priority?: boolean;
+  // Ảnh lấp đầy khung cao cố định (thumbnail, banner thẻ): giữ width/height 100% + object-fit cover
+  // thay vì height:auto, để CSS của khung quyết định kích thước.
+  cover?: boolean;
+  referrerPolicy?: React.HTMLAttributeReferrerPolicy;
 };
 
 function MediaImage({
@@ -30,12 +35,23 @@ function MediaImage({
   height = 800,
   sizes = '(max-width: 768px) 100vw, 800px',
   priority = false,
+  cover = false,
+  referrerPolicy,
 }: MediaImageProps) {
   if (!src) return null;
 
   if (!canOptimize(src)) {
-    // eslint-disable-next-line @next/next/no-img-element -- host ngoài danh sách, next/image sẽ chặn
-    return <img src={src} alt={alt} className={className} loading="lazy" decoding="async" />;
+    return (
+      // eslint-disable-next-line @next/next/no-img-element -- host ngoài danh sách, next/image sẽ chặn
+      <img
+        src={src}
+        alt={alt}
+        className={className}
+        loading="lazy"
+        decoding="async"
+        referrerPolicy={referrerPolicy}
+      />
+    );
   }
 
   return (
@@ -47,7 +63,7 @@ function MediaImage({
       height={height}
       sizes={sizes}
       priority={priority}
-      style={{ width: '100%', height: 'auto' }}
+      style={cover ? { width: '100%', height: '100%', objectFit: 'cover' } : { width: '100%', height: 'auto' }}
     />
   );
 }

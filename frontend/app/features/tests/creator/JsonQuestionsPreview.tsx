@@ -6,7 +6,7 @@ import { Alert } from 'react-bootstrap';
 import { IoBookOutline, IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import type { NormalQuestionRequest, PassageQuestionGroupRequest } from '@/app/types';
+import type { NormalQuestionRequest, PassageQuestionGroupRequest, TagResponse } from '@/app/types';
 import type { DraftQuestion } from '@/app/features/tests/creator/hooks/useCreateTest';
 import Pager, { PAGE_SIZE, pageCountOf } from '@/app/features/tests/creator/Pager';
 import QuestionBlock from '@/app/features/tests/creator/QuestionBlock';
@@ -51,7 +51,7 @@ const relabel = (answers: DraftQuestion['answers']) =>
 type EditableQuestionProps = {
   item: PreviewQuestion;
   partKey: string;
-  partTags: any[];
+  partTags: TagResponse[];
   canRemove: boolean;
   onChange: (question: NormalQuestionRequest | null) => void;
 };
@@ -122,7 +122,7 @@ type JsonQuestionsPreviewProps = {
   warnings: string[];
   parts: PreviewPart[];
   /** Tag của loại kỳ thi; mỗi thẻ chỉ dùng tag của phần thi đó cộng tag dùng chung. */
-  availableTags: any[];
+  availableTags: TagResponse[];
   summary: ReactNode;
   onClear: () => void;
   clearLabel: string;

@@ -1,15 +1,47 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { PlusCircle, Trash, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '@/app/features/tests/CreateTestModal.module.scss';
 import TagSelector from '@/app/features/tests/TagSelector/TagSelector';
-import type { DraftQuestion } from '@/app/features/tests/creator/hooks/useCreateTest';
+import type {
+    DraftAnswerFieldUpdate,
+    DraftQuestion,
+    DraftQuestionFieldUpdate,
+} from '@/app/features/tests/creator/hooks/useCreateTest';
+import type { TagResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
 const ACCEPT_MEDIA = 'image/*,audio/*';
+
+// Xem trước file chưa upload. Object URL phải tạo trong effect và thu hồi khi file đổi/unmount;
+// gọi URL.createObjectURL ngay trong JSX tạo URL mới mỗi lần render và không bao giờ giải phóng.
+function LocalFilePreview({ file }: { file: File }) {
+    const [url, setUrl] = useState<string | null>(null);
+    useEffect(() => {
+        const objectUrl = URL.createObjectURL(file);
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- đồng bộ với tài nguyên ngoài (object URL)
+        setUrl(objectUrl);
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [file]);
+
+    if (!url) return null;
+    if (file.type.startsWith('audio/')) {
+        return (
+            <audio controls className="flex-grow-1" style={{ maxHeight: 32 }}>
+                <source src={url} />
+            </audio>
+        );
+    }
+    if (file.type.startsWith('image/')) {
+        // eslint-disable-next-line @next/next/no-img-element -- blob: URL, next/image không xử lý được
+        return <img src={url} alt={file.name} style={{ maxHeight: 40, objectFit: 'contain' }} />;
+    }
+    return null;
+}
 
 const getQuestionSummary = (question: DraftQuestion) => {
     const text = (question.questionText || '').trim();
@@ -30,14 +62,13 @@ type QuestionBlockProps = {
     index: number;
     removeQuestionFn: (index: number) => void;
     updateQuestionTextFn: (index: number, value: string) => void;
-    updateQuestionFieldFn?: (index: number, field: string, value: any) => void;
-    updateAnswerFn: (index: number, answerIndex: number, field: string, value: any) => void;
+    updateQuestionFieldFn?: (...args: [index: number, ...update: DraftQuestionFieldUpdate]) => void;
+    updateAnswerFn: (...args: [index: number, answerIndex: number, ...update: DraftAnswerFieldUpdate]) => void;
     addAnswerFn?: (index: number) => void;
     removeAnswerFn?: (index: number, answerIndex: number) => void;
     addMediaFilesFn: (index: number, files: FileList | null) => void;
     removeMediaFileFn: (index: number, fileIndex: number) => void;
-    setPassageTypeFn?: (index: number, passageType: string) => void;
-    availableTags?: any[];
+    availableTags?: TagResponse[];
     withMedia?: boolean;
     minQuestions?: number;
     radioGroupPrefix?: string;
@@ -59,7 +90,6 @@ const QuestionBlock = ({
     removeAnswerFn,
     addMediaFilesFn,
     removeMediaFileFn,
-    setPassageTypeFn,
     availableTags = [],
     withMedia = true,
     minQuestions = 1,
@@ -177,18 +207,7 @@ const QuestionBlock = ({
                                     >
                                         <Trash size={14} />
                                     </button>
-                                    {file.type.startsWith('audio/') && (
-                                        <audio controls className="flex-grow-1" style={{ maxHeight: 32 }}>
-                                            <source src={URL.createObjectURL(file)} />
-                                        </audio>
-                                    )}
-                                    {file.type.startsWith('image/') && (
-                                        <img
-                                            src={URL.createObjectURL(file)}
-                                            alt={file.name}
-                                            style={{ maxHeight: 40, objectFit: 'contain' }}
-                                        />
-                                    )}
+                                    <LocalFilePreview file={file} />
                                 </li>
                             ))}
                         </ul>

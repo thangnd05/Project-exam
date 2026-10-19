@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info, Newspaper, Bookmark } from 'lucide-react';
@@ -13,6 +13,7 @@ import Pagination from '@/app/components/Pagination/Pagination';
 import CreatePostModal from '@/app/features/posts/CreatePostModal/CreatePostModal';
 import ProfileSectionModal from '@/app/features/posts/ProfileSectionModal/ProfileSectionModal';
 import styles from './posts.module.scss';
+import MediaImage from '@/app/components/MediaImage/MediaImage';
 
 const cx = classNames.bind(styles);
 const MotionLink = motion.create(Link);
@@ -44,9 +45,17 @@ function Posts() {
     status: 'APPROVED',
   });
 
-  useEffect(() => {
+  // Đổi bộ lọc thì quay về trang đầu ngay trong handler (tránh gọi API thừa cho trang cũ).
+  const changeCategory = (categoryId: string | null) => {
+    if (categoryId === selectedCategory) return;
+    setSelectedCategory(categoryId);
     setCurrentPage(0);
-  }, [selectedCategory, searchQuery]);
+  };
+
+  const changeSearch = (keyword: string) => {
+    setSearchQuery(keyword);
+    setCurrentPage(0);
+  };
 
   const refreshPosts = () => {
     setCurrentPage(0);
@@ -97,7 +106,7 @@ function Posts() {
                 type="text"
                 placeholder="Tìm bài viết..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => changeSearch(e.target.value)}
               />
             </div>
           </div>
@@ -111,7 +120,7 @@ function Posts() {
           <div className={cx('filterPills')}>
             <button
               className={cx('pill', { active: !selectedCategory })}
-              onClick={() => setSelectedCategory(null)}
+              onClick={() => changeCategory(null)}
             >
               Tất cả
             </button>
@@ -119,7 +128,7 @@ function Posts() {
               <button
                 key={cat.id}
                 className={cx('pill', { active: selectedCategory === cat.id })}
-                onClick={() => setSelectedCategory(cat.id)}
+                onClick={() => changeCategory(cat.id)}
               >
                 {cat.name}
               </button>
@@ -144,7 +153,14 @@ function Posts() {
                 <div className={cx('cardCategory')}>
                   {post.categories?.[0]?.name || 'Blog'}
                 </div>
-                <img src={post.thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'} alt={post.title} />
+                <MediaImage
+                  cover
+                  src={post.thumbnailUrl || 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'}
+                  alt={post.title ?? ''}
+                  width={640}
+                  height={360}
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                />
               </div>
               <div className={cx('cardContent')}>
                 <div className={cx('cardMeta')}>
@@ -152,7 +168,7 @@ function Posts() {
                   <span>{new Date(post.createdAt ?? '').toLocaleDateString('vi-VN')}</span>
                 </div>
                 <h3>{post.title}</h3>
-                <p className={cx('cardExcerpt')}>{(post as any).summary || post.title}</p>
+                <p className={cx('cardExcerpt')}>{post.title}</p>
                 <div className={cx('cardFooter')}>
                   <div className={cx('author')}>
                     <AvatarWithCosmetic

@@ -40,6 +40,7 @@ export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
   const [dismissReady, setDismissReady] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- đọc sessionStorage sau khi mount (server không có), tránh lệch hydrate
     setDismissed(sessionStorage.getItem(RESTORE_PROMPT_DISMISS_KEY) === '1');
     setDismissReady(true);
   }, []);
@@ -49,6 +50,7 @@ export const StreakProvider = ({ children }: { children: React.ReactNode }) => {
     const recoverable = Boolean(data?.canRecover) && (data?.lostStreak ?? 0) > 0;
     if (!recoverable) {
       sessionStorage.removeItem(RESTORE_PROMPT_DISMISS_KEY);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- đồng bộ cờ đã ẩn với sessionStorage khi streak hết khả năng khôi phục
       setDismissed(false);
     }
   }, [dismissReady, isAuthenticated, isFetched, data]);

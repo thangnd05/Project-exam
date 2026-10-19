@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
-import { useQueries } from '@tanstack/react-query';
+import { useCallback, useMemo, useState } from 'react';
+import { useQueries, type UseQueryResult } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { ChevronDown } from 'lucide-react';
 import { getEnhancedResult } from '@/app/apis/enhancedResultApi';
@@ -30,6 +30,7 @@ const enhancedResultKeys = {
 };
 
 type EnhancedEntry = Partial<EnhancedResultResponse> & { error?: boolean };
+type EnhancedQueryStatus = { isLoading: boolean; isFetching: boolean };
 
 function formatDuration(seconds: number | null | undefined): string {
   if (seconds == null) return '-';
@@ -79,36 +80,32 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
     return [...ids];
   }, [chartTests, requestedIds]);
 
-  const enhancedQueries = useQueries({
+  // Gom kết quả theo userTestId trong `combine`: react-query giữ nguyên tham chiếu (structural
+  // sharing) khi dữ liệu không đổi, nên enhancedById ổn định giữa các lần render.
+  const combineEnhanced = useCallback(
+    (results: UseQueryResult<EnhancedResultResponse>[]) => {
+      const byId: Record<string, EnhancedEntry> = {};
+      const statusById: Record<string, EnhancedQueryStatus> = {};
+      results.forEach((q, i) => {
+        const id = enhancedIds[i];
+        if (!id) return;
+        statusById[id] = { isLoading: q.isLoading, isFetching: q.isFetching };
+        if (q.isError) byId[id] = { error: true };
+        else if (q.data !== undefined) byId[id] = q.data;
+      });
+      return { byId, statusById };
+    },
+    [enhancedIds],
+  );
+
+  const { byId: enhancedById, statusById: enhancedQueryById } = useQueries({
     queries: enhancedIds.map((userTestId) => ({
       queryKey: enhancedResultKeys.detail(userTestId),
       queryFn: () => getEnhancedResult(userTestId).then((r) => r.data),
       staleTime: Infinity,
     })),
+    combine: combineEnhanced,
   });
-
-  const enhancedQueryById: Record<string, (typeof enhancedQueries)[number] | undefined> = {};
-  enhancedIds.forEach((id, i) => {
-    enhancedQueryById[id] = enhancedQueries[i];
-  });
-
-  const enhancedSignature = enhancedIds
-    .map((id, i) => {
-      const q = enhancedQueries[i];
-      return `${id}:${q?.isError ? 'e' : q?.data !== undefined ? 'd' : 'p'}`;
-    })
-    .join('|');
-
-  const enhancedById = useMemo(() => {
-    const map: Record<string, EnhancedEntry> = {};
-    enhancedIds.forEach((id, i) => {
-      const q = enhancedQueries[i];
-      if (!q) return;
-      if (q.isError) map[id] = { error: true };
-      else if (q.data !== undefined) map[id] = q.data;
-    });
-    return map;
-  }, [enhancedSignature]);
 
   const chartLoading = chartTests.some((t) => {
     const q = enhancedQueryById[t.userTestId];

@@ -7,6 +7,7 @@ import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import type { UserTargetResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import {examTypeKeys, userTargetKeys} from '@/app/configs/queryKeys';
 
 export const CHART_FETCH_LIMIT = 25;
@@ -57,7 +58,7 @@ export function useMockHistory(
     chartTests: chartQuery.data?.content ?? EMPTY_LIST,
     tablePage: tableQuery.data ?? null,
     isLoading: chartQuery.isLoading || tableQuery.isLoading,
-    error: err ? (err as any)?.response?.data?.message || err.message : null,
+    error: err ? getApiErrorMessage(err, '') || err.message : null,
     targetScore: examTypeFilter ? targetQuery.data ?? null : null,
   };
 }

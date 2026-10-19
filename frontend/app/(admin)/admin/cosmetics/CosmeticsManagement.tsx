@@ -18,7 +18,8 @@ import {
 } from '@/app/(admin)/_components/common';
 import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
 import {CosmeticType} from '@/app/enums';
-import type {CosmeticResponse} from '@/app/types';
+import type {CosmeticRequest, CosmeticResponse} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 
 const TYPES = [
   {value: CosmeticType.FRAME, label: 'Khung avatar'},
@@ -183,12 +184,12 @@ function CosmeticsManagement() {
       return;
     }
 
-    const payload = {
+    const payload: CosmeticRequest = {
       name: formState.name.trim(),
       description: formState.description.trim(),
       type: formState.type,
       frameStyle:
-        formState.type === CosmeticType.FRAME ? formState.frameStyle : null,
+        formState.type === CosmeticType.FRAME ? formState.frameStyle : undefined,
       costCoins: cost,
       assetValue: formState.assetValue.trim(),
       imageUrl: formState.imageUrl.trim(),
@@ -205,10 +206,8 @@ function CosmeticsManagement() {
       }
       setShowModal(false);
       resetForm();
-    } catch (error: any) {
-      setErrorMessage(
-        error?.response?.data?.message || 'Không thể lưu vật phẩm.',
-      );
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu vật phẩm.'));
     }
   };
 
@@ -217,7 +216,7 @@ function CosmeticsManagement() {
     try {
       await deleteCosmetic(deleting.cosmeticId);
       setDeleting(null);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể xóa vật phẩm.');
     }
   };

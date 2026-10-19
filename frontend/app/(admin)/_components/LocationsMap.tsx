@@ -27,6 +27,9 @@ const ALIAS: Record<string, string> = {
 };
 const canon = (name?: string) => ALIAS[norm(name)] || norm(name);
 
+// Feature do react-simple-maps truyền vào (chỉ dùng các trường cần thiết)
+type GeoFeature = { rsmKey: string; properties: { name?: string } };
+
 const isRealCountry = (c: CountryTraffic) => c.code && c.code !== 'LO' && c.code !== '??';
 
 const LocationsMap = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
@@ -57,8 +60,8 @@ const LocationsMap = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
                 style={{ width: '100%', height: 'auto' }}
             >
                 <Geographies geography={worldGeo}>
-                    {({ geographies }: { geographies: any[] }) =>
-                        geographies.map((geo: any) => {
+                    {({ geographies }: { geographies: GeoFeature[] }) =>
+                        geographies.map((geo) => {
                             const name = geo.properties.name;
                             const v = counts[norm(name)] || 0;
                             return (

@@ -10,6 +10,8 @@ import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
 import {useAdminQuestionCollections, type CollectionItem} from './_hooks/useAdminQuestionCollections';
+import type {QuestionCollectionRequest} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 import styles from '@/app/(admin)/_components/common/adminTree.module.scss';
 
 const cx = classNames.bind(styles);
@@ -30,8 +32,8 @@ const defaultFormState: CollectionFormState = {
   displayOrder: '',
 };
 
-const extractApiErrorMessage = (error: any, fallback: string) =>
-  error?.response?.data?.message || error?.response?.data?.error || error?.message || fallback;
+const extractApiErrorMessage = (error: unknown, fallback: string) =>
+  getApiErrorMessage(error, (error instanceof Error && error.message) || fallback);
 
 type CollectionNode = CollectionItem & {children?: CollectionNode[]};
 
@@ -266,15 +268,15 @@ function QuestionCollectionsManagement() {
       const payloadParentId = editingId && editingHasChildren ? '' : (formState.parentId || '');
 
       const trimmedOrder = String(formState.displayOrder).trim();
-      const parsedOrder = trimmedOrder === '' ? null : Number.parseInt(trimmedOrder, 10);
-      const payload = {
+      const parsedOrder = trimmedOrder === '' ? undefined : Number.parseInt(trimmedOrder, 10);
+      const payload: QuestionCollectionRequest = {
         name: normalizedName,
         description: formState.description.trim(),
         parentId: payloadParentId,
 
         examTypeId: payloadParentId ? '' : (formState.examTypeId || ''),
-        displayOrder: Number.isNaN(parsedOrder) ? null : parsedOrder,
-      } as any;
+        displayOrder: Number.isNaN(parsedOrder) ? undefined : parsedOrder,
+      };
 
       if (editingId) {
         await updateCollection({id: editingId, payload});
@@ -284,8 +286,8 @@ function QuestionCollectionsManagement() {
 
       const {data: fresh} = await refetchCollections();
       applyDefaultExpanded(Array.isArray(fresh) ? fresh : []);
-      if (payload.parentId) {
-        setExpandedIds((prev) => new Set(prev).add(payload.parentId));
+      if (payloadParentId) {
+        setExpandedIds((prev) => new Set(prev).add(payloadParentId));
       }
       setShowModal(false);
       resetForm();

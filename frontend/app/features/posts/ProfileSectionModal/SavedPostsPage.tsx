@@ -13,6 +13,7 @@ import routes from '@/app/configs/Routes';
 import { useSavedPosts, useUnsavePost } from '@/app/features/posts/hooks/useSavedPosts';
 import type { PostSummaryResponse } from '@/app/types';
 import styles from '@/app/features/posts/ProfileSectionModal/PostsListPage.module.scss';
+import MediaImage from '@/app/components/MediaImage/MediaImage';
 
 const cx = classNames.bind(styles);
 
@@ -80,7 +81,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
       await unsaveMutation.mutateAsync(postId);
       toast.success('Đã bỏ lưu');
       setUnsavingPost(null);
-    } catch (error) {
+    } catch {
       toast.error('Không thể bỏ lưu. Vui lòng thử lại.');
     } finally {
       setActionLoadingId(null);
@@ -200,11 +201,15 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
                 >
                   <Link href={detailUrl} className={cx('thumbnailLink')}>
                     {post.thumbnailUrl ? (
-                      <img
+                      <MediaImage
+                        cover
                         src={post.thumbnailUrl}
-                        alt={post.title}
+                        alt={post.title ?? ''}
                         className={cx('thumbnail')}
                         referrerPolicy="no-referrer"
+                        width={400}
+                        height={225}
+                        sizes="400px"
                       />
                     ) : (
                       <div className={cx('thumbnailPlaceholder')}>
@@ -217,6 +222,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
                     <div className={cx('cardMeta')}>
                       <span className={cx('authorMeta')}>
                         {post.authorAvatar && (
+                          // eslint-disable-next-line @next/next/no-img-element -- avatar tác giả từ host bất kỳ (Google, upload...)
                           <img
                             src={post.authorAvatar}
                             alt={post.authorName}

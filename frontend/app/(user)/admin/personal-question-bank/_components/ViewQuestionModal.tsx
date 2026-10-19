@@ -6,6 +6,7 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {toast} from 'react-toastify';
 import {useQuestionDetail} from '@/app/features/tests/hooks/useQuestionDetail';
+import type {AnswerAdminResponse} from '@/app/types';
 import classNames from 'classnames/bind';
 import {
   CheckCircle,
@@ -46,7 +47,9 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
     }
   }, [isError]);
 
-  const answers = Array.isArray(question?.answers) ? question!.answers! : [];
+  // Dữ liệu cũ có thể dùng `content`/`id` thay cho `answerText`/`answerId`.
+  const answers: (AnswerAdminResponse & { content?: string; id?: string })[] =
+    Array.isArray(question?.answers) ? question!.answers! : [];
   const mediaItems = getPassageMediaItems(question);
   const passageContent = question?.passage?.content || '';
   const passageTranslation = question?.passage?.contentTranslation || '';
@@ -163,7 +166,7 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
               </Alert>
             ) : (
               <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
-                {answers.map((ans: any, idx) => {
+                {answers.map((ans, idx) => {
                   const label =
                     ans.answerLabel || String.fromCharCode(65 + idx);
                   const text = ans.answerText || ans.content || '';

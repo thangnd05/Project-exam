@@ -15,6 +15,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '@/app/(admin)/_components/common';
+import type {ExamPartRequest} from '@/app/types';
 import styles from './ExamPartsManagement.module.scss';
 
 const cx = classNames.bind(styles);
@@ -142,14 +143,14 @@ function ExamPartsManagement() {
       return;
     }
 
-    const payload = {
+    const payload: ExamPartRequest = {
       examTypeId: formState.exam_type_id,
-      skillId: formState.skill_id || null,
+      skillId: formState.skill_id || undefined,
       name: normalizedName,
       description: formState.description.trim(),
       defaultNumQuestions: Number(formState.default_num_questions),
       displayOrder: Number(formState.display_order) || 999,
-    } as any;
+    };
 
     setSubmitting(true);
     setErrorMessage('');
@@ -161,7 +162,7 @@ function ExamPartsManagement() {
       }
       setShowFormModal(false);
       resetForm();
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể lưu phần thi. Vui lòng thử lại.');
     } finally {
       setSubmitting(false);
@@ -178,7 +179,7 @@ function ExamPartsManagement() {
     try {
       await deleteMutation.mutateAsync(deletingExamPart.exam_part_id);
       setDeletingExamPart(null);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể xóa phần thi.');
     } finally {
       setSubmitting(false);

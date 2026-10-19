@@ -34,9 +34,15 @@ function PlanResult() {
   const goToNext = !allTasksDone && nextTaskId && nextTaskId !== taskId
     ? () => router.push(`/learning-plans/${learningPlanId}/study?taskId=${nextTaskId}`)
     : undefined;
+  // Vừa vượt hết ải thì bật modal chúc mừng (một lần cho mỗi lộ trình).
+  const congratsKey = allTasksDone ? learningPlanId : null;
+  const [prevCongratsKey, setPrevCongratsKey] = useState<string | null>(null);
+  if (congratsKey !== prevCongratsKey) {
+    setPrevCongratsKey(congratsKey);
+    if (congratsKey) setShowCongrats(true);
+  }
   useEffect(() => {
     if (!allTasksDone) return;
-    setShowCongrats(true);
     markCongratsSeen(learningPlanId);
   }, [allTasksDone, learningPlanId]);
 

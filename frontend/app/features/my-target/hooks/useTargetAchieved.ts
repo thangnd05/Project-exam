@@ -13,6 +13,7 @@ import type {
   UserTestResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import {examTypeKeys} from '@/app/configs/queryKeys';
 
 export const targetAchievedKeys = {
@@ -20,7 +21,8 @@ export const targetAchievedKeys = {
   detail: (examTypeId?: string) => ['target-achieved', examTypeId],
 };
 
-const normalizeExamTypes = (data: any): ExamTypeResponse[] =>
+// API có lúc trả mảng, có lúc trả trang { content }.
+const normalizeExamTypes = (data: ExamTypeResponse[] | { content?: ExamTypeResponse[] } | null | undefined): ExamTypeResponse[] =>
   (Array.isArray(data) ? data : data?.content ?? []);
 
 type TargetAchievedData = {
@@ -69,6 +71,6 @@ export function useTargetAchieved(examTypeId: string) {
     latestMock: detailQuery.data?.latestMock ?? null,
     enhanced: detailQuery.data?.enhanced ?? null,
     isLoading: detailQuery.isLoading,
-    error: err ? ((err as any)?.response?.data?.message || err.message) : null,
+    error: err ? getApiErrorMessage(err, err.message) : null,
   };
 }

@@ -82,7 +82,7 @@ export function usePostComments(postId?: string, { enabled = true }: { enabled?:
   });
 
   return {
-    comments: Array.isArray(query.data) ? query.data : [],
+    comments: Array.isArray(query.data) ? query.data : EMPTY_LIST,
     isLoading: query.isLoading,
     isError: query.isError,
   };

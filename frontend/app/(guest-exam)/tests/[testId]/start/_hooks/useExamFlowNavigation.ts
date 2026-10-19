@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type {
   ExamFlowStep,
   ExamPart,
@@ -50,8 +50,9 @@ export function useExamFlowNavigation({
     visibleParts.forEach((part) => {
       (part.questionGroups || []).forEach((group, gi) => {
         const passage = group.passage || null;
-        const pType = ((passage as any)?.passageType ?? (passage as any)?.passage_type ?? '')
-          .toUpperCase();
+        // API cũ có thể trả passage_type (snake_case).
+        const loosePassage = passage as { passageType?: string; passage_type?: string } | null;
+        const pType = (loosePassage?.passageType ?? loosePassage?.passage_type ?? '').toUpperCase();
         const sectionType =
           pType === 'LISTENING' ? 'LISTENING' : pType === 'READING' ? 'READING' : null;
 
@@ -83,14 +84,16 @@ export function useExamFlowNavigation({
     return map;
   }, [flowSteps]);
 
-  useEffect(() => {
-    if (flowSteps.length === 0) return;
-    setCurrentStepIndex((i) => Math.max(0, Math.min(i, flowSteps.length - 1)));
-  }, [flowSteps.length]);
+  // Số bước đổi (vd. vừa tải xong đề): kẹp bước hiện tại về khoảng hợp lệ.
+  const [prevStepCount, setPrevStepCount] = useState(flowSteps.length);
+  if (flowSteps.length !== prevStepCount) {
+    setPrevStepCount(flowSteps.length);
+    if (flowSteps.length > 0) {
+      setCurrentStepIndex((i) => Math.max(0, Math.min(i, flowSteps.length - 1)));
+    }
+  }
 
-  useEffect(() => {
-    setMaxStepIndex((m) => Math.max(m, currentStepIndex));
-  }, [currentStepIndex]);
+  if (currentStepIndex > maxStepIndex) setMaxStepIndex(currentStepIndex);
 
   const listeningGateBefore = useMemo(() => {
     const arr: number[] = new Array(flowSteps.length).fill(-1);

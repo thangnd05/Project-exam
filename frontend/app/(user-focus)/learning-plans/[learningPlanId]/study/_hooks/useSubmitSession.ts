@@ -14,7 +14,7 @@ type SubmitSessionVariables = {
 
 type UseSubmitSessionOptions = {
   onSuccess?: (data: SubmitSessionResponse, variables: SubmitSessionVariables, ...rest: unknown[]) => void;
-  onError?: (err: any) => void;
+  onError?: (err: unknown) => void;
 };
 
 export function useSubmitSession({ onSuccess, onError }: UseSubmitSessionOptions = {}) {

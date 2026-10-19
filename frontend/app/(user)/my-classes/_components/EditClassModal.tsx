@@ -1,6 +1,8 @@
 'use client';
 
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
+import {useQuery} from '@tanstack/react-query';
+import {classKeys} from '@/app/configs/queryKeys';
 import {Alert} from 'react-bootstrap';
 import {toast} from 'react-toastify';
 import { getClassById } from '@/app/apis/classApi';
@@ -27,27 +29,40 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
   const [message, setMessage] = useState('');
   const [type, setType] = useState('info');
 
+  const [touched, setTouched] = useState(false);
+
   const updateMutation = useUpdateClass();
   const loading = updateMutation.isPending;
+  const classId = classData?.classId;
 
-  useEffect(() => {
+  // Mở modal (hoặc đổi lớp) thì nạp form từ dữ liệu danh sách.
+  const formFor = show ? (classId ?? null) : null;
+  const [seededFor, setSeededFor] = useState<string | null>(null);
+  if (formFor !== seededFor) {
+    setSeededFor(formFor);
     if (show) {
       setClassName(classData?.className || '');
       setDescription(classData?.description || '');
       setMessage('');
-
-      if (classData?.classId && !classData?.description) {
-        getClassById(classData.classId)
-          .then((data) => {
-            setClassName(data.className || '');
-            setDescription(data.description || '');
-          })
-          .catch((err) => {
-            console.error('Error fetching class details:', err);
-          });
-      }
+      setTouched(false);
     }
-  }, [classData, show]);
+  }
+
+  // Danh sách không có mô tả thì lấy chi tiết lớp. Query có key theo classId nên response của lớp
+  // khác không thể đổ vào form này, và chỉ điền khi người dùng chưa sửa gì.
+  const { data: detail } = useQuery({
+    queryKey: classKeys.detail(classId),
+    queryFn: () => getClassById(classId as string),
+    enabled: show && !!classId && !classData?.description,
+  });
+  const [filledFrom, setFilledFrom] = useState<ClassResponse | undefined>();
+  if (show && detail && detail !== filledFrom) {
+    setFilledFrom(detail);
+    if (!touched) {
+      setClassName(detail.className || '');
+      setDescription(detail.description || '');
+    }
+  }
 
   const handleUpdate = () => {
     setMessage('');
@@ -112,7 +127,7 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
             className={cx('inputControl')}
             placeholder="Nhập tên lớp học"
             value={className}
-            onChange={(e) => setClassName(e.target.value)}
+            onChange={(e) => { setTouched(true); setClassName(e.target.value); }}
             disabled={loading}
           />
         </div>
@@ -125,7 +140,7 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
             className={cx('inputControl', 'textarea')}
             placeholder="Nhập mô tả về lớp học (không bắt buộc)"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => { setTouched(true); setDescription(e.target.value); }}
             disabled={loading}
             rows={3}
           />

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
+import { isAxiosError } from 'axios';
 import { getApiBaseUrl } from '@/app/utils/mediaUrl';
 import { useAuth } from '@/app/hooks/useAuth';
 import { toast } from 'react-toastify';
@@ -89,7 +90,11 @@ function Login() {
   const GOOGLE_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/google`;
   const FACEBOOK_AUTH_URL = `${backendBaseUrl}/oauth2/authorization/facebook`;
 
-  useEffect(() => {
+  // Đồng bộ mode/thông báo từ URL mỗi khi query string đổi (điều chỉnh state ngay khi render).
+  const [syncedParams, setSyncedParams] = useState<typeof searchParams | null>(null);
+  if (syncedParams !== searchParams) {
+    setSyncedParams(searchParams);
+
     const mode = searchParams.get('mode');
     if (mode) {
       setIsSignUp(mode === 'signup');
@@ -105,7 +110,7 @@ function Login() {
       setMessage(flash);
       setMessageType('info');
     }
-  }, [searchParams]);
+  }
 
   useEffect(() => {
     if (user) {
@@ -134,9 +139,9 @@ function Login() {
       } else {
         throw new Error("User data invalid");
       }
-    } catch (err: any) {
+    } catch (err) {
       setMessage(
-        err.response?.data?.message ||
+        (isAxiosError<{ message?: string }>(err) && err.response?.data?.message) ||
         "Đăng nhập thất bại. Vui lòng thử lại!"
       );
       setMessageType("error");
@@ -180,10 +185,11 @@ function Login() {
         setLoginIdentifier(regEmail);
         setIsSignUp(false);
       }
-    } catch (err: any) {
+    } catch (err) {
+      const response = isAxiosError<{ message?: string }>(err) ? err.response : undefined;
       const errorMessage =
-        err.response?.data?.message ||
-        (err.response?.status === 500
+        response?.data?.message ||
+        (response?.status === 500
           ? 'Tên đăng nhập hoặc Email đã tồn tại.'
           : 'Đăng ký thất bại. Vui lòng thử lại sau.');
       setMessage(errorMessage);

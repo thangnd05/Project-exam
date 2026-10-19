@@ -12,8 +12,8 @@ import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache'
 import {userTargetKeys} from '@/app/configs/queryKeys';
 
 type MutationCallbacks = {
-  onSuccess?: (...args: any[]) => void;
-  onError?: (...args: any[]) => void;
+  onSuccess?: (...args: unknown[]) => void;
+  onError?: (...args: unknown[]) => void;
 };
 
 const invalidateTargetQueries = (qc: QueryClient, examTypeId?: string) => {
@@ -27,7 +27,7 @@ export function useSaveUserTarget({ onSuccess, onError }: MutationCallbacks = {}
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: UserTargetRequest) => createOrUpdateUserTarget(payload),
-    onSuccess: (data, variables, ...rest: any[]) => {
+    onSuccess: (data, variables, ...rest: unknown[]) => {
       invalidateTargetQueries(qc, variables?.examTypeId);
       onSuccess?.(data, variables, ...rest);
     },
@@ -39,7 +39,7 @@ export function useDeleteUserTarget({ onSuccess, onError }: MutationCallbacks = 
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (examTypeId: string) => deleteUserTarget(examTypeId),
-    onSuccess: (data, examTypeId, ...rest: any[]) => {
+    onSuccess: (data, examTypeId, ...rest: unknown[]) => {
       invalidateTargetQueries(qc, examTypeId);
       onSuccess?.(data, examTypeId, ...rest);
     },

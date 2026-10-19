@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Braces, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
@@ -54,11 +54,13 @@ function ScoringConversionManagement() {
     deleteMutation.isPending ||
     bulkCreateMutation.isPending;
 
-  useEffect(() => {
-    if (activeSkillId !== 'all') {
-      setFormState((previous) => ({...previous, skill_id: activeSkillId}));
+  // Chọn kỹ năng cụ thể thì điền sẵn kỹ năng đó vào form
+  const selectSkill = (skillId: string) => {
+    setActiveSkillId(skillId);
+    if (skillId !== 'all') {
+      setFormState((previous) => ({...previous, skill_id: skillId}));
     }
-  }, [activeSkillId]);
+  };
 
   const filteredRules = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
@@ -131,7 +133,7 @@ function ScoringConversionManagement() {
         convertedScore: convertedScore,
       });
       resetForm();
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể thêm cấu hình quy đổi.');
     }
   };
@@ -145,7 +147,7 @@ function ScoringConversionManagement() {
     try {
       await deleteMutation.mutateAsync(deletingRule.conversion_id);
       setDeletingRule(null);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể xóa cấu hình quy đổi.');
     }
   };
@@ -187,7 +189,7 @@ function ScoringConversionManagement() {
       setJsonCreateValue('');
       setShowJsonCreateForm(false);
       setErrorMessage('');
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể tạo từ JSON. Vui lòng kiểm tra định dạng và dữ liệu.');
     }
   };
@@ -288,7 +290,7 @@ function ScoringConversionManagement() {
           type="button"
           size="sm"
           className={cx('pillBtn', {active: activeSkillId === 'all'})}
-          onClick={() => setActiveSkillId('all')}
+          onClick={() => selectSkill('all')}
         >
           Tất cả kỹ năng
         </Button>
@@ -298,7 +300,7 @@ function ScoringConversionManagement() {
             type="button"
             size="sm"
             className={cx('pillBtn', {active: activeSkillId === skill.skill_id})}
-            onClick={() => setActiveSkillId(skill.skill_id)}
+            onClick={() => selectSkill(skill.skill_id)}
           >
             {skill.name}
           </Button>

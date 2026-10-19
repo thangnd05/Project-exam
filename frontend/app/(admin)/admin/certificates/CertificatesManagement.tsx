@@ -20,7 +20,12 @@ import {
 } from '@/app/(admin)/_components/common';
 import type { AdminTableColumn } from '@/app/(admin)/_components/common/AdminTable';
 import { CertificateStatus } from '@/app/enums';
-import type { CertificateResponse, CertificateTemplateResponse } from '@/app/types';
+import type {
+  CertificateResponse,
+  CertificateTemplateRequest,
+  CertificateTemplateResponse,
+} from '@/app/types';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import {
   useCertificateTemplates,
   useIssuedCertificates,
@@ -46,21 +51,21 @@ const emptyForm: CertificateTemplateFormState = {
   active: true,
 };
 
-const buildPayload = (formState: CertificateTemplateFormState) => ({
+const buildPayload = (formState: CertificateTemplateFormState): CertificateTemplateRequest => ({
   examTypeId: formState.examTypeId,
   passScore: Number(formState.passScore),
   title: formState.title.trim(),
-  subtitle: formState.subtitle?.trim() || null,
-  bodyText: formState.bodyText?.trim() || null,
-  footerNote: formState.footerNote?.trim() || null,
-  logoUrl: formState.logoUrl?.trim() || null,
-  backgroundUrl: formState.backgroundUrl?.trim() || null,
-  accentColor: formState.accentColor?.trim() || null,
-  issuerName: formState.issuerName?.trim() || null,
-  signatureName: formState.signatureName?.trim() || null,
-  signatureTitle: formState.signatureTitle?.trim() || null,
-  signatureImageUrl: formState.signatureImageUrl?.trim() || null,
-  validMonths: formState.validMonths ? Number(formState.validMonths) : null,
+  subtitle: formState.subtitle?.trim() || undefined,
+  bodyText: formState.bodyText?.trim() || undefined,
+  footerNote: formState.footerNote?.trim() || undefined,
+  logoUrl: formState.logoUrl?.trim() || undefined,
+  backgroundUrl: formState.backgroundUrl?.trim() || undefined,
+  accentColor: formState.accentColor?.trim() || undefined,
+  issuerName: formState.issuerName?.trim() || undefined,
+  signatureName: formState.signatureName?.trim() || undefined,
+  signatureTitle: formState.signatureTitle?.trim() || undefined,
+  signatureImageUrl: formState.signatureImageUrl?.trim() || undefined,
+  validMonths: formState.validMonths ? Number(formState.validMonths) : undefined,
   active: formState.active !== false,
 });
 
@@ -182,10 +187,8 @@ function CertificatesManagement() {
       setShowFormModal(false);
       setFormState(emptyForm);
       setEditingId(null);
-    } catch (error: any) {
-      const message =
-        error.response?.data?.message || 'Không thể lưu mẫu chứng chỉ. Vui lòng thử lại.';
-      setErrorMessage(typeof message === 'string' ? message : JSON.stringify(message));
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu mẫu chứng chỉ. Vui lòng thử lại.'));
     }
   };
 
@@ -194,7 +197,7 @@ function CertificatesManagement() {
     try {
       await deleteMutation.mutateAsync(deletingTemplate.templateId);
       setDeletingTemplate(null);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể xoá mẫu chứng chỉ này.');
     }
   };
@@ -204,7 +207,7 @@ function CertificatesManagement() {
     try {
       await deleteIssuedMutation.mutateAsync(deletingCertificate.certificateId);
       setDeletingCertificate(null);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể xoá chứng chỉ này.');
     }
   };
@@ -217,7 +220,7 @@ function CertificatesManagement() {
         reason: 'Thu hồi bởi quản trị viên',
       });
       setRevokingCertificate(null);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể thu hồi chứng chỉ này.');
     }
   };

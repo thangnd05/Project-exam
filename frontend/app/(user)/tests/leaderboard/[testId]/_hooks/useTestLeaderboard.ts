@@ -1,6 +1,7 @@
 'use client';
 
 import {useQuery} from '@tanstack/react-query';
+import {isAxiosError} from 'axios';
 
 import {getLeaderboardByTest} from '@/app/apis/userTestApi';
 import {getUserTestInfo} from '@/app/apis/testApi';
@@ -51,7 +52,7 @@ export function useTestLeaderboard(testId?: string) {
   let errorMessage = '';
   if (leaderboardQuery.isError) {
     errorMessage =
-      (leaderboardQuery.error as any)?.response?.status === 403
+      isAxiosError(leaderboardQuery.error) && leaderboardQuery.error.response?.status === 403
         ? 'Bạn không có quyền xem bảng xếp hạng của đề này (đề thuộc lớp riêng).'
         : 'Không tải được bảng xếp hạng từ hệ thống.';
   }

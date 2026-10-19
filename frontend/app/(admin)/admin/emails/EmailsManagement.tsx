@@ -17,6 +17,7 @@ import {
 } from '@/app/(admin)/_components/common';
 import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
 import type {EmailResponse} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 import styles from '@/app/(admin)/_components/common/adminKit.module.scss';
 import EmailEditorModal from './_components/EmailEditorModal';
 import EmailRecipientsModal from './_components/EmailRecipientsModal';
@@ -95,7 +96,7 @@ function EmailsManagement() {
       toast.success('Đã xóa email.');
       setDeletingEmail(null);
     } catch (error) {
-      setErrorMessage((error as any)?.response?.data?.message || 'Không xóa được email.');
+      setErrorMessage(getApiErrorMessage(error, 'Không xóa được email.'));
     }
   };
 

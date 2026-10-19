@@ -6,8 +6,12 @@ import type { QuestionCollectionResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import {questionCollectionKeys} from '@/app/configs/queryKeys';
 
-const normalizeCollections = (data: any): QuestionCollectionResponse[] =>
-  Array.isArray(data) ? data : data?.data || data?.content || [];
+// Response có thể bọc trong { data } hoặc { content }; chuẩn hoá về mảng.
+const normalizeCollections = (data: unknown): QuestionCollectionResponse[] => {
+  if (Array.isArray(data)) return data;
+  const wrapped = data as { data?: QuestionCollectionResponse[]; content?: QuestionCollectionResponse[] } | null;
+  return wrapped?.data || wrapped?.content || [];
+};
 
 export function useQuestionCollections() {
   const query = useQuery({

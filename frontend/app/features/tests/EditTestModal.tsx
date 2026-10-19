@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { examCategoryKeys, examTypeKeys, questionCollectionKeys } from '@/app/configs/queryKeys';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import { toDateTimeLocalInput, fromDateTimeLocalInput } from '@/app/utils/format-date-time';
 import { Button, Spinner, Row, Col, Accordion, Form } from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
@@ -14,6 +16,7 @@ import { getQuestionCollections } from '@/app/apis/questionCollectionApi';
 import { buildCollectionTree } from '@/app/features/tests/collectionTree';
 import { useHasPermission } from '@/app/hooks/usePermission';
 import { toast } from 'react-toastify';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import classNames from 'classnames/bind';
 import {
   IoCreateOutline,
@@ -25,7 +28,14 @@ import {
 } from 'react-icons/io5';
 import EditQuestionModal from '@/app/features/tests/EditQuestionModal';
 import { PermissionCode } from '@/app/enums';
-import type { CreateTestRequest, TestAdminResponse, TestResponse } from '@/app/types';
+import type {
+  CreateTestRequest,
+  ExamCategoryResponse,
+  ExamTypeResponse,
+  QuestionCollectionResponse,
+  TestAdminResponse,
+  TestResponse,
+} from '@/app/types';
 import createModalStyles from '@/app/features/tests/CreateTestModal.module.scss';
 
 const cxCreate = classNames.bind(createModalStyles);
@@ -44,116 +54,106 @@ type EditTestModalProps = {
 
 type UpdateTestVariables = { testId: string; payload: CreateTestRequest };
 
+const EMPTY_FORM = {
+  title: '',
+  description: '',
+  examTypeId: '',
+  examCategoryId: '',
+  collectionId: '',
+  durationMinutes: '' as string | number,
+  maxAttempts: '' as string | number,
+  bannerUrl: '',
+  availableFrom: '',
+  availableTo: '',
+  costCoins: '' as string | number,
+  shuffleQuestions: false,
+};
+
+const formFromTest = (test: EditableTest): typeof EMPTY_FORM => ({
+  title: test.title || '',
+  description: test.description || '',
+  examTypeId: test.examType?.examTypeId || test.examTypeId || '',
+  examCategoryId: test.examCategoryId || '',
+  collectionId: test.collectionId || '',
+  durationMinutes: test.durationMinutes || '',
+  maxAttempts: test.maxAttempts || '',
+  bannerUrl: test.bannerUrl || '',
+  availableFrom: toDateTimeLocalInput(test.availableFrom),
+  availableTo: toDateTimeLocalInput(test.availableTo),
+  costCoins: test.costCoins != null ? test.costCoins : '',
+  shuffleQuestions: Boolean(test.shuffleQuestions),
+});
+
+// Response cũ có thể bọc trong { data } hoặc { content }; chuẩn hoá về mảng.
+const toList = <T,>(payload: unknown): T[] => {
+  if (Array.isArray(payload)) return payload as T[];
+  const wrapped = payload as { data?: T[]; content?: T[] } | null;
+  return wrapped?.data ?? wrapped?.content ?? [];
+};
+
+// Nằm dưới gốc ['admin-tests'] để invalidate danh sách đề ở trang admin cũng làm mới chi tiết.
+const testDetailKey = (testId?: string) => ['admin-tests', 'detail', testId ?? null];
+
 const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) => {
+  const queryClient = useQueryClient();
   const canSetPricing = useHasPermission(PermissionCode.TEST_MANAGE_PRICING);
-  const [examTypes, setExamTypes] = useState<any[]>([]);
-  const [examCategories, setExamCategories] = useState<any[]>([]);
-  const [questionCollections, setQuestionCollections] = useState<any[]>([]);
-  const [loadingDetail, setLoadingDetail] = useState(false);
-  const [testDetail, setTestDetail] = useState<TestAdminResponse | null>(null);
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
+  const [formData, setFormData] = useState(EMPTY_FORM);
+  const testId = test?.testId || test?.id;
 
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    examTypeId: '',
-    examCategoryId: '',
-    collectionId: '',
-    durationMinutes: '' as string | number,
-    maxAttempts: '' as string | number,
-    bannerUrl: '',
-    availableFrom: '',
-    availableTo: '',
-    costCoins: '' as string | number,
-    shuffleQuestions: false,
+  // Dữ liệu dùng chung cache với các trang khác (cùng key) và có key theo testId, nên mở đề B ngay
+  // sau đề A không thể hiện nhầm dữ liệu của A như khi fetch tay trong useEffect.
+  const { data: examTypes = EMPTY_LIST as ExamTypeResponse[] } = useQuery({
+    queryKey: examTypeKeys.all,
+    queryFn: getExamTypes,
+    enabled: show,
+    select: toList<ExamTypeResponse>,
   });
+  const { data: examCategories = EMPTY_LIST as ExamCategoryResponse[] } = useQuery({
+    queryKey: examCategoryKeys.all,
+    queryFn: getExamCategories,
+    enabled: show,
+    select: toList<ExamCategoryResponse>,
+  });
+  const { data: questionCollections = EMPTY_LIST as QuestionCollectionResponse[] } = useQuery({
+    queryKey: questionCollectionKeys.all,
+    queryFn: getQuestionCollections,
+    enabled: show,
+    select: toList<QuestionCollectionResponse>,
+  });
+  const detailQuery = useQuery({
+    queryKey: testDetailKey(testId),
+    queryFn: () => getAdminTestById(testId as string),
+    enabled: show && !!testId,
+  });
+  const testDetail: TestAdminResponse | undefined = detailQuery.data;
+  const loadingDetail = detailQuery.isFetching;
+  const refreshTestDetail = () => queryClient.invalidateQueries({ queryKey: testDetailKey(testId) });
 
-  useEffect(() => {
-    if (show) {
-      fetchExamTypes();
-      fetchExamCategories();
-      fetchQuestionCollections();
-      if (test) {
-        setFormData({
-          title: test.title || '',
-          description: test.description || '',
-          examTypeId: test.examType?.examTypeId || test.examTypeId || '',
-          examCategoryId: test.examCategoryId || '',
-          collectionId: test.collectionId || '',
-          durationMinutes: test.durationMinutes || '',
-          maxAttempts: test.maxAttempts || '',
-          bannerUrl: test.bannerUrl || '',
-          availableFrom: toDateTimeLocalInput(test.availableFrom),
-          availableTo: toDateTimeLocalInput(test.availableTo),
-          costCoins: test.costCoins != null ? test.costCoins : '',
-          shuffleQuestions: Boolean(test.shuffleQuestions),
-        });
-        fetchTestDetail(test.testId || test.id);
-      }
-    } else {
-      setTestDetail(null);
-      setEditingQuestionId(null);
+  // Mở modal (hoặc đổi sang đề khác) thì nạp lại form từ đề; cha re-render truyền object mới của
+  // cùng đề thì không nạp lại, để không xoá những gì người dùng đang sửa.
+  const formFor = show ? (testId ?? null) : null;
+  const [seededFor, setSeededFor] = useState<string | null>(null);
+  if (formFor !== seededFor) {
+    setSeededFor(formFor);
+    if (show && test) setFormData(formFromTest(test));
+    if (!show) setEditingQuestionId(null);
+  }
+
+  // Đề cũ chưa có phân loại trong danh sách thì lấy từ chi tiết khi chi tiết về.
+  const [seededCategoryFrom, setSeededCategoryFrom] = useState<TestAdminResponse | undefined>();
+  if (testDetail && testDetail !== seededCategoryFrom) {
+    setSeededCategoryFrom(testDetail);
+    if (testDetail.examCategoryId && !formData.examCategoryId) {
+      setFormData((prev) => ({ ...prev, examCategoryId: testDetail.examCategoryId as string }));
     }
-  }, [show, test]);
-
-  const fetchTestDetail = async (id?: string) => {
-    if (!id) return;
-    setLoadingDetail(true);
-    try {
-      const data = await getAdminTestById(id);
-      setTestDetail(data);
-
-      if (data?.examCategoryId) {
-        setFormData((prev) =>
-          prev.examCategoryId ? prev : { ...prev, examCategoryId: data.examCategoryId as string },
-        );
-      }
-    } catch (error) {
-      console.error('Failed to load test detail', error);
-      toast.error('Không tải được danh sách câu hỏi của đề');
-    } finally {
-      setLoadingDetail(false);
-    }
-  };
-
-  const fetchExamTypes = async () => {
-    try {
-      const data: any = await getExamTypes();
-      if (data?.data) {
-        setExamTypes(data.data);
-      } else if (Array.isArray(data)) {
-        setExamTypes(data);
-      }
-    } catch (error) {
-      console.error('Failed to load exam types', error);
-    }
-  };
-
-  const fetchExamCategories = async () => {
-    try {
-      const data: any = await getExamCategories();
-      setExamCategories(Array.isArray(data) ? data : (data?.data || []));
-    } catch (error) {
-      console.error('Failed to load exam categories', error);
-      setExamCategories([]);
-    }
-  };
-
-  const fetchQuestionCollections = async () => {
-    try {
-      const data: any = await getQuestionCollections();
-      setQuestionCollections(Array.isArray(data) ? data : (data?.data || data?.content || []));
-    } catch (error) {
-      console.error('Failed to load collections', error);
-      setQuestionCollections([]);
-    }
-  };
+  }
 
   const collectionOptions = useMemo(
     () =>
       buildCollectionTree(
-        (questionCollections || []).filter(
-          (c: any) =>
+        questionCollections.filter(
+          (c) =>
             !formData.examTypeId ||
             !c.examTypeId ||
             String(c.examTypeId) === String(formData.examTypeId),
@@ -168,20 +168,20 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
       toast.success('Cập nhật đề thi thành công!');
       onSuccess();
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message ?? error.message;
+    onError: (error: unknown) => {
+      const msg = getApiErrorMessage(error, error instanceof Error ? error.message : undefined);
       toast.error(`Lỗi khi cập nhật: ${msg}`);
     },
   });
 
   const shuffleMutation = useMutation({
     mutationFn: (testId: string) => shuffleTestQuestions(testId),
-    onSuccess: async (_data, testId) => {
+    onSuccess: async () => {
       toast.success('Đã xáo lại thứ tự câu trong đề');
-      await fetchTestDetail(testId);
+      await refreshTestDetail();
     },
-    onError: (error: any) => {
-      const msg = error.response?.data?.message ?? error.message;
+    onError: (error: unknown) => {
+      const msg = getApiErrorMessage(error, error instanceof Error ? error.message : undefined);
       toast.error(`Lỗi khi xáo thứ tự câu: ${msg}`);
     },
   });
@@ -234,34 +234,19 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
   const groupedQuestions = useMemo(() => {
     if (!testDetail?.parts) return [];
-    return (testDetail.parts as any[]).map((part: any, partIndex: number) => {
-      const partName =
-        part?.examPart?.name ||
-        part?.examPartName ||
-        part?.name ||
-        `Part ${partIndex + 1}`;
+    return testDetail.parts.map((part, partIndex) => {
+      const partName = part.partName || `Part ${partIndex + 1}`;
       const questionRows: Array<{ questionId: string; questionText: string }> = [];
-      const groups = Array.isArray(part?.questionGroups) ? part.questionGroups : [];
+      const groups = Array.isArray(part.questionGroups) ? part.questionGroups : [];
 
-      groups.forEach((group: any) => {
+      groups.forEach((group) => {
         const questions = Array.isArray(group?.questions) ? group.questions : [];
-        questions.forEach((q: any) => {
-          const id = q?.questionId ?? q?.id;
-          if (!id) return;
+        questions.forEach((q) => {
+          if (!q?.questionId) return;
           questionRows.push({
-            questionId: id,
-            questionText: q?.questionText || '(Không có nội dung)',
+            questionId: q.questionId,
+            questionText: q.questionText || '(Không có nội dung)',
           });
-        });
-      });
-
-      const directQuestions = Array.isArray(part?.questions) ? part.questions : [];
-      directQuestions.forEach((q: any) => {
-        const id = q?.questionId ?? q?.id;
-        if (!id) return;
-        questionRows.push({
-          questionId: id,
-          questionText: q?.questionText || '(Không có nội dung)',
         });
       });
 
@@ -271,8 +256,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
   const handleQuestionUpdated = async () => {
     setEditingQuestionId(null);
-    const testId = test?.testId || test?.id;
-    await fetchTestDetail(testId);
+    await refreshTestDetail();
     onSuccess?.();
   };
 
@@ -353,7 +337,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                 >
                   <option value="">-- Chọn loại --</option>
 
-                  {examTypes.filter((type: any) => !type.childCount).map((type: any) => (
+                  {examTypes.filter((type) => !type.childCount).map((type) => (
                     <option key={type.examTypeId} value={type.examTypeId}>
                       {type.name}
                     </option>
@@ -374,7 +358,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                   aria-label="Phân loại bài thi"
                 >
                   <option value="">-- Không phân loại --</option>
-                  {examCategories.map((c: any) => (
+                  {examCategories.map((c) => (
                     <option key={c.examCategoryId} value={c.examCategoryId}>
                       {c.name}
                     </option>
@@ -530,6 +514,8 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
             <div className="text-center py-4">
               <Spinner animation="border" />
             </div>
+          ) : detailQuery.isError ? (
+            <p className="text-danger mb-0">Không tải được danh sách câu hỏi của đề.</p>
           ) : groupedQuestions.length === 0 ? (
             <p className="text-muted mb-0">Không có câu hỏi để hiển thị.</p>
           ) : (

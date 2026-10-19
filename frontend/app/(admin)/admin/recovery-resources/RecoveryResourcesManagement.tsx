@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {Badge, Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Download, Edit, ExternalLink, Plus, Trash2} from 'lucide-react';
@@ -12,7 +12,8 @@ import RecoveryResourceFormModal, {
 import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
 import {isMarkdownResource} from '@/app/features/resources/recoveryResource';
-import type {RecoveryResourceResponse, TagResponse} from '@/app/types';
+import type {RecoveryResourceRequest, RecoveryResourceResponse, TagResponse} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 import {useRecoveryResources, useTagsByExamType} from './_hooks/useRecoveryResources';
 import styles from './RecoveryResourcesManagement.module.scss';
 
@@ -132,14 +133,17 @@ function RecoveryResourcesManagement() {
 
   const fetchError = resourcesError ? 'Không thể tải danh sách tài liệu.' : '';
 
-  useEffect(() => {
+  // Đổi kỳ thi hoặc danh sách tag thì chọn lại nhóm tag đầu tiên
+  const [prevTagSource, setPrevTagSource] = useState({examTypeId: selectedExamTypeId, tags: availableTags});
+  if (prevTagSource.examTypeId !== selectedExamTypeId || prevTagSource.tags !== availableTags) {
+    setPrevTagSource({examTypeId: selectedExamTypeId, tags: availableTags});
     if (!selectedExamTypeId) {
       setSelectedParentTagId('');
-      return;
+    } else {
+      const firstGroupKey = availableTags.length ? availableTags[0].examPartId || SHARED_PART_KEY : '';
+      setSelectedParentTagId(firstGroupKey);
     }
-    const firstGroupKey = availableTags.length ? availableTags[0].examPartId || SHARED_PART_KEY : '';
-    setSelectedParentTagId(firstGroupKey);
-  }, [selectedExamTypeId, availableTags]);
+  }
 
   const filteredResources = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
@@ -344,10 +348,10 @@ function RecoveryResourcesManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      const payload = {
+      const payload: RecoveryResourceRequest = {
         title: formState.title.trim(),
         description: formState.description.trim(),
-        url: formState.url.trim() || null,
+        url: formState.url.trim() || undefined,
         tagIds: [...new Set(formState.tagIds || [])],
         examTypeId: formExamTypeId || '',
       };
@@ -358,8 +362,8 @@ function RecoveryResourcesManagement() {
       }
       setShowFormModal(false);
       resetForm();
-    } catch (error: any) {
-      setErrorMessage(error?.response?.data?.message || 'Không thể lưu tài liệu. Vui lòng thử lại.');
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu tài liệu. Vui lòng thử lại.'));
     } finally {
       setSubmitting(false);
     }

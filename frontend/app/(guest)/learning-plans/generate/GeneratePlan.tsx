@@ -13,6 +13,7 @@ import { isPracticeAttempt } from '@/app/features/learning-plans/planLabels';
 import { getLearnerLevel } from '@/app/features/learning-plans/learnerLevel';
 import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
@@ -86,13 +87,12 @@ function GeneratePlan() {
   const submitting =
     generatePlanMutation.isPending || generateSyllabusMutation.isPending || navigating;
 
-  useEffect(() => {
-    if (!sourceExamTypeId && examTypes.length > 0) {
-      const initial = examTypeIdFromUrl || examTypes[0].examTypeId;
-      setSourceExamTypeId(initial);
-      setFilterExamTypeId(initial);
-    }
-  }, [examTypes, sourceExamTypeId, examTypeIdFromUrl]);
+  // Danh sách kỳ thi vừa tải xong mà chưa chọn: chọn theo URL, không có thì lấy kỳ thi đầu tiên.
+  if (!sourceExamTypeId && examTypes.length > 0) {
+    const initial = examTypeIdFromUrl || examTypes[0].examTypeId;
+    setSourceExamTypeId(initial);
+    setFilterExamTypeId(initial);
+  }
 
   const filteredUserTests = useMemo(() => {
     if (!sourceExamTypeId) return userTests;
@@ -110,30 +110,39 @@ function GeneratePlan() {
     if (planSourceTouched || !sourceExamTypeId || loadingList) return;
     const beginner =
       getLearnerLevel(sourceExamTypeId) === 'BEGINNER' || filteredUserTests.length === 0;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- trình độ tự khai đọc từ localStorage, chỉ đọc sau mount để không lệch hydration
     setPlanSource(beginner ? 'SYLLABUS' : 'DIAGNOSIS');
   }, [planSourceTouched, sourceExamTypeId, loadingList, filteredUserTests.length]);
 
   // Đổi kỳ thi thủ công đã tự bỏ chọn bài; ở đây chỉ bỏ khi bài không còn tồn tại, để bài
   // truyền từ trang kết quả không bị xoá trước khi kỳ thi kịp đồng bộ theo bài đó.
   // Chờ cả lượt tải lại xong: bài vừa nộp có thể chưa có trong bản cache cũ.
-  useEffect(() => {
-    if (!userTestId || loadingList || fetchingList) return;
-    if (!userTests.some((t) => t.userTestId === userTestId)) {
-      setUserTestId('');
-    }
-  }, [userTests, userTestId, loadingList, fetchingList]);
+  // Chờ cả đăng nhập xong: lúc đó query danh sách bài mới chạy, trước đó danh sách luôn rỗng.
+  if (
+    userTestId &&
+    !authLoading &&
+    !loadingList &&
+    !fetchingList &&
+    !userTests.some((t) => t.userTestId === userTestId)
+  ) {
+    setUserTestId('');
+  }
 
   const selectedTest = useMemo(
     () => userTests.find((t) => t.userTestId === userTestId),
     [userTests, userTestId],
   );
 
-  useEffect(() => {
+  // Chọn bài khác (hoặc bài vừa tải xong) thì đồng bộ kỳ thi theo bài đó.
+  const selectedSyncKey = `${userTestId}|${selectedTest?.examTypeId ?? ''}`;
+  const [syncedSelectedKey, setSyncedSelectedKey] = useState<string | null>(null);
+  if (selectedSyncKey !== syncedSelectedKey) {
+    setSyncedSelectedKey(selectedSyncKey);
     if (selectedTest?.examTypeId) {
       setFilterExamTypeId(selectedTest.examTypeId);
       setSourceExamTypeId(selectedTest.examTypeId);
     }
-  }, [userTestId, selectedTest?.examTypeId]);
+  }
 
   const handleSourceExamTypeChange = (nextId: string) => {
     setSourceExamTypeId(nextId);
@@ -181,8 +190,13 @@ function GeneratePlan() {
 
         setListRefreshKey((k) => k + 1);
       },
-      onError: (err: any) => {
-        setError(err?.response?.data?.message || err.message || 'Lỗi không xác định');
+      onError: (err: unknown) => {
+        setError(
+          getApiErrorMessage(
+            err,
+            (err instanceof Error && err.message) || 'Lỗi không xác định',
+          ),
+        );
       },
     };
 

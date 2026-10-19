@@ -1,5 +1,6 @@
 'use client';
 
+import {classKeys} from '@/app/configs/queryKeys';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getClassById, getClassChapterTests } from '@/app/apis/classApi';
 import { deleteTest } from '@/app/apis/testApi';
@@ -7,12 +8,16 @@ import type { TestResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const testByClassKeys = {
-  classInfo: (classId: string) => ['class-info', classId],
+  classInfo: classKeys.detail,
   chapterTests: (classId: string, chapterId: string) => ['class-chapter-tests', classId, chapterId],
 };
 
-const normalizeTests = (data: TestResponse[]): TestResponse[] =>
-  Array.isArray(data) ? data : Array.isArray((data as any)?.data) ? (data as any).data : [];
+// API có thể trả mảng trực tiếp hoặc bọc trong { data }.
+const normalizeTests = (data: unknown): TestResponse[] => {
+  if (Array.isArray(data)) return data;
+  const inner = (data as { data?: unknown } | null | undefined)?.data;
+  return Array.isArray(inner) ? inner : [];
+};
 
 export function useTestByClass(classId: string, chapterId: string) {
   const qc = useQueryClient();
@@ -31,7 +36,7 @@ export function useTestByClass(classId: string, chapterId: string) {
     select: normalizeTests,
   });
 
-  const deleteTestMutation = useMutation<void, any, string>({
+  const deleteTestMutation = useMutation<void, Error, string>({
     mutationFn: (testId) => deleteTest(testId),
     onSuccess: () =>
       qc.invalidateQueries({

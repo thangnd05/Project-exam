@@ -1,7 +1,7 @@
 'use client';
 
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache';
 import { toast } from 'react-toastify';
@@ -52,9 +52,12 @@ const AUTO_SUBMIT_RETRY_TOAST_ID = 'auto-submit-retry';
 
 type AnswerValue = ExamUserAnswers[string];
 
+const getHttpStatus = (err: unknown): number | undefined =>
+  (err as { response?: { status?: number } } | null)?.response?.status;
+
 // Mất mạng / server tạm lỗi thì thử lại được; 4xx là bài đã nộp hoặc hết giờ, thử lại cũng vô ích.
 const isRetryableError = (err: unknown): boolean => {
-  const httpStatus = (err as { response?: { status?: number } } | null)?.response?.status;
+  const httpStatus = getHttpStatus(err);
   return !httpStatus || httpStatus >= 500 || httpStatus === 408 || httpStatus === 429;
 };
 
@@ -229,7 +232,14 @@ export function useTestSession() {
     [testId, guestSessionId],
   );
 
+  // Mỗi lần tải đề tăng số thứ tự; phản hồi của lần tải cũ (deps đổi, unmount, bấm thử lại) bị bỏ qua.
+  const loadSeqRef = useRef(0);
+
   const loadTest = useCallback(() => {
+    loadSeqRef.current += 1;
+    const seq = loadSeqRef.current;
+    const isStale = () => seq !== loadSeqRef.current;
+
     pruneExpiredExamSessions();
 
     const savedState = readExamSessionState(sessionKey);
@@ -251,8 +261,10 @@ export function useTestSession() {
     const savedAttemptId = savedState?.userTestId || readExamSessionId(sessionKey) || null;
     getUserTestInfo(testId, { userTestId: savedAttemptId, guestSessionId })
       .then(async (testInfoData) => {
+        if (isStale()) return;
         const testData: ActiveTest = { ...testInfoData, parts: testInfoData.parts || [] };
         const enriched = await enrichTestWithPassageMedia(testData);
+        if (isStale()) return;
         orderedForRef.current = testData.shuffleQuestions ? savedAttemptId : null;
         setTest(enriched);
 
@@ -288,6 +300,7 @@ export function useTestSession() {
         } catch (err) {
           console.error('Failed to check in-progress attempt:', err);
         }
+        if (isStale()) return;
 
         const nowMs = serverNowMs();
         const availableFromMs = testData.availableFrom
@@ -310,6 +323,7 @@ export function useTestSession() {
             const serverAnswers = toAnswersMap(
               await getAnswersByUserTest(activeUserTestId, isGuest, guestCfg),
             );
+            if (isStale()) return;
             const sameAttempt = savedState?.userTestId === activeUserTestId;
             const merged = sameAttempt
               ? mergeLocalAnswers(serverAnswers, savedState.userAnswers, savedState.dirtyQuestionIds)
@@ -330,6 +344,7 @@ export function useTestSession() {
           } catch (err) {
             console.error('Failed to restore in-progress answers:', err);
           }
+          if (isStale()) return;
         }
 
         if (availableToMs !== null && nowMs > availableToMs && !restored) {
@@ -345,13 +360,20 @@ export function useTestSession() {
           setStatus('active');
         }
       })
-      .catch(() => setStatus('error'));
+      .catch(() => {
+        if (!isStale()) setStatus('error');
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [testId, sessionKey, isPractice, selectedPartIds, router, isGuest, guestCfg]);
 
   useEffect(() => {
-    if (!testId || authLoading) return;
+    if (!testId || authLoading) return undefined;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- khôi phục phiên thi từ localStorage (chỉ đọc được phía client) rồi gọi API
     loadTest();
+    return () => {
+      // Huỷ lần tải đang chạy để phản hồi cũ không ghi đè state của lần tải mới.
+      loadSeqRef.current += 1;
+    };
   }, [testId, authLoading, loadTest]);
 
   useEffect(() => {
@@ -359,6 +381,7 @@ export function useTestSession() {
     if (status === 'open' && test?.testId) {
       const existing = readExamSessionId(sessionKey);
       if (existing) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- máy trạng thái phiên thi: lượt làm đã lưu trong localStorage thì vào thẳng bài
         setUserTestId(existing);
         const saved = readExamSessionState(sessionKey);
         if (saved?.startedAt) setStartedAt(saved.startedAt);
@@ -478,6 +501,7 @@ export function useTestSession() {
   useEffect(() => {
     if (status === 'locked' && preCountdown !== null) {
       if (preCountdown <= 0) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- máy trạng thái phiên thi: đếm ngược giờ mở đề về 0 thì mở bài
         setStatus('open');
         return undefined;
       }
@@ -541,8 +565,8 @@ export function useTestSession() {
       if (!isGuest) refreshStreak();
       invalidateAfterSubmit();
       router.push(`/tests/result/${userTestId}`);
-    } catch (err: any) {
-      if (err?.response?.status === 409) {
+    } catch (err: unknown) {
+      if (getHttpStatus(err) === 409) {
         clearAutoSubmitRetry();
         clearExamSession(sessionKey);
         invalidateAfterSubmit();
@@ -572,7 +596,6 @@ export function useTestSession() {
   };
 
   const runSubmitRef = useRef<((auto: boolean) => Promise<void>) | undefined>(undefined);
-  runSubmitRef.current = runSubmit;
 
   const startSubmit = async (auto: boolean) => {
     if (!userTestId || submittingRef.current) return;
@@ -584,7 +607,12 @@ export function useTestSession() {
   const handleSubmit = () => startSubmit(false);
 
   const autoSubmitRef = useRef<(() => Promise<void>) | undefined>(undefined);
-  autoSubmitRef.current = () => startSubmit(true);
+
+  // Cập nhật ref sau mỗi lần commit, trước mọi effect / timer, để timer luôn gọi bản hàm mới nhất.
+  useLayoutEffect(() => {
+    runSubmitRef.current = runSubmit;
+    autoSubmitRef.current = () => startSubmit(true);
+  });
 
   // Có mạng lại thì nộp ngay, không chờ hết lượt chờ.
   useEffect(() => {
@@ -604,22 +632,18 @@ export function useTestSession() {
 
   const deadline = useMemo(() => {
     if (isPractice || !startedAt) return null;
-    const durationMinutes = test?.durationMinutes;
+    const durationMinutes = test.durationMinutes;
     const durationSec =
       durationMinutes && durationMinutes > 0 ? durationMinutes * 60 : null;
     let end =
       durationSec !== null ? new Date(startedAt).getTime() + durationSec * 1000 : null;
-    const availableToMs = test?.availableTo ? new Date(test.availableTo).getTime() : null;
+    const availableToMs = test.availableTo ? new Date(test.availableTo).getTime() : null;
     if (availableToMs !== null && (end === null || availableToMs < end)) end = availableToMs;
     return end;
-  }, [isPractice, startedAt, test?.durationMinutes, test?.availableTo]);
+  }, [isPractice, startedAt, test.durationMinutes, test.availableTo]);
 
   useEffect(() => {
-    if (status !== 'active' || holdStart) return undefined;
-    if (deadline == null) {
-      setTimeLeft(null);
-      return undefined;
-    }
+    if (status !== 'active' || holdStart || deadline == null) return undefined;
 
     const tick = () => {
       // So với giờ server, không phải giờ máy người dùng (có thể chạy nhanh/chậm).
@@ -681,7 +705,8 @@ export function useTestSession() {
     test,
     layoutConfig,
     userAnswers,
-    timeLeft,
+    // Không có hạn nộp (luyện tập / đề không giới hạn giờ) thì không hiện đồng hồ.
+    timeLeft: deadline == null ? null : timeLeft,
     preCountdown,
     isSubmitting,
     purchasing,

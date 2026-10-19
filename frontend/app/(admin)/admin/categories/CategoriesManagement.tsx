@@ -50,7 +50,7 @@ const CategoriesManagement = () => {
             await deleteCategory(deletingCategory.id);
             toast.success('Xóa danh mục thành công');
             setDeletingCategory(null);
-        } catch (error) {
+        } catch {
             toast.error('Lỗi khi xóa danh mục');
         }
     };
@@ -65,7 +65,7 @@ const CategoriesManagement = () => {
                 toast.success('Tạo danh mục thành công');
             }
             setShowModal(false);
-        } catch (error) {
+        } catch {
             toast.error('Lỗi khi lưu danh mục');
         }
     };

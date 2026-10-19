@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Check, Pencil, Plus, Trash2, X} from 'lucide-react';
@@ -61,21 +61,19 @@ function MilestonesManagement() {
     deleteMilestone,
   } = useMilestones(examTypeFilter);
 
-  useEffect(() => {
-    if (examTypes.length > 0 && !examTypeFilter) {
-      setExamTypeFilter(examTypes[0].examTypeId);
-    }
-  }, [examTypes, examTypeFilter]);
+  // Mặc định chọn loại kỳ thi đầu tiên khi danh sách đã tải
+  if (examTypes.length > 0 && !examTypeFilter) {
+    setExamTypeFilter(examTypes[0].examTypeId);
+  }
 
-  useEffect(() => {
+  // Đổi loại kỳ thi thì xoá lỗi cũ
+  const [prevExamTypeFilter, setPrevExamTypeFilter] = useState(examTypeFilter);
+  if (examTypeFilter !== prevExamTypeFilter) {
+    setPrevExamTypeFilter(examTypeFilter);
     setErrorMessage('');
-  }, [examTypeFilter]);
+  }
 
-  useEffect(() => {
-    if (loadErrorText) {
-      setErrorMessage(loadErrorText);
-    }
-  }, [loadErrorText]);
+  const displayedError = errorMessage || loadErrorText;
 
   const filteredParts = sortPartsByNameOrder(
     examParts.filter((p) => p.examTypeId === examTypeFilter),
@@ -95,7 +93,8 @@ function MilestonesManagement() {
     examTypes,
     examParts,
     skills,
-    scoringConversions: scoringConversions as any,
+    // API luôn trả đủ các trường mà ConversionLike của hook bắt buộc
+    scoringConversions,
     selectedExamTypeId: examTypeFilter,
   });
 
@@ -125,7 +124,7 @@ function MilestonesManagement() {
       await createMilestone({
         examTypeId: examTypeFilter,
         milestoneScore: Number(newScore),
-        description: newDescription || null,
+        description: newDescription || undefined,
         partRequirements,
       });
 
@@ -276,7 +275,7 @@ function MilestonesManagement() {
               Thêm
             </ButtonPrime>
           </div>
-          <AdminFieldError message={errorMessage} />
+          <AdminFieldError message={displayedError} />
         </div>
       )}
 

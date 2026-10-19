@@ -37,6 +37,13 @@ const PostsManagement = () => {
     const PAGE_SIZE = 10;
     const debouncedSearch = useDebouncedValue(searchQuery, 300);
 
+    // Đổi bộ lọc hoặc từ khoá thì quay về trang đầu
+    const [prevFilters, setPrevFilters] = useState({ statusFilter, debouncedSearch });
+    if (prevFilters.statusFilter !== statusFilter || prevFilters.debouncedSearch !== debouncedSearch) {
+        setPrevFilters({ statusFilter, debouncedSearch });
+        setCurrentPage(0);
+    }
+
     const {
         posts,
         totalPages,
@@ -51,10 +58,6 @@ const PostsManagement = () => {
     });
     const approvePost = useApprovePost();
     const deletePostMutation = useDeletePost();
-
-    useEffect(() => {
-        setCurrentPage(0);
-    }, [statusFilter, debouncedSearch]);
 
     useEffect(() => {
         if (isError) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -27,7 +27,7 @@ const pageCx = classNamesBind.bind(pageStyles);
 
 function TargetDashboard() {
   const [searchParams, setSearchParams] = useSearchParamsState();
-  // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ở effect dưới.
+  // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ngay khi danh sách về (xem bên dưới).
   const [examTypeId, setExamTypeId] = useState('');
 
   const {
@@ -43,19 +43,16 @@ function TargetDashboard() {
 
   useNormalizeExamParam(examTypes);
 
-  useEffect(() => {
-    if (!examTypeId && examTypes.length > 0) {
-      setExamTypeId(examTypeIdFromParams(searchParams, examTypes) || examTypes[0].examTypeId);
-    }
-  }, [examTypes, examTypeId, searchParams]);
+  // Danh sách kỳ thi về thì chọn kỳ thi theo ?exam= hoặc kỳ đầu tiên (điều chỉnh state ngay khi render).
+  if (!examTypeId && examTypes.length > 0) {
+    setExamTypeId(examTypeIdFromParams(searchParams, examTypes) || examTypes[0].examTypeId);
+  }
 
   const activePlan = useMemo(
     () => (plans || []).find((p) => p.status === LearningPlanStatus.ACTIVE) || null,
     [plans],
   );
 
-  const partNameOf = (id: string) =>
-    examParts.find((p) => p.examPartId === id)?.name || id;
 
   const enhancedMatchesType =
     latestEnhanced && (!latestEnhanced.examTypeId || latestEnhanced.examTypeId === examTypeId);
@@ -82,6 +79,8 @@ function TargetDashboard() {
     if (!target?.partRequirements?.length) {
       return [];
     }
+    const partNameOf = (id: string) =>
+      examParts.find((p) => p.examPartId === id)?.name || id;
     return sortPartsByLookup(target.partRequirements, examParts).map((p) => {
       const cur = p.currentScore != null ? Number(p.currentScore) : null;
       const aim = p.requiredPercentage ?? 0;

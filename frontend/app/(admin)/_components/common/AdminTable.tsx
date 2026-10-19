@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
@@ -21,22 +21,24 @@ function buildPageItems(current: number, total: number): Array<number | '...'> {
   return items;
 }
 
-export type AdminTableColumn = {
+// Callback khai báo dạng method để nơi dùng có thể ghi kiểu row cụ thể (vd. `AdminTableColumn[]`)
+export type AdminTableColumn<T extends object = object> = {
   key: string;
   header?: React.ReactNode;
   align?: string;
   width?: number | string;
-  render?: (row: any, index: number) => React.ReactNode;
+  render?(row: T, index: number): React.ReactNode;
 };
 
-type AdminTableProps = {
-  columns?: AdminTableColumn[];
-  data?: any[];
+type AdminTableProps<T extends object> = {
+  // Kiểu row suy ra từ `data`
+  columns?: AdminTableColumn<NoInfer<T>>[];
+  data?: T[];
   loading?: boolean;
   emptyText?: React.ReactNode;
   loadingText?: React.ReactNode;
-  getRowKey?: (row: any, index: number) => React.Key;
-  rowActions?: (row: any, index: number) => React.ReactNode;
+  getRowKey?(row: T, index: number): React.Key;
+  rowActions?(row: T, index: number): React.ReactNode;
   actionsHeader?: React.ReactNode;
   showIndex?: boolean;
   indexHeader?: React.ReactNode;
@@ -50,7 +52,9 @@ type AdminTableProps = {
   onPageChange?: (page: number) => void;
 };
 
-function AdminTable({
+const cellValue = (row: object, key: string) => (row as Record<string, unknown>)[key] as React.ReactNode;
+
+function AdminTable<T extends object>({
   columns = [],
   data = [],
   loading = false,
@@ -69,7 +73,7 @@ function AdminTable({
   totalPages: totalPagesProp,
   totalElements,
   onPageChange,
-}: AdminTableProps) {
+}: AdminTableProps<T>) {
   const isServer = typeof onPageChange === 'function';
   const hasPager = isServer || paginated;
   const [internalPage, setInternalPage] = useState(0);
@@ -82,11 +86,10 @@ function AdminTable({
   const safeInternal = Math.min(internalPage, totalPages - 1);
   const currentPage = isServer ? page || 0 : safeInternal;
 
-  useEffect(() => {
-    if (!isServer && internalPage !== safeInternal) {
-      setInternalPage(safeInternal);
-    }
-  }, [isServer, internalPage, safeInternal]);
+  // Kéo trang nội bộ về trang cuối hợp lệ khi dữ liệu co lại
+  if (!isServer && internalPage !== safeInternal) {
+    setInternalPage(safeInternal);
+  }
 
   const pageRows = useMemo(() => {
     if (!paginated || isServer) {
@@ -154,7 +157,7 @@ function AdminTable({
                 )}
                 {columns.map((col) => (
                   <td key={col.key} className={cx({[col.align as string]: col.align})}>
-                    {col.render ? col.render(row, indexOffset + index) : row[col.key]}
+                    {col.render ? col.render(row, indexOffset + index) : cellValue(row, col.key)}
                   </td>
                 ))}
                 {rowActions && (

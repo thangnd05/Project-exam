@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import classNames from 'classnames/bind';
 import { Save } from 'lucide-react';
 
@@ -40,13 +40,16 @@ function BulkEditQuestionsModal({
   const [collectionChoice, setCollectionChoice] = useState<string>(KEEP);
   const [bankChoice, setBankChoice] = useState<string>(KEEP);
 
-  useEffect(() => {
+  // Đặt lại lựa chọn mỗi khi mở modal
+  const [prevShow, setPrevShow] = useState(false);
+  if (show !== prevShow) {
+    setPrevShow(show);
     if (show) {
       setUsageScope(KEEP);
       setCollectionChoice(KEEP);
       setBankChoice(KEEP);
     }
-  }, [show]);
+  }
 
   const hasChange =
     usageScope !== KEEP || collectionChoice !== KEEP || bankChoice !== KEEP;

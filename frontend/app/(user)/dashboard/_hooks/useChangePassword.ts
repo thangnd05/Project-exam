@@ -6,11 +6,11 @@ import type { AuthMessageResponse, ChangePasswordRequest } from '@/app/types';
 
 interface ChangePasswordCallbacks {
   onSuccess?: (data: AuthMessageResponse) => void;
-  onError?: (error: any) => void;
+  onError?: (error: Error) => void;
 }
 
 export function useChangePassword({ onSuccess, onError }: ChangePasswordCallbacks = {}) {
-  return useMutation<AuthMessageResponse, any, ChangePasswordRequest>({
+  return useMutation<AuthMessageResponse, Error, ChangePasswordRequest>({
     mutationFn: (payload) => changePassword(payload),
     onSuccess,
     onError,

@@ -71,6 +71,7 @@ function QuickTestConfirmModal({
     >
       <div className={cx('body')}>
         {test.examTypeImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element -- logo do admin dán (URL ngoài tuỳ ý), không qua next/image
           <img
             className={cx('logo')}
             src={test.examTypeImageUrl}

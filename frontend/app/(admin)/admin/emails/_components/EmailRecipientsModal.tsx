@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {RefreshCw} from 'lucide-react';
 import {toast} from 'react-toastify';
 
@@ -10,6 +10,7 @@ import {AdminFieldError, AdminTable, StatCard, StatCardGroup} from '@/app/(admin
 import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
 import {EmailStatus, EmailType} from '@/app/enums';
 import type {EmailRecipientResponse, EmailResponse} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 import {useEmailMutations, useEmailRecipients} from '@/app/(admin)/admin/emails/_hooks/useAdminEmails';
 
 const PAGE_SIZE = 20;
@@ -34,12 +35,17 @@ function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps)
   const {page: recipientPage, isLoading} = useEmailRecipients(show ? email?.emailId : null, page, PAGE_SIZE);
   const {retryFailed} = useEmailMutations();
 
-  useEffect(() => {
+  // Về trang đầu mỗi khi mở modal hoặc đổi email
+  const [prevShow, setPrevShow] = useState(false);
+  const [prevEmailId, setPrevEmailId] = useState(email?.emailId);
+  if (show !== prevShow || email?.emailId !== prevEmailId) {
+    setPrevShow(show);
+    setPrevEmailId(email?.emailId);
     if (show) {
       setPage(0);
       setErrorMessage('');
     }
-  }, [show, email?.emailId]);
+  }
 
   const handleRetry = async () => {
     setErrorMessage('');
@@ -48,7 +54,7 @@ function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps)
       await retryFailed(email!.emailId);
       toast.info('Đã đưa các email lỗi vào hàng gửi lại.');
     } catch (error) {
-      setErrorMessage((error as any)?.response?.data?.message || 'Không gửi lại được.');
+      setErrorMessage(getApiErrorMessage(error, 'Không gửi lại được.'));
     } finally {
       setRetrying(false);
     }

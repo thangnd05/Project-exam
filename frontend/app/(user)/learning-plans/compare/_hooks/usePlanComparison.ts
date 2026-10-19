@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import {examTypeKeys} from '@/app/configs/queryKeys';
 
 export const planComparisonKeys = {
@@ -11,8 +12,12 @@ export const planComparisonKeys = {
   plans: (examTypeId?: string) => ['learning-plans', examTypeId],
 };
 
-const normalizeList = <T>(data: T[]): T[] =>
-  Array.isArray(data) ? data : Array.isArray((data as any)?.content) ? (data as any).content : [];
+// API có thể trả mảng trực tiếp hoặc bọc trong { content } (phân trang).
+const normalizeList = <T,>(data: T[] | { content?: T[] } | null | undefined): T[] => {
+  if (Array.isArray(data)) return data;
+  const content = data?.content;
+  return Array.isArray(content) ? content : [];
+};
 
 export function usePlanComparison(examTypeId?: string) {
   const examTypesQuery = useQuery({
@@ -34,7 +39,7 @@ export function usePlanComparison(examTypeId?: string) {
     isLoading: plansQuery.isLoading,
     isError: plansQuery.isError,
     error: plansQuery.error
-      ? (plansQuery.error as any)?.response?.data?.message || plansQuery.error.message
+      ? getApiErrorMessage(plansQuery.error, '') || plansQuery.error.message
       : null,
   };
 }

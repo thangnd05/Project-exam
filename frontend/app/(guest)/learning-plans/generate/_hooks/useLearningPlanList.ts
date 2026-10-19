@@ -5,6 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import type { ExamTypeResponse, PlanResponse } from '@/app/types';
+import { getApiErrorMessage } from '@/app/utils/apiError';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export type PlanListItem = PlanResponse & { examTypeName?: string };
 
@@ -82,8 +84,8 @@ export function useLearningPlanList({
     queryFn: () => fetchPlanList({ loadAll, filterExamTypeId }),
   });
 
-  const examTypes = query.data?.examTypes ?? [];
-  const plans = query.data?.plans ?? [];
+  const examTypes = query.data?.examTypes ?? EMPTY_LIST;
+  const plans = query.data?.plans ?? EMPTY_LIST;
 
   const filteredPlans = useMemo(() => {
     if (loadAll && !filterExamTypeId) return plans;
@@ -97,9 +99,7 @@ export function useLearningPlanList({
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error
-      ? (query.error as any)?.response?.data?.message
-        || query.error.message
-        || 'Không tải được danh sách lộ trình'
+      ? getApiErrorMessage(query.error, query.error.message || 'Không tải được danh sách lộ trình')
       : null,
     filterExamTypeId,
     setFilterExamTypeId,

@@ -5,6 +5,7 @@ import type { UseMutationOptions } from '@tanstack/react-query';
 import { getMyClasses, joinClass } from '@/app/apis/classMemberApi';
 import { createClass, updateClass, deleteClass } from '@/app/apis/classApi';
 import type {
+  ApiError,
   ClassMemberJoinRequest,
   ClassMemberResponse,
   ClassRequest,
@@ -41,7 +42,7 @@ export function useMyClasses() {
 }
 
 type MutationCallbacks<TData, TVariables> = Pick<
-  UseMutationOptions<TData, any, TVariables>,
+  UseMutationOptions<TData, ApiError, TVariables>,
   'onSuccess' | 'onError'
 >;
 
@@ -49,7 +50,7 @@ export function useCreateClass(
   { onSuccess, onError }: MutationCallbacks<ClassResponse, ClassRequest> = {},
 ) {
   const qc = useQueryClient();
-  return useMutation<ClassResponse, any, ClassRequest>({
+  return useMutation<ClassResponse, ApiError, ClassRequest>({
     mutationFn: (payload) => createClass(payload),
     onSuccess: (...args) => {
       qc.invalidateQueries({ queryKey: myClassesKeys.all });
@@ -66,7 +67,7 @@ export function useUpdateClass(
   }: MutationCallbacks<ClassResponse, { classId: string; payload: ClassRequest }> = {},
 ) {
   const qc = useQueryClient();
-  return useMutation<ClassResponse, any, { classId: string; payload: ClassRequest }>({
+  return useMutation<ClassResponse, ApiError, { classId: string; payload: ClassRequest }>({
     mutationFn: ({ classId, payload }) => updateClass(classId, payload),
     onSuccess: (...args) => {
       qc.invalidateQueries({ queryKey: myClassesKeys.all });
@@ -80,7 +81,7 @@ export function useJoinClass(
   { onSuccess, onError }: MutationCallbacks<ClassMemberResponse, ClassMemberJoinRequest> = {},
 ) {
   const qc = useQueryClient();
-  return useMutation<ClassMemberResponse, any, ClassMemberJoinRequest>({
+  return useMutation<ClassMemberResponse, ApiError, ClassMemberJoinRequest>({
     mutationFn: (payload) => joinClass(payload),
     onSuccess: (...args) => {
       qc.invalidateQueries({ queryKey: myClassesKeys.all });
@@ -92,7 +93,7 @@ export function useJoinClass(
 
 export function useDeleteClass() {
   const qc = useQueryClient();
-  return useMutation<void, any, string>({
+  return useMutation<void, ApiError, string>({
     mutationFn: (classId) => deleteClass(classId),
     onSuccess: () => qc.invalidateQueries({ queryKey: myClassesKeys.all }),
   });

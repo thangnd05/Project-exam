@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import { examTypeIdFromParams, setExamParam, useNormalizeExamParam } from '@/app/features/exam-types/hooks/useExamParam';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
@@ -25,18 +25,17 @@ const PlanComparisonCharts = dynamic(() => import('./_components/PlanComparisonC
 
 function PlanComparison() {
   const [searchParams, setSearchParams] = useSearchParamsState();
-  // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ở effect dưới.
+  // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ngay khi danh sách về (xem bên dưới).
   const [examTypeId, setExamTypeId] = useState('');
 
   const { examTypes, plans, isLoading: loading, error } = usePlanComparison(examTypeId);
 
   useNormalizeExamParam(examTypes);
 
-  useEffect(() => {
-    if (!examTypeId && examTypes.length > 0) {
-      setExamTypeId(examTypeIdFromParams(searchParams, examTypes) || examTypes[0].examTypeId);
-    }
-  }, [examTypes, examTypeId, searchParams]);
+  // Danh sách kỳ thi về thì chọn kỳ thi theo ?exam= hoặc kỳ đầu tiên (điều chỉnh state ngay khi render).
+  if (!examTypeId && examTypes.length > 0) {
+    setExamTypeId(examTypeIdFromParams(searchParams, examTypes) || examTypes[0].examTypeId);
+  }
 
   const sorted = useMemo(() => {
     return [...plans].sort((a, b) => (a.planSequence ?? 0) - (b.planSequence ?? 0));

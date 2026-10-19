@@ -87,7 +87,7 @@ const MyClasses = () => {
   if (loading) {
     return (
       <div className={cx('loading-container')}>
-        <Spinner animation="grow" variant="primary" size={'lg' as any} />
+        <Spinner animation="grow" variant="primary" />
         <p>Đang chuẩn bị giảng đường của bạn...</p>
       </div>
     );

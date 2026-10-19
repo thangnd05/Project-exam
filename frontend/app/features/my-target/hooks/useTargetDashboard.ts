@@ -16,6 +16,7 @@ import type {
   UserTestResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import {examTypeKeys, examPartKeys} from '@/app/configs/queryKeys';
 
 export const targetDashboardKeys = {
@@ -91,7 +92,7 @@ export function useTargetDashboard(examTypeId: string) {
     latestEnhanced: data.latestEnhanced,
     isLoading: dashboardQuery.isLoading,
     error: dashboardQuery.error
-      ? (dashboardQuery.error as any)?.response?.data?.message || dashboardQuery.error.message
+      ? getApiErrorMessage(dashboardQuery.error, dashboardQuery.error.message)
       : null,
   };
 }

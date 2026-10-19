@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {Badge, Button, Spinner} from 'react-bootstrap';
 import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Paintbrush, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
@@ -12,7 +12,8 @@ import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ExamTypeFormModal, {type ExamTypeFormState} from './_components/ExamTypeFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
 import {useAdminExamTypes} from '@/app/(admin)/admin/exam-types/_hooks/useAdminExamTypes';
-import type {ExamTypeResponse} from '@/app/types';
+import type {ExamTypeRequest, ExamTypeResponse} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 
 import styles from '@/app/(admin)/_components/common/adminTree.module.scss';
 
@@ -65,9 +66,12 @@ const mapExamTypeFromApi = (item: ExamTypeResponse): ExamTypeItem => ({
   child_count: typeof item.childCount === 'number' ? item.childCount : 0,
 });
 
-const buildExamTypePayload = (formState: ExamTypeFormState, {hasChildren}: {hasChildren?: boolean} = {}) => {
+const buildExamTypePayload = (
+  formState: ExamTypeFormState,
+  {hasChildren}: {hasChildren?: boolean} = {},
+): ExamTypeRequest => {
   const durationValue = String(formState.duration_minutes).trim();
-  const durationMinutes = durationValue ? Number(durationValue) : null;
+  const durationMinutes = durationValue ? Number(durationValue) : undefined;
 
   return {
     name: formState.name.trim(),
@@ -192,13 +196,21 @@ function ExamTypesManagement() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [deletingExamType, setDeletingExamType] = useState<ExamTypeItem | null>(null);
-  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  // Lưu node bị thu gọn thay vì node đang mở: mặc định mọi node cha đều mở, và tải lại danh sách
+  // (sau thêm/sửa/xoá) không bung lại những node admin đã thu gọn.
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(new Set());
 
   const examTypes = useMemo(() => examTypeList.map(mapExamTypeFromApi), [examTypeList]);
 
-  useEffect(() => {
-    setExpandedIds(new Set(examTypes.filter((t) => t.child_count > 0).map((t) => t.exam_type_id)));
-  }, [examTypes]);
+  const expandedIds = useMemo(
+    () =>
+      new Set(
+        examTypes
+          .filter((t) => t.child_count > 0 && !collapsedIds.has(t.exam_type_id))
+          .map((t) => t.exam_type_id),
+      ),
+    [examTypes, collapsedIds],
+  );
 
   const examTypeTree = useMemo(() => {
     const byId = new Map(examTypes.map((t) => [t.exam_type_id, t]));
@@ -219,7 +231,7 @@ function ExamTypesManagement() {
   }, [examTypes]);
 
   const toggleExpand = useCallback((id: string) => {
-    setExpandedIds((prev) => {
+    setCollapsedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
@@ -227,11 +239,11 @@ function ExamTypesManagement() {
     });
   }, []);
 
-  const expandAll = useCallback(
-    () => setExpandedIds(new Set(examTypes.filter((t) => t.child_count > 0).map((t) => t.exam_type_id))),
+  const expandAll = useCallback(() => setCollapsedIds(new Set()), []);
+  const collapseAll = useCallback(
+    () => setCollapsedIds(new Set(examTypes.filter((t) => t.child_count > 0).map((t) => t.exam_type_id))),
     [examTypes],
   );
-  const collapseAll = useCallback(() => setExpandedIds(new Set()), []);
 
   const parentOptions = useMemo(
     () => examTypes.filter((t) => !t.parent_id && t.exam_type_id !== editingTypeId),
@@ -307,7 +319,7 @@ function ExamTypesManagement() {
     setSubmitting(true);
     setErrorMessage('');
     try {
-      const payload = buildExamTypePayload(formState, {hasChildren: editingHasChildren}) as any;
+      const payload = buildExamTypePayload(formState, {hasChildren: editingHasChildren});
       if (editingTypeId) {
         await updateMutation.mutateAsync({id: editingTypeId, payload});
       } else {
@@ -315,13 +327,18 @@ function ExamTypesManagement() {
       }
 
       if (payload.parentId) {
-        setExpandedIds((prev) => new Set(prev).add(payload.parentId));
+        const parentId = payload.parentId;
+        setCollapsedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(parentId);
+          return next;
+        });
       }
       setShowFormModal(false);
       resetForm();
-    } catch (error: any) {
+    } catch (error) {
       setErrorMessage(
-        error?.response?.data?.message || 'Không thể lưu loại kỳ thi. Vui lòng thử lại.',
+        getApiErrorMessage(error, 'Không thể lưu loại kỳ thi. Vui lòng thử lại.'),
       );
     } finally {
       setSubmitting(false);
@@ -335,9 +352,9 @@ function ExamTypesManagement() {
     try {
       await deleteMutation.mutateAsync(deletingExamType.exam_type_id);
       setDeletingExamType(null);
-    } catch (error: any) {
+    } catch (error) {
       setErrorMessage(
-        error?.response?.data?.message || 'Không thể xóa loại kỳ thi này.',
+        getApiErrorMessage(error, 'Không thể xóa loại kỳ thi này.'),
       );
     } finally {
       setSubmitting(false);

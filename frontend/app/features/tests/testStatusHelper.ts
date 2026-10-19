@@ -5,7 +5,6 @@ type TestScheduleLike = {
   canDoTest?: boolean | null;
   maxAttempts?: number | null;
   remainingAttempts?: number | null;
-  durationMinutes?: number | null;
 };
 
 export type TestStatusInfo = {
@@ -61,24 +60,4 @@ export const getTestStatus = (
     }
 
     return { status, statusLabel, buttonText, canStart };
-};
-
-export const calculateAllowedTime = (test: TestScheduleLike): number | null => {
-    const now = new Date();
-    const availableTo = test.availableTo ? new Date(test.availableTo) : null;
-
-    if (!test.durationMinutes || test.durationMinutes <= 0) {
-        return null;
-    }
-
-    let allowedTime = test.durationMinutes * 60;
-
-    if (availableTo) {
-        const timeUntilClose = Math.floor((availableTo.getTime() - now.getTime()) / 1000);
-        if (timeUntilClose < allowedTime) {
-            allowedTime = timeUntilClose;
-        }
-    }
-
-    return allowedTime;
 };

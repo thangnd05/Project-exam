@@ -13,8 +13,10 @@ import {
     IoLogInOutline,
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
+import MediaImage from '@/app/components/MediaImage/MediaImage';
+import { getFullMediaUrl } from '@/app/utils/mediaUrl';
 import styles from '@/app/features/tests/TestCard/TestCard.module.scss';
-import {getTestStatus, calculateAllowedTime} from '@/app/features/tests/testStatusHelper';
+import {getTestStatus} from '@/app/features/tests/testStatusHelper';
 import {formatDayMonthTime, formatFullDateTime} from '@/app/utils/format-date-time';
 import TestModeModal from '@/app/features/tests/TestModeModal/TestModeModal';
 import type { TestModeSelection } from '@/app/features/tests/TestModeModal/TestModeModal';
@@ -106,7 +108,6 @@ function TestCard({ test, countdowns }: TestCardProps) {
 
     const handleSelectMode = ({ mode, examPartIds }: TestModeSelection) => {
         setShowModeModal(false);
-        const allowedTime = calculateAllowedTime(test);
         const params = new URLSearchParams();
         if (mode === 'practice') {
             params.set('mode', 'practice');
@@ -119,13 +120,14 @@ function TestCard({ test, countdowns }: TestCardProps) {
     return (
         <div className={cx('test-card')}>
             <div className={cx('banner-wrapper')}>
-                <img
-                    src={
-                        test.bannerUrl ||
-                        getSubjectBanner(test.title, status)
-                    }
+                <MediaImage
+                    cover
+                    src={getFullMediaUrl(test.bannerUrl) || getSubjectBanner(test.title, status)}
                     className={cx('banner-img')}
-                    alt={test.title}
+                    alt={test.title ?? ''}
+                    width={480}
+                    height={220}
+                    sizes="(max-width: 768px) 100vw, 360px"
                 />
 
                 <div className={cx('status-badge', `status-${status}`)}>

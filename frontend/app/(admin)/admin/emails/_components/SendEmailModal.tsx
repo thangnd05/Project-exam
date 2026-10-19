@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {Form, Spinner} from 'react-bootstrap';
 import {toast} from 'react-toastify';
 
@@ -8,6 +8,7 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import {AdminFieldError} from '@/app/(admin)/_components/common';
 import type {EmailResponse} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 import {useEmailAudience, useEmailMutations} from '@/app/(admin)/admin/emails/_hooks/useAdminEmails';
 
 const PREMIUM_FILTERS = [
@@ -33,7 +34,10 @@ function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
   const {users, isLoading} = useEmailAudience(show);
   const {sendEmail} = useEmailMutations();
 
-  useEffect(() => {
+  // Xoá bộ lọc và lựa chọn mỗi khi mở modal
+  const [prevShow, setPrevShow] = useState(false);
+  if (show !== prevShow) {
+    setPrevShow(show);
     if (show) {
       setKeyword('');
       setRoleFilter('ALL');
@@ -41,7 +45,7 @@ function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
       setSelectedIds([]);
       setErrorMessage('');
     }
-  }, [show]);
+  }
 
   const roles = useMemo(() => {
     const names = new Set(users.map((user) => user.roleName).filter(Boolean));
@@ -105,7 +109,7 @@ function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
       toast.success(`Đã đưa ${selectedIds.length} email vào hàng gửi.`);
       onClose();
     } catch (error) {
-      setErrorMessage((error as any)?.response?.data?.message || 'Không gửi được email.');
+      setErrorMessage(getApiErrorMessage(error, 'Không gửi được email.'));
     } finally {
       setSubmitting(false);
     }

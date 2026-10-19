@@ -225,9 +225,12 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
                 size="lg"
                 onClick={() => {
                   this.handleReset();
-                  window.history.length > 1
-                    ? window.history.back()
-                    : (window.location.href = '/');
+                  if (window.history.length > 1) {
+                    window.history.back();
+                  } else {
+                    // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- cố ý tải lại cứng trang chủ để xoá state hỏng sau lỗi (class component, không có router)
+                    window.location.assign('/');
+                  }
                 }}
               >
                 Quay lại

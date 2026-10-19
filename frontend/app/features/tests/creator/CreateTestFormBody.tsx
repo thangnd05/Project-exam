@@ -7,7 +7,13 @@ import { getClassById } from '@/app/apis/classApi';
 import { getChapterById } from '@/app/apis/chapterApi';
 import { previewDocument, previewJsonFile, previewPassageDocument } from '@/app/apis/questionApi';
 import { previewTestJson } from '@/app/apis/testApi';
-import type { QuestionJsonImportPreviewResponse, TestJsonImportPreviewResponse } from '@/app/types';
+import type {
+  NormalQuestionRequest,
+  PassageQuestionGroupRequest,
+  QuestionJsonImportPreviewResponse,
+  TagResponse,
+  TestJsonImportPreviewResponse,
+} from '@/app/types';
 import {
   IoCalendarOutline,
   IoTimeOutline,
@@ -38,6 +44,7 @@ import { TAG_STATUS_LABEL, editorTagStatus } from '@/app/features/tests/creator/
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
 import { buildCollectionTree } from '@/app/features/tests/collectionTree';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import { QuestionUsageScope } from '@/app/enums';
 import styles from '@/app/features/tests/CreateTestModal.module.scss';
 
@@ -50,6 +57,11 @@ const ACCEPT_BY_TYPE = {
   DOCUMENT: '.pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 };
 
+const pruneIndexes = (set: Set<number>, length: number) => {
+  const next = new Set([...set].filter((i) => i < length));
+  return next.size === set.size ? set : next;
+};
+
 export type CreateTestMode = 'personal' | 'class';
 
 type CreateTestFormBodyProps = {
@@ -60,7 +72,6 @@ type CreateTestFormBodyProps = {
   onCreatorTypeChange?: (creatorType: CreatorType) => void;
   onSuccess?: () => void;
   onCancel?: () => void;
-  embedded?: boolean;
   showCreatorTypeTabs?: boolean;
 };
 
@@ -72,7 +83,6 @@ const CreateTestFormBody = ({
   onCreatorTypeChange,
   onSuccess,
   onCancel,
-  embedded = false,
   showCreatorTypeTabs = true,
 }: CreateTestFormBodyProps) => {
   const router = useRouter();
@@ -108,7 +118,6 @@ const CreateTestFormBody = ({
     removeAnswer,
     addMediaFiles,
     removeMediaFile,
-    setPassageType,
     addGroup,
     removeGroup,
     updatePassage,
@@ -157,12 +166,17 @@ const CreateTestFormBody = ({
     }
   }, [mode, classId, chapterId]);
 
-  useEffect(() => {
-    setCollapsedGroups((prev) => {
-      const next = new Set([...prev].filter((i) => i < groups.length));
-      return next.size === prev.size ? prev : next;
-    });
-  }, [groups.length]);
+  // Số nhóm/câu đổi thì bỏ chỉ số thu gọn đã vượt quá danh sách (điều chỉnh ngay lúc render, không cần effect).
+  const [prevGroupCount, setPrevGroupCount] = useState(groups.length);
+  if (groups.length !== prevGroupCount) {
+    setPrevGroupCount(groups.length);
+    setCollapsedGroups((prev) => pruneIndexes(prev, groups.length));
+  }
+  const [prevQuestionCount, setPrevQuestionCount] = useState(questions.length);
+  if (questions.length !== prevQuestionCount) {
+    setPrevQuestionCount(questions.length);
+    setCollapsedQuestions((prev) => pruneIndexes(prev, questions.length));
+  }
 
   const toggleGroupCollapsed = (gIndex: number) => {
     setCollapsedGroups((prev) => {
@@ -175,13 +189,6 @@ const CreateTestFormBody = ({
       return next;
     });
   };
-
-  useEffect(() => {
-    setCollapsedQuestions((prev) => {
-      const next = new Set([...prev].filter((i) => i < questions.length));
-      return next.size === prev.size ? prev : next;
-    });
-  }, [questions.length]);
 
   // Câu đã có nội dung mà chưa có tag (hoặc tag nạp từ file không khớp); câu trống chưa tính.
   const editorTagIssues = useMemo(
@@ -279,6 +286,12 @@ const CreateTestFormBody = ({
     }
     const success = await handleSubmit(editedFile);
     if (success) {
+      // Lưu thành công thì hook đã xoá file; bỏ luôn bản xem trước (giữ lại bảng lỗi của file hỏng).
+      if (activeCreatorType === CREATOR_TYPES.TEST) {
+        setTestJsonPreview((prev) => (prev?.valid ? null : prev));
+      } else if (activeCreatorType === CREATOR_TYPES.BULK) {
+        setBankJsonPreview((prev) => (prev?.valid ? null : prev));
+      }
       toast.success(
         activeCreatorType === CREATOR_TYPES.TEST
           ? 'Đã tạo đề thi thành công'
@@ -299,8 +312,8 @@ const CreateTestFormBody = ({
   const normTag = (s?: string | null) => (s || '').trim().toLowerCase();
   const resolveTagNamesToIds = (tagNames: string[] = []): string[] => {
     if (!tagNames.length || !availableTags.length) return [];
-    const byName = new Map<string, any[]>();
-    availableTags.forEach((t: any) => {
+    const byName = new Map<string, TagResponse[]>();
+    availableTags.forEach((t) => {
       const k = normTag(t.name);
       if (!byName.has(k)) byName.set(k, []);
       byName.get(k)!.push(t);
@@ -321,12 +334,12 @@ const CreateTestFormBody = ({
       }
       let cands = byName.get(normTag(tagName)) || [];
       if (partName) {
-        cands = cands.filter((t: any) => normTag(t.examPartName) === normTag(partName));
+        cands = cands.filter((t) => normTag(t.examPartName) === normTag(partName));
       }
       if (!cands.length) return;
-      let chosen = null;
+      let chosen: TagResponse | null = null;
       if (cands.length > 1 && partId) {
-        const inPart = cands.filter((t: any) => t.examPartId === partId);
+        const inPart = cands.filter((t) => t.examPartId === partId);
         if (inPart.length === 1) chosen = inPart[0];
       }
       if (!chosen && cands.length === 1) chosen = cands[0];
@@ -335,7 +348,7 @@ const CreateTestFormBody = ({
     return ids;
   };
 
-  const normalizeParsedQuestions = (parsedQuestions: any[] = []): DraftQuestion[] => (
+  const normalizeParsedQuestions = (parsedQuestions: NormalQuestionRequest[] = []): DraftQuestion[] => (
     parsedQuestions.map((question) => {
       const tagNames: string[] = question.tagNames || [];
       const tagIds = [...(question.tagIds || []), ...resolveTagNamesToIds(tagNames)]
@@ -350,7 +363,7 @@ const CreateTestFormBody = ({
         tagIds,
         tagNames,
         answers: (question.answers && question.answers.length > 0)
-          ? question.answers.map((ans: any, idx: number) => ({
+          ? question.answers.map((ans, idx) => ({
             answerLabel: ans.answerLabel || String.fromCharCode(65 + idx),
             answerText: ans.answerText || "",
             isCorrect: Boolean(ans.isCorrect),
@@ -364,8 +377,8 @@ const CreateTestFormBody = ({
     })
   );
 
-  const normalizeParsedGroups = (parsedGroups: any[] = []): DraftGroup[] => (
-    parsedGroups.map((group: any) => ({
+  const normalizeParsedGroups = (parsedGroups: PassageQuestionGroupRequest[] = []): DraftGroup[] => (
+    parsedGroups.map((group) => ({
       passage: {
         content: group.passage?.content || '',
         contentTranslation: group.passage?.contentTranslation || '',
@@ -401,11 +414,8 @@ const CreateTestFormBody = ({
       setQuestions(normalizedQuestions);
       setDocumentFile(null);
       toast.success(`Đã nạp ${normalizedQuestions.length} câu hỏi từ Word.`);
-    } catch (error: any) {
-      const message =
-        error.response?.data?.detail ||
-        error.response?.data?.message ||
-        'Không thể nạp câu hỏi từ Word.';
+    } catch (error) {
+      const message = getApiErrorMessage(error, 'Không thể nạp câu hỏi từ Word.');
       toast.error(message);
     }
   };
@@ -439,13 +449,10 @@ const CreateTestFormBody = ({
       if (data.valid) {
         toast.success(`File hợp lệ: ${data.questionCount} câu, chia vào ${data.parts.length} phần thi.`);
       }
-    } catch (error: any) {
+    } catch (error) {
       setTestJsonFile(null);
       setTestJsonPreview(null);
-      const message =
-        error.response?.data?.detail ||
-        error.response?.data?.message ||
-        'Không thể đọc file JSON.';
+      const message = getApiErrorMessage(error, 'Không thể đọc file JSON.');
       toast.error(message, { autoClose: 20000 });
     } finally {
       setTestJsonChecking(false);
@@ -476,13 +483,10 @@ const CreateTestFormBody = ({
       if (data.valid) {
         toast.success(`File hợp lệ: ${data.questionCount} câu.`);
       }
-    } catch (error: any) {
+    } catch (error) {
       setBankJsonFile(null);
       setBankJsonPreview(null);
-      const message =
-        error.response?.data?.detail ||
-        error.response?.data?.message ||
-        'Không thể đọc file JSON.';
+      const message = getApiErrorMessage(error, 'Không thể đọc file JSON.');
       toast.error(message, { autoClose: 20000 });
     } finally {
       setBankJsonChecking(false);
@@ -500,8 +504,12 @@ const CreateTestFormBody = ({
     const next = applyQuestionEdit(
       { questions: bankJsonPreview.questions || [], groups: bankJsonPreview.groups || [] }, loc, question);
     const total = countQuestions(next);
+    // Xoá hết câu thì bỏ luôn file và bản xem trước.
+    if (total === 0) {
+      clearBankJson();
+      return;
+    }
     setBankJsonPreview({ ...bankJsonPreview, ...next, questionCount: total, groupCount: next.groups.length });
-    if (total === 0) setBankJsonFile(null);
   };
 
   const editTestQuestion: EditQuestionHandler = (partKey, loc, question) => {
@@ -514,29 +522,12 @@ const CreateTestFormBody = ({
       })
       .filter((p) => p.questionCount > 0);
     const total = parts.reduce((n, p) => n + p.questionCount, 0);
+    if (total === 0) {
+      clearTestJson();
+      return;
+    }
     setTestJsonPreview({ ...testJsonPreview, parts, questionCount: total });
-    if (total === 0) setTestJsonFile(null);
   };
-
-  // Lưu thành công thì hook xoá file; bỏ luôn bản xem trước (giữ lại bảng lỗi của file hỏng).
-  useEffect(() => {
-    if (!bankJsonFile) {
-      setBankJsonPreview((prev) => (prev?.valid ? null : prev));
-    }
-  }, [bankJsonFile]);
-
-  // Tạo đề thành công thì hook xoá file; bỏ luôn bảng tóm tắt (giữ lại bảng lỗi của file hỏng).
-  useEffect(() => {
-    if (!testJsonFile) {
-      setTestJsonPreview((prev) => (prev?.valid ? null : prev));
-    }
-  }, [testJsonFile]);
-
-  // Đổi loại kỳ thi thì phần thi đổi theo, kết quả chia cũ không còn đúng.
-  useEffect(() => {
-    clearTestJson();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [testInfo.examTypeId]);
 
   /** Nạp file JSON vào form nháp. Mục tiêu 'questions' cho câu lẻ, 'groups' cho nhóm theo passage. */
   const handlePreviewFromJson = async (fileInput: File, target: 'questions' | 'groups') => {
@@ -583,11 +574,8 @@ const CreateTestFormBody = ({
       const normalizedQuestions = normalizeParsedQuestions(parsedQuestions);
       setQuestions(normalizedQuestions);
       toast.success(`Đã nạp ${normalizedQuestions.length} câu hỏi từ JSON.`);
-    } catch (error: any) {
-      const message =
-        error.response?.data?.detail ||
-        error.response?.data?.message ||
-        'Không thể nạp câu hỏi từ file JSON.';
+    } catch (error) {
+      const message = getApiErrorMessage(error, 'Không thể nạp câu hỏi từ file JSON.');
       toast.error(message, { autoClose: 20000 });
     }
   };
@@ -636,11 +624,8 @@ const CreateTestFormBody = ({
       setGroupQuestions(gIndex, normalizedQuestions);
       setGroupDocumentFiles((prev) => ({ ...prev, [gIndex]: null }));
       toast.success(`Đã nạp ${normalizedQuestions.length} câu hỏi cho nhóm ${gIndex + 1}.`);
-    } catch (error: any) {
-      const message =
-        error.response?.data?.detail ||
-        error.response?.data?.message ||
-        'Không thể nạp nhóm câu hỏi từ Word.';
+    } catch (error) {
+      const message = getApiErrorMessage(error, 'Không thể nạp nhóm câu hỏi từ Word.');
       toast.error(message);
     }
   };
@@ -676,18 +661,15 @@ const CreateTestFormBody = ({
       setGroups(normalizedGroups);
       setBulkPassageFile(null);
       toast.success(`Đã nạp ${normalizedGroups.length} nhóm passage từ Word.`);
-    } catch (error: any) {
-      const message =
-        error.response?.data?.detail ||
-        error.response?.data?.message ||
-        'Không thể nạp passage từ Word.';
+    } catch (error) {
+      const message = getApiErrorMessage(error, 'Không thể nạp passage từ Word.');
       toast.error(message);
     }
   };
 
   const collectionOptions = buildCollectionTree(
     (questionCollections || []).filter(
-      (c: any) =>
+      (c) =>
         !testInfo.examTypeId ||
         !c.examTypeId ||
         String(c.examTypeId) === String(testInfo.examTypeId),
@@ -773,10 +755,14 @@ const CreateTestFormBody = ({
             <Col md={4}>
               <div className={cx('formGroupModern')}>
                 <label>Loại kỳ thi</label>
-                <select className={cx('inputModern')} value={testInfo.examTypeId} onChange={(e) => handleExamTypeChange(e.target.value)}>
+                <select className={cx('inputModern')} value={testInfo.examTypeId} onChange={(e) => {
+                  handleExamTypeChange(e.target.value);
+                  // Đổi loại kỳ thi thì phần thi đổi theo, kết quả chia cũ không còn đúng.
+                  clearTestJson();
+                }}>
                   <option value="">-- Chọn --</option>
 
-                  {examTypes.filter((t: any) => !t.childCount).map((t: any) => <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>)}
+                  {examTypes.filter((t) => !t.childCount).map((t) => <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>)}
                 </select>
               </div>
             </Col>
@@ -787,7 +773,7 @@ const CreateTestFormBody = ({
                 <label>Phần thi *</label>
                 <select className={cx('inputModern')} value={testInfo.examPartId} onChange={(e) => setTestInfo({ ...testInfo, examPartId: e.target.value })} disabled={!testInfo.examTypeId}>
                   <option value="">-- Chọn part --</option>
-                  {examParts.map((p: any) => <option key={p.examPartId} value={p.examPartId}>{p.name}</option>)}
+                  {examParts.map((p) => <option key={p.examPartId} value={p.examPartId}>{p.name}</option>)}
                 </select>
               </div>
             </Col>
@@ -1036,7 +1022,7 @@ const CreateTestFormBody = ({
             warnings={bankJsonPreview.warnings}
             parts={[{
               key: testInfo.examPartId,
-              name: examParts.find((p: any) => p.examPartId === testInfo.examPartId)?.name || 'Phần thi đã chọn',
+              name: examParts.find((p) => p.examPartId === testInfo.examPartId)?.name || 'Phần thi đã chọn',
               questions: bankJsonPreview.questions || [],
               groups: bankJsonPreview.groups || [],
             }]}
@@ -1095,7 +1081,6 @@ const CreateTestFormBody = ({
               removeAnswerFn={removeAnswer}
               addMediaFilesFn={addMediaFiles}
               removeMediaFileFn={removeMediaFile}
-              setPassageTypeFn={setPassageType}
               availableTags={availableTags}
               minQuestions={questions.length}
               collapsible
@@ -1279,13 +1264,12 @@ const CreateTestFormBody = ({
                     radioGroupPrefix={`group-${gIndex}-question`}
                     removeQuestionFn={(i) => removeGroupQuestion(gIndex, i)}
                     updateQuestionTextFn={(i, v) => updateGroupQuestion(gIndex, i, 'questionText', v)}
-                    updateQuestionFieldFn={(i, field, value) => updateGroupQuestion(gIndex, i, field, value)}
-                    updateAnswerFn={(i, aIndex, field, value) => updateGroupAnswer(gIndex, i, aIndex, field, value)}
+                    updateQuestionFieldFn={(...args) => updateGroupQuestion(gIndex, ...args)}
+                    updateAnswerFn={(...args) => updateGroupAnswer(gIndex, ...args)}
                     addAnswerFn={(i) => addGroupAnswer(gIndex, i)}
                     removeAnswerFn={(i, aIndex) => removeGroupAnswer(gIndex, i, aIndex)}
                     addMediaFilesFn={() => { }}
                     removeMediaFileFn={() => { }}
-                    setPassageTypeFn={() => { }}
                     availableTags={availableTags}
                     withMedia={false}
                     minQuestions={group.questions.length}

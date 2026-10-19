@@ -11,6 +11,7 @@ import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { getRecoveryResourceLinkProps } from '@/app/features/resources/recoveryResource';
 import { getApiBaseUrl, getFullMediaUrl } from '@/app/utils/mediaUrl';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import { useStreak } from '@/app/features/gamification/streak/hooks/useStreak';
 import { useStreakRestoreGate } from '@/app/features/gamification/streak/hooks/useStreakRestoreGate';
 import StreakRestoreModal from '@/app/features/gamification/streak/StreakRestoreModal';
@@ -148,6 +149,7 @@ function PlanStudy() {
   const error = formError || loadError;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- khôi phục đáp án đang làm từ sessionStorage (chỉ đọc được phía client) khi đổi phiên
     setFormError(null);
     const sessionId = session?.sessionId;
     if (!sessionId) {
@@ -226,7 +228,13 @@ function PlanStudy() {
           const taskId = taskIdFromUrl || session?.activeTask?.taskId;
           router.push(`/learning-plans/${learningPlanId}/tasks/${taskId}/result`);
         },
-        onError: (err: any) => setFormError(err?.response?.data?.message || err.message),
+        onError: (err: unknown) =>
+          setFormError(
+            getApiErrorMessage(
+              err,
+              (err instanceof Error && err.message) || 'Nộp bài thất bại. Vui lòng thử lại.',
+            ),
+          ),
       },
     );
   };

@@ -47,19 +47,20 @@ const Practice = () => {
     const [finished, setFinished] = useState(false);
     const [loadingNext, setLoadingNext] = useState(false);
     const [knownMessage, setKnownMessage] = useState('');
-    const [sessionScore, setSessionScore] = useState({correct: 0, total: 0});
     const audioRef = useRef<AutoplayAudioElement | null>(null);
     const { refreshStreak } = useStreak();
     const { blocked, allow, streakReady } = useStreakRestoreGate();
     const markMutation = useMarkVocabKnown(albumId);
     const markingKnown = markMutation.isPending;
     const checkMutation = useCheckPracticeAnswer(albumId);
-    const generateMutation = useGeneratePracticeQuestion(albumId);
+    // Chỉ lấy mutateAsync (ổn định giữa các lần render). Object trả về từ useMutation đổi mỗi
+    // render, đưa nó vào deps làm effect bên dưới gọi API sinh câu hỏi liên tục.
+    const { mutateAsync: generateQuestion } = useGeneratePracticeQuestion(albumId);
 
     const fetchQuestion = useCallback(async () => {
         try {
             setLoading(true);
-            const data = await generateMutation.mutateAsync();
+            const data = await generateQuestion();
             if (!data) {
                 setFinished(true);
                 setQuestion(null);
@@ -74,10 +75,11 @@ const Practice = () => {
             setSelectedOption(null);
             setUserAnswer({english: '', vietnamese: ''});
         }
-    }, [albumId, generateMutation]);
+    }, [generateQuestion]);
 
     useEffect(() => {
         if (!streakReady || blocked) return;
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- API sinh câu hỏi ngẫu nhiên (mỗi lần gọi một câu khác), không đưa vào cache useQuery được; chỉ gọi khi cổng streak mở
         fetchQuestion();
     }, [fetchQuestion, streakReady, blocked]);
 
@@ -128,10 +130,6 @@ const Practice = () => {
         checkMutation.mutate(payload, {
             onSuccess: (data) => {
                 setResult(data);
-                if (data.correct) {
-                    setSessionScore(prev => ({...prev, correct: prev.correct + 1}));
-                }
-                setSessionScore(prev => ({...prev, total: prev.total + 1}));
                 refreshStreak();
             },
             onError: (err) => {

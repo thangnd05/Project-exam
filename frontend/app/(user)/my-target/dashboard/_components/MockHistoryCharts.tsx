@@ -38,14 +38,14 @@ export type MockChartPoint = {
 
 type MockHistoryTooltipProps = {
   active?: boolean;
-  payload?: any[];
+  payload?: { payload?: MockChartPoint }[];
 };
 
 function MockHistoryTooltip({ active, payload }: MockHistoryTooltipProps) {
   if (!active || !payload?.length) {
     return null;
   }
-  const row: MockChartPoint | undefined = payload[0]?.payload;
+  const row = payload[0]?.payload;
   if (!row) {
     return null;
   }

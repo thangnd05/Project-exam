@@ -2,7 +2,7 @@
 
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
 import { useRouter } from 'next/navigation';
-import { useState, useRef, useMemo, useCallback, useEffect } from 'react';
+import { useState, useRef, useMemo, useCallback } from 'react';
 
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -45,22 +45,29 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
   });
   const loading = savePostMutation.isPending;
 
-  useEffect(() => {
-    if (!show) return;
-    if (editingPost) {
-      setTitle(editingPost.title || '');
-      setContent(editingPost.content || '');
-      setCategoryId(editingPost.categories?.[0]?.id || '');
-      setThumbnailUrl(editingPost.thumbnailUrl || '');
-    } else {
-      setTitle('');
-      setContent('');
-      setCategoryId('');
-      setThumbnailUrl('');
+  // Mở modal (hoặc đổi bài đang sửa) thì nạp lại form — điều chỉnh state ngay khi render, không cần effect.
+  const [prevOpen, setPrevOpen] = useState<{ show: boolean; editingPost: PostResponse | null }>({
+    show: false,
+    editingPost: null,
+  });
+  if (prevOpen.show !== show || prevOpen.editingPost !== editingPost) {
+    setPrevOpen({ show, editingPost });
+    if (show) {
+      if (editingPost) {
+        setTitle(editingPost.title || '');
+        setContent(editingPost.content || '');
+        setCategoryId(editingPost.categories?.[0]?.id || '');
+        setThumbnailUrl(editingPost.thumbnailUrl || '');
+      } else {
+        setTitle('');
+        setContent('');
+        setCategoryId('');
+        setThumbnailUrl('');
+      }
+      setThumbnailFile(null);
+      setInlineImages([]);
     }
-    setThumbnailFile(null);
-    setInlineImages([]);
-  }, [show, editingPost]);
+  }
 
   const quillRef = useRef<RichTextEditorHandle>(null);
 

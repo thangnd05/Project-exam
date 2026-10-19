@@ -21,7 +21,8 @@ import type {
   DraftQuestion,
   TestInfoForm,
 } from '@/app/features/tests/creator/hooks/useCreateTest';
-import type { CreateTestRequest } from '@/app/types';
+import type { CreateTestRequest, ExamPartResponse, TagResponse } from '@/app/types';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 
 const TOAST_VALIDATION_MS = 8000;
 
@@ -40,8 +41,8 @@ export interface UseTestSubmissionOptions {
   documentFile: File | null;
   testJsonFile: File | null;
   bankJsonFile: File | null;
-  examParts: any[];
-  examTypeTags: any[];
+  examParts: ExamPartResponse[];
+  examTypeTags: TagResponse[];
   setQuestions: (questions: DraftQuestion[]) => void;
   setGroups: (groups: DraftGroup[]) => void;
   setDocumentFile: (file: File | null) => void;
@@ -106,11 +107,11 @@ export const useTestSubmission = ({
      */
     const assignQuestionsToParts = () => {
         const tagPartById = new Map<string, string>();
-        examTypeTags.forEach((t: any) => {
+        examTypeTags.forEach((t) => {
             if (t.examPartId) tagPartById.set(String(t.tagId), String(t.examPartId));
         });
         const partIdByName = new Map<string, string>();
-        examParts.forEach((p: any) => partIdByName.set(String(p.name).trim().toLowerCase(), String(p.examPartId)));
+        examParts.forEach((p) => partIdByName.set(String(p.name).trim().toLowerCase(), String(p.examPartId)));
 
         const byPart = new Map<string, DraftQuestion[]>();
         const errors: string[] = [];
@@ -139,7 +140,7 @@ export const useTestSubmission = ({
         });
 
         const partGroups = examParts
-            .map((p: any) => ({ examPartId: String(p.examPartId), questions: byPart.get(String(p.examPartId)) || [] }))
+            .map((p) => ({ examPartId: String(p.examPartId), questions: byPart.get(String(p.examPartId)) || [] }))
             .filter((g) => g.questions.length > 0);
         return { partGroups, errors };
     };
@@ -241,7 +242,7 @@ export const useTestSubmission = ({
 
                 const { partGroups } = assignQuestionsToParts();
                 const testData = await createTest(testPayload);
-                const newTestId = testData.testId || (testData as any).id;
+                const newTestId = testData.testId;
 
                 for (const { examPartId, questions: partQuestions } of partGroups) {
                     const partData = await createTestPart({
@@ -249,7 +250,7 @@ export const useTestSubmission = ({
                         examPartId,
                         numQuestions: partQuestions.length,
                     });
-                    const newPartId = partData.testPartId || (partData as any).id;
+                    const newPartId = partData.testPartId;
 
                     await Promise.all(
                         partQuestions.map((q) => {
@@ -398,11 +399,8 @@ export const useTestSubmission = ({
                 setGroups([createInitialGroup()]);
             }
         },
-        onError: (error: any) => {
-            const msg =
-                error.response?.data?.detail ||
-                error.response?.data?.message ||
-                error.message;
+        onError: (error: unknown) => {
+            const msg = getApiErrorMessage(error, error instanceof Error ? error.message : '');
             toast.error(msg, { autoClose: TOAST_VALIDATION_MS });
             setNotification({});
         },

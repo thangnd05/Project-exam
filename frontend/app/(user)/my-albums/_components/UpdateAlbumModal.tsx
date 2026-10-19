@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from 'react-toastify';
 import classNames from "classnames/bind";
 import { FaEdit, FaInfoCircle } from "react-icons/fa";
@@ -10,6 +10,7 @@ import ModalActionFooter from "@/app/components/modal/ModalActionFooter";
 import styles from "@/app/components/modal/CommonFormModal.module.scss";
 import type { VocabularyAlbumResponse } from "@/app/types";
 import { useUpdateAlbum } from "@/app/(user)/my-albums/_hooks/useAlbums";
+import { getApiErrorMessage } from "@/app/utils/apiError";
 
 const cx = classNames.bind(styles);
 
@@ -32,20 +33,21 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalP
         },
         onError: (err) => {
             console.error(err);
-            toast.error(
-                err.response?.data?.message ||
-                " Có lỗi xảy ra khi cập nhật Album!"
-            );
+            toast.error(getApiErrorMessage(err, " Có lỗi xảy ra khi cập nhật Album!"));
         },
     });
     const loading = updateMutation.isPending;
 
-    useEffect(() => {
-        if (album) {
-            setName(album.name || "");
-            setDescription(album.description || "");
+    // Mỗi lần mở modal (hoặc đổi album cần sửa) thì nạp lại form (điều chỉnh state ngay khi render).
+    const seedKey = show ? album : null;
+    const [seededFor, setSeededFor] = useState<VocabularyAlbumResponse | null>(null);
+    if (seedKey !== seededFor) {
+        setSeededFor(seedKey);
+        if (seedKey) {
+            setName(seedKey.name || "");
+            setDescription(seedKey.description || "");
         }
-    }, [album, show]);
+    }
 
     const handleUpdate = () => {
         if (!name.trim()) {

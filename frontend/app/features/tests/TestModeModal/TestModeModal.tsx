@@ -19,6 +19,7 @@ import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/
 import { getTestPartsSummary } from '@/app/apis/testApi';
 import { getResourcesByParts } from '@/app/apis/recoveryResourceApi';
 import type { TestPartSummaryResponse, TestResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import styles from '@/app/features/tests/TestModeModal/TestModeModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -55,7 +56,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
     select: normalizeParts,
   });
 
-  const parts = (partsQuery.data ?? []) as PartSummary[];
+  const parts = (partsQuery.data ?? EMPTY_LIST) as PartSummary[];
   const loading = partsQuery.isLoading;
 
   const partResourcesQuery = useQuery({
@@ -66,11 +67,16 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
   });
   const partResources = partResourcesQuery.data ?? [];
 
-  useEffect(() => {
-    if (!show || !test?.testId) return;
-    setTab('exam');
-    setSelected(new Set());
-  }, [show, test?.testId]);
+  // Mở modal (hoặc đổi sang đề khác) thì về tab thi thử và bỏ chọn phần thi; điều chỉnh ngay lúc render.
+  const openedFor = show ? (test?.testId ?? null) : null;
+  const [resetFor, setResetFor] = useState<string | null>(null);
+  if (openedFor !== resetFor) {
+    setResetFor(openedFor);
+    if (openedFor) {
+      setTab('exam');
+      setSelected(new Set());
+    }
+  }
 
   useEffect(() => {
     if (partsQuery.isError) {

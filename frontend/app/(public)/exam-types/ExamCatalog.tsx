@@ -117,6 +117,7 @@ function ExamBadge({sources, name}: {sources: (string | undefined)[]; name: stri
   return (
     <span className={cx('badge')} aria-hidden="true">
       {src ? (
+        // eslint-disable-next-line @next/next/no-img-element -- logo do admin dán (URL ngoài tuỳ ý), chuỗi fallback qua onError
         <img src={src} alt="" onError={() => setIndex((i) => i + 1)} />
       ) : (
         <span className={cx('initials')}>{getInitials(name)}</span>

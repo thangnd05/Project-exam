@@ -24,6 +24,7 @@ export const examCategoryKeys = {
 export const examPartKeys = {
   all: ['exam-parts'], // getExamParts
   byExamType: (examTypeId?: Id) => ['exam-parts', 'by-exam-type', id(examTypeId)],
+  detail: (examPartId?: Id) => ['exam-parts', 'detail', id(examPartId)], // getExamPartById
 };
 
 export const skillKeys = {
@@ -64,6 +65,10 @@ export const completedUserTestKeys = {
 
 export const postCategoryKeys = {
   all: ['post-categories'], // getCategories
+};
+
+export const classKeys = {
+  detail: (classId?: Id) => ['class-info', id(classId)], // getClassById
 };
 
 export const classChapterKeys = {

@@ -17,7 +17,7 @@ import type {
 
 type MutationCallbacks<T> = {
   onSuccess?: (data: T, ...rest: unknown[]) => void;
-  onError?: (err: any) => void;
+  onError?: (err: Error) => void;
 };
 
 const invalidateAlbumProgress = (qc: QueryClient, albumId?: string) => {
@@ -28,7 +28,7 @@ const invalidateAlbumProgress = (qc: QueryClient, albumId?: string) => {
 export function useGeneratePracticeQuestion(
   albumId?: string,
   options: Omit<
-    UseMutationOptions<PracticeQuestionResponse | null, any, void>,
+    UseMutationOptions<PracticeQuestionResponse | null, Error, void>,
     'mutationFn'
   > = {}
 ) {

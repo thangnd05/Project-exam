@@ -1,4 +1,4 @@
-import type { NormalQuestionRequest, PassageQuestionGroupRequest, PassageRequest } from '@/app/types';
+import type { NormalQuestionRequest, PassageQuestionGroupRequest, PassageRequest, TagResponse } from '@/app/types';
 import type { DraftQuestion } from '@/app/features/tests/creator/hooks/useCreateTest';
 import { resolveQuestionTags } from '@/app/features/tests/creator/tagStatus';
 
@@ -44,7 +44,7 @@ export const countQuestions = (part: PreviewPartData) =>
  * Chuyển câu sang dạng khung soạn thảo. Tag ghi bằng tên được đổi sang id để bỏ chọn được;
  * tên không khớp tag nào giữ lại trong tagNames để vẫn thấy cảnh báo.
  */
-export const toDraftQuestion = (question: NormalQuestionRequest, partTags: any[]): DraftQuestion => {
+export const toDraftQuestion = (question: NormalQuestionRequest, partTags: TagResponse[]): DraftQuestion => {
   const { ids, unmatched } = resolveQuestionTags(question, partTags);
   return {
     questionText: question.questionText || '',

@@ -47,6 +47,12 @@ export interface DraftGroup {
   questions: DraftQuestion[];
 }
 
+/** Cặp (trường, giá trị) đúng kiểu, để nơi nhận thu hẹp được value theo field. */
+type FieldUpdate<T> = { [K in keyof T]: [field: K, value: T[K]] }[keyof T];
+export type DraftQuestionFieldUpdate = FieldUpdate<DraftQuestion>;
+export type DraftAnswerFieldUpdate = FieldUpdate<DraftAnswer>;
+export type DraftPassageFieldUpdate = FieldUpdate<DraftPassage>;
+
 export interface TestInfoForm {
   title: string;
   description: string;
@@ -161,7 +167,7 @@ export const useCreateTest = ({
   const availableTags = useMemo(
     () => creatorType === CREATOR_TYPES.TEST
       ? examTypeTags
-      : examTypeTags.filter((t: any) => !t.examPartId || t.examPartId === testInfo.examPartId),
+      : examTypeTags.filter((t) => !t.examPartId || t.examPartId === testInfo.examPartId),
     [creatorType, examTypeTags, testInfo.examPartId],
   );
 
@@ -215,7 +221,7 @@ export const useCreateTest = ({
     setQuestions(newQ);
   };
 
-  const updateQuestionField = (index: number, field: string, value: any) => {
+  const updateQuestionField = (index: number, ...[field, value]: DraftQuestionFieldUpdate) => {
     const newQ = [...questions];
     newQ[index] = { ...newQ[index], [field]: value } as DraftQuestion;
 
@@ -231,7 +237,7 @@ export const useCreateTest = ({
     setQuestions(newQ);
   };
 
-  const updateAnswer = (qIndex: number, aIndex: number, field: string, value: any) => {
+  const updateAnswer = (qIndex: number, aIndex: number, ...[field, value]: DraftAnswerFieldUpdate) => {
     const newQ = [...questions];
     if (field === 'isCorrect') {
 
@@ -307,12 +313,6 @@ export const useCreateTest = ({
     setQuestions(newQ);
   };
 
-  const setPassageType = (index: number, passageType: string) => {
-    const newQ = [...questions];
-    newQ[index] = { ...newQ[index], passageType, mediaFiles: [] };
-    setQuestions(newQ);
-  };
-
   const addGroup = () => {
     if (groups.length >= MAX_QUESTIONS) {
       setNotification({ type: 'warning', message: `Hệ thống giới hạn tối đa ${MAX_QUESTIONS} nhóm mỗi lần tạo.` });
@@ -325,7 +325,7 @@ export const useCreateTest = ({
     if (groups.length > 1) setGroups(groups.filter((_, i) => i !== gIndex));
   };
 
-  const updatePassage = (gIndex: number, field: string, value: any) => {
+  const updatePassage = (gIndex: number, ...[field, value]: DraftPassageFieldUpdate) => {
     const newGroups = [...groups];
     newGroups[gIndex].passage = { ...newGroups[gIndex].passage, [field]: value } as DraftPassage;
     if (field === 'passageType') newGroups[gIndex].passage.mediaFiles = [];
@@ -411,7 +411,10 @@ export const useCreateTest = ({
     }
   };
 
-  const updateGroupQuestion = (gIndex: number, qIndex: number, field: string, value: any) => {
+  const updateGroupQuestion = (
+    gIndex: number,
+    ...[qIndex, field, value]: [qIndex: number, ...update: DraftQuestionFieldUpdate]
+  ) => {
     const newGroups = [...groups];
     newGroups[gIndex].questions[qIndex] = { ...newGroups[gIndex].questions[qIndex], [field]: value } as DraftQuestion;
     setGroups(newGroups);
@@ -426,7 +429,10 @@ export const useCreateTest = ({
     setGroups(newGroups);
   };
 
-  const updateGroupAnswer = (gIndex: number, qIndex: number, aIndex: number, field: string, value: any) => {
+  const updateGroupAnswer = (
+    gIndex: number,
+    ...[qIndex, aIndex, field, value]: [qIndex: number, aIndex: number, ...update: DraftAnswerFieldUpdate]
+  ) => {
     const newGroups = [...groups];
     const q = newGroups[gIndex].questions[qIndex];
     if (field === 'isCorrect') {
@@ -472,12 +478,6 @@ export const useCreateTest = ({
     setGroups(newGroups);
   };
 
-  const setGroupPassageType = (gIndex: number, passageType: string) => {
-    const newGroups = [...groups];
-    newGroups[gIndex].passage = { ...newGroups[gIndex].passage, passageType, mediaFiles: [] };
-    setGroups(newGroups);
-  };
-
   const handleSubmit = (jsonFile?: File | null) => submitLogic(creatorType, jsonFile);
 
   return {
@@ -508,7 +508,6 @@ export const useCreateTest = ({
     removeAnswer,
     addMediaFiles,
     removeMediaFile,
-    setPassageType,
     addGroup,
     removeGroup,
     updatePassage,
@@ -524,7 +523,6 @@ export const useCreateTest = ({
     updateGroupAnswer,
     addGroupAnswer,
     removeGroupAnswer,
-    setGroupPassageType,
     handleSubmit,
     questionCollections,
     availableTags,

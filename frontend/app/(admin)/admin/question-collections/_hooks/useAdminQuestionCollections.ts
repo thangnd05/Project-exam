@@ -47,7 +47,9 @@ const mapCollectionFromApi = (collection: QuestionCollectionResponse): Collectio
 
 const normalizeCollections = (data: QuestionCollectionResponse[]): CollectionItem[] =>
   (Array.isArray(data) ? data : []).map(mapCollectionFromApi);
-const normalizeExamTypes = (data: any): ExamTypeResponse[] =>
+const normalizeExamTypes = (
+  data: ExamTypeResponse[] | {data?: ExamTypeResponse[]; content?: ExamTypeResponse[]} | null | undefined,
+): ExamTypeResponse[] =>
   Array.isArray(data) ? data : data?.data ?? data?.content ?? [];
 
 export function useAdminQuestionCollections() {

@@ -43,7 +43,13 @@ function barColor(status?: string) {
   return COLOR_DEFAULT;
 }
 
-function PlanComparisonTooltip({ active, payload }: { active?: boolean; payload?: any[] }) {
+function PlanComparisonTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: { payload?: PlanComparisonChartRow }[];
+}) {
   if (!active || !payload?.length) {
     return null;
   }
@@ -118,9 +124,9 @@ function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsP
           <div className={cx('statTile')}>
             <span className={cx('statTileLabel')}>Tăng từ plan đầu</span>
             <strong
-              className={(classNames as any)(cx('statTileValue'), {
-                [cx('statTileDeltaUp')]: totalDelta > 0,
-                [cx('statTileDeltaDown')]: totalDelta < 0,
+              className={cx('statTileValue', {
+                statTileDeltaUp: totalDelta > 0,
+                statTileDeltaDown: totalDelta < 0,
               })}
             >
               {totalDelta > 0 ? '+' : ''}

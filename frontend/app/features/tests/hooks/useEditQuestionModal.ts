@@ -1,10 +1,15 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { getQuestionById } from '@/app/apis/questionApi';
 import { getExamPartById } from '@/app/apis/examPartApi';
 import { getTagsFlatByExamType } from '@/app/apis/tagApi';
+import { examPartKeys, tagKeys } from '@/app/configs/queryKeys';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import { getApiErrorMessage } from '@/app/utils/apiError';
+import { questionDetailKeys } from '@/app/features/tests/hooks/useQuestionDetail';
 import { useQuestionCollections } from '@/app/features/tests/hooks/useQuestionCollections';
 import { useUpdateQuestion } from '@/app/features/tests/hooks/useUpdateQuestion';
 import { useDeletePassageMedia } from '@/app/features/tests/hooks/useDeletePassageMedia';
@@ -16,9 +21,11 @@ import {
 import type { PassageMediaItem } from '@/app/features/tests/passageMedia';
 import type {
   AnswerRequest,
+  QuestionAdminResponse,
   QuestionCreateRequest,
   TagResponse,
 } from '@/app/types';
+
 
 type EditPassageForm = {
   passageType: string;
@@ -82,6 +89,34 @@ const defaultOptions = (): EditQuestionOption[] => [
 
 const getAnswerLabelByIndex = (index: number) => String.fromCharCode(65 + index);
 
+const formFromQuestion = (questionDetail: QuestionAdminResponse): EditQuestionFormData => ({
+  classId: questionDetail.classId || '',
+  examPartId: questionDetail.examPartId || '',
+  questionType: questionDetail.questionType || 'MCQ',
+  questionText: questionDetail.questionText || '',
+  explanation: questionDetail.explanation || '',
+  collectionId: questionDetail.collectionId || '',
+  isBank: questionDetail.isBank !== undefined ? questionDetail.isBank : true,
+  usageScope: questionDetail.usageScope ?? QuestionUsageScope.EXAM,
+  passage: questionDetail.passage
+    ? {
+        passageType: questionDetail.passage.passageType || 'READING',
+        content: questionDetail.passage.content || '',
+        contentTranslation: questionDetail.passage.contentTranslation || '',
+        mediaUrl: questionDetail.passage.mediaUrl || '',
+      }
+    : { ...EMPTY_PASSAGE },
+  options:
+    questionDetail.answers && questionDetail.answers.length > 0
+      ? questionDetail.answers.map((ans) => ({
+          id: ans.answerId || null,
+          answerLabel: ans.answerLabel ?? '',
+          content: ans.answerText || '',
+          isCorrect: !!ans.isCorrect,
+        }))
+      : defaultOptions(),
+});
+
 type UseEditQuestionModalParams = {
   show: boolean;
   questionId?: string | null;
@@ -95,12 +130,10 @@ export function useEditQuestionModal({
   onHide,
   onSuccess,
 }: UseEditQuestionModalParams) {
-  const [loading, setLoading] = useState(false);
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [extraContents, setExtraContents] = useState<string[]>([]);
   const [existingMedia, setExistingMedia] = useState<PassageMediaItem[]>([]);
   const [confirmDeleteMedia, setConfirmDeleteMedia] = useState<PassageMediaItem | null>(null);
-  const [availableTags, setAvailableTags] = useState<TagResponse[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [formData, setFormData] = useState<EditQuestionFormData>({
     classId: '',
@@ -127,95 +160,59 @@ export function useEditQuestionModal({
   const isDeletingMedia = (id: string) =>
     deleteMediaMutation.isPending && deleteMediaMutation.variables?.mediaId === id;
 
+  // Mở modal (hoặc đổi câu) là một lần nạp: dùng chung cache chi tiết câu hỏi với các nơi khác,
+  // staleTime 0 để mỗi lần mở đều lấy bản mới như trước.
+  const openedFor = show ? (questionId ?? null) : null;
+  const detailQuery = useQuery({
+    queryKey: questionDetailKeys.detail(questionId ?? undefined),
+    queryFn: () => getQuestionById(questionId as string),
+    enabled: !!openedFor,
+    staleTime: 0,
+  });
+  const questionDetail = detailQuery.data;
+
+  // Câu cũ chưa lưu examTypeId thì lấy loại kỳ thi qua phần thi.
+  const fallbackPartId = questionDetail && !questionDetail.examTypeId ? questionDetail.examPartId : undefined;
+  const examPartQuery = useQuery({
+    queryKey: examPartKeys.detail(fallbackPartId),
+    queryFn: () => getExamPartById(fallbackPartId as string),
+    enabled: !!openedFor && !!fallbackPartId,
+  });
+  const tagExamTypeId = questionDetail?.examTypeId || examPartQuery.data?.examTypeId;
+  const tagsQuery = useQuery({
+    queryKey: tagKeys.flat(tagExamTypeId),
+    queryFn: () => getTagsFlatByExamType(tagExamTypeId as string),
+    enabled: !!openedFor && !!tagExamTypeId,
+    select: (tags: TagResponse[]) => (Array.isArray(tags) ? tags : []),
+  });
+  const availableTags = tagsQuery.data ?? EMPTY_LIST;
+
+  // Nạp form một lần cho mỗi lần mở, khi bản mới đã về; refetch nền sau đó (vd. sau khi xoá
+  // media) không ghi đè những gì người dùng đang sửa. Điều chỉnh ngay lúc render, không qua effect.
+  const [resetFor, setResetFor] = useState<string | null>(null);
+  const [seededFor, setSeededFor] = useState<string | null>(null);
+  if (openedFor !== resetFor) {
+    setResetFor(openedFor);
+    setSeededFor(null);
+    if (openedFor) {
+      setNewFiles([]);
+      setExtraContents([]);
+      setExistingMedia([]);
+    }
+  } else if (openedFor && seededFor !== openedFor && questionDetail && !detailQuery.isFetching) {
+    setSeededFor(openedFor);
+    setFormData(formFromQuestion(questionDetail));
+    setExistingMedia(getPassageMediaItems(questionDetail));
+    setExtraContents(getExtraTextContents(questionDetail));
+    setSelectedTagIds((questionDetail.tags || []).map((t) => t.tagId));
+  }
+  const loading = !!openedFor && seededFor !== openedFor && !detailQuery.isError;
+
   useEffect(() => {
-    if (!show || !questionId) return undefined;
-    let cancelled = false;
-
-    const fetchQuestionDetails = async (id: string) => {
-      setLoading(true);
-      try {
-        const questionDetail = await getQuestionById(id);
-
-        let mappedOptions: EditQuestionOption[] = [];
-        if (questionDetail.answers && questionDetail.answers.length > 0) {
-          mappedOptions = questionDetail.answers.map((ans: any) => ({
-            id: ans.answerId || ans.id || null,
-            answerLabel: ans.answerLabel,
-            content: ans.answerText || ans.content || '',
-            isCorrect: ans.isCorrect,
-          }));
-        } else {
-          mappedOptions = defaultOptions();
-        }
-
-        if (!cancelled) {
-          setFormData({
-            classId: questionDetail.classId || '',
-            examPartId: questionDetail.examPartId || '',
-            questionType: questionDetail.questionType || 'MCQ',
-            questionText: questionDetail.questionText || '',
-            explanation: questionDetail.explanation || '',
-            collectionId: questionDetail.collectionId || '',
-            isBank:
-              questionDetail.isBank !== undefined ? questionDetail.isBank : true,
-            usageScope: questionDetail.usageScope ?? QuestionUsageScope.EXAM,
-            passage: questionDetail.passage
-              ? {
-                  passageType: questionDetail.passage.passageType || 'READING',
-                  content: questionDetail.passage.content || '',
-                  contentTranslation:
-                    questionDetail.passage.contentTranslation || '',
-                  mediaUrl: questionDetail.passage.mediaUrl || '',
-                }
-              : { ...EMPTY_PASSAGE },
-            options: mappedOptions,
-          });
-          setExistingMedia(getPassageMediaItems(questionDetail));
-          setExtraContents(getExtraTextContents(questionDetail));
-
-          const currentTagIds = (questionDetail.tags || []).map((t) => t.tagId);
-          setSelectedTagIds(currentTagIds);
-
-          if (questionDetail.examTypeId) {
-            getTagsFlatByExamType(questionDetail.examTypeId)
-              .then((tags) => {
-                if (!cancelled) setAvailableTags(tags);
-              })
-              .catch(() => {});
-          } else if (questionDetail.examPartId) {
-            getExamPartById(questionDetail.examPartId)
-              .then((part) => {
-                const etId = part?.examTypeId;
-                if (etId && !cancelled) {
-                  return getTagsFlatByExamType(etId);
-                }
-                return [] as TagResponse[];
-              })
-              .then((tags) => {
-                if (!cancelled) setAvailableTags(Array.isArray(tags) ? tags : []);
-              })
-              .catch(() => {});
-          }
-        }
-      } catch {
-        if (!cancelled) {
-          toast.error('Không thể tải dữ liệu câu hỏi');
-          onHideRef.current?.();
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    };
-
-    setNewFiles([]);
-    setExtraContents([]);
-    setExistingMedia([]);
-    fetchQuestionDetails(questionId);
-
-    return () => {
-      cancelled = true;
-    };
-  }, [show, questionId]);
+    if (!openedFor || !detailQuery.isError) return;
+    toast.error('Không thể tải dữ liệu câu hỏi');
+    onHideRef.current?.();
+  }, [openedFor, detailQuery.isError]);
 
   const handlePassageChange = (field: keyof EditPassageForm, value: string) => {
     setFormData((prev) => ({
@@ -328,8 +325,8 @@ export function useEditQuestionModal({
           }
           toast.success('Đã xóa media');
         },
-        onError: (error: any) => {
-          const msg = error.response?.data?.message ?? error.message;
+        onError: (error: unknown) => {
+          const msg = getApiErrorMessage(error, error instanceof Error ? error.message : undefined);
           toast.error(`Xóa media thất bại: ${msg}`);
         },
       },
@@ -409,8 +406,8 @@ export function useEditQuestionModal({
           toast.success('Cập nhật câu hỏi thành công!');
           onSuccess();
         },
-        onError: (error: any) => {
-          const msg = error.response?.data?.message ?? error.message;
+        onError: (error: unknown) => {
+          const msg = getApiErrorMessage(error, error instanceof Error ? error.message : undefined);
           toast.error(`Lỗi khi cập nhật: ${msg}`);
         },
       },

@@ -5,15 +5,23 @@ import styles from '@/app/assets/styles/ReviewQuestions.module.scss';
 
 const cx = classNames.bind(styles);
 
+type ReviewAnswer = {
+  answerId: string;
+  answerText?: string;
+  answerLabel?: string;
+  /** Không có thì so với correctAnswerId. */
+  isCorrect?: boolean | null;
+};
+
 type ReviewQuestionCardProps = {
   id?: string;
   number?: number;
   status?: string;
   questionText?: React.ReactNode;
   mode?: 'options' | 'fill';
-  answers?: any[];
-  selectedAnswerIds?: any[];
-  correctAnswerId?: any;
+  answers?: ReviewAnswer[];
+  selectedAnswerIds?: string[];
+  correctAnswerId?: string | null;
   userAnswerText?: string;
   correctAnswerText?: string;
   explanation?: string;

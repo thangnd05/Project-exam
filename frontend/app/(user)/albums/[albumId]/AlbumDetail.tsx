@@ -48,8 +48,9 @@ const AlbumDetail = () => {
   const deleteMutation = useDeleteVocabulary(albumId);
 
   useEffect(() => {
-
+    // Màn hình nhỏ thì mặc định mở chế độ flashcard.
     if (window.innerWidth < 768) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- đọc kích thước cửa sổ (chỉ có ở client), không tính được lúc render SSR
       setFlashMode(true);
     }
   }, []);
@@ -86,7 +87,7 @@ const AlbumDetail = () => {
   if (loading)
     return (
       <div className={cx('loading-box')}>
-        <Spinner animation="grow" variant="primary" size={'lg' as any} />
+        <Spinner animation="grow" variant="primary" />
         <p>Đang mài giũa kiến thức...</p>
       </div>
     );

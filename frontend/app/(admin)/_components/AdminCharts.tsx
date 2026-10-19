@@ -31,7 +31,7 @@ const brand = brandColors;
 type DayTrafficDatum = { day?: string; users?: number; exams?: number; guests?: number };
 type HourDatum = { hour?: string | number; visits?: number };
 type ScoreRangeDatum = { range?: string; count?: number };
-type SparkDatum = Record<string, any>;
+type SparkDatum = Record<string, unknown>;
 type ChartTooltipProps = Partial<TooltipContentProps<number, string>>;
 
 const VIZ = { primary: brand.accent, accent: brand.unique, muted: '#94a3b8' };

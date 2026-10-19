@@ -2,12 +2,18 @@
 
 import Link from 'next/link';
 import { forwardRef } from 'react';
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, Ref } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Button.module.scss';
 
 const cx = classNames.bind(styles);
 
-type ButtonPrimeProps = {
+// Props gốc của <button>/<a> được truyền thẳng xuống phần tử render ra (onClick, href, target...).
+// Dùng HTMLElement cho event handler vì cùng props có thể render ra <button>, <a> hoặc <Link>.
+type NativeProps = Omit<ButtonHTMLAttributes<HTMLElement>, 'type'> &
+  Pick<AnchorHTMLAttributes<HTMLElement>, 'href' | 'target' | 'rel' | 'download' | 'hrefLang'>;
+
+type ButtonPrimeProps = NativeProps & {
   as?: 'button' | 'link' | 'a';
   variant?: 'primary' | 'outline' | 'ghost' | 'danger' | 'dangerGhost' | 'success';
   size?: 'sm' | 'md' | 'lg' | 'icon';
@@ -17,10 +23,9 @@ type ButtonPrimeProps = {
   className?: string;
   children?: React.ReactNode;
   type?: 'button' | 'submit' | 'reset';
-  [key: string]: any;
 };
 
-const ButtonPrime = forwardRef<any, ButtonPrimeProps>(function ButtonPrime(
+const ButtonPrime = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPrimeProps>(function ButtonPrime(
   {
     as = 'button',
     variant = 'primary',
@@ -46,8 +51,15 @@ const ButtonPrime = forwardRef<any, ButtonPrimeProps>(function ButtonPrime(
   );
 
   if (as === 'link') {
+    const { href = '', ...linkRest } = rest;
     return (
-      <Link ref={ref} className={classes} aria-disabled={disabled || loading} {...(rest as any)}>
+      <Link
+        ref={ref as Ref<HTMLAnchorElement>}
+        href={href}
+        className={classes}
+        aria-disabled={disabled || loading}
+        {...linkRest}
+      >
         {loading ? 'Đang xử lý...' : children}
       </Link>
     );
@@ -55,7 +67,7 @@ const ButtonPrime = forwardRef<any, ButtonPrimeProps>(function ButtonPrime(
 
   if (as === 'a') {
     return (
-      <a ref={ref} className={classes} aria-disabled={disabled || loading} {...rest}>
+      <a ref={ref as Ref<HTMLAnchorElement>} className={classes} aria-disabled={disabled || loading} {...rest}>
         {loading ? 'Đang xử lý...' : children}
       </a>
     );
@@ -63,7 +75,7 @@ const ButtonPrime = forwardRef<any, ButtonPrimeProps>(function ButtonPrime(
 
   return (
     <button
-      ref={ref}
+      ref={ref as Ref<HTMLButtonElement>}
       type={type}
       className={classes}
       disabled={disabled || loading}

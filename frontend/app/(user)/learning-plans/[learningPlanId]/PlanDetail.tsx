@@ -70,6 +70,7 @@ function PlanDetail() {
     try {
       if (localStorage.getItem(congratsSeenKey(plan.learningPlanId))) return;
     } catch {}
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- đọc cờ "đã xem" trong localStorage (chỉ có ở client) rồi mới hiện modal chúc mừng
     setShowCongrats(true);
   }, [plan]);
 

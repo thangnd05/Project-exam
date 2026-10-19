@@ -8,6 +8,7 @@ import CommonFormModal from "@/app/components/modal/CommonFormModal";
 import ModalActionFooter from "@/app/components/modal/ModalActionFooter";
 import styles from "@/app/components/modal/CommonFormModal.module.scss";
 import { useCreateAlbum } from '@/app/(user)/my-albums/_hooks/useAlbums';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 
 const cx = classNames.bind(styles);
 
@@ -47,10 +48,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }: CreateAlbumModalProps) {
             },
             onError: (err) => {
                 console.error(err);
-                toast.error(
-                    err.response?.data?.message ||
-                    "Có lỗi xảy ra khi tạo Album!"
-                );
+                toast.error(getApiErrorMessage(err, "Có lỗi xảy ra khi tạo Album!"));
             },
         });
     };

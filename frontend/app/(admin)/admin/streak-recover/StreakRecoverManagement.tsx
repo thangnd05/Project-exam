@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Form, Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { Flame } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { AdminCard, AdminFieldError, AdminPageHeader } from '@/app/(admin)/_components/common';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import { useStreakRecoverConfig } from './_hooks/useStreakRecoverConfig';
 
 function StreakRecoverManagement() {
@@ -16,18 +17,17 @@ function StreakRecoverManagement() {
 
   const { config, isLoading, isError, updateConfig, isSaving } = useStreakRecoverConfig();
 
-  useEffect(() => {
+  // Nạp lại form mỗi khi cấu hình từ server thay đổi
+  const [prevConfig, setPrevConfig] = useState<typeof config>(null);
+  if (config !== prevConfig) {
+    setPrevConfig(config);
     if (config) {
       setCostCoins(config.costCoins ?? 50);
       setActive(config.active !== false);
     }
-  }, [config]);
+  }
 
-  useEffect(() => {
-    if (isError) {
-      setErrorMessage('Không thể tải cấu hình.');
-    }
-  }, [isError]);
+  const displayedError = errorMessage || (isError ? 'Không thể tải cấu hình.' : '');
 
   const handleSave = async () => {
     const cost = Number(costCoins);
@@ -41,8 +41,8 @@ function StreakRecoverManagement() {
       setCostCoins(data?.costCoins ?? cost);
       setActive(data?.active !== false);
       toast.success('Đã lưu cấu hình khôi phục chuỗi.');
-    } catch (error: any) {
-      setErrorMessage(error?.response?.data?.message || 'Không thể lưu cấu hình.');
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu cấu hình.'));
     }
   };
 
@@ -88,7 +88,7 @@ function StreakRecoverManagement() {
             className="mb-3"
           />
 
-          <AdminFieldError message={errorMessage} />
+          <AdminFieldError message={displayedError} />
 
           <ButtonPrime onClick={handleSave} disabled={isSaving}>
             {isSaving ? 'Đang lưu...' : 'Lưu cấu hình'}

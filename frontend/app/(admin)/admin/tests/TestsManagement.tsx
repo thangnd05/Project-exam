@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
 import {Edit, Trash2} from 'lucide-react';
 
@@ -13,17 +13,19 @@ import {
   AdminToolbar,
 } from '@/app/(admin)/_components/common';
 import { useAdminTests } from './_hooks/useAdminTests';
-import type { ExamTypeResponse, TestAdminResponse } from '@/app/types';
+import type { CreateTestRequest, ExamTypeResponse, TestAdminResponse, UserResponse } from '@/app/types';
 
 const parseOptionalId = (value: string) => {
   const trimmed = String(value).trim();
-  return trimmed === '' ? null : trimmed;
+  return trimmed === '' ? undefined : trimmed;
 };
 
-const getUserIdValue = (user: any) => user?.id ?? user?.userId ?? user?.user_id ?? null;
+const getUserIdValue = (user?: UserResponse) => user?.id ?? null;
 
-const getUserDisplayName = (user: any) =>
-  user?.fullName ?? user?.full_name ?? user?.username ?? user?.userName ?? null;
+const getUserDisplayName = (user?: UserResponse) => user?.fullName ?? user?.userName ?? null;
+
+// TestAdminResponse của backend hiện chưa trả chapterId nên trường này luôn undefined
+type AdminTestRow = TestAdminResponse & { chapterId?: string };
 
 type TestFormState = {
   title: string;
@@ -62,14 +64,8 @@ function TestsManagement() {
   const [formState, setFormState] = useState<TestFormState>(createEmptyForm());
   const [errorMessage, setErrorMessage] = useState('');
 
-  useEffect(() => {
-    if (examTypes.length > 0 && !formState.examTypeId) {
-      setFormState((previous) => ({
-        ...previous,
-        examTypeId: String(examTypes[0].examTypeId),
-      }));
-    }
-  }, [examTypes, formState.examTypeId]);
+  // Chưa chọn loại kỳ thi thì mặc định loại đầu tiên
+  const formExamTypeId = formState.examTypeId || String(examTypes[0]?.examTypeId ?? '');
 
   const filteredTests = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
@@ -95,7 +91,7 @@ function TestsManagement() {
     setEditingTestId(null);
   };
 
-  const openEditModal = (test: TestAdminResponse) => {
+  const openEditModal = (test: AdminTestRow) => {
     setEditingTestId(test.testId);
     setFormState({
       title: test.title!,
@@ -104,7 +100,7 @@ function TestsManagement() {
       durationMinutes: test.durationMinutes || 60,
       maxAttempts: test.maxAttempts || 1,
       classId: test.classId ?? '',
-      chapterId: (test as any).chapterId ?? '',
+      chapterId: test.chapterId ?? '',
     });
     setShowFormModal(true);
   };
@@ -119,17 +115,14 @@ function TestsManagement() {
       return;
     }
 
-    const payload: any = {
+    const payload: CreateTestRequest = {
       title: normalizedTitle,
-      description: formState.description.trim() || null,
-      examTypeId: String(formState.examTypeId),
+      description: formState.description.trim() || undefined,
+      examTypeId: String(formExamTypeId),
       durationMinutes: Math.max(1, Number(formState.durationMinutes) || 60),
       maxAttempts: Math.max(1, Number(formState.maxAttempts) || 1),
       classId: parseOptionalId(formState.classId),
       chapterId: parseOptionalId(formState.chapterId),
-      availableFrom: null,
-      availableTo: null,
-      bannerUrl: null,
     };
 
     setErrorMessage('');
@@ -137,7 +130,7 @@ function TestsManagement() {
       await updateTest({ testId: editingTestId, payload });
       setShowFormModal(false);
       resetForm();
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể lưu đề thi. Vui lòng thử lại.');
     }
   };
@@ -146,7 +139,7 @@ function TestsManagement() {
     setErrorMessage('');
     try {
       await deleteTest(testId);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể xóa đề thi.');
     }
   };
@@ -156,7 +149,7 @@ function TestsManagement() {
     {
       key: 'examTypeId',
       header: 'Loại kỳ thi',
-      render: (test: TestAdminResponse) => (
+      render: (test: AdminTestRow) => (
         <Badge bg="secondary">
           {examTypes.find(
             (item) => String(item.examTypeId) === String(test.examTypeId),
@@ -167,7 +160,7 @@ function TestsManagement() {
     {
       key: 'durationMinutes',
       header: 'Thời lượng',
-      render: (test: TestAdminResponse) =>
+      render: (test: AdminTestRow) =>
         test.durationMinutes != null && String(test.durationMinutes) !== ''
           ? `${test.durationMinutes} phút`
           : 'Không giới hạn',
@@ -176,15 +169,15 @@ function TestsManagement() {
     {
       key: 'classChapter',
       header: 'Lớp / chương',
-      render: (test: TestAdminResponse) =>
-        test.classId != null || (test as any).chapterId != null
-          ? `Lớp ${test.classId ?? '-'} / Chương ${(test as any).chapterId ?? '-'}`
+      render: (test: AdminTestRow) =>
+        test.classId != null || test.chapterId != null
+          ? `Lớp ${test.classId ?? '-'} / Chương ${test.chapterId ?? '-'}`
           : '-',
     },
     {
       key: 'createdBy',
       header: 'Người tạo',
-      render: (test: TestAdminResponse) =>
+      render: (test: AdminTestRow) =>
         getUserDisplayName(
           users.find(
             (user) => String(getUserIdValue(user)) === String(test.createdBy),
@@ -219,8 +212,8 @@ function TestsManagement() {
         columns={columns}
         data={filteredTests}
         loading={loading}
-        getRowKey={(test: TestAdminResponse) => test.testId}
-        rowActions={(test: TestAdminResponse) => (
+        getRowKey={(test: AdminTestRow) => test.testId}
+        rowActions={(test: AdminTestRow) => (
           <>
             <button type="button" onClick={() => openEditModal(test)} title="Sửa">
               <Edit size={14} />
@@ -285,7 +278,7 @@ function TestsManagement() {
           <Form.Group className="mb-3">
             <Form.Label>Loại kỳ thi</Form.Label>
             <Form.Select
-              value={formState.examTypeId}
+              value={formExamTypeId}
               onChange={(event) =>
                 setFormState((previous) => ({
                   ...previous,

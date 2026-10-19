@@ -26,11 +26,17 @@ function GatedAudioPlayer({ urls = [], onCompleted }: GatedAudioPlayerProps) {
 
   const total = urls.length;
 
+  // Giữ onCompleted mới nhất trong ref để complete ổn định: parent đổi callback không làm effect phát lại audio.
+  const onCompletedRef = useRef(onCompleted);
+  useEffect(() => {
+    onCompletedRef.current = onCompleted;
+  }, [onCompleted]);
+
   const complete = useCallback(() => {
     if (completedRef.current) return;
     completedRef.current = true;
-    onCompleted?.();
-  }, [onCompleted]);
+    onCompletedRef.current?.();
+  }, []);
 
   const tryPlay = useCallback(() => {
     const el = audioRef.current;
@@ -49,8 +55,7 @@ function GatedAudioPlayer({ urls = [], onCompleted }: GatedAudioPlayerProps) {
       return;
     }
     tryPlay();
-
-  }, [clipIdx, total]);
+  }, [clipIdx, total, complete, tryPlay]);
 
   const handleEnded = () => {
     if (clipIdx < total - 1) {

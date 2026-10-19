@@ -1,3 +1,5 @@
+import type { TagResponse } from '@/app/types';
+
 /**
  * Trạng thái tag của một câu hỏi, dùng chung cho bản xem trước file JSON và khung soạn thảo.
  * Câu thiếu tag vẫn lưu được nhưng không góp vào điểm theo tag và không sinh ải học trong lộ trình.
@@ -20,7 +22,7 @@ export const shortTag = (spec: string) => {
 };
 
 /** Đối chiếu tag ghi trong file với tag có trong hệ thống của phần thi. */
-export const resolveQuestionTags = (question: TaggedQuestion, partTags: any[]) => {
+export const resolveQuestionTags = (question: TaggedQuestion, partTags: TagResponse[]) => {
   const ids: string[] = [...(question.tagIds || [])];
   const unmatched: string[] = [];
   (question.tagNames || []).forEach((spec) => {
@@ -35,7 +37,7 @@ export const resolveQuestionTags = (question: TaggedQuestion, partTags: any[]) =
 };
 
 /** Bản xem trước file: có tag nào ghi sai tên là báo, kể cả khi các tag khác khớp. */
-export const previewTagStatus = (question: TaggedQuestion, partTags: any[]): TagStatus => {
+export const previewTagStatus = (question: TaggedQuestion, partTags: TagResponse[]): TagStatus => {
   const { ids, unmatched } = resolveQuestionTags(question, partTags);
   if (unmatched.length > 0) return 'unmatched';
   return ids.length > 0 ? 'ok' : 'missing';

@@ -5,18 +5,18 @@ import type { UseMutationOptions, UseMutationResult } from '@tanstack/react-quer
 import { restoreStreak } from '@/app/apis/streakApi';
 import { STREAK_QUERY_KEY } from '@/app/contexts/StreakContext';
 import { COINS_QUERY_KEY } from '@/app/contexts/CoinContext';
-import type { StreakResponse } from '@/app/types';
+import type { ApiError, StreakResponse } from '@/app/types';
 
 type UseRestoreStreakOptions = Pick<
-  UseMutationOptions<StreakResponse, any, void>,
+  UseMutationOptions<StreakResponse, ApiError, void>,
   'onSuccess' | 'onError'
 >;
 
 export function useRestoreStreak(
   { onSuccess, onError }: UseRestoreStreakOptions = {},
-): UseMutationResult<StreakResponse, any, void> {
+): UseMutationResult<StreakResponse, ApiError, void> {
   const qc = useQueryClient();
-  return useMutation<StreakResponse, any, void>({
+  return useMutation<StreakResponse, ApiError, void>({
     mutationFn: () => restoreStreak(),
     onSuccess: (result, ...rest) => {
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -8,11 +8,18 @@ import { CircleDollarSign, Check } from 'lucide-react';
 
 import { getCosmeticShop } from '@/app/apis/cosmeticApi';
 import { useCoins } from '@/app/features/gamification/coin/hooks/useCoins';
-import { useBuyCosmetic, useEquipCosmetic, useUnequipCosmetic } from '@/app/features/gamification/cosmetic/hooks/useCosmeticShop';
+import {
+  COSMETIC_SHOP_QUERY_KEY,
+  useBuyCosmetic,
+  useEquipCosmetic,
+  useUnequipCosmetic,
+} from '@/app/features/gamification/cosmetic/hooks/useCosmeticShop';
+import { useAuth } from '@/app/hooks/useAuth';
 import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import images from '@/app/assets/images';
 import { CosmeticType } from '@/app/enums';
 import type { CosmeticResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import styles from '@/app/features/gamification/cosmetic/CosmeticShop.module.scss';
 
 const cx = classNames.bind(styles);
@@ -60,8 +67,7 @@ export function CosmeticPreview({ item, size = 60 }: CosmeticPreviewProps) {
 
 function CosmeticShop() {
   const { balance } = useCoins();
-  const [items, setItems] = useState<CosmeticResponse[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
   const buyMutation = useBuyCosmetic();
   const equipMutation = useEquipCosmetic();
   const unequipMutation = useUnequipCosmetic();
@@ -71,27 +77,26 @@ function CosmeticShop() {
     (unequipMutation.isPending && unequipMutation.variables) ||
     null;
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getCosmeticShop();
-      setItems(Array.isArray(data) ? data : []);
-    } catch (error) {
-      toast.error('Không thể tải cửa hàng.');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    load();
-  }, [load]);
+  // Mua/đeo/tháo xong, các mutation tự invalidate COSMETIC_SHOP_QUERY_KEY để tải lại danh sách.
+  const { data, isLoading: loading } = useQuery({
+    queryKey: [...COSMETIC_SHOP_QUERY_KEY, user?.userId],
+    queryFn: async () => {
+      try {
+        return await getCosmeticShop();
+      } catch (error) {
+        toast.error('Không thể tải cửa hàng.');
+        throw error;
+      }
+    },
+    retry: false,
+    staleTime: 0,
+  });
+  const items: CosmeticResponse[] = Array.isArray(data) ? data : EMPTY_LIST;
 
   const handleBuy = (item: CosmeticResponse) => {
     buyMutation.mutate(item.cosmeticId, {
       onSuccess: () => {
         toast.success(`Đã mua "${item.name}"!`);
-        load();
       },
       onError: (error) => {
         toast.error(error?.response?.data?.message || 'Mua thất bại. Vui lòng thử lại.');
@@ -101,9 +106,6 @@ function CosmeticShop() {
 
   const handleEquip = (item: CosmeticResponse) => {
     equipMutation.mutate(item.cosmeticId, {
-      onSuccess: () => {
-        load();
-      },
       onError: (error) => {
         toast.error(error?.response?.data?.message || 'Không thể đeo vật phẩm.');
       },
@@ -112,9 +114,6 @@ function CosmeticShop() {
 
   const handleUnequip = (item: CosmeticResponse) => {
     unequipMutation.mutate(item.cosmeticId, {
-      onSuccess: () => {
-        load();
-      },
       onError: () => {
         toast.error('Không thể tháo vật phẩm.');
       },

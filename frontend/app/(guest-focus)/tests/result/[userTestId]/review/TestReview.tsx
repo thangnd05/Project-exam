@@ -21,6 +21,34 @@ import MediaImage from '@/app/components/MediaImage/MediaImage';
 
 const cx = classNames.bind(styles);
 
+// Passage / media có thể đến ở dạng camelCase hoặc snake_case tuỳ API, nên chỉ mô tả các trường cần đọc.
+type LooseMedia = {
+  mediaType?: string | null;
+  media_type?: string | null;
+  mediaUrl?: string | null;
+  media_url?: string | null;
+  content?: string | null;
+  content_text?: string | null;
+};
+
+type LoosePassageSource = {
+  content?: string | null;
+  passage_content?: string | null;
+  contentTranslation?: string | null;
+  content_translation?: string | null;
+  passageType?: string | null;
+  passage_type?: string | null;
+  mediaUrl?: string | null;
+  media_url?: string | null;
+  audioUrl?: string | null;
+  audio_url?: string | null;
+  passageMediaUrl?: string | null;
+  passageMediaList?: LooseMedia[] | null;
+  passageMedias?: LooseMedia[] | null;
+  mediaList?: LooseMedia[] | null;
+  passage_media?: LooseMedia[] | null;
+};
+
 const isMsqCorrect = (q: QuestionAdminResponse, userAnswer?: UserAnswerResponse) => {
   const correctIds = (q.answers || []).filter((a) => a.isCorrect).map((a) => a.answerId).sort();
   const chosen = [...(userAnswer?.selectedAnswerIds || [])].sort();
@@ -133,7 +161,9 @@ const TestReview = () => {
     return () => clearTimeout(timer);
   }, [loading, test]);
 
-  const hasPassageContent = (passage: any, fallbackObj: any) => {
+  const hasPassageContent = (passageArg: unknown, fallbackArg: unknown) => {
+    const passage = passageArg as LoosePassageSource | null | undefined;
+    const fallbackObj = fallbackArg as LoosePassageSource | null | undefined;
     const content =
       passage?.content ??
       passage?.passage_content ??
@@ -166,7 +196,9 @@ const TestReview = () => {
     </div>
   );
 
-  const renderPassage = (passage: any, fallbackObj: any) => {
+  const renderPassage = (passageArg: unknown, fallbackArg: unknown) => {
+    const passage = passageArg as LoosePassageSource | null | undefined;
+    const fallbackObj = fallbackArg as LoosePassageSource | null | undefined;
     const content =
       passage?.content ??
       passage?.passage_content ??
@@ -200,19 +232,13 @@ const TestReview = () => {
     const hasAnyMedia = hasList || !!singleMediaUrl;
     if (!hasContent && !hasAnyMedia) return null;
 
-    const audioCount = hasList
-      ? mediaList.filter(
-          (x: any) => (x.mediaType ?? x.media_type ?? "").toUpperCase() === "AUDIO",
-        ).length
-      : 0;
-
     return (
       <div className={cx("passage-box")}>
 
         {content && renderPassageText(content, "main")}
 
         {hasList &&
-          mediaList.map((m: any, idx: number) => {
+          mediaList.map((m: LooseMedia, idx: number) => {
             const type = (m.mediaType ?? m.media_type ?? "").toUpperCase();
             if (type === "TEXT") {
               const t = m.content ?? m.content_text;

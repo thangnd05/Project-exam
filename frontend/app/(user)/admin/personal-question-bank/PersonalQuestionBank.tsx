@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Alert, Spinner } from 'react-bootstrap';
 import {
   BookOpen,
@@ -23,6 +23,7 @@ import { buildCollectionTree } from '@/app/features/tests/collectionTree';
 import EditQuestionModal from '@/app/features/tests/EditQuestionModal';
 import ViewQuestionModal from './_components/ViewQuestionModal';
 import { PermissionCode } from '@/app/enums';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import { useDeleteQuestion } from './_hooks/useDeleteQuestion';
 import {
   BANK_SCOPE,
@@ -56,6 +57,11 @@ const PersonalQuestionBank = () => {
   const [collectionFilter, setCollectionFilter] = useState('');
   const [includeChildCollections, setIncludeChildCollections] = useState(true);
 
+  // Mất quyền kho admin thì chuyển về kho cá nhân (điều chỉnh state ngay khi render).
+  if (!canAccessAdminBank && bankScope === BANK_SCOPE.ADMIN) {
+    setBankScope(BANK_SCOPE.PERSONAL);
+  }
+
   const { examTypes, examParts } = useBaseMetaData(examTypeId);
 
   const {
@@ -73,7 +79,6 @@ const PersonalQuestionBank = () => {
     invalidateAfterEdit,
     invalidateAfterDelete,
     loadError,
-    clearLoadError,
   } = usePersonalQuestionBank({
     bankScope,
     examTypeId,
@@ -87,18 +92,13 @@ const PersonalQuestionBank = () => {
   const isDeleting = (id: string) =>
     deleteMutation.isPending && deleteMutation.variables === id;
 
-  useEffect(() => {
-    if (!canAccessAdminBank && bankScope === BANK_SCOPE.ADMIN) {
-      setBankScope(BANK_SCOPE.PERSONAL);
-    }
-  }, [canAccessAdminBank, bankScope]);
-
-  useEffect(() => {
-    if (loadError) {
-      setNotification({ type: 'danger', message: loadError });
-      clearLoadError();
-    }
-  }, [loadError, clearLoadError]);
+  // Có lỗi tải dữ liệu mới thì hiện thông báo một lần; người dùng đóng thì không hiện lại
+  // cho tới khi xuất hiện lỗi khác.
+  const [notifiedLoadError, setNotifiedLoadError] = useState<string | null>(null);
+  if (loadError !== notifiedLoadError) {
+    setNotifiedLoadError(loadError);
+    if (loadError) setNotification({ type: 'danger', message: loadError });
+  }
 
   const handleEditSuccess = async () => {
     setEditingQuestionId(null);
@@ -121,9 +121,8 @@ const PersonalQuestionBank = () => {
         });
         setDeleteQuestionTarget(null);
       },
-      onError: (error: any) => {
-        const message =
-          error.response?.data?.message || 'Không thể xóa câu hỏi. Vui lòng thử lại.';
+      onError: (error: unknown) => {
+        const message = getApiErrorMessage(error, 'Không thể xóa câu hỏi. Vui lòng thử lại.');
         setNotification({ type: 'danger', message });
       },
     });
@@ -212,7 +211,7 @@ const PersonalQuestionBank = () => {
                 aria-label="Chọn lớp học"
               >
                 <option value="">-- Chọn lớp học --</option>
-                {(classes || []).map((c: any) => (
+                {classes.map((c) => (
                   <option key={c.classId} value={c.classId}>
                     {c.className || `Lớp ${c.classId}`}
                   </option>
@@ -228,7 +227,7 @@ const PersonalQuestionBank = () => {
                 aria-label="Loại kỳ thi"
               >
                 <option value="">-- Chọn loại kỳ thi --</option>
-                {(examTypes || []).map((t: any) => (
+                {examTypes.map((t) => (
                   <option key={t.examTypeId} value={t.examTypeId}>
                     {t.name}
                   </option>
@@ -325,7 +324,7 @@ const PersonalQuestionBank = () => {
                           }
                           return (
                             <ul className={cx('questionList')}>
-                              {visibleChapterQuestions.map((q: any, idx) => {
+                              {visibleChapterQuestions.map((q, idx) => {
                                 const id = q.questionId ?? q.id;
                                 if (!id) return null;
                                 const collectionName = getCollectionName(q.collectionId);
@@ -416,7 +415,7 @@ const PersonalQuestionBank = () => {
                   : 'Danh sách câu hỏi theo Part'}
               </div>
 
-              {examParts.map((part: any) => {
+              {examParts.map((part) => {
                 const cfg = partConfigs[part.examPartId] || {
                   expanded: false,
                   loading: false,
@@ -458,7 +457,7 @@ const PersonalQuestionBank = () => {
                           </Alert>
                         ) : (
                           <ul className={cx('questionList')}>
-                            {visibleQuestions.map((q: any, idx) => {
+                            {visibleQuestions.map((q, idx) => {
                               const id = q.questionId ?? q.id;
                               if (!id) return null;
                               const collectionName = getCollectionName(q.collectionId);

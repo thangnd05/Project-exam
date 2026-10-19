@@ -13,6 +13,7 @@ import { useSwitchPlan } from '@/app/(guest)/learning-plans/generate/_hooks/useS
 import { useResyncPlan } from '@/app/features/learning-plans/hooks/useResyncPlan';
 import { withExam } from '@/app/features/exam-types/hooks/useExamParam';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 import {
   buildResyncMessage,
   planStageLabel,
@@ -114,7 +115,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
     setSwitchTarget(null);
     switchMutation.mutate(planId, {
       onSuccess: () => reload(),
-      onError: (err: any) => toast.error(err?.response?.data?.message || 'Lỗi khi chuyển lộ trình'),
+      onError: (err: unknown) => toast.error(getApiErrorMessage(err, 'Lỗi khi chuyển lộ trình')),
     });
   }, [switchTarget, switchMutation, reload]);
 
@@ -124,7 +125,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
     setDeleteTarget(null);
     deleteMutation.mutate(planId, {
       onSuccess: () => reload(),
-      onError: (err: any) => toast.error(err?.response?.data?.message || 'Lỗi khi xóa lộ trình'),
+      onError: (err: unknown) => toast.error(getApiErrorMessage(err, 'Lỗi khi xóa lộ trình')),
     });
   }, [deleteTarget, deleteMutation, reload]);
 
@@ -319,7 +320,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
                 <button
                   type="button"
                   className={cx('btn', 'btnGhost', 'btnSm')}
-                  onClick={reload as any}
+                  onClick={() => reload()}
                   disabled={loading}
                 >
                   Làm mới

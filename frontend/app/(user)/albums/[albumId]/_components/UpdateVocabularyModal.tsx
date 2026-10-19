@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { IoText, IoLanguage } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -26,15 +26,19 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabu
         example: '',
     });
 
-    useEffect(() => {
-        if (vocab) {
+    // Mỗi lần mở modal (hoặc đổi từ cần sửa) thì nạp lại form (điều chỉnh state ngay khi render).
+    const seedKey = show ? vocab : null;
+    const [seededFor, setSeededFor] = useState<VocabularyResponse | null>(null);
+    if (seedKey !== seededFor) {
+        setSeededFor(seedKey);
+        if (seedKey) {
             setEditVocab({
-                word: vocab.word || '',
-                meaning: vocab.meaning || '',
-                example: vocab.example || '',
+                word: seedKey.word || '',
+                meaning: seedKey.meaning || '',
+                example: seedKey.example || '',
             });
         }
-    }, [vocab, show]);
+    }
 
     const updateMutation = useUpdateVocabulary({
         onSuccess: () => {

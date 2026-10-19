@@ -39,7 +39,6 @@ type TestListContainerProps = {
   countdowns?: Record<string, number>;
   handleDeleteTest?: (testId: string) => void;
   emptyState?: React.ReactNode;
-  loading?: boolean;
   onRefresh?: () => void;
   footer?: React.ReactNode;
   topSlot?: React.ReactNode;
@@ -59,7 +58,6 @@ const TestListContainer = ({
   countdowns = {},
   handleDeleteTest,
   emptyState,
-  loading,
   onRefresh,
   footer,
   topSlot,

@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import { useUpdateChapter } from '@/app/(user)/class/[classId]/chapters/_hooks/useChaptersOfClass';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -8,6 +8,7 @@ import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import commonModalStyles from '@/app/components/modal/CommonFormModal.module.scss';
 import type { ChapterResponse } from '@/app/types';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 
 const cx = classNames.bind(commonModalStyles);
 
@@ -25,16 +26,16 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}: Update
   const updateMutation = useUpdateChapter(classId);
   const submitting = updateMutation.isPending;
 
-  useEffect(() => {
-    if (!chapter) {
-      setTitle('');
-      setDescription('');
-      return;
+  // Mỗi lần mở modal (hoặc đổi chương cần sửa) thì nạp lại form (điều chỉnh state ngay khi render).
+  const seedKey = show ? (chapter ?? null) : null;
+  const [seededFor, setSeededFor] = useState<ChapterResponse | null>(null);
+  if (seedKey !== seededFor) {
+    setSeededFor(seedKey);
+    if (seedKey) {
+      setTitle(seedKey.title || '');
+      setDescription(seedKey.description || '');
     }
-
-    setTitle(chapter.title || '');
-    setDescription(chapter.description || '');
-  }, [chapter, show]);
+  }
 
   const handleSubmit = () => {
     if (!chapter?.chapterId) {
@@ -63,7 +64,7 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}: Update
         },
         onError: (error) => {
           toast.error(
-            error.response?.data?.message || 'Không thể cập nhật chương. Vui lòng thử lại.',
+            getApiErrorMessage(error, 'Không thể cập nhật chương. Vui lòng thử lại.'),
           );
         },
       },

@@ -14,11 +14,21 @@ import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { useClassMembers } from './_hooks/useClassMembers';
 import { ClassMemberStatus } from '@/app/enums';
 import type { ClassMemberResponse } from '@/app/types';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 
 const cx = classNames.bind(styles);
 
 type SortKey = 'fullName' | 'joinedAt';
 type SortConfig = { key: SortKey; direction: 'asc' | 'desc' };
+
+const EmptyState = ({ message, icon: Icon }: { message: string; icon: React.ElementType }) => (
+  <div className={cx('empty-state')}>
+    <div className={cx('empty-icon-wrapper')}>
+      <Icon />
+    </div>
+    <p>{message}</p>
+  </div>
+);
 
 const ClassMemberManagement = () => {
   const { classId } = useParams<{ classId: string }>();
@@ -48,9 +58,9 @@ const ClassMemberManagement = () => {
         userId: String(userId),
       });
       toast.success('Duyệt học sinh thành công!');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Lỗi duyệt học sinh:', err);
-      const msg = err?.response?.data?.error || 'Không thể duyệt học sinh';
+      const msg = getApiErrorMessage(err, 'Không thể duyệt học sinh');
       toast.error(msg);
     }
   };
@@ -63,9 +73,9 @@ const ClassMemberManagement = () => {
     try {
       const result = await approveAllMutation.mutateAsync(classId);
       toast.success(result.message || 'Đã duyệt tất cả học sinh!');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Lỗi duyệt tất cả:', err);
-      const msg = err?.response?.data?.error || 'Không thể duyệt tất cả';
+      const msg = getApiErrorMessage(err, 'Không thể duyệt tất cả');
       toast.error(msg);
     }
   };
@@ -80,9 +90,9 @@ const ClassMemberManagement = () => {
       toast.success('Đã xóa học sinh khỏi lớp!');
       setShowDeleteModal(false);
       setMemberToDelete(null);
-    } catch (err: any) {
+    } catch (err) {
       console.error('Lỗi xóa học sinh:', err);
-      const msg = err?.response?.data?.error || 'Không thể xóa học sinh';
+      const msg = getApiErrorMessage(err, 'Không thể xóa học sinh');
       toast.error(msg);
     }
   };
@@ -95,18 +105,14 @@ const ClassMemberManagement = () => {
   };
 
   const getSortedMembers = (members: ClassMemberResponse[]) => {
+    const sortValue = (m: ClassMemberResponse): string | number =>
+      sortConfig.key === 'fullName'
+        ? String(m.fullName || '').toLowerCase()
+        : m.joinedAt ? new Date(m.joinedAt).getTime() : NaN;
     const sorted = [...members];
     sorted.sort((a, b) => {
-      let aVal: any = a[sortConfig.key];
-      let bVal: any = b[sortConfig.key];
-      if (sortConfig.key === 'fullName') {
-        aVal = String(aVal || '').toLowerCase();
-        bVal = String(bVal || '').toLowerCase();
-      }
-      if (sortConfig.key === 'joinedAt') {
-        aVal = new Date(aVal).getTime();
-        bVal = new Date(bVal).getTime();
-      }
+      const aVal = sortValue(a);
+      const bVal = sortValue(b);
       if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
       if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
@@ -194,20 +200,12 @@ const ClassMemberManagement = () => {
     </tr>
   );
 
-  const EmptyState = ({ message, icon: Icon }: { message: string; icon: React.ElementType }) => (
-    <div className={cx('empty-state')}>
-      <div className={cx('empty-icon-wrapper')}>
-        <Icon />
-      </div>
-      <p>{message}</p>
-    </div>
-  );
 
   if (loading) {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('loading-container')}>
-          <Spinner animation="grow" variant="primary" size={'lg' as any} />
+          <Spinner animation="grow" variant="primary" />
           <p>Đang tải danh sách học sinh...</p>
         </div>
       </div>

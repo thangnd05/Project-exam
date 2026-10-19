@@ -82,7 +82,7 @@ function MyAlbum() {
   if (loading)
     return (
       <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-        <Spinner animation="grow" variant="primary" size={'lg' as any} />
+        <Spinner animation="grow" variant="primary" />
         <p className="mt-3 fw-bold text-primary fs-4">Đang chuẩn bị kho tàng từ vựng...</p>
       </div>
     );

@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import {isAxiosError} from 'axios';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import classNames from 'classnames/bind';
 import routes from '@/app/configs/Routes';
@@ -59,10 +60,11 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
       await forgotPasswordMutation.mutateAsync(value);
       setSentTo(value);
       startCooldown(RESEND_COOLDOWN_SECONDS);
-    } catch (err: any) {
-      const status = err?.response?.status;
+    } catch (err) {
+      const response = isAxiosError<{ message?: string }>(err) ? err.response : undefined;
+      const status = response?.status;
       if (status === 429) {
-        const retryAfter = Number(err?.response?.headers?.['retry-after']);
+        const retryAfter = Number(response?.headers?.['retry-after']);
         const waitFor =
           Number.isFinite(retryAfter) && retryAfter > 0
             ? retryAfter
@@ -74,8 +76,8 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
         return;
       }
       setFormError(
-        err?.response?.data?.message ||
-          (err?.response
+        response?.data?.message ||
+          (response
             ? 'Không gửi được yêu cầu. Vui lòng thử lại.'
             : 'Không thể kết nối đến máy chủ. Kiểm tra kết nối mạng của bạn.'),
       );

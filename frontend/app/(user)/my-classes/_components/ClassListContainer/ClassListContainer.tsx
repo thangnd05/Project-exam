@@ -62,7 +62,6 @@ type ClassListContainerProps = {
   onEditClass?: (classData: ClassStudentResponse) => void;
   onDeleteClass?: (classData: ClassStudentResponse) => void;
   onManageStudents?: (classId: string) => void;
-  emptyMessage?: React.ReactNode;
 };
 
 const ClassListContainer = ({
@@ -76,7 +75,6 @@ const ClassListContainer = ({
   onEditClass,
   onDeleteClass,
   onManageStudents,
-  emptyMessage,
 }: ClassListContainerProps) => {
   const [viewMode, setViewMode] = useState('grid');
   const hasTeaching = teachingClasses.length > 0;

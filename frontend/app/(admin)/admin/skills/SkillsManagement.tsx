@@ -112,7 +112,7 @@ function SkillsManagement() {
 
       setShowModal(false);
       resetForm();
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể lưu kỹ năng. Vui lòng thử lại.');
     } finally {
       setSubmitting(false);
@@ -129,7 +129,7 @@ function SkillsManagement() {
     try {
       await deleteSkill(deletingSkill.skill_id);
       setDeletingSkill(null);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể xóa kỹ năng.');
     } finally {
       setSubmitting(false);

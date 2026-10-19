@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useEffect, useMemo, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
 import {Save, ShieldCheck} from 'lucide-react';
 import {toast} from 'react-toastify';
@@ -30,13 +30,16 @@ function PermissionsManagement() {
 
   const [errorMessage, setErrorMessage] = useState('');
 
-  const [matrix, setMatrix] = useState<PermissionMatrix>({});
-  const [original, setOriginal] = useState<PermissionMatrix>({});
+  const [matrix, setMatrix] = useState<PermissionMatrix>(() => buildMatrix(roles));
+  const [original, setOriginal] = useState<PermissionMatrix>(() => buildMatrix(roles));
 
-  useEffect(() => {
+  // Dựng lại ma trận mỗi khi danh sách vai trò từ server thay đổi
+  const [prevRoles, setPrevRoles] = useState(roles);
+  if (roles !== prevRoles) {
+    setPrevRoles(roles);
     setMatrix(buildMatrix(roles));
     setOriginal(buildMatrix(roles));
-  }, [roles]);
+  }
 
   const displayError = errorMessage || (isError ? 'Không thể tải dữ liệu phân quyền.' : '');
 
@@ -109,7 +112,7 @@ function PermissionsManagement() {
         return snapshot;
       });
       toast.success(`Đã lưu phân quyền cho ${dirtyRoleIds.length} vai trò.`);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể lưu phân quyền.');
     }
   };

@@ -21,6 +21,7 @@ import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss'
 import { taskCurrentAccuracy, taskGapToPass, taskUnpassedAttempts } from '@/app/features/learning-plans/PlanPartTaskList/taskProgress';
 import { TaskStatus } from '@/app/enums';
 import type { PlanPartGroupResponse, PlanTaskResponse } from '@/app/types';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import {
   CAPSTONE_TYPES,
   TASK_STATUS,
@@ -227,7 +228,7 @@ type StageMapProps = {
 };
 
 function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStudyTask }: StageMapProps) {
-  const tasks = group.tasks || [];
+  const tasks: PlanTaskResponse[] = group.tasks || EMPTY_LIST;
   const defaultSelected = useMemo(() => {
     if (!tasks.length) return null;
     const rec = tasks.find((t) => t.taskId === recommendedTaskId);

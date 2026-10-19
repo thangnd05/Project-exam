@@ -5,6 +5,7 @@ import { getPlanById, getTaskSessions } from '@/app/apis/learningPlanApi';
 import { planDetailKeys } from '@/app/features/learning-plans/hooks/usePlanDetail';
 import type { TaskSessionHistoryResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
+import { getApiErrorMessage } from '@/app/utils/apiError';
 
 export const taskHistoryKeys = {
 
@@ -12,10 +13,15 @@ export const taskHistoryKeys = {
   sessions: (planId?: string, taskId?: string) => ['task-sessions', planId, taskId],
 };
 
-const errMessage = (err: any): string | null => err?.response?.data?.message || err?.message || null;
+const errMessage = (err: unknown): string | null =>
+  getApiErrorMessage(err, '') || (err instanceof Error ? err.message : '') || null;
 
-const normalizeSessions = (data: TaskSessionHistoryResponse[]): TaskSessionHistoryResponse[] =>
-  Array.isArray(data) ? data : Array.isArray((data as any)?.content) ? (data as any).content : [];
+// API có thể trả mảng trực tiếp hoặc bọc trong { content } (phân trang).
+const normalizeSessions = (data: unknown): TaskSessionHistoryResponse[] => {
+  if (Array.isArray(data)) return data;
+  const content = (data as { content?: unknown } | null | undefined)?.content;
+  return Array.isArray(content) ? content : [];
+};
 
 export function useTaskHistory(learningPlanId: string, taskId: string) {
   const planQuery = useQuery({

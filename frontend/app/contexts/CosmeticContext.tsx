@@ -5,8 +5,9 @@ import { useQuery } from '@tanstack/react-query';
 import { queryClient } from '@/app/configs/queryClient';
 import { getMyEquippedCosmetics } from '@/app/apis/cosmeticApi';
 import { useAuth } from '@/app/hooks/useAuth';
+import type { CosmeticResponse } from '@/app/types';
 
-export type EquippedCosmetic = Record<string, any>;
+export type EquippedCosmetic = CosmeticResponse;
 
 export type CosmeticContextValue = {
   frame: EquippedCosmetic | null;

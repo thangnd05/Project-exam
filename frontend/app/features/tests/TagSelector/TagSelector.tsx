@@ -5,19 +5,20 @@ import { Badge } from 'react-bootstrap';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '@/app/features/tests/TagSelector/TagSelector.module.scss';
+import type { TagResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
 const SHARED_PART_KEY = '__shared__';
 
 type TagSelectorProps = {
-    tags?: any[];
-    selectedIds?: any[];
-    onToggle?: (tagId: any) => void;
+    tags?: TagResponse[];
+    selectedIds?: string[];
+    onToggle?: (tagId: string) => void;
     label?: string;
 };
 
-type PartGroup = { key: string; name: string; tags: any[] };
+type PartGroup = { key: string; name: string; tags: TagResponse[] };
 
 const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân loại' }: TagSelectorProps) => {
     // Tag được nhóm theo phần thi; thứ tự nhóm theo thứ tự tag backend trả về.
@@ -39,7 +40,7 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
 
     if (tags.length === 0) return null;
 
-    const Chip = ({ tag }: { tag: any }) => {
+    const Chip = ({ tag }: { tag: TagResponse }) => {
         const selected = selectedSet.has(tag.tagId);
         return (
             <Badge

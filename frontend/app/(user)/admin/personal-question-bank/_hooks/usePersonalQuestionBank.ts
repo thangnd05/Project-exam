@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   getMyClassBankCount,
@@ -16,6 +16,7 @@ import {
 } from '@/app/features/tests/collectionTree';
 import type {
   ChapterResponse,
+  ClassSimpleResponse,
   ExamPartResponse,
   QuestionCollectionResponse,
   QuestionResponse,
@@ -40,25 +41,39 @@ export const questionBankKeys = {
   partQuestions: (partId?: string, scope?: string) => ['question-bank', 'part-questions', partId, scope],
 };
 
-const normalizeCollections = (data: any): QuestionCollectionResponse[] =>
-  Array.isArray(data) ? data : (data?.data || data?.content || []);
+// API có thể trả mảng trực tiếp hoặc bọc trong object ({ data } / { content } / ...): lấy mảng đầu tiên tìm thấy.
+const listFrom = <T,>(payload: unknown, keys: string[]): T[] => {
+  if (Array.isArray(payload)) return payload as T[];
+  const obj = payload as Record<string, unknown> | null | undefined;
+  for (const key of keys) {
+    const value = obj?.[key];
+    if (Array.isArray(value)) return value as T[];
+  }
+  return [];
+};
 
-const normalizeMyClasses = (result: any) =>
-  Array.isArray(result) ? result : result?.classes || [];
+const normalizeCollections = (data: unknown): QuestionCollectionResponse[] =>
+  listFrom(data, ['data', 'content']);
 
-const normalizeChapters = (raw: any): ChapterResponse[] =>
-  Array.isArray(raw) ? raw : (Array.isArray(raw?.data) ? raw.data : []);
+const normalizeMyClasses = (result: unknown): ClassSimpleResponse[] =>
+  listFrom(result, ['classes']);
 
-const normalizePartQuestions = (data: any): QuestionResponse[] =>
-  Array.isArray(data) ? data : (data?.data ?? data?.questions ?? []);
+const normalizeChapters = (raw: unknown): ChapterResponse[] =>
+  listFrom(raw, ['data']);
 
-const normalizeChapterQuestions = (raw: any): QuestionResponse[] =>
-  Array.isArray(raw) ? raw : (Array.isArray(raw?.data) ? raw.data : []);
+const normalizePartQuestions = (data: unknown): QuestionBankItem[] =>
+  listFrom(data, ['data', 'questions']);
+
+const normalizeChapterQuestions = (raw: unknown): QuestionBankItem[] =>
+  listFrom(raw, ['data']);
+
+// Một số API cũ trả `id` thay cho `questionId`.
+export type QuestionBankItem = QuestionResponse & { id?: string };
 
 export type QuestionBankPartConfig = {
   expanded: boolean;
   loading: boolean;
-  questions: QuestionResponse[];
+  questions: QuestionBankItem[];
 };
 
 export type QuestionBankChapterConfig = QuestionBankPartConfig & {
@@ -85,7 +100,20 @@ export function usePersonalQuestionBank({
   const queryClient = useQueryClient();
   const [expandedParts, setExpandedParts] = useState<Set<string>>(() => new Set());
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(() => new Set());
-  const [loadError, setLoadError] = useState<string | null>(null);
+
+  // Đổi loại đề / nguồn thì thu gọn các part; đổi lớp / nguồn thì thu gọn các chương.
+  const partsResetKey = `${bankScope}|${examTypeId ?? ''}`;
+  const [expandedPartsFor, setExpandedPartsFor] = useState(partsResetKey);
+  if (expandedPartsFor !== partsResetKey) {
+    setExpandedPartsFor(partsResetKey);
+    setExpandedParts(new Set());
+  }
+  const chaptersResetKey = `${bankScope}|${selectedClassId ?? ''}`;
+  const [expandedChaptersFor, setExpandedChaptersFor] = useState(chaptersResetKey);
+  if (expandedChaptersFor !== chaptersResetKey) {
+    setExpandedChaptersFor(chaptersResetKey);
+    setExpandedChapters(new Set());
+  }
 
   const isPartScope =
     bankScope === BANK_SCOPE.PERSONAL || bankScope === BANK_SCOPE.ADMIN;
@@ -95,7 +123,7 @@ export function usePersonalQuestionBank({
     queryFn: getQuestionCollections,
     select: normalizeCollections,
   });
-  const collectionsList = collectionsQuery.data ?? [];
+  const collectionsList = collectionsQuery.data ?? EMPTY_LIST;
 
   const collectionsMap = useMemo(() => {
     const map: Record<string, string> = {};
@@ -112,7 +140,7 @@ export function usePersonalQuestionBank({
 
   const selectedIsParent = isParentCollection(collectionsList, collectionFilter);
 
-  const filterByCollection = (questions: QuestionResponse[]) => {
+  const filterByCollection = <T extends QuestionResponse>(questions: T[]): T[] => {
     if (!collectionFilter) return questions;
     if (collectionFilter === '__none__') {
       return questions.filter((q) => !q.collectionId);
@@ -158,15 +186,6 @@ export function usePersonalQuestionBank({
   }, [examParts, partQueries, expandedParts]);
 
   const anyPartError = partQueries.some((q) => q.isError);
-  useEffect(() => {
-    if (anyPartError) {
-      setLoadError('Không tải được danh sách câu hỏi.');
-    }
-  }, [anyPartError]);
-
-  useEffect(() => {
-    setExpandedParts(new Set());
-  }, [examTypeId, bankScope]);
 
   const togglePartExpanded = (partId: string) => {
     setExpandedParts((prev) => {
@@ -183,14 +202,8 @@ export function usePersonalQuestionBank({
     enabled: bankScope === BANK_SCOPE.CLASS && !!selectedClassId,
     select: normalizeChapters,
   });
-  const chapters = chaptersQuery.data ?? [];
+  const chapters = chaptersQuery.data ?? EMPTY_LIST;
   const chaptersLoading = chaptersQuery.isLoading;
-
-  useEffect(() => {
-    if (chaptersQuery.isError) {
-      setLoadError('Không tải được danh sách chương.');
-    }
-  }, [chaptersQuery.isError]);
 
   const chapterCountQueries = useQueries({
     queries: chapters.map((ch) => ({
@@ -234,15 +247,16 @@ export function usePersonalQuestionBank({
   }, [chapters, chapterQuestionQueries, chapterCountQueries, expandedChapters]);
 
   const anyChapterQuestionError = chapterQuestionQueries.some((q) => q.isError);
-  useEffect(() => {
-    if (anyChapterQuestionError) {
-      setLoadError('Không tải được câu hỏi của chương này.');
-    }
-  }, [anyChapterQuestionError]);
 
-  useEffect(() => {
-    setExpandedChapters(new Set());
-  }, [selectedClassId, bankScope]);
+  // Thông báo lỗi tải dữ liệu, suy ra trực tiếp từ trạng thái các query
+  // (thứ tự ưu tiên giữ như trước: lỗi ghi sau cùng thắng).
+  const loadError = anyChapterQuestionError
+    ? 'Không tải được câu hỏi của chương này.'
+    : chaptersQuery.isError
+      ? 'Không tải được danh sách chương.'
+      : anyPartError
+        ? 'Không tải được danh sách câu hỏi.'
+        : null;
 
   const toggleChapterExpanded = (chapterId: string) => {
     setExpandedChapters((prev) => {
@@ -293,8 +307,6 @@ export function usePersonalQuestionBank({
     }
   };
 
-  const clearLoadError = useCallback(() => setLoadError(null), []);
-
   return {
     collectionsList,
     getCollectionName,
@@ -310,6 +322,5 @@ export function usePersonalQuestionBank({
     invalidateAfterEdit,
     invalidateAfterDelete,
     loadError,
-    clearLoadError,
   };
 }

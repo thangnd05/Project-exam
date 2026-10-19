@@ -19,9 +19,12 @@ import {
   StatCardGroup,
 } from '@/app/(admin)/_components/common';
 import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 import styles from './UsersManagement.module.scss';
 
 const cx = classNames.bind(styles);
+
+type FormFieldElement = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
 type CreateFormState = {
   fullName: string;
@@ -139,10 +142,10 @@ function UsersManagement() {
     setShowCreateModal(false);
   };
 
-  const updateCreateField = (field: keyof CreateFormState) => (event: React.ChangeEvent<any>) => {
+  const updateCreateField = (field: keyof CreateFormState) => (event: React.ChangeEvent<FormFieldElement>) => {
     const value =
       field === 'verified' || field === 'isPremium'
-        ? event.target.checked
+        ? (event.target as HTMLInputElement).checked
         : event.target.value;
     setCreateForm((previous) => ({...previous, [field]: value}));
   };
@@ -162,7 +165,7 @@ function UsersManagement() {
         userName,
         email,
         password: createForm.password,
-        roleId: (createForm.roleId || null) as any,
+        roleId: createForm.roleId || undefined,
         verified: createForm.verified,
         isPremium: createForm.isPremium,
       });
@@ -170,7 +173,7 @@ function UsersManagement() {
       setCurrentPage(1);
     } catch (error) {
       setCreateError(
-        (error as any)?.response?.data?.message || 'Không thể tạo người dùng.',
+        getApiErrorMessage(error, 'Không thể tạo người dùng.'),
       );
     }
   };
@@ -196,7 +199,7 @@ function UsersManagement() {
     setEditingUser(null);
   };
 
-  const updateEditField = (field: keyof EditFormState) => (event: React.ChangeEvent<any>) => {
+  const updateEditField = (field: keyof EditFormState) => (event: React.ChangeEvent<FormFieldElement>) => {
     setEditForm((previous) => ({...previous, [field]: event.target.value}));
   };
 
@@ -223,7 +226,7 @@ function UsersManagement() {
       setEditingUser(null);
     } catch (error) {
       setEditError(
-        (error as any)?.response?.data?.message || 'Không thể cập nhật người dùng.',
+        getApiErrorMessage(error, 'Không thể cập nhật người dùng.'),
       );
     }
   };
@@ -236,7 +239,7 @@ function UsersManagement() {
     try {
       await deleteUserMutation.mutateAsync(userToDelete.user_id);
       setUserToDelete(null);
-    } catch (error) {
+    } catch {
       setDeleteErrorMessage('Không thể xóa người dùng.');
     }
   };

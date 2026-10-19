@@ -50,6 +50,7 @@ function Logo({url, name}: LogoProps) {
 
   if (showImage) {
     return (
+      // eslint-disable-next-line @next/next/no-img-element -- logo do admin dán (URL ngoài tuỳ ý) kèm onError fallback
       <img
         className={cx('logo')}
         src={url}

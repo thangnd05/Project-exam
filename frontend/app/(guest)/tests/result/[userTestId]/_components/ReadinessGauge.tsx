@@ -1,8 +1,8 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
+import { useMounted } from '@/app/hooks/useMounted';
 import InfoTip from '@/app/components/InfoTip/InfoTip';
 import { TERM_TIPS } from '@/app/features/learning-plans/termTips';
 import { isBeginnerLevel } from '@/app/features/learning-plans/learnerLevel';
@@ -41,11 +41,9 @@ function ReadinessGauge({ enhanced, isPractice = false }: ReadinessGaugeProps) {
 
   const isQuickChallenge = examCategoryCode === 'QUICK_CHALLENGE';
 
-  const [isBeginner, setIsBeginner] = useState(false);
-
-  useEffect(() => {
-    setIsBeginner(isQuickChallenge && isBeginnerLevel(examTypeId));
-  }, [isQuickChallenge, examTypeId]);
+  // Trình độ tự khai nằm ở localStorage: chỉ đọc sau khi mount để không lệch hydration.
+  const mounted = useMounted();
+  const isBeginner = mounted && isQuickChallenge && isBeginnerLevel(examTypeId);
 
   const { gaugePercentage, displayValue, gaugeLabel, gaugeTitle, gaugeMessage, gaugeLevel } =
     buildGaugeView(enhanced, { isBeginner, isPractice });

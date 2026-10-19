@@ -10,6 +10,8 @@ import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
 import { useBulkCreateVocabularies } from '@/app/(user)/albums/[albumId]/_hooks/useAlbumVocabularies';
+import { getApiErrorMessage } from '@/app/utils/apiError';
+import type { VocabularyRequest } from '@/app/types';
 
 const cx = classNames.bind(styles);
 
@@ -45,15 +47,15 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
 
             setJsonInput(cleanedJson);
             toast.success('Chuẩn hóa dữ liệu thành công!');
-        } catch (err: any) {
+        } catch (err) {
             console.error('Lỗi chuẩn hóa AI:', err);
 
             let errorMsg;
             if (err instanceof SyntaxError) {
                 errorMsg = 'AI trả về dữ liệu không hợp lệ. Vui lòng thử lại!';
             } else {
-                errorMsg = err.response?.data?.message
-                    || err.message
+                errorMsg = getApiErrorMessage(err, '')
+                    || (err instanceof Error ? err.message : '')
                     || 'Không thể kết nối AI. Vui lòng thử lại!';
             }
             toast.error(errorMsg);
@@ -70,7 +72,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
             return;
         }
 
-        let payload;
+        let payload: unknown;
         try {
             payload = JSON.parse(jsonInput);
             if (!Array.isArray(payload)) {
@@ -81,12 +83,12 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
                 toast.error('Mảng từ vựng không được rỗng!');
                 return;
             }
-        } catch (err) {
+        } catch {
             toast.error('Định dạng JSON không hợp lệ. Vui lòng kiểm tra lại!');
             return;
         }
 
-        const processedPayload = payload.map((item: any) => ({
+        const processedPayload = (payload as VocabularyRequest[]).map((item) => ({
             ...item,
             albumId: item.albumId || albumId,
         }));
@@ -100,8 +102,10 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
             },
             onError: (err) => {
                 console.error('Lỗi khi nhập bulk:', err);
-                const msg = err.response?.data?.message
-                    || 'Có lỗi xảy ra khi nhập dữ liệu. Vui lòng kiểm tra cấu trúc JSON!';
+                const msg = getApiErrorMessage(
+                    err,
+                    'Có lỗi xảy ra khi nhập dữ liệu. Vui lòng kiểm tra cấu trúc JSON!',
+                );
                 toast.error(msg);
             },
         });

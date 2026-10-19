@@ -1,6 +1,6 @@
 'use client';
 
-import {useEffect, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {Form} from 'react-bootstrap';
 import {Eye, Send} from 'lucide-react';
 import {toast} from 'react-toastify';
@@ -13,6 +13,7 @@ import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {AdminFieldError} from '@/app/(admin)/_components/common';
 import {EmailType} from '@/app/enums';
 import type {EmailResponse} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 import {useEmailMutations} from '@/app/(admin)/admin/emails/_hooks/useAdminEmails';
 import styles from './EmailEditorModal.module.scss';
 
@@ -67,25 +68,29 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
 
   const {createEmail, updateEmail, previewEmail, testSendEmail} = useEmailMutations();
 
-  useEffect(() => {
-    if (!show) {
-      return;
+  // Nạp lại form mỗi khi mở modal hoặc đổi email đang sửa
+  const [prevShow, setPrevShow] = useState(false);
+  const [prevEmail, setPrevEmail] = useState(email);
+  if (show !== prevShow || email !== prevEmail) {
+    setPrevShow(show);
+    setPrevEmail(email);
+    if (show) {
+      setForm(
+        email
+          ? {
+              name: email.name || '',
+              description: email.description || '',
+              subject: email.subject || '',
+              bodyHtml: email.bodyHtml || '',
+              active: email.active !== false,
+            }
+          : emptyForm,
+      );
+      setErrorMessage('');
+      setPreviewHtml('');
+      setTestEmail('');
     }
-    setForm(
-      email
-        ? {
-            name: email.name || '',
-            description: email.description || '',
-            subject: email.subject || '',
-            bodyHtml: email.bodyHtml || '',
-            active: email.active !== false,
-          }
-        : emptyForm,
-    );
-    setErrorMessage('');
-    setPreviewHtml('');
-    setTestEmail('');
-  }, [show, email]);
+  }
 
   const setField = (field: keyof EmailFormState, value: string | boolean) =>
     setForm((previous) => ({...previous, [field]: value}));
@@ -129,7 +134,7 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
       toast.success('Đã lưu nội dung email.');
       onClose();
     } catch (error) {
-      setErrorMessage((error as any)?.response?.data?.message || 'Không thể lưu email. Vui lòng thử lại.');
+      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu email. Vui lòng thử lại.'));
     } finally {
       setSubmitting(false);
     }
@@ -144,7 +149,7 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
       const result = await previewEmail({subject: form.subject, bodyHtml: form.bodyHtml});
       setPreviewHtml(result.bodyHtml ?? '');
     } catch (error) {
-      setErrorMessage((error as any)?.response?.data?.message || 'Không tạo được bản xem trước.');
+      setErrorMessage(getApiErrorMessage(error, 'Không tạo được bản xem trước.'));
     }
   };
 
@@ -164,7 +169,7 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
       });
       toast.info('Đã đưa email thử vào hàng gửi, kiểm tra hộp thư sau ít giây.');
     } catch (error) {
-      setErrorMessage((error as any)?.response?.data?.message || 'Không gửi thử được.');
+      setErrorMessage(getApiErrorMessage(error, 'Không gửi thử được.'));
     }
   };
 

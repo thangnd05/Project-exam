@@ -8,6 +8,19 @@ import { getCurrentUser, logout as logoutRequest } from '@/app/apis/authApi';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
 import routes from '@/app/configs/Routes';
+import type { UserResponse } from '@/app/types';
+
+// Phần tối thiểu của Google Identity Services (script ngoài) mà app dùng tới.
+type GoogleIdentityWindow = Window & {
+  google?: {
+    accounts: {
+      id: {
+        initialize: (config: { client_id?: string; auto_select?: boolean; itp_support?: boolean }) => void;
+        cancel: () => void;
+      };
+    };
+  };
+};
 
 export type AuthUser = {
   userId: string;
@@ -55,7 +68,7 @@ const clearUserStorage = () => {
   }
 };
 
-const normalizeUser = (data: any): AuthUser => ({
+const normalizeUser = (data: UserResponse): AuthUser => ({
   userId: data.id,
   userName: data.userName,
   fullName: data.fullName,
@@ -91,7 +104,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
 
   useEffect(() => {
-    const google = (window as any).google;
+    const google = (window as GoogleIdentityWindow).google;
     if (google) {
       google.accounts.id.initialize({
         client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 import {toast} from 'react-toastify';
@@ -19,6 +19,7 @@ import {
 import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
 import {QuestConditionType} from '@/app/enums';
 import type {QuestRequest, QuestResponse} from '@/app/types';
+import {getApiErrorMessage} from '@/app/utils/apiError';
 
 const CONDITION_TYPES = [
   {value: QuestConditionType.NONE, label: 'Không cần điều kiện (tặng xu)'},
@@ -71,12 +72,6 @@ function QuestsManagement() {
     updateQuest,
     removeQuest,
   } = useQuests();
-
-  useEffect(() => {
-    if (isError) {
-      setErrorMessage('Không thể tải danh sách nhiệm vụ.');
-    }
-  }, [isError]);
 
   const filteredQuests = useMemo(() => {
     const normalized = keyword.trim().toLowerCase();
@@ -148,9 +143,9 @@ function QuestsManagement() {
       }
       setShowModal(false);
       resetForm();
-    } catch (error: any) {
+    } catch (error) {
       setErrorMessage(
-        error?.response?.data?.message || 'Không thể lưu nhiệm vụ. Vui lòng thử lại.',
+        getApiErrorMessage(error, 'Không thể lưu nhiệm vụ. Vui lòng thử lại.'),
       );
     } finally {
       setSubmitting(false);
@@ -165,8 +160,8 @@ function QuestsManagement() {
     try {
       await removeQuest(deletingQuest.questId);
       toast.success('Đã xóa nhiệm vụ.');
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Không thể xóa nhiệm vụ.');
+    } catch (error) {
+      toast.error(getApiErrorMessage(error, 'Không thể xóa nhiệm vụ.'));
     } finally {
       setDeletingQuest(null);
       setSubmitting(false);
@@ -235,7 +230,9 @@ function QuestsManagement() {
         onSearchChange={setKeyword}
         searchPlaceholder="Tìm theo tiêu đề..."
       />
-      {!showModal && <AdminFieldError message={errorMessage} />}
+      {!showModal && (
+        <AdminFieldError message={errorMessage || (isError ? 'Không thể tải danh sách nhiệm vụ.' : '')} />
+      )}
 
       <AdminTable
         showIndex

@@ -100,7 +100,7 @@ function RolesManagement() {
         codes,
       });
       setPermRole(null);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể lưu phân quyền.');
     } finally {
       setPermSaving(false);
@@ -163,7 +163,7 @@ function RolesManagement() {
 
       setShowFormModal(false);
       resetForm();
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể lưu vai trò.');
     } finally {
       setSubmitting(false);
@@ -179,7 +179,7 @@ function RolesManagement() {
     try {
       await deleteRoleMutation.mutateAsync(deletingRole.role_id);
       setDeletingRole(null);
-    } catch (error) {
+    } catch {
       setErrorMessage('Không thể xóa vai trò.');
     } finally {
       setSubmitting(false);

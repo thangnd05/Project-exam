@@ -58,6 +58,7 @@ function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, e
 
         <header className={cx('head')}>
           {design?.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element -- logo do admin cấu hình (host bất kỳ), cần <img> thường để in/xuất chứng chỉ
             <img className={cx('logo')} src={design.logoUrl} alt="" />
           ) : (
             <span className={cx('emblem')} aria-hidden="true" />
@@ -108,6 +109,7 @@ function CertificateCanvas({ design, recipientName, certificateCode, issuedAt, e
 
           <div className={cx('footCol', 'signCol')}>
             {design?.signatureImageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element -- chữ ký do admin cấu hình (host bất kỳ), cần <img> thường để in/xuất chứng chỉ
               <img className={cx('signature')} src={design.signatureImageUrl} alt="" />
             )}
             {signatureName && <span className={cx('signName')}>{signatureName}</span>}

@@ -1,5 +1,6 @@
 'use client';
 
+import {classKeys} from '@/app/configs/queryKeys';
 import { useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
@@ -15,13 +16,17 @@ import type { ClassMemberActionRequest, ClassMemberResponse, MessageResponse } f
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const classMemberKeys = {
-  info: (classId: string) => ['class-info', classId],
+  info: classKeys.detail,
   members: (classId: string) => ['class-members', classId],
   pending: (classId: string) => ['class-pending', classId],
 };
 
-const normalizeList = (data: ClassMemberResponse[]): ClassMemberResponse[] =>
-  (Array.isArray(data) ? data : ((data as any)?.content ?? []));
+// API có thể trả mảng trực tiếp hoặc bọc trong { content } (phân trang).
+const normalizeList = (data: unknown): ClassMemberResponse[] => {
+  if (Array.isArray(data)) return data;
+  const content = (data as { content?: unknown } | null | undefined)?.content;
+  return Array.isArray(content) ? content : [];
+};
 
 export function useClassMembers(classId: string) {
   const qc = useQueryClient();
@@ -74,17 +79,17 @@ export function useClassMembers(classId: string) {
   const refreshMembers = () =>
     Promise.all([membersQuery.refetch(), pendingQuery.refetch()]);
 
-  const approveMemberMutation = useMutation<MessageResponse, any, ClassMemberActionRequest>({
+  const approveMemberMutation = useMutation<MessageResponse, Error, ClassMemberActionRequest>({
     mutationFn: approveMember,
     onSuccess: invalidateMembers,
   });
 
-  const approveAllMutation = useMutation<MessageResponse, any, string>({
+  const approveAllMutation = useMutation<MessageResponse, Error, string>({
     mutationFn: approveAllMembers,
     onSuccess: invalidateMembers,
   });
 
-  const removeMemberMutation = useMutation<void, any, ClassMemberActionRequest>({
+  const removeMemberMutation = useMutation<void, Error, ClassMemberActionRequest>({
     mutationFn: removeMember,
     onSuccess: invalidateMembers,
   });
