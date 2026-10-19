@@ -6,13 +6,23 @@ const OAUTH_REDIRECT_KEY = 'postLoginRedirect';
 
 type SearchParamsLike = { get(name: string): string | null };
 
-// Chỉ nhận đường dẫn nội bộ, và bỏ qua các trang xác thực để không bị vòng lặp chuyển hướng.
 const AUTH_PAGES = ['/login', '/forgot', '/reset'];
+const PROBE_ORIGIN = 'https://internal.invalid';
+
+const isInternalPath = (target: string): boolean => {
+  if (!target.startsWith('/') || target.startsWith('//')) return false;
+  if (/[\\\u0000-\u001f\u007f]/.test(target)) return false;
+  try {
+    return new URL(target, PROBE_ORIGIN).origin === PROBE_ORIGIN;
+  } catch {
+    return false;
+  }
+};
+
 const isSafeRedirect = (target: string | null | undefined): target is string =>
-  Boolean(target)
-  && target!.startsWith('/')
-  && !target!.startsWith('//')
-  && !AUTH_PAGES.some((p) => target === p || target!.startsWith(`${p}?`) || target!.startsWith(`${p}/`));
+  typeof target === 'string'
+  && isInternalPath(target)
+  && !AUTH_PAGES.some((p) => target === p || target.startsWith(`${p}?`) || target.startsWith(`${p}/`));
 
 export const getRedirectTarget = (searchParams: SearchParamsLike | null | undefined, fallback = '/'): string => {
   const from = searchParams?.get?.('from');
@@ -50,7 +60,7 @@ export const takeOAuthRedirect = (fallback = '/'): string => {
   if (typeof window === 'undefined') return fallback;
   const target = window.sessionStorage.getItem(OAUTH_REDIRECT_KEY);
   window.sessionStorage.removeItem(OAUTH_REDIRECT_KEY);
-  return target || fallback;
+  return isSafeRedirect(target) ? target : fallback;
 };
 
 // Chỉ gắn bài khi khách đã bấm "Đăng nhập & lưu". Đăng nhập theo đường khác thì bỏ phiên khách,

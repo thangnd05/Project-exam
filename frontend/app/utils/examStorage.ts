@@ -11,6 +11,8 @@ export type ExamSessionState = {
   currentStepIndex: number;
   maxStepIndex: number;
   flaggedQuestionIds: string[];
+  // Câu đã sửa ở máy này nhưng chưa chắc đã lưu lên server. null = bản lưu cũ chưa có trường này.
+  dirtyQuestionIds: string[] | null;
   lastSavedAt: number;
 };
 
@@ -85,6 +87,9 @@ export const readExamSessionState = (sessionKey: string): ExamSessionState | nul
     flaggedQuestionIds: Array.isArray(parsed.flaggedQuestionIds)
       ? parsed.flaggedQuestionIds.filter((id): id is string => typeof id === 'string')
       : [],
+    dirtyQuestionIds: Array.isArray(parsed.dirtyQuestionIds)
+      ? parsed.dirtyQuestionIds.filter((id): id is string => typeof id === 'string')
+      : null,
     lastSavedAt: parsed.lastSavedAt as number,
   };
 };

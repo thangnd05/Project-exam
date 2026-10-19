@@ -1,5 +1,6 @@
 package com.project_exam.backend.modules.auth.service;
 
+import com.project_exam.backend.shared.exception.AppException;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import com.project_exam.backend.shared.exception.ConflictException;
 import com.project_exam.backend.shared.exception.NotFoundException;
@@ -121,6 +122,16 @@ public class AuthService {
     }
 
     public AuthMessageResponse refresh(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            return rotateTokens(request, response);
+        } catch (AppException e) {
+            // Phiên không cứu được nữa: xoá cả cookie đánh dấu phiên để proxy.ts không cho vào trang cần đăng nhập.
+            authCookieWriter.clearTokens(response);
+            throw e;
+        }
+    }
+
+    private AuthMessageResponse rotateTokens(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = extractRefreshTokenFromCookie(request);
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new UnauthorizedException("Không tìm thấy refresh token");

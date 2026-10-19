@@ -705,33 +705,25 @@ public class UserTestService {
             return emptyHallOfFame();
         }
 
-        List<UserTest> attempts = userTestRepository.findCompletedByCategoryCode(
-                FULL_MOCK_CODE, UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE);
-        Map<String, Test> testsById = loadTests(attempts);
-        List<UserTest> forExam = attempts.stream()
-                .filter(attempt -> {
-                    Test test = testsById.get(attempt.getTestId());
-                    return test != null && examTypeId.equals(test.getExamTypeId());
-                })
-                .toList();
-
-        Map<String, UserTest> bestByPerson = new LinkedHashMap<>();
-        for (UserTest attempt : forExam) {
-            String key = personKey(attempt);
-            if (key == null) {
-                continue;
-            }
-            UserTest currentBest = bestByPerson.get(key);
-            if (currentBest == null || compareHallOfFame(attempt, currentBest) < 0) {
-                bestByPerson.put(key, attempt);
-            }
+        // Lọc, chọn lượt tốt nhất mỗi người và xếp hạng làm trong DB: chỉ kéo về top N
+        // thay vì nạp mọi lượt thi FULL_MOCK vào RAM ở endpoint công khai này.
+        List<UserTestRepository.HallOfFameRow> rows = userTestRepository.findHallOfFameRows(
+                FULL_MOCK_CODE,
+                examTypeId,
+                UserTest.Status.COMPLETED.name(),
+                UserTest.Mode.PRACTICE.name(),
+                safeLimit);
+        if (rows.isEmpty()) {
+            return emptyHallOfFame();
         }
 
-        List<UserTest> ranked = bestByPerson.values().stream()
-                .sorted(this::compareHallOfFame)
+        List<String> topIds = rows.stream().map(UserTestRepository.HallOfFameRow::getUserTestId).toList();
+        Map<String, UserTest> attemptsById = userTestRepository.findAllById(topIds).stream()
+                .collect(Collectors.toMap(UserTest::getUserTestId, attempt -> attempt));
+        List<UserTest> top = topIds.stream()
+                .map(attemptsById::get)
+                .filter(Objects::nonNull)
                 .toList();
-
-        List<UserTest> top = ranked.size() > safeLimit ? ranked.subList(0, safeLimit) : ranked;
 
         Set<String> userIds = top.stream()
                 .map(UserTest::getUserId)
@@ -759,7 +751,7 @@ public class UserTestService {
 
         return QuickLeaderboardResponse.builder()
                 .entries(entries)
-                .totalParticipants(ranked.size())
+                .totalParticipants(rows.get(0).getTotal().intValue())
                 .build();
     }
 
@@ -768,61 +760,6 @@ public class UserTestService {
                 .entries(List.of())
                 .totalParticipants(0)
                 .build();
-    }
-
-    private Map<String, Test> loadTests(Collection<UserTest> attempts) {
-        Set<String> testIds = attempts.stream()
-                .map(UserTest::getTestId)
-                .filter(id -> id != null && !id.isBlank())
-                .collect(Collectors.toSet());
-        if (testIds.isEmpty()) {
-            return Map.of();
-        }
-        return testRepository.findAllById(testIds).stream()
-                .collect(Collectors.toMap(Test::getTestId, test -> test));
-    }
-
-    private int compareHallOfFame(UserTest left, UserTest right) {
-        int byScore = Integer.compare(hallScore(right), hallScore(left));
-        if (byScore != 0) {
-            return byScore;
-        }
-        int byDuration = Long.compare(getDurationTaken(left), getDurationTaken(right));
-        if (byDuration != 0) {
-            return byDuration;
-        }
-        int byFinished = compareEarlier(left.getFinishedAt(), right.getFinishedAt());
-        if (byFinished != 0) {
-            return byFinished;
-        }
-        return compareEarlier(left.getStartedAt(), right.getStartedAt());
-    }
-
-    private int hallScore(UserTest attempt) {
-        return attempt.getTotalScore() != null ? attempt.getTotalScore() : Integer.MIN_VALUE;
-    }
-
-    private int compareEarlier(Instant left, Instant right) {
-        if (left == null && right == null) {
-            return 0;
-        }
-        if (left == null) {
-            return 1;
-        }
-        if (right == null) {
-            return -1;
-        }
-        return left.compareTo(right);
-    }
-
-    private String personKey(UserTest attempt) {
-        if (attempt.getUserId() != null && !attempt.getUserId().isBlank()) {
-            return "user:" + attempt.getUserId();
-        }
-        if (attempt.getGuestSessionId() != null && !attempt.getGuestSessionId().isBlank()) {
-            return "guest:" + attempt.getGuestSessionId();
-        }
-        return null;
     }
 
     private String displayName(User user) {

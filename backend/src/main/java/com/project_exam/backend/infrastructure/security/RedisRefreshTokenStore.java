@@ -139,6 +139,17 @@ public class RedisRefreshTokenStore implements RefreshTokenStore {
         }
     }
 
+    @Override
+    public boolean isFamilyRevoked(String familyId) {
+        try {
+            return redis.opsForHash().get(familyKey(familyId), FIELD_REVOKED) != null;
+        } catch (DataAccessException ex) {
+            // Redis sập thì vẫn cho qua: access token chỉ sống vài phút, chặn hết sẽ đăng xuất mọi người.
+            log.warn("Redis lỗi khi kiểm tra thu hồi fid={}: {}", familyId, ex.getMessage());
+            return false;
+        }
+    }
+
     private void revokeFamilyInternal(String userId, String familyId) {
         markRevoked(familyKey(familyId));
         redis.opsForSet().remove(userKey(userId), familyId);

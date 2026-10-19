@@ -122,20 +122,46 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
                                              @Param("userId") String userId,
                                              @Param("limit") int limit);
 
-    @Query("""
-            SELECT ut FROM UserTest ut
-            WHERE ut.status = :status
-              AND (ut.mode IS NULL OR ut.mode <> :practiceMode)
-              AND ut.testId IN (
-                SELECT t.testId FROM Test t
-                WHERE t.examCategoryId = (
-                  SELECT c.examCategoryId FROM ExamCategory c WHERE c.code = :categoryCode
-                )
-              )
-            """)
-    List<UserTest> findCompletedByCategoryCode(@Param("categoryCode") String categoryCode,
-                                               @Param("status") UserTest.Status status,
-                                               @Param("practiceMode") UserTest.Mode practiceMode);
+    interface HallOfFameRow {
+        String getUserTestId();
+        Long getTotal();
+    }
+
+    // Bảng vinh danh tính trong DB: mỗi người (user hoặc phiên khách) lấy lượt tốt nhất
+    // (điểm cao, làm nhanh, nộp sớm), chỉ trả về top :limit kèm tổng số người tham gia.
+    @Query(value = """
+            WITH attempts AS (
+                SELECT ut.user_test_id, ut.total_score, ut.started_at, ut.finished_at,
+                       ut.finished_at - ut.started_at AS taken,
+                       COALESCE('user:' || NULLIF(ut.user_id, ''),
+                                'guest:' || NULLIF(ut.guest_session_id, '')) AS person_key
+                FROM assessment.user_tests ut
+                JOIN assessment.tests t ON t.test_id = ut.test_id AND t.deleted_at IS NULL
+                JOIN assessment.exam_categories c ON c.exam_category_id = t.exam_category_id
+                                                 AND c.deleted_at IS NULL
+                WHERE c.code = :categoryCode
+                  AND t.exam_type_id = :examTypeId
+                  AND ut.status = :status
+                  AND (ut.mode IS NULL OR ut.mode <> :practiceMode)
+                  AND ut.deleted_at IS NULL
+            ), best AS (
+                SELECT DISTINCT ON (a.person_key) a.*
+                FROM attempts a
+                WHERE a.person_key IS NOT NULL
+                ORDER BY a.person_key, a.total_score DESC NULLS LAST, a.taken ASC NULLS LAST,
+                         a.finished_at ASC NULLS LAST, a.started_at ASC NULLS LAST
+            )
+            SELECT b.user_test_id AS "userTestId", COUNT(*) OVER () AS "total"
+            FROM best b
+            ORDER BY b.total_score DESC NULLS LAST, b.taken ASC NULLS LAST,
+                     b.finished_at ASC NULLS LAST, b.started_at ASC NULLS LAST, b.user_test_id
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<HallOfFameRow> findHallOfFameRows(@Param("categoryCode") String categoryCode,
+                                           @Param("examTypeId") String examTypeId,
+                                           @Param("status") String status,
+                                           @Param("practiceMode") String practiceMode,
+                                           @Param("limit") int limit);
 
     List<UserTest> findByUserIdAndStatusAndFinishedAtIsNotNullOrderByFinishedAtDesc(
             String userId, UserTest.Status status);

@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
 const AUTH_COOKIE = 'accessToken';
+// Access token chỉ sống 15 phút; còn cookie này (sống bằng refresh token) nghĩa là client tự refresh được.
+const SESSION_HINT_COOKIE = 'hasSession';
 
 const PUBLIC_EXCEPTIONS = ['/certificates/verify'];
 
@@ -15,7 +17,7 @@ export default function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   if (isPublicException(pathname)) return NextResponse.next();
-  if (request.cookies.has(AUTH_COOKIE)) return NextResponse.next();
+  if (request.cookies.has(AUTH_COOKIE) || request.cookies.has(SESSION_HINT_COOKIE)) return NextResponse.next();
 
   const loginUrl = new URL('/login', request.url);
   loginUrl.searchParams.set('from', `${pathname}${search}`);

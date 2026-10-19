@@ -22,15 +22,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class JwtServiceTokenTypeTest {
 
     private final UserDetails user = User.withUsername("a@example.com").password("").authorities("ROLE_USER").build();
     private JwtService jwtService;
+    private RefreshTokenStore refreshTokenStore;
 
     @BeforeEach
     void setUp() {
-        jwtService = new JwtService();
+        refreshTokenStore = mock(RefreshTokenStore.class);
+        jwtService = new JwtService(refreshTokenStore);
         String secret = Encoders.BASE64URL.encode(Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded());
         ReflectionTestUtils.setField(jwtService, "secretKey", secret);
         ReflectionTestUtils.setField(jwtService, "jwtExpiration", 60_000L);
@@ -82,8 +86,38 @@ class JwtServiceTokenTypeTest {
     @DisplayName("extractAllClaimsFromRequest trả claims của access token")
     void extractClaimsFromRequestAcceptsAccessToken() {
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setCookies(new Cookie("accessToken", jwtService.generateToken(user, Map.of("userId", "u1"))));
+        request.setCookies(new Cookie("accessToken",
+                jwtService.generateToken(user, Map.of("userId", "u1", "fid", "f1"))));
 
         assertEquals("u1", jwtService.extractAllClaimsFromRequest(request).get("userId"));
+    }
+
+    @Test
+    @DisplayName("Access token của phiên đã thu hồi (logout / đổi mật khẩu) không còn dùng được")
+    void revokedFamilyAccessTokenIsRejected() {
+        when(refreshTokenStore.isFamilyRevoked("f1")).thenReturn(true);
+        String token = jwtService.generateToken(user, Map.of("userId", "u1", "fid", "f1"));
+
+        assertFalse(jwtService.isActiveAccessToken(jwtService.extractAllClaims(token)));
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setCookies(new Cookie("accessToken", token));
+        assertThrows(UnauthorizedException.class, () -> jwtService.extractAllClaimsFromRequest(request));
+    }
+
+    @Test
+    @DisplayName("Access token không gắn phiên (thiếu fid) bị từ chối để client refresh lấy token mới")
+    void accessTokenWithoutFamilyIsRejected() {
+        String token = jwtService.generateToken(user, Map.of("userId", "u1"));
+
+        assertFalse(jwtService.isActiveAccessToken(jwtService.extractAllClaims(token)));
+    }
+
+    @Test
+    @DisplayName("Access token của phiên còn hiệu lực được chấp nhận")
+    void activeFamilyAccessTokenIsAccepted() {
+        String token = jwtService.generateToken(user, Map.of("userId", "u1", "fid", "f1"));
+
+        assertTrue(jwtService.isActiveAccessToken(jwtService.extractAllClaims(token)));
     }
 }

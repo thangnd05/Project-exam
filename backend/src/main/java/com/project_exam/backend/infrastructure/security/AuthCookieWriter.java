@@ -16,6 +16,8 @@ import java.util.Date;
 @Component
 public class AuthCookieWriter {
 
+    public static final String SESSION_HINT_COOKIE = "hasSession";
+
     private final JwtService jwtService;
     private final boolean secure;
 
@@ -25,13 +27,16 @@ public class AuthCookieWriter {
     }
 
     public void writeTokens(HttpServletResponse response, String accessToken, String refreshToken) {
+        int refreshMaxAge = maxAgeOf(refreshToken);
         response.addHeader("Set-Cookie", accessTokenCookie(encode(accessToken), maxAgeOf(accessToken)));
-        response.addHeader("Set-Cookie", refreshTokenCookie(encode(refreshToken), maxAgeOf(refreshToken)));
+        response.addHeader("Set-Cookie", refreshTokenCookie(encode(refreshToken), refreshMaxAge));
+        response.addHeader("Set-Cookie", sessionHintCookie("1", refreshMaxAge));
     }
 
     public void clearTokens(HttpServletResponse response) {
         response.addHeader("Set-Cookie", accessTokenCookie("", 0));
         response.addHeader("Set-Cookie", refreshTokenCookie("", 0));
+        response.addHeader("Set-Cookie", sessionHintCookie("", 0));
     }
 
     private String accessTokenCookie(String value, int maxAge) {
@@ -40,6 +45,14 @@ public class AuthCookieWriter {
 
     private String refreshTokenCookie(String value, int maxAge) {
         return "refreshToken=" + value + "; HttpOnly; Path=/api/auth/refresh; Max-Age=" + maxAge + sameSiteAttr();
+    }
+
+    /**
+     * Access token chỉ sống vài phút, nên middleware Next (proxy.ts) không dựa vào cookie accessToken
+     * để biết người dùng còn phiên. Cookie này sống bằng refresh token và không chứa gì bí mật.
+     */
+    private String sessionHintCookie(String value, int maxAge) {
+        return SESSION_HINT_COOKIE + "=" + value + "; HttpOnly; Path=/; Max-Age=" + maxAge + sameSiteAttr();
     }
 
     private String sameSiteAttr() {

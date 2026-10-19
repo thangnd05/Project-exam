@@ -27,8 +27,15 @@ import {
   writeExamSessionId,
   writeExamSessionState,
 } from '@/app/utils/examStorage';
+import { serverNowMs, syncServerClock } from '@/app/utils/serverClock';
 import type { UserTestMode } from '@/app/enums';
-import type { TestPartResponse, TestResponse, UserAnswerRequest } from '@/app/types';
+import type {
+  ActiveUserTestResponse,
+  TestPartResponse,
+  TestResponse,
+  UserAnswerRequest,
+  UserAnswerResponse,
+} from '@/app/types';
 import { enrichTestWithPassageMedia } from './passageUtils';
 import { useExamFlowNavigation } from './useExamFlowNavigation';
 
@@ -40,6 +47,45 @@ type ActiveTest = Omit<TestResponse, 'testId' | 'status'> & {
 
 const PRACTICE_MODE_PARAM = 'practice' as UserTestMode;
 const AUTOSAVE_INTERVAL_MS = 60000;
+const AUTO_SUBMIT_RETRY_MS = [2000, 4000, 8000, 15000];
+const AUTO_SUBMIT_RETRY_TOAST_ID = 'auto-submit-retry';
+
+type AnswerValue = ExamUserAnswers[string];
+
+// Mất mạng / server tạm lỗi thì thử lại được; 4xx là bài đã nộp hoặc hết giờ, thử lại cũng vô ích.
+const isRetryableError = (err: unknown): boolean => {
+  const httpStatus = (err as { response?: { status?: number } } | null)?.response?.status;
+  return !httpStatus || httpStatus >= 500 || httpStatus === 408 || httpStatus === 429;
+};
+
+const toAnswersMap = (answers: UserAnswerResponse[] | null | undefined): ExamUserAnswers => {
+  const map: ExamUserAnswers = {};
+  (answers || []).forEach((a) => {
+    map[a.questionId as string] = {
+      selectedAnswerId: a.selectedAnswerId || null,
+      selectedAnswerIds: a.selectedAnswerIds || null,
+      answerText: a.answerText || null,
+    };
+  });
+  return map;
+};
+
+// Server là bản chuẩn: chỉ giữ đáp án local của những câu sửa ở máy này mà chưa lưu được lên server.
+// Bản lưu cũ không ghi lại câu nào chưa lưu, nên chỉ lấy những câu server chưa có
+// để không ghi đè đáp án mới hơn đã làm ở máy/tab khác.
+const mergeLocalAnswers = (
+  server: ExamUserAnswers,
+  local: ExamUserAnswers,
+  localDirty: string[] | null,
+): { answers: ExamUserAnswers; dirty: string[] } => {
+  const dirty = (localDirty ?? Object.keys(local).filter((qid) => !(qid in server)))
+    .filter((qid) => qid in local);
+  const answers = { ...server };
+  dirty.forEach((qid) => {
+    answers[qid] = local[qid];
+  });
+  return { answers, dirty };
+};
 
 export function useTestSession() {
   const { testId } = useParams<{ testId: string }>();
@@ -121,22 +167,52 @@ export function useTestSession() {
   const flow = useExamFlowNavigation({ visibleParts, layoutConfig });
 
   const userAnswersRef = useRef(userAnswers);
-  const pendingSinceRef = useRef<number | null>(null);
+  // Câu đã sửa nhưng server chưa xác nhận lưu. Chỉ gửi những câu này, để bản cũ còn trong
+  // localStorage không ghi đè đáp án mới hơn trên server.
+  const dirtyRef = useRef<Set<string>>(new Set());
+  const [dirtyVersion, setDirtyVersion] = useState(0);
+  const autoSubmitRetryRef = useRef<{ timer: ReturnType<typeof setTimeout> | null; attempt: number }>({
+    timer: null,
+    attempt: 0,
+  });
 
   useEffect(() => {
     userAnswersRef.current = userAnswers;
   }, [userAnswers]);
 
-  const buildAnswersPayload = useCallback((): UserAnswerRequest[] => {
-    if (!userTestId) return [];
-    return Object.entries(userAnswersRef.current).map(([qid, ans]) => ({
-      userTestId,
-      questionId: String(qid),
-      selectedAnswerId: ans?.selectedAnswerId || null,
-      selectedAnswerIds: ans?.selectedAnswerIds || null,
-      answerText: ans?.answerText || null,
-    }));
-  }, [userTestId]);
+  const replaceDirty = useCallback((questionIds: Iterable<string>) => {
+    dirtyRef.current = new Set(questionIds);
+    setDirtyVersion((v) => v + 1);
+  }, []);
+
+  // Chụp đáp án đang chờ lưu; lưu xong chỉ bỏ cờ những câu không bị sửa tiếp trong lúc chờ phản hồi.
+  const takeDirtySnapshot = useCallback((): Map<string, AnswerValue> => {
+    const snapshot = new Map<string, AnswerValue>();
+    dirtyRef.current.forEach((qid) => snapshot.set(qid, userAnswersRef.current[qid]));
+    return snapshot;
+  }, []);
+
+  const markSaved = useCallback((snapshot: Map<string, AnswerValue>) => {
+    let changed = false;
+    snapshot.forEach((ans, qid) => {
+      if (userAnswersRef.current[qid] === ans && dirtyRef.current.delete(qid)) changed = true;
+    });
+    if (changed) setDirtyVersion((v) => v + 1);
+  }, []);
+
+  const buildAnswersPayload = useCallback(
+    (snapshot: Map<string, AnswerValue>): UserAnswerRequest[] => {
+      if (!userTestId) return [];
+      return Array.from(snapshot, ([qid, ans]) => ({
+        userTestId,
+        questionId: String(qid),
+        selectedAnswerId: ans?.selectedAnswerId || null,
+        selectedAnswerIds: ans?.selectedAnswerIds || null,
+        answerText: ans?.answerText || null,
+      }));
+    },
+    [userTestId],
+  );
 
   const orderedForRef = useRef<string | null>(null);
 
@@ -166,8 +242,8 @@ export function useTestSession() {
       savedStartedAt = savedState.startedAt;
       restored = true;
 
-      // Bản local có thể mới hơn server nếu lần lưu trước thất bại.
-      if (Object.keys(savedState.userAnswers).length > 0) pendingSinceRef.current = Date.now();
+      // Tạm dùng bản local (vd. đang mất mạng); có dữ liệu server thì gộp lại bên dưới.
+      replaceDirty(savedState.dirtyQuestionIds ?? Object.keys(savedState.userAnswers));
     }
 
     const savedAttemptId = savedState?.userTestId || readExamSessionId(sessionKey) || null;
@@ -198,59 +274,63 @@ export function useTestSession() {
           return;
         }
 
-        const now = new Date();
-        const availableFrom = testData.availableFrom
-          ? new Date(testData.availableFrom)
+        // Luôn hỏi server: vừa lấy lượt đang làm, vừa lấy serverNow để đồng hồ thi chạy theo giờ server.
+        let active: ActiveUserTestResponse | null = null;
+        try {
+          const requestedAt = Date.now();
+          active = await checkActiveUserTest(testId, isGuest, guestCfg, {
+            mode: isPractice ? PRACTICE_MODE_PARAM : undefined,
+            examPartIds: isPractice ? selectedPartIds : undefined,
+          });
+          syncServerClock(active?.serverNow, requestedAt);
+        } catch (err) {
+          console.error('Failed to check in-progress attempt:', err);
+        }
+
+        const nowMs = serverNowMs();
+        const availableFromMs = testData.availableFrom
+          ? new Date(testData.availableFrom).getTime()
           : null;
-        const availableTo = testData.availableTo
-          ? new Date(testData.availableTo)
+        const availableToMs = testData.availableTo
+          ? new Date(testData.availableTo).getTime()
           : null;
 
-        if (availableFrom && now < availableFrom) {
+        if (availableFromMs !== null && nowMs < availableFromMs) {
           setStatus('locked');
-          setPreCountdown(Math.floor((availableFrom.getTime() - now.getTime()) / 1000));
+          setPreCountdown(Math.floor((availableFromMs - nowMs) / 1000));
           return;
         }
 
         let serverStartedAt: string | null = null;
-
-        const needStartedAt = !isPractice && !savedStartedAt;
-        if (!restored || needStartedAt) {
+        const activeUserTestId = active?.userTestId;
+        if (activeUserTestId) {
           try {
-            const active = await checkActiveUserTest(testId, isGuest, guestCfg, {
-              mode: isPractice ? PRACTICE_MODE_PARAM : undefined,
-              examPartIds: isPractice ? selectedPartIds : undefined,
-            });
-            const activeUserTestId = active?.userTestId;
-            if (activeUserTestId) {
-              serverStartedAt = active?.startedAt || null;
+            const serverAnswers = toAnswersMap(
+              await getAnswersByUserTest(activeUserTestId, isGuest, guestCfg),
+            );
+            const sameAttempt = savedState?.userTestId === activeUserTestId;
+            const merged = sameAttempt
+              ? mergeLocalAnswers(serverAnswers, savedState.userAnswers, savedState.dirtyQuestionIds)
+              : { answers: serverAnswers, dirty: [] };
 
-              if (!restored) {
-                const answers = await getAnswersByUserTest(
-                  activeUserTestId,
-                  isGuest,
-                  guestCfg,
-                );
-                const answersMap: ExamUserAnswers = {};
-                (answers || []).forEach((a) => {
-                  answersMap[a.questionId as string] = {
-                    selectedAnswerId: a.selectedAnswerId || null,
-                    selectedAnswerIds: a.selectedAnswerIds || null,
-                    answerText: a.answerText || null,
-                  };
-                });
-                setUserTestId(activeUserTestId);
-                setUserAnswers(answersMap);
-              }
-              writeExamSessionId(sessionKey, activeUserTestId);
-              restored = true;
+            if (savedState && !sameAttempt) {
+              // Bản local thuộc lượt làm khác (đã kết thúc): bỏ, theo lượt server đang mở.
+              setFlaggedQuestionIds([]);
+              flow.restoreStepState(0, 0);
+              savedStartedAt = null;
             }
+            setUserTestId(activeUserTestId);
+            setUserAnswers(merged.answers);
+            replaceDirty(merged.dirty);
+            serverStartedAt = active?.startedAt || null;
+            writeExamSessionId(sessionKey, activeUserTestId);
+            restored = true;
           } catch (err) {
             console.error('Failed to restore in-progress answers:', err);
           }
         }
 
-        if (availableTo && now > availableTo && !restored) {
+        if (availableToMs !== null && nowMs > availableToMs && !restored) {
           setStatus('closed');
           return;
         }
@@ -258,7 +338,8 @@ export function useTestSession() {
         if (!restored) {
           setStatus('open');
         } else {
-          setStartedAt(savedStartedAt || serverStartedAt || null);
+          // Giờ bắt đầu do server ghi nhận là chuẩn; bản local chỉ dùng khi không hỏi được server.
+          setStartedAt(serverStartedAt || savedStartedAt || null);
           setStatus('active');
         }
       })
@@ -286,11 +367,13 @@ export function useTestSession() {
         setStatus('ready');
         return;
       }
+      const requestedAt = Date.now();
       startUserTest(test.testId, isGuest, guestCfg, {
         mode: isPractice ? PRACTICE_MODE_PARAM : undefined,
         examPartIds: isPractice ? selectedPartIds : undefined,
       })
         .then(async (data) => {
+          syncServerClock(data.serverNow, requestedAt);
           if (test.shuffleQuestions && data.userTestId) {
             await applyAttemptOrder(data.userTestId).catch((err) =>
               console.error('Failed to load shuffled question order:', err),
@@ -329,6 +412,7 @@ export function useTestSession() {
         currentStepIndex: flow.currentStepIndex,
         maxStepIndex: flow.maxStepIndex,
         flaggedQuestionIds,
+        dirtyQuestionIds: Array.from(dirtyRef.current),
       });
     }
   }, [
@@ -340,36 +424,36 @@ export function useTestSession() {
     sessionKey,
     flow.currentStepIndex,
     flow.maxStepIndex,
+    dirtyVersion,
   ]);
 
   useEffect(() => {
     if (status !== 'active' || !userTestId) return undefined;
 
     const timer = setInterval(() => {
-      if (pendingSinceRef.current === null) return;
-      const payload = buildAnswersPayload();
-      if (payload.length === 0) return;
-
-      pendingSinceRef.current = null;
-      batchSaveAnswers(payload, isGuest, guestCfg).catch((err) => {
-        const httpStatus = err?.response?.status;
-        // 4xx nghĩa là bài đã nộp hoặc hết giờ, thử lại cũng vô ích.
-        if (!(httpStatus >= 400 && httpStatus < 500)) pendingSinceRef.current = Date.now();
-      });
+      if (submittingRef.current || dirtyRef.current.size === 0) return;
+      const snapshot = takeDirtySnapshot();
+      batchSaveAnswers(buildAnswersPayload(snapshot), isGuest, guestCfg)
+        .then(() => markSaved(snapshot))
+        .catch((err) => {
+          // Bài đã nộp hoặc hết giờ: không lưu được nữa, bỏ cờ để khỏi gửi lại mãi.
+          if (!isRetryableError(err)) markSaved(snapshot);
+        });
     }, AUTOSAVE_INTERVAL_MS);
 
     return () => clearInterval(timer);
-  }, [status, userTestId, isGuest, guestCfg, buildAnswersPayload]);
+  }, [status, userTestId, isGuest, guestCfg, buildAnswersPayload, takeDirtySnapshot, markSaved]);
 
   useEffect(() => {
     if (status !== 'active' || !userTestId) return undefined;
 
     const flush = () => {
-      if (submittingRef.current || pendingSinceRef.current === null) return;
-      const payload = buildAnswersPayload();
-      if (payload.length === 0) return;
-      pendingSinceRef.current = null;
-      sendAnswersOnExit(payload, isGuest, guestSessionId);
+      if (submittingRef.current || dirtyRef.current.size === 0) return;
+      const snapshot = takeDirtySnapshot();
+      // Đóng tab thì không biết kết quả; câu vẫn giữ cờ chưa lưu cho tới khi server xác nhận.
+      sendAnswersOnExit(buildAnswersPayload(snapshot), isGuest, guestSessionId).then((ok) => {
+        if (ok) markSaved(snapshot);
+      });
     };
 
     const handleVisibilityChange = () => {
@@ -382,7 +466,7 @@ export function useTestSession() {
       window.removeEventListener('pagehide', flush);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [status, userTestId, isGuest, guestSessionId, buildAnswersPayload]);
+  }, [status, userTestId, isGuest, guestSessionId, buildAnswersPayload, takeDirtySnapshot, markSaved]);
 
   useEffect(() => {
     if (status === 'locked' && preCountdown !== null) {
@@ -397,19 +481,23 @@ export function useTestSession() {
   }, [preCountdown, status]);
 
   const handleAnswerChange = (questionId: string, type: string, value: string) => {
-    if (pendingSinceRef.current === null) pendingSinceRef.current = Date.now();
-    setUserAnswers((prev) => {
-      if (type === 'MSQ') {
-        const current = prev[questionId]?.selectedAnswerIds || [];
-        const next = current.includes(value)
+    const prev = userAnswersRef.current;
+    let updatedAnswer: AnswerValue;
+    if (type === 'MSQ') {
+      const current = prev[questionId]?.selectedAnswerIds || [];
+      updatedAnswer = {
+        selectedAnswerIds: current.includes(value)
           ? current.filter((x) => x !== value)
-          : [...current, value];
-        return { ...prev, [questionId]: { selectedAnswerIds: next } };
-      }
-      const updatedAnswer =
-        type === 'MCQ' ? { selectedAnswerId: value } : { answerText: value };
-      return { ...prev, [questionId]: updatedAnswer };
-    });
+          : [...current, value],
+      };
+    } else {
+      updatedAnswer = type === 'MCQ' ? { selectedAnswerId: value } : { answerText: value };
+    }
+    // Cập nhật ref ngay (không đợi render) để markSaved so đúng với đáp án mới nhất.
+    const next = { ...prev, [questionId]: updatedAnswer };
+    userAnswersRef.current = next;
+    dirtyRef.current.add(questionId);
+    setUserAnswers(next);
   };
 
   const toggleFlag = useCallback((questionId: string) => {
@@ -418,35 +506,94 @@ export function useTestSession() {
     );
   }, []);
 
-  const handleSubmit = async () => {
-    if (!userTestId || submittingRef.current) return;
-    submittingRef.current = true;
-    setIsSubmitting(true);
+  const clearAutoSubmitRetry = () => {
+    const retry = autoSubmitRetryRef.current;
+    if (retry.timer) clearTimeout(retry.timer);
+    retry.timer = null;
+    retry.attempt = 0;
+    toast.dismiss(AUTO_SUBMIT_RETRY_TOAST_ID);
+  };
+
+  // Gọi khi đã giữ cờ submittingRef. auto = tự nộp lúc hết giờ: lỗi mạng thì tự thử lại thay vì bỏ cuộc.
+  const runSubmit = async (auto: boolean) => {
+    if (!userTestId) return;
     try {
-      pendingSinceRef.current = null;
-      const payload = buildAnswersPayload();
-      if (payload.length > 0) await batchSaveAnswers(payload, isGuest, guestCfg);
-      const result = await submitUserTest(userTestId, isGuest, guestCfg);
+      const snapshot = takeDirtySnapshot();
+      if (snapshot.size > 0) {
+        try {
+          await batchSaveAnswers(buildAnswersPayload(snapshot), isGuest, guestCfg);
+          markSaved(snapshot);
+        } catch (err) {
+          // 4xx (hết giờ / đã nộp): đáp án không lưu thêm được nữa, vẫn nộp để chốt bài với phần đã lưu.
+          if (isRetryableError(err)) throw err;
+        }
+      }
+      await submitUserTest(userTestId, isGuest, guestCfg);
+      clearAutoSubmitRetry();
       clearExamSession(sessionKey);
       if (!isGuest) refreshStreak();
       invalidateAfterSubmit();
       router.push(`/tests/result/${userTestId}`);
     } catch (err: any) {
       if (err?.response?.status === 409) {
+        clearAutoSubmitRetry();
         clearExamSession(sessionKey);
         invalidateAfterSubmit();
         router.push(`/tests/result/${userTestId}`);
         return;
       }
+      if (auto && isRetryableError(err)) {
+        const retry = autoSubmitRetryRef.current;
+        const delay = AUTO_SUBMIT_RETRY_MS[Math.min(retry.attempt, AUTO_SUBMIT_RETRY_MS.length - 1)];
+        retry.attempt += 1;
+        toast.warning('Mất kết nối khi nộp bài. Đang tự thử nộp lại, đừng đóng trang...', {
+          toastId: AUTO_SUBMIT_RETRY_TOAST_ID,
+          autoClose: false,
+        });
+        // Vẫn giữ trạng thái đang nộp để người dùng không sửa / bấm nộp chồng lên.
+        retry.timer = setTimeout(() => {
+          retry.timer = null;
+          void runSubmitRef.current?.(true);
+        }, delay);
+        return;
+      }
+      clearAutoSubmitRetry();
       toast.error(getApiErrorMessage(err, 'Nộp bài thất bại! Vui lòng thử lại.'));
-    } finally {
-      submittingRef.current = false;
-      setIsSubmitting(false);
     }
+    submittingRef.current = false;
+    setIsSubmitting(false);
   };
 
-  const handleSubmitRef = useRef<(() => Promise<void>) | undefined>(undefined);
-  handleSubmitRef.current = handleSubmit;
+  const runSubmitRef = useRef<((auto: boolean) => Promise<void>) | undefined>(undefined);
+  runSubmitRef.current = runSubmit;
+
+  const startSubmit = async (auto: boolean) => {
+    if (!userTestId || submittingRef.current) return;
+    submittingRef.current = true;
+    setIsSubmitting(true);
+    await runSubmit(auto);
+  };
+
+  const handleSubmit = () => startSubmit(false);
+
+  const autoSubmitRef = useRef<(() => Promise<void>) | undefined>(undefined);
+  autoSubmitRef.current = () => startSubmit(true);
+
+  // Có mạng lại thì nộp ngay, không chờ hết lượt chờ.
+  useEffect(() => {
+    const retry = autoSubmitRetryRef.current;
+    const handleOnline = () => {
+      if (!retry.timer) return;
+      clearTimeout(retry.timer);
+      retry.timer = null;
+      void runSubmitRef.current?.(true);
+    };
+    window.addEventListener('online', handleOnline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      if (retry.timer) clearTimeout(retry.timer);
+    };
+  }, []);
 
   const deadline = useMemo(() => {
     if (isPractice || !startedAt) return null;
@@ -468,11 +615,12 @@ export function useTestSession() {
     }
 
     const tick = () => {
-      const remaining = Math.max(0, Math.round((deadline - Date.now()) / 1000));
+      // So với giờ server, không phải giờ máy người dùng (có thể chạy nhanh/chậm).
+      const remaining = Math.max(0, Math.round((deadline - serverNowMs()) / 1000));
       setTimeLeft(remaining);
       if (remaining <= 0) {
         clearInterval(timer);
-        if (!submittingRef.current) handleSubmitRef.current?.();
+        if (!submittingRef.current) autoSubmitRef.current?.();
       }
     };
     tick();

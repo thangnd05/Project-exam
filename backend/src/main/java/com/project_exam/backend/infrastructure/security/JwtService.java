@@ -37,6 +37,11 @@ public class JwtService {
 
     private SecretKey cachedSigningKey;
     private UserRepository userRepository;
+    private final RefreshTokenStore refreshTokenStore;
+
+    public JwtService(RefreshTokenStore refreshTokenStore) {
+        this.refreshTokenStore = refreshTokenStore;
+    }
 
     @PostConstruct
     private void init() {
@@ -125,6 +130,18 @@ public class JwtService {
         return claims != null && !isRefreshClaims(claims);
     }
 
+    /**
+     * Access token dùng được để xác thực: không phải refresh token và gắn với một phiên (fid) chưa bị thu hồi.
+     * Token không có fid (cấp từ bản cũ) bị từ chối, client tự gọi /api/auth/refresh để lấy token mới.
+     */
+    public boolean isActiveAccessToken(Claims claims) {
+        if (claims == null || isRefreshClaims(claims)) {
+            return false;
+        }
+        Object fid = claims.get("fid");
+        return fid != null && !refreshTokenStore.isFamilyRevoked(fid.toString());
+    }
+
     private boolean isRefreshClaims(Claims claims) {
         return REFRESH_TOKEN_TYPE.equals(claims.get(TOKEN_TYPE_CLAIM));
     }
@@ -178,7 +195,7 @@ public String resolveToken(HttpServletRequest request) {
         } catch (Exception e) {
             throw new UnauthorizedException("Token không hợp lệ hoặc đã hết hạn.");
         }
-        if (claims == null || isRefreshClaims(claims)) {
+        if (!isActiveAccessToken(claims)) {
             throw new UnauthorizedException("Token không hợp lệ hoặc đã hết hạn.");
         }
         return claims;

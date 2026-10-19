@@ -1,5 +1,6 @@
 package com.project_exam.backend.infrastructure.security;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -50,10 +51,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token)) {
             try {
                 token = URLDecoder.decode(token, StandardCharsets.UTF_8);
-                String username = jwtService.extractUsername(token);
+                Claims claims = jwtService.extractAllClaims(token);
+                String username = claims.getSubject();
 
+                // Token của phiên đã đăng xuất / đổi mật khẩu bị bỏ qua dù chữ ký và hạn vẫn hợp lệ.
                 if (username != null
-                        && jwtService.isAccessToken(token)
+                        && jwtService.isActiveAccessToken(claims)
                         && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByEmail(username);
                     if (jwtService.isTokenValid(token, userDetails)) {
