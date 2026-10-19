@@ -5,8 +5,8 @@ import { getExamTypes } from '@/app/apis/examTypeApi';
 import { getQuestionCollections } from '@/app/apis/questionCollectionApi';
 import { getExamPartsByExamType } from '@/app/apis/examPartApi';
 import { getTagsFlatByExamType } from '@/app/apis/tagApi';
-import { sortByPartOrder } from '../utils/partOrder';
-import { EMPTY_LIST } from '../utils/stableEmpty';
+import { sortByPartOrder } from '@/app/utils/partOrder';
+import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 const normalizeList = (payload: any): any[] => {
     if (Array.isArray(payload)) {

@@ -24,7 +24,7 @@ import TestModeModal from '@/app/components/tests/TestModeModal/TestModeModal';
 import type { TestModeSelection } from '@/app/components/tests/TestModeModal/TestModeModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { useAuth } from '@/app/hooks/useAuth';
-import { useGuestAllowedCategories } from '@/app/hooks/useGuestAllowedCategories';
+import { useGuestAllowedCategories } from '@/app/components/tests/TestCard/hooks/useGuestAllowedCategories';
 import { buildLoginUrl } from '@/app/utils/authRedirect';
 import type { TestResponse } from '@/app/types';
 

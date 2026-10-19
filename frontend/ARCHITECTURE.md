@@ -12,6 +12,23 @@ nâng lên `app/components` / `app/hooks` / `app/utils`.
 Thang bậc tái sử dụng: `_components/` của route → `app/components/` → (nếu sau này tách
 package dùng chung nhiều app thì mới tính tiếp).
 
+Hook đi theo cùng thang đó, đặt ở nơi **gần nhất** chứa đủ mọi chỗ dùng nó:
+
+1. Chỉ một route (hoặc một nhánh route) dùng → `_hooks/` của route/nhánh đó
+   (vd. `(admin)/admin/_hooks/useAdminCrud.ts` cho mọi trang quản trị).
+2. Chỉ một component dùng chung dùng → `hooks/` trong thư mục component đó
+   (vd. `components/CreatePostModal/hooks/useSavePost.ts`).
+3. Hook nghiệp vụ của một domain, dùng ở nhiều route/nhóm route → `components/<domain>/hooks/`
+   (vd. `components/learning-plans/hooks/usePlanDetail.ts`). Route group tách một domain ra
+   nhiều nhánh (`(guest)/my-target` và `(user)/my-target`) nên domain không có route nào làm
+   "nhà" chung - thư mục domain trong `components/` đóng vai trò đó.
+   Hook đọc context của một domain cũng theo domain đó (vd. `useStreak` nằm ở
+   `components/gamification/streak/hooks/`), dù context vẫn khai ở `app/contexts/`.
+4. Chỉ hạ tầng không thuộc domain nào mới vào `app/hooks/`: người dùng hiện tại và quyền
+   (`useAuth`, `usePermission`), tiện ích thuần (`useDebouncedValue`, `useMounted`), state trên URL (`useSearchParamsState`, `useExamParam`), và phần đọc của danh
+   mục loại đề mà mọi nhóm route đều dùng (`useExamTypes`, `examTypeKeys`). Phần CRUD của danh
+   mục đó thuộc trang admin (`(admin)/admin/exam-types/_hooks/`).
+
 ## 2. Cấu trúc thư mục
 
 ```
@@ -32,10 +49,12 @@ frontend/
       admin/                    #   adminKit (AdminTable, StatCard, AdminTabs...) + widget analytics
       tests/  exam-layout/      #   thành phần đề thi & engine layout làm bài
       gamification/  learning-plans/  modal/  Button/  ...
+      <domain>/hooks/           #   hook nghiệp vụ theo domain: learning-plans, tests, my-target,
+                                #   certificates, classes, posts, auth, gamification/<x>
+    hooks/                      # chỉ hook hạ tầng không thuộc domain nào (xem mục 1)
     configs/                    # Routes.ts, permissions.ts, adminPermissions.ts, queryClient.ts
     contexts/                   # Auth/Coin/Cosmetic/Streak context
     enums/                      # enum mirror backend (QuestionType, TestStatus, ...)
-    hooks/                      # hook dùng chung ≥2 route
     types/                      # interface mirror DTO backend, theo domain + index.ts barrel
     utils/                      # hàm thuần dùng chung
     constants/ helpers/ interfaces/   # placeholder theo chuẩn, dùng khi cần
@@ -81,6 +100,9 @@ mang tên nó, không còn hàng chục `index.js` trùng tên như cấu trúc 
 |---|---|
 | Component/hook chỉ một trang dùng | `_components/`, `_hooks/` ngay trong thư mục trang |
 | Component dùng ≥2 nơi | `app/components/` (mỗi component một thư mục, không có barrel) |
+| Hook nghiệp vụ dùng ≥2 nơi | `app/components/<domain>/hooks/` |
+| Hook chỉ khu admin dùng (vd. `useAdminCrud`) | `app/(admin)/admin/_hooks/` |
+| Hook hạ tầng (user hiện tại, quyền, util, URL state) | `app/hooks/` (không có barrel) |
 | Hàm gọi API | `app/apis/<tên>Api.ts` |
 | Kiểu dữ liệu backend trả về | `app/types/` |
 | Màu, biến CSS | `app/assets/styles/GlobalStyles/` |

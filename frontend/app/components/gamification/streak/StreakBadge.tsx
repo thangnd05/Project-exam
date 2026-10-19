@@ -3,7 +3,7 @@
 import { useId, useState } from 'react';
 import classNames from 'classnames/bind';
 import style from './StreakBadge.module.scss';
-import { useStreak } from '@/app/hooks/useStreak';
+import { useStreak } from '@/app/components/gamification/streak/hooks/useStreak';
 import StreakRestoreModal from './StreakRestoreModal';
 
 const cx = classNames.bind(style);

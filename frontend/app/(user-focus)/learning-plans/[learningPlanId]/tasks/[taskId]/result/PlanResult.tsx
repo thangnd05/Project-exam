@@ -7,7 +7,7 @@ import PlanCongratsModal, { markCongratsSeen } from '@/app/components/learning-p
 import PlanResultView from '@/app/components/learning-plans/PlanResultView/PlanResultView';
 import { toPlanResult } from '@/app/utils/planResult';
 import { usePlanResult } from './_hooks/usePlanResult';
-import { usePlanDetail } from '@/app/hooks/usePlanDetail';
+import { usePlanDetail } from '@/app/components/learning-plans/hooks/usePlanDetail';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { PlanStage } from '@/app/enums';
 

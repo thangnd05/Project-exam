@@ -8,7 +8,7 @@ import {
   updateCoinBalance,
 } from '@/app/apis/coinApi';
 import { getUsers } from '@/app/apis/userApi';
-import { useAdminCrud } from '@/app/hooks/useAdminCrud';
+import { useAdminCrud } from '@/app/(admin)/admin/_hooks/useAdminCrud';
 import type { CoinWalletResponse, PageResponse, UserResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 

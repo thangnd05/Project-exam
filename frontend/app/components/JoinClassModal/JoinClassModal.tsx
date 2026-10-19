@@ -4,7 +4,7 @@ import { buildLoginUrlFromHere } from '@/app/utils/authRedirect';
 import { useRouter } from 'next/navigation';
 import { useState } from "react";
 import { Alert } from "react-bootstrap";
-import { useJoinClass } from '@/app/hooks/useMyClasses';
+import { useJoinClass } from '@/app/components/classes/hooks/useMyClasses';
 import classNames from "classnames/bind";
 import { FaKey, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "@/app/hooks/useAuth";

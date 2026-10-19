@@ -8,9 +8,15 @@ import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
 import { sortPartsByLookup } from '@/app/utils/partOrder';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
+import {
+  examTypeIdFromParams,
+  setExamParam,
+  useNormalizeExamParam,
+  withExam,
+} from '@/app/hooks/useExamParam';
 import MockHistoryPanel from './_components/MockHistoryPanel';
 import TargetDashboardPartChart, { type PartChartRow } from './_components/TargetDashboardPartChart';
-import { useTargetDashboard } from '@/app/hooks/useTargetDashboard';
+import { useTargetDashboard } from '@/app/components/my-target/hooks/useTargetDashboard';
 import { getReadinessClassName, getReadinessLabel } from '@/app/utils/readiness-label';
 import { LearningPlanStatus } from '@/app/enums';
 import pageStyles from './TargetDashboard.module.scss';
@@ -21,7 +27,8 @@ const pageCx = classNamesBind.bind(pageStyles);
 
 function TargetDashboard() {
   const [searchParams, setSearchParams] = useSearchParamsState();
-  const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
+  // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ở effect dưới.
+  const [examTypeId, setExamTypeId] = useState('');
 
   const {
     examTypes,
@@ -34,11 +41,13 @@ function TargetDashboard() {
     error,
   } = useTargetDashboard(examTypeId);
 
+  useNormalizeExamParam(examTypes);
+
   useEffect(() => {
     if (!examTypeId && examTypes.length > 0) {
-      setExamTypeId(examTypes[0].examTypeId);
+      setExamTypeId(examTypeIdFromParams(searchParams, examTypes) || examTypes[0].examTypeId);
     }
-  }, [examTypes, examTypeId]);
+  }, [examTypes, examTypeId, searchParams]);
 
   const activePlan = useMemo(
     () => (plans || []).find((p) => p.status === LearningPlanStatus.ACTIVE) || null,
@@ -96,7 +105,7 @@ function TargetDashboard() {
 
   return (
     <div className={cx('wrapper')}>
-      <TargetPlanTabs active="overview" examTypeId={examTypeId} />
+      <TargetPlanTabs active="overview" examTypeId={examTypeId} examTypes={examTypes} />
       <div className={cx('headerBar')}>
         <h2 className={cx('title')}>Tổng quan mục tiêu</h2>
       </div>
@@ -109,7 +118,7 @@ function TargetDashboard() {
             value={examTypeId}
             onChange={(e) => {
               setExamTypeId(e.target.value);
-              setSearchParams({ examTypeId: e.target.value });
+              setSearchParams(setExamParam(new URLSearchParams(), e.target.value, examTypes));
             }}
           >
             {examTypes.map((et) => (
@@ -127,7 +136,7 @@ function TargetDashboard() {
       {!loading && !target?.hasTarget && examTypeId && (
         <div className={cx('alert', 'alertInfo')}>
           <span>Bạn chưa đặt mục tiêu cho kỳ thi này.</span>
-          <ButtonPrime as="link" href={`/my-target?examTypeId=${examTypeId}`} variant="primary" size="sm">
+          <ButtonPrime as="link" href={withExam('/my-target', examTypeId, examTypes)} variant="primary" size="sm">
             Đặt mục tiêu
           </ButtonPrime>
         </div>
@@ -145,7 +154,7 @@ function TargetDashboard() {
               </p>
               <ButtonPrime
                 as="link"
-                href={`/my-target/achieved?examTypeId=${examTypeId}`}
+                href={withExam('/my-target/achieved', examTypeId, examTypes)}
                 variant="success"
                 size="sm"
               >

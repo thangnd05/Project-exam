@@ -11,7 +11,7 @@ import classNames from 'classnames/bind';
 import styles from './MobileBottomNav.module.scss';
 import routes from '@/app/configs/Routes';
 import {useAuth} from '@/app/hooks/useAuth';
-import {useCosmetics} from '@/app/hooks/useCosmetics';
+import {useCosmetics} from '@/app/components/gamification/cosmetic/hooks/useCosmetics';
 import images from '@/app/assets/images';
 // import JoinClassModal from '@/app/components/JoinClassModal/JoinClassModal';
 // import CreateClassModal from '@/app/components/CreateClassModal/CreateClassModal';
@@ -19,7 +19,7 @@ import CreateTestModal from '@/app/components/tests/CreateTestModal';
 import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
-import {useStreak} from '@/app/hooks/useStreak';
+import {useStreak} from '@/app/components/gamification/streak/hooks/useStreak';
 import { FaGraduationCap, FaHouse, FaPlus, FaRoute, FaUser, FaXmark } from 'react-icons/fa6';
 
 const cx = classNames.bind(styles);

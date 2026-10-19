@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { resyncPlan } from '@/app/apis/learningPlanApi';
 import type { PlanResponse } from '@/app/types';
-import { invalidatePlanQueries } from '@/app/hooks/plan-cache';
+import { invalidatePlanQueries } from '@/app/components/learning-plans/hooks/plan-cache';
 
 type UseResyncPlanOptions = {
   onSuccess?: (data: PlanResponse, ...rest: unknown[]) => void;

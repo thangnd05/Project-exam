@@ -22,8 +22,8 @@ import StreakBadge from '@/app/components/gamification/streak/StreakBadge';
 import CoinQuestMenu from '@/app/components/gamification/coin/CoinQuestMenu';
 import FirstTimeHint from '@/app/components/gamification/onboarding/FirstTimeHint';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
-import {useCosmetics} from '@/app/hooks/useCosmetics';
-import {useStreak} from '@/app/hooks/useStreak';
+import {useCosmetics} from '@/app/components/gamification/cosmetic/hooks/useCosmetics';
+import {useStreak} from '@/app/components/gamification/streak/hooks/useStreak';
 
 const cx = classNames.bind(style);
 

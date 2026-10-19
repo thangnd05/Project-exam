@@ -10,7 +10,8 @@ import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import { useLearningPlanList } from '../_hooks/useLearningPlanList';
 import { useDeletePlan } from '../_hooks/useDeletePlan';
 import { useSwitchPlan } from '../_hooks/useSwitchPlan';
-import { useResyncPlan } from '@/app/hooks/useResyncPlan';
+import { useResyncPlan } from '@/app/components/learning-plans/hooks/useResyncPlan';
+import { withExam } from '@/app/hooks/useExamParam';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import {
   buildResyncMessage,
@@ -137,9 +138,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
 
   const currentFilter = isControlled ? examTypeId : filterExamTypeId;
 
-  const compareHref = currentFilter
-    ? `/learning-plans/compare?examTypeId=${currentFilter}`
-    : '/learning-plans/compare';
+  const compareHref = withExam('/learning-plans/compare', currentFilter, examTypes);
 
   const countSubtitle = loading
     ? 'Đang tải...'

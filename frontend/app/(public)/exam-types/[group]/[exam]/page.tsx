@@ -12,5 +12,5 @@ export async function generateMetadata({ params }: Props) {
 export default async function Page({ params }: Props) {
   const { group, exam } = await params;
   const examType = await requireExamType([group, exam]);
-  return <TestByExamType examTypeId={examType.examTypeId} />;
+  return <TestByExamType examTypeId={examType.examTypeId} examSlug={examType.slug} />;
 }

@@ -16,7 +16,8 @@ import {
 } from 'lucide-react';
 import classNames from 'classnames/bind';
 
-import {useExamTypeById, useOwnExamTypeLayout, useUpdateExamTypeLayout} from '@/app/hooks/useExamTypes';
+import {useExamTypeById} from '@/app/hooks/useExamTypes';
+import {useOwnExamTypeLayout, useUpdateExamTypeLayout} from '@/app/(admin)/admin/exam-types/_hooks/useAdminExamTypes';
 import { resolveLayoutConfig } from '@/app/components/exam-layout/resolveLayoutConfig';
 import {
   defaultLayoutConfig,

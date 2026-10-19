@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
+import { examTypeIdFromParams, setExamParam, useNormalizeExamParam } from '@/app/hooks/useExamParam';
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
@@ -23,7 +24,7 @@ import {
   useGeneratePlanMutation,
   useGenerateSyllabusPlanMutation,
   useUserTarget,
-} from '@/app/hooks/useGeneratePlan';
+} from '@/app/components/learning-plans/hooks/useGeneratePlan';
 
 type PlanSource = 'DIAGNOSIS' | 'SYLLABUS';
 
@@ -52,15 +53,14 @@ function GeneratePlan() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PlanResponse | null>(null);
 
-  const [sourceExamTypeId, setSourceExamTypeId] = useState(
-    searchParams.get('examTypeId') || '',
-  );
-  const [filterExamTypeId, setFilterExamTypeId] = useState(
-    searchParams.get('examTypeId') || '',
-  );
+  // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ở effect dưới.
+  const [sourceExamTypeId, setSourceExamTypeId] = useState('');
+  const [filterExamTypeId, setFilterExamTypeId] = useState('');
   const [listRefreshKey, setListRefreshKey] = useState(0);
 
   const { examTypes } = useExamTypes();
+  const examTypeIdFromUrl = examTypeIdFromParams(searchParams, examTypes);
+  useNormalizeExamParam(examTypes);
 
   const {
     userTests,
@@ -88,12 +88,11 @@ function GeneratePlan() {
 
   useEffect(() => {
     if (!sourceExamTypeId && examTypes.length > 0) {
-      const fromUrl = searchParams.get('examTypeId');
-      const initial = fromUrl || examTypes[0].examTypeId;
+      const initial = examTypeIdFromUrl || examTypes[0].examTypeId;
       setSourceExamTypeId(initial);
       setFilterExamTypeId(initial);
     }
-  }, [examTypes, sourceExamTypeId]);
+  }, [examTypes, sourceExamTypeId, examTypeIdFromUrl]);
 
   const filteredUserTests = useMemo(() => {
     if (!sourceExamTypeId) return userTests;
@@ -140,12 +139,7 @@ function GeneratePlan() {
     setSourceExamTypeId(nextId);
     setFilterExamTypeId(nextId);
     setUserTestId('');
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (nextId) next.set('examTypeId', nextId);
-      else next.delete('examTypeId');
-      return next;
-    });
+    setSearchParams((prev) => setExamParam(prev, nextId, examTypes));
   };
 
   const sourceExamTypeName = useMemo(
@@ -207,7 +201,7 @@ function GeneratePlan() {
 
   return (
     <div className={cx('wrapper')}>
-      <TargetPlanTabs active="plan" examTypeId={sourceExamTypeId} />
+      <TargetPlanTabs active="plan" examTypeId={sourceExamTypeId} examTypes={examTypes} />
       <div className={cx('headerBar')}>
         <h2 className={cx('title')}>Sinh lộ trình vượt ải</h2>
       </div>
@@ -457,7 +451,7 @@ function GeneratePlan() {
         allowAllInFilter
         examTypeId={filterExamTypeId}
         onExamTypeIdChange={setFilterExamTypeId}
-        initialExamTypeId={searchParams.get('examTypeId') || ''}
+        initialExamTypeId={examTypeIdFromUrl}
         refreshKey={listRefreshKey}
         showExamTypeBadge
         title="Lộ trình đã sinh"

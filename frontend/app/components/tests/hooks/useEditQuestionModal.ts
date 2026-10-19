@@ -5,9 +5,9 @@ import { toast } from 'react-toastify';
 import { getQuestionById } from '@/app/apis/questionApi';
 import { getExamPartById } from '@/app/apis/examPartApi';
 import { getTagsFlatByExamType } from '@/app/apis/tagApi';
-import { useQuestionCollections } from '@/app/hooks/useQuestionCollections';
-import { useUpdateQuestion } from '@/app/hooks/useUpdateQuestion';
-import { useDeletePassageMedia } from '@/app/hooks/useDeletePassageMedia';
+import { useQuestionCollections } from '@/app/components/tests/hooks/useQuestionCollections';
+import { useUpdateQuestion } from '@/app/components/tests/hooks/useUpdateQuestion';
+import { useDeletePassageMedia } from '@/app/components/tests/hooks/useDeletePassageMedia';
 import { QuestionType, QuestionUsageScope } from '@/app/enums';
 import {
   getExtraTextContents,

@@ -5,7 +5,7 @@ import {Spinner, Alert} from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {toast} from 'react-toastify';
-import {useQuestionDetail} from '@/app/hooks/useQuestionDetail';
+import {useQuestionDetail} from '@/app/components/tests/hooks/useQuestionDetail';
 import classNames from 'classnames/bind';
 import {
   CheckCircle,

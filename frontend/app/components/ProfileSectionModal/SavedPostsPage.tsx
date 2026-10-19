@@ -10,7 +10,7 @@ import { IoEyeOutline, IoHeartOutline, IoChatbubbleOutline, IoBookmarkOutline, I
 import { toast } from 'react-toastify';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import routes from '@/app/configs/Routes';
-import { useSavedPosts, useUnsavePost } from '@/app/hooks/useSavedPosts';
+import { useSavedPosts, useUnsavePost } from '@/app/components/posts/hooks/useSavedPosts';
 import type { PostSummaryResponse } from '@/app/types';
 import styles from './PostsListPage.module.scss';
 

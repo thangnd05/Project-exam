@@ -7,7 +7,7 @@ import { IoBookOutline, IoChevronDownOutline, IoChevronUpOutline } from 'react-i
 import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import type { NormalQuestionRequest, PassageQuestionGroupRequest } from '@/app/types';
-import type { DraftQuestion } from '@/app/hooks/useCreateTest';
+import type { DraftQuestion } from '@/app/components/tests/creator/hooks/useCreateTest';
 import Pager, { PAGE_SIZE, pageCountOf } from './Pager';
 import QuestionBlock from './QuestionBlock';
 import { TAG_STATUS_LABEL, previewTagStatus, resolveQuestionTags, shortTag } from './tagStatus';

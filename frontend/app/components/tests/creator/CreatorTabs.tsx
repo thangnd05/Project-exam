@@ -2,8 +2,8 @@
 
 import classNames from 'classnames/bind';
 import styles from '../CreateTestModal.module.scss';
-import { CREATOR_TYPES } from '@/app/hooks/useCreateTest';
-import type { CreatorType } from '@/app/hooks/useCreateTest';
+import { CREATOR_TYPES } from '@/app/components/tests/creator/hooks/useCreateTest';
+import type { CreatorType } from '@/app/components/tests/creator/hooks/useCreateTest';
 
 const cx = classNames.bind(styles);
 

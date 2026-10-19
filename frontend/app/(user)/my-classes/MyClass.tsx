@@ -16,7 +16,7 @@ import {
   myClassesKeys,
   useMyClasses,
   useDeleteClass,
-} from '@/app/hooks/useMyClasses';
+} from '@/app/components/classes/hooks/useMyClasses';
 import type { ClassStudentResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);

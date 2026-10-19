@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deleteQuestion } from '@/app/apis/questionApi';
-import { questionDetailKeys } from '@/app/hooks/useQuestionDetail';
+import { questionDetailKeys } from '@/app/components/tests/hooks/useQuestionDetail';
 
 type UseDeleteQuestionOptions = {
   onSuccess?: (data: void, questionId: string, context: unknown) => void;

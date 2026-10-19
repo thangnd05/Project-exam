@@ -25,7 +25,7 @@ import {
   IoSchoolOutline,
   IoFilterOutline,
 } from 'react-icons/io5';
-import { useBaseMetaData } from '@/app/hooks/useBaseMetaData';
+import { useBaseMetaData } from '@/app/components/tests/creator/hooks/useBaseMetaData';
 import { durationMinutesFromExamType } from '@/app/hooks/useExamTypes';
 import { useHasPermission } from '@/app/hooks/usePermission';
 import { brandColors } from '@/app/assets/styles/brandColors';
@@ -33,14 +33,14 @@ import CoinPriceField from '@/app/components/tests/CoinPriceField';
 import { getQuestionDisplayNumber } from '@/app/utils/questionNumber';
 import EditQuestionModal from '@/app/components/tests/EditQuestionModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import { useExamCategories } from '@/app/hooks/useExamCategories';
+import { useExamCategories } from '@/app/components/tests/creator/hooks/useExamCategories';
 import {
   useBankTestBuilder,
   SELECTION_MODES,
   defaultPartConfig,
   groupQuestionsByPassage,
-} from '@/app/hooks/useBankTestBuilder';
-import type { BankLoadParams, BankQuestion, PartConfig } from '@/app/hooks/useBankTestBuilder';
+} from '@/app/components/tests/creator/hooks/useBankTestBuilder';
+import type { BankLoadParams, BankQuestion, PartConfig } from '@/app/components/tests/creator/hooks/useBankTestBuilder';
 import { PermissionCode, QuestionBankScope, QuestionUsageScope } from '@/app/enums';
 import type { CreateTestRequest } from '@/app/types';
 import type { CreateTestMode } from './CreateTestFormBody';

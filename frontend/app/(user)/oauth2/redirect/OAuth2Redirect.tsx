@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuth } from '@/app/hooks/useAuth';
-import { fetchCurrentUser } from '@/app/hooks/useAuthActions';
+import { fetchCurrentUser } from '@/app/components/auth/hooks/useAuthActions';
 import { claimGuestAfterLogin, takeOAuthRedirect } from '@/app/utils/authRedirect';
 
 // Quá thời gian này mà chưa lấy được tài khoản thì trả về trang đăng nhập, không để người dùng đứng chờ mãi.

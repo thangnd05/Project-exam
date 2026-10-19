@@ -5,6 +5,8 @@ import classNames from 'classnames/bind';
 import { useQuery } from '@tanstack/react-query';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import { useAuth } from '@/app/hooks/useAuth';
+import { withExam } from '@/app/hooks/useExamParam';
+import type { ExamTypeResponse } from '@/app/types/exam-type';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
 const cx = classNames.bind(styles);
@@ -19,10 +21,11 @@ const TABS = [
 type TargetPlanTabsProps = {
   active?: 'target' | 'plan' | 'compare' | 'overview';
   examTypeId?: string | null;
+  /** Danh sách kỳ thi của trang, để link tab mang slug (?exam=saa-c03) thay vì id. */
+  examTypes?: readonly ExamTypeResponse[];
 };
 
-function TargetPlanTabs({ active, examTypeId }: TargetPlanTabsProps) {
-  const qs = examTypeId ? `?examTypeId=${encodeURIComponent(examTypeId)}` : '';
+function TargetPlanTabs({ active, examTypeId, examTypes }: TargetPlanTabsProps) {
   const { isAuthenticated } = useAuth();
 
   // Chưa có ít nhất 2 lộ trình thì chưa có gì để so sánh, ẩn tab cho đỡ rối.
@@ -41,7 +44,7 @@ function TargetPlanTabs({ active, examTypeId }: TargetPlanTabsProps) {
       {tabs.map((tab) => (
         <Link
           key={tab.key}
-          href={`${tab.path}${qs}`}
+          href={withExam(tab.path, examTypeId, examTypes)}
           className={cx('pageTab', { active: tab.key === active })}
           aria-current={tab.key === active ? 'page' : undefined}
         >

@@ -145,7 +145,7 @@ public class UserTestService {
         Test test = testRepository.findById(userTest.getTestId())
                 .orElseThrow(() -> new NotFoundException("Test not found"));
 
-        Instant deadline = AttemptTimeUtil.deadline(userTest, test.getDurationMinutes());
+        Instant deadline = AttemptTimeUtil.deadline(userTest, test);
         userTest.setFinishedAt(deadline != null && now.isAfter(deadline) ? deadline : now);
         userTest.setStatus(UserTest.Status.COMPLETED);
 
@@ -185,10 +185,8 @@ public class UserTestService {
         if (userTest == null || userTest.getStatus() != UserTest.Status.IN_PROGRESS) {
             return false;
         }
-        Integer durationMinutes = testRepository.findById(userTest.getTestId())
-                .map(Test::getDurationMinutes)
-                .orElse(null);
-        if (!AttemptTimeUtil.isExpired(userTest, durationMinutes, Instant.now())) {
+        Test test = testRepository.findById(userTest.getTestId()).orElse(null);
+        if (!AttemptTimeUtil.isExpired(userTest, test, Instant.now())) {
             return false;
         }
         finalizeAttempt(userTest, Instant.now());
@@ -649,6 +647,7 @@ public class UserTestService {
         List<UserTest> candidates = userTestRepository.findStaleTimedAttempts(
                 UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE,
                 now.minus(Duration.ofHours(staleAfterHours)),
+                now.minusSeconds(AttemptTimeUtil.GRACE_SECONDS),
                 org.springframework.data.domain.PageRequest.of(0, batchSize));
 
         int finalized = 0;

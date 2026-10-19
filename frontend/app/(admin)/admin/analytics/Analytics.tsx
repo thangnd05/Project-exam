@@ -14,7 +14,7 @@ import {
     useMonthlyPerformance,
     useContentInsights,
     useTrafficLocations,
-} from '@/app/hooks/useDashboardStats';
+} from '@/app/(admin)/admin/_hooks/useDashboardStats';
 
 import styles from './Analytics.module.scss';
 

@@ -6,10 +6,10 @@ import {
   deleteUserTarget,
 } from '@/app/apis/userTargetApi';
 import type { UserTargetRequest } from '@/app/types';
-import { targetDashboardKeys } from '@/app/hooks/useTargetDashboard';
-import { targetAchievedKeys } from '@/app/hooks/useTargetAchieved';
-import { generatePlanKeys } from '@/app/hooks/useGeneratePlan';
-import { invalidatePlanQueries } from '@/app/hooks/plan-cache';
+import { targetDashboardKeys } from '@/app/components/my-target/hooks/useTargetDashboard';
+import { targetAchievedKeys } from '@/app/components/my-target/hooks/useTargetAchieved';
+import { generatePlanKeys } from '@/app/components/learning-plans/hooks/useGeneratePlan';
+import { invalidatePlanQueries } from '@/app/components/learning-plans/hooks/plan-cache';
 
 type MutationCallbacks = {
   onSuccess?: (...args: any[]) => void;

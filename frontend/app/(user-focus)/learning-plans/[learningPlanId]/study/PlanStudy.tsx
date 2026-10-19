@@ -11,7 +11,7 @@ import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { getRecoveryResourceLinkProps } from '@/app/utils/recoveryResource';
 import { getApiBaseUrl, getFullMediaUrl } from '@/app/utils/mediaUrl';
-import { useStreak } from '@/app/hooks/useStreak';
+import { useStreak } from '@/app/components/gamification/streak/hooks/useStreak';
 import { useStreakRestoreGate } from '@/app/components/gamification/streak/hooks/useStreakRestoreGate';
 import StreakRestoreModal from '@/app/components/gamification/streak/StreakRestoreModal';
 import PlanPartTaskList from '@/app/components/learning-plans/PlanPartTaskList/PlanPartTaskList';

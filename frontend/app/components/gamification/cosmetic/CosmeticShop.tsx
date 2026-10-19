@@ -7,7 +7,7 @@ import classNames from 'classnames/bind';
 import { CircleDollarSign, Check } from 'lucide-react';
 
 import { getCosmeticShop } from '@/app/apis/cosmeticApi';
-import { useCoins } from '@/app/hooks/useCoins';
+import { useCoins } from '@/app/components/gamification/coin/hooks/useCoins';
 import { useBuyCosmetic, useEquipCosmetic, useUnequipCosmetic } from '@/app/components/gamification/cosmetic/hooks/useCosmeticShop';
 import AvatarWithCosmetic from './AvatarWithCosmetic';
 import images from '@/app/assets/images';

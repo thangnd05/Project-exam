@@ -1,5 +1,5 @@
 import type { NormalQuestionRequest, PassageQuestionGroupRequest, PassageRequest } from '@/app/types';
-import type { DraftQuestion } from '@/app/hooks/useCreateTest';
+import type { DraftQuestion } from '@/app/components/tests/creator/hooks/useCreateTest';
 import { resolveQuestionTags } from './tagStatus';
 
 /** Vị trí của câu trong một phần thi: câu độc lập (groupIndex null) hoặc câu trong nhóm đoạn văn. */

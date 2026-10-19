@@ -2,7 +2,7 @@
 
 import classNames from 'classnames/bind';
 import style from './CoinBadge.module.scss';
-import { useCoins } from '@/app/hooks/useCoins';
+import { useCoins } from '@/app/components/gamification/coin/hooks/useCoins';
 import { formatCompactNumber, formatFullNumber } from '@/app/utils/formatNumber';
 import { FaCircleDollarToSlot } from 'react-icons/fa6';
 

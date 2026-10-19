@@ -5,7 +5,7 @@ import { PlusCircle, Trash, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '../CreateTestModal.module.scss';
 import TagSelector from '@/app/components/TagSelector/TagSelector';
-import type { DraftQuestion } from '@/app/hooks/useCreateTest';
+import type { DraftQuestion } from '@/app/components/tests/creator/hooks/useCreateTest';
 
 const cx = classNames.bind(styles);
 

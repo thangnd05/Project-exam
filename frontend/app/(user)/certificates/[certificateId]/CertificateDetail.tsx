@@ -8,7 +8,7 @@ import { ArrowLeft, Copy, Printer } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
-import { useCertificateDetail } from '@/app/hooks/useCertificates';
+import { useCertificateDetail } from '@/app/components/certificates/hooks/useCertificates';
 import { CertificateStatus } from '@/app/enums';
 import styles from './CertificateDetail.module.scss';
 

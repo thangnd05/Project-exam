@@ -1,7 +1,7 @@
 'use client';
 
 import {createSkill, deleteSkill, getSkills, updateSkill} from '@/app/apis/skillApi';
-import {useAdminCrud} from '@/app/hooks/useAdminCrud';
+import {useAdminCrud} from '@/app/(admin)/admin/_hooks/useAdminCrud';
 import type {SkillRequest, SkillResponse} from '@/app/types';
 
 export const skillKeys = {

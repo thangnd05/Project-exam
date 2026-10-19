@@ -12,8 +12,8 @@ import PlanCongratsModal, {
   markCongratsSeen,
 } from '@/app/components/learning-plans/PlanCongratsModal/PlanCongratsModal';
 import PlanPartTaskList from '@/app/components/learning-plans/PlanPartTaskList/PlanPartTaskList';
-import { usePlanDetail } from '@/app/hooks/usePlanDetail';
-import { useResyncPlan } from '@/app/hooks/useResyncPlan';
+import { usePlanDetail } from '@/app/components/learning-plans/hooks/usePlanDetail';
+import { useResyncPlan } from '@/app/components/learning-plans/hooks/useResyncPlan';
 import {
   buildResyncMessage,
   planStageLabel,

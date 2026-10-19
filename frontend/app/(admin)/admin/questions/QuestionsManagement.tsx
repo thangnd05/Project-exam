@@ -17,7 +17,7 @@ import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import EditQuestionModal from '@/app/components/tests/EditQuestionModal';
 import { UNCLASSIFIED_COLLECTION } from '@/app/apis/questionApi';
-import { useQuestionCollections } from '@/app/hooks/useQuestionCollections';
+import { useQuestionCollections } from '@/app/components/tests/hooks/useQuestionCollections';
 import { buildCollectionTree } from '@/app/utils/collectionTree';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { QuestionType, QuestionUsageScope } from '@/app/enums';

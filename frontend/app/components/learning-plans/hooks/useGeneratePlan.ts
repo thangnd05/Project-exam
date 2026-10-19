@@ -5,7 +5,7 @@ import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
 import { generatePlan, generateSyllabusPlan, listPlans } from '@/app/apis/learningPlanApi';
-import { invalidatePlanQueries } from '@/app/hooks/plan-cache';
+import { invalidatePlanQueries } from '@/app/components/learning-plans/hooks/plan-cache';
 import { LearningPlanStatus } from '@/app/enums';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';

@@ -71,13 +71,14 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     void hardDeleteByIdIn(@Param("ids") Collection<String> ids);
 
     @Query("SELECT ut FROM UserTest ut WHERE ut.status = :status AND ut.mode <> :practiceMode "
-            + "AND ut.startedAt < :cutoff "
             + "AND EXISTS (SELECT t FROM Test t WHERE t.testId = ut.testId "
-            + "AND t.durationMinutes IS NOT NULL AND t.durationMinutes > 0) "
+            + "AND ((t.durationMinutes IS NOT NULL AND t.durationMinutes > 0 AND ut.startedAt < :cutoff) "
+            + "OR (t.availableTo IS NOT NULL AND t.availableTo < :closedBefore))) "
             + "ORDER BY ut.startedAt ASC")
     List<UserTest> findStaleTimedAttempts(@Param("status") UserTest.Status status,
                                           @Param("practiceMode") UserTest.Mode practiceMode,
                                           @Param("cutoff") java.time.Instant cutoff,
+                                          @Param("closedBefore") java.time.Instant closedBefore,
                                           org.springframework.data.domain.Pageable pageable);
 
     List<UserTest> findByUserIdAndTestId(String userId, String testId);

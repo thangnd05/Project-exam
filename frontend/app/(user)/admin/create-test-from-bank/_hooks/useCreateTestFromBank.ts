@@ -5,8 +5,8 @@ import { toast } from 'react-toastify';
 import { createTest, addRandomQuestionsToPart, addQuestionsToPart } from '@/app/apis/testApi';
 import { createTestPart } from '@/app/apis/testPartApi';
 import { fromDateTimeLocalInput } from '@/app/utils/format-date-time';
-import { SELECTION_MODES } from '@/app/hooks/useBankTestBuilder';
-import type { PartConfigMap } from '@/app/hooks/useBankTestBuilder';
+import { SELECTION_MODES } from '@/app/components/tests/creator/hooks/useBankTestBuilder';
+import type { PartConfigMap } from '@/app/components/tests/creator/hooks/useBankTestBuilder';
 import type { CreateTestRequest } from '@/app/types';
 
 export type BankTestInfo = {

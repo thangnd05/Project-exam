@@ -5,7 +5,8 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
-import { useTargetAchieved } from '@/app/hooks/useTargetAchieved';
+import { useTargetAchieved } from '@/app/components/my-target/hooks/useTargetAchieved';
+import { examTypeIdFromParams, useNormalizeExamParam, withExam } from '@/app/hooks/useExamParam';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 
@@ -13,14 +14,19 @@ const cx = classNames.bind(styles);
 
 function TargetAchieved() {
   const searchParams = useSearchParams();
-  const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
+  // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ở effect dưới.
+  const [examTypeId, setExamTypeId] = useState('');
 
   const { examTypes, target, latestMock, enhanced, isLoading: loading, error } =
     useTargetAchieved(examTypeId);
 
+  useNormalizeExamParam(examTypes);
+
   useEffect(() => {
-    if (!examTypeId && examTypes.length > 0) setExamTypeId(examTypes[0].examTypeId);
-  }, [examTypes, examTypeId]);
+    if (!examTypeId && examTypes.length > 0) {
+      setExamTypeId(examTypeIdFromParams(searchParams, examTypes) || examTypes[0].examTypeId);
+    }
+  }, [examTypes, examTypeId, searchParams]);
 
   const enhancedMatches =
     enhanced && (!enhanced.examTypeId || enhanced.examTypeId === examTypeId);
@@ -56,7 +62,7 @@ function TargetAchieved() {
       {!loading && !target?.hasTarget && (
         <div className={cx('alert', 'alertInfo')}>
           <span>Bạn chưa đặt mục tiêu cho kỳ thi này.</span>
-          <ButtonPrime as="link" href={`/my-target?examTypeId=${examTypeId}`} variant="primary" size="sm">
+          <ButtonPrime as="link" href={withExam('/my-target', examTypeId, examTypes)} variant="primary" size="sm">
             Đặt mục tiêu
           </ButtonPrime>
         </div>
@@ -72,7 +78,7 @@ function TargetAchieved() {
           </span>
           <ButtonPrime
             as="link"
-            href={`/my-target/dashboard?examTypeId=${examTypeId}`}
+            href={withExam('/my-target/dashboard', examTypeId, examTypes)}
             variant="outline"
             size="sm"
           >
@@ -111,7 +117,7 @@ function TargetAchieved() {
               </p>
               <ButtonPrime
                 as="link"
-                href={`/my-target?examTypeId=${examTypeId}`}
+                href={withExam('/my-target', examTypeId, examTypes)}
                 variant="outline"
                 size="sm"
               >
@@ -125,17 +131,17 @@ function TargetAchieved() {
             <div className={cx('cardBody')}>
               <ul style={{ paddingLeft: '2rem', margin: 0, fontSize: 'var(--font-size-ssm)' }}>
                 <li>
-                  <Link href={`/my-target?examTypeId=${examTypeId}`}>Đặt mục tiêu mới</Link>
+                  <Link href={withExam('/my-target', examTypeId, examTypes)}>Đặt mục tiêu mới</Link>
                   {' '}- chỉnh điểm và mục tiêu từng phần.
                 </li>
                 <li>
-                  <Link href={`/learning-plans/compare?examTypeId=${examTypeId}`}>
+                  <Link href={withExam('/learning-plans/compare', examTypeId, examTypes)}>
                     Xem hành trình các lộ trình
                   </Link>
                   {' '}- độ sẵn sàng #1 → #N qua từng bài thi thử.
                 </li>
                 <li>
-                  <Link href={`/my-target/dashboard?examTypeId=${examTypeId}`}>
+                  <Link href={withExam('/my-target/dashboard', examTypeId, examTypes)}>
                     Tổng quan mục tiêu
                   </Link>
                   {' '}- biểu đồ độ sẵn sàng theo thời gian và các bài đã làm.

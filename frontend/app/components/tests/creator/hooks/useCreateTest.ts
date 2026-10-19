@@ -1,9 +1,9 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { useBaseMetaData } from '@/app/hooks/useBaseMetaData';
+import { useBaseMetaData } from '@/app/components/tests/creator/hooks/useBaseMetaData';
 import { durationMinutesFromExamType } from '@/app/hooks/useExamTypes';
-import { useTestSubmission } from '@/app/hooks/useTestSubmission';
+import { useTestSubmission } from '@/app/components/tests/creator/hooks/useTestSubmission';
 import { QuestionUsageScope } from '@/app/enums';
 
 export const CREATOR_TYPES = {

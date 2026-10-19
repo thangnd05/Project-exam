@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info, Newspaper, Bookmark } from 'lucide-react';
-import { usePosts } from '@/app/hooks/usePosts';
+import { usePosts } from '@/app/components/posts/hooks/usePosts';
 import routes from '@/app/configs/Routes';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
 import PageHeader from '@/app/components/PageHeader/PageHeader';

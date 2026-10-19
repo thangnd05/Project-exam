@@ -7,7 +7,7 @@ import {Check, Pencil, Plus, Trash2, X} from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import useMilestoneScoring from '@/app/hooks/useMilestoneScoring';
+import useMilestoneScoring from '@/app/components/my-target/hooks/useMilestoneScoring';
 import {
   AdminFieldError,
   AdminPageHeader,

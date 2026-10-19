@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 import {
   useLoginMutation,
   useRegisterMutation,
-} from '@/app/hooks/useAuthActions';
+} from '@/app/components/auth/hooks/useAuthActions';
 import {
   getRedirectTarget,
   saveOAuthRedirect,

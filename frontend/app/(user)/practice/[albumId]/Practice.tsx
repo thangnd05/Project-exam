@@ -3,7 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { getTtsUrl } from '@/app/utils/mediaUrl';
-import { useStreak } from '@/app/hooks/useStreak';
+import { useStreak } from '@/app/components/gamification/streak/hooks/useStreak';
 import { useStreakRestoreGate } from '@/app/components/gamification/streak/hooks/useStreakRestoreGate';
 import StreakRestoreModal from '@/app/components/gamification/streak/StreakRestoreModal';
 import {

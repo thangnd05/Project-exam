@@ -8,7 +8,7 @@ import { Search } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
-import { useCertificateVerification } from '@/app/hooks/useCertificates';
+import { useCertificateVerification } from '@/app/components/certificates/hooks/useCertificates';
 import { CertificateVerifyState } from '@/app/enums';
 import CertificateWall from './_components/CertificateWall';
 import { getCertificateStateView } from './_components/certificateStateView';

@@ -8,7 +8,7 @@ import {
   getAdminEvaluations,
   getEvaluationStatsByTest,
 } from '@/app/apis/evaluationApi';
-import {useCrudMutations} from '@/app/hooks/useAdminCrud';
+import {useCrudMutations} from '@/app/(admin)/admin/_hooks/useAdminCrud';
 import type {EvaluationResponse, PageResponse} from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 

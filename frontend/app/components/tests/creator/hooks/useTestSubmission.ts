@@ -13,14 +13,14 @@ import {
   importJsonFile,
 } from '@/app/apis/questionApi';
 import { toast } from 'react-toastify';
-import { CREATOR_TYPES } from '@/app/hooks/useCreateTest';
+import { CREATOR_TYPES } from '@/app/components/tests/creator/hooks/useCreateTest';
 import type {
   CreatorNotification,
   CreatorType,
   DraftGroup,
   DraftQuestion,
   TestInfoForm,
-} from '@/app/hooks/useCreateTest';
+} from '@/app/components/tests/creator/hooks/useCreateTest';
 import type { CreateTestRequest } from '@/app/types';
 
 const TOAST_VALIDATION_MS = 8000;

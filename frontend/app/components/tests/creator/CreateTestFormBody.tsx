@@ -22,9 +22,9 @@ import {
 import { Trash, PlusCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
-import { useCreateTest, CREATOR_TYPES } from '@/app/hooks/useCreateTest';
-import { useExamCategories } from '@/app/hooks/useExamCategories';
-import type { CreatorType, DraftGroup, DraftQuestion } from '@/app/hooks/useCreateTest';
+import { useCreateTest, CREATOR_TYPES } from '@/app/components/tests/creator/hooks/useCreateTest';
+import { useExamCategories } from '@/app/components/tests/creator/hooks/useExamCategories';
+import type { CreatorType, DraftGroup, DraftQuestion } from '@/app/components/tests/creator/hooks/useCreateTest';
 import CoinPriceField from '@/app/components/tests/CoinPriceField';
 import QuestionBlock from './QuestionBlock';
 import CreatorTabs from './CreatorTabs';

@@ -4,7 +4,7 @@ import { Modal, Button } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import classNames from 'classnames/bind';
 import style from './StreakCelebration.module.scss';
-import { useStreak } from '@/app/hooks/useStreak';
+import { useStreak } from '@/app/components/gamification/streak/hooks/useStreak';
 import { FaFire } from 'react-icons/fa6';
 
 const cx = classNames.bind(style);

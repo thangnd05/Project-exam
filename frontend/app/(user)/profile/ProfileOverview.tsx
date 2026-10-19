@@ -13,7 +13,7 @@ import styles from './ProfileOverview.module.scss';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
 import AvatarWithCosmetic from '@/app/components/gamification/cosmetic/AvatarWithCosmetic';
-import { useCosmetics } from '@/app/hooks/useCosmetics';
+import { useCosmetics } from '@/app/components/gamification/cosmetic/hooks/useCosmetics';
 import {
   useProfileOverview,
   useMyTargets,

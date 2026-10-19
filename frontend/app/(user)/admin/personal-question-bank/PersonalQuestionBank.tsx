@@ -13,7 +13,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import classNames from 'classnames/bind';
-import { useBaseMetaData } from '@/app/hooks/useBaseMetaData';
+import { useBaseMetaData } from '@/app/components/tests/creator/hooks/useBaseMetaData';
 import { useHasPermission } from '@/app/hooks/usePermission';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';

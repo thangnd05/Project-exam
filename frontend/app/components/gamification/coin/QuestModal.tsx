@@ -8,7 +8,7 @@ import classNames from 'classnames/bind';
 import {CircleDollarSign, Clock, CheckCircle2} from 'lucide-react';
 
 import {getMyQuests, QUESTS_QUERY_KEY} from '@/app/apis/questApi';
-import {useCoins} from '@/app/hooks/useCoins';
+import {useCoins} from '@/app/components/gamification/coin/hooks/useCoins';
 import {useClaimQuest} from '@/app/components/gamification/coin/hooks/useClaimQuest';
 import BaseModal from '@/app/components/modal/BaseModal';
 import CosmeticShop from '@/app/components/gamification/cosmetic/CosmeticShop';

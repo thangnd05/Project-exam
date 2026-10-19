@@ -6,14 +6,14 @@
 
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 32px;
-  padding: 6px 14px;
+  gap: 6px;
+  min-height: 36px;
+  padding: 7px 16px;
   border: 1px solid rgb(var(--slate-600-rgb) / 0.25);
   border-radius: 999px;
   background: transparent;
-  font-size: 1.2rem;
-  line-height: 1;
+  font-size: 1.35rem;
+  line-height: 1.4;
   color: var(--slate-400);
   user-select: none;
   cursor: default;
@@ -22,20 +22,19 @@
     background-color 0.2s ease;
 
   .icon {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
   }
 
   .count {
-    font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-    font-size: 1.3rem;
+    font-size: 1.35rem;
     font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
 
   .label {
-    font-size: 1.1rem;
+    font-size: 1.35rem;
     font-weight: 600;
     white-space: nowrap;
     color: var(--slate-700);

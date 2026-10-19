@@ -197,10 +197,8 @@ public class UserAnswerService {
     }
 
     private void assertWithinTimeLimit(UserTest userTest) {
-        Integer durationMinutes = testRepository.findById(userTest.getTestId())
-                .map(Test::getDurationMinutes)
-                .orElse(null);
-        if (AttemptTimeUtil.isExpired(userTest, durationMinutes, Instant.now())) {
+        Test test = testRepository.findById(userTest.getTestId()).orElse(null);
+        if (AttemptTimeUtil.isExpired(userTest, test, Instant.now())) {
             throw new ConflictException("Đã hết giờ làm bài, không thể sửa đáp án");
         }
     }

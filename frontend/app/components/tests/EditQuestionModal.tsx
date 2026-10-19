@@ -10,7 +10,7 @@ import { buildCollectionTree } from '@/app/utils/collectionTree';
 import classNames from 'classnames/bind';
 import { CheckCircle2, Pencil, Trash2 } from 'lucide-react';
 import { PassageMediaList } from './passageMedia';
-import { useEditQuestionModal } from '@/app/hooks/useEditQuestionModal';
+import { useEditQuestionModal } from '@/app/components/tests/hooks/useEditQuestionModal';
 import { QuestionUsageScope } from '@/app/enums';
 import styles from './EditQuestionModal.module.scss';
 import createStyles from '@/app/components/tests/CreateTestModal.module.scss';

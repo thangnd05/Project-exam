@@ -11,7 +11,7 @@ import routes from '@/app/configs/Routes';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ExamTypeFormModal, {type ExamTypeFormState} from './_components/ExamTypeFormModal';
 import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/components/admin/common';
-import {useExamTypes} from '@/app/hooks/useExamTypes';
+import {useAdminExamTypes} from '@/app/(admin)/admin/exam-types/_hooks/useAdminExamTypes';
 import type {ExamTypeResponse} from '@/app/types';
 
 import styles from '@/app/(admin)/admin/question-collections/QuestionCollectionsManagement.module.scss';
@@ -184,7 +184,7 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
 function ExamTypesManagement() {
   const router = useRouter();
   const {examTypeList, isLoading: loading, isError, createMutation, updateMutation, deleteMutation} =
-    useExamTypes();
+    useAdminExamTypes();
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingTypeId, setEditingTypeId] = useState<string | null>(null);

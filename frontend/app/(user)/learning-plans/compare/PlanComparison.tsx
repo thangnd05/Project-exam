@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
+import { examTypeIdFromParams, setExamParam, useNormalizeExamParam } from '@/app/hooks/useExamParam';
 
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
@@ -24,15 +25,18 @@ const PlanComparisonCharts = dynamic(() => import('./_components/PlanComparisonC
 
 function PlanComparison() {
   const [searchParams, setSearchParams] = useSearchParamsState();
-  const [examTypeId, setExamTypeId] = useState(searchParams.get('examTypeId') || '');
+  // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ở effect dưới.
+  const [examTypeId, setExamTypeId] = useState('');
 
   const { examTypes, plans, isLoading: loading, error } = usePlanComparison(examTypeId);
 
+  useNormalizeExamParam(examTypes);
+
   useEffect(() => {
     if (!examTypeId && examTypes.length > 0) {
-      setExamTypeId(examTypes[0].examTypeId);
+      setExamTypeId(examTypeIdFromParams(searchParams, examTypes) || examTypes[0].examTypeId);
     }
-  }, [examTypes, examTypeId]);
+  }, [examTypes, examTypeId, searchParams]);
 
   const sorted = useMemo(() => {
     return [...plans].sort((a, b) => (a.planSequence ?? 0) - (b.planSequence ?? 0));
@@ -68,7 +72,7 @@ function PlanComparison() {
 
   return (
     <div className={cx('wrapper')}>
-      <TargetPlanTabs active="compare" examTypeId={examTypeId} />
+      <TargetPlanTabs active="compare" examTypeId={examTypeId} examTypes={examTypes} />
       <div className={cx('headerBar')}>
         <h2 className={cx('title')}>So sánh các lộ trình</h2>
       </div>
@@ -81,7 +85,7 @@ function PlanComparison() {
             value={examTypeId}
             onChange={(e) => {
               setExamTypeId(e.target.value);
-              setSearchParams({ examTypeId: e.target.value });
+              setSearchParams(setExamParam(new URLSearchParams(), e.target.value, examTypes));
             }}
           >
             {examTypes.map((et) => (

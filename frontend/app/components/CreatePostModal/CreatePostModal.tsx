@@ -13,7 +13,7 @@ import RichTextEditor, { type RichTextEditorHandle } from '@/app/components/Rich
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
-import { useSavePost, type InlinePostImage } from '@/app/hooks/useSavePost';
+import { useSavePost, type InlinePostImage } from '@/app/components/CreatePostModal/hooks/useSavePost';
 
 const cx = classNames.bind(styles);
 

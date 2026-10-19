@@ -1,5 +1,5 @@
 'use client';
-import { useStreak } from '@/app/hooks/useStreak';
+import { useStreak } from '@/app/components/gamification/streak/hooks/useStreak';
 
 export function useStreakRestoreGate() {
   const { promptRestore, dismissRestorePrompt, streakReady } = useStreak();

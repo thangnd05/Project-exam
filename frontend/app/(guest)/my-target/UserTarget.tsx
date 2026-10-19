@@ -1,16 +1,23 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import TargetPlanTabs from '@/app/components/TargetPlanTabs/TargetPlanTabs';
+import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
+import {
+  examTypeIdFromParams,
+  setExamParam,
+  useNormalizeExamParam,
+  withExam,
+} from '@/app/hooks/useExamParam';
 import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import styles from './UserTarget.module.scss';
 import { sortPartsByLookup } from '@/app/utils/partOrder';
-import useMilestoneScoring from '@/app/hooks/useMilestoneScoring';
+import useMilestoneScoring from '@/app/components/my-target/hooks/useMilestoneScoring';
 import { useAuth } from '@/app/hooks/useAuth';
 import { buildLoginUrl } from '@/app/utils/authRedirect';
 import type { MilestoneResponse } from '@/app/types';
@@ -24,7 +31,7 @@ const cx = classNamesBind.bind(styles);
 const planCx = classNamesBind.bind(planStyles);
 
 function UserTarget() {
-  const searchParams = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParamsState();
   const router = useRouter();
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [targetScore, setTargetScore] = useState('');
@@ -45,21 +52,21 @@ function UserTarget() {
   const deleteMutation = useDeleteUserTarget();
   const loading = saveMutation.isPending || deleteMutation.isPending;
 
+  useNormalizeExamParam(examTypes);
+
   useEffect(() => {
-    const examTypeIdFromQuery = searchParams.get('examTypeId');
+    const examTypeIdFromQuery = examTypeIdFromParams(searchParams, examTypes);
     if (examTypeIdFromQuery) {
       setSelectedExamTypeId(examTypeIdFromQuery);
     }
-  }, [searchParams]);
+  }, [searchParams, examTypes]);
 
   // Được điều hướng tới đây chỉ để đặt mục tiêu thì giữ đúng bước tiếp theo của luồng cũ.
   const nextAfterTarget = useMemo(() => {
     const next = searchParams.get('next');
     if (next && next.startsWith('/') && !next.startsWith('//')) return next;
-    return selectedExamTypeId
-      ? `/learning-plans/generate?examTypeId=${encodeURIComponent(selectedExamTypeId)}`
-      : '/learning-plans/generate';
-  }, [searchParams, selectedExamTypeId]);
+    return withExam('/learning-plans/generate', selectedExamTypeId, examTypes);
+  }, [searchParams, selectedExamTypeId, examTypes]);
 
   const {
     isScaled,
@@ -142,8 +149,7 @@ function UserTarget() {
     }
     if (!isAuthenticated) {
       // Giữ cả next để đăng nhập xong quay lại đây, lưu xong vẫn đi tiếp đúng luồng.
-      const backParams = new URLSearchParams(searchParams.toString());
-      backParams.set('examTypeId', selectedExamTypeId);
+      const backParams = setExamParam(searchParams, selectedExamTypeId, examTypes);
       router.push(
         buildLoginUrl(`/my-target?${backParams.toString()}`, {
           flash: 'Bạn cần đăng nhập để lưu mục tiêu!',
@@ -249,7 +255,7 @@ function UserTarget() {
 
   return (
     <div className={classNames(planCx('wrapper'), cx('pageRoot'))}>
-      <TargetPlanTabs active="target" examTypeId={selectedExamTypeId} />
+      <TargetPlanTabs active="target" examTypeId={selectedExamTypeId} examTypes={examTypes} />
       <div className={planCx('headerBar')}>
         <h2 className={classNames(planCx('title'), cx('pageTitle'))}>Mục tiêu của tôi</h2>
       </div>
@@ -298,6 +304,10 @@ function UserTarget() {
                 setSelectedExamTypeId(e.target.value);
                 setTargetScore('');
                 setCustomParts({});
+                // Đưa kỳ thi lên URL để F5 / copy link vẫn đúng kỳ thi đang chọn.
+                setSearchParams((prev) => setExamParam(prev, e.target.value, examTypes), {
+                  replace: true,
+                });
               }}
             >
               <option value="">-- Chọn kỳ thi bạn muốn học --</option>

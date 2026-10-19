@@ -3,8 +3,8 @@
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { generatePlanKeys } from '@/app/hooks/useGeneratePlan';
-import { invalidatePlanQueries } from '@/app/hooks/plan-cache';
+import { generatePlanKeys } from '@/app/components/learning-plans/hooks/useGeneratePlan';
+import { invalidatePlanQueries } from '@/app/components/learning-plans/hooks/plan-cache';
 import { toast } from 'react-toastify';
 import { checkActiveUserTest, startUserTest, submitUserTest } from '@/app/apis/userTestApi';
 import { getAnswersByUserTest, batchSaveAnswers, sendAnswersOnExit } from '@/app/apis/userAnswerApi';
@@ -15,9 +15,9 @@ import { defaultLayoutConfig } from '@/app/components/exam-layout/layoutSchema';
 import type { ExamUserAnswers } from '@/app/components/exam-layout/examLayoutTypes';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { useAuth } from '@/app/hooks/useAuth';
-import { useStreak } from '@/app/hooks/useStreak';
+import { useStreak } from '@/app/components/gamification/streak/hooks/useStreak';
 import { useStreakRestoreGate } from '@/app/components/gamification/streak/hooks/useStreakRestoreGate';
-import { useCoins } from '@/app/hooks/useCoins';
+import { useCoins } from '@/app/components/gamification/coin/hooks/useCoins';
 import { getOrCreateGuestSessionId, guestHeaders } from '@/app/utils/guestSession';
 import {
   clearExamSession,
@@ -27,7 +27,7 @@ import {
   writeExamSessionId,
   writeExamSessionState,
 } from '@/app/utils/examStorage';
-import { serverNowMs, syncServerClock } from '@/app/utils/serverClock';
+import { clockMark, serverNowMs, syncServerClock } from '@/app/utils/serverClock';
 import type { UserTestMode } from '@/app/enums';
 import type {
   ActiveUserTestResponse,
@@ -277,7 +277,7 @@ export function useTestSession() {
         // Luôn hỏi server: vừa lấy lượt đang làm, vừa lấy serverNow để đồng hồ thi chạy theo giờ server.
         let active: ActiveUserTestResponse | null = null;
         try {
-          const requestedAt = Date.now();
+          const requestedAt = clockMark();
           active = await checkActiveUserTest(testId, isGuest, guestCfg, {
             mode: isPractice ? PRACTICE_MODE_PARAM : undefined,
             examPartIds: isPractice ? selectedPartIds : undefined,
@@ -367,7 +367,7 @@ export function useTestSession() {
         setStatus('ready');
         return;
       }
-      const requestedAt = Date.now();
+      const requestedAt = clockMark();
       startUserTest(test.testId, isGuest, guestCfg, {
         mode: isPractice ? PRACTICE_MODE_PARAM : undefined,
         examPartIds: isPractice ? selectedPartIds : undefined,
@@ -627,6 +627,26 @@ export function useTestSession() {
     const timer = setInterval(tick, 1000);
     return () => clearInterval(timer);
   }, [status, deadline, holdStart]);
+
+  // Máy ngủ / treo tab thì performance.now() có thể dừng ở một số trình duyệt: quay lại tab là đồng bộ lại giờ server.
+  useEffect(() => {
+    if (status !== 'active' || deadline == null) return undefined;
+
+    const resync = () => {
+      if (document.visibilityState !== 'visible') return;
+      const requestedAt = clockMark();
+      checkActiveUserTest(testId, isGuest, guestCfg)
+        .then((active) => syncServerClock(active?.serverNow, requestedAt))
+        .catch(() => {});
+    };
+
+    document.addEventListener('visibilitychange', resync);
+    window.addEventListener('online', resync);
+    return () => {
+      document.removeEventListener('visibilitychange', resync);
+      window.removeEventListener('online', resync);
+    };
+  }, [status, deadline, testId, isGuest, guestCfg]);
 
   const handlePurchase = async () => {
     setPurchasing(true);

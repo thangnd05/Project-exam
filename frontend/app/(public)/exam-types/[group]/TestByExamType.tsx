@@ -16,6 +16,7 @@ import {
 import TestCard from '@/app/components/tests/TestCard/TestCard';
 import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
+import { withExam } from '@/app/hooks/useExamParam';
 
 import style from './TestByExamType.module.scss';
 import TestListContainer from '@/app/components/tests/TestListContainer/TestListContainer';
@@ -25,7 +26,7 @@ import { useTestsByExamType } from './_hooks/useTestsByExamType';
 const cx = classNames.bind(style);
 
 // examTypeId do server tra từ slug trên URL (/exam-types/aws/saa-c03) rồi truyền xuống.
-function TestByExamType({ examTypeId }: { examTypeId: string }) {
+function TestByExamType({ examTypeId, examSlug }: { examTypeId: string; examSlug?: string }) {
   const router = useRouter();
   const { user } = useAuth();
 
@@ -112,7 +113,7 @@ function TestByExamType({ examTypeId }: { examTypeId: string }) {
       router.push(buildLoginUrlFromHere());
       return;
     }
-    router.push(`${routes.myTarget}?examTypeId=${examTypeId}`);
+    router.push(withExam(routes.myTarget, examTypeId, [{ examTypeId, slug: examSlug }]));
   };
 
   const emptyState = (

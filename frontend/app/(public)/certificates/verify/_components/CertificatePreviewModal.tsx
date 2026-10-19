@@ -5,7 +5,7 @@ import classNames from 'classnames/bind';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import CertificateCanvas from '@/app/components/CertificateCanvas/CertificateCanvas';
-import { useCertificateVerification } from '@/app/hooks/useCertificates';
+import { useCertificateVerification } from '@/app/components/certificates/hooks/useCertificates';
 import { CertificateVerifyState } from '@/app/enums';
 import { getCertificateStateView } from './certificateStateView';
 import styles from './CertificatePreviewModal.module.scss';

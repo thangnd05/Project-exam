@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { deletePlan } from '@/app/apis/learningPlanApi';
-import { invalidatePlanQueries } from '@/app/hooks/plan-cache';
+import { invalidatePlanQueries } from '@/app/components/learning-plans/hooks/plan-cache';
 
 type UseDeletePlanOptions = {
   onSuccess?: (...args: unknown[]) => void;
