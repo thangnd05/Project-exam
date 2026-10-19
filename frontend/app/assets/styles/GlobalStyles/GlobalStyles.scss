@@ -262,6 +262,8 @@
   --header-gradient: linear-gradient(135deg, var(--frost-graphite) 0%, var(--frost-surface) 55%, var(--frost-black) 100%);
   --hero-gradient: linear-gradient(135deg, var(--frost-black) 0%, var(--frost-graphite) 55%, rgb(var(--frost-deep-rgb)) 100%);
   --hero-shadow: 0 12px 30px rgb(var(--frost-black-rgb) / 0.28);
+  // Footer tối hơn section Frost Black để tách bạch như mẫu (#0C131A).
+  --footer-bg: rgb(12 19 26);
 }
 
 @mixin bootstrap-bridge {
@@ -519,6 +521,11 @@
   color-scheme: dark;
   @include palette-dark-raw;
   @include bootstrap-bridge;
+
+  // slate-900/950 là màu chữ đậm nhất; ở dark mode phải sáng nhất để đọc được.
+  // Chỉ đổi biến màu, giữ kênh -rgb tối vì nền mờ của modal dùng rgb(var(--slate-900-rgb) / a).
+  --slate-900: rgb(236 240 244);
+  --slate-950: rgb(248 250 252);
 
   .theme-locked {
     color-scheme: light;

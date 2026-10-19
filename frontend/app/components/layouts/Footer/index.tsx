@@ -2,57 +2,72 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Container } from 'react-bootstrap';
-import { FaFacebookF, FaInstagram, FaYoutube } from 'react-icons/fa';
+import { FiMail } from 'react-icons/fi';
 
-import { imageAssets, name } from '@/app/assets/images';
+import { imageAssets } from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
 
 import styles from './footer.module.scss';
 
+const CONTACT_EMAIL = 'contact@frostscope.com';
+const DISPUTE_EMAIL = 'dispute@frostscope.com';
+
 type FooterLink = { label: string; href: string };
 
-const COLUMNS: { title: string; links: FooterLink[] }[] = [
+// Bố cục theo mẫu FrostScope: thương hiệu (2 cột) + Luyện thi + Về chúng tôi + Pháp lý.
+const COLUMNS: { title: string; links: FooterLink[]; note?: string }[] = [
   {
     title: 'Luyện thi',
     links: [
       { label: 'Kho đề thi', href: routes.examTypes },
-      { label: 'Lộ trình học', href: routes.generatePlan },
+      { label: 'Chứng chỉ', href: `${routes.home}#certifications` },
+      { label: 'Bảng xếp hạng', href: `${routes.home}#rankscope` },
+      { label: 'Kiểm tra nhanh', href: `${routes.home}#hero` },
+      { label: 'Tạo lộ trình học', href: routes.generatePlan },
     ],
   },
   {
-    title: 'Hỗ trợ',
+    title: 'Về chúng tôi',
     links: [
-      { label: 'Giới thiệu', href: routes.about },
-      { label: 'Chính sách', href: routes.policy },
-      { label: 'Điều khoản & dịch vụ', href: routes.service },
+      { label: 'About us', href: routes.about },
+      { label: 'Contact', href: `mailto:${CONTACT_EMAIL}` },
     ],
+  },
+  {
+    title: 'Pháp lý',
+    links: [
+      { label: 'Chính sách', href: routes.policy },
+      { label: 'Điều khoản và điều kiện', href: routes.service },
+    ],
+    note: 'All related logos are trademarks of their respective owners.',
   },
 ];
 
-const SOCIALS = [
-  { href: 'https://facebook.com', label: 'Facebook', Icon: FaFacebookF },
-  { href: 'https://instagram.com', label: 'Instagram', Icon: FaInstagram },
-  { href: 'https://youtube.com', label: 'YouTube', Icon: FaYoutube },
-];
-
 function Footer() {
+  const year = new Date().getFullYear();
+
   return (
     <footer className={`${styles.footer} theme-locked`}>
-      <Container className={styles.container}>
+      <div className={styles.container}>
         <div className={styles.top}>
           <div className={styles.brandCol}>
-            <Link href={routes.home} className={styles.brand} aria-label="WinDe - Trang chủ">
-              <span className={styles.logoWrapper}>
-                <Image src={imageAssets.logoW} alt="" width={28} height={28} />
-              </span>
-              <span className={styles.brandName}>WinDe</span>
+            <Link href={routes.home} className={styles.brand} aria-label="FrostScope - Trang chủ">
+              <Image src={imageAssets.frostscopeLogoWhite} alt="FrostScope" width={152} height={32} />
             </Link>
+            <p className={styles.tagline}>Nền tảng ôn thi chứng chỉ Cloud cá nhân hóa</p>
+            <p className={styles.description}>
+              Đánh giá năng lực Cloud &amp; DevOps, nhận diện điểm yếu và luyện thi chứng chỉ theo đúng phần
+              kiến thức bạn cần cải thiện.
+            </p>
+            <a href={`mailto:${CONTACT_EMAIL}`} className={styles.mail}>
+              <FiMail aria-hidden="true" />
+              <span>{CONTACT_EMAIL}</span>
+            </a>
           </div>
 
-          {COLUMNS.map(({ title, links }) => (
+          {COLUMNS.map(({ title, links, note }) => (
             <nav key={title} className={styles.linkCol} aria-label={title}>
-              <h4 className={styles.colTitle}>{title}</h4>
+              <p className={styles.colTitle}>{title}</p>
               <ul className={styles.linkList}>
                 {links.map(({ label, href }) => (
                   <li key={label}>
@@ -61,30 +76,23 @@ function Footer() {
                     </Link>
                   </li>
                 ))}
+                {note && <li className={styles.note}>{note}</li>}
               </ul>
             </nav>
           ))}
+        </div>
 
-          <div className={styles.linkCol}>
-            <h4 className={styles.colTitle}>Theo dõi</h4>
-            <div className={styles.socials}>
-              {SOCIALS.map(({ href, label, Icon }) => (
-                <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label}>
-                  <Icon />
-                </a>
-              ))}
-            </div>
+        <div className={styles.bottom}>
+          <span>Bản quyền {year} FrostScope. Nền tảng ôn thi chứng chỉ Cloud cá nhân hóa.</span>
+          <div className={styles.bottomLinks}>
+            <Link href={routes.policy}>Chính sách</Link>
+            <Link href={routes.service}>Điều khoản và điều kiện</Link>
+            <a href={`mailto:${DISPUTE_EMAIL}`} className={styles.accentLink}>
+              {DISPUTE_EMAIL}
+            </a>
           </div>
         </div>
-      </Container>
-
-      <div className={styles.divider} />
-
-      <Container className={styles.container}>
-        <div className={styles.bottom}>
-          <span className={styles.copyright}>© {name} Exam.. All rights reserved.</span>
-        </div>
-      </Container>
+      </div>
     </footer>
   );
 }

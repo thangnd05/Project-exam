@@ -1,11 +1,7 @@
 import noImage from './no-image.png';
 import avtImage from './avtImage.jpg';
-import logo from './logo.png';
 import membership from './vip-member-banner.webp';
 import logoW from './logoWD.svg';
-import quickImage from './quick-image.png';
-import dignos from './dignos.png';
-import learningPlan from './learningplan.png';
 import frostscopeLogoWhite from './brand/frostscope-logo-white.png';
 import frostscopeLogoRgb from './brand/frostscope-logo-rgb.png';
 import frostscopeFavicon from './brand/frostscope-favicon.png';
@@ -13,12 +9,8 @@ import frostscopeFavicon from './brand/frostscope-favicon.png';
 export const imageAssets = {
     noImage,
     avtImage,
-    logo,
     membership,
     logoW,
-    quickImage,
-    dignos,
-    learningPlan,
     frostscopeLogoWhite,
     frostscopeLogoRgb,
     frostscopeFavicon,
@@ -27,12 +19,8 @@ export const imageAssets = {
 const images = {
     noImage: noImage.src,
     avtImage: avtImage.src,
-    logo: logo.src,
     membership: membership.src,
     logoW: logoW.src,
-    quickImage: quickImage.src,
-    dignos: dignos.src,
-    learningPlan: learningPlan.src,
     frostscopeLogoWhite: frostscopeLogoWhite.src,
     frostscopeLogoRgb: frostscopeLogoRgb.src,
     frostscopeFavicon: frostscopeFavicon.src,

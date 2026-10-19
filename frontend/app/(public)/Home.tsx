@@ -1,7 +1,6 @@
 'use client';
 
 import HeroSection from './_components/HeroSection/HeroSection';
-// import JourneySection from './_components/JourneySection/JourneySection';
 import RankScope from './_components/RankScope/RankScope';
 import CertificationOrbit from './_components/CertificationOrbit/CertificationOrbit';
 // import ExamTypeGrid from './_components/ExamTypeGrid/ExamTypeGrid';
@@ -12,7 +11,6 @@ export default function Home() {
   return (
     <div>
       <HeroSection />
-      {/* <JourneySection /> */}
       <RankScope />
       <CertificationOrbit />
       {/* <ExamTypeGrid />

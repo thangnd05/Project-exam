@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import classNames from 'classnames/bind';
 import style from './StreakBadge.module.scss';
 import { useStreak } from '@/app/hooks/useStreak';
@@ -34,22 +34,31 @@ function StreakBadge({ className, variant = 'default' }: StreakBadgeProps) {
   const recoverable = canRecover && lostStreak > 0;
   const display = recoverable ? lostStreak : currentStreak;
 
-  const title = recoverable
-    ? `Đã đứt chuỗi ${lostStreak} ngày  bấm để khôi phục`
+  const tooltipId = useId();
+  const tooltip = recoverable
+    ? {
+        heading: `Đã đứt chuỗi ${lostStreak} ngày`,
+        body: 'Bấm vào huy hiệu để khôi phục chuỗi trước khi hết hạn.',
+      }
     : active
-      ? `Chuỗi ${currentStreak} ngày học liên tiếp`
-      : 'Học hôm nay để bắt đầu chuỗi!';
+      ? {
+          heading: `Chuỗi ${currentStreak} ngày liên tiếp`,
+          body: 'Chuỗi tăng mỗi ngày bạn làm bài hoặc học một nhiệm vụ trong lộ trình. Bỏ một ngày là chuỗi về 0.',
+        }
+      : {
+          heading: 'Chưa có chuỗi ngày học',
+          body: 'Làm một bài hoặc học một nhiệm vụ trong lộ trình hôm nay để bắt đầu chuỗi.',
+        };
 
   return (
-    <>
+    <span className={cx('wrapper', variant === 'onDark' && 'onDark', className)}>
       <div
         className={cx(
           'streakBadge',
           { active, recoverable },
           variant === 'onDark' && 'onDark',
-          className
         )}
-        title={title}
+        aria-describedby={tooltipId}
         role={recoverable ? 'button' : undefined}
         tabIndex={recoverable ? 0 : undefined}
         onClick={recoverable ? () => setShowRestore(true) : undefined}
@@ -68,10 +77,14 @@ function StreakBadge({ className, variant = 'default' }: StreakBadgeProps) {
         <span className={cx('count')}>{display}</span>
         <span className={cx('label')}>ngày liên tiếp</span>
       </div>
+      <span id={tooltipId} role="tooltip" className={cx('tooltip', { activeTip: active || recoverable })}>
+        <span className={cx('tooltipHeading')}>{tooltip.heading}</span>
+        <span className={cx('tooltipBody')}>{tooltip.body}</span>
+      </span>
       {recoverable && (
         <StreakRestoreModal show={showRestore} onClose={() => setShowRestore(false)} />
       )}
-    </>
+    </span>
   );
 }
 

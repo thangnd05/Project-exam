@@ -106,6 +106,81 @@
   }
 }
 
+/* ---------- Ô giải thích khi rê chuột (theo mẫu FrostScope) ---------- */
+
+.wrapper {
+  --flame-rgb: 255 161 22;
+
+  position: relative;
+  display: inline-flex;
+
+  &:hover .tooltip,
+  &:focus-within .tooltip {
+    display: flex;
+  }
+}
+
+.tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  z-index: 1050;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  width: 224px;
+  padding: 12px;
+  border: 1px solid var(--slate-300);
+  border-radius: 16px;
+  background: var(--bg-white);
+  box-shadow: 0 15px 30px -5px rgb(var(--slate-900-rgb) / 0.15);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  white-space: normal;
+  text-align: left;
+  transform: translateX(-50%);
+  pointer-events: none;
+
+  // Màn hình hẹp: neo mép phải để không tràn khỏi màn hình.
+  @media (max-width: 639.98px) {
+    right: 0;
+    left: auto;
+    transform: none;
+  }
+}
+
+.tooltipHeading {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--slate-800);
+}
+
+.tooltipBody {
+  color: var(--slate-700);
+}
+
+.activeTip .tooltipHeading {
+  color: rgb(var(--flame-rgb));
+}
+
+.wrapper.onDark .tooltip {
+  border-color: var(--surface-dark-border);
+  background: var(--surface-dark);
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.6);
+
+  .tooltipHeading {
+    color: var(--text-on-dark);
+  }
+
+  .tooltipBody {
+    color: var(--text-on-dark);
+  }
+}
+
+.wrapper.onDark .activeTip .tooltipHeading {
+  color: rgb(var(--flame-rgb));
+}
+
 @media (prefers-reduced-motion: reduce) {
   .streakBadge {
     transition: none;
