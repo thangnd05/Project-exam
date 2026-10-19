@@ -52,7 +52,7 @@ frontend/
       <domain>/hooks/           #   hook nghiệp vụ theo domain: learning-plans, tests, my-target,
                                 #   certificates, classes, posts, auth, gamification/<x>
     hooks/                      # chỉ hook hạ tầng không thuộc domain nào (xem mục 1)
-    configs/                    # Routes.ts, permissions.ts, adminPermissions.ts, queryClient.ts
+    configs/                    # Routes.ts, adminPermissions.ts (dùng enum PermissionCode), queryClient.ts
     contexts/                   # Auth/Coin/Cosmetic/Streak context
     enums/                      # enum mirror backend (QuestionType, TestStatus, ...)
     types/                      # interface mirror DTO backend, theo domain + index.ts barrel

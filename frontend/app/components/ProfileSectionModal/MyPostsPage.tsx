@@ -188,7 +188,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
               <h1 className={cx('title')}>Bài viết của tôi</h1>
               <p className={cx('subtitle')}>Quản lý và theo dõi trạng thái các bài viết của bạn.</p>
             </div>
-            <button type="button" className={cx('backLink')} onClick={() => router.push(routes.profile)}>
+            <button type="button" className={cx('backLink')} onClick={() => router.push(routes.dashboard)}>
               Trở lại hồ sơ
             </button>
           </header>

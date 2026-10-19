@@ -69,7 +69,7 @@ export const config = {
     '/my-classes/:path*',
     '/my-target/:path*',
     '/practice/:path*',
-    '/profile/:path*',
+    '/dashboard/:path*',
     '/tests/history/:path*',
     '/tests/leaderboard/:path*',
   ],

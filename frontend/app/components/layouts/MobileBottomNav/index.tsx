@@ -75,7 +75,7 @@ function MobileBottomNav() {
   const isPlanActive =
     pathname.startsWith(routes.myTarget) || pathname.startsWith(routes.learningPlans);
   const isProfileActive =
-    pathname.startsWith('/profile') || pathname.startsWith(routes.myCertificates);
+    pathname.startsWith(routes.dashboard) || pathname.startsWith(routes.myCertificates);
 
   // const requireLogin = (message: string) => {
   //   if (user) {
@@ -255,7 +255,7 @@ function MobileBottomNav() {
                     {user ? (
                       <>
                         <Link
-                          href={routes.profile}
+                          href={routes.dashboard}
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >

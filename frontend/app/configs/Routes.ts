@@ -59,7 +59,7 @@ const routes = {
   login: '/login',
   forgot: '/forgot',
   reset: '/reset',
-  profile: '/profile',
+  dashboard: '/dashboard',
   myTarget: '/my-target',
   targetDashboard: '/my-target/dashboard',
 

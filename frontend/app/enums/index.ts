@@ -115,12 +115,6 @@ export enum QuestConditionType {
   COMPLETE_PLAN_TASK = 'COMPLETE_PLAN_TASK',
 }
 
-export enum StreakActivityType {
-  TEST_SUBMIT = 'TEST_SUBMIT',
-  VOCAB_PRACTICE = 'VOCAB_PRACTICE',
-  LESSON_PASS = 'LESSON_PASS',
-}
-
 export enum PostStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',

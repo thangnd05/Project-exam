@@ -145,7 +145,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
               <h1 className={cx('title')}>Bài viết đã lưu</h1>
               <p className={cx('subtitle')}>Những bài viết bạn đã đánh dấu để xem lại.</p>
             </div>
-            <button type="button" className={cx('backLink')} onClick={() => router.push(routes.profile)}>
+            <button type="button" className={cx('backLink')} onClick={() => router.push(routes.dashboard)}>
               Trở lại hồ sơ
             </button>
           </header>

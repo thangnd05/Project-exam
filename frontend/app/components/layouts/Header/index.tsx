@@ -385,7 +385,7 @@ function Header() {
                         <p className={cx('dropdownName')}>{user.fullName || user.userName}</p>
                         {user.email && <p className={cx('dropdownEmail')}>{user.email}</p>}
                       </div>
-                      <Dropdown.Item as={Link} href={routes.profile}>
+                      <Dropdown.Item as={Link} href={routes.dashboard}>
                         Hồ sơ
                       </Dropdown.Item>
                       <Dropdown.Item as={Link} href={routes.myCertificates}>
