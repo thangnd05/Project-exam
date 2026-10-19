@@ -1,28 +1,158 @@
 @import 'app/assets/styles/mixins.scss';
 
+// Header dạng thanh nổi bo tròn theo mẫu FrostScope: nền than chì gần đặc, chữ bạc, điểm nhấn xanh băng.
 .wrapper {
   font-size: 1.6rem;
   position: sticky;
   top: 0;
   z-index: 1000;
-  padding: 0;
+  padding: 12px clamp(12px, 2vw, 16px) 0;
   isolation: isolate;
-  background-color: rgb(var(--brand-900-rgb) / 0.8);
-  backdrop-filter: blur(28px) saturate(180%);
-  -webkit-backdrop-filter: blur(28px) saturate(180%);
-  border-bottom: 1px solid rgb(var(--brand-200-rgb) / 0.18);
-  box-shadow: 0 1px 0 rgb(var(--brand-200-rgb) / 0.05);
-
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    background-color: rgb(var(--brand-900-rgb) / 0.97);
-  }
+  background: transparent;
+  pointer-events: none;
 }
 
 .pill {
-  max-width: 1280px;
+  max-width: 1152px;
   margin: 0 auto;
   width: 100%;
-  padding: 10px clamp(16px, 3vw, 28px);
+  padding: 10px clamp(18px, 2.4vw, 32px);
+  border-radius: 999px;
+  background-color: rgb(var(--brand-900-rgb) / 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 10px 30px rgb(var(--brand-900-rgb) / 0.18);
+  pointer-events: auto;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background-color: rgb(var(--brand-900-rgb) / 0.98);
+  }
+}
+
+// Khi nội dung bên dưới có nền sáng (giống .nav-light của mẫu): nền trùng 100% màu nền trang,
+// không viền, không bóng; chữ slate, nút graphite.
+.pill.onLight {
+  background-color: var(--bg-body);
+  box-shadow: none;
+
+  .home {
+    color: var(--slate-600);
+
+    &:visited {
+      color: var(--slate-600);
+    }
+
+    &:hover,
+    &:active,
+    &:focus-visible {
+      color: var(--slate-900);
+      background-color: rgb(255 255 255 / 0.7);
+    }
+
+    &:global(.active),
+    &.active {
+      color: var(--brand-700);
+      background-color: rgb(255 255 255 / 0.7);
+    }
+  }
+
+  .ctaSlot {
+    border-right-color: rgb(var(--slate-600-rgb) / 0.25);
+  }
+
+  .themeToggle {
+    border-color: rgb(var(--slate-600-rgb) / 0.25);
+    background: transparent;
+    color: var(--slate-600);
+
+    &:hover {
+      border-color: var(--primary);
+      background: rgb(var(--slate-900-rgb) / 0.06);
+      color: var(--slate-900);
+    }
+  }
+
+  .ctaBtn {
+    --bs-btn-color: var(--text-on-dark);
+    --bs-btn-bg: var(--brand-800);
+    --bs-btn-hover-color: var(--white);
+    --bs-btn-hover-bg: rgb(var(--brand-deeper-rgb));
+    --bs-btn-active-color: var(--white);
+    --bs-btn-active-bg: rgb(var(--brand-deeper-rgb));
+
+    background: var(--brand-800);
+    color: var(--text-on-dark);
+    box-shadow: none;
+
+    &:visited {
+      color: var(--text-on-dark);
+    }
+
+    &:hover {
+      background: rgb(var(--brand-deeper-rgb));
+      color: var(--white);
+    }
+  }
+
+  .user-info {
+    border-color: rgb(var(--slate-600-rgb) / 0.25);
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--primary);
+      background: rgb(var(--slate-900-rgb) / 0.06);
+    }
+
+    &:global(.dropdown-toggle)::after {
+      border-top-color: var(--slate-500);
+    }
+  }
+
+  .username {
+    color: var(--slate-900);
+  }
+
+  .custom-dropdown {
+    background: var(--white);
+    border-color: var(--slate-300);
+    box-shadow:
+      0 20px 35px -5px rgb(var(--slate-900-rgb) / 0.18),
+      0 0 1px 1px rgb(0 0 0 / 0.05);
+
+    :global(.dropdown-item) {
+      color: var(--slate-800);
+
+      &:hover,
+      &:focus {
+        background: var(--slate-100);
+        color: var(--slate-900);
+      }
+    }
+
+    :global(.dropdown-item).logoutItem {
+      color: var(--red-600);
+
+      &:hover,
+      &:focus {
+        background: var(--red-100);
+        color: var(--red-700);
+      }
+    }
+  }
+
+  .dropdownHead,
+  .dropdownDivider {
+    border-color: var(--slate-200);
+  }
+
+  .dropdownName {
+    color: var(--slate-900);
+  }
+
+  .dropdownEmail {
+    color: var(--slate-500);
+  }
 }
 
 .barRow {
@@ -61,22 +191,16 @@
 
 .brand {
   display: inline-flex;
-  font-size: 1.9rem;
-  font-weight: 700;
+  align-items: center;
   text-decoration: none;
   color: inherit;
+  transition: transform 0.2s ease;
 
   &:hover {
     text-decoration: none;
     color: inherit;
+    transform: scale(1.02);
   }
-}
-
-.brandInner {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
 }
 
 .logo-brand {
@@ -84,23 +208,12 @@
   width: auto;
   object-fit: contain;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 10px rgb(var(--primary-rgb) / 0.35));
-}
-
-.brandName {
-  font-size: 1.05em;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--text-on-dark);
-  white-space: nowrap;
 }
 
 .navTrack {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
   max-width: 100%;
   min-width: 0;
   padding: 2px 4px;
@@ -111,32 +224,21 @@
   flex: 0 0 auto;
   font-size: 1.35rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 10px 12px;
-  border-radius: 8px;
-  color: rgb(var(--text-on-dark-rgb) / 0.68);
+  padding: 7px 14px;
+  border-radius: 999px;
+  color: var(--text-on-dark-muted);
   text-decoration: none;
   white-space: nowrap;
   transition: color 0.2s ease, background-color 0.2s ease;
 
-  &::after {
-    content: '';
-    position: absolute;
-    left: 12px;
-    right: 12px;
-    bottom: 3px;
-    height: 2.5px;
-    border-radius: 2px;
-    background: linear-gradient(90deg, var(--brand-200), var(--primary));
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.2s ease;
+  &:visited {
+    color: var(--text-on-dark-muted);
   }
 
   &:hover,
-  &:active,
-  &:visited {
+  &:active {
     color: var(--text-on-dark);
+    background-color: rgb(255 255 255 / 0.05);
     text-decoration: none;
   }
 
@@ -146,22 +248,15 @@
 
   &:focus-visible {
     color: var(--text-on-dark);
-    background: rgb(var(--brand-200-rgb) / 0.08);
-    box-shadow: 0 0 0 2px rgb(var(--primary-rgb) / 0.45);
-  }
-
-  &:hover::after {
-    transform: scaleX(1);
+    background-color: rgb(255 255 255 / 0.05);
+    box-shadow: 0 0 0 2px rgb(var(--primary-rgb) / 0.55);
   }
 
   &:global(.active),
   &.active {
-    color: var(--text-on-dark);
+    color: var(--primary);
     font-weight: 700;
-
-    &::after {
-      transform: scaleX(1);
-    }
+    background-color: rgb(var(--primary-rgb) / 0.12);
   }
 }
 
@@ -169,49 +264,54 @@
   display: flex;
   align-items: center;
   margin-right: 2px;
-  padding-right: 16px;
-  border-right: 1px solid rgb(var(--brand-200-rgb) / 0.16);
+  padding-right: 14px;
+  border-right: 1px solid var(--surface-dark-border);
 }
 
-.new-test {
-  --bs-btn-color: var(--primary-btn-fg);
-  --bs-btn-bg: var(--primary-btn-bg);
+// Nút nhấn chính: nền xanh băng, chữ than chì (giống "Thi thử ngay" ở mẫu).
+.ctaBtn {
+  --bs-btn-color: var(--text-on-brand);
+  --bs-btn-bg: var(--primary);
   --bs-btn-border-color: transparent;
-  --bs-btn-hover-color: var(--primary-btn-fg-hover);
-  --bs-btn-hover-bg: var(--primary-btn-bg);
-  --bs-btn-hover-border-color: var(--primary);
-  --bs-btn-active-color: var(--primary-btn-fg-hover);
-  --bs-btn-active-bg: var(--primary-btn-bg);
-  --bs-btn-active-border-color: var(--primary);
-  --bs-btn-disabled-color: var(--primary-btn-fg);
-  --bs-btn-disabled-bg: var(--primary-btn-bg);
-  --bs-btn-disabled-border-color: transparent;
+  --bs-btn-hover-color: var(--text-on-brand);
+  --bs-btn-hover-bg: var(--brand-400);
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-active-color: var(--text-on-brand);
+  --bs-btn-active-bg: var(--brand-400);
+  --bs-btn-active-border-color: transparent;
+  --bs-btn-border-radius: 999px;
 
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--text-on-brand);
   font-size: 1.35rem;
   font-weight: 700;
-  --bs-btn-border-radius: 999px;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  color: var(--primary-btn-fg);
+  line-height: 1.4;
   white-space: nowrap;
-  padding: 9px 16px;
-  background: var(--primary-btn-bg);
-  box-shadow: 0 4px 18px rgb(var(--primary-rgb) / 0.3);
-  transition:
-    box-shadow 0.2s ease,
-    transform 0.15s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    filter 0.2s ease;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgb(var(--primary-rgb) / 0.2);
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+
+  svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+
+  &:visited {
+    color: var(--text-on-brand);
+  }
 
   &:hover {
-    background: var(--primary-btn-bg);
-    border-color: var(--primary);
-    color: var(--primary-btn-fg-hover);
-    transform: translateY(-2px);
-    box-shadow:
-      0 6px 22px rgb(var(--primary-rgb) / 0.4),
-      0 0 0 3px var(--primary-alpha-35);
+    background: var(--brand-400);
+    color: var(--text-on-brand);
+    transform: scale(1.02);
+    text-decoration: none;
   }
 
   &:focus {
@@ -220,12 +320,11 @@
 
   &:focus-visible {
     box-shadow:
-      0 0 0 2px rgb(var(--brand-900-rgb) / 0.9),
-      0 0 0 4px rgb(var(--primary-rgb) / 0.55);
+      0 0 0 2px rgb(var(--brand-900-rgb)),
+      0 0 0 4px rgb(var(--primary-rgb) / 0.7);
   }
 
   &:active {
-    filter: brightness(0.96);
     transform: scale(0.98);
   }
 }
@@ -240,27 +339,29 @@
 .userMenuWrapper {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
 }
 
 .authLinks {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 8px;
 }
 
 .user-info {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 44px;
-  padding: 4px 8px;
-  border-radius: 10px;
-  transition: background-color 0.2s ease;
+  min-height: 40px;
+  padding: 3px 12px 3px 4px;
+  border: 1px solid var(--surface-dark-border);
+  border-radius: 999px;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 
   &:hover {
     cursor: pointer;
-    background: rgb(var(--brand-200-rgb) / 0.08);
+    border-color: rgb(var(--primary-rgb) / 0.5);
+    background: rgb(255 255 255 / 0.06);
   }
 
   &:focus {
@@ -268,21 +369,21 @@
   }
 
   &:focus-visible {
-    background: rgb(var(--brand-200-rgb) / 0.1);
+    border-color: rgb(var(--primary-rgb) / 0.5);
     box-shadow: 0 0 0 2px rgb(var(--primary-rgb) / 0.45);
   }
 
   &:global(.dropdown-toggle)::after {
     margin-left: 2px;
-    border-top-color: rgb(var(--text-on-dark-rgb) / 0.7);
+    border-top-color: var(--text-on-dark-muted);
   }
 }
 
 .username {
   display: block;
   max-width: 120px;
-  font-weight: 600;
-  font-size: var(--font-size-md);
+  font-weight: 700;
+  font-size: 1.3rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -295,24 +396,72 @@
   min-width: 0;
 }
 
+// Dropdown tài khoản dạng thẻ tối (nền card than chì, viền graphite).
 .custom-dropdown {
-  font-size: 1.6rem;
-  min-width: 200px;
-  background: var(--bg-white);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  font-size: 1.35rem;
+  min-width: 240px;
+  margin-top: 10px !important;
+  padding: 8px;
+  background: var(--surface-dark);
+  border: 1px solid var(--surface-dark-border);
+  border-radius: 16px;
+  box-shadow:
+    0 20px 40px -10px rgb(0 0 0 / 0.8),
+    0 0 1px 1px rgb(255 255 255 / 0.05);
 
   :global(.dropdown-item) {
+    padding: 9px 12px;
+    border-radius: 12px;
     white-space: nowrap;
-    color: var(--text-color);
+    font-weight: 600;
+    color: var(--text-on-dark);
 
     &:hover,
     &:focus {
-      background: var(--hover-color);
-      color: var(--primary-text);
+      background: rgb(255 255 255 / 0.06);
+      color: var(--white);
     }
   }
+
+  :global(.dropdown-item).logoutItem {
+    color: var(--red-400);
+
+    &:hover,
+    &:focus {
+      background: rgb(var(--red-500-rgb) / 0.12);
+      color: rgb(252 165 165);
+    }
+  }
+}
+
+.dropdownHead {
+  padding: 8px 12px 10px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgb(var(--surface-dark-border-rgb) / 0.8);
+
+  p {
+    margin: 0;
+  }
+}
+
+.dropdownName {
+  font-weight: 700;
+  color: var(--text-on-dark);
+}
+
+.dropdownEmail {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  color: var(--text-on-dark-muted);
+}
+
+.dropdownDivider {
+  margin: 4px 0;
+  border-color: rgb(var(--surface-dark-border-rgb) / 0.8);
+  opacity: 1;
 }
 
 .customMenu {
@@ -330,43 +479,24 @@
   gap: 4px;
   font-size: 1.35rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
-  padding: 10px 12px;
+  padding: 7px 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 999px;
   background: transparent;
-  color: rgb(var(--text-on-dark-rgb) / 0.68);
+  color: var(--text-on-dark-muted);
   cursor: pointer;
   white-space: nowrap;
   transition: color 0.2s ease, background-color 0.2s ease;
 
   &:global(.dropdown-toggle)::after {
     margin-left: 4px;
-    border-top-color: rgb(var(--text-on-dark-rgb) / 0.55);
-  }
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 12px;
-    right: 22px;
-    bottom: 3px;
-    height: 2.5px;
-    border-radius: 2px;
-    background: linear-gradient(90deg, var(--brand-200), var(--primary));
-    transform: scaleX(0);
-    transform-origin: center;
-    transition: transform 0.2s ease;
+    border-top-color: var(--text-on-dark-muted);
   }
 
   &:hover,
   &:global(.show) {
     color: var(--text-on-dark);
-  }
-
-  &:hover::before,
-  &:global(.show)::before {
-    transform: scaleX(1);
+    background-color: rgb(255 255 255 / 0.05);
   }
 
   &:focus {
@@ -375,20 +505,19 @@
 
   &:focus-visible {
     color: var(--text-on-dark);
-    background: rgb(var(--brand-200-rgb) / 0.08);
     box-shadow: 0 0 0 2px rgb(var(--primary-rgb) / 0.45);
   }
 }
 
 .classDropdown {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   min-width: 200px;
   margin-top: 8px !important;
-  background: var(--bg-white);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
-  padding: 6px 0;
+  padding: 8px;
+  background: var(--surface-dark);
+  border: 1px solid var(--surface-dark-border);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px -10px rgb(0 0 0 / 0.8);
 
   &::before {
     content: '';
@@ -401,14 +530,14 @@
 
   :global(.dropdown-item) {
     white-space: nowrap;
-    color: var(--text-color);
-    padding: 10px 16px;
-    font-size: 1.4rem;
+    color: var(--text-on-dark);
+    padding: 9px 12px;
+    border-radius: 12px;
 
     &:hover,
     &:focus {
-      background: var(--hover-color);
-      color: var(--primary-text);
+      background: rgb(255 255 255 / 0.06);
+      color: var(--white);
     }
   }
 }
@@ -424,40 +553,26 @@
 @media (min-width: 992px) and (max-width: 1199.98px) {
   .home,
   .menuTitle {
-    padding-left: 8px;
-    padding-right: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
     font-size: 1.28rem;
   }
 
-  .home::after {
-    left: 8px;
-    right: 8px;
-  }
-
-  .menuTitle::before {
-    left: 8px;
-    right: 18px;
-  }
-
   .ctaSlot {
-    padding-right: 12px;
+    padding-right: 10px;
   }
 
-  .new-test {
-    padding: 8px 12px;
+  .ctaBtn {
+    padding: 7px 14px;
     font-size: 1.25rem;
   }
 
   .userMenuWrapper {
-    gap: 10px;
+    gap: 8px;
   }
 
   .username {
     max-width: 80px;
-  }
-
-  .brandName {
-    display: none;
   }
 }
 
@@ -471,14 +586,19 @@
   }
 }
 
+@media (min-width: 1536px) {
+  .pill {
+    max-width: 1280px;
+  }
+}
+
 @media (max-width: 991.98px) {
   .wrapper {
     padding: 8px 12px 0;
   }
 
   .pill {
-    border-radius: 24px;
-    padding: 6px 10px 6px 12px;
+    padding: 6px 10px 6px 16px;
   }
 
   .barRow {
@@ -508,25 +628,16 @@
     display: none !important;
   }
 
-  .brand {
-    font-size: 1.65rem;
-  }
-
   .logo-brand {
-    height: 26px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .navTrack {
-    gap: 4px;
+    height: 24px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .brand,
   .home,
   .menuTitle,
-  .new-test,
+  .ctaBtn,
   .user-info {
     transition: none;
   }

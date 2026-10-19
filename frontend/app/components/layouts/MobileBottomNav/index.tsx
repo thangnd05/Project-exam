@@ -43,7 +43,6 @@ function MobileBottomNav() {
   const router = useRouter();
   const {user, logout, roleName} = useAuth();
   const canCreateTest = roleName === 'ADMIN';
-  const canManageTests = roleName === 'ADMIN';
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
   // Giữ đúng các mục như menu desktop; Lớp học và Từ vựng đang tạm ẩn ở cả hai nơi.
   const [activeSheet, setActiveSheet] = useState<'menu' | null>(null);
@@ -130,7 +129,7 @@ function MobileBottomNav() {
           aria-current={isExamActive ? 'page' : undefined}
         >
           <FaGraduationCap className={cx('tabIcon')} />
-          <span className={cx('tabLabel')}>Kỳ thi</span>
+          <span className={cx('tabLabel')}>Kho đề thi</span>
         </Link>
 
         {/* <Link
@@ -253,15 +252,6 @@ function MobileBottomNav() {
                     >
                       Tài liệu
                     </Link>
-                    {canManageTests && (
-                      <Link
-                        href={routes.MyTest}
-                        className={cx('menuItem')}
-                        onClick={closeSheet}
-                      >
-                        Bài đã tạo
-                      </Link>
-                    )}
                     {user ? (
                       <>
                         <Link

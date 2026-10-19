@@ -103,6 +103,8 @@
   --brand-deeper-rgb: 63 52 32;
   --brand-cream-rgb: 250 247 240;
   --surface-inverse-rgb: 30 41 59;
+  --surface-dark-rgb: 32 28 22;
+  --surface-dark-border-rgb: 63 52 32;
 
   --body-rgb: 255 255 255;
   --surface-rgb: 255 255 255;
@@ -180,6 +182,86 @@
 @mixin dark-dim-accents {
   --brand-500-rgb: 180 150 68;
   --brand-600-rgb: 150 124 54;
+}
+
+/**
+ * Bảng màu FrostScope (bật bằng data-palette="frost" trên <html>).
+ * Frost Black #101820, Graphite #25374A, Ice Blue #77BBDD, Ice White #DCEEF7, Silver #A2ABB8.
+ * Chỉ ghi đè các kênh brand; thang neutral/trạng thái dùng chung với bảng màu gốc.
+ */
+@mixin frost-constants {
+  --frost-black-rgb: 16 24 32;
+  --frost-graphite-rgb: 37 55 74;
+  --frost-surface-rgb: 26 38 52;
+  --frost-card-rgb: 22 34 47;
+  --frost-ice-rgb: 119 187 221;
+  --frost-ice-hover-rgb: 142 199 227;
+  --frost-ice-white-rgb: 220 238 247;
+  --frost-silver-rgb: 162 171 184;
+  --frost-link-rgb: 2 132 199;
+  --frost-deep-rgb: 23 78 110;
+
+  --frost-black: rgb(var(--frost-black-rgb));
+  --frost-graphite: rgb(var(--frost-graphite-rgb));
+  --frost-surface: rgb(var(--frost-surface-rgb));
+  --frost-card: rgb(var(--frost-card-rgb));
+  --frost-ice: rgb(var(--frost-ice-rgb));
+  --frost-ice-hover: rgb(var(--frost-ice-hover-rgb));
+  --frost-ice-white: rgb(var(--frost-ice-white-rgb));
+  --frost-silver: rgb(var(--frost-silver-rgb));
+  --frost-link: rgb(var(--frost-link-rgb));
+}
+
+@mixin palette-frost-light {
+  --brand-50-rgb: 243 248 252;
+  --brand-100-rgb: 228 241 248;
+  --brand-150-rgb: 213 233 244;
+  --brand-200-rgb: 194 223 239;
+  --brand-300-rgb: 167 210 232;
+  --brand-400-rgb: 142 199 227;
+  --brand-500-rgb: 119 187 221;
+  --brand-600-rgb: 79 163 207;
+  --brand-700-rgb: 3 105 161;
+  --brand-800-rgb: 37 55 74;
+  --brand-900-rgb: 16 24 32;
+  --text-on-dark-rgb: 220 238 247;
+
+  --brand-deep-rgb: 37 55 74;
+  --brand-deeper-rgb: 26 38 52;
+  --brand-cream-rgb: 220 238 247;
+  --surface-inverse-rgb: 37 55 74;
+  --surface-dark-rgb: 22 34 47;
+  --surface-dark-border-rgb: 37 55 74;
+
+  // Nền trang băng nhạt #EBF2F7 như mẫu; thẻ/bề mặt giữ trắng để nổi lên trên nền.
+  --body-rgb: 235 242 247;
+  --surface-rgb: 255 255 255;
+}
+
+@mixin palette-frost-dark {
+  --brand-50-rgb: 22 33 44;
+  --brand-100-rgb: 26 38 52;
+  --brand-150-rgb: 31 46 62;
+  --brand-200-rgb: 37 55 74;
+  --brand-300-rgb: 46 67 90;
+  --brand-400-rgb: 79 140 173;
+  --brand-500-rgb: 119 187 221;
+  --brand-600-rgb: 142 199 227;
+  --brand-700-rgb: 142 199 227;
+  --brand-800-rgb: 220 238 247;
+
+  --ink: #dceef7;
+  --body-rgb: 16 24 32;
+  --surface-rgb: 22 34 47;
+  --glass-bg: rgb(22 34 47 / 0.78);
+  --glass-border: rgb(220 238 247 / 0.08);
+}
+
+// Gradient dựng từ hằng số frost để không bị đảo màu khi brand-800 sáng lên ở dark mode.
+@mixin frost-tokens {
+  --header-gradient: linear-gradient(135deg, var(--frost-graphite) 0%, var(--frost-surface) 55%, var(--frost-black) 100%);
+  --hero-gradient: linear-gradient(135deg, var(--frost-black) 0%, var(--frost-graphite) 55%, rgb(var(--frost-deep-rgb)) 100%);
+  --hero-shadow: 0 12px 30px rgb(var(--frost-black-rgb) / 0.28);
 }
 
 @mixin bootstrap-bridge {
@@ -360,6 +442,8 @@
   --bg-body: rgb(var(--body-rgb));
   --bg-white: rgb(var(--surface-rgb));
   --surface-inverse: rgb(var(--surface-inverse-rgb));
+  --surface-dark: rgb(var(--surface-dark-rgb));
+  --surface-dark-border: rgb(var(--surface-dark-border-rgb));
   --brand-deep: rgb(var(--brand-deep-rgb));
   --brand-deeper: rgb(var(--brand-deeper-rgb));
   --input-bg: var(--warm-input);
@@ -423,6 +507,12 @@
   color-scheme: light;
   @include palette-light-raw;
   @include theme-tokens;
+  @include frost-constants;
+}
+
+:root[data-palette='frost'] {
+  @include palette-frost-light;
+  @include frost-tokens;
 }
 
 @include dark-theme-root {
@@ -443,6 +533,18 @@
 
   img {
     filter: brightness(0.9);
+  }
+}
+
+:root[data-palette='frost'][data-theme='dark'] {
+  @include palette-frost-dark;
+
+  .theme-locked {
+    @include palette-frost-light;
+    @include frost-tokens;
+
+    --surface-rgb: 228 234 240;
+    --body-rgb: 228 234 240;
   }
 }
 

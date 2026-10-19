@@ -39,7 +39,6 @@ export const config = {
     '/my-certificates/:path*',
     '/my-classes/:path*',
     '/my-target/:path*',
-    '/my-tests/:path*',
     '/practice/:path*',
     '/profile/:path*',
     '/tests/history/:path*',

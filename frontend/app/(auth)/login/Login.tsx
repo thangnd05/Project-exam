@@ -21,7 +21,7 @@ import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
-import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiArrowLeft, FiArrowRight, FiAtSign, FiEye, FiEyeOff, FiLock, FiMail, FiUser } from 'react-icons/fi';
 import { imageAssets, name } from '@/app/assets/images';
 import ForgotPassword from '../forgot/ForgotPassword';
 import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/components/Recaptcha/RecaptchaCheckbox';
@@ -36,39 +36,26 @@ const OAUTH_ERROR_TEXT: Record<string, string> = {
   oauth2_timeout: 'Đăng nhập bằng Google mất quá nhiều thời gian. Vui lòng thử lại.',
 };
 
-const HIGHLIGHTS = [
-  { title: 'Đề sát format thật', text: 'Cấu trúc và thời gian như phòng thi' },
-  { title: 'Chấm điểm tự động', text: 'Có kết quả ngay sau khi nộp bài' },
-  { title: 'Chẩn đoán điểm yếu', text: 'Biết rõ phần nào cần ôn lại' },
-  { title: 'Lộ trình cá nhân hoá', text: 'Ôn đúng chỗ, không luyện mù quáng' },
-];
-
-function BrandLink({ className }: { className?: string }) {
+// Logo màu cho nền sáng, logo trắng cho dark mode; CSS quyết định cái nào hiển thị.
+function BrandLink() {
   return (
-    <Link href={routes.home} className={cx('brand', className)} aria-label={`Về trang chủ ${name}`}>
-      <Image src={imageAssets.logoW} alt="" width={40} height={26} />
-      <span>{name}</span>
+    <Link href={routes.home} className={cx('brand')} aria-label="Về trang chủ">
+      <Image
+        src={imageAssets.frostscopeLogoRgb}
+        alt="FrostScope"
+        width={190}
+        height={40}
+        priority
+        className={cx('brandLogo', 'brandLogoLight')}
+      />
+      <Image
+        src={imageAssets.frostscopeLogoWhite}
+        alt=""
+        width={190}
+        height={40}
+        className={cx('brandLogo', 'brandLogoDark')}
+      />
     </Link>
-  );
-}
-
-function BrandPanel() {
-  return (
-    <>
-      <BrandLink className={cx('panelBrand')} />
-      <div className={cx('pitch')}>
-        <h2>Học theo lộ trình riêng - Chạm tay đến mục tiêu</h2>
-        <ul className={cx('highlights')}>
-          {HIGHLIGHTS.map(({ title, text }) => (
-            <li key={title}>
-              <strong>{title}</strong>
-              <span>{text}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <p className={cx('panelCopyright')}>© {name} Exam. All rights reserved.</p>
-    </>
   );
 }
 
@@ -217,212 +204,261 @@ function Login() {
   const handleSocialClick = () => saveOAuthRedirect(getRedirectTarget(searchParams));
 
   const socialButtons = (
-    <div className={cx('social-btns')}>
-      <a href={GOOGLE_AUTH_URL} className={cx('social-btn')} onClick={handleSocialClick} aria-label="Đăng nhập bằng Google">
-        <FcGoogle size={24} />
+    <div className={cx('socialBtns')}>
+      <a href={GOOGLE_AUTH_URL} className={cx('socialBtn')} onClick={handleSocialClick}>
+        <FcGoogle size={18} aria-hidden="true" />
+        <span>Tiếp tục với Google</span>
       </a>
-      <a href={FACEBOOK_AUTH_URL} className={cx('social-btn')} onClick={handleSocialClick} aria-label="Đăng nhập bằng Facebook">
-        <FaFacebook size={24} color="#1877F2" />
+      <a href={FACEBOOK_AUTH_URL} className={cx('socialBtn')} onClick={handleSocialClick}>
+        <FaFacebook size={18} color="#1877F2" aria-hidden="true" />
+        <span>Tiếp tục với Facebook</span>
       </a>
     </div>
   );
 
-  const legalLinks = (
-    <nav className={cx('legal')} aria-label="Thông tin pháp lý">
-      <Link href={routes.service}>Điều khoản</Link>
-      <span className={cx('legal-divider')} aria-hidden="true">|</span>
-      <Link href={routes.policy}>Quyền riêng tư</Link>
-    </nav>
+  const passwordToggle = (shown: boolean, toggle: () => void) => (
+    <button
+      type="button"
+      className={cx('passwordToggle')}
+      onClick={toggle}
+      aria-label={shown ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+    >
+      {shown ? <FiEyeOff /> : <FiEye />}
+    </button>
+  );
+
+  const messageBox = message && (
+    <div className={cx('loginMessage', messageType)} role={messageType === 'error' ? 'alert' : 'status'}>
+      <p>{message}</p>
+    </div>
+  );
+
+  const loginForm = (
+    <form onSubmit={handleLogin} className={cx('form')}>
+      <div className={cx('field')}>
+        <label htmlFor="login-identifier">Email hoặc tên đăng nhập</label>
+        <div className={cx('control')}>
+          <FiMail className={cx('fieldIcon')} aria-hidden="true" />
+          <input
+            id="login-identifier"
+            type="text"
+            autoComplete="username"
+            placeholder="name@example.com"
+            required
+            value={loginIdentifier}
+            onChange={(e) => setLoginIdentifier(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+      </div>
+
+      <div className={cx('field')}>
+        <div className={cx('labelRow')}>
+          <label htmlFor="login-password">Mật khẩu</label>
+          <button
+            type="button"
+            className={cx('textLink')}
+            onClick={() => { setShowForgot(true); setMessage(''); }}
+          >
+            Quên mật khẩu?
+          </button>
+        </div>
+        <div className={cx('control')}>
+          <FiLock className={cx('fieldIcon')} aria-hidden="true" />
+          <input
+            id="login-password"
+            type={showLoginPassword ? 'text' : 'password'}
+            autoComplete="current-password"
+            placeholder="Nhập mật khẩu của bạn"
+            required
+            value={loginPassword}
+            onChange={(e) => setLoginPassword(e.target.value)}
+            disabled={loading}
+            className={cx('hasToggle')}
+          />
+          {passwordToggle(showLoginPassword, () => setShowLoginPassword((prev) => !prev))}
+        </div>
+      </div>
+
+      {messageBox}
+
+      <button type="submit" className={cx('submitBtn')} disabled={loading}>
+        {loading && <span className={cx('loadingSpinner')} />}
+        <span>{loading ? 'Đang đăng nhập...' : 'Đăng nhập ngay'}</span>
+        {!loading && <FiArrowRight aria-hidden="true" />}
+      </button>
+    </form>
+  );
+
+  const registerForm = (
+    <form onSubmit={handleRegister} className={cx('form')}>
+      <div className={cx('field')}>
+        <label htmlFor="reg-fullname">Họ và tên</label>
+        <div className={cx('control')}>
+          <FiUser className={cx('fieldIcon')} aria-hidden="true" />
+          <input
+            id="reg-fullname"
+            type="text"
+            autoComplete="name"
+            placeholder="Ví dụ: Nguyễn Văn An"
+            required
+            value={regFullName}
+            onChange={(e) => setRegFullName(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+      </div>
+
+      <div className={cx('field')}>
+        <label htmlFor="reg-email">Địa chỉ email</label>
+        <div className={cx('control')}>
+          <FiMail className={cx('fieldIcon')} aria-hidden="true" />
+          <input
+            id="reg-email"
+            type="email"
+            autoComplete="email"
+            placeholder="name@example.com"
+            required
+            value={regEmail}
+            onChange={(e) => setRegEmail(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+      </div>
+
+      <div className={cx('field')}>
+        <label htmlFor="reg-username">Tên đăng nhập</label>
+        <div className={cx('control')}>
+          <FiAtSign className={cx('fieldIcon')} aria-hidden="true" />
+          <input
+            id="reg-username"
+            type="text"
+            autoComplete="username"
+            placeholder="Nhập tên đăng nhập"
+            required
+            value={regUserName}
+            onChange={(e) => setRegUserName(e.target.value)}
+            disabled={loading}
+          />
+        </div>
+      </div>
+
+      <div className={cx('field')}>
+        <label htmlFor="reg-password">Mật khẩu</label>
+        <div className={cx('control')}>
+          <FiLock className={cx('fieldIcon')} aria-hidden="true" />
+          <input
+            id="reg-password"
+            type={showRegPassword ? 'text' : 'password'}
+            autoComplete="new-password"
+            placeholder="Tạo mật khẩu an toàn"
+            required
+            value={regPassword}
+            onChange={(e) => setRegPassword(e.target.value)}
+            disabled={loading}
+            className={cx('hasToggle')}
+          />
+          {passwordToggle(showRegPassword, () => setShowRegPassword((prev) => !prev))}
+        </div>
+      </div>
+
+      <div className={cx('recaptchaRow')}>
+        <RecaptchaCheckbox
+          ref={recaptchaRef}
+          siteKey={RECAPTCHA_SITE_KEY}
+          onChange={setRecaptchaToken}
+          className={cx('recaptchaBox')}
+        />
+      </div>
+
+      <p className={cx('terms')}>
+        Bằng việc đăng ký, bạn đồng ý với <Link href={routes.service}>Điều khoản</Link> và{' '}
+        <Link href={routes.policy}>Chính sách bảo mật</Link> của chúng tôi.
+      </p>
+
+      {messageBox}
+
+      <button type="submit" className={cx('submitBtn')} disabled={loading}>
+        {loading && <span className={cx('loadingSpinner')} />}
+        <span>{loading ? 'Đang xử lý...' : 'Tạo tài khoản'}</span>
+        {!loading && <FiArrowRight aria-hidden="true" />}
+      </button>
+    </form>
   );
 
   return (
     <div className={cx('authPage')}>
-      <div className={cx('mainCard', { signUpMode: isSignUp })}>
-        <div className={cx('formContainer', 'signUpContainer')}>
-          <div className={cx('formInner')}>
-            <BrandLink className={cx('mobileBrand')} />
-            <div className={cx('head')}>
-              <h1>Tạo tài khoản</h1>
-              <p>Bắt đầu hành trình chinh phục cùng cộng đồng {name}</p>
-            </div>
-            {socialButtons}
-
-            <form onSubmit={handleRegister}>
-              <div className={cx('field')}>
-                <label htmlFor="reg-fullname">Họ và tên <span className={cx('required')}>*</span></label>
-                <input
-                  id="reg-fullname"
-                  type="text"
-                  autoComplete="name"
-                  placeholder="Nhập họ và tên"
-                  required
-                  value={regFullName}
-                  onChange={(e) => setRegFullName(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-
-              <div className={cx('field')}>
-                <label htmlFor="reg-email">Email <span className={cx('required')}>*</span></label>
-                <input
-                  id="reg-email"
-                  type="email"
-                  autoComplete="email"
-                  placeholder="Nhập email"
-                  required
-                  value={regEmail}
-                  onChange={(e) => setRegEmail(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-
-              <div className={cx('field')}>
-                <label htmlFor="reg-username">Tên đăng nhập <span className={cx('required')}>*</span></label>
-                <input
-                  id="reg-username"
-                  type="text"
-                  autoComplete="username"
-                  placeholder="Nhập tên đăng nhập"
-                  required
-                  value={regUserName}
-                  onChange={(e) => setRegUserName(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-
-              <div className={cx('field')}>
-                <label htmlFor="reg-password">Mật khẩu <span className={cx('required')}>*</span></label>
-                <div className={cx('control')}>
-                  <input
-                    id="reg-password"
-                    type={showRegPassword ? 'text' : 'password'}
-                    autoComplete="new-password"
-                    placeholder="Nhập mật khẩu"
-                    required
-                    value={regPassword}
-                    onChange={(e) => setRegPassword(e.target.value)}
-                    disabled={loading}
-                  />
-                  <button
-                    type="button"
-                    className={cx('password-toggle')}
-                    onClick={() => setShowRegPassword((prev) => !prev)}
-                    aria-label={showRegPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                  >
-                    {showRegPassword ? <FiEyeOff /> : <FiEye />}
-                  </button>
-                </div>
-              </div>
-
-              <div className={cx('agreement')}>
-                <RecaptchaCheckbox
-                  ref={recaptchaRef}
-                  siteKey={RECAPTCHA_SITE_KEY}
-                  onChange={setRecaptchaToken}
-                  className={cx('recaptchaBox')}
-                />
-              </div>
-
-              {isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}
-              <button type="submit" className={cx('login-btn')} disabled={loading}>
-                {loading && <span className={cx('loading-spinner')} />}
-                <span>{loading ? 'Đang xử lý...' : 'Đăng ký'}</span>
-              </button>
-            </form>
-
-            <p className={cx('mode-switch')}>
-              Đã có tài khoản?{' '}
-              <button type="button" onClick={() => switchMode(false)}>Đăng nhập ngay</button>
-            </p>
-          </div>
-          {legalLinks}
-        </div>
-
-        <div className={cx('formContainer', 'signInContainer')}>
-          {showForgot ? (
-            <div className={cx('formInner')}>
-              <BrandLink className={cx('mobileBrand')} />
-              <ForgotPassword embedded onBack={() => setShowForgot(false)} />
-            </div>
-          ) : (
-            <div className={cx('formInner')}>
-              <BrandLink className={cx('mobileBrand')} />
-              <div className={cx('head')}>
-                <h1>Đăng nhập tài khoản</h1>
-                <p>Chào mừng bạn quay lại với {name}</p>
-              </div>
-              {socialButtons}
-
-              <form onSubmit={handleLogin}>
-                <div className={cx('field')}>
-                  <label htmlFor="login-identifier">Email hoặc tên đăng nhập <span className={cx('required')}>*</span></label>
-                  <input
-                    id="login-identifier"
-                    type="text"
-                    autoComplete="username"
-                    placeholder="Nhập email hoặc tên đăng nhập"
-                    required
-                    value={loginIdentifier}
-                    onChange={(e) => setLoginIdentifier(e.target.value)}
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className={cx('field')}>
-                  <label htmlFor="login-password">Mật khẩu <span className={cx('required')}>*</span></label>
-                  <div className={cx('control')}>
-                    <input
-                      id="login-password"
-                      type={showLoginPassword ? 'text' : 'password'}
-                      autoComplete="current-password"
-                      placeholder="Nhập mật khẩu"
-                      required
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      className={cx('password-toggle')}
-                      onClick={() => setShowLoginPassword((prev) => !prev)}
-                      aria-label={showLoginPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
-                    >
-                      {showLoginPassword ? <FiEyeOff /> : <FiEye />}
-                    </button>
-                  </div>
-                </div>
-
-                <button type="button" className={cx('forgot-link')} onClick={() => { setShowForgot(true); setMessage(''); }}>
-                  Quên mật khẩu?
-                </button>
-                {!isSignUp && message && <div className={cx('login-message', messageType)}><p>{message}</p></div>}
-
-                <button type="submit" className={cx('login-btn')} disabled={loading}>
-                  {loading && <span className={cx('loading-spinner')} />}
-                  <span>{loading ? 'Đang đăng nhập...' : 'Đăng nhập'}</span>
-                </button>
-              </form>
-
-              <p className={cx('mode-switch')}>
-                Chưa có tài khoản?{' '}
-                <button type="button" onClick={() => switchMode(true)}>Đăng ký ngay</button>
-              </p>
-            </div>
-          )}
-          {legalLinks}
-        </div>
-
-        <div className={cx('overlayContainer', 'theme-locked')}>
-          <div className={cx('overlay')}>
-            <div className={cx('overlayPanel', 'overlayLeft')}>
-              <BrandPanel />
-            </div>
-            <div className={cx('overlayPanel', 'overlayRight')}>
-              <BrandPanel />
-            </div>
-          </div>
+      <div className={cx('topBar')}>
+        <Link href={routes.home} className={cx('backHome')}>
+          <FiArrowLeft aria-hidden="true" />
+          <span>Về trang chủ</span>
+        </Link>
+        <div className={cx('topSwitch')}>
+          <span className={cx('topSwitchText')}>
+            {isSignUp ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'}
+          </span>
+          <button type="button" className={cx('textLink')} onClick={() => switchMode(!isSignUp)}>
+            {isSignUp ? 'Đăng nhập' : 'Đăng ký ngay'}
+          </button>
         </div>
       </div>
+
+      <main className={cx('main')}>
+        <div className={cx('column')}>
+          <div className={cx('brandHead')}>
+            <BrandLink />
+            <p>Nền tảng ôn thi chứng chỉ Cloud cá nhân hóa</p>
+          </div>
+
+          <div className={cx('card')}>
+            {showForgot ? (
+              <ForgotPassword embedded onBack={() => setShowForgot(false)} />
+            ) : (
+              <>
+                <div className={cx('tabs')} role="tablist" aria-label="Chọn đăng nhập hoặc đăng ký">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={!isSignUp}
+                    className={cx('tab', { activeTab: !isSignUp })}
+                    onClick={() => switchMode(false)}
+                  >
+                    Đăng nhập
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={isSignUp}
+                    className={cx('tab', { activeTab: isSignUp })}
+                    onClick={() => switchMode(true)}
+                  >
+                    Đăng ký
+                  </button>
+                </div>
+
+                {socialButtons}
+
+                <div className={cx('orDivider')}>
+                  <span>Hoặc với email</span>
+                </div>
+
+                <div key={isSignUp ? 'signup' : 'signin'} className={cx('panel')}>
+                  {isSignUp ? registerForm : loginForm}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </main>
+
+      <footer className={cx('bottom')}>
+        <nav className={cx('legal')} aria-label="Thông tin pháp lý">
+          <Link href={routes.service}>Điều khoản</Link>
+          <span className={cx('legalDivider')} aria-hidden="true" />
+          <Link href={routes.policy}>Quyền riêng tư</Link>
+        </nav>
+        <p className={cx('copyright')}>© {name} Exam. All rights reserved.</p>
+      </footer>
     </div>
   );
 }

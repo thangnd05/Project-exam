@@ -1,0 +1,413 @@
+@import 'app/assets/styles/mixins.scss';
+
+// RankScope theo mẫu FrostScope: thẻ trắng phẳng trên nền băng nhạt, bảng 4 cột top 5.
+$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+.section {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 80px clamp(16px, 3vw, 32px) 24px;
+  overflow: hidden;
+  background: linear-gradient(to bottom, var(--bg-body), rgb(var(--slate-50-rgb)), var(--brand-100));
+  border-top: 1px solid var(--brand-200);
+  border-bottom: 1px solid var(--brand-200);
+  color: var(--slate-900);
+}
+
+.inner {
+  width: 100%;
+  max-width: 1024px;
+  margin: auto;
+}
+
+.card {
+  overflow: hidden;
+  border: 1px solid rgb(var(--slate-200-rgb) / 0.9);
+  border-radius: 24px;
+  background: var(--bg-white);
+}
+
+/* ---------- Đầu thẻ ---------- */
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px clamp(20px, 4vw, 32px);
+  border-bottom: 1px solid rgb(var(--slate-200-rgb) / 0.8);
+
+  @media (max-width: 575.98px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(2.2rem, 2.4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--slate-900);
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--slate-500);
+}
+
+.outlineBtn {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border: 1px solid var(--slate-300);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--slate-700);
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--slate-400);
+    background: var(--slate-100);
+    color: var(--slate-900);
+
+    .arrow {
+      transform: translateX(3px);
+    }
+  }
+
+  &:disabled {
+    cursor: progress;
+  }
+}
+
+.refreshIcon {
+  font-size: 1.5rem;
+  color: var(--slate-500);
+}
+
+.spinning {
+  animation: spin-once 0.6s ease-in-out;
+}
+
+@keyframes spin-once {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.arrow {
+  font-size: 1.5rem;
+  color: var(--slate-400);
+  transition: transform 0.2s ease;
+}
+
+/* ---------- Tab lọc hãng ---------- */
+
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 3vw, 32px);
+  padding: 0 clamp(20px, 4vw, 32px);
+  overflow-x: auto;
+  border-bottom: 1px solid rgb(var(--slate-200-rgb) / 0.8);
+  background: rgb(var(--slate-50-rgb) / 0.8);
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.tab {
+  padding: 12px 0;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-size: 1.4rem;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--slate-500);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    color: var(--slate-900);
+  }
+}
+
+.activeTab {
+  border-bottom-color: var(--brand-700);
+  font-weight: 700;
+  color: var(--brand-700);
+
+  &:hover {
+    color: var(--brand-700);
+  }
+}
+
+/* ---------- Bảng ---------- */
+
+.row {
+  display: grid;
+  grid-template-columns: 38px 115px minmax(0, 1fr) 75px;
+  align-items: center;
+  gap: 12px;
+  padding: 0 clamp(20px, 4vw, 32px);
+
+  @media (min-width: 640px) {
+    grid-template-columns: 48px 180px minmax(0, 1fr) 110px;
+    gap: 20px;
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 52px 210px minmax(0, 1fr) 120px;
+    gap: 24px;
+  }
+}
+
+.headRow {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgb(var(--slate-200-rgb) / 0.8);
+  background: rgb(var(--slate-50-rgb) / 0.9);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate-500);
+  user-select: none;
+}
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+.list {
+  animation: reveal 0.3s ease;
+
+  > * + * {
+    border-top: 1px solid var(--slate-100);
+  }
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+
+  to {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+.dataRow {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: rgb(var(--slate-50-rgb) / 0.7);
+  }
+}
+
+.rankNo {
+  font-family: $mono;
+  font-size: 1.6rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.person,
+.cert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.avatar {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid;
+  border-radius: 50%;
+  font-family: $mono;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.personName {
+  margin: 0;
+  overflow: hidden;
+  font-size: 1.4rem;
+  font-weight: 700;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--slate-900);
+  transition: color 0.2s ease;
+}
+
+.certBadge {
+  flex-shrink: 0;
+  width: auto;
+  height: 32px;
+  object-fit: contain;
+}
+
+.certName {
+  overflow: hidden;
+  font-size: 1.4rem;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--slate-700);
+}
+
+.score {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.scoreVal {
+  font-family: $mono;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--slate-900);
+}
+
+.scoreMax {
+  font-family: $mono;
+  font-size: 1.2rem;
+  color: var(--slate-400);
+}
+
+// Màu huy chương hạng 1-3 theo mẫu: vàng, bạc, đồng; hạng còn lại xám nhạt.
+@mixin rank-tone($color, $bg, $border, $weight) {
+  .rankNo {
+    font-weight: $weight;
+    color: $color;
+  }
+
+  .avatar {
+    border-color: $border;
+    background: $bg;
+    color: $color;
+  }
+
+  &:hover .personName {
+    color: $color;
+  }
+}
+
+.rank1 {
+  @include rank-tone(#d97706, var(--amber-50), rgb(252 211 77), 900);
+}
+
+.rank2 {
+  @include rank-tone(var(--slate-500), var(--slate-100), var(--slate-300), 700);
+}
+
+.rank3 {
+  @include rank-tone(var(--orange-700), var(--orange-50), rgb(253 186 116), 700);
+}
+
+.rankRest {
+  @include rank-tone(var(--slate-400), var(--slate-50), var(--slate-200), 500);
+
+  &:hover .personName {
+    color: var(--slate-900);
+  }
+}
+
+/* ---------- Đang tải / trống ---------- */
+
+.skeletonRow {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.skeleton {
+  display: block;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--slate-100) 0%, var(--slate-50) 50%, var(--slate-100) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+.empty {
+  padding: 48px 24px;
+  text-align: center;
+  font-size: 1.4rem;
+  color: var(--slate-500);
+
+  p {
+    margin: 0 0 4px;
+  }
+}
+
+.emptyTitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.emptyLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-weight: 700;
+  color: var(--brand-700);
+
+  &:hover {
+    color: var(--brand-700);
+    text-decoration: underline;
+  }
+}
+
+.cardFoot {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  border-top: 1px solid rgb(var(--slate-200-rgb) / 0.8);
+  background: rgb(var(--slate-50-rgb) / 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list,
+  .spinning,
+  .skeleton {
+    animation: none;
+  }
+}

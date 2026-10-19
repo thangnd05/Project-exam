@@ -123,9 +123,9 @@
 .input {
   width: 100%;
   background-color: var(--bg-white);
-  border: 1px solid var(--border-color);
-  padding: 13px 16px;
-  border-radius: var(--radius-md);
+  border: 1px solid var(--slate-300);
+  padding: 11px 18px;
+  border-radius: 999px;
   font-size: 1.4rem;
   font-weight: 500;
   color: var(--text-color);
@@ -137,8 +137,8 @@
 
   &:focus {
     outline: none;
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 3px var(--primary-alpha-10);
+    border-color: var(--brand-700);
+    box-shadow: 0 0 0 3px rgb(var(--brand-700-rgb) / 0.2);
   }
 
   &:disabled {
@@ -211,14 +211,14 @@
 
 .submitBtn {
   width: 100%;
-  padding: 14px 18px;
+  padding: 13px 18px;
   border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  color: var(--text-on-brand);
+  border-radius: 999px;
+  font-size: var(--font-size-ssm);
+  font-weight: 700;
+  color: var(--brand-50);
   cursor: pointer;
-  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-act-color) 100%);
+  background: var(--brand-800);
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   display: flex;
   align-items: center;
@@ -239,8 +239,8 @@
 .ghostBtn {
   width: 100%;
   padding: 12px 18px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  border: 1px solid var(--slate-300);
   background-color: transparent;
   color: var(--text-color);
   font-size: var(--font-size-smd);

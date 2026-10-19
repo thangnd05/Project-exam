@@ -1,16 +1,17 @@
 
+// Giá trị dự phòng khi render phía server, khớp bảng màu mặc định (frost) trong GlobalStyles.scss.
 const FALLBACK: Record<string, string> = {
-  'brand-50': '#faf7f0',
-  'brand-100': '#f3ebda',
-  'brand-150': '#f0e4c4',
-  'brand-200': '#e8d5a3',
-  'brand-300': '#e8d5a3',
-  'brand-400': '#dcc07a',
-  'brand-500': '#c9a84b',
-  'brand-600': '#a88b3a',
-  'brand-700': '#7d672c',
-  'brand-800': '#3f3420',
-  'brand-900': '#14110d',
+  'brand-50': '#f3f8fc',
+  'brand-100': '#e4f1f8',
+  'brand-150': '#d5e9f4',
+  'brand-200': '#c2dfef',
+  'brand-300': '#a7d2e8',
+  'brand-400': '#8ec7e3',
+  'brand-500': '#77bbdd',
+  'brand-600': '#4fa3cf',
+  'brand-700': '#0369a1',
+  'brand-800': '#25374a',
+  'brand-900': '#101820',
 };
 
 const cache = new Map<string, string>();

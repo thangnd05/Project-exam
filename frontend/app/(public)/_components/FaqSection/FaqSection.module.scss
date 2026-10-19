@@ -1,7 +1,7 @@
 .section {
   position: relative;
   padding: clamp(48px, 6vw, 88px) clamp(20px, 4vw, 48px);
-  background: var(--bg-white);
+  background: var(--bg-body);
   color: var(--text-color);
   border-top: 1px solid rgb(var(--slate-900-rgb) / 0.06);
 }

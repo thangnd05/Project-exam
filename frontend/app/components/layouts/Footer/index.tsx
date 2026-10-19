@@ -16,9 +16,8 @@ const COLUMNS: { title: string; links: FooterLink[] }[] = [
   {
     title: 'Luyện thi',
     links: [
-      { label: 'Kỳ thi', href: routes.examTypes },
+      { label: 'Kho đề thi', href: routes.examTypes },
       { label: 'Lộ trình học', href: routes.generatePlan },
-      { label: 'Đề của tôi', href: routes.MyTest },
     ],
   },
   {

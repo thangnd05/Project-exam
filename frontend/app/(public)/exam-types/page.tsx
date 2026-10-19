@@ -1,9 +1,9 @@
 import ExamCatalog from './ExamCatalog';
 
 export const metadata = {
-  title: 'Kỳ thi AWS',
+  title: 'Kho đề thi',
   description:
-    'Danh sách chứng chỉ AWS đang mở trên WinDe: SAA-C03, SAP-C02, DOP-C02. Luyện đề sát format, chấm thang 100–1000.',
+    'Kho đề thi chứng chỉ Cloud trên WinDe: lọc theo hãng và cấp độ, thi nhanh hoặc làm đề full sát format thật.',
 };
 
 export default function Page() {

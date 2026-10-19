@@ -6,6 +6,9 @@ import logoW from './logoWD.svg';
 import quickImage from './quick-image.png';
 import dignos from './dignos.png';
 import learningPlan from './learningplan.png';
+import frostscopeLogoWhite from './brand/frostscope-logo-white.png';
+import frostscopeLogoRgb from './brand/frostscope-logo-rgb.png';
+import frostscopeFavicon from './brand/frostscope-favicon.png';
 
 export const imageAssets = {
     noImage,
@@ -16,6 +19,9 @@ export const imageAssets = {
     quickImage,
     dignos,
     learningPlan,
+    frostscopeLogoWhite,
+    frostscopeLogoRgb,
+    frostscopeFavicon,
 };
 
 const images = {
@@ -27,6 +33,9 @@ const images = {
     quickImage: quickImage.src,
     dignos: dignos.src,
     learningPlan: learningPlan.src,
+    frostscopeLogoWhite: frostscopeLogoWhite.src,
+    frostscopeLogoRgb: frostscopeLogoRgb.src,
+    frostscopeFavicon: frostscopeFavicon.src,
 };
 
 type SearchIconProps = {

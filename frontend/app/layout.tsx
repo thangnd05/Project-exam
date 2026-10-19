@@ -36,8 +36,11 @@ export const metadata = {
   applicationName: SITE_NAME,
   manifest: '/site.webmanifest',
   icons: {
-    icon: { url: '/favicons/logoWD.svg', type: 'image/svg+xml' },
-    apple: '/favicons/logoWD.svg',
+    icon: [
+      { url: '/favicons/frostscope-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicons/frostscope-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+    apple: { url: '/favicons/frostscope-180.png', sizes: '180x180', type: 'image/png' },
   },
   openGraph: {
     type: 'website',
@@ -46,27 +49,35 @@ export const metadata = {
     url: SITE_URL,
     title: TITLE,
     description: DESCRIPTION,
-    images: [{ url: '/favicons/logoWD.svg', alt: SITE_NAME }],
+    images: [{ url: '/favicons/frostscope-512.png', width: 512, height: 512, alt: SITE_NAME }],
   },
   twitter: {
     card: 'summary_large_image',
     title: TITLE,
     description: DESCRIPTION,
-    images: ['/favicons/logoWD.svg'],
+    images: ['/favicons/frostscope-512.png'],
   },
 };
 
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#000000',
+  themeColor: '#101820',
 };
+
+// Bảng màu đang dùng: 'frost' (FrostScope) hoặc 'gold' (bảng màu vàng gốc).
+const PALETTE = 'frost';
 
 const THEME_INIT_SCRIPT = `(function(){try{if(localStorage.getItem('theme')==='dark'){var d=document.documentElement;d.setAttribute('data-theme','dark');d.setAttribute('data-bs-theme','dark')}}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="vi" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
+    <html
+      lang="vi"
+      className={`${inter.variable} ${playfair.variable}`}
+      data-palette={PALETTE}
+      suppressHydrationWarning
+    >
       <head>
         <Script id="theme-init" strategy="beforeInteractive">
           {THEME_INIT_SCRIPT}

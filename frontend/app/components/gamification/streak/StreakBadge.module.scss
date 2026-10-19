@@ -1,44 +1,61 @@
+// Huy hiệu chuỗi ngày học theo mẫu FrostScope: viên thuốc trong suốt có viền,
+// ngọn lửa + số màu cam #FFA116, chữ "ngày liên tiếp".
+
 .streakBadge {
+  --flame-rgb: 255 161 22;
+
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-height: 32px;
-  padding: 4px 12px;
+  padding: 6px 14px;
+  border: 1px solid rgb(var(--slate-600-rgb) / 0.25);
   border-radius: 999px;
-  border: 1px solid transparent;
-  background: var(--slate-100);
+  background: transparent;
+  font-size: 1.2rem;
+  line-height: 1;
   color: var(--slate-400);
-  font-weight: 700;
-  font-size: var(--font-size-md);
   user-select: none;
   cursor: default;
   transition:
-    background 0.2s ease,
     border-color 0.2s ease,
-    color 0.2s ease;
+    background-color 0.2s ease;
 
   .icon {
-    font-size: var(--font-size-base);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
   }
 
   .count {
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
 
+  .label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--slate-700);
+  }
+
   &.active {
-    background: rgb(var(--orange-500-rgb) / 0.1);
-    color: var(--orange-600);
-    box-shadow: none;
+    color: rgb(var(--flame-rgb));
 
     .icon {
-      filter: none;
+      filter: drop-shadow(0 0 6px rgb(var(--flame-rgb) / 0.4));
+    }
+
+    &:hover {
+      border-color: rgb(var(--flame-rgb) / 0.5);
     }
   }
 
   &.recoverable {
     position: relative;
     cursor: pointer;
-    color: var(--text-color);
 
     &::after {
       content: '';
@@ -48,44 +65,49 @@
       width: 9px;
       height: 9px;
       border-radius: 50%;
-      background: #ff922b;
-      box-shadow: 0 0 0 2px #fff;
+      background: rgb(var(--flame-rgb));
+      box-shadow: 0 0 0 2px var(--bg-white);
     }
 
     &:hover {
-      background: var(--slate-100);
+      border-color: rgb(var(--flame-rgb) / 0.5);
+      background: rgb(var(--slate-900-rgb) / 0.04);
     }
   }
 
   &.onDark {
-    background: rgb(255 255 255 / 0.08);
-    border-color: rgb(255 255 255 / 0.12);
-    color: rgb(var(--text-on-dark-rgb) / 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    border-color: var(--surface-dark-border);
+    color: var(--text-on-dark-muted);
+
+    .label {
+      color: var(--text-on-dark);
+    }
 
     &.active {
-      background: rgb(255 255 255 / 0.08);
-      border-color: rgb(255 255 255 / 0.12);
-      color: var(--orange-500);
-      cursor: pointer;
-
-      &:hover {
-        background: rgb(255 255 255 / 0.16);
-        border-color: rgb(255 255 255 / 0.22);
-      }
+      color: rgb(var(--flame-rgb));
     }
 
     &.recoverable {
-      color: var(--text-on-dark);
-
       &::after {
         box-shadow: 0 0 0 2px rgb(var(--brand-900-rgb) / 0.85);
       }
 
       &:hover {
-        background: rgb(255 255 255 / 0.12);
+        background: rgb(255 255 255 / 0.06);
       }
     }
+  }
+
+  // Màn hình hẹp chỉ giữ ngọn lửa + số cho gọn header.
+  @media (max-width: 575.98px) {
+    .label {
+      display: none;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .streakBadge {
+    transition: none;
   }
 }

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {Button, Dropdown} from 'react-bootstrap';
 import Image from 'next/image';
-import {useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 // import {useCallback, useEffect, useRef, useState} from 'react';
 // import {toast} from 'react-toastify';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -12,7 +12,6 @@ import style from './header.module.scss';
 import images, {imageAssets} from '@/app/assets/images';
 import classNames from 'classnames/bind';
 import {useAuth} from '@/app/hooks/useAuth';
-import {name} from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
 import {buildLoginUrl} from '@/app/utils/authRedirect';
 // import JoinClassModal from '@/app/components/JoinClassModal/JoinClassModal';
@@ -28,13 +27,90 @@ import {useStreak} from '@/app/hooks/useStreak';
 
 const cx = classNames.bind(style);
 
+type Rgba = [number, number, number, number];
+
+function parseColors(value: string): Rgba[] {
+  const matches = value.match(/rgba?\([^)]*\)/g) ?? [];
+  return matches.map((m) => {
+    const [r = 0, g = 0, b = 0, a = 1] = (m.match(/[\d.]+/g) ?? []).map(Number);
+    return [r, g, b, a];
+  });
+}
+
+// Màu nền thực của một phần tử: màu đặc trước, nếu trong suốt thì lấy màu đầu tiên của gradient.
+function solidBackground(el: Element): Rgba | null {
+  const cs = getComputedStyle(el);
+  const [bg] = parseColors(cs.backgroundColor);
+  if (bg && bg[3] >= 0.5) return bg;
+  if (cs.backgroundImage.includes('gradient')) {
+    return parseColors(cs.backgroundImage).find((c) => c[3] >= 0.5) ?? null;
+  }
+  return null;
+}
+
+// Phần tử trải gần hết bề ngang màn hình mới được coi là nền section; thẻ, mockup, ảnh... bị bỏ qua.
+const BACKDROP_MIN_WIDTH_RATIO = 0.9;
+
+// Giống mẫu FrostScope: header chuyển sang nền sáng khi section nằm ngay dưới nó có nền sáng.
+function isLightBehind(pill: HTMLElement): boolean {
+  const header = pill.closest('header');
+  const rect = pill.getBoundingClientRect();
+  const minWidth = document.documentElement.clientWidth * BACKDROP_MIN_WIDTH_RATIO;
+  const stack = document.elementsFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  for (const el of stack) {
+    if (header?.contains(el)) continue;
+    if (el.getBoundingClientRect().width < minWidth) continue;
+    const color = solidBackground(el);
+    if (color) {
+      const [r, g, b] = color;
+      return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255 > 0.6;
+    }
+  }
+  return false;
+}
+
+function useLightBehind(pillRef: React.RefObject<HTMLElement | null>, pathname: string) {
+  const [onLight, setOnLight] = useState(false);
+
+  useEffect(() => {
+    const pill = pillRef.current;
+    if (!pill) return undefined;
+
+    let frame = 0;
+    const schedule = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        setOnLight(isLightBehind(pill));
+      });
+    };
+
+    schedule();
+    window.addEventListener('scroll', schedule, {passive: true});
+    window.addEventListener('resize', schedule);
+    // Trang tải dữ liệu xong làm đổi bố cục, đổi theme sáng/tối cũng đổi màu nền.
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(document.body);
+    const themeObserver = new MutationObserver(schedule);
+    themeObserver.observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme', 'data-palette']});
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      resizeObserver.disconnect();
+      themeObserver.disconnect();
+    };
+  }, [pillRef, pathname]);
+
+  return onLight;
+}
+
 // const CLASS_MENU_CLOSE_DELAY = 160;
 
 function Header() {
   const {user, logout, roleName} = useAuth();
   const canCreateTest = roleName === 'ADMIN';
-  // "Bài đã tạo" là công cụ soạn đề, tạm thời chỉ mở cho admin.
-  const canManageTests = roleName === 'ADMIN';
   const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
   // const [showJoinModal, setShowJoinModal] = useState(false);
   // const [showCreateModal, setShowCreateModal] = useState(false);
@@ -43,6 +119,9 @@ function Header() {
   // const classMenuTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const pillRef = useRef<HTMLDivElement>(null);
+  const onLight = useLightBehind(pillRef, pathname);
+  const statVariant = onLight ? 'default' : 'onDark';
 
   // const clearClassMenuTimer = useCallback(() => {
   //   if (classMenuTimer.current) {
@@ -90,8 +169,8 @@ function Header() {
         </>
       }
     >
-      <StreakBadge variant="onDark" />
-      <CoinQuestMenu variant="onDark" />
+      <StreakBadge variant={statVariant} />
+      <CoinQuestMenu variant={statVariant} />
     </FirstTimeHint>
   );
 
@@ -134,21 +213,18 @@ function Header() {
 
   return (
     <header className={cx('wrapper', 'theme-locked')} data-bs-theme="light">
-      <div className={cx('pill')}>
+      <div ref={pillRef} className={cx('pill', {onLight})}>
         <div className={cx('barRow')}>
           <div className={cx('zoneLeft')}>
             <Link href={routes.home} className={cx('brand')}>
-              <span className={cx('brandInner')}>
-                <Image
-                  src={imageAssets.logoW}
-                  alt="WinDe"
-                  width={50}
-                  height={32}
-                  priority
-                  className={cx('logo-brand')}
-                />
-                <span className={cx('brandName')}>{name}</span>
-              </span>
+              <Image
+                src={onLight ? imageAssets.frostscopeLogoRgb : imageAssets.frostscopeLogoWhite}
+                alt="FrostScope"
+                width={152}
+                height={32}
+                priority
+                className={cx('logo-brand')}
+              />
             </Link>
           </div>
 
@@ -166,7 +242,7 @@ function Header() {
                   active: pathname === routes.examTypes || pathname.startsWith('/exam-types/'),
                 })}
               >
-                Kỳ thi
+                Kho đề thi
               </Link>
               <Link
                 href={routes.resources}
@@ -198,14 +274,6 @@ function Header() {
               >
                 Từ vựng
               </Link> */}
-              {canManageTests && (
-                <Link
-                  href={routes.MyTest}
-                  className={cx('home', {active: pathname === routes.MyTest})}
-                >
-                  Bài đã tạo
-                </Link>
-              )}
               {/* <Dropdown
                 className={cx('customMenu')}
                 align="start"
@@ -247,7 +315,7 @@ function Header() {
           </nav>
 
           <div className={cx('zoneRight')}>
-            <ThemeToggle />
+            <ThemeToggle className={cx('themeToggle')} />
             {showStats && (
               <div className={cx('mobileHeaderActions')}>
                 <div className={cx('statsCluster')}>
@@ -262,8 +330,11 @@ function Header() {
                   <Link href={buildLoginUrl(pathname === routes.home ? null : pathname, {mode: 'signin'})} className={cx('home')}>
                     Đăng nhập
                   </Link>
-                  <Link href={buildLoginUrl(pathname === routes.home ? null : pathname, {mode: 'signup'})} className={cx('home')}>
-                    Đăng ký
+                  <Link href={buildLoginUrl(pathname === routes.home ? null : pathname, {mode: 'signup'})} className={cx('ctaBtn')}>
+                    <span>Đăng ký</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
                   </Link>
                 </div>
               ) : (
@@ -272,7 +343,7 @@ function Header() {
                     <div className={cx('ctaSlot')}>
                       <Button
                         variant=""
-                        className={cx('new-test')}
+                        className={cx('ctaBtn')}
                         onClick={handleCreateTest}
                       >
                         Tạo bài kiểm tra
@@ -304,14 +375,21 @@ function Header() {
                         <span className={cx('username')}>{user.userName}</span>
                       </div>
                     </Dropdown.Toggle>
-                    <Dropdown.Menu className={cx('custom-dropdown')}>
+                    <Dropdown.Menu align="end" className={cx('custom-dropdown')}>
+                      <div className={cx('dropdownHead')}>
+                        <p className={cx('dropdownName')}>{user.fullName || user.userName}</p>
+                        {user.email && <p className={cx('dropdownEmail')}>{user.email}</p>}
+                      </div>
                       <Dropdown.Item as={Link} href={routes.profile}>
                         Hồ sơ
                       </Dropdown.Item>
                       <Dropdown.Item as={Link} href={routes.myCertificates}>
                         Chứng chỉ của tôi
                       </Dropdown.Item>
-                      <Dropdown.Item onClick={handleLogout}>Đăng xuất</Dropdown.Item>
+                      <Dropdown.Divider className={cx('dropdownDivider')} />
+                      <Dropdown.Item onClick={handleLogout} className={cx('logoutItem')}>
+                        Đăng xuất
+                      </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
                 </div>

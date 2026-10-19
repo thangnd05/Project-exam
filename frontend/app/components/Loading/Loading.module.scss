@@ -1,34 +1,98 @@
+@import 'app/assets/styles/mixins.scss';
+
 .wrapper {
   min-height: 60vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.2rem;
+  gap: 1.6rem;
   color: var(--text-secondary);
 }
 
-.spinner {
-  width: 3.6rem;
-  height: 3.6rem;
-  border: 0.3rem solid var(--border-color);
-  border-top-color: var(--primary-color);
+// Logo nháy: icon thở nhẹ (mờ - rõ) kèm vòng sáng xanh băng lan ra.
+.logo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 7.2rem;
+  height: 7.2rem;
   border-radius: 50%;
-  animation: spin 0.7s linear infinite;
+
+  // Phần navy của icon chìm trên nền tối, nên đặt icon lên nền tròn sáng.
+  @include dark-theme {
+    background-color: var(--text-on-dark);
+  }
+}
+
+.ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(var(--primary-rgb) / 0.35), transparent 70%);
+  animation: glow 1.4s ease-out infinite;
+}
+
+.mark {
+  position: relative;
+  width: 5.6rem;
+  height: 5.6rem;
+  object-fit: contain;
+  animation: blink 1.4s ease-in-out infinite;
 }
 
 .label {
   font-size: 1.4rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  animation: fade 1.4s ease-in-out infinite;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.45;
+    transform: scale(0.94);
   }
 }
 
+@keyframes glow {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.7);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes fade {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+}
+
+// GlobalStyles ép animation về 0.01ms khi giảm chuyển động; giữ logo đứng yên, rõ nét.
 @media (prefers-reduced-motion: reduce) {
-  .spinner {
-    animation-duration: 2s;
+  .ring {
+    display: none;
+  }
+
+  .mark,
+  .label {
+    animation: none;
   }
 }

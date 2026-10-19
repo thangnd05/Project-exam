@@ -18,7 +18,6 @@ export * from './useExamTypes';
 export * from './useMilestoneScoring';
 export * from './useMounted';
 export * from './useMyClasses';
-export * from './useMyTests';
 export * from './usePermission';
 export * from './usePlanDetail';
 export * from './usePosts';

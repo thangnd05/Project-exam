@@ -52,7 +52,6 @@ const routes = {
   resources: '/resources',
   examTypeDetail: '/exam-types/:examTypeId',
   examTypeCollection: '/exam-types/:examTypeId/collections/:collectionId',
-  MyTest: '/my-tests',
 
   myCertificates: '/my-certificates',
   certificateDetail: '/certificates/:certificateId',

@@ -25,15 +25,6 @@ export const getAdminTests = (): Promise<TestAdminResponse[]> => {
   return axios.get('/api/admin/tests').then((res) => res.data);
 };
 
-export const getMyTests = ({ page = 0, size = 12 }: TestPagingParams = {}): Promise<PageResponse<TestResponse>> => {
-  const params = new URLSearchParams();
-  params.set('page', String(page));
-  params.set('size', String(size));
-  return axios
-    .get(`${BASE_URL}/my-tests?${params.toString()}`)
-    .then((res) => res.data);
-};
-
 export const getTestsByExamType = (examTypeId: string, { page = 0, size = 12 }: TestPagingParams = {}): Promise<PageResponse<TestResponse>> => {
   const params = new URLSearchParams();
   params.set('page', String(page));
