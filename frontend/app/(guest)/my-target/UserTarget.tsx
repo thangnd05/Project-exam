@@ -1,12 +1,16 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
+import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
+import { IoFlagOutline } from 'react-icons/io5';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
-import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
+import ExamPillPicker from '@/app/features/my-target/ExamPillPicker/ExamPillPicker';
+import ExamHeading from '@/app/features/my-target/ExamHeading/ExamHeading';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import {
   examTypeIdFromParams,
@@ -15,6 +19,7 @@ import {
   withExam,
 } from '@/app/features/exam-types/hooks/useExamParam';
 import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
+import uiStyles from '@/app/assets/styles/diagnostic/TargetPlanPage.module.scss';
 import styles from './UserTarget.module.scss';
 import { sortPartsByLookup } from '@/app/features/exam-types/partOrder';
 import useMilestoneScoring from '@/app/features/my-target/hooks/useMilestoneScoring';
@@ -29,6 +34,7 @@ import {
 
 const cx = classNamesBind.bind(styles);
 const planCx = classNamesBind.bind(planStyles);
+const ui = classNamesBind.bind(uiStyles);
 
 function UserTarget() {
   const [searchParams, setSearchParams] = useSearchParamsState();
@@ -237,121 +243,160 @@ function UserTarget() {
 
   const hasSavedTarget = Boolean(currentTarget?.hasTarget);
 
-  const scoreEstimateBlock = (() => {
+  const activeExam = examTypes.find((exam) => exam.examTypeId === selectedExamTypeId);
+
+  const selectExam = (examTypeId: string) => {
+    setSelectedExamTypeId(examTypeId);
+    setTargetScore('');
+    setCustomParts({});
+    // Đưa kỳ thi lên URL để F5 / copy link vẫn đúng kỳ thi đang chọn.
+    setSearchParams((prev) => setExamParam(prev, examTypeId, examTypes), { replace: true });
+  };
+
+  const pctOf = (pr: { examPartId: string; requiredPercentage: number }) =>
+    customParts[pr.examPartId] !== undefined
+      ? Number(customParts[pr.examPartId])
+      : pr.requiredPercentage;
+
+  const estimate = (() => {
     if (!targetScore || partRequirements.length === 0) return null;
     const partsConfig: Record<string, number> = {};
     partRequirements.forEach((pr) => {
-      partsConfig[pr.examPartId] =
-        customParts[pr.examPartId] !== undefined
-          ? Number(customParts[pr.examPartId])
-          : pr.requiredPercentage;
+      partsConfig[pr.examPartId] = pctOf(pr);
     });
-    const est = estimateScore(partsConfig, selectedExamTypeId);
-    if (!est) return null;
-    const diff = est.totalScore - Number(targetScore);
-    const tone = diff === 0 ? 'neutral' : diff > 0 ? 'above' : 'below';
-    const diffColor =
-      diff === 0 ? 'var(--success-text)' : 'var(--primary)';
-
-    return (
-      <div className={classNames(planCx('alert'), cx('scoreEstimate', tone))}>
-        <div className={cx('scoreEstimateMain')}>
-          <span className={planCx('muted')}>Điểm ước tính:</span>
-          <span className={cx('scoreEstimateValue')}>{est.totalScore}</span>
-          <span className={cx('scoreEstimateDiff')} style={{ color: diffColor }}>
-            ({diff > 0 ? '+' : ''}
-            {diff} so với mục tiêu {targetScore})
-          </span>
-        </div>
-        <div className={cx('scoreEstimateDetail')}>
-          {est.scaled
-            ? `${formatEstimateDetail(est)}, cần đạt ≥ ${targetScore}`
-            : formatEstimateDetail(est)}
-        </div>
-      </div>
-    );
+    return estimateScore(partsConfig, selectedExamTypeId);
   })();
+  const estimateDiff = estimate ? estimate.totalScore - Number(targetScore) : 0;
 
-  return (
-    <div className={classNames(planCx('wrapper'), cx('pageRoot'))}>
-      <TargetPlanTabs active="target" examTypeId={selectedExamTypeId} examTypes={examTypes} />
-      <div className={planCx('headerBar')}>
-        <h2 className={classNames(planCx('title'), cx('pageTitle'))}>Mục tiêu của tôi</h2>
+  const renderSummary = () => (
+    <aside className={classNames(ui('card'), cx('summary'))} aria-label="Tóm tắt mục tiêu">
+      <div className={cx('summaryTop')}>
+        <span className={ui('eyebrow')}>Tóm tắt</span>
+        <span className={ui('pill', { pillSuccess: hasSavedTarget })}>
+          {hasSavedTarget ? `Đã lưu · ${currentTarget?.targetScore} điểm` : 'Chưa lưu'}
+        </span>
       </div>
-      {!hasSavedTarget && (
-        <p className={classNames(planCx('muted'), cx('pageSubtitle'))}>
-          Chọn kỳ thi và mức điểm bạn muốn đạt. WinDe dựa vào đó để biết mỗi phần cần luyện tới đâu
-          rồi lập lộ trình cho bạn.
+
+      <div className={cx('scoreStats')}>
+        <div className={cx('scoreStat')}>
+          <span className={cx('statLabel')}>Mục tiêu</span>
+          <span className={cx('statValue')}>{targetScore || '—'}</span>
+        </div>
+        <div className={cx('scoreStat')}>
+          <span className={cx('statLabel')}>Ước tính</span>
+          <span className={cx('statValue')}>{estimate?.totalScore ?? '—'}</span>
+          {estimate && (
+            <span className={cx('statDiff', estimateDiff >= 0 ? 'ok' : 'short')}>
+              {estimateDiff > 0 ? '+' : ''}
+              {estimateDiff}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {partRequirements.length > 0 && (
+        <ul className={cx('partBars')}>
+          {partRequirements.map((pr) => {
+            const pct = pctOf(pr);
+            const total = getPartTotal(pr.examPartId);
+            return (
+              <li key={pr.examPartId}>
+                <div className={cx('partBarHead')}>
+                  <span className={cx('partBarName')}>{getPartName(pr.examPartId)}</span>
+                  <span className={cx('partBarValue')}>
+                    {percentToNum(pct, total)}/{total} · {pct}%
+                  </span>
+                </div>
+                <div className={cx('partBarTrack')}>
+                  <span style={{ width: `${Math.min(Math.max(pct, 0), 100)}%` }} />
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {estimate && (
+        <p className={cx('estimateDetail')}>
+          {estimate.scaled
+            ? `${formatEstimateDetail(estimate)}, cần đạt ≥ ${targetScore}`
+            : formatEstimateDetail(estimate)}
         </p>
       )}
 
-      {hasSavedTarget && currentTarget && (
-        <section className={cx('currentTargetCard')} aria-label="Mục tiêu hiện tại">
-          <div className={cx('currentTargetHeader')}>
-            <span className={cx('currentTargetLabel')}>Mục tiêu hiện tại</span>
-            <span className={cx('currentTargetScore')}>{currentTarget.targetScore} điểm</span>
-          </div>
-          <div className={cx('currentTargetParts')}>
-            {sortPartsByLookup(currentTarget.partRequirements || [], examParts).map((p) => {
-              const total = getPartTotal(p.examPartId);
-              const num = percentToNum(p.requiredPercentage ?? 0, total);
-              return (
-                <span key={p.examPartId} className={cx('currentTargetBadge')}>
-                  {getPartName(p.examPartId)}: {num}/{total} ({p.requiredPercentage}%)
-                </span>
-              );
-            })}
-          </div>
-          <div className={planCx('actionBar')} style={{ marginTop: '1rem' }}>
-            <ButtonPrime as="link" href={nextAfterTarget} variant="primary" size="sm">
-              Sinh lộ trình vượt ải
-            </ButtonPrime>
-          </div>
-        </section>
+      {targetScore && hasSavedTarget && (
+        <p className={cx('overwriteNote')}>Lưu lại sẽ ghi đè mục tiêu hiện tại.</p>
       )}
 
-      <div className={classNames(planCx('card'), cx('setupCard'))}>
-        <div className={classNames(planCx('cardHeader'), cx('compactCardHeader'))}>Thiết lập mục tiêu</div>
-        <div className={classNames(planCx('cardBody'), cx('compactCardBody'))}>
-          <div className={classNames(planCx('fieldGroup'), cx('fieldFull'))}>
-            <label className={cx('fieldLabelLarge')}>Loại kỳ thi</label>
-            <select
-              className={classNames(planCx('select'), cx('compactSelect'))}
-              style={{ width: '100%' }}
-              value={selectedExamTypeId}
-              onChange={(e) => {
-                setSelectedExamTypeId(e.target.value);
-                setTargetScore('');
-                setCustomParts({});
-                // Đưa kỳ thi lên URL để F5 / copy link vẫn đúng kỳ thi đang chọn.
-                setSearchParams((prev) => setExamParam(prev, e.target.value, examTypes), {
-                  replace: true,
-                });
-              }}
-            >
-              <option value="">-- Chọn kỳ thi bạn muốn học --</option>
-              {examTypes.map((et) => (
-                <option key={et.examTypeId} value={et.examTypeId}>
-                  {et.name}
-                </option>
-              ))}
-            </select>
-          </div>
+      <div className={cx('summaryActions')}>
+        <button
+          type="button"
+          className={ui('btnPrimary')}
+          onClick={handleSave}
+          disabled={loading || !targetScore}
+        >
+          {loading ? 'Đang lưu...' : hasSavedTarget ? 'Cập nhật mục tiêu' : 'Lưu mục tiêu'}
+        </button>
+        {hasSavedTarget && (
+          <Link href={nextAfterTarget} className={ui('btnSecondary')}>
+            Sinh lộ trình vượt ải
+            <FiArrowRight aria-hidden="true" />
+          </Link>
+        )}
+        {hasSavedTarget && (
+          <button
+            type="button"
+            className={classNames(ui('dangerText'), cx('deleteBtn'))}
+            onClick={handleDelete}
+            disabled={loading}
+          >
+            Xóa mục tiêu
+          </button>
+        )}
+      </div>
+    </aside>
+  );
 
-          {selectedExamTypeId && (
-            <div className={classNames(planCx('fieldGroup'), cx('fieldFull'))}>
-              <label className={cx('fieldLabelLarge')}>Điểm mục tiêu</label>
+  return (
+    <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
+      <TargetPlanTabs active="target" examTypeId={selectedExamTypeId} examTypes={examTypes} />
+      <header className={ui('pageHead')}>
+        <h1 className={ui('pageTitle')}>Mục tiêu của tôi</h1>
+        <p className={ui('pageSubtitle')}>
+          Chọn kỳ thi và mức điểm bạn muốn đạt. WinDe dựa vào đó để biết mỗi phần cần luyện tới đâu
+          rồi lập lộ trình cho bạn.
+        </p>
+      </header>
+
+      <ExamPillPicker
+        className={ui('pickerRow')}
+        examTypes={examTypes}
+        value={selectedExamTypeId}
+        onChange={selectExam}
+      />
+
+      {!selectedExamTypeId ? (
+        <div className={ui('empty')}>
+          <IoFlagOutline className={ui('emptyIcon')} aria-hidden="true" />
+          <h2>Chọn kỳ thi để đặt mục tiêu</h2>
+          <p>Bấm vào một kỳ thi ở trên để xem mức điểm gợi ý.</p>
+        </div>
+      ) : (
+        <div className={cx('layout')}>
+          <section className={classNames(ui('card'), cx('setupCard'))} aria-labelledby="target-exam-title">
+            <ExamHeading exam={activeExam} id="target-exam-title" className={cx('examHead')} />
+
+            <div className={cx('block')}>
+              <span className={classNames(ui('eyebrow'), cx('blockLabel'))}>Điểm mục tiêu</span>
               {milestones.length > 0 && (
-                <div className={cx('milestoneChips')}>
-                  <span className={cx('chipsLabel')}>Mức điểm gợi ý:</span>
+                <div className={cx('chips')} role="group" aria-label="Mức điểm gợi ý">
                   {milestones.map((m) => (
                     <button
                       key={m.examTargetMilestoneId}
                       type="button"
                       title={m.description || undefined}
-                      className={classNames(planCx('badge'), cx('chip', {
-                        active: Number(targetScore) === m.milestoneScore,
-                      }))}
+                      aria-pressed={Number(targetScore) === m.milestoneScore}
+                      className={cx('chip', { active: Number(targetScore) === m.milestoneScore })}
                       onClick={() => {
                         setTargetScore(String(m.milestoneScore));
                         setCustomParts({});
@@ -362,142 +407,114 @@ function UserTarget() {
                   ))}
                 </div>
               )}
-              {suggestedFor === selectedExamTypeId && !hasSavedTarget && (
-                <p className={cx('partSectionHint')}>
-                  Chưa biết đặt bao nhiêu? WinDe đã chọn sẵn một mức vừa sức, sau này đổi lúc nào cũng được.
-                </p>
-              )}
               <div className={cx('scoreInputRow')}>
-                <input
-                  type="number"
-                  className={classNames(planCx('select'), cx('scoreInput'))}
-                  placeholder={isScaled ? 'VD: 700' : 'VD: 450'}
-                  value={targetScore}
-                  min={0}
-                  max={maxTargetScore}
-                  onChange={(e) => {
-                    setTargetScore(e.target.value);
-                    setCustomParts({});
-                  }}
-                />
+                <label className={cx('scoreInput')}>
+                  <span className="visually-hidden">Điểm mục tiêu</span>
+                  <input
+                    type="number"
+                    placeholder={isScaled ? 'VD: 700' : 'VD: 450'}
+                    value={targetScore}
+                    min={0}
+                    max={maxTargetScore}
+                    onChange={(e) => {
+                      setTargetScore(e.target.value);
+                      setCustomParts({});
+                    }}
+                  />
+                  <span className={cx('scoreUnit')}>/ {maxTargetScore}</span>
+                </label>
                 {targetScore && matchedMilestone && (
-                  <span className={cx('milestoneHint', 'matched')}>
+                  <span className={cx('milestoneHint')}>
                     Mức {matchedMilestone.milestoneScore}
                     {matchedMilestone.description && `: ${matchedMilestone.description}`}
                   </span>
                 )}
                 {targetScore && !matchedMilestone && (
-                  <span className={cx('milestoneHint', 'custom')}>
+                  <span className={cx('milestoneHint')}>
                     Điểm tự chọn: mỗi phần thi cần đúng khoảng {evenPctForScore(targetScore)}%
                   </span>
                 )}
               </div>
+              {suggestedFor === selectedExamTypeId && !hasSavedTarget && (
+                <p className={cx('hint')}>
+                  Chưa biết đặt bao nhiêu? WinDe đã chọn sẵn một mức vừa sức, sau này đổi lúc nào cũng được.
+                </p>
+              )}
             </div>
-          )}
 
-          {targetScore && partRequirements.length > 0 && (
-            <details className={cx('partSection')} open={Object.keys(customParts).length > 0}>
-              <summary className={cx('partSectionTitle')}>
-                Nâng cao: số câu cần đúng ở từng phần thi{' '}
-                <span className={cx('partSectionOptional')}>(không bắt buộc)</span>
-              </summary>
-              <div className={cx('partSectionBody')}>
-                <p className={cx('partSectionHint')}>
+            {targetScore && partRequirements.length > 0 && (
+              <details className={cx('advanced')} open={Object.keys(customParts).length > 0}>
+                <summary className={cx('advancedTitle')}>
+                  <FiChevronRight className={cx('chevron')} aria-hidden="true" />
+                  Nâng cao: số câu cần đúng ở từng phần thi
+                  <span className={cx('optional')}>không bắt buộc</span>
+                </summary>
+                <p className={cx('hint')}>
                   {matchedMilestone
                     ? 'Đã điền sẵn theo mức điểm bạn chọn. Chỉ sửa nếu bạn muốn dồn sức vào phần nào đó.'
                     : `Đã điền sẵn: mỗi phần cần đúng khoảng ${evenPctForScore(targetScore)}%. Chỉ sửa nếu bạn muốn dồn sức vào phần nào đó.`}
                 </p>
 
-                {partRequirements.map((pr) => {
-                  const isCustom = customParts[pr.examPartId] !== undefined;
-                  const currentPct = Number(
-                    isCustom ? customParts[pr.examPartId] : pr.requiredPercentage,
-                  );
-                  const total = getPartTotal(pr.examPartId);
-                  const numCorrect = percentToNum(currentPct, total);
+                <div className={cx('partList')}>
+                  {partRequirements.map((pr) => {
+                    const isCustom = customParts[pr.examPartId] !== undefined;
+                    const currentPct = pctOf(pr);
+                    const total = getPartTotal(pr.examPartId);
+                    const numCorrect = percentToNum(currentPct, total);
 
-                  return (
-                    <div key={pr.examPartId} className={cx('partRow')}>
-                      <span className={cx('partName')}>
-                        {getPartName(pr.examPartId)}
-                        <span className={cx('partTotal')}>({total} câu)</span>
-                      </span>
-                      <input
-                        type="number"
-                        min={0}
-                        max={total}
-                        className={classNames(planCx('select'), cx('partInput', { custom: isCustom }))}
-                        value={numCorrect}
-                        onChange={(e) => {
-                          const newPct = numToPercent(Number(e.target.value), total);
-                          handlePartChange(pr.examPartId, newPct);
-                        }}
-                      />
-                      <span className={cx('partUnit')}>câu</span>
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        className={classNames(planCx('select'), cx('partInput', { custom: isCustom }))}
-                        value={currentPct}
-                        onChange={(e) => {
-                          handlePartChange(pr.examPartId, Number(e.target.value));
-                        }}
-                      />
-                      <span className={cx('partUnit')}>%</span>
-                      {isCustom && (
-                        <button
-                          type="button"
-                          className={cx('resetBtn')}
-                          onClick={() => handleResetPart(pr.examPartId)}
-                        >
-                          Đặt lại
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </details>
-          )}
+                    return (
+                      <div key={pr.examPartId} className={cx('partRow')}>
+                        <span className={cx('partName')}>
+                          {getPartName(pr.examPartId)}
+                          <span className={cx('partTotal')}>{total} câu</span>
+                        </span>
+                        <div className={cx('partInputs')}>
+                          <label className={cx('partField', { custom: isCustom })}>
+                            <input
+                              type="number"
+                              min={0}
+                              max={total}
+                              value={numCorrect}
+                              onChange={(e) => {
+                                const newPct = numToPercent(Number(e.target.value), total);
+                                handlePartChange(pr.examPartId, newPct);
+                              }}
+                            />
+                            <span>câu</span>
+                          </label>
+                          <label className={cx('partField', { custom: isCustom })}>
+                            <input
+                              type="number"
+                              min={0}
+                              max={100}
+                              value={currentPct}
+                              onChange={(e) => {
+                                handlePartChange(pr.examPartId, Number(e.target.value));
+                              }}
+                            />
+                            <span>%</span>
+                          </label>
+                          <button
+                            type="button"
+                            className={classNames(ui('textBtn'), cx('resetBtn', { hidden: !isCustom }))}
+                            onClick={() => handleResetPart(pr.examPartId)}
+                            tabIndex={isCustom ? undefined : -1}
+                            aria-hidden={!isCustom}
+                          >
+                            Đặt lại
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </details>
+            )}
+          </section>
 
-          {scoreEstimateBlock}
-
-          {targetScore && hasSavedTarget && (
-            <div className={planCx('alert', 'alertWarning')} style={{ marginTop: '0.8rem' }}>
-              Bạn đang chỉnh sửa mục tiêu nó sẽ được ghi đè lên mục tiêu hiện tại.
-            </div>
-          )}
-
-          {targetScore && (
-            <div className={planCx('actionBar')} style={{ marginTop: '0.8rem' }}>
-              <ButtonPrime
-                variant="primary"
-                size="lg"
-                onClick={handleSave}
-                disabled={loading}
-              >
-                {loading
-                  ? 'Đang lưu...'
-                  : hasSavedTarget
-                    ? 'Cập nhật mục tiêu'
-                    : 'Lưu mục tiêu'}
-              </ButtonPrime>
-              {hasSavedTarget && (
-                <ButtonPrime
-                  variant="dangerGhost"
-                  size="lg"
-                  onClick={handleDelete}
-                  disabled={loading}
-                >
-                  Xóa mục tiêu
-                </ButtonPrime>
-              )}
-            </div>
-          )}
+          {renderSummary()}
         </div>
-      </div>
-
+      )}
     </div>
   );
 }

@@ -1,0 +1,336 @@
+@import 'app/assets/styles/mixins.scss';
+
+// Khuôn chung cho nhóm tab Mục tiêu / Lập lộ trình / Tổng quan, cùng kiểu Kho tài liệu và Kho đề thi:
+// thẻ trắng viền slate phẳng, nhãn chữ hoa nhỏ, số liệu chữ mono, nút graphite dạng viên thuốc.
+$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+.pageRoot {
+  margin-top: 2.4rem;
+}
+
+/* ---------- Tiêu đề trang ---------- */
+
+.pageHead {
+  margin-bottom: 20px;
+}
+
+.pageTitle {
+  margin: 0 0 6px;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.pageSubtitle {
+  max-width: 680px;
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.55;
+  color: var(--slate-500);
+}
+
+.pickerRow {
+  margin-bottom: 20px;
+}
+
+/* ---------- Thẻ ---------- */
+
+.card {
+  margin-bottom: 20px;
+  padding: 24px;
+  border: 1px solid var(--slate-200);
+  border-radius: 16px;
+  background: var(--bg-white);
+
+  @media (max-width: 767.98px) {
+    padding: 18px;
+  }
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-bottom: 18px;
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--slate-900);
+}
+
+.cardMeta {
+  font-family: $mono;
+  font-size: 1.2rem;
+  color: var(--slate-500);
+
+  strong {
+    font-weight: 700;
+    color: var(--brand-700);
+  }
+}
+
+.eyebrow {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate-400);
+}
+
+.mono {
+  font-family: $mono;
+}
+
+.hint {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  color: var(--slate-500);
+}
+
+/* ---------- Nút ---------- */
+
+.btnPrimary,
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-family: var(--font-family);
+  font-size: 1.3rem;
+  white-space: nowrap;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, filter 0.2s ease;
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.btnSm {
+  padding: 6px 14px;
+  font-size: 1.2rem;
+}
+
+// Nút chính graphite giống "Thi nhanh"; ở dark mode token brand đảo thành nền sáng chữ tối.
+.btnPrimary {
+  border: none;
+  background: var(--brand-800);
+  font-weight: 700;
+  color: var(--brand-50);
+
+  &:hover:not(:disabled) {
+    filter: brightness(0.85);
+    color: var(--brand-50);
+  }
+
+  @include dark-theme {
+    &:hover:not(:disabled) {
+      filter: brightness(1.08);
+    }
+  }
+}
+
+.btnSecondary {
+  border: 1px solid var(--slate-200);
+  background: var(--slate-100);
+  font-weight: 600;
+  color: var(--slate-700);
+
+  &:hover:not(:disabled) {
+    background: var(--slate-200);
+    color: var(--slate-900);
+  }
+}
+
+.textBtn,
+.dangerText {
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-family);
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    text-decoration: underline;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.textBtn {
+  color: var(--brand-700);
+}
+
+.dangerText {
+  color: var(--danger-text);
+}
+
+/* ---------- Nhãn trạng thái ---------- */
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border: 1px solid var(--slate-200);
+  border-radius: 999px;
+  background: var(--slate-50);
+  font-size: 1.1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--slate-500);
+}
+
+.pillBrand {
+  border-color: rgb(var(--brand-700-rgb) / 0.3);
+  background: rgb(var(--brand-700-rgb) / 0.08);
+  color: var(--brand-700);
+}
+
+.pillSuccess {
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.pillWarning {
+  border-color: var(--author-tag-border);
+  background: var(--author-tag-bg);
+  color: var(--author-tag-text);
+}
+
+.pillDanger {
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+/* ---------- Thông báo ---------- */
+
+.notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-bottom: 20px;
+  padding: 14px 18px;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  background: var(--bg-white);
+  font-size: 1.3rem;
+  line-height: 1.55;
+  color: var(--slate-700);
+
+  > span {
+    flex: 1;
+    min-width: 220px;
+  }
+
+  a:not(.btnPrimary):not(.btnSecondary) {
+    font-weight: 600;
+    color: var(--brand-700);
+  }
+}
+
+.noticeInfo {
+  border-color: rgb(var(--brand-700-rgb) / 0.25);
+  background: rgb(var(--brand-700-rgb) / 0.05);
+}
+
+.noticeWarning {
+  border-color: var(--author-tag-border);
+  background: var(--author-tag-bg);
+  color: var(--author-tag-text);
+}
+
+.noticeDanger {
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+  color: var(--danger-text);
+}
+
+.noticeSuccess {
+  border-color: var(--success-border);
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+/* ---------- Trạng thái rỗng / đang tải ---------- */
+
+.empty {
+  margin-bottom: 20px;
+  padding: 56px 32px;
+  text-align: center;
+  border: 2px dashed var(--slate-300);
+  border-radius: 16px;
+  background: var(--bg-white);
+
+  h2,
+  h3 {
+    margin: 0 0 8px;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--slate-900);
+  }
+
+  p {
+    margin: 0 auto;
+    max-width: 520px;
+    color: var(--slate-500);
+  }
+
+  .btnPrimary,
+  .btnSecondary {
+    margin-top: 18px;
+  }
+}
+
+.emptyIcon {
+  margin-bottom: 14px;
+  font-size: 4.4rem;
+  color: var(--slate-300);
+}
+
+.skeleton {
+  height: 120px;
+  margin-bottom: 20px;
+  border: 1px solid var(--slate-200);
+  border-radius: 16px;
+  background: linear-gradient(90deg, var(--slate-100) 0%, var(--bg-white) 45%, var(--slate-100) 100%);
+  background-size: 180% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -80% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

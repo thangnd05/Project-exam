@@ -5,10 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import { examTypeIdFromParams, setExamParam, useNormalizeExamParam } from '@/app/features/exam-types/hooks/useExamParam';
 import { useEffect, useMemo, useState } from 'react';
-import classNames from 'classnames/bind';
+import classNames from 'classnames';
+import classNamesBind from 'classnames/bind';
+import { FiAlertTriangle, FiBookOpen, FiTarget } from 'react-icons/fi';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import LearningPlanList from './_components/LearningPlanList';
 import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
+import ExamPillPicker from '@/app/features/my-target/ExamPillPicker/ExamPillPicker';
+import ExamHeading from '@/app/features/my-target/ExamHeading/ExamHeading';
 import { isPracticeAttempt } from '@/app/features/learning-plans/planLabels';
 import { getLearnerLevel } from '@/app/features/learning-plans/learnerLevel';
 import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
@@ -16,7 +20,9 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
-import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
+import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
+import uiStyles from '@/app/assets/styles/diagnostic/TargetPlanPage.module.scss';
+import styles from './GeneratePlan.module.scss';
 import type { PlanResponse } from '@/app/types';
 import {
   useActivePlan,
@@ -29,7 +35,32 @@ import {
 
 type PlanSource = 'DIAGNOSIS' | 'SYLLABUS';
 
-const cx = classNames.bind(styles);
+const cx = classNamesBind.bind(styles);
+const ui = classNamesBind.bind(uiStyles);
+const planCx = classNamesBind.bind(planStyles);
+
+const PLAN_SOURCES: {
+  value: PlanSource;
+  title: string;
+  subtitle: string;
+  desc: string;
+  icon: React.ElementType;
+}[] = [
+  {
+    value: 'SYLLABUS',
+    title: 'Chương trình học',
+    subtitle: 'Tôi mới bắt đầu, chưa làm bài nào',
+    desc: 'Đi tuần tự hết các chủ điểm của từng phần. Làm bài thi thử sau để sinh lộ trình sát hơn.',
+    icon: FiBookOpen,
+  },
+  {
+    value: 'DIAGNOSIS',
+    title: 'Kết quả một bài thi',
+    subtitle: 'Chẩn đoán điểm yếu của tôi',
+    desc: 'Ưu tiên các chủ điểm bạn làm sai nhiều nhất trong bài đã chọn.',
+    icon: FiTarget,
+  },
+];
 
 function GeneratePlan() {
   const router = useRouter();
@@ -151,10 +182,11 @@ function GeneratePlan() {
     setSearchParams((prev) => setExamParam(prev, nextId, examTypes));
   };
 
-  const sourceExamTypeName = useMemo(
-    () => examTypes.find((et) => et.examTypeId === sourceExamTypeId)?.name || '',
+  const sourceExamType = useMemo(
+    () => examTypes.find((et) => et.examTypeId === sourceExamTypeId),
     [examTypes, sourceExamTypeId],
   );
+  const sourceExamTypeName = sourceExamType?.name || '';
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -213,63 +245,114 @@ function GeneratePlan() {
     setError(null);
   };
 
-  return (
-    <div className={cx('wrapper')}>
-      <TargetPlanTabs active="plan" examTypeId={sourceExamTypeId} examTypes={examTypes} />
-      <div className={cx('headerBar')}>
-        <h2 className={cx('title')}>Sinh lộ trình vượt ải</h2>
-      </div>
+  const submitDisabled =
+    authLoading ||
+    submitting ||
+    (!isGuest &&
+      (formLocked ||
+        (planSource === 'DIAGNOSIS' && (!userTestId || filteredUserTests.length === 0))));
 
-      <div className={cx('stepsGuide')}>
-        <div className={cx('stepItem')}>
-          <span className={cx('stepNum')}>1</span>
-          <div>
-            <div className={cx('stepTitle')}>
-              {planSource === 'SYLLABUS' ? 'Chọn kỳ thi muốn học' : 'Chọn bài thi đã làm'}
-            </div>
-            <div className={cx('stepDesc')}>
-              {planSource === 'SYLLABUS'
-                ? 'Chưa làm bài nào cũng được  lộ trình đi theo chương trình của kỳ thi.'
-                : 'Hệ thống chẩn đoán điểm yếu của bạn từ bài này.'}
-            </div>
-          </div>
+  const renderTestPicker = () => {
+    if (isGuest) {
+      return (
+        <div className={ui('notice', 'noticeInfo')}>
+          <span>Đăng nhập để chọn bài thi bạn đã làm.</span>
+          <button type="button" className={ui('btnPrimary', 'btnSm')} onClick={requireLogin}>
+            Đăng nhập
+          </button>
         </div>
-        <div className={cx('stepItem')}>
-          <span className={cx('stepNum')}>2</span>
-          <div>
-            <div className={cx('stepTitle')}>Sinh lộ trình</div>
-            <div className={cx('stepDesc')}>
-              Lộ trình chia thành các chặng (mỗi chặng là một phần thi). Mỗi chặng gồm nhiều ải
-              lượt luyện ngắn về một chủ đề, làm đủ % câu đúng là vượt.
-            </div>
-          </div>
+      );
+    }
+    if (loadingList) {
+      return <div className={ui('skeleton')} aria-hidden="true" />;
+    }
+    if (userTests.length === 0) {
+      return (
+        <div className={ui('notice', 'noticeWarning')}>
+          <span>
+            Bạn chưa có bài thi nào đã hoàn thành. Hãy làm một bài thử thách nhanh hoặc thi thử trước.
+          </span>
+          <Link
+            href={sourceExamTypeId ? buildExamTypeDetailPath(sourceExamTypeId) : routes.examTypes}
+            className={ui('btnSecondary', 'btnSm')}
+          >
+            Chọn bài để làm
+          </Link>
         </div>
-        <div className={cx('stepItem')}>
-          <span className={cx('stepNum')}>3</span>
-          <div>
-            <div className={cx('stepTitle')}>Vượt ải rồi thi thử</div>
-            <div className={cx('stepDesc')}>
-              Vượt hết ải thì làm bài thi thử để kiểm tra lại và cập nhật lộ trình.
-            </div>
-          </div>
+      );
+    }
+    if (filteredUserTests.length === 0) {
+      return (
+        <div className={ui('notice', 'noticeWarning')}>
+          <span>
+            Chưa có bài hoàn thành cho &quot;{sourceExamTypeName || 'kỳ thi đã chọn'}&quot;. Hãy làm
+            bài thi thử của kỳ thi này hoặc đổi kỳ thi khác.
+          </span>
+          <Link href={buildExamTypeDetailPath(sourceExamTypeId)} className={ui('btnSecondary', 'btnSm')}>
+            Xem đề thi
+          </Link>
         </div>
+      );
+    }
+    return (
+      <div className={cx('testList')} role="radiogroup" aria-label="Bài thi đã làm">
+        {filteredUserTests.map((t) => (
+          <label
+            key={t.userTestId}
+            className={cx('testItem', { selected: t.userTestId === userTestId, locked: formLocked })}
+          >
+            <input
+              type="radio"
+              name="userTestId"
+              value={t.userTestId}
+              checked={t.userTestId === userTestId}
+              onChange={() => setUserTestId(t.userTestId)}
+              disabled={formLocked}
+            />
+            <span className={cx('testText')}>
+              <span className={cx('testTitle')}>{t.testTitle || 'Bài thi'}</span>
+              <span className={cx('testMeta')}>{formatDate(t.finishedAt)}</span>
+            </span>
+            {isPracticeAttempt(t) && <span className={ui('pill')}>Luyện theo phần</span>}
+            <span className={cx('testScore')}>
+              {t.totalScore ?? '-'}
+              <small>điểm</small>
+            </span>
+          </label>
+        ))}
       </div>
+    );
+  };
+
+  return (
+    <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
+      <TargetPlanTabs active="plan" examTypeId={sourceExamTypeId} examTypes={examTypes} />
+      <header className={ui('pageHead')}>
+        <h1 className={ui('pageTitle')}>Sinh lộ trình vượt ải</h1>
+        <p className={ui('pageSubtitle')}>
+          Lộ trình chia thành các chặng, mỗi chặng là một phần thi. Mỗi chặng gồm nhiều ải luyện ngắn
+          về một chủ đề, làm đủ % câu đúng là vượt.
+        </p>
+      </header>
+
+      <ExamPillPicker
+        className={ui('pickerRow')}
+        examTypes={examTypes}
+        value={sourceExamTypeId}
+        onChange={handleSourceExamTypeChange}
+      />
 
       {sourceExamTypeId && targetError && (
-        <div className={cx('alert', 'alertDanger')}>
+        <div className={ui('notice', 'noticeDanger')}>
           <span>Không tải được mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot;: {targetError}.</span>
-          <button
-            type="button"
-            className={cx('btn', 'btnPrimary', 'btnSm')}
-            onClick={() => refetchTarget()}
-          >
+          <button type="button" className={ui('btnSecondary', 'btnSm')} onClick={() => refetchTarget()}>
             Thử lại
           </button>
         </div>
       )}
 
       {isAuthenticated && sourceExamTypeId && !loadingTarget && !targetError && !hasTarget && (
-        <div className={cx('alert', planSource === 'SYLLABUS' ? 'alertInfo' : 'alertWarning')}>
+        <div className={ui('notice', planSource === 'SYLLABUS' ? 'noticeInfo' : 'noticeWarning')}>
           <span>
             {planSource === 'SYLLABUS' ? (
               <>
@@ -293,146 +376,128 @@ function GeneratePlan() {
                 ...(userTestId ? { userTestId } : {}),
               }).toString()}`,
             }).toString()}`}
-            className={cx('btn', 'btnPrimary', 'btnSm')}
+            className={ui('btnPrimary', 'btnSm')}
           >
             Đặt mục tiêu
           </Link>
         </div>
       )}
 
-      <div className={cx('card')}>
-        <div className={cx('cardBody')}>
-          <form onSubmit={handleSubmit}>
-            <div className={cx('filterRow')} style={{ marginBottom: '1.6rem', alignItems: 'flex-start' }}>
-              <div className={cx('fieldGroup')} style={{ flex: 1 }}>
-                <label className={cx('fieldLabel')}>Loại kỳ thi</label>
-                <select
-                  className={cx('select')}
-                  value={sourceExamTypeId}
-                  onChange={(e) => handleSourceExamTypeChange(e.target.value)}
-                  disabled={examTypes.length === 0}
-                >
-                  {examTypes.length === 0 ? (
-                    <option value="">Đang tải loại kỳ thi...</option>
-                  ) : (
-                    examTypes.map((et) => (
-                      <option key={et.examTypeId} value={et.examTypeId}>
-                        {et.name}
-                      </option>
-                    ))
-                  )}
-                </select>
-                {planSource === 'DIAGNOSIS' && (
-                  <small className={cx('muted')}>
-                    Chỉ hiện bài đã hoàn thành thuộc loại kỳ thi này.
-                  </small>
-                )}
-              </div>
+      <div className={cx('layout')}>
+        <form className={classNames(ui('card'), cx('formCard'))} onSubmit={handleSubmit}>
+          <ExamHeading exam={sourceExamType} className={cx('examHead')} />
 
-              <div className={cx('fieldGroup')} style={{ flex: 1 }}>
-                <label className={cx('fieldLabel')}>Lộ trình dựa trên</label>
-                <select
-                  className={cx('select')}
-                  value={planSource}
-                  onChange={(e) => handlePlanSourceChange(e.target.value as PlanSource)}
-                  disabled={!examTypeReady}
-                >
-                  <option value="SYLLABUS">
-                    Chương trình học  tôi mới bắt đầu, chưa làm bài nào
-                  </option>
-                  <option value="DIAGNOSIS">
-                    Kết quả một bài thi  chẩn đoán điểm yếu của tôi
-                  </option>
-                </select>
-                <small className={cx('muted')}>
-                  {planSource === 'SYLLABUS'
-                    ? 'Đi tuần tự hết các chủ điểm của từng phần. Làm bài thi thử sau để sinh lộ trình sát hơn.'
-                    : 'Ưu tiên các chủ điểm bạn làm sai nhiều nhất trong bài đã chọn.'}
-                </small>
-              </div>
+          <div className={cx('block')}>
+            <span className={classNames(ui('eyebrow'), cx('blockLabel'))}>Lộ trình dựa trên</span>
+            <div className={cx('sourceGrid')} role="radiogroup" aria-label="Lộ trình dựa trên">
+              {PLAN_SOURCES.map((option) => {
+                const Icon = option.icon;
+                const selected = planSource === option.value;
+                return (
+                  <label
+                    key={option.value}
+                    className={cx('sourceOption', { selected, locked: !examTypeReady })}
+                  >
+                    <input
+                      type="radio"
+                      name="planSource"
+                      value={option.value}
+                      checked={selected}
+                      onChange={() => handlePlanSourceChange(option.value)}
+                      disabled={!examTypeReady}
+                    />
+                    <span className={cx('sourceIcon')} aria-hidden="true">
+                      <Icon />
+                    </span>
+                    <span className={cx('sourceText')}>
+                      <span className={cx('sourceTitle')}>{option.title}</span>
+                      <span className={cx('sourceSubtitle')}>{option.subtitle}</span>
+                      <span className={cx('sourceDesc')}>{option.desc}</span>
+                    </span>
+                  </label>
+                );
+              })}
             </div>
+          </div>
 
-            {planSource === 'DIAGNOSIS' && (
-              <div className={cx('fieldGroup')} style={{ marginBottom: '1.6rem' }}>
-                <label className={cx('fieldLabel')}>
-                  Chọn bài thi muốn lập lộ trình
-                </label>
-              {isGuest ? (
-                <div className={cx('alert', 'alertInfo')}>
-                  <span>Đăng nhập để chọn bài thi bạn đã làm.</span>
-                  <button type="button" className={cx('btn', 'btnPrimary', 'btnSm')} onClick={requireLogin}>
-                    Đăng nhập
-                  </button>
-                </div>
-              ) : loadingList ? (
-                <div className={cx('muted')}>Đang tải danh sách bài thi...</div>
-              ) : userTests.length === 0 ? (
-                <div className={cx('alert', 'alertWarning')}>
-                  Bạn chưa có bài thi nào đã hoàn thành. Hãy làm một bài thử thách nhanh hoặc thi thử trước.{' '}
-                  <Link href={sourceExamTypeId ? buildExamTypeDetailPath(sourceExamTypeId) : routes.examTypes}>
-                    Chọn bài để làm
-                  </Link>
-                </div>
-              ) : filteredUserTests.length === 0 ? (
-                <div className={cx('alert', 'alertWarning')}>
-                  Chưa có bài hoàn thành cho loại kỳ thi này. Hãy làm bài thi thử thuộc &quot;{sourceExamTypeName || 'kỳ thi đã chọn'}&quot; hoặc đổi loại kỳ thi.{' '}
-                  <Link href={buildExamTypeDetailPath(sourceExamTypeId)}>Xem đề thi</Link>
-                </div>
-              ) : (
-                <select
-                  className={cx('select')}
-                  value={userTestId}
-                  onChange={(e) => setUserTestId(e.target.value)}
-                  required
-                  disabled={formLocked}
-                >
-                  <option value="">-- Chọn bài thi --</option>
-                  {filteredUserTests.map((t) => (
-                    <option key={t.userTestId} value={t.userTestId}>
-                      {t.testTitle ? `${t.testTitle}  ` : ''}
-                      {formatDate(t.finishedAt)} · Điểm {t.totalScore ?? '-'}
-                      {isPracticeAttempt(t) ? ' · Luyện theo phần' : ''}
-                    </option>
-                  ))}
-                </select>
-              )}
-              {isPracticeAttempt(selectedTest) && (
-                <small className={cx('warningText')}>
-                  Bài này chỉ luyện một phần đề nên lộ trình sinh ra chỉ phủ các phần đã luyện.
-                  Muốn lộ trình đầy đủ, hãy chọn một bài thi thử trọn đề.
-                </small>
-              )}
+          {planSource === 'DIAGNOSIS' && (
+            <div className={cx('block')}>
+              <div className={cx('blockHead')}>
+                <span className={ui('eyebrow')}>Chọn bài thi muốn lập lộ trình</span>
+                <span className={ui('hint')}>Chỉ hiện bài đã hoàn thành của kỳ thi này.</span>
               </div>
-            )}
+              {renderTestPicker()}
+              {isPracticeAttempt(selectedTest) && (
+                <p className={cx('practiceWarning')}>
+                  <FiAlertTriangle aria-hidden="true" />
+                  <span>
+                    Bài này chỉ luyện một phần đề nên lộ trình sinh ra chỉ phủ các phần đã luyện.
+                    Muốn lộ trình đầy đủ, hãy chọn một bài thi thử trọn đề.
+                  </span>
+                </p>
+              )}
+            </div>
+          )}
 
-            <button
-              type="submit"
-              className={cx('btn', 'btnPrimary', 'btnLg')}
-              disabled={
-                authLoading ||
-                submitting ||
-                (!isGuest &&
-                  (formLocked ||
-                    (planSource === 'DIAGNOSIS' && (!userTestId || filteredUserTests.length === 0))))
-              }
-              style={{ marginTop: '1.6rem' }}
-            >
+          <div className={cx('submitRow')}>
+            <button type="submit" className={ui('btnPrimary')} disabled={submitDisabled}>
               {submitting ? 'Đang sinh lộ trình...' : 'Sinh lộ trình'}
             </button>
-          </form>
-        </div>
+            {isGuest && (
+              <span className={ui('hint')}>
+                <button type="button" className={ui('textBtn')} onClick={requireLogin}>
+                  Đăng nhập
+                </button>{' '}
+                để sinh, lưu và theo dõi tiến độ lộ trình.
+              </span>
+            )}
+          </div>
+        </form>
+
+        <aside className={classNames(ui('card'), cx('steps'))} aria-label="Các bước">
+          <span className={ui('eyebrow')}>Cách hoạt động</span>
+          <ol className={cx('stepList')}>
+            <li>
+              <span className={cx('stepNum')}>01</span>
+              <div>
+                <h3>{planSource === 'SYLLABUS' ? 'Chọn kỳ thi muốn học' : 'Chọn bài thi đã làm'}</h3>
+                <p>
+                  {planSource === 'SYLLABUS'
+                    ? 'Chưa làm bài nào cũng được, lộ trình đi theo chương trình của kỳ thi.'
+                    : 'Hệ thống chẩn đoán điểm yếu của bạn từ bài này.'}
+                </p>
+              </div>
+            </li>
+            <li>
+              <span className={cx('stepNum')}>02</span>
+              <div>
+                <h3>Sinh lộ trình</h3>
+                <p>Mỗi chặng là một phần thi, gồm nhiều ải ngắn theo chủ đề.</p>
+              </div>
+            </li>
+            <li>
+              <span className={cx('stepNum')}>03</span>
+              <div>
+                <h3>Vượt ải rồi thi thử</h3>
+                <p>Vượt hết ải thì làm bài thi thử để kiểm tra lại và cập nhật lộ trình.</p>
+              </div>
+            </li>
+          </ol>
+        </aside>
       </div>
 
       {(error || userTestsError) && (
-        <div className={cx('alert', 'alertDanger')}>{error || userTestsError}</div>
+        <div className={ui('notice', 'noticeDanger')}>
+          <span>{error || userTestsError}</span>
+        </div>
       )}
 
       {result?.targetAchieved && (
-        <div className={cx('alert', 'alertSuccess')}>
+        <div className={ui('notice', 'noticeSuccess')}>
           <span>
-            Bạn đã đạt mục tiêu (mức sẵn sàng {result.baselineReadiness ?? 0}%), chưa cần sinh lộ trình mới.
-            <br />
-            <small>Bạn có thể đặt mục tiêu cao hơn trong tab Mục tiêu, hoặc tiếp tục làm bài thi thử để duy trì phong độ.</small>
+            <strong>Bạn đã đạt mục tiêu</strong> (mức sẵn sàng {result.baselineReadiness ?? 0}%), chưa cần
+            sinh lộ trình mới. Bạn có thể đặt mục tiêu cao hơn trong tab Mục tiêu, hoặc tiếp tục làm bài
+            thi thử để duy trì phong độ.
           </span>
         </div>
       )}
@@ -450,28 +515,19 @@ function GeneratePlan() {
         }
       />
 
-      {isGuest && (
-        <div className={cx('alert', 'alertInfo')}>
-          <span>Đăng nhập để sinh, lưu và theo dõi tiến độ lộ trình của bạn.</span>
-          <button type="button" className={cx('btn', 'btnPrimary', 'btnSm')} onClick={requireLogin}>
-            Đăng nhập
-          </button>
-        </div>
-      )}
-
       {isAuthenticated && (
-      <LearningPlanList
-        loadAll
-        allowAllInFilter
-        examTypeId={filterExamTypeId}
-        onExamTypeIdChange={setFilterExamTypeId}
-        initialExamTypeId={examTypeIdFromUrl}
-        refreshKey={listRefreshKey}
-        showExamTypeBadge
-        title="Lộ trình đã sinh"
-        emptyMessage={null}
-        showRefreshButton={false}
-      />
+        <LearningPlanList
+          loadAll
+          allowAllInFilter
+          examTypeId={filterExamTypeId}
+          onExamTypeIdChange={setFilterExamTypeId}
+          initialExamTypeId={examTypeIdFromUrl}
+          refreshKey={listRefreshKey}
+          showExamTypeBadge
+          title="Lộ trình đã sinh"
+          emptyMessage={null}
+          showRefreshButton={false}
+        />
       )}
     </div>
   );

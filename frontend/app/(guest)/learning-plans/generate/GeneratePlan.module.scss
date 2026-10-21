@@ -1,0 +1,302 @@
+// Khung chung (tiêu đề, thẻ, nút, nhãn, thông báo) nằm ở TargetPlanPage.module.scss; ở đây chỉ phần riêng của trang.
+$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+/* ---------- Bố cục: form | các bước ---------- */
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  align-items: start;
+  gap: 24px;
+  margin-bottom: 20px;
+
+  @media (max-width: 991.98px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.formCard {
+  margin-bottom: 0;
+}
+
+.examHead {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--slate-100);
+}
+
+.block {
+  padding-top: 20px;
+}
+
+.blockLabel {
+  margin-bottom: 10px;
+}
+
+.blockHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-bottom: 10px;
+}
+
+/* ---------- Lộ trình dựa trên ---------- */
+
+.sourceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  @media (max-width: 575.98px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.sourceOption {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  background: var(--bg-white);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &:hover {
+    border-color: var(--slate-400);
+  }
+
+  &:focus-within {
+    outline: 3px solid rgb(var(--brand-700-rgb) / 0.25);
+    outline-offset: 1px;
+  }
+
+  &.selected {
+    border-color: var(--brand-700);
+    background: rgb(var(--brand-700-rgb) / 0.06);
+
+    .sourceIcon {
+      background: var(--brand-800);
+      color: var(--brand-50);
+    }
+
+    .sourceTitle {
+      color: var(--brand-700);
+    }
+  }
+
+  &.locked {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.sourceIcon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgb(var(--brand-700-rgb) / 0.08);
+  font-size: 1.7rem;
+  color: var(--brand-700);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.sourceText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sourceTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.sourceSubtitle {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--slate-600);
+}
+
+.sourceDesc {
+  margin-top: 4px;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  color: var(--slate-500);
+}
+
+/* ---------- Chọn bài thi ---------- */
+
+.testList {
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+}
+
+.testItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  & + & {
+    border-top: 1px solid var(--slate-100);
+  }
+
+  input {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--brand-700);
+  }
+
+  &:hover {
+    background: var(--slate-50);
+  }
+
+  &.selected {
+    background: rgb(var(--brand-700-rgb) / 0.06);
+
+    .testTitle {
+      color: var(--brand-700);
+    }
+  }
+
+  &.locked {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.testText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.testTitle {
+  overflow: hidden;
+  font-size: 1.3rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--slate-900);
+}
+
+.testMeta {
+  font-family: $mono;
+  font-size: 1.1rem;
+  color: var(--slate-500);
+}
+
+.testScore {
+  flex-shrink: 0;
+  font-family: $mono;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--slate-900);
+
+  small {
+    margin-left: 3px;
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--slate-400);
+  }
+}
+
+.practiceWarning {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 10px 0 0;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  color: var(--author-tag-text);
+
+  svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
+.submitRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--slate-100);
+}
+
+/* ---------- Các bước ---------- */
+
+.steps {
+  position: sticky;
+  top: 96px;
+  margin-bottom: 0;
+
+  @media (max-width: 991.98px) {
+    position: static;
+  }
+}
+
+.stepList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    gap: 12px;
+  }
+
+  h3 {
+    margin: 0 0 2px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--slate-900);
+  }
+
+  p {
+    margin: 0;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    color: var(--slate-500);
+  }
+}
+
+.stepNum {
+  flex-shrink: 0;
+  font-family: $mono;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.7;
+  color: var(--brand-700);
+}

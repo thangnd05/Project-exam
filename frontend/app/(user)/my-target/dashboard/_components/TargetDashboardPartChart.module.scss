@@ -1,0 +1,133 @@
+$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.row {
+  padding: 14px 16px;
+
+  & + & {
+    border-top: 1px solid var(--slate-100);
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  margin-bottom: 10px;
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--slate-900);
+}
+
+.values {
+  font-family: $mono;
+  font-size: 1.2rem;
+  color: var(--slate-500);
+
+  strong {
+    font-weight: 700;
+    color: var(--slate-900);
+  }
+}
+
+.track {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--slate-100);
+}
+
+.fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: inherit;
+  transition: width 0.35s ease;
+
+  &.ok {
+    background: var(--success-text);
+  }
+
+  &.gap {
+    background: var(--author-tag-text);
+  }
+}
+
+.aim {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--slate-700);
+  box-shadow: 0 0 0 2px var(--bg-white);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 14px;
+  font-size: 1.15rem;
+  color: var(--slate-500);
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.swatch {
+  display: inline-block;
+  width: 14px;
+  height: 6px;
+  border-radius: 999px;
+
+  &.ok {
+    background: var(--success-text);
+  }
+
+  &.gap {
+    background: var(--author-tag-text);
+  }
+
+  &.aimSwatch {
+    width: 3px;
+    height: 12px;
+    border-radius: 2px;
+    background: var(--slate-700);
+  }
+}
+
+.emptyHint {
+  margin: 0;
+  padding: 24px 16px;
+  border: 1px dashed var(--slate-300);
+  border-radius: 12px;
+  font-size: 1.3rem;
+  text-align: center;
+  color: var(--slate-500);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

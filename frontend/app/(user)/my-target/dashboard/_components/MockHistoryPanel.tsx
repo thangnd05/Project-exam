@@ -17,9 +17,11 @@ import type { ScoreScaleSource } from '@/app/features/exam-types/scoreScale';
 import dynamic from 'next/dynamic';
 import type { MockChartPoint } from './MockHistoryCharts';
 import { useMockHistory } from '@/app/(user)/my-target/dashboard/_hooks/useMockHistory';
-import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
+import uiStyles from '@/app/assets/styles/diagnostic/TargetPlanPage.module.scss';
+import styles from './MockHistoryPanel.module.scss';
 
 const cx = classNames.bind(styles);
+const ui = classNames.bind(uiStyles);
 
 const MockHistoryCharts = dynamic(() => import('./MockHistoryCharts'), { ssr: false });
 
@@ -155,134 +157,142 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
   const showCharts = !loading && chartData.length > 0;
 
   return (
-    <div className={cx('card')}>
-      <div className={cx('cardHeader')}>Tiến triển qua các bài đã làm</div>
-
-      <div className={cx('cardBody')}>
-        {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
-        {loading && <div className={cx('loading')}>Đang tải...</div>}
-
-        {!loading && totalElements === 0 && (
-          <div className={cx('alert', 'alertInfo')} style={{ marginBottom: 0 }}>
-            <span>Chưa có bài thi đầy đủ nào để thống kê.</span>
-            <Link href="/" className={cx('btn', 'btnPrimary', 'btnSm')}>
-              Làm bài đầu tiên
-            </Link>
-          </div>
-        )}
-
-        {showCharts && (
-          <MockHistoryCharts
-            chartData={chartData}
-            targetScore={targetScore}
-            loading={chartLoading}
-            examTypeName={examTypeName || ''}
-            scaleSource={scaleSource}
-          />
-        )}
-
+    <section className={ui('card')} aria-labelledby="mock-history-title">
+      <div className={ui('cardHead')}>
+        <h3 id="mock-history-title" className={ui('cardTitle')}>
+          Tiến triển qua các bài đã làm
+        </h3>
         {totalElements > 0 && (
-          <button
-            type="button"
-            className={cx('btn', 'btnOutline', 'btnSm', 'historyToggle')}
-            onClick={() => setTableOpen((prev) => !prev)}
-            aria-expanded={tableOpen}
-          >
-            <ChevronDown
-              size={16}
-              className={cx('historyToggleIcon', { historyToggleIconOpen: tableOpen })}
-            />
-            {tableOpen ? 'Ẩn bảng chi tiết' : `Xem bảng chi tiết (${totalElements} bài)`}
-          </button>
-        )}
-
-        {tableOpen && tableRows.length > 0 && (
-          <>
-            <div className={cx('tableWrapper')} style={{ marginTop: '1.4rem' }}>
-              <table className={cx('table')}>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Hoàn thành</th>
-                    <th>Tên bài kiểm tra</th>
-                    <th className={cx('right')}>Score</th>
-                    <th className={cx('right')}>Độ sẵn sàng</th>
-                    <th>Mục tiêu</th>
-                    <th>Thời gian</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableRows.map((t, idx) => {
-                    const e = enhancedById[t.userTestId];
-                    const enhancedLoaded = e && !e.error;
-                    const rowQuery = enhancedQueryById[t.userTestId];
-                    const rowLoading = !enhancedLoaded && !!rowQuery?.isFetching;
-                    return (
-                      <tr key={t.userTestId}>
-                        <td>{totalElements - (currentPage * PAGE_SIZE + idx)}</td>
-                        <td className={cx('small')}>{formatDate(t.finishedAt)}</td>
-                        <td>{t.testTitle || '-'}</td>
-                        <td className={cx('right')}>
-                          <strong>
-                            {(enhancedLoaded ? e.totalScore : t.totalScore) ?? '-'}
-                          </strong>
-                        </td>
-                        <td className={cx('right')}>
-                          {enhancedLoaded ? (
-                            `${e.readinessScore}%`
-                          ) : rowLoading ? (
-                            '...'
-                          ) : (
-                            <button
-                              type="button"
-                              className={cx('btn', 'btnGhost', 'btnSm')}
-                              onClick={() => loadEnhanced(t.userTestId)}
-                            >
-                              Tải
-                            </button>
-                          )}
-                        </td>
-                        <td>
-                          {enhancedLoaded ? (
-                            e.isTargetMet === true ? (
-                              <span className={cx('badge', 'badgeSuccess')}>Đạt</span>
-                            ) : e.isTargetMet === false ? (
-                              <span className={cx('badge', 'badgeWarning')}>Chưa đạt</span>
-                            ) : (
-                              <span className={cx('badge', 'badgeMuted')}>Chưa set</span>
-                            )
-                          ) : (
-                            '-'
-                          )}
-                        </td>
-                        <td className={cx('small')}>{formatDuration(t.durationTaken)}</td>
-                        <td>
-                          <Link
-                            href={`/tests/result/${t.userTestId}`}
-                            className={cx('btn', 'btnOutline', 'btnSm')}
-                          >
-                            Chẩn đoán
-                          </Link>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onChange={setPage}
-              />
-            )}
-          </>
+          <span className={ui('cardMeta')}>
+            <strong>{totalElements}</strong> bài thi đầy đủ
+          </span>
         )}
       </div>
-    </div>
+
+      {error && (
+        <div className={ui('notice', 'noticeDanger')}>
+          <span>{error}</span>
+        </div>
+      )}
+      {loading && <div className={ui('skeleton')} aria-hidden="true" />}
+
+      {!loading && totalElements === 0 && (
+        <div className={ui('notice', 'noticeInfo')} style={{ marginBottom: 0 }}>
+          <span>Chưa có bài thi đầy đủ nào để thống kê.</span>
+          <Link href="/" className={ui('btnPrimary', 'btnSm')}>
+            Làm bài đầu tiên
+          </Link>
+        </div>
+      )}
+
+      {showCharts && (
+        <MockHistoryCharts
+          chartData={chartData}
+          targetScore={targetScore}
+          loading={chartLoading}
+          examTypeName={examTypeName || ''}
+          scaleSource={scaleSource}
+        />
+      )}
+
+      {totalElements > 0 && (
+        <button
+          type="button"
+          className={ui('btnSecondary', 'btnSm')}
+          onClick={() => setTableOpen((prev) => !prev)}
+          aria-expanded={tableOpen}
+        >
+          <ChevronDown size={16} className={cx('toggleIcon', { toggleIconOpen: tableOpen })} />
+          {tableOpen ? 'Ẩn bảng chi tiết' : `Xem bảng chi tiết (${totalElements} bài)`}
+        </button>
+      )}
+
+      {tableOpen && tableRows.length > 0 && (
+        <>
+          <div className={cx('tableWrap')}>
+            <table className={cx('table')}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Hoàn thành</th>
+                  <th>Tên bài kiểm tra</th>
+                  <th className={cx('right')}>Điểm</th>
+                  <th className={cx('right')}>Độ sẵn sàng</th>
+                  <th>Mục tiêu</th>
+                  <th>Thời gian</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {tableRows.map((t, idx) => {
+                  const e = enhancedById[t.userTestId];
+                  const enhancedLoaded = e && !e.error;
+                  const rowQuery = enhancedQueryById[t.userTestId];
+                  const rowLoading = !enhancedLoaded && !!rowQuery?.isFetching;
+                  return (
+                    <tr key={t.userTestId}>
+                      <td className={cx('mono', 'dim')}>
+                        {totalElements - (currentPage * PAGE_SIZE + idx)}
+                      </td>
+                      <td className={cx('mono', 'dim')}>{formatDate(t.finishedAt)}</td>
+                      <td className={cx('testName')}>{t.testTitle || '-'}</td>
+                      <td className={cx('right', 'mono', 'strong')}>
+                        {(enhancedLoaded ? e.totalScore : t.totalScore) ?? '-'}
+                      </td>
+                      <td className={cx('right', 'mono')}>
+                        {enhancedLoaded ? (
+                          `${e.readinessScore}%`
+                        ) : rowLoading ? (
+                          '...'
+                        ) : (
+                          <button
+                            type="button"
+                            className={ui('textBtn')}
+                            onClick={() => loadEnhanced(t.userTestId)}
+                          >
+                            Tải
+                          </button>
+                        )}
+                      </td>
+                      <td>
+                        {enhancedLoaded ? (
+                          e.isTargetMet === true ? (
+                            <span className={ui('pill', 'pillSuccess')}>Đạt</span>
+                          ) : e.isTargetMet === false ? (
+                            <span className={ui('pill', 'pillWarning')}>Chưa đạt</span>
+                          ) : (
+                            <span className={ui('pill')}>Chưa đặt</span>
+                          )
+                        ) : (
+                          '-'
+                        )}
+                      </td>
+                      <td className={cx('mono', 'dim')}>{formatDuration(t.durationTaken)}</td>
+                      <td className={cx('right')}>
+                        <Link
+                          href={`/tests/result/${t.userTestId}`}
+                          className={ui('btnSecondary', 'btnSm')}
+                        >
+                          Chẩn đoán
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onChange={setPage}
+            />
+          )}
+        </>
+      )}
+    </section>
   );
 }
 

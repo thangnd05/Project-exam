@@ -1,0 +1,71 @@
+// Cùng kiểu bộ lọc "Kỳ thi:" ở Kho tài liệu (ResourceLibrary).
+$vendor-colors: (
+  aws: #f79400,
+  azure: #0089d6,
+  gcp: #4cb050,
+  other: #64748b,
+);
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.label {
+  flex-shrink: 0;
+  margin-right: 4px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate-400);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border: 1px solid var(--slate-300);
+  border-radius: 999px;
+  background: var(--bg-white);
+  font-size: 1.2rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--slate-600);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+
+  &:hover {
+    color: var(--slate-900);
+  }
+
+  &.active {
+    border-color: var(--brand-700);
+    background: rgb(var(--brand-700-rgb) / 0.1);
+    color: var(--brand-700);
+    font-weight: 700;
+  }
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+}
+
+@each $name, $color in $vendor-colors {
+  .dot-#{$name} {
+    background-color: $color;
+  }
+}

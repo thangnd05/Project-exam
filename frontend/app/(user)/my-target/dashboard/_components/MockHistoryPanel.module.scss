@@ -1,47 +1,16 @@
+$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+/* ---------- Biểu đồ ---------- */
+
 .chartsSection {
-  margin-bottom: 1.6rem;
-}
-
-.statsRow {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
-  gap: 0.8rem;
-  margin-bottom: 1.2rem;
-}
-
-.statTile {
-  padding: 0.9rem 1rem;
-  background: var(--bg-white);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-}
-
-.statTileHighlight {
-  border-left: 3px solid var(--primary);
-}
-
-.statTileLabel {
-  display: block;
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.25rem;
-}
-
-.statTileValue {
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-color);
+  margin-bottom: 16px;
 }
 
 .chartCard {
+  padding: 16px 18px 18px;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
   background: var(--bg-white);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  padding: 1.2rem 1.4rem 1.4rem;
 }
 
 .chartCardHeader {
@@ -49,27 +18,28 @@
   align-items: baseline;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.35rem;
+  gap: 4px 12px;
+  margin-bottom: 4px;
 }
 
 .chartCardTitle {
   margin: 0;
-  font-size: var(--font-size-ssm);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-color);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--slate-900);
 }
 
 .chartCardMeta {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
+  font-family: $mono;
+  font-size: 1.1rem;
+  color: var(--slate-500);
 }
 
 .chartCardDesc {
-  margin: 0 0 0.8rem;
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  line-height: 1.45;
+  margin: 0 0 12px;
+  font-size: 1.2rem;
+  line-height: 1.5;
+  color: var(--slate-500);
 }
 
 .chartContainer {
@@ -79,54 +49,133 @@
 
 .chartLoading,
 .chartLoadingInline {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
+  font-size: 1.2rem;
+  color: var(--slate-500);
 }
 
 .chartLoading {
-  padding: 2rem;
+  padding: 32px;
   text-align: center;
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-md);
+  border: 1px dashed var(--slate-300);
+  border-radius: 12px;
 }
 
 .chartLoadingInline {
-  margin: 0 0 0.6rem;
+  margin: 0 0 10px;
 }
 
 .chartLegendNote {
-  margin: 0.8rem 0 0;
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  line-height: 1.45;
+  margin: 12px 0 0;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  color: var(--slate-500);
 }
 
 .chartTooltip {
-  padding: 0.6rem 0.8rem;
+  padding: 8px 12px;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
   background: var(--bg-white);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-md);
-  font-size: var(--font-size-sm);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.08);
+  font-size: 1.2rem;
   line-height: 1.5;
+  color: var(--slate-700);
 
   p {
-    margin: 0.2rem 0;
+    margin: 2px 0;
   }
 }
 
 .chartTooltipTitle {
-  font-weight: var(--font-weight-semibold);
-  margin-bottom: 0.35rem !important;
-  color: var(--text-color);
+  margin-bottom: 4px !important;
+  font-family: $mono;
+  font-weight: 700;
+  color: var(--slate-900);
 }
 
 .chartTooltipSuccess {
+  font-weight: 600;
   color: var(--success-text);
-  font-weight: var(--font-weight-medium);
 }
 
 .chartTooltipWarn {
+  font-weight: 600;
   color: var(--author-tag-text);
-  font-weight: var(--font-weight-medium);
+}
+
+/* ---------- Bảng chi tiết ---------- */
+
+.toggleIcon {
+  transition: transform 0.2s ease;
+}
+
+.toggleIconOpen {
+  transform: rotate(180deg);
+}
+
+.tableWrap {
+  margin-top: 16px;
+  overflow-x: auto;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.3rem;
+
+  th {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--slate-200);
+    background: var(--slate-50);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--slate-400);
+  }
+
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--slate-100);
+    vertical-align: middle;
+    white-space: nowrap;
+    color: var(--slate-700);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover td {
+    background: var(--slate-50);
+  }
+
+  .right {
+    text-align: right;
+  }
+}
+
+.mono {
+  font-family: $mono;
+  font-size: 1.2rem;
+}
+
+.dim {
+  color: var(--slate-500);
+}
+
+.strong {
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.testName {
+  min-width: 180px;
+  font-weight: 600;
+  white-space: normal !important;
+  color: var(--slate-900) !important;
 }

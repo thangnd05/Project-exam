@@ -1,0 +1,142 @@
+$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+.section {
+  margin-bottom: 20px;
+}
+
+.headText {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+.headActions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.picker {
+  margin-bottom: 16px;
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--slate-200);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+  padding: 16px 18px;
+
+  & + & {
+    border-top: 1px solid var(--slate-100);
+  }
+
+  &.active {
+    background: rgb(var(--brand-700-rgb) / 0.04);
+    box-shadow: inset 3px 0 0 var(--brand-700);
+  }
+
+  @media (max-width: 767.98px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  margin-bottom: 4px;
+}
+
+.title {
+  margin: 0 4px 0 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.examPill {
+  font-family: $mono;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 0;
+  font-family: $mono;
+  font-size: 1.1rem;
+  color: var(--slate-500);
+
+  span + span::before {
+    content: '·';
+    margin: 0 8px;
+    color: var(--slate-300);
+  }
+
+  strong {
+    font-weight: 700;
+    color: var(--slate-900);
+  }
+}
+
+.progress {
+  max-width: 320px;
+  height: 5px;
+  margin-top: 10px;
+  border-radius: 999px;
+  background: var(--slate-100);
+  overflow: hidden;
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--brand-700);
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.deleteBtn {
+  margin-left: 4px;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 28px 16px;
+  border: 1px dashed var(--slate-300);
+  border-radius: 12px;
+  font-size: 1.3rem;
+  color: var(--slate-500);
+
+  svg {
+    font-size: 1.8rem;
+    color: var(--slate-400);
+  }
+}
