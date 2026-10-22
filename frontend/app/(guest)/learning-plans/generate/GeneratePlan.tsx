@@ -21,7 +21,7 @@ import { getApiErrorMessage } from '@/app/utils/apiError';
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
-import uiStyles from '@/app/assets/styles/diagnostic/TargetPlanPage.module.scss';
+import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './GeneratePlan.module.scss';
 import type { PlanResponse } from '@/app/types';
 import {

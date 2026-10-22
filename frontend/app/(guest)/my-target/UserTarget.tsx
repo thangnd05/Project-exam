@@ -19,7 +19,7 @@ import {
   withExam,
 } from '@/app/features/exam-types/hooks/useExamParam';
 import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
-import uiStyles from '@/app/assets/styles/diagnostic/TargetPlanPage.module.scss';
+import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './UserTarget.module.scss';
 import { sortPartsByLookup } from '@/app/features/exam-types/partOrder';
 import useMilestoneScoring from '@/app/features/my-target/hooks/useMilestoneScoring';

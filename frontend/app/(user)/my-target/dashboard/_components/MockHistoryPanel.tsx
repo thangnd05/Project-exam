@@ -17,7 +17,7 @@ import type { ScoreScaleSource } from '@/app/features/exam-types/scoreScale';
 import dynamic from 'next/dynamic';
 import type { MockChartPoint } from './MockHistoryCharts';
 import { useMockHistory } from '@/app/(user)/my-target/dashboard/_hooks/useMockHistory';
-import uiStyles from '@/app/assets/styles/diagnostic/TargetPlanPage.module.scss';
+import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './MockHistoryPanel.module.scss';
 
 const cx = classNames.bind(styles);

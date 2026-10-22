@@ -1,6 +1,6 @@
 @import 'app/assets/styles/mixins.scss';
 
-// Khuôn chung cho nhóm tab Mục tiêu / Lập lộ trình / Tổng quan, cùng kiểu Kho tài liệu và Kho đề thi:
+// Khuôn phẳng dùng chung (Mục tiêu / Lộ trình / Tổng quan, trang kỳ thi), cùng kiểu Kho tài liệu và Kho đề thi:
 // thẻ trắng viền slate phẳng, nhãn chữ hoa nhỏ, số liệu chữ mono, nút graphite dạng viên thuốc.
 $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 

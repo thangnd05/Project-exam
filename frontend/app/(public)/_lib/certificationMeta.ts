@@ -95,3 +95,16 @@ export const badgeUrl = (name: string | undefined, code: string) => {
   const file = BADGE_BY_CODE[code] ?? BADGE_BY_NAME.find(([pattern]) => pattern.test(name ?? ''))?.[1];
   return file ? `${CERT_IMAGE_DIR}/${file}.webp` : undefined;
 };
+
+// Số câu của đề full theo đề thi thật.
+export const FULL_QUESTIONS: Record<string, number> = {
+  'SAA-C03': 65,
+  'SAP-C02': 75,
+  'DOP-C02': 75,
+};
+
+export const formatFullSpec = (durationMinutes: number | null | undefined, code: string) => {
+  const questions = FULL_QUESTIONS[code];
+  const minutes = durationMinutes ? `${durationMinutes}p` : 'theo đề';
+  return questions ? `${questions} câu / ${minutes}` : minutes;
+};

@@ -22,7 +22,7 @@ import {
   planStageLabel,
   planStatusLabel,
 } from '@/app/features/learning-plans/planLabels';
-import uiStyles from '@/app/assets/styles/diagnostic/TargetPlanPage.module.scss';
+import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './LearningPlanList.module.scss';
 import { LearningPlanStatus } from '@/app/enums';
 import type { PlanListItem } from '@/app/(guest)/learning-plans/generate/_hooks/useLearningPlanList';

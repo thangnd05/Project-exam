@@ -4,6 +4,7 @@ import Link from 'next/link';
 import {useQuery} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {Container} from 'react-bootstrap';
+import {FiArrowRight} from 'react-icons/fi';
 import {IoAlertCircleOutline, IoDocumentTextOutline, IoSearchOutline} from 'react-icons/io5';
 
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
@@ -18,22 +19,17 @@ import {
   LEVELS,
   VENDORS,
   badgeUrl,
+  formatFullSpec,
   parseCode,
   parseLevel,
   parseVendor,
   type Level,
   type Vendor,
 } from '@/app/(public)/_lib/certificationMeta';
+import ExamBadge from '@/app/(public)/_components/ExamBadge/ExamBadge';
 import styles from './ExamCatalog.module.scss';
 
 const cx = classNames.bind(styles);
-
-// Số câu của đề full theo đề thi thật.
-const FULL_QUESTIONS: Record<string, number> = {
-  'SAA-C03': 65,
-  'SAP-C02': 75,
-  'DOP-C02': 75,
-};
 
 type CatalogExam = {
   exam: ExamTypeResponse;
@@ -84,13 +80,6 @@ const toCatalog = (payload: unknown): CatalogExam[] =>
       || a.title.localeCompare(b.title, 'en'),
     );
 
-const getInitials = (name?: string) => {
-  const words = (name ?? '').trim().split(/\s+/).filter(Boolean);
-  if (!words.length) return '?';
-  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
-  return (words[0][0] + words[1][0]).toUpperCase();
-};
-
 const vendorTag = ({vendor, exam}: CatalogExam) => {
   if (vendor !== 'other') return {label: VENDORS.find((v) => v.id === vendor)?.tag ?? '', tone: vendor};
   return /oracle/i.test(exam.name ?? '') ? {label: 'Oracle', tone: 'oracle'} : {label: 'Linux', tone: 'linux'};
@@ -101,30 +90,6 @@ const formatQuick = (test?: QuickChallengeCardResponse) => {
   const minutes = test.durationMinutes ? ` / ${test.durationMinutes}p` : '';
   return `${test.totalQuestions} câu${minutes}`;
 };
-
-const formatFull = ({exam, code}: CatalogExam) => {
-  const questions = FULL_QUESTIONS[code];
-  const minutes = exam.durationMinutes ? `${exam.durationMinutes}p` : 'theo đề';
-  return questions ? `${questions} câu / ${minutes}` : minutes;
-};
-
-// Ưu tiên huy hiệu có sẵn trong dự án, lỗi thì thử ảnh từ API, cuối cùng là chữ viết tắt.
-function ExamBadge({sources, name}: {sources: (string | undefined)[]; name: string}) {
-  const candidates = sources.filter(Boolean) as string[];
-  const [index, setIndex] = useState(0);
-  const src = candidates[index];
-
-  return (
-    <span className={cx('badge')} aria-hidden="true">
-      {src ? (
-        // eslint-disable-next-line @next/next/no-img-element -- logo do admin dán (URL ngoài tuỳ ý), chuỗi fallback qua onError
-        <img src={src} alt="" onError={() => setIndex((i) => i + 1)} />
-      ) : (
-        <span className={cx('initials')}>{getInitials(name)}</span>
-      )}
-    </span>
-  );
-}
 
 function ExamCatalog() {
   const {data: exams = [], isLoading, isError} = useQuery({
@@ -245,7 +210,7 @@ function ExamCatalog() {
                     Quick: <span>{formatQuick(quick)}</span>
                   </div>
                   <div>
-                    Full: <span>{formatFull(item)}</span>
+                    Full: <span>{formatFullSpec(exam.durationMinutes, code)}</span>
                   </div>
                 </div>
               </div>
@@ -260,8 +225,9 @@ function ExamCatalog() {
                 >
                   Thi nhanh
                 </button>
-                <Link href={href} className={cx('btnSecondary')}>
-                  Full Mock
+                <Link href={href} className={cx('btnSecondary')} title={`Xem các đề Full Mock của ${code || title}`}>
+                  Đề Full Mock
+                  <FiArrowRight aria-hidden="true" />
                 </Link>
               </div>
             </article>

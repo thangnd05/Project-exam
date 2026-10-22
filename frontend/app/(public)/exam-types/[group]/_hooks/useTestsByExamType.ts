@@ -35,11 +35,10 @@ export function useTestsByExamType(examTypeId?: string, page = 0) {
     placeholderData: keepPreviousData,
   });
 
-  const nameQuery = useQuery({
+  const examTypeQuery = useQuery({
     queryKey: examTypeTestsKeys.name(examTypeId),
     queryFn: () => getExamTypeById(examTypeId as string),
     enabled: !!examTypeId,
-    select: (data) => data?.name ?? '',
   });
 
   const childrenQuery = useQuery({
@@ -61,7 +60,9 @@ export function useTestsByExamType(examTypeId?: string, page = 0) {
       : []) as TestResponse[],
     certificateExam: (certificateExamsQuery.data ?? null) as CertificateExamListResponse | null,
     totalPages: testsQuery.data?.totalPages ?? 0,
-    examTypeName: nameQuery.data ?? '',
+    totalElements: testsQuery.data?.totalElements ?? 0,
+    examType: (examTypeQuery.data ?? null) as ExamTypeResponse | null,
+    examTypeName: examTypeQuery.data?.name ?? '',
     children: childrenQuery.data ?? EMPTY_LIST,
     isLoading: testsQuery.isLoading,
   };

@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import {
     IoTimeOutline,
     IoCalendarOutline,
@@ -16,14 +15,10 @@ import classNames from 'classnames/bind';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
 import styles from '@/app/features/tests/TestCard/TestCard.module.scss';
-import {getTestStatus} from '@/app/features/tests/testStatusHelper';
 import {formatDayMonthTime, formatFullDateTime} from '@/app/utils/format-date-time';
 import TestModeModal from '@/app/features/tests/TestModeModal/TestModeModal';
-import type { TestModeSelection } from '@/app/features/tests/TestModeModal/TestModeModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import { useAuth } from '@/app/hooks/useAuth';
-import { useGuestAllowedCategories } from '@/app/features/tests/TestCard/hooks/useGuestAllowedCategories';
-import { buildLoginUrl } from '@/app/features/auth/authRedirect';
+import { useTestStart } from '@/app/features/tests/TestCard/hooks/useTestStart';
 import type { TestResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
@@ -75,47 +70,18 @@ type TestCardProps = {
 
 function TestCard({ test, countdowns }: TestCardProps) {
     const router = useRouter();
-    const now = new Date();
-    const [showModeModal, setShowModeModal] = useState(false);
-
-    const { status, statusLabel, buttonText, canStart } =
-        getTestStatus(test, now, countdowns);
-
-    // Lịch sử và bảng xếp hạng cần đăng nhập, khách bấm vào sẽ bị đẩy sang trang đăng nhập.
-    const { isAuthenticated, loading: authLoading } = useAuth();
-    const isGuest = !authLoading && !isAuthenticated;
-    const { isGuestAllowed } = useGuestAllowedCategories(isGuest);
-    // null = chưa biết (đang tải hoặc đã đăng nhập) thì không hiện nhãn.
-    const guestAllowed = isGuest ? isGuestAllowed(test) : null;
-    const needsLogin = guestAllowed === false;
-    const showLeaderboard =
-        isAuthenticated &&
-        (test.availableTo == null || now > new Date(test.availableTo));
-
-    const handleStart = () => {
-        if (!canStart) return;
-        // Khách mở đề cần tài khoản thì đưa thẳng sang đăng nhập, không để bấm tới bước bắt đầu mới biết.
-        if (needsLogin) {
-            router.push(
-                buildLoginUrl(window.location.pathname + window.location.search, {
-                    flash: 'Đề này cần tài khoản. Đăng nhập hoặc đăng ký miễn phí để làm bài.',
-                }),
-            );
-            return;
-        }
-        setShowModeModal(true);
-    };
-
-    const handleSelectMode = ({ mode, examPartIds }: TestModeSelection) => {
-        setShowModeModal(false);
-        const params = new URLSearchParams();
-        if (mode === 'practice') {
-            params.set('mode', 'practice');
-            if (examPartIds?.length) params.set('parts', examPartIds.join(','));
-        }
-        const qs = params.toString();
-        router.push(`/tests/${test.testId}/start${qs ? `?${qs}` : ''}`);
-    };
+    const {
+        status,
+        statusLabel,
+        buttonText,
+        canStart,
+        isAuthenticated,
+        guestAllowed,
+        needsLogin,
+        showLeaderboard,
+        handleStart,
+        modeModal,
+    } = useTestStart(test, countdowns);
 
     return (
         <div className={cx('test-card')}>
@@ -252,10 +218,10 @@ function TestCard({ test, countdowns }: TestCardProps) {
             </div>
 
             <TestModeModal
-                show={showModeModal}
+                show={modeModal.show}
                 test={test}
-                onClose={() => setShowModeModal(false)}
-                onStart={handleSelectMode}
+                onClose={modeModal.onClose}
+                onStart={modeModal.onStart}
             />
         </div>
     );

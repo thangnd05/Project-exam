@@ -25,7 +25,7 @@ import { getReadinessClassName, getReadinessLabel } from '@/app/features/my-targ
 import { LearningPlanStatus } from '@/app/enums';
 import pageStyles from './TargetDashboard.module.scss';
 import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
-import uiStyles from '@/app/assets/styles/diagnostic/TargetPlanPage.module.scss';
+import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 
 const planCx = classNamesBind.bind(planStyles);
 const pageCx = classNamesBind.bind(pageStyles);

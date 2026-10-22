@@ -1,7 +1,7 @@
 'use client';
 
 import classNamesBind from 'classnames/bind';
-import uiStyles from '@/app/assets/styles/diagnostic/TargetPlanPage.module.scss';
+import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './TargetDashboardPartChart.module.scss';
 
 const cx = classNamesBind.bind(styles);
