@@ -336,7 +336,7 @@
   padding-top: 6px;
 }
 
-@media (max-width: 768px) {
+@include down(md) {
   .wrapper {
     padding: 18px 12px;
   }

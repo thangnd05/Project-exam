@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 // Huy hiệu chuỗi ngày học theo mẫu FrostScope: viên thuốc trong suốt có viền,
 // ngọn lửa + số màu cam #FFA116, chữ "ngày liên tiếp".
 
@@ -98,7 +100,7 @@
   }
 
   // Màn hình hẹp chỉ giữ ngọn lửa + số cho gọn header.
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     .label {
       display: none;
     }
@@ -141,7 +143,7 @@
   pointer-events: none;
 
   // Màn hình hẹp: neo mép phải để không tràn khỏi màn hình.
-  @media (max-width: 639.98px) {
+  @include down(sm) {
     right: 0;
     left: auto;
     transform: none;

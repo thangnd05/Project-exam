@@ -27,6 +27,7 @@ import { useToggleReact, useToggleSavePost } from './_hooks/usePostReactions';
 import { ReactType } from '@/app/enums';
 import type { CommentResponse } from '@/app/types';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
+import { BREAKPOINTS } from '@/app/assets/styles/breakpoints';
 
 const Slider = dynamic(() => import('react-slick'), { ssr: false });
 
@@ -107,9 +108,9 @@ function PostDetail() {
 
   useEffect(() => {
     const computeIndent = () => {
-      if (window.innerWidth <= 576) return 12;
-      if (window.innerWidth <= 768) return 18;
-      if (window.innerWidth <= 992) return 28;
+      if (window.innerWidth < BREAKPOINTS.sm) return 12;
+      if (window.innerWidth < BREAKPOINTS.md) return 18;
+      if (window.innerWidth < BREAKPOINTS.lg) return 28;
       return 40;
     };
 

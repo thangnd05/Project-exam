@@ -13,7 +13,7 @@
     margin-bottom: 30px;
     padding: 0 10px;
 
-    @media (max-width: 768px) {
+    @include down(md) {
         flex-direction: column;
         align-items: center;
         gap: 20px;
@@ -28,7 +28,7 @@
     padding: 6px;
     border-radius: 16px;
 
-    @media (max-width: 576px) {
+    @include down(sm) {
         width: 100%;
     }
 }
@@ -56,7 +56,7 @@
         box-shadow: var(--shadow-md);
     }
 
-    @media (max-width: 576px) {
+    @include down(sm) {
         flex: 1;
         justify-content: center;
     }
@@ -101,7 +101,7 @@
             border: none;
             display: table-cell !important;
 
-            @media (max-width: 576px) {
+            @include down(sm) {
                 padding: 15px 12px;
                 font-size: 1.2rem;
             }
@@ -128,7 +128,7 @@
             border-bottom: 1px solid var(--border-color);
             display: table-cell !important;
 
-            @media (max-width: 576px) {
+            @include down(sm) {
                 padding: 15px 12px;
                 font-size: 1.4rem;
             }
@@ -142,7 +142,7 @@
     font-size: 1.8rem;
     text-transform: capitalize;
 
-    @media (max-width: 576px) {
+    @include down(sm) {
         font-size: 1.6rem;
     }
 }
@@ -189,7 +189,7 @@
     width: 95%;
     margin: 0 auto;
 
-    @media (max-width: 576px) {
+    @include down(sm) {
         padding: 30px 0;
     }
 }
@@ -199,7 +199,7 @@
     perspective: 1500px;
     cursor: pointer;
 
-    @media (max-width: 576px) {
+    @include down(sm) {
         height: 280px;
     }
 }
@@ -230,7 +230,7 @@
     padding: 40px;
     box-shadow: var(--shadow-md);
 
-    @media (max-width: 576px) {
+    @include down(sm) {
         padding: 20px;
     }
 }
@@ -245,7 +245,7 @@
         color: var(--primary-text);
         margin-bottom: 10px;
 
-        @media (max-width: 576px) {
+        @include down(sm) {
             font-size: var(--font-size-2xxl);
         }
     }
@@ -262,7 +262,7 @@
         margin-bottom: 15px;
         text-align: center;
 
-        @media (max-width: 576px) {
+        @include down(sm) {
             font-size: 2rem;
         }
     }
@@ -282,7 +282,7 @@
     align-items: center;
     gap: 30px;
 
-    @media (max-width: 576px) {
+    @include down(sm) {
         margin-top: 30px;
         gap: 20px;
     }
@@ -318,7 +318,7 @@
         cursor: not-allowed;
     }
 
-    @media (max-width: 576px) {
+    @include down(sm) {
         width: 48px;
         height: 48px;
         font-size: 2rem;

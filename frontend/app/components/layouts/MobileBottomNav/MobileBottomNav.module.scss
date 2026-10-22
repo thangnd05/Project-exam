@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 .bottomNav {
   position: fixed;
   left: 0;
@@ -16,7 +18,7 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
-  @media (max-width: 991.98px) {
+  @include down(lg) {
     display: flex;
   }
 }

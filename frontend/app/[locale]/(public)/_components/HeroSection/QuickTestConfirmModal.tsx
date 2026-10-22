@@ -1,16 +1,10 @@
 'use client';
-import {
-  IoArrowForward,
-  IoDocumentTextOutline,
-  IoLeafOutline,
-  IoPlayOutline,
-  IoTimeOutline,
-  IoTrendingUpOutline,
-} from 'react-icons/io5';
+import {IoArrowForward, IoLeafOutline} from 'react-icons/io5';
 import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 
 import BaseModal from '@/app/components/modal/BaseModal';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
 import {setLearnerLevel} from '@/app/features/learning-plans/learnerLevel';
 import styles from './QuickTestConfirmModal.module.scss';
@@ -40,13 +34,11 @@ function QuickTestConfirmModal({
   isGuest = false,
 }: QuickTestConfirmModalProps) {
   const t = useTranslations('Home.quickTest');
+  const tCommon = useTranslations('Common');
 
   if (!test) return null;
 
-  const durationLabel =
-    test.durationMinutes != null && test.durationMinutes > 0
-      ? t('minutes', {minutes: test.durationMinutes})
-      : t('unlimited');
+  const hasDuration = test.durationMinutes != null && test.durationMinutes > 0;
 
   const questionLabel =
     test.totalQuestions != null
@@ -69,77 +61,82 @@ function QuickTestConfirmModal({
     <BaseModal
       show={show}
       onClose={onClose}
-      title={t('confirm.title', {name: examName})}
-      maxWidth={560}
-    >
-      <div className={cx('body')}>
-        {test.examTypeImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- logo do admin dán (URL ngoài tuỳ ý), không qua next/image
-          <img
-            className={cx('logo')}
-            src={test.examTypeImageUrl}
-            alt=""
-            aria-hidden="true"
-          />
-        ) : null}
-
-        <p className={cx('examName')}>{examName}</p>
-
-        <div className={cx('options')}>
-          <button
-            type="button"
-            className={cx('option')}
+      title={t('confirm.title')}
+      maxWidth={600}
+      variant="plain"
+      footer={
+        <>
+          <ButtonPrime
+            variant="outline"
+            size="lg"
+            className={cx('footerBtn')}
+            onClick={onClose}
+          >
+            {tCommon('cancelShort')}
+          </ButtonPrime>
+          <ButtonPrime
+            variant="primary"
+            size="lg"
+            className={cx('footerBtn')}
             onClick={chooseStudied}
           >
-            <span className={cx('optionIcon')}>
-              <IoTrendingUpOutline aria-hidden="true" />
-            </span>
-            <span className={cx('optionText')}>
-              <span className={cx('optionTitle')}>{t('confirm.practiceTitle')}</span>
-              <span className={cx('optionHint')}>
-                {isGuest
-                  ? t('confirm.practiceHintGuest')
-                  : t('confirm.practiceHint')}
-              </span>
-            </span>
-            <IoPlayOutline className={cx('optionArrow')} aria-hidden="true" />
-          </button>
+            {t('confirm.start')}
+          </ButtonPrime>
+        </>
+      }
+    >
+      <div className={cx('body')}>
+        <p className={cx('intro')}>
+          {hasDuration
+            ? t.rich('confirm.intro', {
+                questions: questionLabel,
+                duration: t('minutes', {minutes: test.durationMinutes ?? 0}),
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })
+            : t.rich('confirm.introNoLimit', {
+                questions: questionLabel,
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
+        </p>
 
-          <button
-            type="button"
-            className={cx('option')}
-            onClick={chooseBeginner}
-          >
-            <span className={cx('optionIcon', 'optionIconSoft')}>
-              <IoLeafOutline aria-hidden="true" />
-            </span>
-            <span className={cx('optionText')}>
-              <span className={cx('optionTitle')}>
-                {isGuest
-                  ? t('confirm.planTitleGuest')
-                  : t('confirm.planTitle')}
-              </span>
-              <span className={cx('optionHint')}>
-                {t('confirm.planHint')}
-              </span>
-            </span>
-            <IoArrowForward
-              className={cx('optionArrow')}
-              aria-hidden="true"
-            />
-          </button>
+        <div className={cx('perk')}>
+          <p className={cx('perkTitle')}>{t('confirm.perkTitle')}</p>
+          <p className={cx('perkText')}>
+            {isGuest ? t('confirm.perkTextGuest') : t('confirm.perkText')}
+          </p>
         </div>
 
-        <ul className={cx('meta')}>
-          <li>
-            <IoDocumentTextOutline aria-hidden="true" />
-            <span>{questionLabel}</span>
-          </li>
-          <li>
-            <IoTimeOutline aria-hidden="true" />
-            <span>{durationLabel}</span>
-          </li>
-        </ul>
+        <div className={cx('field')}>
+          <span className={cx('fieldLabel')}>{t('confirm.examLabel')}</span>
+          <div className={cx('exam')}>
+            {test.examTypeImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- logo do admin dán (URL ngoài tuỳ ý), không qua next/image
+              <img
+                className={cx('logo')}
+                src={test.examTypeImageUrl}
+                alt=""
+                aria-hidden="true"
+              />
+            ) : null}
+            <span className={cx('examName')}>{examName}</span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className={cx('planLink')}
+          onClick={chooseBeginner}
+          title={t('confirm.planHint')}
+        >
+          <IoLeafOutline className={cx('planIcon')} aria-hidden="true" />
+          <span>
+            <span className={cx('planPrompt')}>{t('confirm.planPrompt')}</span>{' '}
+            <span className={cx('planTitle')}>
+              {isGuest ? t('confirm.planTitleGuest') : t('confirm.planTitle')}
+            </span>
+          </span>
+          <IoArrowForward className={cx('planArrow')} aria-hidden="true" />
+        </button>
       </div>
     </BaseModal>
   );

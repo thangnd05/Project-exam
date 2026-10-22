@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 .wrapper {
   background: var(--bg-white);
   border-radius: var(--radius-lg);
@@ -137,7 +139,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@include down(md) {
   .wrapper {
     padding: 18px;
   }

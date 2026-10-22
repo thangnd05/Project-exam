@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 .editor {
   display: flex;
   flex-direction: column;
@@ -264,7 +266,7 @@
   font-size: var(--font-size-smd);
 }
 
-@media (max-width: 1200px) {
+@include down(xl) {
   .workspace {
     grid-template-columns: 1fr;
   }

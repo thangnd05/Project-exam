@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .head {
@@ -41,7 +43,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   gap: 8px;
 }
 
-@media (max-width: 575.98px) {
+@include down(sm) {
   .head {
     flex-wrap: wrap;
   }

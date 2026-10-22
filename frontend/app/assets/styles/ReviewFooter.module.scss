@@ -1,3 +1,5 @@
+@import 'mixins.scss';
+
 
 
 .footerActions {
@@ -13,7 +15,7 @@
   margin: 0 auto;
   padding: 0 24px 10px;
 
-  @media (max-width: 768px) {
+  @include down(md) {
     padding: 0 14px 8px;
   }
 }
@@ -135,7 +137,7 @@
   gap: 12px;
   padding: 12px 24px;
 
-  @media (max-width: 768px) {
+  @include down(md) {
     padding: 10px 14px;
   }
 }

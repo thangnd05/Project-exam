@@ -1,3 +1,35 @@
+// Breakpoint dùng chung, trùng mốc Bootstrap 5 để khớp grid/utility của react-bootstrap
+// (xs, wide là mốc thêm). Giữ đồng bộ với breakpoints.ts khi JS cần đo màn hình.
+$breakpoints: (
+  xs: 480px,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+  wide: 1536px,
+);
+
+// Từ mốc trở lên: @include up(lg) { ... }
+@mixin up($bp) {
+  @media (min-width: map-get($breakpoints, $bp)) {
+    @content;
+  }
+}
+
+// Dưới mốc (trừ 0.02px để không chồng với up() đúng tại mốc): @include down(md) { ... }
+@mixin down($bp) {
+  @media (max-width: map-get($breakpoints, $bp) - 0.02px) {
+    @content;
+  }
+}
+
+// Từ mốc $from đến dưới mốc $to: @include between(lg, xl) { ... }
+@mixin between($from, $to) {
+  @media (min-width: map-get($breakpoints, $from)) and (max-width: map-get($breakpoints, $to) - 0.02px) {
+    @content;
+  }
+}
 
 @mixin primaryGradientButton {
   background: var(--primary-btn-bg);

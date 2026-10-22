@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import routes from '@/app/configs/Routes';
 import { adminPermissionByPath } from '@/app/configs/adminPermissions';
+import { mediaDown } from '@/app/assets/styles/breakpoints';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useTranslations } from 'next-intl';
 import styles from '@/app/[locale]/(admin)/_components/AdminLayout/AdminLayout.module.scss';
@@ -181,7 +182,7 @@ function AdminLayout({children}: AdminLayoutProps) {
   }, [permissions]);
 
   useEffect(() => {
-    const mql = window.matchMedia('(max-width: 1024px)');
+    const mql = window.matchMedia(mediaDown('lg'));
     const sync = () => {
       if (mql.matches) {
         setCollapsed(false);

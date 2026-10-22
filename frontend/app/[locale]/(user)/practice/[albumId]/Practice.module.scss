@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 $primary: var(--primary);
 $accent-color: var(--accent-color);
 $accent-act-color: var(--accent-act-color);
@@ -482,7 +484,7 @@ $transition: all 0.3s ease;
     flex: 1;
 }
 
-@media (max-width: 768px) {
+@include down(md) {
     .wrapper {
         padding: 1rem 0;
     }
@@ -535,7 +537,7 @@ $transition: all 0.3s ease;
     }
 }
 
-@media (max-width: 480px) {
+@include down(xs) {
     .header {
         flex-direction: column;
         gap: 1rem;

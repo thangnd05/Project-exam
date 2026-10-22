@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 // Footer theo mẫu FrostScope: nền tối hơn section phía trên + viền trên graphite để tách bạch,
 // chữ bạc, tiêu đề cột trắng băng, hover xanh băng.
 .footer {
@@ -21,11 +23,11 @@
   padding-bottom: 48px;
   border-bottom: 1px solid rgb(var(--surface-dark-border-rgb) / 0.6);
 
-  @media (min-width: 768px) {
+  @include up(md) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  @media (min-width: 992px) {
+  @include up(lg) {
     grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 48px;
   }
@@ -39,7 +41,7 @@
   align-items: flex-start;
   gap: 14px;
 
-  @media (min-width: 992px) {
+  @include up(lg) {
     grid-column: span 2;
   }
 }
@@ -145,7 +147,7 @@
   padding-top: 32px;
   color: rgb(var(--text-on-dark-rgb) / 0.6);
 
-  @media (max-width: 639.98px) {
+  @include down(sm) {
     flex-direction: column;
     text-align: center;
   }

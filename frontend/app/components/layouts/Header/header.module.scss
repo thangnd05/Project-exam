@@ -551,7 +551,7 @@
   display: none;
 }
 
-@media (min-width: 992px) and (max-width: 1199.98px) {
+@include between(lg, xl) {
   .home,
   .menuTitle {
     padding-left: 10px;
@@ -577,7 +577,7 @@
   }
 }
 
-@media (min-width: 992px) {
+@include up(lg) {
   .desktopUtils {
     display: block;
   }
@@ -587,13 +587,13 @@
   }
 }
 
-@media (min-width: 1536px) {
+@include up(wide) {
   .pill {
     max-width: 1280px;
   }
 }
 
-@media (max-width: 991.98px) {
+@include down(lg) {
   .wrapper {
     padding: 8px 12px 0;
   }

@@ -366,7 +366,7 @@
   margin: 0;
 }
 
-@media (max-width: 768px) {
+@include down(md) {
   .wrapper {
     padding: 18px 0 44px;
     max-width: 100%;
@@ -441,7 +441,7 @@
   }
 }
 
-@media (max-width: 576px) {
+@include down(sm) {
   .header-stats {
     justify-content: center;
   }

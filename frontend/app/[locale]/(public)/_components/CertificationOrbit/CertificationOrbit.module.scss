@@ -16,7 +16,7 @@ $directions: (1: 1, 2: -1, 3: 1);
   background: var(--hero-bg);
   border-top: 1px solid rgb(var(--surface-dark-border-rgb) / 0.7);
 
-  @media (min-width: 1024px) {
+  @include up(lg) {
     height: 100dvh;
     max-height: 100dvh;
   }
@@ -285,36 +285,37 @@ $directions: (1: 1, 2: -1, 3: 1);
 
 /* ---------- Thu nhỏ cụm quỹ đạo cho vừa một màn hình ---------- */
 
-@media (min-height: 960px) and (min-width: 1024px) {
+@media (min-height: 960px) and (min-width: map-get($breakpoints, lg)) {
   .canvas {
     --scale: 0.88;
   }
 }
 
-@media (max-height: 959px) and (min-width: 1024px) {
+@media (max-height: 959px) and (min-width: map-get($breakpoints, lg)) {
   .canvas {
     --scale: 0.8;
   }
 }
 
-@media (max-height: 839px) and (min-width: 1024px) {
+@media (max-height: 839px) and (min-width: map-get($breakpoints, lg)) {
   .canvas {
     --scale: 0.7;
   }
 }
 
-@media (max-height: 719px) and (min-width: 1024px) {
+@media (max-height: 719px) and (min-width: map-get($breakpoints, lg)) {
   .canvas {
     --scale: 0.6;
   }
 }
 
-@media (max-width: 1023px) {
+@include down(lg) {
   .canvas {
     --scale: 0.75;
   }
 }
 
+// Các bậc co nhỏ hơn bám theo khung 820px của quỹ đạo, cố ý không dùng mốc chung.
 @media (max-width: 860px) {
   .canvas {
     --scale: 0.66;

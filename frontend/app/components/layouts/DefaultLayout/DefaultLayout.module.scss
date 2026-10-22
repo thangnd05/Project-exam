@@ -54,12 +54,12 @@
 }
 
 .wrapper.hasMobileNav {
-  @media (max-width: 991.98px) {
+  @include down(lg) {
     padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
   }
 }
 
-@media (max-width: 991.98px) {
+@include down(lg) {
   .main {
     padding-top: 16px;
     padding-bottom: 24px;
@@ -72,7 +72,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@include down(md) {
   .main {
     padding-top: 16px;
     padding-bottom: 20px;

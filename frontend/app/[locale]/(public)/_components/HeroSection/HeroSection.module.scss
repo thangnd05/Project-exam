@@ -14,7 +14,8 @@
   background: var(--hero-bg);
   color: var(--text-on-dark);
 
-  @media (min-width: 992px) {
+  // Chỉ khóa đúng 1 màn hình khi đủ cao, màn thấp hơn để hero tự giãn thay vì cắt mất nội dung.
+  @media (min-width: map-get($breakpoints, lg)) and (min-height: 720px) {
     height: 100dvh;
     max-height: 100dvh;
   }
@@ -27,7 +28,7 @@
   margin: 0 auto;
   padding: 0 clamp(16px, 3vw, 32px);
 
-  @media (min-width: 1536px) {
+  @include up(wide) {
     max-width: 1440px;
   }
 }
@@ -47,9 +48,9 @@
   gap: 32px;
   width: 100%;
 
-  @media (min-width: 992px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(48px, 4vw, 80px);
+  @include up(lg) {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: clamp(32px, 3vw, 64px);
   }
 }
 
@@ -77,10 +78,11 @@
 
 .headline {
   margin: 0;
-  font-size: clamp(3rem, 4.2vw, 6.4rem);
+  font-size: var(--font-size-display);
   font-weight: 900;
   letter-spacing: -0.025em;
-  line-height: 1.18;
+  line-height: 1.12;
+  text-wrap: balance;
 }
 
 .headlineMuted {
@@ -99,7 +101,7 @@
   gap: 12px;
   padding-top: 4px;
 
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     flex-direction: column;
     align-items: stretch;
   }

@@ -1,135 +1,124 @@
 .body {
   display: flex;
   flex-direction: column;
+  gap: 18px;
+}
+
+.intro {
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+
+  strong {
+    color: var(--text-color);
+    font-weight: 700;
+  }
+}
+
+.perk {
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-tint);
+}
+
+.perkTitle {
+  margin: 0 0 4px;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--primary-text);
+}
+
+.perkText {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.55;
+  color: var(--text-color);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldLabel {
+  font-size: 1.35rem;
+  color: var(--text-secondary);
+}
+
+.exam {
+  display: flex;
   align-items: center;
   gap: 12px;
-  text-align: center;
-  padding: 4px 0 8px;
+  min-height: 48px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--primary);
+  background: var(--bg-white);
 }
 
 .logo {
-  width: 56px;
-  height: 56px;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
   object-fit: contain;
-  border-radius: 14px;
+  border-radius: 8px;
   background: var(--surface-tint);
-  padding: 8px;
+  padding: 4px;
 }
 
 .examName {
-  margin: 0;
-  font-size: 1.7rem;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--text-color);
-}
-
-.hint {
-  margin: 0;
-  max-width: 32rem;
-  font-size: 1.35rem;
-  line-height: 1.5;
-  color: var(--text-secondary);
-}
-
-.options {
-  align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 6px;
-  text-align: left;
-}
-
-.option {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 14px;
-  border: 1px solid var(--border-color);
-  background: var(--surface-color, #fff);
-  cursor: pointer;
-  transition:
-    border-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    border-color: var(--primary);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgb(0 0 0 / 6%);
-  }
-}
-
-.optionIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: var(--surface-tint);
-  color: var(--primary-text);
-  font-size: 2rem;
-}
-
-.optionIconSoft {
-  color: var(--text-secondary);
-}
-
-.optionText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
   min-width: 0;
-}
-
-.optionTitle {
   font-size: 1.45rem;
-  font-weight: 700;
+  font-weight: 600;
+  line-height: 1.4;
   color: var(--text-color);
 }
 
-.optionHint {
-  font-size: 1.25rem;
+.planLink {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 1.3rem;
   line-height: 1.45;
   color: var(--text-secondary);
-}
+  cursor: pointer;
 
-.optionArrow {
-  flex-shrink: 0;
-  color: var(--text-secondary);
-  font-size: 1.6rem;
-}
-
-.meta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  margin: 8px 0 0;
-  padding: 0;
-  list-style: none;
-
-  li {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: var(--surface-tint);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    font-size: 1.3rem;
-    font-weight: 600;
-
-    svg {
-      color: var(--primary-text);
-      flex-shrink: 0;
-    }
+  &:hover .planTitle {
+    text-decoration: underline;
   }
+
+  &:hover .planArrow {
+    transform: translateX(3px);
+  }
+}
+
+.planIcon {
+  flex-shrink: 0;
+  font-size: 1.6rem;
+  color: var(--primary-text);
+}
+
+.planTitle {
+  font-weight: 700;
+  color: var(--primary-text);
+}
+
+.planArrow {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--primary-text);
+  transition: transform 0.2s ease;
+}
+
+.footerBtn {
+  flex: 1;
+  justify-content: center;
 }

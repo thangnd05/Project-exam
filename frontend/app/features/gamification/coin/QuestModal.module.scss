@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 .tabs {
   display: flex;
   gap: 8px;
@@ -207,7 +209,7 @@
   color: var(--success-text);
 }
 
-@media (max-width: 480px) {
+@include down(xs) {
   .row {
     align-items: flex-start;
   }

@@ -334,7 +334,7 @@
   animation: authSpin 0.7s linear infinite;
 }
 
-@media (max-width: 480px) {
+@include down(xs) {
   .card {
     padding: 30px 22px;
   }

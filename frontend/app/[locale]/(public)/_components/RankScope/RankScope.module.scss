@@ -40,7 +40,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   padding: 20px clamp(20px, 4vw, 32px);
   border-bottom: 1px solid rgb(var(--slate-200-rgb) / 0.8);
 
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     flex-direction: column;
     align-items: flex-start;
   }
@@ -48,7 +48,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .title {
   margin: 0;
-  font-size: clamp(2.2rem, 2.4vw, 3rem);
+  font-size: var(--font-size-3xl);
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--slate-900);
@@ -165,12 +165,12 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   gap: 12px;
   padding: 0 clamp(20px, 4vw, 32px);
 
-  @media (min-width: 640px) {
+  @include up(sm) {
     grid-template-columns: 48px 180px minmax(0, 1fr) 110px;
     gap: 20px;
   }
 
-  @media (min-width: 1024px) {
+  @include up(lg) {
     grid-template-columns: 52px 210px minmax(0, 1fr) 120px;
     gap: 24px;
   }

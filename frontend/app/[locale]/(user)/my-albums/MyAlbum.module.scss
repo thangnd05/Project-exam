@@ -2,7 +2,7 @@
     padding: 60px 0;
     min-height: calc(100vh - 200px);
 
-    @media (max-width: 768px) {
+    @include down(md) {
         padding: 30px 0;
     }
 }.album-grid {
@@ -11,7 +11,7 @@
     justify-content: start;
     gap: 3.5rem;
 
-    @media (max-width: 768px) {
+    @include down(md) {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1.2rem;
     }
@@ -32,7 +32,7 @@
     max-width: 400px;
     justify-self: start;
 
-    @media (max-width: 768px) {
+    @include down(md) {
         max-width: none;
         justify-self: stretch;
         padding: 16px 14px;
@@ -82,7 +82,7 @@
         flex-shrink: 0;
     }
 
-    @media (max-width: 768px) {
+    @include down(md) {
         margin-bottom: 12px;
 
         .index {
@@ -103,7 +103,7 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
 
-    @media (max-width: 768px) {
+    @include down(md) {
         font-size: var(--font-size-lg);
         line-height: 1.25;
     }
@@ -171,7 +171,7 @@
         }
     }
 }
-@media (max-width: 768px) {
+@include down(md) {
 .progress-body {
         gap: 14px;
         margin-bottom: 14px;
@@ -212,7 +212,7 @@
         margin-bottom: 30px;
     }
 
-    @media (max-width: 768px) {
+    @include down(md) {
         padding: 48px 24px;
 
         .empty-icon {

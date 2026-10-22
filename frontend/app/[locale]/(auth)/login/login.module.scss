@@ -377,6 +377,7 @@
   min-height: 78px;
   flex-shrink: 0;
 
+  // Mốc theo bề rộng cố định 304px của reCAPTCHA, không phải breakpoint layout.
   @media (max-width: 360px) {
     transform: scale(0.85);
     transform-origin: center top;
@@ -523,7 +524,7 @@
   color: var(--slate-400);
 }
 
-@media (max-width: 575.98px) {
+@include down(sm) {
   .topSwitchText {
     display: none;
   }

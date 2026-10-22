@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 // Trang văn bản (Chính sách, Điều khoản, Giới thiệu) theo mẫu FrostScope: một cột đọc liên tục, không đóng khung.
 $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
@@ -145,13 +147,13 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   text-align: center;
 }
 
-@media (min-width: 1280px) {
+@include up(xl) {
   .page {
     max-width: 896px;
   }
 }
 
-@media (max-width: 639.98px) {
+@include down(sm) {
   .page {
     padding: 24px 20px 64px;
     font-size: var(--font-size-ssm);

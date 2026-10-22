@@ -720,7 +720,7 @@
   gap: 1.4rem;
   grid-template-columns: 1fr;
 
-  @media (min-width: 1180px) {
+  @include globalStyles.up(xl) {
     grid-template-columns: minmax(0, 1fr) minmax(28rem, 34rem);
     align-items: stretch;
   }
@@ -742,7 +742,7 @@
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
 
-  @media (max-width: 1179px) {
+  @include globalStyles.down(xl) {
     max-height: min(62vh, 520px);
   }
 }
@@ -931,7 +931,7 @@
   z-index: 3;
   box-shadow: 0 1px 0 rgb(var(--slate-900-rgb) / 0.04);
 
-  @media (max-width: 560px) {
+  @include globalStyles.down(sm) {
     width: 9.5rem;
   }
 }
@@ -982,7 +982,7 @@
   display: flex;
   flex-direction: column;
 
-  @media (min-width: 1180px) {
+  @include globalStyles.up(xl) {
     position: sticky;
     top: 8rem;
     align-self: start;
@@ -1308,7 +1308,7 @@
   grid-template-columns: 1fr;
   gap: 1.6rem;
 
-  @media (min-width: 992px) {
+  @include globalStyles.up(lg) {
     grid-template-columns: 30rem minmax(0, 1fr);
   }
 }
@@ -1321,7 +1321,7 @@
 }
 
 .studySidebar {
-  @media (min-width: 992px) {
+  @include globalStyles.up(lg) {
     position: sticky;
     top: 7rem;
     align-self: flex-start;
@@ -1435,7 +1435,7 @@
   gap: 0.8rem;
   flex-wrap: wrap;
 
-  @media (max-width: 600px) {
+  @include globalStyles.down(sm) {
     justify-content: center;
   }
 }
@@ -1506,7 +1506,7 @@
   flex-direction: column;
   gap: 1.6rem;
 
-  @media (max-width: 768px) {
+  @include globalStyles.down(md) {
     padding: 1.6rem;
   }
 }

@@ -22,6 +22,7 @@ import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import classNames from 'classnames/bind';
 import { IoAdd, IoFlashOutline, IoTrashOutline, IoPencilOutline, IoChevronBack, IoChevronForward, IoListOutline, IoSchoolOutline, IoVolumeHighOutline, IoCodeSlashOutline } from 'react-icons/io5';
 import type { VocabularyResponse } from '@/app/types';
+import { BREAKPOINTS } from '@/app/assets/styles/breakpoints';
 
 import styles from './AlbumDetail.module.scss';
 
@@ -52,7 +53,7 @@ const AlbumDetail = () => {
 
   useEffect(() => {
     // Màn hình nhỏ thì mặc định mở chế độ flashcard.
-    if (window.innerWidth < 768) {
+    if (window.innerWidth < BREAKPOINTS.md) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- đọc kích thước cửa sổ (chỉ có ở client), không tính được lúc render SSR
       setFlashMode(true);
     }

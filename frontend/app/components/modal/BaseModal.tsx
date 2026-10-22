@@ -20,6 +20,8 @@ type BaseModalProps = {
   closeOnOverlay?: boolean;
   closeOnEsc?: boolean;
   showCloseButton?: boolean;
+  // plain: header phẳng cùng nền modal, có đường kẻ ngăn cách thay cho dải gradient.
+  variant?: 'default' | 'plain';
   children?: React.ReactNode;
 };
 
@@ -33,6 +35,7 @@ function BaseModal({
   closeOnOverlay = true,
   closeOnEsc = true,
   showCloseButton = true,
+  variant = 'default',
   children,
 }: BaseModalProps) {
   const tCommon = useTranslations('Common');
@@ -66,7 +69,7 @@ function BaseModal({
       onClick={closeOnOverlay ? onClose : undefined}
     >
       <div
-        className={cx('modalContent')}
+        className={cx('modalContent', {plain: variant === 'plain'})}
         style={maxWidth ? {maxWidth} : undefined}
         onClick={(event) => event.stopPropagation()}
       >

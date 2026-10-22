@@ -695,7 +695,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@include down(md) {
     .modalContent {
         width: 98%;
         max-height: 95vh;

@@ -42,7 +42,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   border-radius: 16px;
   background: var(--bg-white);
 
-  @media (max-width: 767.98px) {
+  @include down(md) {
     padding: 18px;
   }
 }

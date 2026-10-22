@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 .banner {
   display: flex;
   align-items: center;
@@ -51,7 +53,7 @@
   color: var(--text-secondary);
 }
 
-@media (max-width: 768px) {
+@include down(md) {
   .banner {
     flex-direction: column;
     align-items: flex-start;

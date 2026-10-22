@@ -305,7 +305,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   border-top: 1px solid var(--surface-dark-border);
   font-size: 1.2rem;
 
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     flex-direction: column;
   }
 }
@@ -319,7 +319,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   align-items: center;
   gap: 8px;
 
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     width: 100%;
   }
 }
@@ -343,7 +343,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
     background: var(--brand-400);
   }
 
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     flex: 1;
   }
 }

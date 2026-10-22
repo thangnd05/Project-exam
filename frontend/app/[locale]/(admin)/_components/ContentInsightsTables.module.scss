@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 $text-primary: var(--slate-800);
 $text-secondary: var(--slate-500);
 $border-color: var(--slate-200);
@@ -99,7 +101,7 @@ $danger: var(--red-500);
     padding: 28px 0;
 }
 
-@media (max-width: 768px) {
+@include down(md) {
     .title { max-width: 160px; }
     .rateCol { width: 130px; }
 }

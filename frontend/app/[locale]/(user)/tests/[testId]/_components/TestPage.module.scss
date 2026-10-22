@@ -8,7 +8,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   min-height: calc(100vh - 200px);
   padding: 24px 0 60px;
 
-  @media (max-width: 768px) {
+  @include down(md) {
     padding: 12px 0 30px;
   }
 }
@@ -62,7 +62,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   gap: 16px;
   padding: 22px 24px 18px;
 
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     flex-wrap: wrap;
     padding: 18px 18px 14px;
   }
@@ -107,7 +107,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .headActions {
   flex-shrink: 0;
 
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     width: 100%;
 
     button {
@@ -162,7 +162,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   background: var(--bg-white);
   overflow: hidden;
 
-  @media (max-width: 767.98px) {
+  @include down(md) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -179,7 +179,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
     border-left: none;
   }
 
-  @media (max-width: 767.98px) {
+  @include down(md) {
     &:nth-child(odd) {
       border-left: none;
     }
@@ -432,7 +432,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   font-size: 1.2rem;
   color: var(--slate-500);
 
-  @media (max-width: 767.98px) {
+  @include down(md) {
     margin-left: 0;
   }
 }
@@ -445,7 +445,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   gap: 16px;
   margin-bottom: 24px;
 
-  @media (max-width: 767.98px) {
+  @include down(md) {
     grid-template-columns: 1fr;
   }
 }

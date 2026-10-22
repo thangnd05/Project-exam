@@ -23,10 +23,14 @@
     "questionsUnknown": "- questions",
     "loginFlash": "Sign in to build a personalized study plan for this exam.",
     "confirm": {
-      "title": "Get started with {name}",
-      "practiceTitle": "Take a practice test now",
-      "practiceHintGuest": "No sign-in needed. See your weak areas as soon as you finish.",
-      "practiceHint": "See your weak areas as soon as you finish.",
+      "title": "Quick test (Quick Scope)",
+      "intro": "A short test of <strong>{questions}</strong> in <strong>{duration}</strong>, aligned with the Blueprint, that instantly pinpoints your knowledge gaps.",
+      "perkTitle": "What you get:",
+      "perkText": "A per-domain analysis report right after you submit.",
+      "perkTextGuest": "No sign-in needed. Get a per-domain analysis report right after you submit.",
+      "examLabel": "Exam:",
+      "start": "Start now",
+      "planPrompt": "Not ready yet?",
       "planTitleGuest": "Sign in to build a personalized study plan",
       "planTitle": "Build a personalized study plan",
       "planHint": "Set a goal and get your own study plan, with progress saved to your account."

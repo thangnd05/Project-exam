@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 // Khung chung (tiêu đề, thẻ, nút, nhãn, thông báo) nằm ở FlatUi.module.scss; ở đây chỉ phần riêng của trang.
 $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
@@ -25,7 +27,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   border-radius: 12px;
   overflow: hidden;
 
-  @media (max-width: 767.98px) {
+  @include down(md) {
     grid-template-columns: 1fr;
   }
 }
@@ -41,7 +43,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   & + & {
     border-left: 1px solid var(--slate-200);
 
-    @media (max-width: 767.98px) {
+    @include down(md) {
       border-top: 1px solid var(--slate-200);
       border-left: none;
     }

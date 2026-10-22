@@ -1,3 +1,5 @@
+@import 'app/assets/styles/mixins.scss';
+
 // Trang kỳ thi cùng khuôn với Kho đề thi / Kho tài liệu; nút, nhãn, trạng thái rỗng lấy từ FlatUi.module.scss.
 $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
@@ -5,7 +7,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   min-height: calc(100vh - 200px);
   padding: 24px 0 60px;
 
-  @media (max-width: 768px) {
+  @include down(md) {
     padding: 12px 0 30px;
   }
 }
@@ -55,7 +57,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   border-radius: 16px;
   background: var(--bg-white);
 
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     flex-direction: column;
     gap: 14px;
     padding: 18px;
@@ -82,7 +84,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   line-height: 1.3;
   color: var(--slate-900);
 
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     font-size: 1.9rem;
   }
 }
@@ -170,12 +172,12 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   gap: 24px;
   margin-bottom: 24px;
 
-  @media (max-width: 991.98px) {
+  @include down(lg) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
   }
 
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     grid-template-columns: 1fr;
   }
 }
@@ -275,11 +277,11 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
 
-  @media (max-width: 991.98px) {
+  @include down(lg) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  @media (max-width: 575.98px) {
+  @include down(sm) {
     grid-template-columns: 1fr;
   }
 }
