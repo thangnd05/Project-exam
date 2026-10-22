@@ -5,12 +5,12 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 // Màu nhận diện hãng, giữ đúng màu thương hiệu của từng nhà cung cấp.
 $vendor-colors: (
-  aws: #f79400,
-  azure: #0089d6,
-  gcp: #4cb050,
-  linux: #334155,
-  oracle: #c74634,
-  other: #64748b,
+  "aws": #f79400,
+  "azure": #0089d6,
+  "gcp": #4cb050,
+  "linux": #334155,
+  "oracle": #c74634,
+  "other": #64748b,
 );
 
 .wrapper {

@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 public class QuickChallengeCardResponse {
     private String testId;
+    private String slug;
     private String title;
     private String description;
     private Integer durationMinutes;

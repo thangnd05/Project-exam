@@ -8,6 +8,7 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { useGuestAllowedCategories } from '@/app/features/tests/TestCard/hooks/useGuestAllowedCategories';
 import { buildLoginUrl } from '@/app/features/auth/authRedirect';
 import type { TestResponse } from '@/app/types';
+import { buildTestPath } from '@/app/configs/Routes';
 
 // Trạng thái đề + luồng bấm "Bắt đầu" (khách cần đăng nhập, chọn chế độ thi) dùng chung cho thẻ và hàng đề.
 export function useTestStart(test: TestResponse, countdowns?: Record<string, number>) {
@@ -49,7 +50,7 @@ export function useTestStart(test: TestResponse, countdowns?: Record<string, num
       if (examPartIds?.length) params.set('parts', examPartIds.join(','));
     }
     const qs = params.toString();
-    router.push(`/tests/${test.testId}/start${qs ? `?${qs}` : ''}`);
+    router.push(`${buildTestPath(test, 'start')}${qs ? `?${qs}` : ''}`);
   };
 
   return {

@@ -1,0 +1,547 @@
+// Lịch sử và bảng xếp hạng của một đề, cùng khuôn với trang kỳ thi / Kho đề thi.
+// Nút, nhãn, thông báo, trạng thái rỗng lấy từ FlatUi.module.scss.
+@import 'app/assets/styles/mixins.scss';
+
+$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+.wrapper {
+  min-height: calc(100vh - 200px);
+  padding: 24px 0 60px;
+
+  @media (max-width: 768px) {
+    padding: 12px 0 30px;
+  }
+}
+
+/* ---------- Đường dẫn ---------- */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-family: $mono;
+  font-size: 1.2rem;
+  color: var(--slate-500);
+
+  a {
+    color: var(--slate-500);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--brand-700);
+      text-decoration: underline;
+    }
+  }
+
+  svg {
+    font-size: 1.2rem;
+    color: var(--slate-300);
+  }
+
+  [aria-current='page'] {
+    font-weight: 700;
+    color: var(--brand-700);
+  }
+}
+
+/* ---------- Đầu trang đề ---------- */
+
+.head {
+  margin-bottom: 24px;
+  border: 1px solid var(--slate-200);
+  border-radius: 16px;
+  background: var(--bg-white);
+  overflow: hidden;
+}
+
+.headMain {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px 18px;
+
+  @media (max-width: 575.98px) {
+    flex-wrap: wrap;
+    padding: 18px 18px 14px;
+  }
+}
+
+.headText {
+  flex: 1;
+  min-width: 0;
+}
+
+.code {
+  display: block;
+  font-family: $mono;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--brand-700);
+}
+
+.title {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--slate-900);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  font-family: $mono;
+  font-size: 1.15rem;
+  color: var(--slate-500);
+
+  span + span::before {
+    content: '·';
+    margin: 0 8px;
+    color: var(--slate-300);
+  }
+}
+
+.headActions {
+  flex-shrink: 0;
+
+  @media (max-width: 575.98px) {
+    width: 100%;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 16px;
+  border-top: 1px solid var(--slate-100);
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.tab {
+  margin-bottom: -1px;
+  padding: 12px 10px;
+  border-bottom: 2px solid transparent;
+  font-size: 1.3rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--slate-500);
+  text-decoration: none;
+  transition: color 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    color: var(--slate-900);
+  }
+
+  &.active {
+    border-bottom-color: var(--brand-700);
+    font-weight: 700;
+    color: var(--brand-700);
+  }
+}
+
+/* ---------- Chỉ số ---------- */
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 24px;
+  border: 1px solid var(--slate-200);
+  border-radius: 16px;
+  background: var(--bg-white);
+  overflow: hidden;
+
+  @media (max-width: 767.98px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 16px 18px;
+  border-left: 1px solid var(--slate-200);
+
+  &:first-child {
+    border-left: none;
+  }
+
+  @media (max-width: 767.98px) {
+    &:nth-child(odd) {
+      border-left: none;
+    }
+
+    &:nth-child(n + 3) {
+      border-top: 1px solid var(--slate-200);
+    }
+  }
+}
+
+.statValue {
+  font-family: $mono;
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--slate-900);
+
+  small {
+    margin-left: 4px;
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--slate-400);
+  }
+}
+
+.statMeta {
+  font-family: $mono;
+  font-size: 1.1rem;
+  color: var(--slate-500);
+}
+
+.up {
+  color: var(--success-text);
+}
+
+.down {
+  color: var(--danger-text);
+}
+
+/* ---------- Tiêu đề khối ---------- */
+
+.sectionHead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-bottom: 14px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.sectionCount {
+  padding: 1px 9px;
+  border-radius: 999px;
+  background: rgb(var(--brand-700-rgb) / 0.1);
+  font-family: $mono;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--brand-700);
+}
+
+.sectionNote {
+  margin-left: auto;
+  font-family: $mono;
+  font-size: 1.15rem;
+  color: var(--slate-500);
+}
+
+/* ---------- Bảng ---------- */
+
+.tableWrap {
+  overflow-x: auto;
+  border: 1px solid var(--slate-200);
+  border-radius: 16px;
+  background: var(--bg-white);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1.3rem;
+
+  th {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--slate-200);
+    background: var(--slate-50);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--slate-400);
+  }
+
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--slate-100);
+    vertical-align: middle;
+    white-space: nowrap;
+    color: var(--slate-700);
+  }
+
+  tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  tbody tr:hover td {
+    background: var(--slate-50);
+  }
+
+  .right {
+    text-align: right;
+  }
+}
+
+.mono {
+  font-family: $mono;
+  font-size: 1.2rem;
+}
+
+.dim {
+  color: var(--slate-500);
+}
+
+.score {
+  font-family: $mono;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+.attemptCell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.attemptCellEnd {
+  justify-content: flex-end;
+}
+
+.myRow td {
+  background: rgb(var(--brand-700-rgb) / 0.06);
+}
+
+.myRow:hover td {
+  background: rgb(var(--brand-700-rgb) / 0.09) !important;
+}
+
+/* ---------- Người dùng trên bảng xếp hạng ---------- */
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  font-weight: 600;
+  color: var(--slate-900);
+}
+
+.avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--slate-100);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--slate-600);
+}
+
+.userName {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.rank {
+  font-family: $mono;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--slate-500);
+}
+
+/* ---------- Hạng của bạn ---------- */
+
+.myRank {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+  margin-bottom: 24px;
+  padding: 18px 24px;
+  border: 1px solid rgb(var(--brand-700-rgb) / 0.3);
+  border-radius: 16px;
+  background: rgb(var(--brand-700-rgb) / 0.05);
+}
+
+.myRankMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.myRankValue {
+  font-family: $mono;
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--brand-700);
+
+  small {
+    margin-left: 4px;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--slate-500);
+  }
+}
+
+.myRankStats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+}
+
+.myRankStat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    font-family: $mono;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--slate-900);
+  }
+}
+
+.myRankHint {
+  margin-left: auto;
+  font-size: 1.2rem;
+  color: var(--slate-500);
+
+  @media (max-width: 767.98px) {
+    margin-left: 0;
+  }
+}
+
+/* ---------- Top 3 ---------- */
+
+.podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+
+  @media (max-width: 767.98px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.podiumCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--slate-200);
+  border-top: 3px solid var(--medal);
+  border-radius: 16px;
+  background: var(--bg-white);
+
+  &.mine {
+    background: rgb(var(--brand-700-rgb) / 0.05);
+  }
+}
+
+.medal1 {
+  --medal: #f59e0b;
+}
+
+.medal2 {
+  --medal: #94a3b8;
+}
+
+.medal3 {
+  --medal: #b45309;
+}
+
+.podiumTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.podiumRank {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: $mono;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--medal);
+
+  svg {
+    font-size: 1.8rem;
+  }
+}
+
+.podiumStats {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--slate-100);
+}
+
+.podiumScore {
+  font-family: $mono;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: var(--slate-900);
+}
+
+/* ---------- Đang tải ---------- */
+
+.skeleton {
+  height: 96px;
+  margin-bottom: 24px;
+  border: 1px solid var(--slate-200);
+  border-radius: 16px;
+  background: linear-gradient(90deg, var(--slate-100) 0%, var(--bg-white) 45%, var(--slate-100) 100%);
+  background-size: 180% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonTall {
+  height: 260px;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -80% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

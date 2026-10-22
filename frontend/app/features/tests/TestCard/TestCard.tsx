@@ -20,6 +20,7 @@ import TestModeModal from '@/app/features/tests/TestModeModal/TestModeModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { useTestStart } from '@/app/features/tests/TestCard/hooks/useTestStart';
 import type { TestResponse } from '@/app/types';
+import { buildTestPath } from '@/app/configs/Routes';
 
 const cx = classNames.bind(styles);
 
@@ -174,7 +175,7 @@ function TestCard({ test, countdowns }: TestCardProps) {
                             size="sm"
                             className={cx('btn-outline-modern')}
                             onClick={() =>
-                                router.push(`/tests/history/${test.testId}`)
+                                router.push(buildTestPath(test, 'history'))
                             }
                         >
                             Lịch sử
@@ -189,7 +190,7 @@ function TestCard({ test, countdowns }: TestCardProps) {
                             title="Bảng xếp hạng"
                             aria-label="Bảng xếp hạng"
                             onClick={() =>
-                                router.push(`/tests/leaderboard/${test.testId}`)
+                                router.push(buildTestPath(test, 'leaderboard'))
                             }
                         >
                             <svg

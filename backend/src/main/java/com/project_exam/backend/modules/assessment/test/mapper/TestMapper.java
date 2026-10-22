@@ -38,6 +38,7 @@ public class TestMapper {
             List<QuickChallengeCardResponse.PartSummary> parts) {
         return QuickChallengeCardResponse.builder()
                 .testId(test.getTestId())
+                .slug(test.getSlug())
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .durationMinutes(test.getDurationMinutes())
@@ -56,6 +57,7 @@ public class TestMapper {
             long totalAttempts, boolean canDoTest, boolean owned, boolean locked, String status) {
         return TestResponse.builder()
                 .testId(test.getTestId())
+                .slug(test.getSlug())
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
@@ -84,6 +86,7 @@ public class TestMapper {
     public TestResponse toLoginRequiredResponse(Test test, String status, boolean canDoTest) {
         return TestResponse.builder()
                 .testId(test.getTestId())
+                .slug(test.getSlug())
                 .title(test.getTitle())
                 .status(status)
                 .canDoTest(canDoTest)
@@ -94,6 +97,7 @@ public class TestMapper {
             Test test, String status, boolean canDoTest, boolean owned, boolean locked) {
         return TestResponse.builder()
                 .testId(test.getTestId())
+                .slug(test.getSlug())
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
@@ -117,6 +121,7 @@ public class TestMapper {
             String status, List<TestPartResponse> partResponses) {
         return TestResponse.builder()
                 .testId(test.getTestId())
+                .slug(test.getSlug())
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
@@ -150,6 +155,7 @@ public class TestMapper {
             String status, List<TestPartResponse> partResponses) {
         return TestResponse.builder()
                 .testId(test.getTestId())
+                .slug(test.getSlug())
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
@@ -180,6 +186,7 @@ public class TestMapper {
             boolean canDoTest, boolean owned, boolean locked) {
         return TestResponse.builder()
                 .testId(test.getTestId())
+                .slug(test.getSlug())
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examCategoryId(test.getExamCategoryId())
@@ -202,6 +209,7 @@ public class TestMapper {
     public TestAdminResponse toAdminSummaryResponse(Test test, long totalAttempts, String status) {
         return TestAdminResponse.builder()
                 .testId(test.getTestId())
+                .slug(test.getSlug())
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
@@ -226,6 +234,7 @@ public class TestMapper {
             Test test, long totalAttempts, String status, List<TestPartAdminResponse> partResponses) {
         return TestAdminResponse.builder()
                 .testId(test.getTestId())
+                .slug(test.getSlug())
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())
@@ -250,6 +259,7 @@ public class TestMapper {
             Test test, long totalAttempts, String status, List<TestPartAdminResponse> partResponses) {
         return TestAdminResponse.builder()
                 .testId(test.getTestId())
+                .slug(test.getSlug())
                 .title(test.getTitle())
                 .description(test.getDescription())
                 .examTypeId(test.getExamTypeId())

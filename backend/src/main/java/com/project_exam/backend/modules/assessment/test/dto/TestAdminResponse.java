@@ -10,6 +10,7 @@ import java.util.List;
 public class TestAdminResponse {
 
     private String testId;
+    private String slug;
     private String title;
     private String description;
     private String examTypeId;

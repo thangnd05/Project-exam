@@ -90,6 +90,8 @@ class PublicEndpointApprovalTest {
             "GET /api/tests/admintest/{testId}",
             "GET /api/tests/usertest/{testId}",
             "GET /api/tests/quick-challenge",
+            // Tra slug <-> testId cho URL đề; khách cũng mở link đề nên phải công khai, chỉ trả hai định danh.
+            "GET /api/tests/ref/{key}",
             "GET /api/tests/by-class/{classId}",
             "GET /api/tests/certificate-exams/by-exam-type/{examTypeId}",
             "GET /api/tests/collections/by-exam-type/{examTypeId}",

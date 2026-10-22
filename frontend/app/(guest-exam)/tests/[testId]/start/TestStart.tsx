@@ -5,6 +5,7 @@ import { useState } from 'react';
 import classNames from 'classnames/bind';
 import TestStateScreens from './_components/TestStateScreens';
 import { useTestSession } from './_hooks/useTestSession';
+import type { TestRef } from '@/app/features/tests/testRef';
 import ExamLayoutRenderer from '@/app/features/exam-layout/ExamLayoutRenderer';
 import StreakRestoreModal from '@/app/features/gamification/streak/StreakRestoreModal';
 import BaseModal from '@/app/components/modal/BaseModal';
@@ -14,7 +15,8 @@ const cx = classNames.bind(styles);
 
 const STATE_SCREEN_STATUSES = ['loading', 'ready', 'payment', 'no-attempts', 'locked', 'closed', 'error'];
 
-function TestStart() {
+// testRef do page server tra từ slug trên URL (/tests/aws-dop-c02-test-1/start) rồi truyền xuống.
+function TestStart({ testRef }: { testRef: TestRef }) {
   const router = useRouter();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const {
@@ -49,7 +51,7 @@ function TestStart() {
     streakRestoreBlocked,
     allowStreakRestore,
     holdStart,
-  } = useTestSession();
+  } = useTestSession(testRef.testId);
 
   const formatTime = (seconds: number | null) => {
     if (seconds === null) return '--:--';

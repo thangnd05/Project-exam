@@ -10,11 +10,16 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TestRepository extends JpaRepository<Test, String> {
 
     List<Test>findByCreatedBy(String id);
+
+    Optional<Test> findBySlug(String slug);
+
+    boolean existsBySlug(String slug);
 
     List<Test> findByCreatedByIn(Collection<String> userIds);
 

@@ -10,6 +10,7 @@ import { formatDayMonthTime } from '@/app/utils/format-date-time';
 import type { TestResponse } from '@/app/types';
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './MockTestCard.module.scss';
+import { buildTestPath } from '@/app/configs/Routes';
 
 const cx = classNamesBind.bind(styles);
 const ui = classNamesBind.bind(uiStyles);
@@ -63,7 +64,7 @@ function MockTestCard({ test, index, kind, questions, countdowns }: MockTestCard
             {guestAllowed === true && <span className={ui('pill', 'pillSuccess')}>Không cần tài khoản</span>}
             {showLeaderboard && (
               <Link
-                href={`/tests/leaderboard/${test.testId}`}
+                href={buildTestPath(test, 'leaderboard')}
                 className={cx('rankLink')}
                 title="Bảng xếp hạng"
                 aria-label="Bảng xếp hạng"
@@ -105,7 +106,7 @@ function MockTestCard({ test, index, kind, questions, countdowns }: MockTestCard
         </button>
         {isAuthenticated && (
           <Link
-            href={`/tests/history/${test.testId}`}
+            href={buildTestPath(test, 'history')}
             className={ui('btnSecondary')}
           >
             Lịch sử

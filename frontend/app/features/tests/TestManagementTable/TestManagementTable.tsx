@@ -17,6 +17,7 @@ import type {TestStatusInfo} from '@/app/features/tests/testStatusHelper';
 import EditTestModal from '@/app/features/tests/EditTestModal';
 import type {EditableTest} from '@/app/features/tests/EditTestModal';
 import type {TestResponse} from '@/app/types';
+import { buildTestPath } from '@/app/configs/Routes';
 
 const cx = classNames.bind(styles);
 
@@ -119,7 +120,7 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManag
                         variant="link"
                         className={cx('btn-action', 'stats')}
                         onClick={() =>
-                          router.push(`/tests/history/${test.testId}`)
+                          router.push(buildTestPath(test, 'history'))
                         }
                       >
                         <IoStatsChartOutline />

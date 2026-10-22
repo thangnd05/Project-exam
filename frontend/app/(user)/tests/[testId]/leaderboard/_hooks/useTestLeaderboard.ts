@@ -4,12 +4,10 @@ import {useQuery} from '@tanstack/react-query';
 import {isAxiosError} from 'axios';
 
 import {getLeaderboardByTest} from '@/app/apis/userTestApi';
-import {getUserTestInfo} from '@/app/apis/testApi';
 import type {LeaderboardMyRank, TestLeaderboardResponse, UserTestResponse} from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 export const testLeaderboardKeys = {
-  info: (id?: string) => ['test-info', id],
   leaderboard: (id?: string) => ['test-leaderboard', id],
 };
 
@@ -33,13 +31,6 @@ const normalizeLeaderboard = (data: TestLeaderboardResponse) => {
 };
 
 export function useTestLeaderboard(testId?: string) {
-  const infoQuery = useQuery({
-    queryKey: testLeaderboardKeys.info(testId),
-    queryFn: () => getUserTestInfo(testId as string),
-    enabled: !!testId,
-    select: (data) => data?.title || '',
-  });
-
   const leaderboardQuery = useQuery({
     queryKey: testLeaderboardKeys.leaderboard(testId),
     queryFn: () => getLeaderboardByTest(testId as string),
@@ -58,11 +49,10 @@ export function useTestLeaderboard(testId?: string) {
   }
 
   return {
-    testTitle: infoQuery.data ?? '',
     rawRows: leaderboard?.entries ?? EMPTY_LIST,
     me: leaderboard?.me ?? null,
     totalParticipants: leaderboard?.totalParticipants ?? 0,
     errorMessage,
-    isLoading: infoQuery.isLoading || leaderboardQuery.isLoading,
+    isLoading: leaderboardQuery.isLoading,
   };
 }

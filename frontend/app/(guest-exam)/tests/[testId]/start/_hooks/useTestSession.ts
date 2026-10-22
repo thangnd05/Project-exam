@@ -1,6 +1,7 @@
 'use client';
 
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { buildTestPath } from '@/app/configs/Routes';
 import { useEffect, useLayoutEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache';
@@ -90,8 +91,7 @@ const mergeLocalAnswers = (
   return { answers, dirty };
 };
 
-export function useTestSession() {
-  const { testId } = useParams<{ testId: string }>();
+export function useTestSession(testId: string) {
   const router = useRouter();
   const queryClient = useQueryClient();
   // Bài vừa nộp phải hiện ngay ở trang sinh lộ trình và dashboard mục tiêu.
@@ -271,7 +271,7 @@ export function useTestSession() {
         if (testData.status === 'LOGIN_REQUIRED') {
           router.push(
             `/login?${new URLSearchParams({
-              from: `/tests/${testId}/start`,
+              from: buildTestPath({ testId, slug: testData.slug }, 'start'),
               flash: 'Bạn cần đăng nhập để làm bài thi này!',
             }).toString()}`,
           );

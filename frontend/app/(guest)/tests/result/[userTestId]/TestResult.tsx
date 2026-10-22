@@ -31,6 +31,7 @@ import RecoveryPlan from "./_components/RecoveryPlan";
 import TagAnalysisTable from "./_components/TagAnalysisTable";
 import TestEvaluationModal from "./_components/TestEvaluationModal";
 import styles from "./TestResult.module.scss";
+import { buildTestPath } from '@/app/configs/Routes';
 
 const cx = classNames.bind(styles);
 
@@ -217,10 +218,10 @@ const TestResult = () => {
                 Xem đáp án & giải thích
               </ButtonPrime>
 
-              {!isGuest && (
+              {!isGuest && testId && (
                 <ButtonPrime
                   variant="ghost"
-                  onClick={() => router.push(`/tests/history/${testId}`)}
+                  onClick={() => router.push(buildTestPath({ testId }, 'history'))}
                 >
                   <IoSchoolOutline /> Lịch sử bài thi
                 </ButtonPrime>

@@ -4,7 +4,7 @@ import {useCallback, useState} from 'react';
 import {useRouter} from 'next/navigation';
 
 import {getUserTarget} from '@/app/apis/userTargetApi';
-import routes from '@/app/configs/Routes';
+import routes, { buildTestPath } from '@/app/configs/Routes';
 import {useAuth} from '@/app/hooks/useAuth';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
 import {buildLoginUrl} from '@/app/features/auth/authRedirect';
@@ -28,7 +28,7 @@ export function useQuickTestLauncher() {
   const confirmStart = useCallback(
     (test: QuickChallengeCardResponse) => {
       setPendingTest(null);
-      router.push(`/tests/${test.testId}/start`);
+      router.push(buildTestPath(test, 'start'));
     },
     [router],
   );

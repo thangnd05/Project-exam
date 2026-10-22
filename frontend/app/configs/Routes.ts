@@ -40,7 +40,7 @@ const routes = {
   adminStreakRecover: '/admin/streak-recover',
   adminCertificates: '/admin/certificates',
 
-  testHistory: '/tests/history/:testId',
+  testHistory: '/tests/:testId/history',
   examTypes: '/exam-types',
   resources: '/resources',
 
@@ -101,6 +101,16 @@ export function buildExamTypeCollectionPath(
   const segment = examTypeSegment(exam);
   if (!segment || !collectionId) return routes.home;
   return `/exam-types/${segment}/collections/${encodeURIComponent(collectionId)}`;
+}
+
+export type TestPage = 'start' | 'history' | 'leaderboard';
+
+// Có slug thì dùng /tests/aws-dop-c02-test-1/<trang>; chỉ có id thì /tests/<id>/<trang>, proxy chuyển hướng 308 sang slug.
+export function buildTestPath(
+  test: { slug?: string | null; testId: string },
+  page: TestPage,
+): string {
+  return `/tests/${encodeURIComponent(test.slug || test.testId)}/${page}`;
 }
 
 export default routes;

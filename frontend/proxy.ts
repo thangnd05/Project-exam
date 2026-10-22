@@ -36,12 +36,46 @@ async function redirectLegacyExamPath(request: NextRequest) {
   }
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const TEST_PATH = /^\/tests\/([^/]+)\/(start|history|leaderboard)\/?$/;
+const LEGACY_TEST_PATH = /^\/tests\/(history|leaderboard)\/([^/]+)\/?$/;
+// Lịch sử và bảng xếp hạng cần đăng nhập; trang làm bài và kết quả thì khách vào được.
+const AUTH_TEST_PATH = /^\/tests\/[^/]+\/(history|leaderboard)\/?$/;
+
+// Link đề dạng id (/tests/<uuid>/start) hoặc kiểu cũ (/tests/history/<id>): tra slug rồi trả 308 thật,
+// cùng lý do với kỳ thi ở trên (các nhóm route có loading.tsx).
+async function redirectLegacyTestPath(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const legacy = pathname.match(LEGACY_TEST_PATH);
+  const current = legacy ? null : pathname.match(TEST_PATH);
+  const key = legacy ? legacy[2] : current && UUID_RE.test(current[1]) ? current[1] : null;
+  const page = legacy ? legacy[1] : current?.[2];
+  if (!key || !page || !API_ORIGIN) return null;
+  try {
+    const res = await fetch(`${API_ORIGIN}/api/tests/ref/${encodeURIComponent(key)}`);
+    if (!res.ok) return null;
+    const ref = (await res.json()) as { slug?: string };
+    if (!ref?.slug) return null;
+    const url = request.nextUrl.clone();
+    url.pathname = `/tests/${encodeURIComponent(ref.slug)}/${page}`;
+    return NextResponse.redirect(url, 308);
+  } catch {
+    return null;
+  }
+}
+
 export default async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   // Trang kỳ thi công khai: chỉ đổi link cũ sang slug, không bắt đăng nhập.
   if (pathname === '/exam-types' || pathname.startsWith('/exam-types/')) {
     return (await redirectLegacyExamPath(request)) ?? NextResponse.next();
+  }
+
+  if (pathname.startsWith('/tests/')) {
+    const redirect = await redirectLegacyTestPath(request);
+    if (redirect) return redirect;
+    if (!AUTH_TEST_PATH.test(pathname)) return NextResponse.next();
   }
 
   if (isPublicException(pathname)) return NextResponse.next();
@@ -70,7 +104,6 @@ export const config = {
     '/my-target/:path*',
     '/practice/:path*',
     '/dashboard/:path*',
-    '/tests/history/:path*',
-    '/tests/leaderboard/:path*',
+    '/tests/:path*',
   ],
 };

@@ -101,6 +101,7 @@ export interface TestQuestionResponse {
 
 export interface TestResponse {
   testId: string;
+  slug?: string;
   title?: string;
   description?: string;
   examTypeId?: string;
@@ -129,6 +130,7 @@ export interface TestResponse {
 
 export interface TestAdminResponse {
   testId: string;
+  slug?: string;
   title?: string;
   description?: string;
   examTypeId?: string;
@@ -198,6 +200,7 @@ export interface QuickChallengePartSummary {
 
 export interface QuickChallengeCardResponse {
   testId: string;
+  slug?: string;
   title?: string;
   description?: string;
   durationMinutes?: number;

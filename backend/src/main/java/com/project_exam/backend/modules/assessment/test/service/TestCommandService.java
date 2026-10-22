@@ -34,6 +34,7 @@ public class TestCommandService {
     private final AuthUtils authUtils;
     private final ClassAccessGuard classAccessGuard;
     private final ExamCategoryRepository examCategoryRepository;
+    private final TestSlugService testSlugService;
 
     public Test save(Test test) {
         return testRepository.save(test);
@@ -48,6 +49,7 @@ public class TestCommandService {
         }
         Test test = new Test();
         test.setTitle(request.getTitle());
+        test.setSlug(testSlugService.generateUnique(request.getTitle()));
         test.setDescription(request.getDescription());
         test.setExamTypeId(request.getExamTypeId());
         test.setDurationMinutes(request.getDurationMinutes());
@@ -128,6 +130,7 @@ public class TestCommandService {
             classAccessGuard.requireChapterInClass(effectiveChapterId, effectiveClassId);
         }
 
+        // Đổi tên không đổi slug để link cũ (bảng xếp hạng, lịch sử) vẫn dùng được.
         if (request.getTitle() != null) test.setTitle(request.getTitle());
         if (request.getDescription() != null) test.setDescription(request.getDescription());
         if (request.getExamTypeId() != null) test.setExamTypeId(request.getExamTypeId());

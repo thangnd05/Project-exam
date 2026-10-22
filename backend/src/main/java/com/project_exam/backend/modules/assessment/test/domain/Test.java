@@ -31,6 +31,10 @@ public class Test {
     @Column(nullable = false, length = 255)
     private String title;
 
+    /** Định danh trên URL (vd "aws-dop-c02-test-1"), sinh từ tên lúc tạo và giữ nguyên khi đổi tên. */
+    @Column(nullable = false, length = 120)
+    private String slug;
+
     private String description;
 
     @Column(nullable = false)

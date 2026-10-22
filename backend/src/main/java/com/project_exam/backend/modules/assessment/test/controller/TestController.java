@@ -12,6 +12,7 @@ import com.project_exam.backend.modules.assessment.test.dto.CertificateExamListR
 import com.project_exam.backend.modules.assessment.test.dto.CreateTestRequest;
 import com.project_exam.backend.modules.assessment.test.dto.QuickChallengeCardResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
+import com.project_exam.backend.modules.assessment.test.dto.TestRefResponse;
 import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestCollectionResponse;
@@ -24,6 +25,7 @@ import com.project_exam.backend.modules.assessment.test.service.TestSummaryAssem
 import com.project_exam.backend.modules.assessment.test.service.TestQuestionAssignmentService;
 import com.project_exam.backend.modules.assessment.test.service.TestAccessService;
 import com.project_exam.backend.modules.assessment.test.service.TestCommandService;
+import com.project_exam.backend.modules.assessment.test.service.TestSlugService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,6 +60,7 @@ public class TestController {
     private final TestQuestionAssignmentService testQuestionAssignmentService;
     private final TestAccessService testAccessService;
     private final TestCommandService testCommandService;
+    private final TestSlugService testSlugService;
     private final AuthUtils authUtils;
     private final ClassAccessGuard classAccessGuard;
     private final TestJsonImportService testJsonImportService;
@@ -67,6 +70,12 @@ public class TestController {
     @GetMapping
     public ResponseEntity<List<TestResponse>> getAllTests() {
         return ResponseEntity.ok(testCatalogService.getAllTests());
+    }
+
+    /** Tra đề theo slug hoặc testId (link cũ): frontend dùng testId gọi API, slug để hiện trên URL. */
+    @GetMapping("/ref/{key}")
+    public ResponseEntity<TestRefResponse> resolveTestRef(@PathVariable String key) {
+        return ResponseEntity.ok(testSlugService.resolve(key));
     }
 
     @GetMapping("/usertest/{testId}")
