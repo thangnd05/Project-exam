@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import {
   Bar,
   CartesianGrid,
@@ -42,6 +43,7 @@ type MockHistoryTooltipProps = {
 };
 
 function MockHistoryTooltip({ active, payload }: MockHistoryTooltipProps) {
+  const t = useTranslations('MyTarget');
   if (!active || !payload?.length) {
     return null;
   }
@@ -55,19 +57,19 @@ function MockHistoryTooltip({ active, payload }: MockHistoryTooltipProps) {
       <p className={cx('chartTooltipTitle')}>{row.fullDate}</p>
       {row.totalScore != null && (
         <p>
-          <strong>Điểm:</strong> {row.totalScore}
+          <strong>{t('mockCharts.tooltip.score')}</strong> {row.totalScore}
         </p>
       )}
       {row.readinessScore != null && (
         <p>
-          <strong>Độ sẵn sàng:</strong> {row.readinessScore}%
+          <strong>{t('mockCharts.tooltip.readiness')}</strong> {row.readinessScore}%
         </p>
       )}
       {row.isTargetMet === true && (
-        <p className={cx('chartTooltipSuccess')}>Đạt mục tiêu</p>
+        <p className={cx('chartTooltipSuccess')}>{t('mockCharts.tooltip.met')}</p>
       )}
       {row.isTargetMet === false && (
-        <p className={cx('chartTooltipWarn')}>Chưa đạt mục tiêu</p>
+        <p className={cx('chartTooltipWarn')}>{t('mockCharts.tooltip.notMet')}</p>
       )}
     </div>
   );
@@ -89,6 +91,7 @@ function MockHistoryCharts({
   examTypeName,
   scaleSource,
 }: MockHistoryChartsProps) {
+  const t = useTranslations('MyTarget');
   const scoreScale = getScoreScale(scaleSource);
   const scores = chartData
     .map((p) => p.totalScore)
@@ -103,7 +106,7 @@ function MockHistoryCharts({
   if (loading && chartData.length === 0) {
     return (
       <div className={cx('chartsSection')}>
-        <div className={cx('chartLoading')}>Đang tải dữ liệu biểu đồ...</div>
+        <div className={cx('chartLoading')}>{t('mockCharts.loading')}</div>
       </div>
     );
   }
@@ -116,17 +119,17 @@ function MockHistoryCharts({
     <div className={cx('chartsSection')}>
       <div className={cx('chartCard')}>
         <div className={cx('chartCardHeader')}>
-          <h3 className={cx('chartCardTitle')}>Tiến triển theo thời gian</h3>
+          <h3 className={cx('chartCardTitle')}>{t('mockCharts.title')}</h3>
           {examTypeName && (
             <span className={cx('chartCardMeta')}>{examTypeName}</span>
           )}
         </div>
         <p className={cx('chartCardDesc')}>
-          Trục ngang: thứ tự bài thi từ cũ → mới. Cột = điểm tổng · đường = độ sẵn sàng %.
+          {t('mockCharts.description')}
         </p>
 
         {loading && (
-          <p className={cx('chartLoadingInline')}>Đang bổ sung độ sẵn sàng cho các bài cũ...</p>
+          <p className={cx('chartLoadingInline')}>{t('mockCharts.loadingReadiness')}</p>
         )}
 
         <div className={cx('chartContainer')}>
@@ -150,7 +153,7 @@ function MockHistoryCharts({
                   tickLine={false}
                   axisLine={false}
                   label={{
-                    value: 'Điểm',
+                    value: t('mockCharts.axisScore'),
                     angle: -90,
                     position: 'insideLeft',
                     style: { fontSize: 11, fill: '#94a3b8' },
@@ -166,7 +169,7 @@ function MockHistoryCharts({
                   tickLine={false}
                   axisLine={false}
                   label={{
-                    value: 'Độ sẵn sàng %',
+                    value: t('mockCharts.axisReadiness'),
                     angle: 90,
                     position: 'insideRight',
                     style: { fontSize: 11, fill: '#94a3b8' },
@@ -177,8 +180,8 @@ function MockHistoryCharts({
               <Legend
                 wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
                 formatter={(value) => {
-                  if (value === 'totalScore') return 'Điểm tổng';
-                  if (value === 'readinessScore') return 'Độ sẵn sàng';
+                  if (value === 'totalScore') return t('mockCharts.legendTotal');
+                  if (value === 'readinessScore') return t('mockCharts.legendReadiness');
                   return value;
                 }}
               />
@@ -189,7 +192,7 @@ function MockHistoryCharts({
                   stroke="#ef4444"
                   strokeDasharray="6 4"
                   label={{
-                    value: `Mục tiêu ${targetScore}`,
+                    value: t('mockCharts.targetLine', { score: targetScore }),
                     position: 'insideTopRight',
                     fill: '#ef4444',
                     fontSize: 11,
@@ -236,8 +239,8 @@ function MockHistoryCharts({
         </div>
 
         <p className={cx('chartLegendNote')}>
-          Cột xanh lá = đạt mục tiêu · xanh dương = chưa xác định · vàng = chưa đạt.
-          {targetScore != null && ' Đường đỏ đứt nét = điểm mục tiêu.'}
+          {t('mockCharts.legendNote')}
+          {targetScore != null && ` ${t('mockCharts.legendNoteTarget')}`}
         </p>
       </div>
     </div>

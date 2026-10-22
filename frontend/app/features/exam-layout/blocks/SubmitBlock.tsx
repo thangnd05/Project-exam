@@ -2,8 +2,10 @@
 
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 
 import styles from '@/app/features/exam-layout/TestStart.module.scss';
+import { customBlockLabel } from '@/app/features/exam-layout/layoutSchema';
 
 const cx = classNames.bind(styles);
 
@@ -13,7 +15,8 @@ type SubmitBlockProps = {
   label?: string;
 };
 
-function SubmitBlock({ onSubmit, isSubmitting, label = 'Nộp bài thi' }: SubmitBlockProps) {
+function SubmitBlock({ onSubmit, isSubmitting, label }: SubmitBlockProps) {
+  const t = useTranslations('TestTaking.examLayout');
   return (
     <button
       type="button"
@@ -22,7 +25,7 @@ function SubmitBlock({ onSubmit, isSubmitting, label = 'Nộp bài thi' }: Submi
       disabled={isSubmitting}
     >
       {isSubmitting && <Spinner animation="border" size="sm" />}
-      {isSubmitting ? 'Đang nộp bài...' : label}
+      {isSubmitting ? t('submitting') : (customBlockLabel(label) ?? t('submit'))}
     </button>
   );
 }

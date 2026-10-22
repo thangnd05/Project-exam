@@ -6,10 +6,11 @@ import type { TagResponse } from '@/app/types';
  */
 export type TagStatus = 'ok' | 'missing' | 'unmatched';
 
-export const TAG_STATUS_LABEL: Record<Exclude<TagStatus, 'ok'>, string> = {
-  missing: 'Chưa có tag',
-  unmatched: 'Tag không khớp',
-};
+/** Khóa dịch (namespace TestCreator) cho nhãn trạng thái tag. */
+export const TAG_STATUS_LABEL = {
+  missing: 'tagStatus.missing',
+  unmatched: 'tagStatus.unmatched',
+} as const satisfies Record<Exclude<TagStatus, 'ok'>, string>;
 
 type TaggedQuestion = { tagIds?: string[] | null; tagNames?: string[] | null };
 

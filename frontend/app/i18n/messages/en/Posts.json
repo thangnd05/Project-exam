@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "title": "Posts",
+    "description": "Test-taking tips, strategies, and exam prep experiences."
+  },
+  "common": {
+    "loading": "Loading...",
+    "backToProfile": "Back to profile",
+    "viewDetail": "View post",
+    "saves": "Saves",
+    "myPosts": "My posts",
+    "savedPosts": "Saved posts"
+  },
+  "list": {
+    "title": "Posts",
+    "create": "Write a post",
+    "searchPlaceholder": "Search posts...",
+    "approvalNotice": "New posts must be approved by an admin before they appear publicly. If your post still doesn’t show up here after a while, it may have been removed for violating our guidelines.",
+    "all": "All"
+  },
+  "detail": {
+    "fallbackTitle": "Post",
+    "loginToComment": "Please sign in to comment",
+    "loginToLike": "Please sign in to like this post",
+    "loginToSave": "Please sign in to save this post",
+    "authorTag": "Author",
+    "save": "Save",
+    "cancel": "Cancel",
+    "reply": "Reply",
+    "edit": "Edit",
+    "delete": "Delete",
+    "send": "Send",
+    "replyPlaceholder": "Write a reply to {name}...",
+    "showAllReplies": "{count, plural, one {View # reply} other {View all # replies}}",
+    "hideReplies": "Hide replies",
+    "loading": "Loading post...",
+    "loadError": "Couldn’t load this post. Please check your connection and try again.",
+    "backToList": "Back to posts",
+    "retry": "Try again",
+    "notFound": "Post not found.",
+    "copied": "Link copied",
+    "breadcrumbHome": "Home",
+    "comments": "Comments ({count})",
+    "commentPlaceholder": "Share your thoughts on this post...",
+    "postComment": "Post comment",
+    "related": "Related posts",
+    "deleteCommentTitle": "Delete comment?",
+    "deleteCommentMessage": "Are you sure you want to delete this comment? This action cannot be undone."
+  },
+  "editor": {
+    "loginRequired": "You need to sign in before publishing a post!",
+    "missingFields": "Please enter a title and content, and choose a category!",
+    "createTitle": "Create a new post",
+    "editTitle": "Edit post",
+    "cancel": "Cancel",
+    "submitCreate": "Publish",
+    "submitEdit": "Save changes",
+    "processing": "Processing...",
+    "titleLabel": "Post title",
+    "titlePlaceholder": "Enter a catchy title for your post...",
+    "categoryLabel": "Category",
+    "categoryPlaceholder": "Choose a category...",
+    "thumbnailUploadLabel": "Cover image (upload from your computer)",
+    "thumbnailSelected": "Selected: {name}",
+    "thumbnailUrlLabel": "Or paste a cover image URL",
+    "thumbnailUrlPlaceholder": "Paste the cover image link here...",
+    "thumbnailNote": "* Note: If you both upload an image and paste a URL, the uploaded image will be used.",
+    "contentLabel": "Content",
+    "contentPlaceholder": "Write your post here..."
+  },
+  "myPosts": {
+    "subtitle": "Manage your posts and track their review status.",
+    "searchPlaceholder": "Search posts...",
+    "status": {
+      "all": "All",
+      "approved": "Approved",
+      "pending": "Pending"
+    },
+    "loadError": "Couldn’t load your posts.",
+    "editLoadError": "Couldn’t load the post content for editing.",
+    "deleted": "Post deleted",
+    "deleteError": "Couldn’t delete the post. Please try again.",
+    "emptyFiltered": "No posts match the current filters.",
+    "empty": "You haven’t published any posts yet. <link>Write your first post</link>.",
+    "edit": "Edit",
+    "delete": "Delete post",
+    "deleteTitle": "Delete post?",
+    "deleteMessage": "Delete the post \"{title}\"? This action cannot be undone."
+  },
+  "saved": {
+    "title": "Saved posts",
+    "subtitle": "Posts you’ve bookmarked to read later.",
+    "searchPlaceholder": "Search saved posts...",
+    "loadError": "Couldn’t load your saved posts.",
+    "unsaved": "Removed from saved",
+    "unsaveError": "Couldn’t remove from saved. Please try again.",
+    "emptyFiltered": "No posts match your search.",
+    "empty": "You haven’t saved any posts yet. Open a post and tap the <icon></icon> icon to save it.",
+    "anonymous": "Anonymous",
+    "unsave": "Unsave",
+    "unsaveTitle": "Unsave post",
+    "unsaveMessage": "Remove \"{title}\" from your saved posts?",
+    "cancel": "Cancel"
+  },
+  "save": {
+    "uploadingImages": "Uploading {count, plural, one {# image} other {# images}} in the content...",
+    "uploadImageError": "Failed to upload image {name} to Cloudinary!",
+    "updated": "Post updated successfully!",
+    "created": "Post published successfully!",
+    "updateError": "Failed to update the post!",
+    "createError": "Failed to publish the post!"
+  }
+}

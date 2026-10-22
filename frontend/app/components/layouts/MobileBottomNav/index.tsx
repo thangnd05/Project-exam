@@ -1,8 +1,8 @@
 'use client';
 
 import { useMounted } from '@/app/hooks/useMounted';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import Link, { usePathname, useRouter } from '@/app/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import {useEffect, useState} from 'react';
 import {createPortal} from 'react-dom';
 import classNames from 'classnames/bind';
@@ -38,6 +38,7 @@ function isHiddenRoute(pathname: string) {
 }
 
 function MobileBottomNav() {
+  const t = useTranslations('Layout.nav');
   const pathname = usePathname();
   const mounted = useMounted();
   const router = useRouter();
@@ -113,14 +114,14 @@ function MobileBottomNav() {
 
   return (
     <>
-      <nav className={cx('bottomNav')} aria-label="Điều hướng chính">
+      <nav className={cx('bottomNav')} aria-label={t('mainNavigation')}>
         <Link
           href={routes.home}
           className={cx('tab', {active: isHomeActive})}
           aria-current={isHomeActive ? 'page' : undefined}
         >
           <FaHouse className={cx('tabIcon')} />
-          <span className={cx('tabLabel')}>Trang chủ</span>
+          <span className={cx('tabLabel')}>{t('home')}</span>
         </Link>
 
         <Link
@@ -129,7 +130,7 @@ function MobileBottomNav() {
           aria-current={isExamActive ? 'page' : undefined}
         >
           <FaGraduationCap className={cx('tabIcon')} />
-          <span className={cx('tabLabel')}>Kho đề thi</span>
+          <span className={cx('tabLabel')}>{t('examTypes')}</span>
         </Link>
 
         {/* <Link
@@ -146,7 +147,7 @@ function MobileBottomNav() {
             type="button"
             className={cx('createBtn')}
             onClick={handleCreateTest}
-            aria-label="Tạo bài kiểm tra"
+            aria-label={t('createTest')}
           >
             <FaPlus />
           </button>
@@ -158,14 +159,14 @@ function MobileBottomNav() {
           aria-current={isPlanActive ? 'page' : undefined}
         >
           <FaRoute className={cx('tabIcon')} />
-          <span className={cx('tabLabel')}>Lộ trình</span>
+          <span className={cx('tabLabel')}>{t('learningPlans')}</span>
         </Link>
 
         <button
           type="button"
           className={cx('tab', {active: activeSheet === 'menu' || isProfileActive})}
           onClick={() => setActiveSheet('menu')}
-          aria-label="Menu"
+          aria-label={t('menu')}
           aria-expanded={activeSheet === 'menu'}
         >
           {user ? (
@@ -181,7 +182,7 @@ function MobileBottomNav() {
           ) : (
             <FaUser className={cx('tabIcon')} />
           )}
-          <span className={cx('tabLabel')}>Menu</span>
+          <span className={cx('tabLabel')}>{t('menu')}</span>
         </button>
       </nav>
 
@@ -196,24 +197,24 @@ function MobileBottomNav() {
             className={cx('sheet', {open: sheetOpen})}
             role="dialog"
             aria-modal="true"
-            aria-label="Menu"
+            aria-label={t('menu')}
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               className={cx('sheetHandle')}
               onClick={closeSheet}
-              aria-label="Đóng"
+              aria-label={t('close')}
             />
             <div className={cx('sheetHeader')}>
               <span className={cx('sheetTitle')}>
-                Menu
+                {t('menu')}
               </span>
               <button
                 type="button"
                 className={cx('sheetClose')}
                 onClick={closeSheet}
-                aria-label="Đóng"
+                aria-label={t('close')}
               >
                 <FaXmark />
               </button>
@@ -250,7 +251,7 @@ function MobileBottomNav() {
                       className={cx('menuItem')}
                       onClick={closeSheet}
                     >
-                      Tài liệu
+                      {t('resources')}
                     </Link>
                     {user ? (
                       <>
@@ -259,14 +260,14 @@ function MobileBottomNav() {
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >
-                          Hồ sơ
+                          {t('profile')}
                         </Link>
                         <Link
                           href={routes.myCertificates}
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >
-                          Chứng chỉ của tôi
+                          {t('myCertificates')}
                         </Link>
                       </>
                     ) : (
@@ -276,14 +277,14 @@ function MobileBottomNav() {
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >
-                          Đăng nhập
+                          {t('login')}
                         </Link>
                         <Link
                           href={`${routes.login}?mode=signup`}
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >
-                          Đăng ký
+                          {t('signup')}
                         </Link>
                       </>
                     )}
@@ -295,7 +296,7 @@ function MobileBottomNav() {
                       className={cx('logoutBtn')}
                       onClick={handleLogout}
                     >
-                      Đăng xuất
+                      {t('logout')}
                     </button>
                   )}
                 </>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import {
   IoBookOutline,
@@ -46,6 +47,7 @@ type TestModeModalProps = {
 const normalizeParts = <T,>(data: T[] | null | undefined): T[] => (Array.isArray(data) ? data : []);
 
 function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
+  const t = useTranslations('Tests');
   const [tab, setTab] = useState<'exam' | 'practice'>('exam');
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
 
@@ -80,9 +82,9 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
 
   useEffect(() => {
     if (partsQuery.isError) {
-      toast.error('Không tải được danh sách phần thi.');
+      toast.error(t('mode.loadPartsError'));
     }
-  }, [partsQuery.isError]);
+  }, [partsQuery.isError, t]);
 
   const totalQuestions = useMemo(
     () => parts.reduce((sum, p) => sum + (p.questionCount || 0), 0),
@@ -92,12 +94,12 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
   const grouped = useMemo(() => {
     const map = new Map<string, PartSummary[]>();
     parts.forEach((p) => {
-      const key = p.skillName || 'Khác';
+      const key = p.skillName || t('mode.otherSkill');
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(p);
     });
     return [...map.entries()];
-  }, [parts]);
+  }, [parts, t]);
 
   const selectedCount = useMemo(
     () =>
@@ -123,7 +125,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
   };
 
   const durationLabel =
-    test?.durationMinutes != null ? `${test.durationMinutes} phút` : 'Không giới hạn';
+    test?.durationMinutes != null ? t('minutes', { count: test.durationMinutes }) : t('unlimited');
 
   const handleStartFull = () => {
     onStart?.({ mode: 'full' });
@@ -142,7 +144,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
     <BaseModal
       show={show}
       onClose={onClose}
-      title="Chọn chế độ"
+      title={t('mode.title')}
       maxWidth={640}
     >
       <div className={cx('tabs')}>
@@ -152,7 +154,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
           onClick={() => setTab('exam')}
         >
           <IoDocumentTextOutline />
-          Thi thử
+          {t('mode.examTab')}
         </button>
         <button
           type="button"
@@ -160,7 +162,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
           onClick={() => setTab('practice')}
         >
           <IoRadioButtonOnOutline />
-          Luyện theo phần
+          {t('mode.practiceTab')}
         </button>
       </div>
 
@@ -173,7 +175,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
             </span>
             <div className={cx('exam-info')}>
               <h4> {test?.title}</h4>
-              <p>Làm đầy đủ đề như thi thật, có tính giờ.</p>
+              <p>{t('mode.examDesc')}</p>
             </div>
           </div>
 
@@ -183,7 +185,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
             </span>
             {totalQuestions > 0 && (
               <span className={cx('pill')}>
-                <IoDocumentTextOutline /> {totalQuestions} câu
+                <IoDocumentTextOutline /> {t('questions', { count: totalQuestions })}
               </span>
             )}
           </div>
@@ -191,15 +193,15 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
           <ul className={cx('features')}>
             <li>
               <IoTimeOutline />
-              <span>Tính giờ như phòng thi thật</span>
+              <span>{t('mode.features.timed')}</span>
             </li>
             <li>
               <IoStatsChartOutline />
-              <span>Chấm điểm chi tiết &amp; lưu lịch sử</span>
+              <span>{t('mode.features.scoring')}</span>
             </li>
             <li>
               <IoTrophyOutline />
-              <span>Ghi nhận thành tích lên bảng xếp hạng</span>
+              <span>{t('mode.features.leaderboard')}</span>
             </li>
           </ul>
 
@@ -208,19 +210,19 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
             className={cx('exam-start')}
             onClick={handleStartFull}
           >
-            Bắt đầu thi thử
+            {t('mode.startExam')}
           </button>
         </div>
       ) : (
         <div className={cx('practice')}>
           <p className={cx('practice-hint')}>
-            Chọn phần muốn luyện, <strong>không giới hạn thời gian</strong>.
+            {t.rich('mode.practiceHint', { strong: (chunks) => <strong>{chunks}</strong> })}
           </p>
 
           {partResources.length > 0 && (
             <div className={cx('guide-box')}>
               <div className={cx('guide-title')}>
-                <IoBookOutline /> Giới thiệu &amp; cách làm
+                <IoBookOutline /> {t('mode.guideTitle')}
               </div>
               <ul className={cx('guide-list')}>
                 {partResources.map((r) => (
@@ -235,9 +237,9 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
           )}
 
           {loading ? (
-            <div className={cx('loading')}>Đang tải danh sách phần thi...</div>
+            <div className={cx('loading')}>{t('mode.loadingParts')}</div>
           ) : parts.length === 0 ? (
-            <div className={cx('loading')}>Đề này chưa có phần thi nào.</div>
+            <div className={cx('loading')}>{t('mode.noParts')}</div>
           ) : (
             <>
               <button
@@ -247,9 +249,9 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
               >
                 <span className={cx('checkbox', { checked: allSelected })} />
                 <span className={cx('part-name')}>
-                  Chọn tất cả {parts.length} phần
+                  {t('mode.selectAll', { count: parts.length })}
                 </span>
-                <span className={cx('part-count')}>{totalQuestions} câu</span>
+                <span className={cx('part-count')}>{t('questions', { count: totalQuestions })}</span>
               </button>
 
               <div className={cx('part-scroll')}>
@@ -272,7 +274,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
                             <span className={cx('checkbox', { checked })} />
                             <span className={cx('part-name')}>{p.partName}</span>
                             <span className={cx('part-count')}>
-                              {p.questionCount || 0} câu
+                              {t('questions', { count: p.questionCount || 0 })}
                             </span>
                           </button>
                         );
@@ -284,7 +286,10 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
 
               <div className={cx('practice-footer')}>
                 <span className={cx('summary')}>
-                  Đã chọn <strong>{selectedCount}</strong> câu
+                  {t.rich('mode.selected', {
+                    count: selectedCount,
+                    strong: (chunks) => <strong>{chunks}</strong>,
+                  })}
                 </span>
                 <button
                   type="button"
@@ -293,7 +298,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
                   disabled={selected.size === 0}
                 >
                   <IoPlayOutline />
-                  Bắt đầu
+                  {t('mode.start')}
                 </button>
               </div>
             </>

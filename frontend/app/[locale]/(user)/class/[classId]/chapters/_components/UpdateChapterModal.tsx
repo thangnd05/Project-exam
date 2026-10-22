@@ -1,7 +1,8 @@
 'use client';
 
 import {useState} from 'react';
-import { useUpdateChapter } from '@/app/(user)/class/[classId]/chapters/_hooks/useChaptersOfClass';
+import {useTranslations} from 'next-intl';
+import { useUpdateChapter } from '@/app/[locale]/(user)/class/[classId]/chapters/_hooks/useChaptersOfClass';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
@@ -21,6 +22,8 @@ type UpdateChapterModalProps = {
 };
 
 function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}: UpdateChapterModalProps) {
+  const t = useTranslations('Classes');
+  const tCommon = useTranslations('Common');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const updateMutation = useUpdateChapter(classId);
@@ -43,7 +46,7 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}: Update
     }
 
     if (!title.trim()) {
-      toast.warning('Vui lòng nhập tên chương.');
+      toast.warning(t('updateChapter.titleRequired'));
       return;
     }
 
@@ -58,13 +61,13 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}: Update
       },
       {
         onSuccess: () => {
-          toast.success('Cập nhật chương thành công!');
+          toast.success(t('updateChapter.success'));
           onClose();
           onSuccess?.();
         },
         onError: (error) => {
           toast.error(
-            getApiErrorMessage(error, 'Không thể cập nhật chương. Vui lòng thử lại.'),
+            getApiErrorMessage(error, t('updateChapter.error')),
           );
         },
       },
@@ -75,12 +78,12 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}: Update
     <CommonFormModal
       show={show}
       onHide={onClose}
-      title="Chỉnh sửa chương"
+      title={t('updateChapter.title')}
       footer={
         <ModalActionFooter
-          cancelLabel="Hủy"
-          submitLabel="Lưu thay đổi"
-          loadingLabel="Đang lưu..."
+          cancelLabel={tCommon('cancelShort')}
+          submitLabel={t('common.saveChanges')}
+          loadingLabel={t('updateChapter.saving')}
           loading={submitting}
           onCancel={onClose}
           onSubmit={handleSubmit}
@@ -89,14 +92,14 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}: Update
     >
       <div className={cx('formGroup')}>
         <label className={cx('label')} htmlFor="chapterTitle">
-          Tên chương
+          {t('common.chapterName')}
         </label>
         <input
           id="chapterTitle"
           className={cx('inputControl')}
           value={title}
           onChange={(event) => setTitle(event.target.value)}
-          placeholder="Nhập tên chương"
+          placeholder={t('updateChapter.namePlaceholder')}
           disabled={submitting}
           autoFocus
         />
@@ -104,14 +107,14 @@ function UpdateChapterModal({show, onClose, chapter, classId, onSuccess}: Update
 
       <div className={cx('formGroup')}>
         <label className={cx('label')} htmlFor="chapterDescription">
-          Mô tả
+          {t('common.description')}
         </label>
         <textarea
           id="chapterDescription"
           className={cx('inputControl', 'textarea')}
           value={description}
           onChange={(event) => setDescription(event.target.value)}
-          placeholder="Nhập mô tả chương (không bắt buộc)"
+          placeholder={t('updateChapter.descriptionPlaceholder')}
           disabled={submitting}
           rows={3}
         />

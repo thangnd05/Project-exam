@@ -1,19 +1,19 @@
 'use client';
 
 import {useState} from 'react';
-import Link from 'next/link';
-import {useRouter} from 'next/navigation';
+import Link, { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
+import {useTranslations} from 'next-intl';
 import {useQueryClient} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {FiArrowRight, FiRefreshCw} from 'react-icons/fi';
 
 import routes from '@/app/configs/Routes';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
-import type {Vendor} from '@/app/(public)/_lib/certificationMeta';
-import QuickTestConfirmModal from '@/app/(public)/_components/HeroSection/QuickTestConfirmModal';
-import QuickTestPickerModal from '@/app/(public)/_components/HeroSection/QuickTestPickerModal';
-import {useQuickChallengeTests} from '@/app/(public)/_components/HeroSection/hooks/useQuickChallengeTests';
-import {useQuickTestLauncher} from '@/app/(public)/_components/HeroSection/hooks/useQuickTestLauncher';
+import type {Vendor} from '@/app/[locale]/(public)/_lib/certificationMeta';
+import QuickTestConfirmModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestConfirmModal';
+import QuickTestPickerModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestPickerModal';
+import {useQuickChallengeTests} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickChallengeTests';
+import {useQuickTestLauncher} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickTestLauncher';
 import RankScopeModal from './RankScopeModal';
 import {RANK_BOARD_KEY, displayName, initials, useRankBoard} from './useRankBoard';
 import styles from './RankScope.module.scss';
@@ -22,16 +22,13 @@ const cx = classNames.bind(styles);
 
 const TOP = 5;
 
-const TABS: {id: Vendor | 'all'; label: string}[] = [
-  {id: 'all', label: 'Tất cả'},
-  {id: 'aws', label: 'AWS'},
-  {id: 'azure', label: 'Azure'},
-  {id: 'gcp', label: 'Google Cloud'},
-  {id: 'other', label: 'Linux / Khác'},
-];
+// Nhãn tab lấy từ Home.rankScope.tabs theo id.
+const TABS: (Vendor | 'all')[] = ['all', 'aws', 'azure', 'gcp', 'other'];
 
 function RankScope() {
+  const t = useTranslations('Home.rankScope');
   const router = useRouter();
+  const localizeHref = useLocalizeHref();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Vendor | 'all'>('all');
   const [spinKey, setSpinKey] = useState(0);
@@ -43,7 +40,7 @@ function RankScope() {
   const {pendingTest, requestStart, closeConfirm, confirmStart, startSyllabusPlan, isGuest} =
     useQuickTestLauncher();
 
-  const tabs = TABS.filter((t) => t.id === 'all' || vendors.includes(t.id as Vendor));
+  const tabs = TABS.filter((id) => id === 'all' || vendors.includes(id));
   const rows = rowsFor(tab);
 
   const refresh = () => {
@@ -58,7 +55,7 @@ function RankScope() {
       setPickerOpen(true);
       return;
     }
-    router.push(routes.examTypes);
+    router.push(localizeHref(routes.examTypes));
   };
 
   const pickTest = (test: QuickChallengeCardResponse) => {
@@ -81,10 +78,10 @@ function RankScope() {
     if (rows.length === 0) {
       return (
         <div className={cx('empty')}>
-          <p className={cx('emptyTitle')}>Chưa có ai lên bảng xếp hạng</p>
-          <p>Hoàn thành một đề Full Mock để trở thành người đầu tiên góp mặt.</p>
+          <p className={cx('emptyTitle')}>{t('emptyTitle')}</p>
+          <p>{t('emptyText')}</p>
           <Link href={routes.examTypes} className={cx('emptyLink')}>
-            Vào kho đề thi
+            {t('emptyLink')}
             <FiArrowRight aria-hidden="true" />
           </Link>
         </div>
@@ -94,7 +91,7 @@ function RankScope() {
     return rows.map(({entry, exam}, i) => {
       const rank = i + 1;
       const tone = rank <= 3 ? `rank${rank}` : 'rankRest';
-      const name = displayName(entry);
+      const name = displayName(entry, t('anonymous'));
 
       return (
         <div key={`${exam.examTypeId}-${entry.rank}-${name}`} className={cx('row', 'dataRow', tone)}>
@@ -127,35 +124,35 @@ function RankScope() {
             <div>
               <h2 className={cx('title')}>RankScope</h2>
               <p className={cx('subtitle')}>
-                TOP {TOP} kỹ sư đạt điểm cao nhất từ bài thi Full Mock chuẩn Blueprint
+                {t('subtitle', {count: TOP})}
               </p>
             </div>
             <button type="button" className={cx('outlineBtn')} onClick={refresh} disabled={isFetching}>
               <FiRefreshCw key={spinKey} className={cx('refreshIcon', {spinning: spinKey > 0})} aria-hidden="true" />
-              <span>{isFetching ? 'Đang đồng bộ...' : 'Làm mới dữ liệu'}</span>
+              <span>{isFetching ? t('syncing') : t('refresh')}</span>
             </button>
           </div>
 
-          <div className={cx('tabs')} role="tablist" aria-label="Lọc theo hãng">
-            {tabs.map((t) => (
+          <div className={cx('tabs')} role="tablist" aria-label={t('tabsAria')}>
+            {tabs.map((id) => (
               <button
-                key={t.id}
+                key={id}
                 type="button"
                 role="tab"
-                aria-selected={tab === t.id}
-                className={cx('tab', {activeTab: tab === t.id})}
-                onClick={() => setTab(t.id)}
+                aria-selected={tab === id}
+                className={cx('tab', {activeTab: tab === id})}
+                onClick={() => setTab(id)}
               >
-                {t.label}
+                {t(`tabs.${id}`)}
               </button>
             ))}
           </div>
 
           <div className={cx('row', 'headRow')}>
-            <div className={cx('center')}>Hạng</div>
-            <div>Kỹ sư</div>
-            <div>Chứng chỉ</div>
-            <div className={cx('right')}>Tổng điểm</div>
+            <div className={cx('center')}>{t('columns.rank')}</div>
+            <div>{t('columns.engineer')}</div>
+            <div>{t('columns.certification')}</div>
+            <div className={cx('right')}>{t('columns.totalScore')}</div>
           </div>
 
           <div key={tab} className={cx('list')} role="tabpanel">
@@ -164,7 +161,7 @@ function RankScope() {
 
           <div className={cx('cardFoot')}>
             <button type="button" className={cx('outlineBtn')} onClick={() => setFullOpen(true)}>
-              <span>Xem toàn bộ bảng xếp hạng</span>
+              <span>{t('viewAll')}</span>
               <FiArrowRight className={cx('arrow')} aria-hidden="true" />
             </button>
           </div>

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useTranslations } from 'next-intl';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -11,10 +12,13 @@ import {
     AdminPageHeader,
     AdminToolbar,
     AdminTable,
-} from '@/app/(admin)/_components/common';
+} from '@/app/[locale]/(admin)/_components/common';
 import { useCategories, type AdminCategory } from './_hooks/useCategories';
 
 const CategoriesManagement = () => {
+    const t = useTranslations('AdminSystem.categories');
+    const tAdmin = useTranslations('AdminCommon');
+    const tCommon = useTranslations('Common');
     const {
         categories,
         isLoading: loading,
@@ -48,10 +52,10 @@ const CategoriesManagement = () => {
         if (!deletingCategory) return;
         try {
             await deleteCategory(deletingCategory.id);
-            toast.success('Xóa danh mục thành công');
+            toast.success(t('toast.deleted'));
             setDeletingCategory(null);
         } catch {
-            toast.error('Lỗi khi xóa danh mục');
+            toast.error(t('toast.deleteError'));
         }
     };
 
@@ -59,57 +63,57 @@ const CategoriesManagement = () => {
         try {
             if (editingCategory) {
                 await updateCategory({ id: editingCategory.id, payload: formData });
-                toast.success('Cập nhật danh mục thành công');
+                toast.success(t('toast.updated'));
             } else {
                 await createCategory(formData);
-                toast.success('Tạo danh mục thành công');
+                toast.success(t('toast.created'));
             }
             setShowModal(false);
         } catch {
-            toast.error('Lỗi khi lưu danh mục');
+            toast.error(t('toast.saveError'));
         }
     };
 
     const columns = [
-        { key: 'name', header: 'Tên danh mục' },
+        { key: 'name', header: t('name') },
         { key: 'slug', header: 'Slug', render: (item: AdminCategory) => item.slug || '-' },
     ];
 
     return (
         <div className="d-flex flex-column gap-3">
             <AdminPageHeader
-                title="Quản lý danh mục bài viết"
-                description="Tạo và quản lý các danh mục blog"
+                title={t('title')}
+                description={t('description')}
             >
                 <Button onClick={openCreateModal}>
                     <Plus size={16} className="me-1" />
-                    Thêm danh mục
+                    {t('add')}
                 </Button>
             </AdminPageHeader>
 
             <AdminToolbar
                 searchValue={searchQuery}
                 onSearchChange={setSearchQuery}
-                searchPlaceholder="Tìm kiếm danh mục..."
+                searchPlaceholder={t('searchPlaceholder')}
             />
 
             <AdminTable
                 showIndex
                 paginated
-                itemLabel="danh mục"
+                itemLabel={t('itemLabel')}
                 columns={columns}
                 data={filteredCategories}
                 loading={loading}
                 getRowKey={(item: AdminCategory) => item.id}
                 rowActions={(item: AdminCategory) => (
                     <>
-                        <button onClick={() => openEditModal(item)} title="Sửa">
+                        <button onClick={() => openEditModal(item)} title={tAdmin('actions.edit')}>
                             <Edit size={14} />
                         </button>
                         <button
                             className="danger"
                             onClick={() => setDeletingCategory(item)}
-                            title="Xóa"
+                            title={tAdmin('actions.delete')}
                         >
                             <Trash2 size={14} />
                         </button>
@@ -120,26 +124,26 @@ const CategoriesManagement = () => {
             <BaseModal
                 show={showModal}
                 onClose={() => setShowModal(false)}
-                title={editingCategory ? 'Sửa danh mục' : 'Thêm danh mục mới'}
+                title={editingCategory ? t('editTitle') : t('createTitle')}
                 maxWidth={550}
                 footer={
                     <ModalActionFooter
                         onCancel={() => setShowModal(false)}
                         onSubmit={handleSubmit}
-                        cancelLabel="Hủy"
-                        submitLabel="Lưu"
+                        cancelLabel={tCommon('cancelShort')}
+                        submitLabel={tCommon('save')}
                     />
                 }
             >
                 <Form.Group>
                     <Form.Label>
-                        Tên danh mục <span className="text-danger">*</span>
+                        {t('name')} <span className="text-danger">*</span>
                     </Form.Label>
                     <Form.Control
                         type="text"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="Nhập tên danh mục..."
+                        placeholder={t('namePlaceholder')}
                     />
                 </Form.Group>
             </BaseModal>
@@ -148,8 +152,8 @@ const CategoriesManagement = () => {
                 show={Boolean(deletingCategory)}
                 onClose={() => setDeletingCategory(null)}
                 onConfirm={handleDelete}
-                title="Xác nhận xóa danh mục"
-                message={`Bạn có chắc chắn muốn xóa danh mục "${deletingCategory?.name}"? Hành động này không thể hoàn tác.`}
+                title={t('deleteTitle')}
+                message={t('deleteMessage', { name: deletingCategory?.name ?? '' })}
             />
         </div>
     );

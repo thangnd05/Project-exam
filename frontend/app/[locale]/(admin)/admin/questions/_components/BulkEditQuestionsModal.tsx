@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { Save } from 'lucide-react';
 
@@ -10,7 +11,7 @@ import { buildCollectionTree } from '@/app/features/tests/collectionTree';
 import { QuestionUsageScope } from '@/app/enums';
 import type { BulkUpdateQuestionsRequest, QuestionCollectionResponse } from '@/app/types';
 
-import styles from '@/app/(admin)/admin/questions/QuestionsManagement.module.scss';
+import styles from '@/app/[locale]/(admin)/admin/questions/QuestionsManagement.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -36,6 +37,7 @@ function BulkEditQuestionsModal({
   errorMessage,
   onSubmit,
 }: BulkEditQuestionsModalProps) {
+  const t = useTranslations('AdminContent.questions.bulk');
   const [usageScope, setUsageScope] = useState<string>(KEEP);
   const [collectionChoice, setCollectionChoice] = useState<string>(KEEP);
   const [bankChoice, setBankChoice] = useState<string>(KEEP);
@@ -71,14 +73,14 @@ function BulkEditQuestionsModal({
     <BaseModal
       show={show}
       onClose={saving ? undefined : onClose}
-      title="Sửa hàng loạt"
+      title={t('title')}
       maxWidth={560}
       footer={
         <ModalActionFooter
           onCancel={onClose}
           onSubmit={handleSubmit}
-          submitLabel={hasChange ? `Áp dụng cho ${selectedCount} câu` : 'Chưa chọn gì để sửa'}
-          loadingLabel="Đang lưu..."
+          submitLabel={hasChange ? t('apply', { count: selectedCount }) : t('noChange')}
+          loadingLabel={t('saving')}
           loading={saving || !hasChange}
           submitIcon={Save}
         />
@@ -86,33 +88,35 @@ function BulkEditQuestionsModal({
     >
       <div className={cx('bulkForm')}>
         <p className={cx('bulkIntro')}>
-          Đang chọn <strong>{selectedCount}</strong> câu. Trường nào để{' '}
-          <em>Giữ nguyên</em> thì không bị đụng tới. Nội dung câu, đáp án và đoạn văn
-          phải sửa từng câu.
+          {t.rich('intro', {
+            count: selectedCount,
+            strong: (chunks) => <strong>{chunks}</strong>,
+            em: (chunks) => <em>{chunks}</em>,
+          })}
         </p>
 
         <div className={cx('bulkField')}>
-          <label>Mục đích sử dụng</label>
+          <label>{t('usageScope')}</label>
           <select
             className={cx('bulkInput')}
             value={usageScope}
             onChange={(e) => setUsageScope(e.target.value)}
           >
-            <option value={KEEP}>-- Giữ nguyên --</option>
-            <option value={QuestionUsageScope.EXAM}>Câu thi (ra đề)</option>
-            <option value={QuestionUsageScope.PRACTICE}>Câu ôn tập (lộ trình)</option>
+            <option value={KEEP}>{t('keep')}</option>
+            <option value={QuestionUsageScope.EXAM}>{t('scopeExam')}</option>
+            <option value={QuestionUsageScope.PRACTICE}>{t('scopePractice')}</option>
           </select>
         </div>
 
         <div className={cx('bulkField')}>
-          <label>Bộ sưu tập</label>
+          <label>{t('collection')}</label>
           <select
             className={cx('bulkInput')}
             value={collectionChoice}
             onChange={(e) => setCollectionChoice(e.target.value)}
           >
-            <option value={KEEP}>-- Giữ nguyên --</option>
-            <option value={CLEAR_COLLECTION}>Gỡ khỏi bộ sưu tập</option>
+            <option value={KEEP}>{t('keep')}</option>
+            <option value={CLEAR_COLLECTION}>{t('clearCollection')}</option>
             {buildCollectionTree(collections).map((c) => (
               <option key={c.collectionId} value={c.collectionId}>
                 {c.depth > 0 ? `    └ ${c.name}` : c.name}
@@ -122,15 +126,15 @@ function BulkEditQuestionsModal({
         </div>
 
         <div className={cx('bulkField')}>
-          <label>Thuộc kho tái dùng</label>
+          <label>{t('bank')}</label>
           <select
             className={cx('bulkInput')}
             value={bankChoice}
             onChange={(e) => setBankChoice(e.target.value)}
           >
-            <option value={KEEP}>-- Giữ nguyên --</option>
-            <option value="true">Có - dùng lại được khi ra đề</option>
-            <option value="false">Không - chỉ thuộc đề đã gắn</option>
+            <option value={KEEP}>{t('keep')}</option>
+            <option value="true">{t('bankYes')}</option>
+            <option value="false">{t('bankNo')}</option>
           </select>
         </div>
 

@@ -1,0 +1,347 @@
+{
+  "common": {
+    "plan": "Study plan",
+    "planName": "Plan {sequence}",
+    "back": "Back",
+    "partFallback": "Section",
+    "taskTitle": "{part} · Task {task}",
+    "updating": "Updating...",
+    "resyncError": "Couldn’t update the study plan",
+    "noPlansForExam": "No study plans for this exam yet.",
+    "takeMock": "Take a mock exam",
+    "nextStep": "See next steps",
+    "retry": "Try again",
+    "openResource": "Open material",
+    "newPlan": "Create new plan",
+    "listTitle": "Your study plans",
+    "login": "Log in",
+    "stage": "Phase:",
+    "created": "Created:",
+    "baselineReadiness": "Starting readiness:"
+  },
+  "labels": {
+    "planStatus": {
+      "active": "In progress",
+      "completed": "Completed",
+      "replaced": "Replaced"
+    },
+    "planStage": {
+      "foundation": "Foundation",
+      "mock": "Mock exam"
+    },
+    "taskStatus": {
+      "passed": "Passed",
+      "active": "Not passed",
+      "locked": "Locked",
+      "skipped": "Skipped"
+    },
+    "notice": {
+      "emptyPoolSkipped": "This task has no questions in the bank yet, so it was skipped — please pick another task.",
+      "emptyPoolRetry": "This task has no questions to practice again right now. Please pick another task."
+    },
+    "capstone1": "Stage final task — attempt 1",
+    "capstone2": "Stage final task — attempt 2",
+    "summary": {
+      "target": "reach your target",
+      "targetScore": "reach {score} points",
+      "syllabus": "Following the syllabus, no diagnosis yet. {total} tasks spread across all sections to {target}.",
+      "diagnosis": "Readiness {readiness}%. {total} tasks for the sections below target to {target}."
+    },
+    "resync": {
+      "achieved": "You’ve reached your new target — the current plan is marked as completed, no new plan needed.",
+      "reopened": "Updated to your new target — {count, plural, one {# task needs} other {# tasks need}} to be passed again because the new threshold is higher.",
+      "unchanged": "Updated to your new target — your progress is kept."
+    }
+  },
+  "termTips": {
+    "readiness": "Readiness = average % correct across skills in your latest test — an estimate of how ready you are for the real exam.",
+    "task": "Task = a short practice round on one topic. Score at or above the threshold % to pass it.",
+    "passThreshold": "Pass threshold: the minimum % of correct answers in one practice round to pass the task."
+  },
+  "generate": {
+    "loginRequired": "Please log in to create a study plan!",
+    "unknownError": "Unknown error",
+    "targetLoadError": "Couldn’t load your target",
+    "title": "Create a study plan",
+    "subtitle": "Your plan is split into stages, one per exam section. Each stage has short practice tasks on a single topic — get enough answers right to pass.",
+    "thisExamFallback": "this exam",
+    "targetError": "Couldn’t load the target for \"{exam}\": {error}.",
+    "sources": {
+      "syllabus": {
+        "title": "Syllabus",
+        "subtitle": "I’m just starting and haven’t taken any test",
+        "desc": "Work through every topic in each section in order. Take a mock exam later to get a more precise plan."
+      },
+      "diagnosis": {
+        "title": "Test results",
+        "subtitle": "Diagnose my weak spots",
+        "desc": "Prioritizes the topics you missed most in the selected test."
+      }
+    },
+    "noTarget": {
+      "syllabus": "You haven’t set a target for \"{exam}\", so pass thresholds use the default level for now. Go ahead, create a plan and start studying; once you set a target, click <strong>Update to new target</strong> and the plan applies the right thresholds while keeping your progress.",
+      "diagnosis": "You haven’t set a target for \"{exam}\". Go to the <strong>Target</strong> tab to set one first (suggested milestones included), then come back here to create your plan.",
+      "setTarget": "Set target"
+    },
+    "picker": {
+      "guestNotice": "Log in to choose a test you’ve taken.",
+      "noTests": "You haven’t completed any tests yet. Take a quick challenge or a mock exam first.",
+      "chooseTest": "Choose a test",
+      "selectedExamFallback": "the selected exam",
+      "noTestsForExam": "No completed tests for \"{exam}\" yet. Take a mock exam for this exam or switch to another exam.",
+      "viewExams": "View exams",
+      "ariaLabel": "Tests taken",
+      "testFallback": "Test",
+      "practicePill": "Section practice",
+      "points": "pts"
+    },
+    "form": {
+      "basedOn": "Base the plan on",
+      "pickTest": "Choose a test to build the plan from",
+      "pickTestHint": "Only completed tests for this exam are shown.",
+      "practiceWarning": "This test only practiced part of the exam, so the plan will only cover those sections. For a full plan, choose a full-length mock exam.",
+      "submitting": "Creating plan...",
+      "submit": "Create plan",
+      "guestHint": "<login>Log in</login> to create, save and track your study plan."
+    },
+    "steps": {
+      "ariaLabel": "Steps",
+      "heading": "How it works",
+      "step1SyllabusTitle": "Choose the exam to study",
+      "step1DiagnosisTitle": "Choose a test you’ve taken",
+      "step1SyllabusDesc": "No test needed — the plan follows the exam’s syllabus.",
+      "step1DiagnosisDesc": "We diagnose your weak spots from this test.",
+      "step2Title": "Create the plan",
+      "step2Desc": "Each stage is one exam section, with several short tasks by topic.",
+      "step3Title": "Pass tasks, then take a mock exam",
+      "step3Desc": "Once all tasks are passed, take a mock exam to recheck and update your plan."
+    },
+    "targetAchieved": "<strong>You’ve reached your target</strong> (readiness {readiness}%), no new plan needed. You can set a higher target in the Target tab, or keep taking mock exams to stay in shape.",
+    "confirmReplace": {
+      "title": "Replace your current plan?",
+      "message": "You’re currently on Plan {sequence} ({passed}/{total} tasks passed). Creating a new plan will replace it; the old plan stays saved with the status \"Replaced\" and you can switch back later."
+    }
+  },
+  "planList": {
+    "empty": "No study plans yet.",
+    "loadError": "Couldn’t load your study plans",
+    "switchError": "Couldn’t switch study plan",
+    "deleteError": "Couldn’t delete study plan",
+    "targetOutdated": "Old target",
+    "targetOutdatedTitle": "This plan was created for an old target; update it to apply your current target’s thresholds",
+    "tasksProgress": "Tasks <strong>{passed}/{total}</strong>",
+    "progressAria": "{passed}/{total} tasks passed",
+    "resyncTitle": "Update pass thresholds to your current target, keeping passed tasks",
+    "resync": "Update target",
+    "switching": "Switching...",
+    "switch": "Switch plan",
+    "view": "View",
+    "pickTask": "Choose task",
+    "cannotDeleteActive": "You can’t delete the plan in progress",
+    "deleting": "Deleting...",
+    "delete": "Delete",
+    "allExams": "All",
+    "count": "Showing: <strong>{count}</strong> {count, plural, one {plan} other {plans}}",
+    "compare": "Compare plans",
+    "refresh": "Refresh",
+    "switchModal": {
+      "title": "Switch study plan",
+      "confirm": "Switch",
+      "message": "Switch to Plan {sequence}? Your current plan will be saved with the status \"Replaced\"."
+    },
+    "deleteModal": {
+      "title": "Delete study plan",
+      "message": "Are you sure you want to delete Plan {sequence}? All its task and session data will be permanently lost."
+    }
+  },
+  "detail": {
+    "cheer": {
+      "waiting": "Your plan is waiting for its first task.",
+      "firstTask": "Pass your first task today to kick off your plan.",
+      "allDone": "You’ve passed every task — time for a mock exam to lock in your results!",
+      "almost": "Only {remaining, plural, one {# task} other {# tasks}} left to finish the plan. Bring it home!",
+      "halfway": "You’re past the halfway mark — {remaining, plural, one {# task} other {# tasks}} to go.",
+      "momentum": "{passed, plural, one {# task} other {# tasks}} passed, you’re on a roll. Keep it up with one task a day."
+    },
+    "allPlans": "All plans",
+    "replaced": "This plan has been replaced by a newer one.",
+    "viewNewPlan": "View new plan",
+    "targetOutdatedWithSource": "This plan was created for an <strong>old target</strong> — pass thresholds don’t reflect your current target yet. Update it now from the same diagnostic test, <strong>no retake needed</strong> — progress on passed tasks is kept.",
+    "targetOutdatedNoSource": "This plan was created for an <strong>old target</strong> — pass thresholds don’t reflect your current target yet. Update it now, <strong>no retake needed</strong> — progress on passed tasks is kept.",
+    "resyncNow": "Update to new target",
+    "fromOtherTest": "Create plan from another test",
+    "titleMock": "All tasks passed — ready for a mock exam!",
+    "titleNext": "Next task: {part} · {task}",
+    "titleDefault": "Conquer each task to reach your target",
+    "stage": "Phase: {stage}",
+    "target": "Target: {score} points",
+    "progress": "Progress: <strong>{passed}/{total}</strong> tasks done",
+    "mockCtaHint": "Recheck your real readiness",
+    "enterTask": "Start task",
+    "practiceSource": "This plan was diagnosed from a <strong>section practice test</strong>, so it only covers the sections practiced. Take a full-length mock exam and create a new plan for full coverage.",
+    "partsWithoutTasks": "These sections are below target but don’t have practice material yet — WinDe is adding more:",
+    "roadmapTitle": "Your task map",
+    "roadmapDesc": "{parts, plural, one {# stage} other {# stages}} · {tasks, plural, one {# task} other {# tasks}}. Each stage is one exam section, and each task is a short practice round on one topic — get enough answers right to pass."
+  },
+  "mockGuide": {
+    "heading": "What’s next?",
+    "intro": "You’ve finished the practice tasks. Two more steps to close the learning loop:",
+    "step1Title": "Take a full-length mock exam",
+    "step1Desc": "A full mock exam re-measures your real readiness after practice, more accurately than practicing sections one by one.",
+    "chooseMock": "Choose a mock exam",
+    "step2Title": "Create a new plan from that test",
+    "step2Desc": "We re-diagnose your weak spots from the new test and build your next plan. Repeat until you hit your target.",
+    "freshMock": "You have a newly completed test:",
+    "score": "Score {score}",
+    "practiceNote": "(section practice test — the plan will only cover the sections practiced)",
+    "generateFromThis": "Create plan from this test",
+    "afterSubmit": "After you submit a mock exam, come back here — the <strong>Create plan from this test</strong> button will be ready so you don’t have to look for it."
+  },
+  "history": {
+    "notFound": "This task wasn’t found in the study plan.",
+    "backToPlan": "Back to plan",
+    "continueTask": "Continue this task",
+    "status": "Status: {status}",
+    "passNeeded": "Need ≥ {pass} to pass",
+    "baseline": "At diagnosis",
+    "wrongCount": "{count} wrong",
+    "best": "Best in practice",
+    "deltaVsBaseline": "{delta}% vs diagnosis",
+    "attempts": "Attempts",
+    "attemptsUnit": "practice rounds",
+    "threshold": "Pass threshold",
+    "reached": "Threshold reached",
+    "remaining": "{gap}% to go",
+    "progressCard": "Progress (diagnosis → best)",
+    "baselineTitle": "Starting {value}",
+    "bestTitle": "Best {value}",
+    "thresholdTitle": "Pass threshold {pass}%",
+    "passLegend": "Pass {pass}",
+    "baselineBadge": "Starting",
+    "bestBadge": "Best",
+    "resourceCard": "Material for this task",
+    "sessionsCard": "Practice history",
+    "noSessions": "No practice rounds for this task yet.",
+    "table": {
+      "started": "Started",
+      "submitted": "Submitted",
+      "questions": "Questions",
+      "accuracy": "Accuracy",
+      "result": "Result",
+      "review": "Answers"
+    },
+    "inProgress": "In progress",
+    "passed": "Passed",
+    "failed": "Not passed",
+    "viewAnswers": "View answers"
+  },
+  "compare": {
+    "title": "Compare study plans",
+    "examType": "Exam",
+    "generateFirst": "Create your first plan",
+    "diffVsPrev": "({diff}% vs plan #{sequence})",
+    "tasksPassed": "Tasks passed:",
+    "sourceTest": "Source test:",
+    "viewResult": "View results",
+    "createdAt": "Created: {date}",
+    "replacedBy": "Replaced by the next plan",
+    "details": "Details",
+    "continue": "Continue"
+  },
+  "compareCharts": {
+    "status": "Status:",
+    "vsPrev": "Vs previous plan:",
+    "planCount": "Plans",
+    "baseline": "Starting readiness",
+    "latest": "Latest readiness",
+    "growth": "Gain since first plan",
+    "active": "In progress",
+    "chartTitle": "Readiness progress across plans",
+    "chartDesc": "Horizontal axis: plan order (1 → latest). Bars = starting readiness when the plan was created from a mock exam.",
+    "legendReadiness": "Starting readiness",
+    "legendDiffVsPrev": "Change vs previous plan",
+    "note": "Blue = in progress · green = completed · gray = replaced · red = abandoned. The starting point doesn’t change as you pass tasks — only a new mock exam + a new plan raise readiness."
+  },
+  "study": {
+    "submitError": "Submission failed. Please try again.",
+    "cannotOpen": "Couldn’t open this task.",
+    "mockDone": "You’ve completed the tasks for every section. Take a full mock exam to check your readiness.",
+    "mockHint": "Take a <strong>full-length mock exam</strong>, then come back to your study plan — we’ll suggest creating a new plan from that test.",
+    "pickTitle": "Choose a section and task to study",
+    "pickDesc": "Read the material in each task first, then click Study to practice.",
+    "pickProgress": "Progress: {passed}/{total} tasks",
+    "studying": "Studying",
+    "retakeBadge": "Practice again",
+    "tasksDone": "{passed}/{total} tasks done",
+    "passNeeded": "Need ≥{pass}% to pass",
+    "question": "Question {number}:",
+    "msqHint": "Select all correct answers:",
+    "submit": "Submit",
+    "unanswered": {
+      "title": "Unanswered questions",
+      "confirm": "Submit anyway",
+      "cancel": "Keep working",
+      "message": "You have {count, plural, one {# unanswered question} other {# unanswered questions}} — they’ll be marked wrong. Submit anyway?"
+    }
+  },
+  "review": {
+    "taskHistory": "Task history",
+    "noReview": "No answers found for this practice round."
+  },
+  "result": {
+    "noResult": "No results for this task yet."
+  },
+  "resultView": {
+    "title": "Answer details",
+    "passed": "Task passed",
+    "failed": "Task not passed",
+    "correct": "{correct}/{total} correct",
+    "next": "Next task →",
+    "redo": "Redo this task",
+    "pickAnother": "Choose another task"
+  },
+  "congrats": {
+    "title": "Congratulations!",
+    "subtitle": "You’ve passed every task in your plan",
+    "subtitleWithSequence": "You’ve passed every task in Plan {sequence}",
+    "progress": "{total}/{total} tasks completed",
+    "step1": "Take a <strong>full-length mock exam</strong> to re-measure your real readiness.",
+    "step2": "Go back to your study plan and <strong>create a new plan from that test</strong> — repeat until you reach your target.",
+    "later": "Later"
+  },
+  "taskList": {
+    "empty": "No tasks in this plan yet.",
+    "stage": "Stage",
+    "partMeta": "<strong>{passed}/{total}</strong> tasks done",
+    "threshold": "pass at ≥{pass}%",
+    "completed": "Completed",
+    "stageEmpty": "This stage has no tasks yet.",
+    "hint": "Click a task on the map to see details",
+    "needToPass": "need ≥{pass}% to pass",
+    "resourceIntro": "Stage intro (read first)",
+    "resourceCount": "{count, plural, one {# document} other {# documents}}",
+    "start": "Start",
+    "end": "Stage end",
+    "nodeAria": "Task {order}: {name}",
+    "youAreHere": "You are here",
+    "capstoneShort": "Review",
+    "retake": "Practice again",
+    "begin": "Start",
+    "capstoneKicker": "Stage final review",
+    "taskKicker": "Task {order}",
+    "recommended": "Up next",
+    "nearPass": "Almost there · {gap}% to go",
+    "unpassedAttempts": "{count, plural, one {# attempt} other {# attempts}} · not passed yet",
+    "readFirst": "Recommended reading",
+    "meterNotPracticed": "Not practiced · need ≥{pass}%",
+    "meterReached": "<strong>{current}%</strong> · threshold reached",
+    "meterNeed": "<strong>{current}%</strong> · need ≥{pass}%",
+    "meterGap": "{gap}% to go",
+    "wrongAtDiagnosis": "{count} wrong at diagnosis",
+    "perAttempt": "{count} questions / round",
+    "lockedCapstone": "Pass all the tasks above to unlock the review.",
+    "locked": "Complete the previous tasks to unlock this one.",
+    "history": "History",
+    "explain": "View explanations"
+  }
+}

@@ -1,9 +1,10 @@
 'use client';
 
-import Link from 'next/link';
+import Link, { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import Image from 'next/image';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { isAxiosError } from 'axios';
 import { getApiBaseUrl } from '@/app/utils/mediaUrl';
 import { useAuth } from '@/app/hooks/useAuth';
@@ -24,23 +25,26 @@ import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { FiArrowLeft, FiArrowRight, FiAtSign, FiEye, FiEyeOff, FiLock, FiMail, FiUser } from 'react-icons/fi';
 import { imageAssets, name } from '@/app/assets/images';
-import ForgotPassword from '@/app/(auth)/_components/auth/ForgotPassword';
-import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/(auth)/login/_components/Recaptcha/RecaptchaCheckbox';
+import ForgotPassword from '@/app/[locale]/(auth)/_components/auth/ForgotPassword';
+import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/[locale]/(auth)/login/_components/Recaptcha/RecaptchaCheckbox';
 
 const cx = classNames.bind(style);
 
 const RECAPTCHA_SITE_KEY = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
 
 // Lỗi do trang /oauth2/redirect hoặc backend gắn vào ?error= khi đăng nhập Google thất bại.
-const OAUTH_ERROR_TEXT: Record<string, string> = {
-  oauth2_failed: 'Đăng nhập bằng Google thất bại. Vui lòng thử lại.',
-  oauth2_timeout: 'Đăng nhập bằng Google mất quá nhiều thời gian. Vui lòng thử lại.',
-};
+const OAUTH_ERROR_KEYS = {
+  oauth2_failed: 'login.oauthFailed',
+  oauth2_timeout: 'login.oauthTimeout',
+} as const;
+
+const isOAuthError = (error: string): error is keyof typeof OAUTH_ERROR_KEYS => error in OAUTH_ERROR_KEYS;
 
 // Logo màu cho nền sáng, logo trắng cho dark mode; CSS quyết định cái nào hiển thị.
 function BrandLink() {
+  const t = useTranslations('Auth');
   return (
-    <Link href={routes.home} className={cx('brand')} aria-label="Về trang chủ">
+    <Link href={routes.home} className={cx('brand')} aria-label={t('login.backHome')}>
       <Image
         src={imageAssets.frostscopeLogoRgb}
         alt="FrostScope"
@@ -80,6 +84,9 @@ function Login() {
   const [messageType, setMessageType] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const t = useTranslations('Auth');
+  const tCommon = useTranslations('Common');
+  const localizeHref = useLocalizeHref();
   const { user, login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -103,7 +110,7 @@ function Login() {
     const error = searchParams.get('error');
     const flash = searchParams.get('flash');
     if (error) {
-      setMessage(OAUTH_ERROR_TEXT[error] || OAUTH_ERROR_TEXT.oauth2_failed);
+      setMessage(t(isOAuthError(error) ? OAUTH_ERROR_KEYS[error] : OAUTH_ERROR_KEYS.oauth2_failed));
       setMessageType('error');
     } else if (flash) {
       // Flash là lời nhắc thân thiện ("Đăng nhập để..."), không phải lỗi.
@@ -134,7 +141,7 @@ function Login() {
 
         login(userData);
 
-        setMessage("Đăng nhập thành công! Đang chuyển hướng...");
+        setMessage(t('login.loginSuccess'));
         setMessageType("success");
       } else {
         throw new Error("User data invalid");
@@ -142,7 +149,7 @@ function Login() {
     } catch (err) {
       setMessage(
         (isAxiosError<{ message?: string }>(err) && err.response?.data?.message) ||
-        "Đăng nhập thất bại. Vui lòng thử lại!"
+        t('login.loginFailed')
       );
       setMessageType("error");
     } finally {
@@ -153,7 +160,7 @@ function Login() {
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (RECAPTCHA_SITE_KEY && !recaptchaToken) {
-      setMessage('Vui lòng xác nhận bạn không phải là người máy.');
+      setMessage(t('login.recaptchaRequired'));
       setMessageType('error');
       return;
     }
@@ -177,11 +184,11 @@ function Login() {
         if (!userData?.id) throw new Error('User data invalid');
         await claimGuestAfterLogin();
         login(userData);
-        toast.success('Chào mừng bạn đến với WinDe!');
+        toast.success(t('login.welcome'));
       } catch {
-        setMessage(data.message || 'Đăng ký thành công! Bạn có thể đăng nhập ngay.');
+        setMessage(data.message || t('login.registerSuccess'));
         setMessageType('success');
-        toast.success('Đăng ký thành công! Đăng nhập để bắt đầu nhé.');
+        toast.success(t('login.registerSuccessToast'));
         setLoginIdentifier(regEmail);
         setIsSignUp(false);
       }
@@ -190,8 +197,8 @@ function Login() {
       const errorMessage =
         response?.data?.message ||
         (response?.status === 500
-          ? 'Tên đăng nhập hoặc Email đã tồn tại.'
-          : 'Đăng ký thất bại. Vui lòng thử lại sau.');
+          ? t('login.accountExists')
+          : t('login.registerFailed'));
       setMessage(errorMessage);
       setMessageType('error');
     } finally {
@@ -207,17 +214,18 @@ function Login() {
     setMessage('');
   };
 
-  const handleSocialClick = () => saveOAuthRedirect(getRedirectTarget(searchParams));
+  // Backend luôn trả về /oauth2/redirect (không tiền tố ngôn ngữ), nên lưu sẵn đích đã gắn ngôn ngữ đang xem.
+  const handleSocialClick = () => saveOAuthRedirect(localizeHref(getRedirectTarget(searchParams)));
 
   const socialButtons = (
     <div className={cx('socialBtns')}>
       <a href={GOOGLE_AUTH_URL} className={cx('socialBtn')} onClick={handleSocialClick}>
         <FcGoogle size={18} aria-hidden="true" />
-        <span>Tiếp tục với Google</span>
+        <span>{t('login.continueWithGoogle')}</span>
       </a>
       <a href={FACEBOOK_AUTH_URL} className={cx('socialBtn')} onClick={handleSocialClick}>
         <FaFacebook size={18} color="#1877F2" aria-hidden="true" />
-        <span>Tiếp tục với Facebook</span>
+        <span>{t('login.continueWithFacebook')}</span>
       </a>
     </div>
   );
@@ -227,7 +235,7 @@ function Login() {
       type="button"
       className={cx('passwordToggle')}
       onClick={toggle}
-      aria-label={shown ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+      aria-label={shown ? t('common.hidePassword') : t('common.showPassword')}
     >
       {shown ? <FiEyeOff /> : <FiEye />}
     </button>
@@ -242,7 +250,7 @@ function Login() {
   const loginForm = (
     <form onSubmit={handleLogin} className={cx('form')}>
       <div className={cx('field')}>
-        <label htmlFor="login-identifier">Email hoặc tên đăng nhập</label>
+        <label htmlFor="login-identifier">{t('login.identifierLabel')}</label>
         <div className={cx('control')}>
           <FiMail className={cx('fieldIcon')} aria-hidden="true" />
           <input
@@ -260,13 +268,13 @@ function Login() {
 
       <div className={cx('field')}>
         <div className={cx('labelRow')}>
-          <label htmlFor="login-password">Mật khẩu</label>
+          <label htmlFor="login-password">{t('login.passwordLabel')}</label>
           <button
             type="button"
             className={cx('textLink')}
             onClick={() => { setShowForgot(true); setMessage(''); }}
           >
-            Quên mật khẩu?
+            {t('login.forgotPassword')}
           </button>
         </div>
         <div className={cx('control')}>
@@ -275,7 +283,7 @@ function Login() {
             id="login-password"
             type={showLoginPassword ? 'text' : 'password'}
             autoComplete="current-password"
-            placeholder="Nhập mật khẩu của bạn"
+            placeholder={t('login.passwordPlaceholder')}
             required
             value={loginPassword}
             onChange={(e) => setLoginPassword(e.target.value)}
@@ -290,7 +298,7 @@ function Login() {
 
       <button type="submit" className={cx('submitBtn')} disabled={loading}>
         {loading && <span className={cx('loadingSpinner')} />}
-        <span>{loading ? 'Đang đăng nhập...' : 'Đăng nhập ngay'}</span>
+        <span>{loading ? t('login.signingIn') : t('common.signInNow')}</span>
         {!loading && <FiArrowRight aria-hidden="true" />}
       </button>
     </form>
@@ -299,14 +307,14 @@ function Login() {
   const registerForm = (
     <form onSubmit={handleRegister} className={cx('form')}>
       <div className={cx('field')}>
-        <label htmlFor="reg-fullname">Họ và tên</label>
+        <label htmlFor="reg-fullname">{t('login.fullNameLabel')}</label>
         <div className={cx('control')}>
           <FiUser className={cx('fieldIcon')} aria-hidden="true" />
           <input
             id="reg-fullname"
             type="text"
             autoComplete="name"
-            placeholder="Ví dụ: Nguyễn Văn An"
+            placeholder={t('login.fullNamePlaceholder')}
             required
             value={regFullName}
             onChange={(e) => setRegFullName(e.target.value)}
@@ -316,7 +324,7 @@ function Login() {
       </div>
 
       <div className={cx('field')}>
-        <label htmlFor="reg-email">Địa chỉ email</label>
+        <label htmlFor="reg-email">{t('login.emailLabel')}</label>
         <div className={cx('control')}>
           <FiMail className={cx('fieldIcon')} aria-hidden="true" />
           <input
@@ -333,14 +341,14 @@ function Login() {
       </div>
 
       <div className={cx('field')}>
-        <label htmlFor="reg-username">Tên đăng nhập</label>
+        <label htmlFor="reg-username">{t('login.usernameLabel')}</label>
         <div className={cx('control')}>
           <FiAtSign className={cx('fieldIcon')} aria-hidden="true" />
           <input
             id="reg-username"
             type="text"
             autoComplete="username"
-            placeholder="Nhập tên đăng nhập"
+            placeholder={t('login.usernamePlaceholder')}
             required
             value={regUserName}
             onChange={(e) => setRegUserName(e.target.value)}
@@ -350,14 +358,14 @@ function Login() {
       </div>
 
       <div className={cx('field')}>
-        <label htmlFor="reg-password">Mật khẩu</label>
+        <label htmlFor="reg-password">{t('login.passwordLabel')}</label>
         <div className={cx('control')}>
           <FiLock className={cx('fieldIcon')} aria-hidden="true" />
           <input
             id="reg-password"
             type={showRegPassword ? 'text' : 'password'}
             autoComplete="new-password"
-            placeholder="Tạo mật khẩu an toàn"
+            placeholder={t('login.newPasswordPlaceholder')}
             required
             value={regPassword}
             onChange={(e) => setRegPassword(e.target.value)}
@@ -378,15 +386,17 @@ function Login() {
       </div>
 
       <p className={cx('terms')}>
-        Bằng việc đăng ký, bạn đồng ý với <Link href={routes.service}>Điều khoản</Link> và{' '}
-        <Link href={routes.policy}>Chính sách bảo mật</Link> của chúng tôi.
+        {t.rich('login.agreement', {
+          terms: (chunks) => <Link href={routes.service}>{chunks}</Link>,
+          privacy: (chunks) => <Link href={routes.policy}>{chunks}</Link>,
+        })}
       </p>
 
       {messageBox}
 
       <button type="submit" className={cx('submitBtn')} disabled={loading}>
         {loading && <span className={cx('loadingSpinner')} />}
-        <span>{loading ? 'Đang xử lý...' : 'Tạo tài khoản'}</span>
+        <span>{loading ? tCommon('processing') : t('login.createAccount')}</span>
         {!loading && <FiArrowRight aria-hidden="true" />}
       </button>
     </form>
@@ -397,14 +407,14 @@ function Login() {
       <div className={cx('topBar')}>
         <Link href={routes.home} className={cx('backHome')}>
           <FiArrowLeft aria-hidden="true" />
-          <span>Về trang chủ</span>
+          <span>{t('login.backHome')}</span>
         </Link>
         <div className={cx('topSwitch')}>
           <span className={cx('topSwitchText')}>
-            {isSignUp ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'}
+            {isSignUp ? t('login.hasAccount') : t('login.noAccount')}
           </span>
           <button type="button" className={cx('textLink')} onClick={() => switchMode(!isSignUp)}>
-            {isSignUp ? 'Đăng nhập' : 'Đăng ký ngay'}
+            {isSignUp ? t('login.signIn') : t('login.signUpNow')}
           </button>
         </div>
       </div>
@@ -413,7 +423,7 @@ function Login() {
         <div className={cx('column')}>
           <div className={cx('brandHead')}>
             <BrandLink />
-            <p>Nền tảng ôn thi chứng chỉ Cloud cá nhân hóa</p>
+            <p>{t('login.tagline')}</p>
           </div>
 
           <div className={cx('card')}>
@@ -421,7 +431,7 @@ function Login() {
               <ForgotPassword embedded onBack={() => setShowForgot(false)} />
             ) : (
               <>
-                <div className={cx('tabs')} role="tablist" aria-label="Chọn đăng nhập hoặc đăng ký">
+                <div className={cx('tabs')} role="tablist" aria-label={t('login.tabsLabel')}>
                   <button
                     type="button"
                     role="tab"
@@ -429,7 +439,7 @@ function Login() {
                     className={cx('tab', { activeTab: !isSignUp })}
                     onClick={() => switchMode(false)}
                   >
-                    Đăng nhập
+                    {t('login.signIn')}
                   </button>
                   <button
                     type="button"
@@ -438,14 +448,14 @@ function Login() {
                     className={cx('tab', { activeTab: isSignUp })}
                     onClick={() => switchMode(true)}
                   >
-                    Đăng ký
+                    {t('login.signUp')}
                   </button>
                 </div>
 
                 {socialButtons}
 
                 <div className={cx('orDivider')}>
-                  <span>Hoặc với email</span>
+                  <span>{t('login.orWithEmail')}</span>
                 </div>
 
                 <div key={isSignUp ? 'signup' : 'signin'} className={cx('panel')}>
@@ -458,10 +468,10 @@ function Login() {
       </main>
 
       <footer className={cx('bottom')}>
-        <nav className={cx('legal')} aria-label="Thông tin pháp lý">
-          <Link href={routes.service}>Điều khoản</Link>
+        <nav className={cx('legal')} aria-label={t('common.legalNav')}>
+          <Link href={routes.service}>{t('common.terms')}</Link>
           <span className={cx('legalDivider')} aria-hidden="true" />
-          <Link href={routes.policy}>Quyền riêng tư</Link>
+          <Link href={routes.policy}>{t('common.privacy')}</Link>
         </nav>
         <p className={cx('copyright')}>© {name} Exam. All rights reserved.</p>
       </footer>

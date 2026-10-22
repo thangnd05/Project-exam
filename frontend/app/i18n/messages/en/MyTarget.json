@@ -1,0 +1,226 @@
+{
+  "tabs": {
+    "ariaLabel": "Target and study plan",
+    "target": "Target",
+    "plan": "Create plan",
+    "compare": "Compare plans",
+    "overview": "Overview"
+  },
+  "examPicker": {
+    "label": "Exam",
+    "ariaLabel": "Select {label}"
+  },
+  "scoring": {
+    "scaledDetail": "{correct}/{total} correct in total → {score} points (scale {min}–{max})",
+    "skillDetail": "{skill}: {count, plural, one {# question} other {# questions}} → {score} points"
+  },
+  "readiness": {
+    "levels": {
+      "READY": {
+        "label": "Ready",
+        "message": "You can consider booking the exam if you keep your results steady."
+      },
+      "ALMOST_READY": {
+        "label": "Almost ready",
+        "message": "Focus on fixing your common mistakes and take one more mock test to be sure."
+      },
+      "NEEDS_IMPROVEMENT": {
+        "label": "Needs improvement",
+        "message": "You’re close, but weak domains could still pull your score down."
+      },
+      "NOT_READY": {
+        "label": "Not ready",
+        "message": "Strengthen your fundamentals before taking another mock test."
+      }
+    },
+    "quickTiers": {
+      "EXCELLENT": "Excellent",
+      "GOOD": "Good",
+      "FAIR": "Fair",
+      "WEAK": "Needs more practice"
+    },
+    "gauge": {
+      "startLabel": "Starting point",
+      "startTitle": "Your starting point",
+      "startMessage": "You haven’t studied for this exam yet, so a low score is normal. This number is used to place your starting step, not as an exam result.",
+      "accuracy": "Accuracy",
+      "target": "Target",
+      "targetMet": "Target reached!",
+      "targetNotMet": "Target not reached",
+      "targetMetMessage": "Congratulations! You reached your target score of {score}.",
+      "targetGapMessage": "You’re {gap, plural, one {# point} other {# points}} short of your target.",
+      "readiness": "Readiness"
+    },
+    "recovery": {
+      "targetNotMet": "You haven’t reached your target score yet. Create a study plan to practice exactly the sections you’re weak in.",
+      "nextStep": "Next step: raise your readiness from {score}% to {next}%. Set a target score so WinDe can build a study plan that fits you.",
+      "practiceAllMet": "All practiced sections met their targets. Take a full mock test to check your overall score.",
+      "practicePart": "{part} ({pct}% / need {target}%)",
+      "practiceMissed": "{detail} below target. Create a study plan to practice these sections."
+    }
+  },
+  "setTarget": {
+    "title": "My target",
+    "subtitle": "Pick an exam and the score you want to reach. WinDe uses it to work out how far each section needs to go, then builds your study plan.",
+    "toast": {
+      "enterScoreFirst": "Enter a target score first.",
+      "loginRequired": "Please sign in to save your target!",
+      "updated": "Target updated. Your active plan will show an \"Update to new target\" button — just click it, no need to retake the test.",
+      "saved": "Target saved! Now let’s generate your study plan.",
+      "saveError": "Failed to save target.",
+      "deleted": "Target deleted.",
+      "deleteError": "Failed to delete target."
+    },
+    "summary": {
+      "ariaLabel": "Target summary",
+      "eyebrow": "Summary",
+      "saved": "Saved · {score, plural, one {# point} other {# points}}",
+      "notSaved": "Not saved",
+      "target": "Target",
+      "estimate": "Estimate",
+      "estimateNeed": "{detail}, need ≥ {score}",
+      "overwriteNote": "Saving will overwrite your current target.",
+      "saving": "Saving...",
+      "update": "Update target",
+      "save": "Save target",
+      "generatePlan": "Generate study plan",
+      "delete": "Delete target"
+    },
+    "empty": {
+      "title": "Choose an exam to set a target",
+      "description": "Click an exam above to see suggested score levels."
+    },
+    "scoreLabel": "Target score",
+    "milestonesAriaLabel": "Suggested score levels",
+    "placeholderScaled": "e.g. 700",
+    "placeholder": "e.g. 450",
+    "milestoneHint": "Level {score}",
+    "customHint": "Custom score: each section needs about {pct}% correct",
+    "suggestedHint": "Not sure what to aim for? WinDe has preselected a realistic level — you can change it any time.",
+    "advanced": {
+      "title": "Advanced: correct answers needed per section",
+      "optional": "optional",
+      "milestoneHint": "Prefilled from the score level you picked. Only change it if you want to focus on a particular section.",
+      "evenHint": "Prefilled: each section needs about {pct}% correct. Only change it if you want to focus on a particular section.",
+      "questionCount": "{count, plural, one {# question} other {# questions}}",
+      "questionUnit": "correct",
+      "reset": "Reset"
+    }
+  },
+  "achieved": {
+    "back": "← Target overview",
+    "examType": "Exam type",
+    "noTarget": "You haven’t set a target for this exam yet.",
+    "setTarget": "Set target",
+    "notMet": "Your latest mock test hasn’t reached the target of {score, plural, one {# point} other {# points}}.",
+    "latestScore": "Latest score: <strong>{score}</strong>.",
+    "viewProgress": "View progress",
+    "heroTitle": "You reached your target!",
+    "heroTarget": "Target: <strong>{score}</strong>",
+    "heroScore": "Score achieved: <strong>{score}</strong> (+{diff})",
+    "achievedAt": "Target reached on: {date}",
+    "mockAchieved": "Mock test that reached the target: {date}",
+    "nextTarget": {
+      "title": "Next target",
+      "description": "You just completed the <strong>{score}</strong> milestone. To set a new level, go to the Target page and enter your score.",
+      "cta": "Go to Target page"
+    },
+    "next": {
+      "title": "What you can do next",
+      "newTarget": "Set a new target",
+      "newTargetDesc": "adjust your score and per-section targets.",
+      "journey": "View your study plan journey",
+      "journeyDesc": "readiness from #1 → #N across each mock test.",
+      "overview": "Target overview",
+      "overviewDesc": "readiness chart over time and the tests you’ve taken.",
+      "practice": "Take more tests",
+      "practiceDesc": "stay in shape until the real exam."
+    }
+  },
+  "dashboard": {
+    "title": "Target overview",
+    "subtitle": "Your latest mock test against your target, your active study plan, and % correct per section.",
+    "noTarget": {
+      "title": "No target set for this exam",
+      "description": "Set the score you want to reach to track progress per section and generate a matching study plan.",
+      "cta": "Set target"
+    },
+    "achievedTitle": "You reached your target of {score}!",
+    "achievedAt": "Reached on {date}.",
+    "latestMockScore": "Latest mock test: {score, plural, one {# point} other {# points}}.",
+    "newTarget": "Set a new target",
+    "targetScore": "Target score",
+    "latest": "Latest <strong>{score}</strong>",
+    "reached": "reached",
+    "gap": "{gap} pts to go",
+    "noMock": "No mock tests yet — take one to see your progress.",
+    "readiness": "Readiness",
+    "noMockForExam": "No mock tests for this exam yet.",
+    "activePlan": "Active study plan",
+    "planName": "Plan {seq}",
+    "baseline": "Started at {pct}%",
+    "byCurriculum": "Based on the curriculum",
+    "stages": "<strong>{passed}/{total}</strong> stages",
+    "openPlan": "Open plan",
+    "none": "None yet",
+    "noActivePlan": "No active study plan.",
+    "generatePlan": "Generate plan",
+    "parts": {
+      "title": "% correct per section",
+      "meta": "current vs. target"
+    }
+  },
+  "partChart": {
+    "empty": "No per-section targets yet. Update them on the Target page.",
+    "noData": "No data yet",
+    "reached": "Reached",
+    "remaining": "{pct}% to go",
+    "ariaLabel": "{name}: current {current}, target {aim}%",
+    "ariaNone": "none yet",
+    "legend": {
+      "reached": "Target reached",
+      "notReached": "Not reached",
+      "aim": "Target marker"
+    }
+  },
+  "mockHistory": {
+    "title": "Progress across your tests",
+    "count": "<strong>{count}</strong> {count, plural, one {full-length test} other {full-length tests}}",
+    "empty": "No full-length tests to show stats for yet.",
+    "firstTest": "Take your first test",
+    "hideTable": "Hide details table",
+    "showTable": "Show details table ({count, plural, one {# test} other {# tests}})",
+    "table": {
+      "finished": "Completed",
+      "testName": "Test name",
+      "score": "Score",
+      "readiness": "Readiness",
+      "target": "Target",
+      "duration": "Duration",
+      "load": "Load",
+      "met": "Met",
+      "notMet": "Not met",
+      "notSet": "Not set",
+      "diagnose": "Diagnosis"
+    }
+  },
+  "mockCharts": {
+    "tooltip": {
+      "score": "Score:",
+      "readiness": "Readiness:",
+      "met": "Target reached",
+      "notMet": "Target not reached"
+    },
+    "loading": "Loading chart data...",
+    "title": "Progress over time",
+    "description": "Horizontal axis: tests from oldest → newest. Bars = total score · line = readiness %.",
+    "loadingReadiness": "Adding readiness for older tests...",
+    "axisScore": "Score",
+    "axisReadiness": "Readiness %",
+    "legendTotal": "Total score",
+    "legendReadiness": "Readiness",
+    "targetLine": "Target {score}",
+    "legendNote": "Green bars = target reached · blue = undetermined · yellow = not reached.",
+    "legendNoteTarget": "Red dashed line = target score."
+  }
+}

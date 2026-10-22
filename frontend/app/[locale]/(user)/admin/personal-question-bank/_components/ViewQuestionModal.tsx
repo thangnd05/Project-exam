@@ -8,6 +8,7 @@ import {toast} from 'react-toastify';
 import {useQuestionDetail} from '@/app/features/tests/hooks/useQuestionDetail';
 import type {AnswerAdminResponse} from '@/app/types';
 import classNames from 'classnames/bind';
+import {useTranslations} from 'next-intl';
 import {
   CheckCircle,
   X,
@@ -30,6 +31,8 @@ type ViewQuestionModalProps = {
 };
 
 const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) => {
+  const t = useTranslations('TestCreatorBank');
+  const tCommon = useTranslations('Common');
   const onHideRef = useRef(onHide);
 
   useEffect(() => {
@@ -42,10 +45,10 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
 
   useEffect(() => {
     if (isError) {
-      toast.error('Không thể tải dữ liệu câu hỏi');
+      toast.error(t('view.loadError'));
       onHideRef.current?.();
     }
-  }, [isError]);
+  }, [isError, t]);
 
   // Dữ liệu cũ có thể dùng `content`/`id` thay cho `answerText`/`answerId`.
   const answers: (AnswerAdminResponse & { content?: string; id?: string })[] =
@@ -59,11 +62,11 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
     <BaseModal
       show={show}
       onClose={onHide}
-      title="Chi tiết câu hỏi"
+      title={t('view.title')}
       maxWidth={800}
       footer={
         <ButtonPrime variant="ghost" size="lg" onClick={onHide}>
-          <X size={20} className="me-1" /> Đóng
+          <X size={20} className="me-1" /> {tCommon('close')}
         </ButtonPrime>
       }
     >
@@ -71,15 +74,15 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
         {loading ? (
           <div className="text-center py-5">
             <Spinner animation="border" variant="primary" />
-            <p className="mt-2 text-muted">Đang tải dữ liệu...</p>
+            <p className="mt-2 text-muted">{t('view.loading')}</p>
           </div>
         ) : !question ? (
           <Alert variant="info" className="mb-0">
-            Không có dữ liệu để hiển thị.
+            {t('view.empty')}
           </Alert>
         ) : (
           <div className={cxCreate('partBlock')}>
-            <div className={cx('sectionTitle')}>Nội dung câu hỏi</div>
+            <div className={cx('sectionTitle')}>{t('view.questionText')}</div>
             <div
               style={{
                 background: 'var(--bg-white)',
@@ -92,12 +95,12 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
                 marginBottom: 16,
               }}
             >
-              {question.questionText || '(Không có nội dung)'}
+              {question.questionText || t('parts.noContent')}
             </div>
 
             {(passageContent || passageTranslation || mediaItems.length > 0 || extraTexts.length > 0) && (
               <>
-                <div className={cx('sectionTitle')}>Đoạn văn / Media</div>
+                <div className={cx('sectionTitle')}>{t('view.passage')}</div>
 
                 {passageContent && (
                   <div
@@ -137,7 +140,7 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
                 {passageTranslation && (
                   <details style={{ marginBottom: 12 }}>
                     <summary style={{ cursor: 'pointer', fontWeight: 600, color: 'var(--text-secondary)', marginBottom: 8 }}>
-                      Bản dịch
+                      {t('view.translation')}
                     </summary>
                     <div
                       style={{
@@ -159,10 +162,10 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
               </>
             )}
 
-            <div className={cx('sectionTitle')}>Đáp án</div>
+            <div className={cx('sectionTitle')}>{t('view.answers')}</div>
             {answers.length === 0 ? (
               <Alert variant="info" className="mb-0">
-                Câu hỏi này chưa có đáp án.
+                {t('view.noAnswers')}
               </Alert>
             ) : (
               <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
@@ -189,7 +192,7 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
                         {label}.
                       </span>
                       <span style={{flex: 1, color: 'var(--text-color)'}}>
-                        {text || '(Trống)'}
+                        {text || t('view.blank')}
                       </span>
                       {isCorrect && (
                         <span
@@ -201,7 +204,7 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
                             fontWeight: 700,
                           }}
                         >
-                          <CheckCircle size={20} /> Đáp án đúng
+                          <CheckCircle size={20} /> {t('view.correct')}
                         </span>
                       )}
                     </div>
@@ -213,7 +216,7 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
             {question?.explanation?.trim() && (
               <>
                 <div className={cx('sectionTitle')} style={{ marginTop: 16 }}>
-                  Giải thích đáp án
+                  {t('view.explanation')}
                 </div>
                 <div
                   style={{

@@ -7,6 +7,7 @@ import type {
 } from '@/app/types';
 import { fetchPublicJson } from '@/app/utils/serverApi';
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
+import { routing } from '@/app/i18n/routing';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
@@ -15,6 +16,22 @@ export const revalidate = 3600;
 const STATIC_PATHS = ['', '/about', '/posts', '/policy', '/service', '/certificates/verify', '/exam-types'];
 
 const MAX_POSTS = 500;
+
+const localeUrl = (locale: string, path: string) =>
+  locale === routing.defaultLocale ? `${SITE_URL}${path}` : `${SITE_URL}/${locale}${path}`;
+
+// Mỗi trang ra một mục cho từng ngôn ngữ, mục nào cũng kèm đủ bản ngôn ngữ khác (hreflang trong sitemap).
+function withLocales(entries: MetadataRoute.Sitemap, pathOf: (url: string) => string): MetadataRoute.Sitemap {
+  return entries.flatMap((entry) => {
+    const path = pathOf(entry.url);
+    const languages = Object.fromEntries(routing.locales.map((l) => [l, localeUrl(l, path)]));
+    return routing.locales.map((locale) => ({
+      ...entry,
+      url: localeUrl(locale, path),
+      alternates: { languages },
+    }));
+  });
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [posts, examTypes, resources] = await Promise.all([
@@ -49,5 +66,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [...staticEntries, ...examTypeEntries, ...postEntries, ...resourceEntries];
+  return withLocales(
+    [...staticEntries, ...examTypeEntries, ...postEntries, ...resourceEntries],
+    (url) => url.slice(SITE_URL.length),
+  );
 }

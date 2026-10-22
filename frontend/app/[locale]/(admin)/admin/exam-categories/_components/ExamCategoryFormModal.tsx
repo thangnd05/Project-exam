@@ -1,6 +1,7 @@
 'use client';
 
 import {Form} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 
@@ -30,78 +31,79 @@ function ExamCategoryFormModal({
   onClose,
   onSubmit,
 }: ExamCategoryFormModalProps) {
+  const t = useTranslations('AdminContent.examCategories.form');
+  const tc = useTranslations('Common');
   return (
     <BaseModal
       show={show}
       onClose={onClose}
-      title={isEditing ? 'Cập nhật phân loại bài thi' : 'Tạo phân loại bài thi'}
+      title={isEditing ? t('editTitle') : t('createTitle')}
       maxWidth={550}
       footer={
         <ModalActionFooter
           onCancel={onClose}
           onSubmit={onSubmit}
-          cancelLabel="Hủy"
-          submitLabel={isEditing ? 'Lưu' : 'Tạo mới'}
+          cancelLabel={tc('cancelShort')}
+          submitLabel={isEditing ? tc('save') : t('create')}
         />
       }
     >
         <Form.Group className="mb-3">
-          <Form.Label>Code *</Form.Label>
+          <Form.Label>{t('code')}</Form.Label>
           <Form.Control
             value={formState.code}
             onChange={(event) => onChangeField('code', event.target.value)}
-            placeholder="VD: QUICK_CHALLENGE, FULL_MOCK..."
+            placeholder={t('codePlaceholder')}
             disabled={isEditing}
           />
           <Form.Text className="text-muted">
-            Mã định danh để code tham chiếu. Sau khi tạo không nên đổi.
+            {t('codeHelp')}
           </Form.Text>
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Tên hiển thị *</Form.Label>
+          <Form.Label>{t('name')}</Form.Label>
           <Form.Control
             value={formState.name}
             onChange={(event) => onChangeField('name', event.target.value)}
-            placeholder="VD: Quick Challenge"
+            placeholder={t('namePlaceholder')}
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Mô tả</Form.Label>
+          <Form.Label>{t('description')}</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
             value={formState.description}
             onChange={(event) => onChangeField('description', event.target.value)}
-            placeholder="Mô tả ngắn (tuỳ chọn)"
+            placeholder={t('descriptionPlaceholder')}
           />
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Check
             type="switch"
             id="guest-allowed-switch"
-            label="Cho phép guest làm bài (chưa đăng nhập)"
+            label={t('guestAllowed')}
             checked={!!formState.guestAllowed}
             onChange={(event) => onChangeField('guestAllowed', event.target.checked)}
           />
           <Form.Text className="text-muted">
-            Bật cho Quick Challenge (không cần đăng ký). Tắt cho Full Mock Exam.
+            {t('guestAllowedHelp')}
           </Form.Text>
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Check
             type="switch"
             id="certificate-eligible-switch"
-            label="Cấp chứng chỉ khi đạt điểm"
+            label={t('certificateEligible')}
             checked={!!formState.certificateEligible}
             onChange={(event) => onChangeField('certificateEligible', event.target.checked)}
           />
           <Form.Text className="text-muted">
-            Bật cho Full Mock. Người dùng thường sẽ không gán được nhóm này khi tự tạo đề,
-            tránh việc tự cấp chứng chỉ cho mình.
+            {t('certificateEligibleHelp')}
           </Form.Text>
         </Form.Group>
         <Form.Group>
-          <Form.Label>Thứ tự hiển thị</Form.Label>
+          <Form.Label>{t('displayOrder')}</Form.Label>
           <Form.Control
             type="number"
             value={formState.displayOrder ?? 0}

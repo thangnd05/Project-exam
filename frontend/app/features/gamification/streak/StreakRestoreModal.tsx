@@ -2,6 +2,7 @@
 
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { Flame, CircleDollarSign } from 'lucide-react';
 
 import BaseModal from '@/app/components/modal/BaseModal';
@@ -20,6 +21,7 @@ type StreakRestoreModalProps = {
 function StreakRestoreModal({ show, onClose }: StreakRestoreModalProps) {
   const { lostStreak, recoverCost } = useStreak();
   const { balance } = useCoins();
+  const t = useTranslations('Gamification');
   const restoreMutation = useRestoreStreak();
   const busy = restoreMutation.isPending;
 
@@ -28,11 +30,11 @@ function StreakRestoreModal({ show, onClose }: StreakRestoreModalProps) {
   const handleRestore = () => {
     restoreMutation.mutate(undefined, {
       onSuccess: () => {
-        toast.success(`Đã khôi phục chuỗi ${lostStreak} ngày!`);
+        toast.success(t('restore.success', { count: lostStreak }));
         onClose();
       },
       onError: (error) => {
-        toast.error(error?.response?.data?.message || 'Khôi phục thất bại. Vui lòng thử lại.');
+        toast.error(error?.response?.data?.message || t('restore.error'));
       },
     });
   };
@@ -41,7 +43,7 @@ function StreakRestoreModal({ show, onClose }: StreakRestoreModalProps) {
     <BaseModal
       show={show}
       onClose={busy ? undefined : onClose}
-      title="Khôi phục chuỗi"
+      title={t('restore.title')}
       maxWidth={420}
       footer={
         <>
@@ -51,7 +53,7 @@ function StreakRestoreModal({ show, onClose }: StreakRestoreModalProps) {
             onClick={onClose}
             disabled={busy}
           >
-            Để sau
+            {t('restore.later')}
           </button>
           <button
             type="button"
@@ -59,7 +61,7 @@ function StreakRestoreModal({ show, onClose }: StreakRestoreModalProps) {
             onClick={handleRestore}
             disabled={busy || !enough}
           >
-            {busy ? 'Đang khôi phục...' : enough ? `Khôi phục (${recoverCost} xu)` : 'Không đủ xu'}
+            {busy ? t('restore.restoring') : enough ? t('restore.restore', { cost: recoverCost }) : t('restore.notEnough')}
           </button>
         </>
       }
@@ -70,27 +72,26 @@ function StreakRestoreModal({ show, onClose }: StreakRestoreModalProps) {
           <span className={cx('lost')}>{lostStreak}</span>
         </div>
         <p className={cx('lead')}>
-          Bạn vừa làm đứt chuỗi <strong>{lostStreak} ngày</strong>. Khôi phục bằng xu để nối lại
-          trước khi làm bài. Nếu để sau, xong bài này chuỗi bắt đầu lại từ 1.
+          {t.rich('restore.lead', { count: lostStreak, strong: (chunks) => <strong>{chunks}</strong> })}
         </p>
         <div className={cx('rows')}>
           <div className={cx('row')}>
-            <span>Chi phí khôi phục</span>
+            <span>{t('restore.cost')}</span>
             <span className={cx('cost')}>
               <CircleDollarSign size={15} />
-              {recoverCost} xu
+              {t('coins.amount', { amount: recoverCost })}
             </span>
           </div>
           <div className={cx('row')}>
-            <span>Số dư của bạn</span>
+            <span>{t('restore.balance')}</span>
             <span className={cx({ insufficient: !enough })}>
               <CircleDollarSign size={15} />
-              {balance} xu
+              {t('coins.amount', { amount: balance })}
             </span>
           </div>
         </div>
         {!enough && (
-          <p className={cx('warn')}>Bạn không đủ xu để khôi phục. Hãy làm nhiệm vụ để kiếm thêm xu.</p>
+          <p className={cx('warn')}>{t('restore.warn')}</p>
         )}
       </div>
     </BaseModal>

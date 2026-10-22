@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import {Table, Badge, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {
   IoPencilOutline,
@@ -30,6 +31,8 @@ type TestManagementTableProps = {
 
 const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManagementTableProps) => {
   const router = useRouter();
+  const t = useTranslations('TestTaking.managementTable');
+  const tTests = useTranslations('Tests');
   const now = new Date();
   const [editingTest, setEditingTest] = React.useState<EditableTest | null>(null);
 
@@ -51,37 +54,37 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManag
       <Table hover className={cx('management-table')}>
         <thead>
           <tr>
-            <th>Tên bài test</th>
+            <th>{t('name')}</th>
             <th>
               <IoTimeOutline className="me-2" />
-              Thời gian
+              {t('duration')}
             </th>
-            <th>Trạng thái</th>
+            <th>{t('status')}</th>
             <th>
               <IoPeopleOutline className="me-2" />
-              Tổng lượt làm
+              {t('totalAttempts')}
             </th>
-            <th className="text-center">Hành động</th>
+            <th className="text-center">{t('actions')}</th>
           </tr>
         </thead>
         <tbody>
           {tests.map((test) => {
-            const {status, statusLabel} = getTestStatus(test, now, countdowns);
+            const {status, statusLabelKey} = getTestStatus(test, now, countdowns);
             const variant = getBadgeVariant(status);
 
             return (
               <tr key={test.testId}>
                 <td className={cx('test-title')}>
-                  <strong>{test.title || 'Bài tập luyện tập'}</strong>
+                  <strong>{test.title || tTests('card.fallbackTitle')}</strong>
                 </td>
                 <td className={cx('test-duration')}>
                   {test.durationMinutes
-                    ? `${test.durationMinutes} phút`
-                    : 'Không giới hạn'}
+                    ? tTests('minutes', {count: test.durationMinutes})
+                    : tTests('unlimited')}
                 </td>
                 <td>
                   <Badge bg={variant} className={cx('status-badge')}>
-                    {statusLabel}
+                    {tTests(`status.${statusLabelKey}`)}
                   </Badge>
                 </td>
                 <td className={cx('test-participants')}>
@@ -90,7 +93,7 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManag
                 <td>
                   <div className={cx('action-group')}>
                     {onRefresh && (
-                      <OverlayTrigger overlay={<Tooltip>Sửa bài test</Tooltip>}>
+                      <OverlayTrigger overlay={<Tooltip>{t('edit')}</Tooltip>}>
                         <Button
                           variant="link"
                           className={cx('btn-action', 'edit')}
@@ -102,7 +105,7 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManag
                     )}
 
                     {onDelete && (
-                      <OverlayTrigger overlay={<Tooltip>Xóa bài test</Tooltip>}>
+                      <OverlayTrigger overlay={<Tooltip>{t('delete')}</Tooltip>}>
                         <Button
                           variant="link"
                           className={cx('btn-action', 'delete')}
@@ -114,7 +117,7 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManag
                     )}
 
                     <OverlayTrigger
-                      overlay={<Tooltip>Xem chi tiết điểm</Tooltip>}
+                      overlay={<Tooltip>{t('viewScores')}</Tooltip>}
                     >
                       <Button
                         variant="link"

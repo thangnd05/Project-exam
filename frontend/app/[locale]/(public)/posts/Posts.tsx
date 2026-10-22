@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info, Newspaper, Bookmark } from 'lucide-react';
@@ -32,6 +33,8 @@ const cardVariants: Variants = {
 };
 
 function Posts() {
+  const t = useTranslations('Posts');
+  const dateLocale = useLocale() === 'en' ? 'en-US' : 'vi-VN';
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -68,8 +71,8 @@ function Posts() {
 
         <PageHeader
           label="BLOG"
-          title="Bài viết"
-          actionText="Tạo bài viết"
+          title={t('list.title')}
+          actionText={t('list.create')}
           actionIcon={Plus}
           onAction={() => setShowCreateModal(true)}
         >
@@ -77,8 +80,8 @@ function Posts() {
             type="button"
             className={cx('headerIconBtn')}
             onClick={() => setActiveSection('posts')}
-            title="Bài viết của tôi"
-            aria-label="Bài viết của tôi"
+            title={t('common.myPosts')}
+            aria-label={t('common.myPosts')}
           >
             <Newspaper size={22} />
           </button>
@@ -86,8 +89,8 @@ function Posts() {
             type="button"
             className={cx('headerIconBtn')}
             onClick={() => setActiveSection('saved')}
-            title="Bài đã lưu"
-            aria-label="Bài đã lưu"
+            title={t('common.savedPosts')}
+            aria-label={t('common.savedPosts')}
           >
             <Bookmark size={22} />
           </button>
@@ -104,7 +107,7 @@ function Posts() {
               <Search className={cx('searchIcon')} size={18} />
               <input
                 type="text"
-                placeholder="Tìm bài viết..."
+                placeholder={t('list.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => changeSearch(e.target.value)}
               />
@@ -112,17 +115,14 @@ function Posts() {
           </div>
           <div className={cx('approvalNotice')}>
             <Info size={16} />
-            <span>
-              Bài viết mới cần được admin duyệt trước khi hiển thị công khai.
-              Nếu sau một thời gian bài của bạn không xuất hiện ở đây, có thể bài đã bị xóa do không phù hợp.
-            </span>
+            <span>{t('list.approvalNotice')}</span>
           </div>
           <div className={cx('filterPills')}>
             <button
               className={cx('pill', { active: !selectedCategory })}
               onClick={() => changeCategory(null)}
             >
-              Tất cả
+              {t('list.all')}
             </button>
             {categories.map(cat => (
               <button
@@ -165,7 +165,7 @@ function Posts() {
               <div className={cx('cardContent')}>
                 <div className={cx('cardMeta')}>
                   <Clock size={14} />
-                  <span>{new Date(post.createdAt ?? '').toLocaleDateString('vi-VN')}</span>
+                  <span>{new Date(post.createdAt ?? '').toLocaleDateString(dateLocale)}</span>
                 </div>
                 <h3>{post.title}</h3>
                 <p className={cx('cardExcerpt')}>{post.title}</p>

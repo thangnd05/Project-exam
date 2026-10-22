@@ -1,0 +1,347 @@
+{
+  "common": {
+    "plan": "Lộ trình",
+    "planName": "Lộ trình {sequence}",
+    "back": "Quay lại",
+    "partFallback": "Phần",
+    "taskTitle": "{part} · Ải {task}",
+    "updating": "Đang cập nhật...",
+    "resyncError": "Không cập nhật được lộ trình",
+    "noPlansForExam": "Chưa có lộ trình nào cho kỳ thi này.",
+    "takeMock": "Làm bài thi thử",
+    "nextStep": "Xem bước tiếp theo",
+    "retry": "Thử lại",
+    "openResource": "Mở tài liệu",
+    "newPlan": "Sinh lộ trình mới",
+    "listTitle": "Lộ trình đã sinh",
+    "login": "Đăng nhập",
+    "stage": "Giai đoạn:",
+    "created": "Tạo:",
+    "baselineReadiness": "Độ sẵn sàng ban đầu:"
+  },
+  "labels": {
+    "planStatus": {
+      "active": "Đang học",
+      "completed": "Hoàn thành",
+      "replaced": "Đã thay"
+    },
+    "planStage": {
+      "foundation": "Nền tảng",
+      "mock": "Thi thử"
+    },
+    "taskStatus": {
+      "passed": "Đã vượt",
+      "active": "Chưa vượt",
+      "locked": "Chưa mở",
+      "skipped": "Bỏ qua"
+    },
+    "notice": {
+      "emptyPoolSkipped": "Ải này chưa có câu hỏi nào trong kho nên đã được bỏ qua  hãy chọn ải khác.",
+      "emptyPoolRetry": "Ải này hiện chưa có câu hỏi để luyện lại. Hãy chọn ải khác."
+    },
+    "capstone1": "Ải cuối chặng  lần 1",
+    "capstone2": "Ải cuối chặng  lần 2",
+    "summary": {
+      "target": "đạt mục tiêu",
+      "targetScore": "đạt {score} điểm",
+      "syllabus": "Đi theo chương trình học, chưa có chẩn đoán. {total} ải trải đều các phần, để {target}.",
+      "diagnosis": "Độ sẵn sàng {readiness}%. {total} ải cho các phần chưa đạt mục tiêu, để {target}."
+    },
+    "resync": {
+      "achieved": "Bạn đã đạt mục tiêu mới  lộ trình hiện tại được đánh dấu hoàn thành, chưa cần lộ trình mới.",
+      "reopened": "Đã cập nhật theo mục tiêu mới  {count} ải phải vượt lại vì ngưỡng mới cao hơn.",
+      "unchanged": "Đã cập nhật theo mục tiêu mới  tiến độ giữ nguyên."
+    }
+  },
+  "termTips": {
+    "readiness": "Độ sẵn sàng = trung bình % đúng các kỹ năng trong bài gần nhất  ước lượng mức sẵn sàng cho kỳ thi thật.",
+    "task": "Ải = một lượt luyện ngắn về một chủ đề. Đạt ≥ ngưỡng % câu đúng là vượt ải.",
+    "passThreshold": "Ngưỡng vượt ải: % câu đúng tối thiểu trong một lượt luyện để vượt ải."
+  },
+  "generate": {
+    "loginRequired": "Bạn cần đăng nhập để sinh lộ trình!",
+    "unknownError": "Lỗi không xác định",
+    "targetLoadError": "Không tải được mục tiêu",
+    "title": "Sinh lộ trình vượt ải",
+    "subtitle": "Lộ trình chia thành các chặng, mỗi chặng là một phần thi. Mỗi chặng gồm nhiều ải luyện ngắn về một chủ đề, làm đủ % câu đúng là vượt.",
+    "thisExamFallback": "kỳ thi này",
+    "targetError": "Không tải được mục tiêu cho \"{exam}\": {error}.",
+    "sources": {
+      "syllabus": {
+        "title": "Chương trình học",
+        "subtitle": "Tôi mới bắt đầu, chưa làm bài nào",
+        "desc": "Đi tuần tự hết các chủ điểm của từng phần. Làm bài thi thử sau để sinh lộ trình sát hơn."
+      },
+      "diagnosis": {
+        "title": "Kết quả một bài thi",
+        "subtitle": "Chẩn đoán điểm yếu của tôi",
+        "desc": "Ưu tiên các chủ điểm bạn làm sai nhiều nhất trong bài đã chọn."
+      }
+    },
+    "noTarget": {
+      "syllabus": "Bạn chưa đặt mục tiêu cho \"{exam}\" nên ngưỡng vượt ải tạm dùng mức mặc định. Cứ sinh lộ trình và học trước; khi nào đặt mục tiêu, bấm <strong>Cập nhật theo mục tiêu mới</strong> là lộ trình áp ngưỡng đúng mà vẫn giữ tiến độ.",
+      "diagnosis": "Bạn chưa đặt mục tiêu cho \"{exam}\". Sang tab <strong>Mục tiêu</strong> đặt trước (có mốc gợi ý sẵn), rồi quay lại đây sinh lộ trình.",
+      "setTarget": "Đặt mục tiêu"
+    },
+    "picker": {
+      "guestNotice": "Đăng nhập để chọn bài thi bạn đã làm.",
+      "noTests": "Bạn chưa có bài thi nào đã hoàn thành. Hãy làm một bài thử thách nhanh hoặc thi thử trước.",
+      "chooseTest": "Chọn bài để làm",
+      "selectedExamFallback": "kỳ thi đã chọn",
+      "noTestsForExam": "Chưa có bài hoàn thành cho \"{exam}\". Hãy làm bài thi thử của kỳ thi này hoặc đổi kỳ thi khác.",
+      "viewExams": "Xem đề thi",
+      "ariaLabel": "Bài thi đã làm",
+      "testFallback": "Bài thi",
+      "practicePill": "Luyện theo phần",
+      "points": "điểm"
+    },
+    "form": {
+      "basedOn": "Lộ trình dựa trên",
+      "pickTest": "Chọn bài thi muốn lập lộ trình",
+      "pickTestHint": "Chỉ hiện bài đã hoàn thành của kỳ thi này.",
+      "practiceWarning": "Bài này chỉ luyện một phần đề nên lộ trình sinh ra chỉ phủ các phần đã luyện. Muốn lộ trình đầy đủ, hãy chọn một bài thi thử trọn đề.",
+      "submitting": "Đang sinh lộ trình...",
+      "submit": "Sinh lộ trình",
+      "guestHint": "<login>Đăng nhập</login> để sinh, lưu và theo dõi tiến độ lộ trình."
+    },
+    "steps": {
+      "ariaLabel": "Các bước",
+      "heading": "Cách hoạt động",
+      "step1SyllabusTitle": "Chọn kỳ thi muốn học",
+      "step1DiagnosisTitle": "Chọn bài thi đã làm",
+      "step1SyllabusDesc": "Chưa làm bài nào cũng được, lộ trình đi theo chương trình của kỳ thi.",
+      "step1DiagnosisDesc": "Hệ thống chẩn đoán điểm yếu của bạn từ bài này.",
+      "step2Title": "Sinh lộ trình",
+      "step2Desc": "Mỗi chặng là một phần thi, gồm nhiều ải ngắn theo chủ đề.",
+      "step3Title": "Vượt ải rồi thi thử",
+      "step3Desc": "Vượt hết ải thì làm bài thi thử để kiểm tra lại và cập nhật lộ trình."
+    },
+    "targetAchieved": "<strong>Bạn đã đạt mục tiêu</strong> (mức sẵn sàng {readiness}%), chưa cần sinh lộ trình mới. Bạn có thể đặt mục tiêu cao hơn trong tab Mục tiêu, hoặc tiếp tục làm bài thi thử để duy trì phong độ.",
+    "confirmReplace": {
+      "title": "Thay lộ trình đang học?",
+      "message": "Bạn đang học Lộ trình {sequence} ({passed}/{total} ải đã vượt). Sinh lộ trình mới sẽ thay thế lộ trình này; lộ trình cũ vẫn được lưu với trạng thái \"Đã thay\" và có thể chuyển lại sau."
+    }
+  },
+  "planList": {
+    "empty": "Chưa có lộ trình nào.",
+    "loadError": "Không tải được danh sách lộ trình",
+    "switchError": "Lỗi khi chuyển lộ trình",
+    "deleteError": "Lỗi khi xóa lộ trình",
+    "targetOutdated": "Mục tiêu cũ",
+    "targetOutdatedTitle": "Lộ trình sinh theo mục tiêu cũ, cập nhật để áp ngưỡng mục tiêu hiện tại",
+    "tasksProgress": "Ải <strong>{passed}/{total}</strong>",
+    "progressAria": "Đã vượt {passed}/{total} ải",
+    "resyncTitle": "Cập nhật ngưỡng vượt ải theo mục tiêu hiện tại, giữ tiến độ ải đã vượt",
+    "resync": "Cập nhật mục tiêu",
+    "switching": "Đang chuyển...",
+    "switch": "Đổi lộ trình",
+    "view": "Xem",
+    "pickTask": "Chọn ải",
+    "cannotDeleteActive": "Không thể xóa lộ trình đang học",
+    "deleting": "Đang xóa...",
+    "delete": "Xóa",
+    "allExams": "Tất cả",
+    "count": "Hiển thị: <strong>{count}</strong> lộ trình",
+    "compare": "So sánh lộ trình",
+    "refresh": "Làm mới",
+    "switchModal": {
+      "title": "Đổi lộ trình học",
+      "confirm": "Đồng ý chuyển",
+      "message": "Chuyển sang lộ trình {sequence}? Lộ trình đang học hiện tại sẽ được lưu lại với trạng thái \"Đã thay\"."
+    },
+    "deleteModal": {
+      "title": "Xác nhận xóa lộ trình",
+      "message": "Bạn có chắc muốn xóa lộ trình {sequence}? Toàn bộ dữ liệu ải và phiên học sẽ bị mất vĩnh viễn."
+    }
+  },
+  "detail": {
+    "cheer": {
+      "waiting": "Lộ trình đang chờ ải đầu tiên.",
+      "firstTask": "Vượt ải đầu tiên hôm nay để khởi động lộ trình.",
+      "allDone": "Bạn đã vượt toàn bộ ải  đến lúc thi thử để chốt kết quả!",
+      "almost": "Chỉ còn {remaining} ải nữa là hết lộ trình. Về đích thôi!",
+      "halfway": "Đã đi được hơn nửa chặng  còn {remaining} ải.",
+      "momentum": "Đã vượt {passed} ải, đang có đà. Giữ nhịp mỗi ngày một ải nhé."
+    },
+    "allPlans": "Tất cả lộ trình",
+    "replaced": "Lộ trình này đã được thay bằng lộ trình mới hơn.",
+    "viewNewPlan": "Xem lộ trình mới",
+    "targetOutdatedWithSource": "Lộ trình này sinh theo <strong>mục tiêu cũ</strong>  ngưỡng vượt ải chưa áp mục tiêu hiện tại. Cập nhật lại ngay từ chính bài chẩn đoán cũ, <strong>không cần thi lại</strong>  tiến độ các ải đã vượt được giữ nguyên.",
+    "targetOutdatedNoSource": "Lộ trình này sinh theo <strong>mục tiêu cũ</strong>  ngưỡng vượt ải chưa áp mục tiêu hiện tại. Cập nhật lại ngay, <strong>không cần thi lại</strong>  tiến độ các ải đã vượt được giữ nguyên.",
+    "resyncNow": "Cập nhật theo mục tiêu mới",
+    "fromOtherTest": "Sinh lộ trình từ bài thi khác",
+    "titleMock": "Đã vượt hết ải  sẵn sàng thi thử!",
+    "titleNext": "Ải tiếp theo: {part} · {task}",
+    "titleDefault": "Chinh phục từng ải để chạm mục tiêu",
+    "stage": "Giai đoạn: {stage}",
+    "target": "Mục tiêu: {score} điểm",
+    "progress": "Tiến độ: <strong>{passed}/{total}</strong> ải đã xong",
+    "mockCtaHint": "Chấm lại độ sẵn sàng thật",
+    "enterTask": "Vào ải ngay",
+    "practiceSource": "Lộ trình này chẩn đoán từ một <strong>bài luyện theo phần</strong> nên chỉ phủ các phần đã luyện. Làm bài thi thử trọn đề rồi sinh lại để có lộ trình đầy đủ.",
+    "partsWithoutTasks": "Các phần thi sau chưa đạt mục tiêu nhưng tạm thời chưa có bài luyện, WinDe đang bổ sung:",
+    "roadmapTitle": "Bản đồ ải của bạn",
+    "roadmapDesc": "{parts} chặng · {tasks} ải. Mỗi chặng là một phần thi, mỗi ải là một lượt luyện ngắn về một chủ đề  đạt đủ % câu đúng là vượt ải."
+  },
+  "mockGuide": {
+    "heading": "Tiếp theo làm gì?",
+    "intro": "Bạn đã xong phần luyện ải. Còn 2 bước nữa để khép vòng lặp học:",
+    "step1Title": "Làm một bài thi thử trọn đề",
+    "step1Desc": "Bài thi thử đầy đủ chấm lại độ sẵn sàng thật sau khi luyện, chính xác hơn luyện lẻ từng phần.",
+    "chooseMock": "Chọn đề thi thử",
+    "step2Title": "Sinh lộ trình mới từ chính bài đó",
+    "step2Desc": "Hệ thống chẩn đoán lại điểm yếu từ bài mới và tạo lộ trình tiếp theo. Lặp đến khi đạt mục tiêu.",
+    "freshMock": "Bạn đã có bài mới hoàn thành:",
+    "score": "Điểm {score}",
+    "practiceNote": "(bài luyện theo phần, lộ trình sinh ra chỉ phủ các phần đã luyện)",
+    "generateFromThis": "Sinh lộ trình từ bài này",
+    "afterSubmit": "Sau khi nộp bài thi thử, quay lại đây  nút <strong>Sinh lộ trình từ bài này</strong> sẽ hiện sẵn để bạn không phải tự tìm."
+  },
+  "history": {
+    "notFound": "Không tìm thấy ải này trong lộ trình.",
+    "backToPlan": "Về lộ trình",
+    "continueTask": "Học tiếp ải này",
+    "status": "Trạng thái: {status}",
+    "passNeeded": "Cần ≥ {pass} để vượt ải",
+    "baseline": "Lúc chẩn đoán",
+    "wrongCount": "Sai {count} câu",
+    "best": "Tốt nhất khi luyện",
+    "deltaVsBaseline": "{delta}% vs chẩn đoán",
+    "attempts": "Số lần luyện",
+    "attemptsUnit": "lượt luyện",
+    "threshold": "Ngưỡng vượt ải",
+    "reached": "Đã đạt ngưỡng",
+    "remaining": "Còn {gap}%",
+    "progressCard": "Tiến triển (chẩn đoán → tốt nhất)",
+    "baselineTitle": "Ban đầu {value}",
+    "bestTitle": "Tốt nhất {value}",
+    "thresholdTitle": "Ngưỡng vượt ải {pass}%",
+    "passLegend": "Pass {pass}",
+    "baselineBadge": "Ban đầu",
+    "bestBadge": "Tốt nhất",
+    "resourceCard": "Tài liệu được gắn cho ải",
+    "sessionsCard": "Lịch sử các lần luyện",
+    "noSessions": "Chưa có lần luyện nào cho ải này.",
+    "table": {
+      "started": "Bắt đầu",
+      "submitted": "Nộp",
+      "questions": "Số câu",
+      "accuracy": "Độ chính xác",
+      "result": "Kết quả",
+      "review": "Bài làm"
+    },
+    "inProgress": "Đang làm",
+    "passed": "Đạt",
+    "failed": "Chưa đạt",
+    "viewAnswers": "Xem đáp án"
+  },
+  "compare": {
+    "title": "So sánh các lộ trình",
+    "examType": "Loại kỳ thi",
+    "generateFirst": "Sinh lộ trình đầu tiên",
+    "diffVsPrev": "({diff}% so với lộ trình #{sequence})",
+    "tasksPassed": "Ải đã qua:",
+    "sourceTest": "Bài thi nguồn:",
+    "viewResult": "Xem kết quả",
+    "createdAt": "Tạo: {date}",
+    "replacedBy": "Đã thay bằng lộ trình kế tiếp",
+    "details": "Chi tiết",
+    "continue": "Học tiếp"
+  },
+  "compareCharts": {
+    "status": "Trạng thái:",
+    "vsPrev": "So với lộ trình trước:",
+    "planCount": "Số plan",
+    "baseline": "Sẵn sàng ban đầu",
+    "latest": "Sẵn sàng mới nhất",
+    "growth": "Tăng từ plan đầu",
+    "active": "Đang học",
+    "chartTitle": "Tiến triển độ sẵn sàng qua các lộ trình",
+    "chartDesc": "Trục ngang: thứ tự lộ trình (1 → mới nhất). Cột = độ sẵn sàng ban đầu khi tạo lộ trình từ bài thi thử.",
+    "legendReadiness": "Độ sẵn sàng ban đầu",
+    "legendDiffVsPrev": "Chênh so với lộ trình trước",
+    "note": "Xanh dương = đang học · xanh lá = hoàn thành · xám = đã thay · đỏ = đã bỏ. Mốc ban đầu không đổi khi qua ải  chỉ bài thi thử mới + lộ trình mới mới tăng độ sẵn sàng."
+  },
+  "study": {
+    "submitError": "Nộp bài thất bại. Vui lòng thử lại.",
+    "cannotOpen": "Không mở được ải này.",
+    "mockDone": "Đã hoàn thành ải của từng phần. Làm bài thi thử đầy đủ để kiểm tra độ sẵn sàng.",
+    "mockHint": "Làm một bài <strong>thi thử trọn đề</strong>, sau đó quay lại trang lộ trình hệ thống sẽ gợi ý sinh lộ trình mới từ chính bài vừa làm.",
+    "pickTitle": "Chọn phần và ải để học",
+    "pickDesc": "Đọc tài liệu trong từng ải trước, sau đó bấm Học ải để luyện.",
+    "pickProgress": "Tiến độ: {passed}/{total} ải",
+    "studying": "Đang học",
+    "retakeBadge": "Luyện lại",
+    "tasksDone": "{passed}/{total} ải đã xong",
+    "passNeeded": "Cần ≥{pass}% để qua ải",
+    "question": "Câu {number}:",
+    "msqHint": "Chọn tất cả đáp án đúng:",
+    "submit": "Nộp bài",
+    "unanswered": {
+      "title": "Còn câu chưa trả lời",
+      "confirm": "Vẫn nộp bài",
+      "cancel": "Quay lại làm tiếp",
+      "message": "Bạn còn {count} câu chưa trả lời  các câu này sẽ bị tính là sai khi chấm. Vẫn nộp bài?"
+    }
+  },
+  "review": {
+    "taskHistory": "Lịch sử ải",
+    "noReview": "Không có bài làm nào cho lượt luyện này."
+  },
+  "result": {
+    "noResult": "Chưa có kết quả cho ải này."
+  },
+  "resultView": {
+    "title": "Chi tiết bài làm",
+    "passed": "Đã qua ải",
+    "failed": "Chưa qua ải",
+    "correct": "{correct}/{total} câu đúng",
+    "next": "Ải tiếp theo →",
+    "redo": "Làm lại ải này",
+    "pickAnother": "Chọn ải khác"
+  },
+  "congrats": {
+    "title": "Chúc mừng!",
+    "subtitle": "Bạn đã vượt toàn bộ ải của lộ trình",
+    "subtitleWithSequence": "Bạn đã vượt toàn bộ ải của lộ trình {sequence}",
+    "progress": "{total}/{total} ải hoàn thành",
+    "step1": "Làm một bài <strong>thi thử trọn đề</strong> để chấm lại độ sẵn sàng thật của bạn.",
+    "step2": "Quay lại trang lộ trình và <strong>sinh lộ trình mới từ chính bài đó</strong> lặp đến khi đạt mục tiêu.",
+    "later": "Để sau"
+  },
+  "taskList": {
+    "empty": "Chưa có ải trong lộ trình.",
+    "stage": "Chặng",
+    "partMeta": "<strong>{passed}/{total}</strong> ải đã xong",
+    "threshold": "ngưỡng đạt ≥{pass}%",
+    "completed": "Hoàn thành",
+    "stageEmpty": "Chặng này chưa có ải nào.",
+    "hint": "Bấm ải trên bản đồ để xem chi tiết",
+    "needToPass": "cần ≥{pass}% để vượt",
+    "resourceIntro": "Giới thiệu chặng (đọc trước)",
+    "resourceCount": "{count} tài liệu",
+    "start": "Xuất phát",
+    "end": "Hết chặng",
+    "nodeAria": "Ải {order}: {name}",
+    "youAreHere": "Bạn ở đây",
+    "capstoneShort": "Tổng hợp",
+    "retake": "Luyện lại",
+    "begin": "Bắt đầu",
+    "capstoneKicker": "Tổng hợp cuối chặng",
+    "taskKicker": "Ải {order}",
+    "recommended": "Nên làm tiếp",
+    "nearPass": "Sắp vượt · còn {gap}%",
+    "unpassedAttempts": "Đã làm {count} lượt · chưa qua",
+    "readFirst": "Tài liệu nên đọc trước",
+    "meterNotPracticed": "Chưa luyện · cần ≥{pass}%",
+    "meterReached": "<strong>{current}%</strong> · đã đạt ngưỡng",
+    "meterNeed": "<strong>{current}%</strong> · cần ≥{pass}%",
+    "meterGap": "còn {gap}%",
+    "wrongAtDiagnosis": "Sai {count} lúc chẩn đoán",
+    "perAttempt": "{count} câu / lượt",
+    "lockedCapstone": "Vượt hết ải phía trên để mở tổng hợp.",
+    "locked": "Hoàn thành các ải trước để mở ải này.",
+    "history": "Lịch sử",
+    "explain": "Xem giải thích"
+  }
+}

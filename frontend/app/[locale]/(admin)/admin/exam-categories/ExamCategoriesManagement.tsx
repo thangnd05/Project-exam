@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import {Badge, Button} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -11,7 +12,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/(admin)/_components/common';
+} from '@/app/[locale]/(admin)/_components/common';
 import {useExamCategories, type ExamCategoryItem} from './_hooks/useExamCategories';
 import type {ExamCategoryRequest} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
@@ -35,6 +36,7 @@ const buildPayload = (formState: ExamCategoryFormState): ExamCategoryRequest => 
 });
 
 function ExamCategoriesManagement() {
+  const t = useTranslations('AdminContent.examCategories');
   const {
     categories,
     isLoading: loading,
@@ -94,11 +96,11 @@ function ExamCategoriesManagement() {
     const normalizedCode = formState.code.trim();
     const normalizedName = formState.name.trim();
     if (!normalizedCode) {
-      setErrorMessage('Code không được để trống.');
+      setErrorMessage(t('errors.codeRequired'));
       return;
     }
     if (!normalizedName) {
-      setErrorMessage('Tên không được để trống.');
+      setErrorMessage(t('errors.nameRequired'));
       return;
     }
 
@@ -113,7 +115,7 @@ function ExamCategoriesManagement() {
       setShowFormModal(false);
       resetForm();
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu phân loại bài thi. Vui lòng thử lại.'));
+      setErrorMessage(getApiErrorMessage(error, t('errors.saveFailed')));
     }
   };
 
@@ -124,7 +126,7 @@ function ExamCategoriesManagement() {
       await deleteMutation.mutateAsync(deletingItem.examCategoryId);
       setDeletingItem(null);
     } catch {
-      setErrorMessage('Không thể xóa phân loại này.');
+      setErrorMessage(t('errors.deleteFailed'));
     }
   };
 
@@ -134,72 +136,72 @@ function ExamCategoriesManagement() {
       header: 'Code',
       render: (item: ExamCategoryItem) => <Badge bg="primary">{item.code}</Badge>,
     },
-    {key: 'name', header: 'Tên'},
+    {key: 'name', header: t('columns.name')},
     {
       key: 'guestAllowed',
       header: 'Guest',
       render: (item: ExamCategoryItem) =>
         item.guestAllowed ? (
-          <Badge bg="success">Cho phép</Badge>
+          <Badge bg="success">{t('allowed')}</Badge>
         ) : (
-          <Badge bg="secondary">Không</Badge>
+          <Badge bg="secondary">{t('no')}</Badge>
         ),
     },
     {
       key: 'certificateEligible',
-      header: 'Chứng chỉ',
+      header: t('columns.certificate'),
       render: (item: ExamCategoryItem) =>
         item.certificateEligible ? (
-          <Badge bg="warning" text="dark">Có cấp</Badge>
+          <Badge bg="warning" text="dark">{t('issued')}</Badge>
         ) : (
-          <Badge bg="secondary">Không</Badge>
+          <Badge bg="secondary">{t('no')}</Badge>
         ),
     },
-    {key: 'displayOrder', header: 'Thứ tự'},
-    {key: 'description', header: 'Mô tả', render: (item: ExamCategoryItem) => item.description || '-'},
+    {key: 'displayOrder', header: t('columns.order')},
+    {key: 'description', header: t('columns.description'), render: (item: ExamCategoryItem) => item.description || '-'},
   ];
 
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Phân loại bài thi"
-        description="Cấu hình các loại bài thi (Quick Challenge, Full Mock, Recovery...)  gán vào Test khi tạo đề."
+        title={t('title')}
+        description={t('description')}
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
-          Thêm phân loại
+          {t('add')}
         </Button>
       </AdminPageHeader>
 
       <AdminToolbar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="Tìm theo code, tên, mô tả..."
+        searchPlaceholder={t('searchPlaceholder')}
       />
       <AdminFieldError
         message={
           errorMessage ||
-          (isError ? 'Không thể tải danh sách phân loại bài thi.' : '')
+          (isError ? t('errors.loadFailed') : '')
         }
       />
 
       <AdminTable
         showIndex
         paginated
-        itemLabel="danh mục"
+        itemLabel={t('itemLabel')}
         columns={columns}
         data={filtered}
         loading={loading}
         getRowKey={(item: ExamCategoryItem) => item.examCategoryId}
         rowActions={(item: ExamCategoryItem) => (
           <>
-            <button onClick={() => openEditModal(item)} title="Sửa">
+            <button onClick={() => openEditModal(item)} title={t('edit')}>
               <Edit size={14} />
             </button>
             <button
               className="danger"
               onClick={() => setDeletingItem(item)}
-              title="Xóa"
+              title={t('delete')}
             >
               <Trash2 size={14} />
             </button>
@@ -228,8 +230,8 @@ function ExamCategoriesManagement() {
           setDeletingItem(null);
         }}
         onConfirm={handleConfirmDelete}
-        title="Xác nhận xóa phân loại"
-        message={`Bạn có chắc muốn xóa "${deletingItem?.name || ''}" không?`}
+        title={t('deleteTitle')}
+        message={t('deleteMessage', {name: deletingItem?.name || ''})}
       />
     </div>
   );

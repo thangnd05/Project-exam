@@ -3,6 +3,7 @@
 import { useEffect, useEffectEvent, useState } from 'react';
 import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import {
   BookOpen,
   CheckSquare,
@@ -40,6 +41,7 @@ import styles from './CreateTestFromBank.module.scss';
 const cx = classNames.bind(styles);
 
 const CreateTestFromBank = () => {
+  const t = useTranslations('TestCreatorBank');
   const [testInfo, setTestInfo] = useState(emptyTestInfo);
   const [notification, setNotification] = useState<{ type?: string; message?: string }>({});
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
@@ -109,7 +111,7 @@ const CreateTestFromBank = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!testInfo.title?.trim() || !testInfo.examTypeId) {
-      setNotification({ type: 'warning', message: 'Vui lòng điền tiêu đề và chọn loại kỳ thi.' });
+      setNotification({ type: 'warning', message: t('submit.titleRequired') });
       return;
     }
 
@@ -117,8 +119,7 @@ const CreateTestFromBank = () => {
     if (partsToAdd.length === 0) {
       setNotification({
         type: 'warning',
-        message:
-          'Vui lòng cấu hình ít nhất một part có câu hỏi (số câu > 0 hoặc chọn thủ công).',
+        message: t('submit.partRequired'),
       });
       return;
     }
@@ -139,12 +140,12 @@ const CreateTestFromBank = () => {
     <div className={cx('wrapper')}>
       <div className={cx('container')}>
         <PageHeader
-          label="Tạo đề thi"
-          title="Tạo đề thi từ kho câu hỏi"
+          label={t('page.label')}
+          title={t('page.title')}
           badgeLabel={
             <>
               <Library size={16} />
-              <span>Cấu hình từng Part (random hoặc chọn thủ công) rồi tạo đề từ kho cá nhân.</span>
+              <span>{t('page.badge')}</span>
             </>
           }
         />
@@ -163,26 +164,26 @@ const CreateTestFromBank = () => {
         <Form onSubmit={handleSubmit}>
           <div className={cx('configCard')}>
             <div className={cx('sectionTitle')}>
-              <Settings size={18} /> 1. Thông tin đề thi
+              <Settings size={18} /> 1. {t('info.section')}
             </div>
             <Row className="g-3">
               <Col md={8}>
                 <div className={cx('formGroup')}>
-                  <label>Tiêu đề đề thi *</label>
+                  <label>{t('info.title')}</label>
                   <input
                     type="text"
                     className={cx('input')}
                     value={testInfo.title}
                     onChange={(e) => setTestInfo({ ...testInfo, title: e.target.value })}
-                    placeholder="Nhập tiêu đề đề thi"
-                    aria-label="Tiêu đề đề thi"
+                    placeholder={t('info.titlePlaceholder')}
+                    aria-label={t('info.titleAria')}
                   />
                 </div>
               </Col>
               <Col md={4}>
                 <div className={cx('formGroup')}>
                   <label>
-                    <Clock size={14} /> Thời gian (phút)
+                    <Clock size={14} /> {t('info.duration')}
                   </label>
                   <input
                     type="number"
@@ -192,24 +193,24 @@ const CreateTestFromBank = () => {
                     onChange={(e) =>
                       setTestInfo({ ...testInfo, durationMinutes: e.target.value })
                     }
-                    placeholder="VD: 60"
-                    aria-label="Thời gian làm bài"
+                    placeholder={t('info.durationPlaceholder')}
+                    aria-label={t('info.durationAria')}
                   />
                 </div>
               </Col>
               <Col md={4}>
                 <div className={cx('formGroup')}>
-                  <label>Loại kỳ thi *</label>
+                  <label>{t('info.examType')}</label>
                   <select
                     className={cx('input')}
                     value={testInfo.examTypeId}
                     onChange={(e) => handleExamTypeChange(e.target.value)}
-                    aria-label="Loại kỳ thi"
+                    aria-label={t('info.examTypeAria')}
                   >
-                    <option value="">-- Chọn --</option>
-                    {examTypes.map((t) => (
-                      <option key={t.examTypeId} value={t.examTypeId}>
-                        {t.name}
+                    <option value="">{t('info.selectPlaceholder')}</option>
+                    {examTypes.map((type) => (
+                      <option key={type.examTypeId} value={type.examTypeId}>
+                        {type.name}
                       </option>
                     ))}
                   </select>
@@ -218,7 +219,7 @@ const CreateTestFromBank = () => {
               <Col md={4}>
                 <div className={cx('formGroup')}>
                   <label>
-                    <Rocket size={14} /> Số lượt làm tối đa
+                    <Rocket size={14} /> {t('info.maxAttempts')}
                   </label>
                   <input
                     type="number"
@@ -226,8 +227,8 @@ const CreateTestFromBank = () => {
                     className={cx('input')}
                     value={testInfo.maxAttempts}
                     onChange={(e) => setTestInfo({ ...testInfo, maxAttempts: e.target.value })}
-                    placeholder="Để trống = không giới hạn"
-                    aria-label="Số lượt làm"
+                    placeholder={t('info.maxAttemptsPlaceholder')}
+                    aria-label={t('info.maxAttemptsAria')}
                   />
                 </div>
               </Col>
@@ -239,16 +240,16 @@ const CreateTestFromBank = () => {
               />
               <Col md={4}>
                 <div className={cx('formGroup')}>
-                  <label>Phân loại bài thi (tuỳ chọn)</label>
+                  <label>{t('info.category')}</label>
                   <select
                     className={cx('input')}
                     value={testInfo.examCategoryId}
                     onChange={(e) =>
                       setTestInfo({ ...testInfo, examCategoryId: e.target.value })
                     }
-                    aria-label="Phân loại bài thi"
+                    aria-label={t('info.categoryAria')}
                   >
-                    <option value="">-- Không phân loại --</option>
+                    <option value="">{t('info.noCategory')}</option>
                     {examCategories.map((c) => (
                       <option key={c.examCategoryId} value={c.examCategoryId}>
                         {c.name}
@@ -259,14 +260,14 @@ const CreateTestFromBank = () => {
               </Col>
               <Col md={12}>
                 <div className={cx('formGroup')}>
-                  <label>Mô tả</label>
+                  <label>{t('info.description')}</label>
                   <textarea
                     className={cx('input')}
                     rows={2}
                     value={testInfo.description}
                     onChange={(e) => setTestInfo({ ...testInfo, description: e.target.value })}
-                    placeholder="Mô tả ngắn (tùy chọn)"
-                    aria-label="Mô tả đề thi"
+                    placeholder={t('info.descriptionPlaceholder')}
+                    aria-label={t('info.descriptionAria')}
                   />
                 </div>
               </Col>
@@ -276,13 +277,10 @@ const CreateTestFromBank = () => {
           {testInfo.examTypeId && (examParts || []).length > 0 && (
             <div className={cx('configCard')}>
               <div className={cx('sectionTitle')}>
-                <Library size={18} /> 2. Cấu hình từng Part
+                <Library size={18} /> 2. {t('parts.section')}
               </div>
               <p className={cx('hint')}>
-                Mỗi part: <strong>Random theo số lượng</strong> (BE lấy ngẫu nhiên từ kho cá
-                nhân) hoặc <strong>Chọn thủ công</strong>. Với part có passage (vd. Part 3, 4,
-                6, 7): chọn theo <strong>nhóm (cùng passage)</strong> để giữ tính tương đồng,
-                không chọn lẻ từng câu.
+                {t.rich('page.hint', { strong: (chunks) => <strong>{chunks}</strong> })}
               </p>
 
               {examParts.map((part) => {
@@ -302,7 +300,7 @@ const CreateTestFromBank = () => {
                       <span className={cx('partName')}>
                         <BookOpen size={20} /> {part.name}
                       </span>
-                      <span className={cx('partBadge')}>{count} câu</span>
+                      <span className={cx('partBadge')}>{t('parts.questionCount', { count })}</span>
                       {cfg.expanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
                     </button>
 
@@ -319,7 +317,7 @@ const CreateTestFromBank = () => {
                             }
                             aria-pressed={cfg.mode === SELECTION_MODES.RANDOM}
                           >
-                            <Shuffle size={18} /> Random theo số lượng
+                            <Shuffle size={18} /> {t('modes.random')}
                           </button>
                           <button
                             type="button"
@@ -335,7 +333,7 @@ const CreateTestFromBank = () => {
                             }
                             aria-pressed={cfg.mode === SELECTION_MODES.SEQUENTIAL}
                           >
-                            <Rocket size={18} /> Lấy tuần tự
+                            <Rocket size={18} /> {t('modes.sequential')}
                           </button>
                           <button
                             type="button"
@@ -347,13 +345,13 @@ const CreateTestFromBank = () => {
                             }
                             aria-pressed={cfg.mode === SELECTION_MODES.MANUAL}
                           >
-                            <CheckSquare size={18} /> Chọn thủ công
+                            <CheckSquare size={18} /> {t('modes.manual')}
                           </button>
                         </div>
 
                         {cfg.mode === SELECTION_MODES.RANDOM && (
                           <div className={cx('randomRow')}>
-                            <label className={cx('randomLabel')}>Số câu lấy ngẫu nhiên:</label>
+                            <label className={cx('randomLabel')}>{t('parts.randomCount')}</label>
                             <input
                               type="number"
                               min={0}
@@ -363,10 +361,10 @@ const CreateTestFromBank = () => {
                               onChange={(e) =>
                                 updatePartConfig(part.examPartId, 'randomCount', e.target.value)
                               }
-                              aria-label={`Số câu random ${part.name}`}
+                              aria-label={t('parts.randomAria', { part: part.name ?? '' })}
                             />
                             <span className={cx('randomHint')}>
-                              Tối đa {maxInBank} câu trong kho
+                              {t('parts.maxInBank', { count: maxInBank })}
                             </span>
                           </div>
                         )}
@@ -376,7 +374,7 @@ const CreateTestFromBank = () => {
                             className={cx('randomRow')}
                             style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}
                           >
-                            <label className={cx('randomLabel')}>Từ câu:</label>
+                            <label className={cx('randomLabel')}>{t('parts.fromIndex')}</label>
                             <input
                               type="number"
                               min={1}
@@ -386,9 +384,9 @@ const CreateTestFromBank = () => {
                               onChange={(e) =>
                                 updatePartConfig(part.examPartId, 'fromIndex', e.target.value)
                               }
-                              aria-label={`Từ câu ${part.name}`}
+                              aria-label={t('parts.fromAria', { part: part.name ?? '' })}
                             />
-                            <label className={cx('randomLabel')}>Đến câu:</label>
+                            <label className={cx('randomLabel')}>{t('parts.toIndex')}</label>
                             <input
                               type="number"
                               min={1}
@@ -398,10 +396,10 @@ const CreateTestFromBank = () => {
                               onChange={(e) =>
                                 updatePartConfig(part.examPartId, 'toIndex', e.target.value)
                               }
-                              aria-label={`Đến câu ${part.name}`}
+                              aria-label={t('parts.toAria', { part: part.name ?? '' })}
                             />
                             <span className={cx('randomHint')}>
-                              Tối đa {maxInBank} câu trong kho
+                              {t('parts.maxInBank', { count: maxInBank })}
                             </span>
                           </div>
                         )}
@@ -409,13 +407,13 @@ const CreateTestFromBank = () => {
                         {cfg.loading && (
                           <div className={cx('loadingWrap')}>
                             <Spinner animation="border" size="sm" />{' '}
-                            <span>Đang tải câu hỏi...</span>
+                            <span>{t('parts.loading')}</span>
                           </div>
                         )}
 
                         {!cfg.loading && maxInBank === 0 && (
                           <Alert variant="info" className="mb-0 mt-2">
-                            Chưa có câu hỏi trong kho (cá nhân) cho part này.
+                            {t('page.noQuestions')}
                           </Alert>
                         )}
 
@@ -430,12 +428,12 @@ const CreateTestFromBank = () => {
                                   <Form.Check
                                     type="checkbox"
                                     id={`select-all-${part.examPartId}`}
-                                    label={`Chọn tất cả (${maxInBank} câu)`}
+                                    label={t('parts.selectAll', { count: maxInBank })}
                                     checked={allSelected}
                                     onChange={(e) =>
                                       toggleSelectAll(part.examPartId, e.target.checked)
                                     }
-                                    aria-label={`Chọn tất cả ${part.name}`}
+                                    aria-label={t('parts.selectAllAria', { part: part.name ?? '' })}
                                   />
                                 </div>
                                 <div className={cx('groupList')}>
@@ -448,8 +446,8 @@ const CreateTestFromBank = () => {
                                       );
                                       const grLabel =
                                         gr.passageId != null
-                                          ? `Nhóm passage (${gr.questions.length} câu)`
-                                          : `Câu độc lập (${gr.questions.length} câu)`;
+                                          ? t('parts.passageGroup', { count: gr.questions.length })
+                                          : t('parts.standalone', { count: gr.questions.length });
                                       const groupStartOffset = listOffset;
                                       listOffset += gr.questions.length;
                                       return (
@@ -491,7 +489,7 @@ const CreateTestFromBank = () => {
                                                     {displayNo}.
                                                   </span>
                                                   <span className={cx('questionText')}>
-                                                    {q.questionText || '(Không có nội dung)'}
+                                                    {q.questionText || t('parts.noContent')}
                                                   </span>
                                                   <button
                                                     type="button"
@@ -500,7 +498,7 @@ const CreateTestFromBank = () => {
                                                       setEditingPartId(part.examPartId);
                                                       setEditingQuestionId(id);
                                                     }}
-                                                    title="Sửa câu hỏi này"
+                                                    title={t('parts.editQuestion')}
                                                   >
                                                     <Pencil size={18} />
                                                   </button>
@@ -523,7 +521,7 @@ const CreateTestFromBank = () => {
               })}
 
               <p className={cx('totalCount')}>
-                Tổng số câu sẽ đưa vào đề: <strong>{totalSelected}</strong>
+                {t.rich('parts.total', { count: totalSelected, strong: (chunks) => <strong>{chunks}</strong> })}
               </p>
             </div>
           )}
@@ -541,11 +539,11 @@ const CreateTestFromBank = () => {
             >
               {createTestMutation.isPending ? (
                 <>
-                  <Spinner animation="border" size="sm" /> Đang tạo đề...
+                  <Spinner animation="border" size="sm" /> {t('submit.creating')}
                 </>
               ) : (
                 <>
-                  <Rocket size={16} /> Tạo đề thi từ kho
+                  <Rocket size={16} /> {t('submit.submit')}
                 </>
               )}
             </ButtonPrime>

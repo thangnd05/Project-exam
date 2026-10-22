@@ -1,49 +1,65 @@
 'use client';
 
-import Link from 'next/link';
+import NextLink from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { FiMail } from 'react-icons/fi';
 
 import { imageAssets } from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
+import Link, { useLanguageSwitch } from '@/app/i18n/navigation';
+import { LOCALE_LABELS } from '@/app/i18n/routing';
 
 import styles from './footer.module.scss';
 
 const CONTACT_EMAIL = 'contact@frostscope.com';
 const DISPUTE_EMAIL = 'dispute@frostscope.com';
 
-type FooterLink = { label: string; href: string };
+type FooterLabelKey =
+  | 'examTypes'
+  | 'certifications'
+  | 'leaderboard'
+  | 'quickTest'
+  | 'generatePlan'
+  | 'about'
+  | 'contact'
+  | 'policy'
+  | 'terms';
+
+type FooterLink = { labelKey: FooterLabelKey; href: string };
 
 // Bố cục theo mẫu FrostScope: thương hiệu (2 cột) + Luyện thi + Về chúng tôi + Pháp lý.
-const COLUMNS: { title: string; links: FooterLink[]; note?: string }[] = [
+const COLUMNS: { titleKey: 'practice' | 'aboutUs' | 'legal'; links: FooterLink[]; noteKey?: 'trademarkNote' }[] = [
   {
-    title: 'Luyện thi',
+    titleKey: 'practice',
     links: [
-      { label: 'Kho đề thi', href: routes.examTypes },
-      { label: 'Chứng chỉ', href: `${routes.home}#certifications` },
-      { label: 'Bảng xếp hạng', href: `${routes.home}#rankscope` },
-      { label: 'Kiểm tra nhanh', href: `${routes.home}#hero` },
-      { label: 'Tạo lộ trình học', href: routes.generatePlan },
+      { labelKey: 'examTypes', href: routes.examTypes },
+      { labelKey: 'certifications', href: `${routes.home}#certifications` },
+      { labelKey: 'leaderboard', href: `${routes.home}#rankscope` },
+      { labelKey: 'quickTest', href: `${routes.home}#hero` },
+      { labelKey: 'generatePlan', href: routes.generatePlan },
     ],
   },
   {
-    title: 'Về chúng tôi',
+    titleKey: 'aboutUs',
     links: [
-      { label: 'About us', href: routes.about },
-      { label: 'Contact', href: `mailto:${CONTACT_EMAIL}` },
+      { labelKey: 'about', href: routes.about },
+      { labelKey: 'contact', href: `mailto:${CONTACT_EMAIL}` },
     ],
   },
   {
-    title: 'Pháp lý',
+    titleKey: 'legal',
     links: [
-      { label: 'Chính sách', href: routes.policy },
-      { label: 'Điều khoản và điều kiện', href: routes.service },
+      { labelKey: 'policy', href: routes.policy },
+      { labelKey: 'terms', href: routes.service },
     ],
-    note: 'All related logos are trademarks of their respective owners.',
+    noteKey: 'trademarkNote',
   },
 ];
 
 function Footer() {
+  const t = useTranslations('Layout.footer');
+  const language = useLanguageSwitch();
   const year = new Date().getFullYear();
 
   return (
@@ -51,45 +67,57 @@ function Footer() {
       <div className={styles.container}>
         <div className={styles.top}>
           <div className={styles.brandCol}>
-            <Link href={routes.home} className={styles.brand} aria-label="FrostScope - Trang chủ">
+            <Link href={routes.home} className={styles.brand} aria-label={t('homeAria')}>
               <Image src={imageAssets.frostscopeLogoWhite} alt="FrostScope" width={152} height={32} />
             </Link>
-            <p className={styles.tagline}>Nền tảng ôn thi chứng chỉ Cloud cá nhân hóa</p>
-            <p className={styles.description}>
-              Đánh giá năng lực Cloud &amp; DevOps, nhận diện điểm yếu và luyện thi chứng chỉ theo đúng phần
-              kiến thức bạn cần cải thiện.
-            </p>
+            <p className={styles.tagline}>{t('tagline')}</p>
+            <p className={styles.description}>{t('description')}</p>
             <a href={`mailto:${CONTACT_EMAIL}`} className={styles.mail}>
               <FiMail aria-hidden="true" />
               <span>{CONTACT_EMAIL}</span>
             </a>
           </div>
 
-          {COLUMNS.map(({ title, links, note }) => (
-            <nav key={title} className={styles.linkCol} aria-label={title}>
-              <p className={styles.colTitle}>{title}</p>
+          {COLUMNS.map(({ titleKey, links, noteKey }) => (
+            <nav key={titleKey} className={styles.linkCol} aria-label={t(titleKey)}>
+              <p className={styles.colTitle}>{t(titleKey)}</p>
               <ul className={styles.linkList}>
-                {links.map(({ label, href }) => (
-                  <li key={label}>
+                {links.map(({ labelKey, href }) => (
+                  <li key={labelKey}>
                     <Link className={styles.footerLink} href={href}>
-                      {label}
+                      {t(labelKey)}
                     </Link>
                   </li>
                 ))}
-                {note && <li className={styles.note}>{note}</li>}
+                {noteKey && <li className={styles.note}>{t(noteKey)}</li>}
               </ul>
             </nav>
           ))}
         </div>
 
         <div className={styles.bottom}>
-          <span>Bản quyền {year} FrostScope. Nền tảng ôn thi chứng chỉ Cloud cá nhân hóa.</span>
+          <span>{t('copyright', { year })}</span>
           <div className={styles.bottomLinks}>
-            <Link href={routes.policy}>Chính sách</Link>
-            <Link href={routes.service}>Điều khoản và điều kiện</Link>
+            <Link href={routes.policy}>{t('policy')}</Link>
+            <Link href={routes.service}>{t('terms')}</Link>
             <a href={`mailto:${DISPUTE_EMAIL}`} className={styles.accentLink}>
               {DISPUTE_EMAIL}
             </a>
+            <nav aria-label={t('language')} className={styles.languageLinks}>
+              {language.locales.map((value) => (
+                // NextLink trực tiếp vì href đã là đường dẫn đích của từng ngôn ngữ.
+                <NextLink
+                  key={value}
+                  href={language.hrefFor(value)}
+                  hrefLang={value}
+                  lang={value}
+                  aria-current={language.locale === value ? 'true' : undefined}
+                  className={language.locale === value ? styles.languageActive : undefined}
+                >
+                  {LOCALE_LABELS[value]}
+                </NextLink>
+              ))}
+            </nav>
           </div>
         </div>
       </div>

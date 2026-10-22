@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { PlusCircle, Trash, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import styles from '@/app/features/tests/CreateTestModal.module.scss';
 import TagSelector from '@/app/features/tests/TagSelector/TagSelector';
 import type {
@@ -43,16 +44,16 @@ function LocalFilePreview({ file }: { file: File }) {
     return null;
 }
 
-const getQuestionSummary = (question: DraftQuestion) => {
+const getQuestionSummary = (question: DraftQuestion, t: ReturnType<typeof useTranslations<'TestCreator'>>) => {
     const text = (question.questionText || '').trim();
     const preview = text
         ? (text.length > 60 ? `${text.slice(0, 60)}…` : text)
-        : 'Chưa có nội dung';
+        : t('questionBlock.noContent');
     const answers = question.answers || [];
     const correctCount = answers.filter((a) => a.isCorrect).length;
-    const parts = [preview, `${answers.length} đáp án`];
+    const parts = [preview, t('questionBlock.answerCount', { count: answers.length })];
     if (correctCount > 0) {
-        parts.push(`${correctCount} đúng`);
+        parts.push(t('questionBlock.correctCount', { count: correctCount }));
     }
     return parts.join(' · ');
 };
@@ -99,6 +100,7 @@ const QuestionBlock = ({
     onToggleCollapsed,
     tagWarning,
 }: QuestionBlockProps) => {
+    const t = useTranslations('TestCreator');
     const selectedTagIds = question.tagIds || [];
     const isMsq = question.questionType === 'MSQ';
     const collapsed = collapsible && isCollapsed;
@@ -111,21 +113,21 @@ const QuestionBlock = ({
                         className={cx('groupToggleBtn')}
                         onClick={() => onToggleCollapsed?.(index)}
                         aria-expanded={!isCollapsed}
-                        aria-label={isCollapsed ? `Mở câu hỏi số ${index + 1}` : `Thu gọn câu hỏi số ${index + 1}`}
+                        aria-label={isCollapsed ? t('questionBlock.expand', { number: index + 1 }) : t('questionBlock.collapse', { number: index + 1 })}
                     >
                         {isCollapsed ? <ChevronRight size={20} /> : <ChevronDown size={20} />}
-                        <h4 className={cx('groupTitle')}>Câu hỏi số {index + 1}</h4>
-                        <span className={cx('groupSummaryBadge')}>{getQuestionSummary(question)}</span>
+                        <h4 className={cx('groupTitle')}>{t('questionBlock.title', { number: index + 1 })}</h4>
+                        <span className={cx('groupSummaryBadge')}>{getQuestionSummary(question, t)}</span>
                         {tagWarning && <span className={cx('tagWarningBadge')}>{tagWarning}</span>}
                     </button>
                 ) : (
                     <b>
-                        Câu hỏi số {index + 1}
+                        {t('questionBlock.title', { number: index + 1 })}
                         {tagWarning && <span className={cx('tagWarningBadge')}>{tagWarning}</span>}
                     </b>
                 )}
                 <div className="d-flex align-items-center gap-3">
-                    <label className="d-flex align-items-center gap-1 mb-0" style={{ fontSize: '1.3rem', cursor: 'pointer' }} title="Cho phép nhiều đáp án đúng (chấm đúng-hết)">
+                    <label className="d-flex align-items-center gap-1 mb-0" style={{ fontSize: '1.3rem', cursor: 'pointer' }} title={t('questionBlock.multipleCorrectHint')}>
                         <input
                             type="checkbox"
                             checked={isMsq}
@@ -133,7 +135,7 @@ const QuestionBlock = ({
                                 updateQuestionFieldFn?.(index, 'questionType', e.target.checked ? 'MSQ' : 'MCQ')
                             }
                         />
-                        Nhiều đáp án đúng
+                        {t('questionBlock.multipleCorrect')}
                     </label>
                     <Button
                         variant="link"
@@ -150,7 +152,7 @@ const QuestionBlock = ({
             <>
             <input
                 className={cx('inputModern', 'mb-3')}
-                placeholder="Nhập nội dung câu hỏi..."
+                placeholder={t('questionBlock.questionPlaceholder')}
                 value={question.questionText}
                 onChange={(e) => updateQuestionTextFn(index, e.target.value)}
             />
@@ -171,7 +173,7 @@ const QuestionBlock = ({
             )}
             {withMedia && (
                 <div className="mb-3">
-                    <label className="fw-bold mb-1 d-block">Phương tiện (nếu có)</label>
+                    <label className="fw-bold mb-1 d-block">{t('questionBlock.media')}</label>
                     <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
                         <input
                             type="file"
@@ -183,16 +185,16 @@ const QuestionBlock = ({
                                 addMediaFilesFn(index, e.target.files);
                                 e.target.value = '';
                             }}
-                            aria-label="Thêm file"
+                            aria-label={t('questionBlock.addFile')}
                         />
                     </div>
                     <input
                         type="text"
                         className={cx('inputModern')}
-                        placeholder="Hoặc điền URL phương tiện (audio/image/document)..."
+                        placeholder={t('questionBlock.mediaUrlPlaceholder')}
                         value={question.mediaUrl || ''}
                         onChange={(e) => updateQuestionFieldFn?.(index, 'mediaUrl', e.target.value)}
-                        aria-label="Điền URL phương tiện"
+                        aria-label={t('questionBlock.mediaUrlAria')}
                     />
                     {question.mediaFiles?.length > 0 && (
                         <ul className="list-unstyled mb-0 mt-2">
@@ -203,7 +205,7 @@ const QuestionBlock = ({
                                         type="button"
                                         className="btn btn-sm btn-outline-danger p-0 px-1"
                                         onClick={() => removeMediaFileFn(index, fIdx)}
-                                        aria-label={`Xóa ${file.name}`}
+                                        aria-label={t('questionBlock.removeFile', { name: file.name })}
                                     >
                                         <Trash size={14} />
                                     </button>
@@ -228,14 +230,14 @@ const QuestionBlock = ({
                             <input
                                 className={cx('inputModern', 'ms-2')}
                                 value={ans.answerText}
-                                placeholder={`Đáp án ${ans.answerLabel}`}
+                                placeholder={t('questionBlock.answerPlaceholder', { label: ans.answerLabel })}
                                 onChange={(e) => updateAnswerFn(index, aIndex, 'answerText', e.target.value)}
                             />
                             <button
                                 type="button"
                                 className="btn btn-sm btn-outline-danger ms-2"
                                 onClick={() => removeAnswerFn?.(index, aIndex)}
-                                aria-label={`Xóa đáp án ${ans.answerLabel}`}
+                                aria-label={t('questionBlock.removeAnswer', { label: ans.answerLabel })}
                             >
                                 <Trash size={14} />
                             </button>
@@ -250,15 +252,15 @@ const QuestionBlock = ({
                     onClick={() => addAnswerFn?.(index)}
                 >
                     <PlusCircle size={16} className="me-1" />
-                    Thêm đáp án
+                    {t('questionBlock.addAnswer')}
                 </button>
             </div>
             <div className="mt-3">
-                <label className="fw-bold mb-1 d-block">Giải thích đáp án (không bắt buộc)</label>
+                <label className="fw-bold mb-1 d-block">{t('questionBlock.explanation')}</label>
                 <textarea
                     className={cx('inputModern', 'explanationTextarea')}
                     rows={6}
-                    placeholder="Nhập giải thích đáp án (hiển thị cho học sinh khi xem lại bài)..."
+                    placeholder={t('questionBlock.explanationPlaceholder')}
                     value={question.explanation || ''}
                     onChange={(e) => updateQuestionFieldFn?.(index, 'explanation', e.target.value)}
                 />

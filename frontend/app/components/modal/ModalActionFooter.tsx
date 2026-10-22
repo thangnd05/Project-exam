@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import styles from './CommonFormModal.module.scss';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
@@ -17,14 +18,16 @@ type ModalActionFooterProps = {
 };
 
 function ModalActionFooter({
-  cancelLabel = 'Hủy',
-  submitLabel = 'Lưu',
+  cancelLabel,
+  submitLabel,
   loadingLabel,
   loading = false,
   onCancel,
   onSubmit,
   submitIcon: SubmitIcon,
 }: ModalActionFooterProps) {
+  const t = useTranslations('Common');
+  const submitText = submitLabel ?? t('save');
 
   return (
     <>
@@ -36,7 +39,7 @@ function ModalActionFooter({
         onClick={onCancel}
         disabled={loading}
       >
-        {cancelLabel}
+        {cancelLabel ?? t('cancelShort')}
       </ButtonPrime>
 
       <ButtonPrime
@@ -48,7 +51,7 @@ function ModalActionFooter({
         disabled={loading}
       >
         {SubmitIcon ? <SubmitIcon className="me-2" /> : null}
-        {loading ? loadingLabel || submitLabel : submitLabel}
+        {loading ? loadingLabel || submitText : submitText}
       </ButtonPrime>
     </>
   );

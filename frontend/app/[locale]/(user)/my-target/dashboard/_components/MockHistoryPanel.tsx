@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useQueries, type UseQueryResult } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { ChevronDown } from 'lucide-react';
@@ -16,7 +17,7 @@ import type { EnhancedResultResponse } from '@/app/types';
 import type { ScoreScaleSource } from '@/app/features/exam-types/scoreScale';
 import dynamic from 'next/dynamic';
 import type { MockChartPoint } from './MockHistoryCharts';
-import { useMockHistory } from '@/app/(user)/my-target/dashboard/_hooks/useMockHistory';
+import { useMockHistory } from '@/app/[locale]/(user)/my-target/dashboard/_hooks/useMockHistory';
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './MockHistoryPanel.module.scss';
 
@@ -58,6 +59,7 @@ type MockHistoryPanelProps = {
 };
 
 function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistoryPanelProps) {
+  const tm = useTranslations('MyTarget');
   const [tableOpen, setTableOpen] = useState(false);
   const [page, setPage] = useState(0);
 
@@ -160,11 +162,14 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
     <section className={ui('card')} aria-labelledby="mock-history-title">
       <div className={ui('cardHead')}>
         <h3 id="mock-history-title" className={ui('cardTitle')}>
-          Tiến triển qua các bài đã làm
+          {tm('mockHistory.title')}
         </h3>
         {totalElements > 0 && (
           <span className={ui('cardMeta')}>
-            <strong>{totalElements}</strong> bài thi đầy đủ
+            {tm.rich('mockHistory.count', {
+              count: totalElements,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </span>
         )}
       </div>
@@ -178,9 +183,9 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
 
       {!loading && totalElements === 0 && (
         <div className={ui('notice', 'noticeInfo')} style={{ marginBottom: 0 }}>
-          <span>Chưa có bài thi đầy đủ nào để thống kê.</span>
+          <span>{tm('mockHistory.empty')}</span>
           <Link href="/" className={ui('btnPrimary', 'btnSm')}>
-            Làm bài đầu tiên
+            {tm('mockHistory.firstTest')}
           </Link>
         </div>
       )}
@@ -203,7 +208,9 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
           aria-expanded={tableOpen}
         >
           <ChevronDown size={16} className={cx('toggleIcon', { toggleIconOpen: tableOpen })} />
-          {tableOpen ? 'Ẩn bảng chi tiết' : `Xem bảng chi tiết (${totalElements} bài)`}
+          {tableOpen
+            ? tm('mockHistory.hideTable')
+            : tm('mockHistory.showTable', { count: totalElements })}
         </button>
       )}
 
@@ -214,12 +221,12 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Hoàn thành</th>
-                  <th>Tên bài kiểm tra</th>
-                  <th className={cx('right')}>Điểm</th>
-                  <th className={cx('right')}>Độ sẵn sàng</th>
-                  <th>Mục tiêu</th>
-                  <th>Thời gian</th>
+                  <th>{tm('mockHistory.table.finished')}</th>
+                  <th>{tm('mockHistory.table.testName')}</th>
+                  <th className={cx('right')}>{tm('mockHistory.table.score')}</th>
+                  <th className={cx('right')}>{tm('mockHistory.table.readiness')}</th>
+                  <th>{tm('mockHistory.table.target')}</th>
+                  <th>{tm('mockHistory.table.duration')}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -250,18 +257,18 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
                             className={ui('textBtn')}
                             onClick={() => loadEnhanced(t.userTestId)}
                           >
-                            Tải
+                            {tm('mockHistory.table.load')}
                           </button>
                         )}
                       </td>
                       <td>
                         {enhancedLoaded ? (
                           e.isTargetMet === true ? (
-                            <span className={ui('pill', 'pillSuccess')}>Đạt</span>
+                            <span className={ui('pill', 'pillSuccess')}>{tm('mockHistory.table.met')}</span>
                           ) : e.isTargetMet === false ? (
-                            <span className={ui('pill', 'pillWarning')}>Chưa đạt</span>
+                            <span className={ui('pill', 'pillWarning')}>{tm('mockHistory.table.notMet')}</span>
                           ) : (
-                            <span className={ui('pill')}>Chưa đặt</span>
+                            <span className={ui('pill')}>{tm('mockHistory.table.notSet')}</span>
                           )
                         ) : (
                           '-'
@@ -273,7 +280,7 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
                           href={`/tests/result/${t.userTestId}`}
                           className={ui('btnSecondary', 'btnSm')}
                         >
-                          Chẩn đoán
+                          {tm('mockHistory.table.diagnose')}
                         </Link>
                       </td>
                     </tr>

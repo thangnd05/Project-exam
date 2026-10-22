@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import { useTargetAchieved } from '@/app/features/my-target/hooks/useTargetAchieved';
@@ -13,6 +14,8 @@ import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss'
 const cx = classNames.bind(styles);
 
 function TargetAchieved() {
+  const t = useTranslations('MyTarget');
+  const tCommon = useTranslations('Common');
   const searchParams = useSearchParams();
   // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ngay khi danh sách về (xem bên dưới).
   const [examTypeId, setExamTypeId] = useState('');
@@ -36,13 +39,13 @@ function TargetAchieved() {
     <div className={cx('wrapper')}>
       <div className={cx('headerBar')}>
         <ButtonPrime as="link" href="/my-target/dashboard" variant="ghost" size="sm">
-          ← Tổng quan mục tiêu
+          {t('achieved.back')}
         </ButtonPrime>
       </div>
 
       <div className={cx('filterRow')}>
         <div className={cx('fieldGroup')}>
-          <label className={cx('fieldLabel')}>Loại kỳ thi</label>
+          <label className={cx('fieldLabel')}>{t('achieved.examType')}</label>
           <select
             className={cx('select')}
             value={examTypeId}
@@ -56,13 +59,13 @@ function TargetAchieved() {
       </div>
 
       {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
-      {loading && <div className={cx('loading')}>Đang tải...</div>}
+      {loading && <div className={cx('loading')}>{tCommon('loading')}</div>}
 
       {!loading && !target?.hasTarget && (
         <div className={cx('alert', 'alertInfo')}>
-          <span>Bạn chưa đặt mục tiêu cho kỳ thi này.</span>
+          <span>{t('achieved.noTarget')}</span>
           <ButtonPrime as="link" href={withExam('/my-target', examTypeId, examTypes)} variant="primary" size="sm">
-            Đặt mục tiêu
+            {t('achieved.setTarget')}
           </ButtonPrime>
         </div>
       )}
@@ -70,9 +73,12 @@ function TargetAchieved() {
       {!loading && target?.hasTarget && !isAchieved && (
         <div className={cx('alert', 'alertWarning')}>
           <span>
-            Bài thi thử gần nhất chưa đạt mục tiêu {target.targetScore} điểm.{' '}
+            {t('achieved.notMet', { score: target.targetScore ?? 0 })}{' '}
             {enhanced?.totalScore != null && (
-              <>Điểm gần nhất: <strong>{enhanced.totalScore}</strong>.</>
+              <>{t.rich('achieved.latestScore', {
+                score: enhanced.totalScore,
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}</>
             )}
           </span>
           <ButtonPrime
@@ -81,7 +87,7 @@ function TargetAchieved() {
             variant="outline"
             size="sm"
           >
-            Xem tiến độ
+            {t('achieved.viewProgress')}
           </ButtonPrime>
         </div>
       )}
@@ -89,30 +95,39 @@ function TargetAchieved() {
       {!loading && isAchieved && target && (
         <>
           <div className={cx('hero')}>
-            <h1 className={cx('heroTitle')}>Bạn đã đạt mục tiêu!</h1>
+            <h1 className={cx('heroTitle')}>{t('achieved.heroTitle')}</h1>
             <p className={cx('heroSubtitle')}>
-              Mục tiêu: <strong>{target.targetScore}</strong>
+              {t.rich('achieved.heroTarget', {
+                score: target.targetScore ?? '',
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
               {enhancedMatches && enhanced?.totalScore != null && target.targetScore != null && (
                 <>
-                  {' · '}Điểm đạt được:{' '}
-                  <strong className={cx('successText')}>{enhanced.totalScore}</strong>
-                  {' '}(+{enhanced.totalScore - target.targetScore})
+                  {' · '}
+                  {t.rich('achieved.heroScore', {
+                    score: enhanced.totalScore,
+                    diff: enhanced.totalScore - target.targetScore,
+                    strong: (chunks) => <strong className={cx('successText')}>{chunks}</strong>,
+                  })}
                 </>
               )}
             </p>
             <p className={cx('heroMeta')}>
               {target.achievedAt
-                ? <>Đạt mục tiêu lúc: {formatDate(target.achievedAt)}</>
-                : <>Bài thi thử đạt mục tiêu: {formatDate(latestMock?.finishedAt)}</>}
+                ? <>{t('achieved.achievedAt', { date: formatDate(target.achievedAt) })}</>
+                : <>{t('achieved.mockAchieved', { date: formatDate(latestMock?.finishedAt) })}</>}
             </p>
           </div>
 
           <div className={cx('card')}>
-            <div className={cx('cardHeader')}>Mục tiêu tiếp theo</div>
+            <div className={cx('cardHeader')}>{t('achieved.nextTarget.title')}</div>
             <div className={cx('cardBody')}>
               {/* Mục tiêu do người dùng tự đặt nên không gợi ý mức điểm. */}
               <p className={cx('muted')} style={{ marginBottom: '1.6rem' }}>
-                Bạn vừa hoàn thành chặng <strong>{target.targetScore}</strong>. Muốn đặt mức mới, hãy vào trang Mục tiêu và tự nhập điểm.
+                {t.rich('achieved.nextTarget.description', {
+                  score: target.targetScore ?? '',
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
               </p>
               <ButtonPrime
                 as="link"
@@ -120,34 +135,34 @@ function TargetAchieved() {
                 variant="outline"
                 size="sm"
               >
-                Vào trang mục tiêu
+                {t('achieved.nextTarget.cta')}
               </ButtonPrime>
             </div>
           </div>
 
           <div className={cx('card')}>
-            <div className={cx('cardHeader')}>Tiếp theo có thể làm</div>
+            <div className={cx('cardHeader')}>{t('achieved.next.title')}</div>
             <div className={cx('cardBody')}>
               <ul style={{ paddingLeft: '2rem', margin: 0, fontSize: 'var(--font-size-ssm)' }}>
                 <li>
-                  <Link href={withExam('/my-target', examTypeId, examTypes)}>Đặt mục tiêu mới</Link>
-                  {' '}- chỉnh điểm và mục tiêu từng phần.
+                  <Link href={withExam('/my-target', examTypeId, examTypes)}>{t('achieved.next.newTarget')}</Link>
+                  {' '}- {t('achieved.next.newTargetDesc')}
                 </li>
                 <li>
                   <Link href={withExam('/learning-plans/compare', examTypeId, examTypes)}>
-                    Xem hành trình các lộ trình
+                    {t('achieved.next.journey')}
                   </Link>
-                  {' '}- độ sẵn sàng #1 → #N qua từng bài thi thử.
+                  {' '}- {t('achieved.next.journeyDesc')}
                 </li>
                 <li>
                   <Link href={withExam('/my-target/dashboard', examTypeId, examTypes)}>
-                    Tổng quan mục tiêu
+                    {t('achieved.next.overview')}
                   </Link>
-                  {' '}- biểu đồ độ sẵn sàng theo thời gian và các bài đã làm.
+                  {' '}- {t('achieved.next.overviewDesc')}
                 </li>
                 <li>
-                  <Link href="/">Làm thêm bài</Link>
-                  {' '}- duy trì phong độ, chờ thi thật.
+                  <Link href="/">{t('achieved.next.practice')}</Link>
+                  {' '}- {t('achieved.next.practiceDesc')}
                 </li>
               </ul>
             </div>

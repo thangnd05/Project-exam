@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useState, useEffect, useMemo } from 'react';
 import { Row, Col, Alert, Form } from 'react-bootstrap';
 import { getClassById } from '@/app/apis/classApi';
@@ -28,6 +28,7 @@ import {
 import { Trash, PlusCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
+import { useTranslations } from 'next-intl';
 import { useCreateTest, CREATOR_TYPES } from '@/app/features/tests/creator/hooks/useCreateTest';
 import { useExamCategories } from '@/app/features/tests/creator/hooks/useExamCategories';
 import type { CreatorType, DraftGroup, DraftQuestion } from '@/app/features/tests/creator/hooks/useCreateTest';
@@ -85,6 +86,7 @@ const CreateTestFormBody = ({
   onCancel,
   showCreatorTypeTabs = true,
 }: CreateTestFormBodyProps) => {
+  const t = useTranslations('TestCreator');
   const router = useRouter();
   const [creatorTypeLocal, setCreatorTypeLocal] = useState<CreatorType>(creatorTypeProp);
   const isControlled = typeof onCreatorTypeChange === 'function';
@@ -159,12 +161,12 @@ const CreateTestFormBody = ({
 
   useEffect(() => {
     if (mode === 'class' && classId) {
-      getClassById(classId).then((data) => setClassName(data?.className || `Lớp ${classId}`)).catch(() => setClassName(`Lớp ${classId}`));
+      getClassById(classId).then((data) => setClassName(data?.className || t('form.classFallback', { classId }))).catch(() => setClassName(t('form.classFallback', { classId })));
     }
     if (mode === 'class' && chapterId) {
-      getChapterById(chapterId).then((data) => setChapterName(data?.title || `Chapter ${chapterId}`)).catch(() => setChapterName(`Chapter ${chapterId}`));
+      getChapterById(chapterId).then((data) => setChapterName(data?.title || t('form.chapterFallback', { chapterId }))).catch(() => setChapterName(t('form.chapterFallback', { chapterId })));
     }
-  }, [mode, classId, chapterId]);
+  }, [mode, classId, chapterId, t]);
 
   // Số nhóm/câu đổi thì bỏ chỉ số thu gọn đã vượt quá danh sách (điều chỉnh ngay lúc render, không cần effect).
   const [prevGroupCount, setPrevGroupCount] = useState(groups.length);
@@ -201,7 +203,7 @@ const CreateTestFormBody = ({
     const q = questions[index];
     if (!q?.questionText?.trim()) return null;
     const status = editorTagStatus(q);
-    return status === 'ok' ? null : TAG_STATUS_LABEL[status];
+    return status === 'ok' ? null : t(TAG_STATUS_LABEL[status]);
   };
   const editorIndexes = editorIssuesOnly && editorTagIssues.length > 0
     ? editorTagIssues
@@ -229,9 +231,9 @@ const CreateTestFormBody = ({
       Boolean(group.passage?.contentTranslation?.trim()) ||
       (group.passage?.extraContents || []).some((t) => t?.trim()) ||
       (group.passage?.mediaFiles?.length ?? 0) > 0;
-    const parts = [`${questionCount} câu hỏi`];
+    const parts = [t('form.groupSummary.questions', { count: questionCount })];
     if (hasPassage) {
-      parts.push('có passage');
+      parts.push(t('form.groupSummary.hasPassage'));
     }
     return parts.join(' · ');
   };
@@ -279,7 +281,7 @@ const CreateTestFormBody = ({
       const invalid = findInvalidJsonQuestions();
       if (invalid.length > 0) {
         toast.warning(
-          `Câu chưa có nội dung hoặc chưa chọn đúng đáp án đúng: ${invalid.slice(0, 15).join(', ')}${invalid.length > 15 ? ' ...' : ''}`,
+          t('form.toast.invalidJsonQuestions', { list: `${invalid.slice(0, 15).join(', ')}${invalid.length > 15 ? ' ...' : ''}` }),
         );
         return;
       }
@@ -294,8 +296,8 @@ const CreateTestFormBody = ({
       }
       toast.success(
         activeCreatorType === CREATOR_TYPES.TEST
-          ? 'Đã tạo đề thi thành công'
-          : 'Đã lưu câu hỏi vào kho thành công'
+          ? t('form.toast.testCreated')
+          : t('form.toast.questionsSaved')
       );
       onSuccess?.();
     }
@@ -393,7 +395,7 @@ const CreateTestFormBody = ({
 
   const handlePreviewQuestionsFromDocument = async (fileInput: File | null = documentFile) => {
     if (!fileInput) {
-      toast.warning('Vui lòng chọn file Word trước khi nạp câu hỏi.');
+      toast.warning(t('form.toast.selectWordFirst'));
       return;
     }
 
@@ -405,7 +407,7 @@ const CreateTestFormBody = ({
 
       const parsedQuestions = Array.isArray(data) ? data : [];
       if (parsedQuestions.length === 0) {
-        toast.warning('Không tìm thấy câu hỏi hợp lệ trong file Word.');
+        toast.warning(t('form.toast.noValidQuestions'));
         return;
       }
 
@@ -413,9 +415,9 @@ const CreateTestFormBody = ({
 
       setQuestions(normalizedQuestions);
       setDocumentFile(null);
-      toast.success(`Đã nạp ${normalizedQuestions.length} câu hỏi từ Word.`);
+      toast.success(t('form.toast.loadedFromWord', { count: normalizedQuestions.length }));
     } catch (error) {
-      const message = getApiErrorMessage(error, 'Không thể nạp câu hỏi từ Word.');
+      const message = getApiErrorMessage(error, t('form.toast.loadFromWordFailed'));
       toast.error(message);
     }
   };
@@ -423,7 +425,7 @@ const CreateTestFormBody = ({
   const showJsonIssues = (issues: string[] = [], label: string, isError: boolean) => {
     if (issues.length === 0) return;
     const shown = issues.slice(0, 3).join(' | ');
-    const rest = issues.length > 3 ? ` (và ${issues.length - 3} mục khác)` : '';
+    const rest = issues.length > 3 ? ` ${t('form.toast.andMoreItems', { count: issues.length - 3 })}` : '';
     const message = `${label}: ${shown}${rest}`;
     if (isError) {
       toast.error(message, { autoClose: 20000 });
@@ -438,7 +440,7 @@ const CreateTestFormBody = ({
    */
   const handleTestJsonFile = async (fileInput: File) => {
     if (!testInfo.examTypeId) {
-      toast.warning('Chọn loại kỳ thi trước khi upload file JSON.');
+      toast.warning(t('form.toast.selectExamTypeFirst'));
       return;
     }
     setTestJsonChecking(true);
@@ -447,12 +449,12 @@ const CreateTestFormBody = ({
       setTestJsonPreview({ ...data, fileName: fileInput.name });
       setTestJsonFile(data.valid ? fileInput : null);
       if (data.valid) {
-        toast.success(`File hợp lệ: ${data.questionCount} câu, chia vào ${data.parts.length} phần thi.`);
+        toast.success(t('form.toast.testJsonValid', { count: data.questionCount, parts: data.parts.length }));
       }
     } catch (error) {
       setTestJsonFile(null);
       setTestJsonPreview(null);
-      const message = getApiErrorMessage(error, 'Không thể đọc file JSON.');
+      const message = getApiErrorMessage(error, t('form.toast.readJsonFailed'));
       toast.error(message, { autoClose: 20000 });
     } finally {
       setTestJsonChecking(false);
@@ -470,7 +472,7 @@ const CreateTestFormBody = ({
    */
   const handleBankJsonFile = async (fileInput: File) => {
     if (!testInfo.examPartId) {
-      toast.warning('Chọn phần thi trước khi upload file JSON.');
+      toast.warning(t('form.toast.selectExamPartFirst'));
       return;
     }
     setBankJsonChecking(true);
@@ -481,12 +483,12 @@ const CreateTestFormBody = ({
       setBankJsonPreview({ ...data, fileName: fileInput.name });
       setBankJsonFile(data.valid ? fileInput : null);
       if (data.valid) {
-        toast.success(`File hợp lệ: ${data.questionCount} câu.`);
+        toast.success(t('form.toast.bankJsonValid', { count: data.questionCount }));
       }
     } catch (error) {
       setBankJsonFile(null);
       setBankJsonPreview(null);
-      const message = getApiErrorMessage(error, 'Không thể đọc file JSON.');
+      const message = getApiErrorMessage(error, t('form.toast.readJsonFailed'));
       toast.error(message, { autoClose: 20000 });
     } finally {
       setBankJsonChecking(false);
@@ -538,44 +540,44 @@ const CreateTestFormBody = ({
       const data = await previewJsonFile(formData);
 
       if (!data.valid) {
-        showJsonIssues(data.errors, `File JSON có ${data.errors.length} lỗi`, true);
+        showJsonIssues(data.errors, t('form.toast.jsonErrors', { count: data.errors.length }), true);
         return;
       }
-      showJsonIssues(data.warnings, 'Cảnh báo', false);
+      showJsonIssues(data.warnings, t('form.toast.warnings'), false);
 
       const parsedQuestions = data.questions ?? [];
       const parsedGroups = data.groups ?? [];
 
       if (target === 'groups') {
         if (parsedGroups.length === 0) {
-          toast.warning('File JSON không có nhóm nào trong "groups".');
+          toast.warning(t('form.toast.noGroups'));
           return;
         }
         if (parsedQuestions.length > 0) {
-          toast.info(`Bỏ qua ${parsedQuestions.length} câu trong "questions" - ở đây chỉ nạp "groups".`);
+          toast.info(t('form.toast.skippedQuestions', { count: parsedQuestions.length }));
         }
         setGroups(normalizeParsedGroups(parsedGroups));
-        toast.success(`Đã nạp ${parsedGroups.length} nhóm passage từ JSON.`);
+        toast.success(t('form.toast.loadedGroupsFromJson', { count: parsedGroups.length }));
         return;
       }
 
       if (parsedQuestions.length === 0) {
         toast.warning(
           parsedGroups.length > 0
-            ? 'File JSON chỉ có "groups". Dùng tab Passage để nạp nhóm câu hỏi.'
-            : 'File JSON không có câu hỏi nào trong "questions".',
+            ? t('form.toast.onlyGroups')
+            : t('form.toast.noQuestions'),
         );
         return;
       }
       if (parsedGroups.length > 0) {
-        toast.info(`Bỏ qua ${parsedGroups.length} nhóm trong "groups" - dùng tab Passage để nạp nhóm.`);
+        toast.info(t('form.toast.skippedGroups', { count: parsedGroups.length }));
       }
 
       const normalizedQuestions = normalizeParsedQuestions(parsedQuestions);
       setQuestions(normalizedQuestions);
-      toast.success(`Đã nạp ${normalizedQuestions.length} câu hỏi từ JSON.`);
+      toast.success(t('form.toast.loadedFromJson', { count: normalizedQuestions.length }));
     } catch (error) {
-      const message = getApiErrorMessage(error, 'Không thể nạp câu hỏi từ file JSON.');
+      const message = getApiErrorMessage(error, t('form.toast.loadFromJsonFailed'));
       toast.error(message, { autoClose: 20000 });
     }
   };
@@ -604,7 +606,7 @@ const CreateTestFormBody = ({
     fileInput: File | null = groupDocumentFiles[gIndex],
   ) => {
     if (!fileInput) {
-      toast.warning('Vui lòng chọn file Word trước khi nạp nhóm câu hỏi.');
+      toast.warning(t('form.toast.selectWordFirstGroup'));
       return;
     }
 
@@ -616,16 +618,16 @@ const CreateTestFormBody = ({
 
       const parsedQuestions = Array.isArray(data) ? data : [];
       if (parsedQuestions.length === 0) {
-        toast.warning('Không tìm thấy câu hỏi hợp lệ trong file Word.');
+        toast.warning(t('form.toast.noValidQuestions'));
         return;
       }
 
       const normalizedQuestions = normalizeParsedQuestions(parsedQuestions);
       setGroupQuestions(gIndex, normalizedQuestions);
       setGroupDocumentFiles((prev) => ({ ...prev, [gIndex]: null }));
-      toast.success(`Đã nạp ${normalizedQuestions.length} câu hỏi cho nhóm ${gIndex + 1}.`);
+      toast.success(t('form.toast.loadedForGroup', { count: normalizedQuestions.length, group: gIndex + 1 }));
     } catch (error) {
-      const message = getApiErrorMessage(error, 'Không thể nạp nhóm câu hỏi từ Word.');
+      const message = getApiErrorMessage(error, t('form.toast.loadGroupFromWordFailed'));
       toast.error(message);
     }
   };
@@ -640,7 +642,7 @@ const CreateTestFormBody = ({
 
   const handlePreviewBulkPassageFromDocument = async (fileInput: File | null = bulkPassageFile) => {
     if (!fileInput) {
-      toast.warning('Vui lòng chọn file Word trước khi nạp passage.');
+      toast.warning(t('form.toast.selectWordFirstPassage'));
       return;
     }
 
@@ -652,7 +654,7 @@ const CreateTestFormBody = ({
 
       const parsedGroups = Array.isArray(data) ? data : [];
       if (parsedGroups.length === 0) {
-        toast.warning('Không tìm thấy passage hợp lệ trong file Word.');
+        toast.warning(t('form.toast.noValidPassage'));
         return;
       }
 
@@ -660,9 +662,9 @@ const CreateTestFormBody = ({
 
       setGroups(normalizedGroups);
       setBulkPassageFile(null);
-      toast.success(`Đã nạp ${normalizedGroups.length} nhóm passage từ Word.`);
+      toast.success(t('form.toast.loadedGroupsFromWord', { count: normalizedGroups.length }));
     } catch (error) {
-      const message = getApiErrorMessage(error, 'Không thể nạp passage từ Word.');
+      const message = getApiErrorMessage(error, t('form.toast.loadPassageFromWordFailed'));
       toast.error(message);
     }
   };
@@ -688,8 +690,7 @@ const CreateTestFormBody = ({
 
       {activeCreatorType === CREATOR_TYPES.TEST && (
         <Alert variant="info" className="mb-3">
-          <strong>Ghi chú:</strong> Sau khi tạo đề, vào chế độ quản lý dạng bảng và bấm biểu tượng bút chì để sửa đề,
-          sửa từng câu hỏi, đáp án, cũng như cập nhật file ảnh/audio liên quan.
+          {t.rich('form.editNote', { strong: (chunks) => <strong>{chunks}</strong> })}
         </Alert>
       )}
 
@@ -697,7 +698,7 @@ const CreateTestFormBody = ({
         <Alert variant="light" className="mb-3 border">
           <div className="d-flex flex-wrap align-items-center justify-content-between gap-2">
             <span>
-              <strong>Kho lưu trữ câu hỏi:</strong> Nếu bạn muốn tạo đề từ câu hỏi đã lưu trong kho, vào trang này.
+              {t.rich('form.bankNote', { strong: (chunks) => <strong>{chunks}</strong> })}
             </span>
             <ButtonPrime
               type="button"
@@ -708,7 +709,7 @@ const CreateTestFormBody = ({
                 router.push(routes.personalQuestionBank);
               }}
             >
-              Mở kho lưu trữ
+              {t('form.openBank')}
             </ButtonPrime>
           </div>
         </Alert>
@@ -717,20 +718,20 @@ const CreateTestFormBody = ({
       {activeCreatorType !== CREATOR_TYPES.BANK && (
         <div className={cx('configCard')}>
           <div className={cx('sectionTitle')}>
-            1. {activeCreatorType === CREATOR_TYPES.TEST ? 'Cấu hình bài thi' : 'Thông tin chung'}
+            1. {activeCreatorType === CREATOR_TYPES.TEST ? t('form.section.testConfig') : t('form.section.generalInfo')}
           </div>
           <Row className="g-3">
             {mode === 'class' && (
               <>
                 <Col md={6}>
                   <div className={cx('formGroupModern')}>
-                    <label><IoSchoolOutline /> Lớp học</label>
+                    <label><IoSchoolOutline /> {t('form.fields.class')}</label>
                     <input className={cx('inputModern', 'inputDisabled')} value={className} disabled />
                   </div>
                 </Col>
                 <Col md={6}>
                   <div className={cx('formGroupModern')}>
-                    <label><IoBookOutline /> Chương</label>
+                    <label><IoBookOutline /> {t('form.fields.chapter')}</label>
                     <input className={cx('inputModern', 'inputDisabled')} value={chapterName} disabled />
                   </div>
                 </Col>
@@ -740,13 +741,13 @@ const CreateTestFormBody = ({
               <>
                 <Col md={8}>
                   <div className={cx('formGroupModern')}>
-                    <label>Tiêu đề đề thi</label>
+                    <label>{t('form.fields.title')}</label>
                     <input className={cx('inputModern')} value={testInfo.title} onChange={(e) => setTestInfo({ ...testInfo, title: e.target.value })} />
                   </div>
                 </Col>
                 <Col md={4}>
                   <div className={cx('formGroupModern')}>
-                    <label><IoImageOutline /> Link ảnh Banner</label>
+                    <label><IoImageOutline /> {t('form.fields.bannerUrl')}</label>
                     <input className={cx('inputModern')} value={testInfo.bannerUrl} onChange={(e) => setTestInfo({ ...testInfo, bannerUrl: e.target.value })} />
                   </div>
                 </Col>
@@ -754,13 +755,13 @@ const CreateTestFormBody = ({
             )}
             <Col md={4}>
               <div className={cx('formGroupModern')}>
-                <label>Loại kỳ thi</label>
+                <label>{t('form.fields.examType')}</label>
                 <select className={cx('inputModern')} value={testInfo.examTypeId} onChange={(e) => {
                   handleExamTypeChange(e.target.value);
                   // Đổi loại kỳ thi thì phần thi đổi theo, kết quả chia cũ không còn đúng.
                   clearTestJson();
                 }}>
-                  <option value="">-- Chọn --</option>
+                  <option value="">{t('form.fields.selectPlaceholder')}</option>
 
                   {examTypes.filter((t) => !t.childCount).map((t) => <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>)}
                 </select>
@@ -770,9 +771,9 @@ const CreateTestFormBody = ({
             {activeCreatorType !== CREATOR_TYPES.TEST && (
             <Col md={4}>
               <div className={cx('formGroupModern')}>
-                <label>Phần thi *</label>
+                <label>{t('form.fields.examPartRequired')}</label>
                 <select className={cx('inputModern')} value={testInfo.examPartId} onChange={(e) => setTestInfo({ ...testInfo, examPartId: e.target.value })} disabled={!testInfo.examTypeId}>
-                  <option value="">-- Chọn part --</option>
+                  <option value="">{t('form.fields.selectPartPlaceholder')}</option>
                   {examParts.map((p) => <option key={p.examPartId} value={p.examPartId}>{p.name}</option>)}
                 </select>
               </div>
@@ -781,9 +782,9 @@ const CreateTestFormBody = ({
             {activeCreatorType === CREATOR_TYPES.TEST && (
               <Col md={4}>
                 <div className={cx('formGroupModern')}>
-                  <label><IoLibraryOutline /> Bộ đề (Collection)</label>
+                  <label><IoLibraryOutline /> {t('form.fields.testCollection')}</label>
                   <select className={cx('inputModern')} value={testInfo.collectionId || ''} onChange={(e) => setTestInfo({ ...testInfo, collectionId: e.target.value })}>
-                    <option value="">-- Trống --</option>
+                    <option value="">{t('form.fields.emptyOption')}</option>
                     {collectionOptions.map((c) => (
                       <option key={c.collectionId} value={c.collectionId}>
                         {c.depth > 0 ? `    └ ${c.name}` : c.name}
@@ -796,9 +797,9 @@ const CreateTestFormBody = ({
             {(activeCreatorType === CREATOR_TYPES.BULK || activeCreatorType === CREATOR_TYPES.PASSAGE) && (
               <Col md={4}>
                 <div className={cx('formGroupModern')}>
-                  <label><IoLibraryOutline /> Nhóm (Collection)</label>
+                  <label><IoLibraryOutline /> {t('form.fields.groupCollection')}</label>
                   <select className={cx('inputModern')} value={testInfo.collectionId || ''} onChange={(e) => setTestInfo({ ...testInfo, collectionId: e.target.value })}>
-                    <option value="">-- Trống --</option>
+                    <option value="">{t('form.fields.emptyOption')}</option>
                     {collectionOptions.map((c) => (
                       <option key={c.collectionId} value={c.collectionId}>
                         {c.depth > 0 ? `    └ ${c.name}` : c.name}
@@ -811,7 +812,7 @@ const CreateTestFormBody = ({
             {(activeCreatorType === CREATOR_TYPES.BULK || activeCreatorType === CREATOR_TYPES.PASSAGE) && (
               <Col md={4}>
                 <div className={cx('formGroupModern')}>
-                  <label>Mục đích sử dụng *</label>
+                  <label>{t('form.fields.usageScope')}</label>
                   <select
                     className={cx('inputModern')}
                     value={testInfo.usageScope}
@@ -822,8 +823,8 @@ const CreateTestFormBody = ({
                       })
                     }
                   >
-                    <option value={QuestionUsageScope.EXAM}>Câu thi (ra đề)</option>
-                    <option value={QuestionUsageScope.PRACTICE}>Câu ôn tập (lộ trình)</option>
+                    <option value={QuestionUsageScope.EXAM}>{t('form.fields.usageExam')}</option>
+                    <option value={QuestionUsageScope.PRACTICE}>{t('form.fields.usagePractice')}</option>
                   </select>
                 </div>
               </Col>
@@ -834,13 +835,13 @@ const CreateTestFormBody = ({
                   <>
                     <Col md={4}>
                       <div className={cx('formGroupModern')}>
-                        <label><IoTimeOutline /> Thời gian (phút)</label>
+                        <label><IoTimeOutline /> {t('form.fields.duration')}</label>
                         <input type="number" className={cx('inputModern')} value={testInfo.durationMinutes} onChange={(e) => setTestInfo({ ...testInfo, durationMinutes: e.target.value })} />
                       </div>
                     </Col>
                     <Col md={4}>
                       <div className={cx('formGroupModern')}>
-                        <label><IoRocketOutline /> Lượt làm tối đa</label>
+                        <label><IoRocketOutline /> {t('form.fields.maxAttempts')}</label>
                         <input type="number" className={cx('inputModern')} value={testInfo.maxAttempts} onChange={(e) => setTestInfo({ ...testInfo, maxAttempts: e.target.value })} />
                       </div>
                     </Col>
@@ -854,14 +855,14 @@ const CreateTestFormBody = ({
                     />
                     <Col md={mode === 'class' ? 8 : 4}>
                       <div className={cx('formGroupModern')}>
-                        <label>Phân loại bài thi (tuỳ chọn)</label>
+                        <label>{t('form.fields.examCategory')}</label>
                         <select
                           className={cx('inputModern')}
                           value={testInfo.examCategoryId}
                           onChange={(e) => setTestInfo({ ...testInfo, examCategoryId: e.target.value })}
-                          aria-label="Phân loại bài thi"
+                          aria-label={t('form.fields.examCategoryAria')}
                         >
-                          <option value="">-- Không phân loại --</option>
+                          <option value="">{t('form.fields.noCategory')}</option>
                           {examCategories.map((c) => (
                             <option key={c.examCategoryId} value={c.examCategoryId}>
                               {c.name}
@@ -872,19 +873,19 @@ const CreateTestFormBody = ({
                     </Col>
                     <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 6 : 4}>
                       <div className={cx('formGroupModern')}>
-                        <label><IoCalendarOutline /> Thời gian bắt đầu</label>
+                        <label><IoCalendarOutline /> {t('form.fields.availableFrom')}</label>
                         <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableFrom} onChange={(e) => setTestInfo({ ...testInfo, availableFrom: e.target.value })} />
                       </div>
                     </Col>
                     <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 6 : 4}>
                       <div className={cx('formGroupModern')}>
-                        <label><IoCalendarOutline /> Thời gian kết thúc</label>
+                        <label><IoCalendarOutline /> {t('form.fields.availableTo')}</label>
                         <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableTo} onChange={(e) => setTestInfo({ ...testInfo, availableTo: e.target.value })} />
                       </div>
                     </Col>
                     <Col md={12}>
                       <div className={cx('formGroupModern')}>
-                        <label><IoInformationCircleOutline /> Mô tả</label>
+                        <label><IoInformationCircleOutline /> {t('form.fields.description')}</label>
                         <textarea className={cx('inputModern')} rows={2} value={testInfo.description} onChange={(e) => setTestInfo({ ...testInfo, description: e.target.value })} />
                       </div>
                     </Col>
@@ -892,7 +893,7 @@ const CreateTestFormBody = ({
                       <Form.Check
                         type="checkbox"
                         id="create-test-shuffle-on-create"
-                        label="Xáo trộn thứ tự câu khi tạo đề (mọi người làm thấy cùng một thứ tự)"
+                        label={t('form.fields.shuffleOnCreate')}
                         checked={testInfo.shuffleOnCreate}
                         onChange={(e) => setTestInfo({ ...testInfo, shuffleOnCreate: e.target.checked })}
                       />
@@ -901,7 +902,7 @@ const CreateTestFormBody = ({
                       <Form.Check
                         type="checkbox"
                         id="create-test-shuffle-per-attempt"
-                        label="Xáo trộn thứ tự câu mỗi lượt làm (mỗi người, mỗi lần làm một thứ tự khác)"
+                        label={t('form.fields.shufflePerAttempt')}
                         checked={testInfo.shuffleQuestions}
                         onChange={(e) => setTestInfo({ ...testInfo, shuffleQuestions: e.target.checked })}
                       />
@@ -913,8 +914,8 @@ const CreateTestFormBody = ({
                   <div className={cx('formGroupModern')}>
                     <label>
                       {activeCreatorType === CREATOR_TYPES.BULK
-                        ? 'Upload file Word để import câu hỏi số lượng lớn vào kho (DOC/DOCX)'
-                        : 'Upload file Word để tạo câu hỏi nhanh (DOC/DOCX)'}
+                        ? t('form.upload.wordBulk')
+                        : t('form.upload.wordQuick')}
                     </label>
                     <input
                       type="file"
@@ -924,7 +925,7 @@ const CreateTestFormBody = ({
                     />
                     {documentFile && (
                       <small className="text-muted d-block mt-2">
-                        Đang nạp từ file: {documentFile.name}
+                        {t('form.upload.loadingFrom', { name: documentFile.name })}
                       </small>
                     )}
                   </div>
@@ -933,7 +934,7 @@ const CreateTestFormBody = ({
                 {activeCreatorType === CREATOR_TYPES.TEST ? (
                   <Col md={12}>
                     <div className={cx('formGroupModern')}>
-                      <label>Hoặc tạo trọn đề từ file JSON (nhiều phần thi, kèm tag)</label>
+                      <label>{t('form.upload.testJson')}</label>
                       <input
                         type="file"
                         accept=".json,application/json"
@@ -947,18 +948,16 @@ const CreateTestFormBody = ({
                       />
                       <small className="text-muted d-block mt-2">
                         {testInfo.examTypeId
-                          ? <>Chỉ cần chọn loại kỳ thi. Mỗi câu được xếp vào phần thi theo trường <code>examPart</code> hoặc
-                            tiền tố tag <code>&quot;Phần thi &gt; Tag&quot;</code>, mỗi phần thi thành một part của đề.
-                            Định dạng file: <code>docs/question-import-json.md</code>.</>
-                          : 'Chọn loại kỳ thi trước để upload file JSON.'}
+                          ? t.rich('form.upload.testJsonHelp', { code: (chunks) => <code>{chunks}</code> })
+                          : t('form.upload.testJsonNeedExamType')}
                       </small>
-                      {testJsonChecking && <small className="d-block mt-2">Đang kiểm tra file...</small>}
+                      {testJsonChecking && <small className="d-block mt-2">{t('form.upload.checking')}</small>}
                     </div>
                   </Col>
                 ) : (
                   <Col md={12}>
                     <div className={cx('formGroupModern')}>
-                      <label>Hoặc upload file JSON (chính xác hơn, không cần đoán cấu trúc)</label>
+                      <label>{t('form.upload.bankJson')}</label>
                       <input
                         type="file"
                         accept=".json,application/json"
@@ -972,12 +971,10 @@ const CreateTestFormBody = ({
                       />
                       <small className="text-muted d-block mt-2">
                         {testInfo.examPartId
-                          ? <>Xem trước câu hỏi và tag rồi lưu thẳng cả file vào kho (không giới hạn số câu).
-                            Sai định dạng sẽ được báo chính xác vị trí. Định dạng file:{' '}
-                            <code>docs/question-import-json.md</code>.</>
-                          : 'Chọn phần thi trước để upload file JSON.'}
+                          ? t.rich('form.upload.bankJsonHelp', { code: (chunks) => <code>{chunks}</code> })
+                          : t('form.upload.bankJsonNeedExamPart')}
                       </small>
-                      {bankJsonChecking && <small className="d-block mt-2">Đang kiểm tra file...</small>}
+                      {bankJsonChecking && <small className="d-block mt-2">{t('form.upload.checking')}</small>}
                     </div>
                   </Col>
                 )}
@@ -990,7 +987,7 @@ const CreateTestFormBody = ({
       {activeCreatorType === CREATOR_TYPES.TEST && testJsonPreview && (
         <>
           <div className={cx('sectionTitle')}>
-            2. Đề từ file JSON: {testJsonPreview.fileName}
+            2. {t('form.preview.testTitle', { name: testJsonPreview.fileName })}
           </div>
           <JsonQuestionsPreview
             valid={testJsonPreview.valid}
@@ -1003,9 +1000,9 @@ const CreateTestFormBody = ({
               groups: p.groups,
             }))}
             availableTags={availableTags}
-            summary={<><strong>{testJsonPreview.questionCount}</strong> câu, chia vào <strong>{testJsonPreview.parts.length}</strong> phần thi. Đề chỉ lấy câu từ file này.</>}
+            summary={t.rich('form.preview.testSummary', { count: testJsonPreview.questionCount, parts: testJsonPreview.parts.length, strong: (chunks) => <strong>{chunks}</strong> })}
             onClear={clearTestJson}
-            clearLabel="Bỏ file JSON, nhập tay"
+            clearLabel={t('form.preview.clearLabel')}
             onEditQuestion={editTestQuestion}
           />
         </>
@@ -1014,7 +1011,7 @@ const CreateTestFormBody = ({
       {isBankJsonMode && bankJsonPreview && (
         <>
           <div className={cx('sectionTitle')}>
-            2. Câu hỏi từ file JSON: {bankJsonPreview.fileName}
+            2. {t('form.preview.bankTitle', { name: bankJsonPreview.fileName })}
           </div>
           <JsonQuestionsPreview
             valid={bankJsonPreview.valid}
@@ -1022,14 +1019,14 @@ const CreateTestFormBody = ({
             warnings={bankJsonPreview.warnings}
             parts={[{
               key: testInfo.examPartId,
-              name: examParts.find((p) => p.examPartId === testInfo.examPartId)?.name || 'Phần thi đã chọn',
+              name: examParts.find((p) => p.examPartId === testInfo.examPartId)?.name || t('form.preview.selectedPart'),
               questions: bankJsonPreview.questions || [],
               groups: bankJsonPreview.groups || [],
             }]}
             availableTags={availableTags}
-            summary={<><strong>{bankJsonPreview.questionCount}</strong> câu sẽ được lưu vào kho của phần thi đã chọn.</>}
+            summary={t.rich('form.preview.bankSummary', { count: bankJsonPreview.questionCount, strong: (chunks) => <strong>{chunks}</strong> })}
             onClear={clearBankJson}
-            clearLabel="Bỏ file JSON, nhập tay"
+            clearLabel={t('form.preview.clearLabel')}
             onEditQuestion={editBankQuestion}
           />
         </>
@@ -1038,20 +1035,19 @@ const CreateTestFormBody = ({
       {((activeCreatorType === CREATOR_TYPES.BULK && !isBankJsonMode) || (activeCreatorType === CREATOR_TYPES.TEST && !testJsonPreview)) && (
         <>
           <div className={cx('sectionTitle')}>
-            2. Danh sách câu hỏi ({questions.length})
+            2. {t('form.editor.title', { count: questions.length })}
           </div>
           {activeCreatorType === CREATOR_TYPES.TEST && (
             <small className="text-muted d-block mb-3">
-              Mỗi câu chọn tag của một phần thi, câu sẽ được xếp vào phần thi đó. Đề có bao nhiêu phần thi
-              thì tạo bấy nhiêu part.
+              {t('form.editor.tagHint')}
             </small>
           )}
           {editorTagIssues.length > 0 && (
             <div className={cx('tagSummaryBar', 'hasIssue')}>
               <span className={cx('tagSummaryItem', 'warn')}>
-                ⚠ {editorTagIssues.length} câu chưa có tag hoặc tag không khớp:{' '}
-                {editorTagIssues.slice(0, 15).map((i) => `Câu ${i + 1}`).join(', ')}
-                {editorTagIssues.length > 15 ? ` và ${editorTagIssues.length - 15} câu khác` : ''}
+                {t('form.editor.tagIssues', { count: editorTagIssues.length })}{' '}
+                {editorTagIssues.slice(0, 15).map((i) => t('form.editor.questionLabel', { number: i + 1 })).join(', ')}
+                {editorTagIssues.length > 15 ? ` ${t('form.editor.andMore', { count: editorTagIssues.length - 15 })}` : ''}
               </span>
               <button
                 type="button"
@@ -1061,7 +1057,7 @@ const CreateTestFormBody = ({
                   setEditorPage(0);
                 }}
               >
-                {editorIssuesOnly ? 'Hiện tất cả câu' : 'Chỉ hiện các câu này'}
+                {editorIssuesOnly ? t('form.editor.showAll') : t('form.editor.showIssuesOnly')}
               </button>
             </div>
           )}
@@ -1095,13 +1091,13 @@ const CreateTestFormBody = ({
       {activeCreatorType === CREATOR_TYPES.PASSAGE && (
         <>
           <div className={cx('sectionTitle')}>
-            2. Danh sách nhóm ({groups.length})
+            2. {t('form.passage.title', { count: groups.length })}
           </div>
 
           <div className={cx('groupCard')} style={{ borderStyle: 'dashed', backgroundColor: '#f8fafc', marginBottom: '20px' }}>
             <div className={cx('formGroupModern', 'mb-0')}>
               <label className="mb-2 d-block fw-bold text-primary">
-                Upload file Word nạp NHIỀU Passage tự động (DOC/DOCX)
+                {t('form.passage.wordUpload')}
               </label>
               <input
                 type="file"
@@ -1110,14 +1106,13 @@ const CreateTestFormBody = ({
                 onChange={handleBulkPassageFileChange}
               />
               <small className="text-muted d-block mt-2">
-                File của bạn cần có dòng phân cách Passage (ví dụ: "Passage 1:", "Bài đọc 2:"). Các câu hỏi bên dưới sẽ tự động được xếp vào đúng Passage.
-                Nếu 1 passage có NHIỀU đoạn văn, ngăn các đoạn bằng dòng "Đoạn 2:", "Đoạn 3:"… (đoạn đầu không cần đánh dấu); đặt trước dòng "Dịch:" nếu có.
+                {t('form.passage.wordHelp')}
               </small>
             </div>
 
             <div className={cx('formGroupModern', 'mb-0')} style={{ marginTop: '16px' }}>
               <label className="mb-2 d-block fw-bold text-primary">
-                Hoặc upload file JSON nạp NHIỀU Passage (chính xác hơn)
+                {t('form.passage.jsonUpload')}
               </label>
               <input
                 type="file"
@@ -1126,9 +1121,7 @@ const CreateTestFormBody = ({
                 onChange={(e) => handleJsonFileChange(e, 'groups')}
               />
               <small className="text-muted d-block mt-2">
-                Nạp các nhóm trong <code>groups</code> của file JSON, không cần dòng phân cách nào.
-                File mẫu: <code>docs/question-import-sample.json</code>. Lưu ý: JSON không mang theo
-                file audio/ảnh - dùng <code>mediaUrl</code> của file đã upload, hoặc thêm media bên dưới sau khi nạp.
+                {t.rich('form.passage.jsonHelp', { code: (chunks) => <code>{chunks}</code> })}
               </small>
             </div>
           </div>
@@ -1143,14 +1136,14 @@ const CreateTestFormBody = ({
                   className={cx('groupToggleBtn')}
                   onClick={() => toggleGroupCollapsed(gIndex)}
                   aria-expanded={!isCollapsed}
-                  aria-label={isCollapsed ? `Mở nhóm ${gIndex + 1}` : `Thu gọn nhóm ${gIndex + 1}`}
+                  aria-label={isCollapsed ? t('form.passage.expandGroup', { number: gIndex + 1 }) : t('form.passage.collapseGroup', { number: gIndex + 1 })}
                 >
                   {isCollapsed ? <ChevronRight size={20} /> : <ChevronDown size={20} />}
-                  <h4 className={cx('groupTitle')}>Nhóm thứ {gIndex + 1}</h4>
+                  <h4 className={cx('groupTitle')}>{t('form.passage.groupTitle', { number: gIndex + 1 })}</h4>
                   <span className={cx('groupSummaryBadge')}>{getGroupSummary(group)}</span>
                 </button>
                 {groups.length > 1 && (
-                  <ButtonPrime variant="dangerGhost" size="icon" onClick={() => removeGroup(gIndex)} aria-label={`Xóa nhóm ${gIndex + 1}`}>
+                  <ButtonPrime variant="dangerGhost" size="icon" onClick={() => removeGroup(gIndex)} aria-label={t('form.passage.removeGroup', { number: gIndex + 1 })}>
                     <Trash size={18} />
                   </ButtonPrime>
                 )}
@@ -1159,24 +1152,24 @@ const CreateTestFormBody = ({
               <>
               <div className={cx('passageSection')}>
                 <div className={cx('formGroupModern')}>
-                  <label className="mb-2 d-block fw-bold">Nội dung Passage (tùy chọn)</label>
+                  <label className="mb-2 d-block fw-bold">{t('form.passage.content')}</label>
                   <textarea
                     className={cx('inputModern')}
                     rows={3}
                     value={group.passage.content}
                     onChange={(e) => updatePassage(gIndex, 'content', e.target.value)}
-                    placeholder="Nhập nội dung văn bản nếu có..."
+                    placeholder={t('form.passage.contentPlaceholder')}
                   />
                 </div>
                 {(group.passage.extraContents || []).map((text, tIdx) => (
                   <div className={cx('formGroupModern')} key={tIdx}>
                     <label className="mb-2 d-flex justify-content-between align-items-center fw-bold">
-                      <span>Đoạn văn bổ sung {tIdx + 2}</span>
+                      <span>{t('form.passage.extraText', { number: tIdx + 2 })}</span>
                       <ButtonPrime
                         variant="dangerGhost"
                         size="icon"
                         onClick={() => removeGroupPassageText(gIndex, tIdx)}
-                        aria-label={`Xóa đoạn văn bổ sung ${tIdx + 2}`}
+                        aria-label={t('form.passage.removeExtraText', { number: tIdx + 2 })}
                       >
                         <Trash size={14} />
                       </ButtonPrime>
@@ -1186,7 +1179,7 @@ const CreateTestFormBody = ({
                       rows={3}
                       value={text}
                       onChange={(e) => updateGroupPassageText(gIndex, tIdx, e.target.value)}
-                      placeholder={`Nội dung đoạn văn thứ ${tIdx + 2}...`}
+                      placeholder={t('form.passage.extraTextPlaceholder', { number: tIdx + 2 })}
                     />
                   </div>
                 ))}
@@ -1198,21 +1191,21 @@ const CreateTestFormBody = ({
                     className={cx('btnSecondary')}
                     onClick={() => addGroupPassageText(gIndex)}
                   >
-                    <PlusCircle size={16} className="me-1" /> Thêm đoạn văn
+                    <PlusCircle size={16} className="me-1" /> {t('form.passage.addText')}
                   </ButtonPrime>
                 </div>
                 <div className={cx('formGroupModern')}>
-                  <label className="mb-2 d-block fw-bold">Bản dịch Passage (tùy chọn)</label>
+                  <label className="mb-2 d-block fw-bold">{t('form.passage.translation')}</label>
                   <textarea
                     className={cx('inputModern')}
                     rows={3}
                     value={group.passage.contentTranslation || ''}
                     onChange={(e) => updatePassage(gIndex, 'contentTranslation', e.target.value)}
-                    placeholder="Bản dịch của nội dung passage (phần &quot;Dịch:&quot; trong file Word)..."
+                    placeholder={t('form.passage.translationPlaceholder')}
                   />
                 </div>
                 <div className={cx('formGroupModern')}>
-                  <label className="mb-2 d-block fw-bold">Upload phương tiện (ảnh / audio)</label>
+                  <label className="mb-2 d-block fw-bold">{t('form.passage.mediaUpload')}</label>
                   <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
                     <input
                       type="file"
@@ -1243,7 +1236,7 @@ const CreateTestFormBody = ({
               </div>
               <div className={cx('questionsSection')}>
                 <div className={cx('formGroupModern')}>
-                  <label>Upload file Word để nạp câu hỏi cho nhóm này (DOC/DOCX)</label>
+                  <label>{t('form.passage.groupWordUpload')}</label>
                   <input
                     type="file"
                     accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -1252,7 +1245,7 @@ const CreateTestFormBody = ({
                   />
                   {groupDocumentFiles[gIndex] && (
                     <small className="text-muted d-block mt-2">
-                      Đang nạp cho nhóm {gIndex + 1}: {groupDocumentFiles[gIndex]?.name}
+                      {t('form.passage.loadingForGroup', { number: gIndex + 1, name: groupDocumentFiles[gIndex]?.name ?? '' })}
                     </small>
                   )}
                 </div>
@@ -1275,14 +1268,14 @@ const CreateTestFormBody = ({
                     minQuestions={group.questions.length}
                   />
                 ))}
-                <ButtonPrime type="button" variant="outline" size="sm" className={cx('btnSecondary')} onClick={() => addGroupQuestion(gIndex)}><PlusCircle size={18} /> Thêm câu hỏi</ButtonPrime>
+                <ButtonPrime type="button" variant="outline" size="sm" className={cx('btnSecondary')} onClick={() => addGroupQuestion(gIndex)}><PlusCircle size={18} /> {t('formFooter.addQuestion')}</ButtonPrime>
               </div>
               </>
               )}
             </div>
             );
           })}
-          <ButtonPrime type="button" variant="outline" size="sm" className={cx('btnSecondary', 'btnGroupAdd')} onClick={addGroup}><IoAddOutline size={20} /> Thêm nhóm passage</ButtonPrime>
+          <ButtonPrime type="button" variant="outline" size="sm" className={cx('btnSecondary', 'btnGroupAdd')} onClick={addGroup}><IoAddOutline size={20} /> {t('form.passage.addGroup')}</ButtonPrime>
         </>
       )}
 
@@ -1316,7 +1309,7 @@ const CreateTestFormBody = ({
           loading={loading}
           onCancel={onCancel}
           onSubmit={handleFormSubmit}
-          submitLabel="Lưu tất cả"
+          submitLabel={t('form.saveAll')}
           showAddBtn={false}
         />
       )}

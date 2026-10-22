@@ -3,17 +3,18 @@
 import { useState } from 'react';
 import { FaStar, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import type { UseMutationResult } from '@tanstack/react-query';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import type { EvaluationRequest, EvaluationResponse } from '@/app/types';
-import styles from '@/app/(guest)/tests/result/[userTestId]/_components/TestEvaluationModal.module.scss';
+import styles from '@/app/[locale]/(guest)/tests/result/[userTestId]/_components/TestEvaluationModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-const RATING_LABELS = ['Rất tệ', 'Chưa tốt', 'Bình thường', 'Tốt', 'Rất tốt'];
+const RATING_LABEL_KEYS = ['veryBad', 'notGood', 'okay', 'good', 'veryGood'] as const;
 
 type TestEvaluationModalProps = {
     show: boolean;
@@ -30,6 +31,7 @@ const TestEvaluationModal = ({
     onAlreadyEvaluated,
     submitMutation,
 }: TestEvaluationModalProps) => {
+    const t = useTranslations('TestTaking.evaluation');
     const [rating, setRating] = useState(0);
     const [content, setContent] = useState('');
     const submitting = submitMutation.isPending;
@@ -37,21 +39,21 @@ const TestEvaluationModal = ({
     const handleSubmit = (e?: React.SyntheticEvent) => {
         e?.preventDefault();
         if (!rating) {
-            toast.warning('Vui lòng chọn số sao');
+            toast.warning(t('ratingRequired'));
             return;
         }
 
         submitMutation.mutate(
             { rating, content: content.trim() || undefined },
             {
-                onSuccess: () => toast.success('Cảm ơn bạn đã đánh giá đề!'),
+                onSuccess: () => toast.success(t('thanks')),
                 onError: (error) => {
                     const status = (error as { response?: { status?: number } })?.response?.status;
                     if (status === 409) {
                         onAlreadyEvaluated();
                         return;
                     }
-                    toast.error(getApiErrorMessage(error, 'Gửi đánh giá thất bại. Vui lòng thử lại sau!'));
+                    toast.error(getApiErrorMessage(error, t('submitFailed')));
                 },
             },
         );
@@ -62,9 +64,9 @@ const TestEvaluationModal = ({
             onCancel={onDismiss}
             onSubmit={handleSubmit}
             loading={submitting}
-            cancelLabel="Để sau"
-            submitLabel="Gửi đánh giá"
-            loadingLabel="Đang gửi..."
+            cancelLabel={t('later')}
+            submitLabel={t('submit')}
+            loadingLabel={t('submitting')}
         />
     );
 
@@ -72,47 +74,50 @@ const TestEvaluationModal = ({
         <BaseModal
             show={show}
             onClose={submitting ? () => {} : onDismiss}
-            title="Bạn thấy đề này thế nào?"
+            title={t('title')}
             maxWidth={550}
             footer={footer}
         >
             <form onSubmit={handleSubmit}>
                 {testTitle && (
                     <p className="mb-3">
-                        Đề: <strong>{testTitle}</strong>
+                        {t.rich('testLabel', {
+                            title: testTitle,
+                            strong: (chunks) => <strong>{chunks}</strong>,
+                        })}
                     </p>
                 )}
 
                 <div className={cx('formGroup')}>
-                    <label className={cx('label')}>Mức độ hài lòng</label>
+                    <label className={cx('label')}>{t('satisfaction')}</label>
                     <div className={cx('ratingSelect')}>
                         {[...Array(5)].map((_, i) => (
                             <FaStar
                                 key={i}
                                 className={i < rating ? cx('starActive') : cx('starInactive')}
                                 onClick={() => setRating(i + 1)}
-                                aria-label={`${i + 1} sao`}
+                                aria-label={t('stars', { count: i + 1 })}
                             />
                         ))}
-                        {rating > 0 && <span className={cx('ratingText')}>{RATING_LABELS[rating - 1]}</span>}
+                        {rating > 0 && <span className={cx('ratingText')}>{t(`ratingLabels.${RATING_LABEL_KEYS[rating - 1]}`)}</span>}
                     </div>
                 </div>
 
                 <div className={cx('formGroup')}>
-                    <label className={cx('label')}>Góp ý thêm (không bắt buộc)</label>
+                    <label className={cx('label')}>{t('feedbackLabel')}</label>
                     <div className={cx('inputWrapper')}>
                         <textarea
                             className={cx('inputControl')}
                             rows={4}
                             maxLength={2000}
-                            placeholder="Đề khó/dễ thế nào, có câu nào sai đáp án hay giải thích chưa rõ không?"
+                            placeholder={t('feedbackPlaceholder')}
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
                         ></textarea>
                     </div>
                     <div className={cx('tip')}>
                         <FaInfoCircle />
-                        <span>Đánh giá chỉ được gửi tới đội ngũ quản trị để cải thiện đề, không hiển thị công khai.</span>
+                        <span>{t('privacyTip')}</span>
                     </div>
                 </div>
             </form>

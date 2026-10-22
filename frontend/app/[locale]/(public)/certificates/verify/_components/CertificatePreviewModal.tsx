@@ -2,6 +2,7 @@
 
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import CertificateCanvas from '@/app/features/certificates/CertificateCanvas/CertificateCanvas';
@@ -21,6 +22,7 @@ type CertificatePreviewModalProps = {
 };
 
 function CertificatePreviewModal({ code, onClose }: CertificatePreviewModalProps) {
+  const t = useTranslations('Certificates');
   const { data: result, isLoading, isError } = useCertificateVerification(code || undefined);
 
   const state = isError ? CertificateVerifyState.NOT_FOUND : result?.state;
@@ -32,13 +34,13 @@ function CertificatePreviewModal({ code, onClose }: CertificatePreviewModalProps
     <BaseModal
       show={Boolean(code)}
       onClose={onClose}
-      title={result?.recipientName || 'Chứng chỉ'}
+      title={result?.recipientName || t('preview.fallbackTitle')}
       maxWidth={MODAL_MAX_WIDTH}
     >
       {isLoading && (
         <div className={cx('state')}>
           <Spinner animation="border" />
-          <p>Đang tải chứng chỉ {code}...</p>
+          <p>{t('preview.loading', { code: code ?? '' })}</p>
         </div>
       )}
 
@@ -56,7 +58,7 @@ function CertificatePreviewModal({ code, onClose }: CertificatePreviewModalProps
       {!isLoading && !showCertificate && (
         <div className={cx('state')}>
           <StateIcon size={36} />
-          <p>{view.message}</p>
+          <p>{t(view.message)}</p>
         </div>
       )}
     </BaseModal>

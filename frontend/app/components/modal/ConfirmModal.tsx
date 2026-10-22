@@ -2,6 +2,7 @@
 
 import { useMounted } from '@/app/hooks/useMounted';
 import ReactDOM from 'react-dom';
+import { useTranslations } from 'next-intl';
 import { IoClose, IoWarningOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from './ConfirmModal.module.scss';
@@ -24,13 +25,14 @@ const ConfirmModal = ({
     show,
     onClose,
     onConfirm,
-    title = 'Xác nhận',
+    title,
     message = '',
     icon: Icon = IoWarningOutline,
     variant = 'primary',
-    confirmText = 'Xác nhận',
-    cancelText = 'Hủy bỏ',
+    confirmText,
+    cancelText,
 }: ConfirmModalProps) => {
+    const t = useTranslations('Common');
   const mounted = useMounted();
 
     if (!show || !mounted) return null;
@@ -40,9 +42,9 @@ const ConfirmModal = ({
             <div className={cx('content')} onClick={(e) => e.stopPropagation()}>
                 <div className={cx('header')}>
                     <div className={cx('titleWrapper')}>
-                        <h3 className={cx('title')}>{title}</h3>
+                        <h3 className={cx('title')}>{title ?? t('confirm')}</h3>
                     </div>
-                    <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label="Đóng">
+                    <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label={t('close')}>
                         <IoClose />
                     </button>
                 </div>
@@ -54,10 +56,10 @@ const ConfirmModal = ({
                 </div>
                 <div className={cx('footer')}>
                     <button type="button" className={cx('btnCancel')} onClick={onClose}>
-                        {cancelText}
+                        {cancelText ?? t('cancel')}
                     </button>
                     <button type="button" className={cx('btnConfirm', variant)} onClick={onConfirm}>
-                        {confirmText}
+                        {confirmText ?? t('confirm')}
                     </button>
                 </div>
             </div>

@@ -3,6 +3,7 @@
 import ReactDOM from 'react-dom';
 import classNames from 'classnames/bind';
 import { Trophy, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import styles from '@/app/features/learning-plans/PlanCongratsModal/PlanCongratsModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -32,6 +33,8 @@ type PlanCongratsModalProps = {
 };
 
 function PlanCongratsModal({ show, onClose, onNext, totalTasks, planSequence }: PlanCongratsModalProps) {
+  const t = useTranslations('LearningPlans');
+  const tc = useTranslations('Common');
   if (!show) return null;
 
   return ReactDOM.createPortal(
@@ -41,22 +44,24 @@ function PlanCongratsModal({ show, onClose, onNext, totalTasks, planSequence }: 
           {CONFETTI_PIECES.map((style, i) => (
             <span key={i} className={cx('confetti')} style={style} aria-hidden />
           ))}
-          <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label="Đóng">
+          <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label={tc('close')}>
             <X size={18} />
           </button>
           <div className={cx('trophyRing')}>
             <Trophy />
           </div>
-          <h2 className={cx('heroTitle')}>Chúc mừng!</h2>
+          <h2 className={cx('heroTitle')}>{t('congrats.title')}</h2>
           <p className={cx('heroSub')}>
-            Bạn đã vượt toàn bộ ải của lộ trình{planSequence != null ? ` ${planSequence}` : ''}
+            {planSequence != null
+              ? t('congrats.subtitleWithSequence', { sequence: planSequence })
+              : t('congrats.subtitle')}
           </p>
         </div>
 
         <div className={cx('body')}>
           {totalTasks != null && (
             <span className={cx('progressPill')}>
-              {totalTasks}/{totalTasks} ải hoàn thành
+              {t('congrats.progress', { total: totalTasks })}
             </span>
           )}
 
@@ -64,24 +69,23 @@ function PlanCongratsModal({ show, onClose, onNext, totalTasks, planSequence }: 
             <li className={cx('nextStep')}>
               <span className={cx('stepNum')}>1</span>
               <span className={cx('stepText')}>
-                Làm một bài <strong>thi thử trọn đề</strong> để chấm lại độ sẵn sàng thật của bạn.
+                {t.rich('congrats.step1', { strong: (chunks) => <strong>{chunks}</strong> })}
               </span>
             </li>
             <li className={cx('nextStep')}>
               <span className={cx('stepNum')}>2</span>
               <span className={cx('stepText')}>
-                Quay lại trang lộ trình và <strong>sinh lộ trình mới từ chính bài đó</strong>
-                lặp đến khi đạt mục tiêu.
+                {t.rich('congrats.step2', { strong: (chunks) => <strong>{chunks}</strong> })}
               </span>
             </li>
           </ul>
 
           <div className={cx('actions')}>
             <button type="button" className={cx('btnPrimary')} onClick={onNext}>
-              Xem bước tiếp theo
+              {t('common.nextStep')}
             </button>
             <button type="button" className={cx('btnGhost')} onClick={onClose}>
-              Để sau
+              {t('congrats.later')}
             </button>
           </div>
         </div>

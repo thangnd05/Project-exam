@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import {Badge, Button, Form} from 'react-bootstrap';
+import {useLocale, useTranslations} from 'next-intl';
 import {Eye, Trash2} from 'lucide-react';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -14,8 +15,8 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '@/app/(admin)/_components/common';
-import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
+} from '@/app/[locale]/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import {EVALUATION_GENERAL_FILTER} from '@/app/apis/evaluationApi';
 import type {EvaluationTestStats} from '@/app/types';
 import {
@@ -33,6 +34,8 @@ const LOW_AVERAGE_THRESHOLD = 3.5;
 const ratingVariant = (rating: number) => (rating >= 4 ? 'success' : rating >= 3 ? 'warning' : 'danger');
 
 function EvaluationsManagement() {
+  const t = useTranslations('AdminContent.evaluations');
+  const dateLocale = useLocale() === 'en' ? 'en-US' : 'vi-VN';
   const ITEMS_PER_PAGE = 10;
   const [tab, setTab] = useState<Tab>('byTest');
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,36 +93,36 @@ function EvaluationsManagement() {
       await deleteMutation.mutateAsync(deletingEvaluation.id);
       setDeletingEvaluation(null);
     } catch {
-      setErrorMessage('Không thể xóa đánh giá.');
+      setErrorMessage(t('errors.deleteFailed'));
     }
   };
 
   const statsColumns: AdminTableColumn[] = [
-    {key: 'testTitle', header: 'Đề', render: (s: EvaluationTestStats) => s.testTitle},
+    {key: 'testTitle', header: t('columns.test'), render: (s: EvaluationTestStats) => s.testTitle},
     {
       key: 'averageRating',
-      header: 'Trung bình',
+      header: t('columns.average'),
       render: (s: EvaluationTestStats) => (
         <Badge bg={s.averageRating < LOW_AVERAGE_THRESHOLD ? 'danger' : 'success'}>
           {s.averageRating.toFixed(2)}/5
         </Badge>
       ),
     },
-    {key: 'count', header: 'Lượt đánh giá', render: (s: EvaluationTestStats) => s.count},
-    {key: 'lowRatingCount', header: 'Số lượt 1–2 sao', render: (s: EvaluationTestStats) => s.lowRatingCount},
+    {key: 'count', header: t('columns.count'), render: (s: EvaluationTestStats) => s.count},
+    {key: 'lowRatingCount', header: t('columns.lowRatingCount'), render: (s: EvaluationTestStats) => s.lowRatingCount},
   ];
 
   const listColumns: AdminTableColumn[] = [
     {
       key: 'username',
-      header: 'Người dùng',
-      render: (evaluation: AdminEvaluation) => <div>{evaluation.username}</div>,
+      header: t('columns.user'),
+      render: (evaluation: AdminEvaluation) => <div>{evaluation.username || t('anonymous')}</div>,
     },
     {
       key: 'test',
-      header: 'Đề',
+      header: t('columns.test'),
       render: (evaluation: AdminEvaluation) =>
-        evaluation.test_title ?? <span className="text-muted">Chung</span>,
+        evaluation.test_title ?? <span className="text-muted">{t('general')}</span>,
     },
     {
       key: 'rating',
@@ -130,16 +133,16 @@ function EvaluationsManagement() {
     },
     {
       key: 'content',
-      header: 'Góp ý',
+      header: t('columns.content'),
       render: (evaluation: AdminEvaluation) =>
         evaluation.content || <span className="text-muted">—</span>,
     },
     {
       key: 'created_at',
-      header: 'Ngày tạo',
+      header: t('columns.createdAt'),
       render: (evaluation: AdminEvaluation) =>
         evaluation.created_at
-          ? new Date(evaluation.created_at).toLocaleString('vi-VN')
+          ? new Date(evaluation.created_at).toLocaleString(dateLocale)
           : '-',
     },
   ];
@@ -147,39 +150,39 @@ function EvaluationsManagement() {
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Đánh giá đề"
-        description="Học viên đánh giá đề sau khi làm full. Chỉ quản trị viên xem được, dùng để cải thiện chất lượng đề."
+        title={t('title')}
+        description={t('description')}
       />
 
       <StatCardGroup>
-        <StatCard label="Lượt đánh giá đề" value={summary.total} />
-        <StatCard label="Điểm trung bình" value={summary.average} />
-        <StatCard label={`Đề dưới ${LOW_AVERAGE_THRESHOLD} sao`} value={summary.lowTests} />
+        <StatCard label={t('stats.total')} value={summary.total} />
+        <StatCard label={t('stats.average')} value={summary.average} />
+        <StatCard label={t('stats.lowTests', {threshold: LOW_AVERAGE_THRESHOLD})} value={summary.lowTests} />
       </StatCardGroup>
 
       <AdminTabs
         activeKey={tab}
         onSelect={(key) => setTab((key as Tab) || 'byTest')}
         items={[
-          {key: 'byTest', label: 'Theo đề'},
-          {key: 'list', label: 'Tất cả đánh giá'},
+          {key: 'byTest', label: t('tabs.byTest')},
+          {key: 'list', label: t('tabs.list')},
         ]}
       />
 
       {tab === 'byTest' ? (
         <>
-          <AdminFieldError message={statsError ? 'Không thể tải thống kê đánh giá.' : ''} />
+          <AdminFieldError message={statsError ? t('errors.statsLoadFailed') : ''} />
           <AdminTable
             showIndex
             paginated
-            itemLabel="đề"
+            itemLabel={t('testItemLabel')}
             columns={statsColumns}
             data={stats}
             loading={statsLoading}
-            emptyText="Chưa có đánh giá đề nào."
+            emptyText={t('statsEmpty')}
             getRowKey={(s: EvaluationTestStats) => s.testId}
             rowActions={(s: EvaluationTestStats) => (
-              <button onClick={() => showTestEvaluations(s.testId)} title="Xem đánh giá của đề">
+              <button onClick={() => showTestEvaluations(s.testId)} title={t('viewTestEvaluations')}>
                 <Eye size={14} />
               </button>
             )}
@@ -193,7 +196,7 @@ function EvaluationsManagement() {
               setKeyword(value);
               setCurrentPage(1);
             }}
-            searchPlaceholder="Tìm theo nội dung góp ý..."
+            searchPlaceholder={t('searchPlaceholder')}
           >
             <Form.Select
               value={testFilter}
@@ -202,11 +205,11 @@ function EvaluationsManagement() {
                 setCurrentPage(1);
               }}
             >
-              <option value="all">Tất cả đề</option>
+              <option value="all">{t('filters.allTests')}</option>
               {stats.map((s) => (
                 <option key={s.testId} value={s.testId}>{s.testTitle}</option>
               ))}
-              <option value={EVALUATION_GENERAL_FILTER}>Đánh giá chung (cũ)</option>
+              <option value={EVALUATION_GENERAL_FILTER}>{t('filters.general')}</option>
             </Form.Select>
             <Form.Select
               value={ratingFilter}
@@ -215,26 +218,26 @@ function EvaluationsManagement() {
                 setCurrentPage(1);
               }}
             >
-              <option value="all">Tất cả rating</option>
-              <option value="5">5 sao</option>
-              <option value="4">4 sao</option>
-              <option value="3">3 sao</option>
-              <option value="2">2 sao</option>
-              <option value="1">1 sao</option>
+              <option value="all">{t('filters.allRatings')}</option>
+              <option value="5">{t('filters.stars', {count: 5})}</option>
+              <option value="4">{t('filters.stars', {count: 4})}</option>
+              <option value="3">{t('filters.stars', {count: 3})}</option>
+              <option value="2">{t('filters.stars', {count: 2})}</option>
+              <option value="1">{t('filters.stars', {count: 1})}</option>
             </Form.Select>
             {testFilter !== 'all' && (
               <Button variant="outline-secondary" onClick={() => setTestFilter('all')}>
-                Bỏ lọc đề
+                {t('filters.clearTest')}
               </Button>
             )}
           </AdminToolbar>
           <AdminFieldError
-            message={errorMessage || (isError ? 'Không thể tải danh sách đánh giá.' : '')}
+            message={errorMessage || (isError ? t('errors.loadFailed') : '')}
           />
 
           <AdminTable
             showIndex
-            itemLabel="đánh giá"
+            itemLabel={t('itemLabel')}
             columns={listColumns}
             data={evaluationList}
             loading={loading}
@@ -248,7 +251,7 @@ function EvaluationsManagement() {
               <button
                 className="danger"
                 onClick={() => setDeletingEvaluation(evaluation)}
-                title="Xóa đánh giá"
+                title={t('delete')}
               >
                 <Trash2 size={14} />
               </button>
@@ -266,8 +269,8 @@ function EvaluationsManagement() {
           setDeletingEvaluation(null);
         }}
         onConfirm={handleDelete}
-        title="Xác nhận xóa đánh giá"
-        message="Bạn có chắc muốn xóa đánh giá này không?"
+        title={t('deleteTitle')}
+        message={t('deleteMessage')}
       />
     </div>
   );

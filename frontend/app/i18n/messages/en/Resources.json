@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Resources",
+    "description": "Exam prep resources on WinDe, organized by exam."
+  },
+  "library": {
+    "pageTitle": "Resource library",
+    "searchLabel": "Search resources",
+    "searchPlaceholder": "Search by title, exam domain, or service (CodePipeline, VPC...)",
+    "showing": "Showing <strong>{count}</strong> {count, plural, one {resource} other {resources}}",
+    "resetFilters": "Reset filters",
+    "examFilterLabel": "Filter by exam",
+    "examLabel": "Exam:",
+    "partFilterLabel": "Filter by exam domain",
+    "partLabel": "Domain:",
+    "allParts": "All",
+    "unassignedExam": "No exam assigned",
+    "otherVendor": "Other",
+    "readResource": "Read",
+    "loadError": {
+      "title": "Couldn’t load resources",
+      "message": "Try reloading the page."
+    },
+    "empty": {
+      "title": "No resources yet",
+      "message": "Resources will show up here once they’re added to an exam."
+    },
+    "noMatch": {
+      "title": "No matching resources"
+    }
+  },
+  "view": {
+    "loading": "Loading resource...",
+    "loadError": "Couldn’t open this markdown resource. Please try again later.",
+    "print": "Print / Save PDF",
+    "backHome": "Back to home",
+    "readHint": "Read it right here. To keep an offline copy, choose <strong>Print / Save PDF</strong> and pick “Save as PDF” as the printer."
+  }
+}

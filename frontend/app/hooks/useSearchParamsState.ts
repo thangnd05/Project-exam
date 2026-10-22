@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from '@/app/i18n/navigation';
 
 type SearchParamsInit = string | URLSearchParams | Record<string, string> | string[][];
 type NextSearchParams = SearchParamsInit | ((prev: URLSearchParams) => SearchParamsInit);

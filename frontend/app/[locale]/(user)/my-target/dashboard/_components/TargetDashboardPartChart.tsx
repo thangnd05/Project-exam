@@ -1,6 +1,7 @@
 'use client';
 
 import classNamesBind from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './TargetDashboardPartChart.module.scss';
 
@@ -23,10 +24,11 @@ function formatPercent(value: number | null | undefined): string {
 }
 
 function TargetDashboardPartChart({ rows }: { rows: PartChartRow[] }) {
+  const t = useTranslations('MyTarget');
   if (!rows.length) {
     return (
       <p className={cx('emptyHint')}>
-        Chưa có mục tiêu cho từng phần. Hãy cập nhật ở trang Mục tiêu.
+        {t('partChart.empty')}
       </p>
     );
   }
@@ -53,16 +55,20 @@ function TargetDashboardPartChart({ rows }: { rows: PartChartRow[] }) {
                   )}
                 >
                   {!hasCurrent
-                    ? 'Chưa có dữ liệu'
+                    ? t('partChart.noData')
                     : row.reached
-                      ? 'Đạt'
-                      : `Còn ${(row.aim - (row.current ?? 0)).toFixed(1)}%`}
+                      ? t('partChart.reached')
+                      : t('partChart.remaining', { pct: (row.aim - (row.current ?? 0)).toFixed(1) })}
                 </span>
               </div>
               <div
                 className={cx('track')}
                 role="img"
-                aria-label={`${row.name}: hiện tại ${hasCurrent ? formatPercent(row.current) : 'chưa có'}, mục tiêu ${aimPct}%`}
+                aria-label={t('partChart.ariaLabel', {
+                  name: row.name,
+                  current: hasCurrent ? formatPercent(row.current) : t('partChart.ariaNone'),
+                  aim: aimPct,
+                })}
               >
                 <span
                   className={cx('fill', { ok: hasCurrent && row.reached, gap: hasCurrent && !row.reached })}
@@ -78,15 +84,15 @@ function TargetDashboardPartChart({ rows }: { rows: PartChartRow[] }) {
       <div className={cx('legend')}>
         <span>
           <i className={cx('swatch', 'ok')} />
-          Đạt mục tiêu
+          {t('partChart.legend.reached')}
         </span>
         <span>
           <i className={cx('swatch', 'gap')} />
-          Chưa đạt
+          {t('partChart.legend.notReached')}
         </span>
         <span>
           <i className={cx('swatch', 'aimSwatch')} />
-          Vạch mục tiêu
+          {t('partChart.legend.aim')}
         </span>
       </div>
     </>

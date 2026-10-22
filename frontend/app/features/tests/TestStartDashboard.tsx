@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import type { QuestionResponse } from '@/app/types';
 import styles from '@/app/features/exam-layout/TestStart.module.scss';
 
@@ -35,6 +36,7 @@ function TestStartDashboard({
   flaggedQuestionIds = null,
   gridMaxHeight = null,
 }: TestStartDashboardProps) {
+  const t = useTranslations('TestTaking.dashboard');
   const flaggedSet = new Set(flaggedQuestionIds ?? []);
   const gridStyle: React.CSSProperties | undefined =
     columns || gridMaxHeight
@@ -47,7 +49,7 @@ function TestStartDashboard({
     <div className={cx('dashboard')}>
       <div className={cx('dashboard-card')}>
         <div className={cx('dashboard-header')}>
-          <span>Danh sách câu hỏi</span>
+          <span>{t('title')}</span>
         </div>
         <div className={cx('question-grid')} style={gridStyle}>
           {allQuestions.map((q, idx) => {
@@ -76,7 +78,7 @@ function TestStartDashboard({
                 onClick={() => !locked && onScrollToQuestion(q.questionId)}
                 disabled={locked}
                 aria-current={isCurrent ? 'true' : undefined}
-                aria-label={`Câu ${idx + 1}${isAnswered ? ', đã làm' : ''}${isFlagged ? ', đã đánh dấu' : ''}${locked ? ', đang khoá' : ''}`}
+                aria-label={`${t('questionLabel', { number: idx + 1 })}${isAnswered ? t('ariaAnswered') : ''}${isFlagged ? t('ariaFlagged') : ''}${locked ? t('ariaLocked') : ''}`}
               >
                 {idx + 1}
               </button>
@@ -86,16 +88,16 @@ function TestStartDashboard({
         <div className={cx('dashboard-footer')}>
           <div className={cx('status-item')}>
             <span className={cx('dot', 'answered')} />
-            <span>Đã làm</span>
+            <span>{t('answered')}</span>
           </div>
           <div className={cx('status-item')}>
             <span className={cx('dot')} />
-            <span>Chưa làm</span>
+            <span>{t('unanswered')}</span>
           </div>
           {flaggedQuestionIds && (
             <div className={cx('status-item')}>
               <span className={cx('dot', 'flagged')} />
-              <span>Đánh dấu ({flaggedQuestionIds.length})</span>
+              <span>{t('flagged', { count: flaggedQuestionIds.length })}</span>
             </div>
           )}
         </div>

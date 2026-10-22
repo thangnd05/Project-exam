@@ -1,8 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import TestStateScreens from './_components/TestStateScreens';
 import { useTestSession } from './_hooks/useTestSession';
 import type { TestRef } from '@/app/features/tests/testRef';
@@ -18,6 +19,7 @@ const STATE_SCREEN_STATUSES = ['loading', 'ready', 'payment', 'no-attempts', 'lo
 // testRef do page server tra từ slug trên URL (/tests/aws-dop-c02-test-1/start) rồi truyền xuống.
 function TestStart({ testRef }: { testRef: TestRef }) {
   const router = useRouter();
+  const t = useTranslations('TestTaking.start');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const {
     isPractice,
@@ -140,7 +142,7 @@ function TestStart({ testRef }: { testRef: TestRef }) {
       <BaseModal
         show={confirmOpen}
         onClose={closeConfirm}
-        title="Nộp bài?"
+        title={t('confirmSubmit.title')}
         maxWidth={440}
         footer={
           <div className={cx('state-actions')}>
@@ -149,37 +151,33 @@ function TestStart({ testRef }: { testRef: TestRef }) {
               className={cx('state-btn', 'state-btn-secondary')}
               onClick={closeConfirm}
             >
-              Làm tiếp
+              {t('confirmSubmit.continue')}
             </button>
             <button
               type="button"
               className={cx('state-btn', 'state-btn-primary')}
               onClick={confirmSubmit}
             >
-              Nộp bài
+              {t('confirmSubmit.submit')}
             </button>
           </div>
         }
       >
         <p className={cx('submit-confirm-text')}>
-          {unansweredCount > 0 ? (
-            <>
-              Bạn còn{' '}
-              <strong>
-                {unansweredCount}/{allQuestions.length} câu
-              </strong>{' '}
-              chưa trả lời. Nộp rồi thì không sửa được nữa.
-            </>
-          ) : (
-            <>
-              Bạn đã trả lời hết {allQuestions.length} câu. Nộp rồi thì không
-              sửa được nữa.
-            </>
-          )}
+          {unansweredCount > 0
+            ? t.rich('confirmSubmit.unanswered', {
+                unanswered: unansweredCount,
+                total: allQuestions.length,
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })
+            : t('confirmSubmit.allAnswered', { total: allQuestions.length })}
           {flaggedQuestionIds.length > 0 && (
             <>
               {' '}
-              Còn <strong>{flaggedQuestionIds.length} câu</strong> bạn đã đánh dấu để xem lại.
+              {t.rich('confirmSubmit.flagged', {
+                count: flaggedQuestionIds.length,
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
             </>
           )}
         </p>

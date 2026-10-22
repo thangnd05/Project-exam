@@ -1,11 +1,13 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { buildTestPath } from '@/app/configs/Routes';
 import { useEffect, useLayoutEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache';
 import { toast } from 'react-toastify';
+import { useTranslations } from 'next-intl';
 import { checkActiveUserTest, startUserTest, submitUserTest } from '@/app/apis/userTestApi';
 import { getAnswersByUserTest, batchSaveAnswers, sendAnswersOnExit } from '@/app/apis/userAnswerApi';
 import { getUserTestInfo, purchaseTestAccess } from '@/app/apis/testApi';
@@ -26,8 +28,8 @@ import {
   readExamSessionState,
   writeExamSessionId,
   writeExamSessionState,
-} from '@/app/(guest-exam)/tests/[testId]/start/_lib/examStorage';
-import { clockMark, serverNowMs, syncServerClock } from '@/app/(guest-exam)/tests/[testId]/start/_lib/serverClock';
+} from '@/app/[locale]/(guest-exam)/tests/[testId]/start/_lib/examStorage';
+import { clockMark, serverNowMs, syncServerClock } from '@/app/[locale]/(guest-exam)/tests/[testId]/start/_lib/serverClock';
 import type { UserTestMode } from '@/app/enums';
 import type {
   ActiveUserTestResponse,
@@ -36,7 +38,7 @@ import type {
   UserAnswerRequest,
   UserAnswerResponse,
 } from '@/app/types';
-import { enrichTestWithPassageMedia } from '@/app/(guest-exam)/tests/[testId]/start/_lib/passageUtils';
+import { enrichTestWithPassageMedia } from '@/app/[locale]/(guest-exam)/tests/[testId]/start/_lib/passageUtils';
 import { useExamFlowNavigation } from './useExamFlowNavigation';
 import {examTypeKeys, completedUserTestKeys} from '@/app/configs/queryKeys';
 
@@ -93,6 +95,7 @@ const mergeLocalAnswers = (
 
 export function useTestSession(testId: string) {
   const router = useRouter();
+  const t = useTranslations('TestTaking.start');
   const queryClient = useQueryClient();
   // Bài vừa nộp phải hiện ngay ở trang sinh lộ trình và dashboard mục tiêu.
   const invalidateAfterSubmit = () => {
@@ -272,7 +275,7 @@ export function useTestSession(testId: string) {
           router.push(
             `/login?${new URLSearchParams({
               from: buildTestPath({ testId, slug: testData.slug }, 'start'),
-              flash: 'Bạn cần đăng nhập để làm bài thi này!',
+              flash: t('loginRequiredFlash'),
             }).toString()}`,
           );
           return;
@@ -364,7 +367,7 @@ export function useTestSession(testId: string) {
         if (!isStale()) setStatus('error');
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [testId, sessionKey, isPractice, selectedPartIds, router, isGuest, guestCfg]);
+  }, [testId, sessionKey, isPractice, selectedPartIds, router, isGuest, guestCfg, t]);
 
   useEffect(() => {
     if (!testId || authLoading) return undefined;
@@ -577,7 +580,7 @@ export function useTestSession(testId: string) {
         const retry = autoSubmitRetryRef.current;
         const delay = AUTO_SUBMIT_RETRY_MS[Math.min(retry.attempt, AUTO_SUBMIT_RETRY_MS.length - 1)];
         retry.attempt += 1;
-        toast.warning('Mất kết nối khi nộp bài. Đang tự thử nộp lại, đừng đóng trang...', {
+        toast.warning(t('autoSubmitRetry'), {
           toastId: AUTO_SUBMIT_RETRY_TOAST_ID,
           autoClose: false,
         });
@@ -589,7 +592,7 @@ export function useTestSession(testId: string) {
         return;
       }
       clearAutoSubmitRetry();
-      toast.error(getApiErrorMessage(err, 'Nộp bài thất bại! Vui lòng thử lại.'));
+      toast.error(getApiErrorMessage(err, t('submitFailed')));
     }
     submittingRef.current = false;
     setIsSubmitting(false);
@@ -684,11 +687,11 @@ export function useTestSession(testId: string) {
     try {
       await purchaseTestAccess(testId);
       await refreshCoins();
-      toast.success('Đã mở khoá bài kiểm tra!');
+      toast.success(t('unlockSuccess'));
       setStatus('loading');
       loadTest();
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Mở khoá thất bại. Vui lòng thử lại.'));
+      toast.error(getApiErrorMessage(error, t('unlockFailed')));
     } finally {
       setPurchasing(false);
     }

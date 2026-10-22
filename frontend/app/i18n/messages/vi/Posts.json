@@ -1,0 +1,113 @@
+{
+  "meta": {
+    "title": "Bài viết",
+    "description": "Mẹo làm bài, chiến thuật và kinh nghiệm luyện thi."
+  },
+  "common": {
+    "loading": "Đang tải...",
+    "backToProfile": "Trở lại hồ sơ",
+    "viewDetail": "Xem chi tiết",
+    "saves": "Lượt lưu",
+    "myPosts": "Bài viết của tôi",
+    "savedPosts": "Bài đã lưu"
+  },
+  "list": {
+    "title": "Bài viết",
+    "create": "Tạo bài viết",
+    "searchPlaceholder": "Tìm bài viết...",
+    "approvalNotice": "Bài viết mới cần được admin duyệt trước khi hiển thị công khai. Nếu sau một thời gian bài của bạn không xuất hiện ở đây, có thể bài đã bị xóa do không phù hợp.",
+    "all": "Tất cả"
+  },
+  "detail": {
+    "fallbackTitle": "Bài viết",
+    "loginToComment": "Vui lòng đăng nhập để bình luận",
+    "loginToLike": "Vui lòng đăng nhập để thả tim",
+    "loginToSave": "Vui lòng đăng nhập để lưu bài viết",
+    "authorTag": "Tác giả",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "reply": "Trả lời",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "send": "Gửi",
+    "replyPlaceholder": "Viết câu trả lời cho {name}...",
+    "showAllReplies": "Xem tất cả {count} phản hồi",
+    "hideReplies": "Ẩn bớt phản hồi",
+    "loading": "Đang tải bài viết...",
+    "loadError": "Không tải được bài viết. Vui lòng kiểm tra kết nối và thử lại.",
+    "backToList": "Về danh sách",
+    "retry": "Thử lại",
+    "notFound": "Không tìm thấy bài viết.",
+    "copied": "Đã sao chép",
+    "breadcrumbHome": "Trang chủ",
+    "comments": "Bình luận ({count})",
+    "commentPlaceholder": "Chia sẻ suy nghĩ của bạn về bài viết này...",
+    "postComment": "Đăng bình luận",
+    "related": "Bài viết liên quan",
+    "deleteCommentTitle": "Xác nhận xóa bình luận",
+    "deleteCommentMessage": "Bạn có chắc muốn xóa bình luận này? Hành động này không thể hoàn tác."
+  },
+  "editor": {
+    "loginRequired": " Bạn cần đăng nhập trước khi đăng bài viết!",
+    "missingFields": " Vui lòng điền đầy đủ tiêu đề, nội dung và chọn danh mục!",
+    "createTitle": "Tạo bài viết mới",
+    "editTitle": "Chỉnh sửa bài viết",
+    "cancel": "Hủy bỏ",
+    "submitCreate": "Đăng bài ngay",
+    "submitEdit": "Lưu thay đổi",
+    "processing": "Đang xử lý...",
+    "titleLabel": "Tiêu đề bài viết",
+    "titlePlaceholder": "Nhập tiêu đề hấp dẫn cho bài viết...",
+    "categoryLabel": "Danh mục",
+    "categoryPlaceholder": "Chọn danh mục...",
+    "thumbnailUploadLabel": "Ảnh bìa (Upload từ máy tính)",
+    "thumbnailSelected": "Đã chọn: {name}",
+    "thumbnailUrlLabel": "Hoặc dán Link (URL) ảnh bìa",
+    "thumbnailUrlPlaceholder": "Dán link ảnh bìa tại đây...",
+    "thumbnailNote": "* Lưu ý: Nếu bạn chọn cả Upload ảnh và dán Link URL, hệ thống sẽ ưu tiên sử dụng ảnh Upload.",
+    "contentLabel": "Nội dung chi tiết",
+    "contentPlaceholder": "Viết nội dung bài viết tại đây..."
+  },
+  "myPosts": {
+    "subtitle": "Quản lý và theo dõi trạng thái các bài viết của bạn.",
+    "searchPlaceholder": "Tìm kiếm bài viết...",
+    "status": {
+      "all": "Tất cả",
+      "approved": "Đã duyệt",
+      "pending": "Chờ duyệt"
+    },
+    "loadError": "Không tải được danh sách bài viết của bạn.",
+    "editLoadError": "Không tải được nội dung bài viết để chỉnh sửa.",
+    "deleted": "Đã xóa bài viết",
+    "deleteError": "Không thể xóa bài viết. Vui lòng thử lại.",
+    "emptyFiltered": "Không có bài viết nào khớp với bộ lọc hiện tại.",
+    "empty": "Bạn chưa đăng bài viết nào. <link>Tạo bài viết đầu tiên</link>.",
+    "edit": "Chỉnh sửa",
+    "delete": "Xóa bài viết",
+    "deleteTitle": "Xác nhận xóa bài viết",
+    "deleteMessage": "Xóa bài viết \"{title}\"? Hành động này không thể hoàn tác."
+  },
+  "saved": {
+    "title": "Bài viết đã lưu",
+    "subtitle": "Những bài viết bạn đã đánh dấu để xem lại.",
+    "searchPlaceholder": "Tìm trong bài đã lưu...",
+    "loadError": "Không tải được danh sách bài đã lưu.",
+    "unsaved": "Đã bỏ lưu",
+    "unsaveError": "Không thể bỏ lưu. Vui lòng thử lại.",
+    "emptyFiltered": "Không có bài viết nào khớp với từ khóa.",
+    "empty": "Bạn chưa lưu bài viết nào. Mở một bài và bấm icon <icon></icon> để lưu lại.",
+    "anonymous": "Ẩn danh",
+    "unsave": "Bỏ lưu",
+    "unsaveTitle": "Bỏ lưu bài viết",
+    "unsaveMessage": "Bỏ lưu bài viết \"{title}\"?",
+    "cancel": "Hủy bỏ"
+  },
+  "save": {
+    "uploadingImages": "Đang tải lên {count} ảnh trong nội dung...",
+    "uploadImageError": " Lỗi tải ảnh {name} lên Cloudinary!",
+    "updated": "Cập nhật bài viết thành công!",
+    "created": "Đăng bài viết thành công!",
+    "updateError": "Lỗi khi cập nhật bài viết!",
+    "createError": "Lỗi khi đăng bài viết!"
+  }
+}

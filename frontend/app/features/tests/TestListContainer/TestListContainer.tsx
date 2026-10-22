@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import {useTranslations} from 'next-intl';
 import {Container} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
@@ -62,6 +63,7 @@ const TestListContainer = ({
   footer,
   topSlot,
 }: TestListContainerProps) => {
+  const t = useTranslations('Tests.list');
   const [viewMode, setViewMode] = useState('grid');
 
   return (
@@ -83,10 +85,10 @@ const TestListContainer = ({
               activeKey={viewMode}
               onChange={setViewMode}
               options={[
-                {key: 'grid', title: 'Dạng lưới', icon: IoGridOutline},
+                {key: 'grid', title: t('gridView'), icon: IoGridOutline},
                 {
                   key: 'table',
-                  title: 'Quản lý chi tiết (Dạng bảng)',
+                  title: t('tableView'),
                   icon: IoListOutline,
                 },
               ]}
@@ -123,8 +125,8 @@ const TestListContainer = ({
           ) : (
             emptyState || (
               <div className={cx('empty-state')}>
-                <h4>Kho lưu trữ hiện đang trống</h4>
-                <p>Chưa có bài kiểm tra nào được hiển thị ở đây.</p>
+                <h4>{t('empty.title')}</h4>
+                <p>{t('empty.desc')}</p>
               </div>
             )
           )}

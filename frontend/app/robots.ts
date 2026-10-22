@@ -7,7 +7,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin/', '/my-', '/learning-plans/', '/tests/', '/dashboard', '/oauth2/'],
+      // Bản tiếng Anh nằm dưới /en nên chặn cả hai.
+      disallow: ['/admin/', '/my-', '/learning-plans/', '/tests/', '/dashboard', '/oauth2/'].flatMap((p) => [p, `/en${p}`]),
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

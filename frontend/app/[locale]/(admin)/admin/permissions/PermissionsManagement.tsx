@@ -1,15 +1,16 @@
 'use client';
 
 import React, {useMemo, useState} from 'react';
+import {useTranslations} from 'next-intl';
 import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
 import {Save, ShieldCheck} from 'lucide-react';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
 
-import {AdminFieldError, AdminPageHeader} from '@/app/(admin)/_components/common';
+import {AdminFieldError, AdminPageHeader} from '@/app/[locale]/(admin)/_components/common';
 import {usePermissionsMatrix, type PermissionMatrix} from './_hooks/usePermissionsMatrix';
 import type {PermissionResponse, RoleResponse} from '@/app/types';
-import styles from '@/app/(admin)/_components/common/adminKit.module.scss';
+import styles from '@/app/[locale]/(admin)/_components/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -24,6 +25,7 @@ const buildMatrix = (roleList: RoleResponse[]): PermissionMatrix => {
 };
 
 function PermissionsManagement() {
+  const t = useTranslations('AdminUsers');
   const {roles, permissions, isLoading, isError, saveMutation} = usePermissionsMatrix();
   const loading = isLoading;
   const saving = saveMutation.isPending;
@@ -41,19 +43,19 @@ function PermissionsManagement() {
     setOriginal(buildMatrix(roles));
   }
 
-  const displayError = errorMessage || (isError ? 'Không thể tải dữ liệu phân quyền.' : '');
+  const displayError = errorMessage || (isError ? t('permissions.errors.load') : '');
 
   const permissionGroups = useMemo(() => {
     const groups = new Map<string, PermissionResponse[]>();
     permissions.forEach((permission) => {
-      const groupName = permission.groupName || 'Khác';
+      const groupName = permission.groupName || t('shared.other');
       if (!groups.has(groupName)) {
         groups.set(groupName, []);
       }
       groups.get(groupName)!.push(permission);
     });
     return Array.from(groups.entries());
-  }, [permissions]);
+  }, [permissions, t]);
 
   const isProtected = (role: RoleResponse) => role.roleName === PROTECTED_ROLE;
 
@@ -111,16 +113,16 @@ function PermissionsManagement() {
         });
         return snapshot;
       });
-      toast.success(`Đã lưu phân quyền cho ${dirtyRoleIds.length} vai trò.`);
+      toast.success(t('permissions.saved', {count: dirtyRoleIds.length}));
     } catch {
-      setErrorMessage('Không thể lưu phân quyền.');
+      setErrorMessage(t('permissions.errors.save'));
     }
   };
 
   if (loading) {
     return (
       <div className="d-flex align-items-center gap-2 text-muted p-4">
-        <Spinner animation="border" size="sm" /> Đang tải ma trận phân quyền...
+        <Spinner animation="border" size="sm" /> {t('permissions.loading')}
       </div>
     );
   }
@@ -128,8 +130,8 @@ function PermissionsManagement() {
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Phân quyền (RBAC)"
-        description="Tích vào hành động mà mỗi vai trò được phép thực hiện. Đổi quyền có hiệu lực ngay cho người dùng."
+        title={t('permissions.title')}
+        description={t('permissions.description')}
       >
         <Button onClick={handleSave} disabled={saving || dirtyRoleIds.length === 0}>
           {saving ? (
@@ -137,7 +139,7 @@ function PermissionsManagement() {
           ) : (
             <Save size={16} className="me-1" />
           )}
-          Lưu thay đổi
+          {t('permissions.saveChanges')}
           {dirtyRoleIds.length > 0 && (
             <Badge bg="light" text="dark" className="ms-2">
               {dirtyRoleIds.length}
@@ -152,7 +154,7 @@ function PermissionsManagement() {
         <Table hover responsive className="align-middle mb-0">
           <thead>
             <tr>
-              <th style={{minWidth: 280}}>Hành động</th>
+              <th style={{minWidth: 280}}>{t('permissions.actionColumn')}</th>
               {roles.map((role) => (
                 <th key={role.roleId} className="text-center" style={{minWidth: 120}}>
                   <div className="d-flex flex-column align-items-center">
@@ -160,7 +162,7 @@ function PermissionsManagement() {
                     {isProtected(role) ? (
                       <Badge bg="warning" text="dark" className="mt-1">
                         <ShieldCheck size={12} className="me-1" />
-                        Toàn quyền
+                        {t('permissions.fullAccess')}
                       </Badge>
                     ) : (
                       <Badge bg="secondary" className="mt-1">
@@ -208,7 +210,7 @@ function PermissionsManagement() {
                     </tr>
                   ))}
                   <tr>
-                    <td className="text-end text-muted small">Chọn cả nhóm “{groupName}”</td>
+                    <td className="text-end text-muted small">{t('permissions.selectGroup', {group: groupName})}</td>
                     {roles.map((role) => {
                       const locked = isProtected(role);
                       const allChecked = codes.every((code) => hasCode(role.roleId, code));
@@ -220,7 +222,7 @@ function PermissionsManagement() {
                             checked={locked ? true : allChecked}
                             disabled={locked || saving}
                             onChange={() => toggleGroupForRole(role.roleId, codes, allChecked)}
-                            aria-label={`${role.roleName} - chọn nhóm ${groupName}`}
+                            aria-label={t('permissions.selectGroupAria', {role: role.roleName ?? '', group: groupName})}
                           />
                         </td>
                       );

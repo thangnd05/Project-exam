@@ -1,10 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { useMounted } from '@/app/hooks/useMounted';
 import InfoTip from '@/app/components/InfoTip/InfoTip';
-import { TERM_TIPS } from '@/app/features/learning-plans/termTips';
 import { isBeginnerLevel } from '@/app/features/learning-plans/learnerLevel';
 import { buildGaugeView } from '@/app/features/my-target/readiness-label';
 import styles from './Result.module.scss';
@@ -37,6 +37,10 @@ type ReadinessGaugeProps = {
 
 function ReadinessGauge({ enhanced, isPractice = false }: ReadinessGaugeProps) {
   const router = useRouter();
+  const t = useTranslations('TestTaking.readinessGauge');
+  // readiness-label dịch theo namespace MyTarget; truyền translator để nhãn theo ngôn ngữ đang xem.
+  const tTarget = useTranslations('MyTarget');
+  const tPlans = useTranslations('LearningPlans');
   const { examCategoryCode, examTypeId, readinessLevel, hasTarget, correct, total } = enhanced;
 
   const isQuickChallenge = examCategoryCode === 'QUICK_CHALLENGE';
@@ -46,7 +50,7 @@ function ReadinessGauge({ enhanced, isPractice = false }: ReadinessGaugeProps) {
   const isBeginner = mounted && isQuickChallenge && isBeginnerLevel(examTypeId);
 
   const { gaugePercentage, displayValue, gaugeLabel, gaugeTitle, gaugeMessage, gaugeLevel } =
-    buildGaugeView(enhanced, { isBeginner, isPractice });
+    buildGaugeView(enhanced, { isBeginner, isPractice, t: tTarget });
 
   const { color, bg } = isQuickChallenge
     ? ((gaugeLevel && COLOR_MAP[gaugeLevel]) || COLOR_MAP.WEAK)
@@ -88,7 +92,7 @@ function ReadinessGauge({ enhanced, isPractice = false }: ReadinessGaugeProps) {
         <div className={cx('gaugeInfo')}>
           <h3 className={cx('gaugeTitle')} style={{ color: effectiveColor }}>
             {gaugeTitle}
-            {!isQuickChallenge && !hasTarget && <InfoTip text={TERM_TIPS.readiness} />}
+            {!isQuickChallenge && !hasTarget && <InfoTip text={tPlans('termTips.readiness')} />}
           </h3>
           {gaugeMessage && (
             <p className={cx('gaugeMessage')}>
@@ -97,7 +101,11 @@ function ReadinessGauge({ enhanced, isPractice = false }: ReadinessGaugeProps) {
           )}
           {isQuickChallenge && (
             <p className={cx('gaugeStat')}>
-              Trả lời đúng <strong>{correct}/{total}</strong> câu
+              {t.rich('correctStat', {
+                correct,
+                total,
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
             </p>
           )}
         </div>
@@ -109,9 +117,7 @@ function ReadinessGauge({ enhanced, isPractice = false }: ReadinessGaugeProps) {
           style={{ backgroundColor: effectiveColor }}
           onClick={() => router.push(`/exam-types/${examTypeId}`)}
         >
-          {isBeginner
-            ? 'Xem cấu trúc kỳ thi để bắt đầu từ nền tảng'
-            : 'Làm một đề thi thử đầy đủ để biết chính xác trình độ của bạn'}
+          {isBeginner ? t('beginnerCta') : t('fullTestCta')}
         </div>
       )}
     </div>

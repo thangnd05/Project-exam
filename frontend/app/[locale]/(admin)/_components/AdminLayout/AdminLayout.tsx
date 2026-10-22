@@ -1,7 +1,6 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link, { usePathname } from '@/app/i18n/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';
@@ -38,76 +37,121 @@ import {
 import routes from '@/app/configs/Routes';
 import { adminPermissionByPath } from '@/app/configs/adminPermissions';
 import { useAuth } from '@/app/hooks/useAuth';
-import styles from '@/app/(admin)/_components/AdminLayout/AdminLayout.module.scss';
+import { useTranslations } from 'next-intl';
+import styles from '@/app/[locale]/(admin)/_components/AdminLayout/AdminLayout.module.scss';
 
 const cx = classNames.bind(styles);
 
-const adminRouteGroups = [
+type AdminNavGroupKey =
+  | 'overview'
+  | 'users'
+  | 'examSystem'
+  | 'content'
+  | 'community'
+  | 'gamification'
+  | 'system'
+  | 'security';
+
+type AdminNavItemKey =
+  | 'dashboard'
+  | 'analytics'
+  | 'users'
+  | 'roles'
+  | 'permissions'
+  | 'examTypes'
+  | 'tags'
+  | 'examCategories'
+  | 'examParts'
+  | 'skills'
+  | 'questions'
+  | 'questionCollections'
+  | 'scoringConversion'
+  | 'milestones'
+  | 'tests'
+  | 'recoveryResources'
+  | 'certificates'
+  | 'categories'
+  | 'posts'
+  | 'evaluations'
+  | 'coins'
+  | 'quests'
+  | 'cosmetics'
+  | 'streakRecover'
+  | 'emails'
+  | 'auditLogs'
+  | 'loginAudit';
+
+type AdminRouteGroup = {
+  label: AdminNavGroupKey;
+  items: {path: string; icon: React.ReactNode; label: AdminNavItemKey}[];
+};
+
+const adminRouteGroups: AdminRouteGroup[] = [
   {
-    label: 'Tổng quan',
+    label: 'overview',
     items: [
-      {path: routes.adminDashboard, icon: <LayoutDashboard size={20} />, label: 'Dashboard'},
-      {path: routes.adminAnalytics, icon: <BarChart3 size={20} />, label: 'Thống kê'},
+      {path: routes.adminDashboard, icon: <LayoutDashboard size={20} />, label: 'dashboard'},
+      {path: routes.adminAnalytics, icon: <BarChart3 size={20} />, label: 'analytics'},
     ],
   },
   {
-    label: 'Người dùng',
+    label: 'users',
     items: [
-      {path: routes.adminUsers, icon: <Users size={20} />, label: 'Quản lý Users'},
-      {path: routes.adminRoles, icon: <ShieldCheck size={20} />, label: 'Quản lý vai trò'},
-      {path: routes.adminPermissions, icon: <KeyRound size={20} />, label: 'Phân quyền (RBAC)'},
+      {path: routes.adminUsers, icon: <Users size={20} />, label: 'users'},
+      {path: routes.adminRoles, icon: <ShieldCheck size={20} />, label: 'roles'},
+      {path: routes.adminPermissions, icon: <KeyRound size={20} />, label: 'permissions'},
     ],
   },
   {
-    label: 'Hệ thống thi cử',
+    label: 'examSystem',
     items: [
-      {path: routes.adminExamTypes, icon: <Layers size={20} />, label: 'Loại kỳ thi'},
-      {path: routes.adminTags, icon: <Tags size={20} />, label: 'Tag câu hỏi'},
-      {path: routes.adminExamCategories, icon: <Tag size={20} />, label: 'Phân loại bài thi'},
-      {path: routes.adminExamParts, icon: <ListChecks size={20} />, label: 'Phần thi'},
-      {path: routes.adminSkills, icon: <Brain size={20} />, label: 'Kỹ năng'},
-      {path: routes.adminQuestions, icon: <FileQuestion size={20} />, label: 'Quản lý câu hỏi'},
-      {path: routes.adminQuestionCollections, icon: <Library size={20} />, label: 'Bộ sưu tập câu hỏi'},
-      {path: routes.adminScoringConversion, icon: <Calculator size={20} />, label: 'Quy đổi điểm'},
-      {path: routes.adminMilestones, icon: <Target size={20} />, label: 'Mốc điểm mục tiêu'},
+      {path: routes.adminExamTypes, icon: <Layers size={20} />, label: 'examTypes'},
+      {path: routes.adminTags, icon: <Tags size={20} />, label: 'tags'},
+      {path: routes.adminExamCategories, icon: <Tag size={20} />, label: 'examCategories'},
+      {path: routes.adminExamParts, icon: <ListChecks size={20} />, label: 'examParts'},
+      {path: routes.adminSkills, icon: <Brain size={20} />, label: 'skills'},
+      {path: routes.adminQuestions, icon: <FileQuestion size={20} />, label: 'questions'},
+      {path: routes.adminQuestionCollections, icon: <Library size={20} />, label: 'questionCollections'},
+      {path: routes.adminScoringConversion, icon: <Calculator size={20} />, label: 'scoringConversion'},
+      {path: routes.adminMilestones, icon: <Target size={20} />, label: 'milestones'},
     ],
   },
   {
-    label: 'Nội dung',
+    label: 'content',
     items: [
-      {path: routes.adminTests, icon: <FileStack size={20} />, label: 'Quản lý đề thi'},
-      {path: routes.adminRecoveryResources, icon: <BookOpen size={20} />, label: 'Kho tài liệu'},
-      {path: routes.adminCertificates, icon: <Award size={20} />, label: 'Chứng chỉ'},
+      {path: routes.adminTests, icon: <FileStack size={20} />, label: 'tests'},
+      {path: routes.adminRecoveryResources, icon: <BookOpen size={20} />, label: 'recoveryResources'},
+      {path: routes.adminCertificates, icon: <Award size={20} />, label: 'certificates'},
     ],
   },
   {
-    label: 'Cộng đồng',
+    label: 'community',
     items: [
-      {path: routes.adminCategories, icon: <Folder size={20} />, label: 'Danh mục'},
-      {path: routes.adminPosts, icon: <FileText size={20} />, label: 'Duyệt bài viết'},
-      {path: routes.adminEvaluations, icon: <MessageSquareWarning size={20} />, label: 'Đánh giá đề'},
+      {path: routes.adminCategories, icon: <Folder size={20} />, label: 'categories'},
+      {path: routes.adminPosts, icon: <FileText size={20} />, label: 'posts'},
+      {path: routes.adminEvaluations, icon: <MessageSquareWarning size={20} />, label: 'evaluations'},
     ],
   },
   {
-    label: 'Gamification',
+    label: 'gamification',
     items: [
-      {path: routes.adminCoins, icon: <Coins size={20} />, label: 'Quản lý xu'},
-      {path: routes.adminQuests, icon: <Target size={20} />, label: 'Quản lý nhiệm vụ'},
-      {path: routes.adminCosmetics, icon: <Sparkles size={20} />, label: 'Cửa hàng trang trí'},
-      {path: routes.adminStreakRecover, icon: <Flame size={20} />, label: 'Khôi phục chuỗi'},
+      {path: routes.adminCoins, icon: <Coins size={20} />, label: 'coins'},
+      {path: routes.adminQuests, icon: <Target size={20} />, label: 'quests'},
+      {path: routes.adminCosmetics, icon: <Sparkles size={20} />, label: 'cosmetics'},
+      {path: routes.adminStreakRecover, icon: <Flame size={20} />, label: 'streakRecover'},
     ],
   },
   {
-    label: 'Hệ thống',
+    label: 'system',
     items: [
-      {path: routes.adminEmails, icon: <Mail size={20} />, label: 'Email hệ thống'},
+      {path: routes.adminEmails, icon: <Mail size={20} />, label: 'emails'},
     ],
   },
   {
-    label: 'Bảo mật',
+    label: 'security',
     items: [
-      {path: routes.adminAuditLogs, icon: <ShieldAlert size={20} />, label: 'Audit logs'},
-      {path: routes.adminLoginAudit, icon: <KeyRound size={20} />, label: 'Audit đăng nhập'},
+      {path: routes.adminAuditLogs, icon: <ShieldAlert size={20} />, label: 'auditLogs'},
+      {path: routes.adminLoginAudit, icon: <KeyRound size={20} />, label: 'loginAudit'},
     ],
   },
 ];
@@ -121,6 +165,7 @@ function AdminLayout({children}: AdminLayoutProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const {permissions} = useAuth();
+  const t = useTranslations('AdminCommon.layout');
 
   const visibleGroups = useMemo(() => {
     const allowed = Array.isArray(permissions) ? permissions : [];
@@ -180,18 +225,18 @@ function AdminLayout({children}: AdminLayoutProps) {
           <nav className={cx('nav')}>
             {visibleGroups.map((group) => (
               <div key={group.label} className={cx('navSection')}>
-                {!collapsed && <span className={cx('navLabel')}>{group.label}</span>}
+                {!collapsed && <span className={cx('navLabel')}>{t(`groups.${group.label}`)}</span>}
                 {group.items.map((route) => (
                   <Link
                     key={route.path}
                     href={route.path}
                     className={cx('navItem', {active: isActive(route.path)})}
                     onClick={() => setMobileOpen(false)}
-                    title={collapsed ? route.label : ''}
+                    title={collapsed ? t(`items.${route.label}`) : ''}
                   >
                     <span className={cx('navIcon')}>{route.icon}</span>
                     {!collapsed && (
-                      <span className={cx('navText')}>{route.label}</span>
+                      <span className={cx('navText')}>{t(`items.${route.label}`)}</span>
                     )}
                     {isActive(route.path) && (
                       <motion.div
@@ -210,13 +255,13 @@ function AdminLayout({children}: AdminLayoutProps) {
             <Link
               href={routes.home}
               className={cx('navItem')}
-              title={collapsed ? 'Về trang chủ' : ''}
+              title={collapsed ? t('backHome') : ''}
             >
               <span className={cx('navIcon')}>
                 <LogOut size={20} />
               </span>
               {!collapsed && (
-                <span className={cx('navText')}>Về trang chủ</span>
+                <span className={cx('navText')}>{t('backHome')}</span>
               )}
             </Link>
           </div>

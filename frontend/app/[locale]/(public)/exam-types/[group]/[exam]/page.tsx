@@ -1,16 +1,16 @@
-import TestByExamType from '@/app/(public)/exam-types/[group]/TestByExamType';
-import { examTypeMetadata, requireExamType } from '@/app/(public)/exam-types/[group]/_lib/examTypeRoute';
+import TestByExamType from '@/app/[locale]/(public)/exam-types/[group]/TestByExamType';
+import { examTypeMetadata, requireExamType } from '@/app/[locale]/(public)/exam-types/[group]/_lib/examTypeRoute';
 
 // Kỳ thi thuộc nhóm cha: /exam-types/aws/saa-c03.
-type Props = { params: Promise<{ group: string; exam: string }> };
+type Props = PageProps<'/[locale]/exam-types/[group]/[exam]'>;
 
 export async function generateMetadata({ params }: Props) {
-  const { group, exam } = await params;
-  return examTypeMetadata([group, exam]);
+  const { locale, group, exam } = await params;
+  return examTypeMetadata([group, exam], locale);
 }
 
 export default async function Page({ params }: Props) {
-  const { group, exam } = await params;
-  const examType = await requireExamType([group, exam]);
+  const { locale, group, exam } = await params;
+  const examType = await requireExamType([group, exam], locale);
   return <TestByExamType examTypeId={examType.examTypeId} examSlug={examType.slug} />;
 }

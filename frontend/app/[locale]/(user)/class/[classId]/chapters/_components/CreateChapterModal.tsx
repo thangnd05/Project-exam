@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
-import { useCreateChapter } from '@/app/(user)/class/[classId]/chapters/_hooks/useChaptersOfClass';
+import { useCreateChapter } from '@/app/[locale]/(user)/class/[classId]/chapters/_hooks/useChaptersOfClass';
 import { toast } from 'react-toastify';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
@@ -19,6 +20,7 @@ type CreateChapterModalProps = {
 };
 
 const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapterModalProps) => {
+    const t = useTranslations('Classes');
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const createMutation = useCreateChapter(classId);
@@ -26,7 +28,7 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapter
 
     const handleCreate = () => {
         if (!title.trim()) {
-            toast.warning(' Vui lòng nhập tên chương!');
+            toast.warning(t('createChapter.titleRequired'));
             return;
         }
 
@@ -34,7 +36,7 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapter
             { classId, title, description },
             {
                 onSuccess: () => {
-                    toast.success('Tạo chương mới thành công!');
+                    toast.success(t('createChapter.success'));
                     setTitle('');
                     setDescription('');
                     onSuccess?.();
@@ -42,7 +44,7 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapter
                 },
                 onError: (error) => {
                     console.error('Failed to create chapter:', error);
-                    toast.error('Có lỗi xảy ra khi tạo chương mới!');
+                    toast.error(t('createChapter.error'));
                 },
             },
         );
@@ -52,12 +54,12 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapter
         <CommonFormModal
             show={show}
             onHide={onClose}
-            title="Tạo chương mới"
+            title={t('chapters.create')}
             footer={(
                 <ModalActionFooter
-                    cancelLabel="Để sau"
-                    submitLabel="Tạo chương ngay"
-                    loadingLabel="Đang tạo..."
+                    cancelLabel={t('common.later')}
+                    submitLabel={t('createChapter.submit')}
+                    loadingLabel={t('createChapter.submitting')}
                     loading={submitting}
                     onCancel={onClose}
                     onSubmit={handleCreate}
@@ -65,7 +67,7 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapter
             )}
         >
             <div className={cx('formGroup')}>
-                <label className={cx('label')}>Tên chương</label>
+                <label className={cx('label')}>{t('common.chapterName')}</label>
                 <div className={cx('inputWrapper')}>
                     <span className={cx('inputIcon')}>
                         <FaEdit />
@@ -73,7 +75,7 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapter
                     <input
                         type="text"
                         className={cx('inputControl')}
-                        placeholder="Ví dụ: Unit 1: Present Simple"
+                        placeholder={t('createChapter.namePlaceholder')}
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         disabled={submitting}
@@ -83,12 +85,12 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapter
             </div>
 
             <div className={cx('formGroup')}>
-                <label className={cx('label')}>Mô tả</label>
+                <label className={cx('label')}>{t('common.description')}</label>
                 <div className={cx('inputWrapper')}>
                     <textarea
                         className={cx('inputControl', 'textarea')}
                         rows={3}
-                        placeholder="Nhập mô tả ngắn gọn về chương học này..."
+                        placeholder={t('createChapter.descriptionPlaceholder')}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         disabled={submitting}
@@ -96,7 +98,7 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapter
                 </div>
                 <div className={cx('tip')}>
                     <FaInfoCircle />
-                    <span>Mô tả giúp học viên nắm bắt được nội dung chính của chương.</span>
+                    <span>{t('createChapter.descriptionTip')}</span>
                 </div>
             </div>
         </CommonFormModal>

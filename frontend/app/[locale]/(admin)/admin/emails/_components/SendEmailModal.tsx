@@ -3,19 +3,20 @@
 import {useMemo, useState} from 'react';
 import {Form, Spinner} from 'react-bootstrap';
 import {toast} from 'react-toastify';
+import {useTranslations} from 'next-intl';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
-import {AdminFieldError} from '@/app/(admin)/_components/common';
+import {AdminFieldError} from '@/app/[locale]/(admin)/_components/common';
 import type {EmailResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
-import {useEmailAudience, useEmailMutations} from '@/app/(admin)/admin/emails/_hooks/useAdminEmails';
+import {useEmailAudience, useEmailMutations} from '@/app/[locale]/(admin)/admin/emails/_hooks/useAdminEmails';
 
 const PREMIUM_FILTERS = [
-  {value: 'ALL', label: 'Tất cả'},
-  {value: 'PREMIUM', label: 'Premium'},
-  {value: 'NORMAL', label: 'Thường'},
-];
+  {value: 'ALL', label: 'all'},
+  {value: 'PREMIUM', label: 'premium'},
+  {value: 'NORMAL', label: 'normal'},
+] as const;
 
 type SendEmailModalProps = {
   show: boolean;
@@ -24,6 +25,8 @@ type SendEmailModalProps = {
 };
 
 function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
+  const t = useTranslations('AdminSystem.emails.send');
+  const tCommon = useTranslations('Common');
   const [keyword, setKeyword] = useState('');
   const [roleFilter, setRoleFilter] = useState('ALL');
   const [premiumFilter, setPremiumFilter] = useState('ALL');
@@ -100,16 +103,16 @@ function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
   const handleSubmit = async () => {
     setErrorMessage('');
     if (selectedIds.length === 0) {
-      setErrorMessage('Hãy chọn ít nhất một người nhận.');
+      setErrorMessage(t('noRecipients'));
       return;
     }
     setSubmitting(true);
     try {
       await sendEmail({emailId: email!.emailId, userIds: selectedIds});
-      toast.success(`Đã đưa ${selectedIds.length} email vào hàng gửi.`);
+      toast.success(t('queued', {count: selectedIds.length}));
       onClose();
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, 'Không gửi được email.'));
+      setErrorMessage(getApiErrorMessage(error, t('sendFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -119,14 +122,14 @@ function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
     <BaseModal
       show={show}
       onClose={submitting ? undefined : onClose}
-      title={`Gửi email: ${email?.name || email?.subject || ''}`}
+      title={t('title', {name: email?.name || email?.subject || ''})}
       maxWidth={760}
       footer={
         <ModalActionFooter
           onCancel={onClose}
           onSubmit={handleSubmit}
-          cancelLabel="Hủy"
-          submitLabel={`Gửi cho ${selectedIds.length} người`}
+          cancelLabel={tCommon('cancelShort')}
+          submitLabel={t('submit', {count: selectedIds.length})}
           loading={submitting}
         />
       }
@@ -135,7 +138,7 @@ function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
         <Form.Control
           className="flex-fill"
           style={{minWidth: '18rem'}}
-          placeholder="Tìm theo tên, tài khoản hoặc email..."
+          placeholder={t('searchPlaceholder')}
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
         />
@@ -144,7 +147,7 @@ function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
           value={roleFilter}
           onChange={(event) => setRoleFilter(event.target.value)}
         >
-          <option value="ALL">Mọi vai trò</option>
+          <option value="ALL">{t('allRoles')}</option>
           {roles.map((role) => (
             <option key={role} value={role}>
               {role}
@@ -158,7 +161,7 @@ function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
         >
           {PREMIUM_FILTERS.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {t(`premiumFilters.${option.label}`)}
             </option>
           ))}
         </Form.Select>
@@ -167,12 +170,12 @@ function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
       <div className="d-flex justify-content-between align-items-center mb-2">
         <Form.Check
           type="checkbox"
-          label={`Chọn tất cả ${filteredUsers.length} người đang lọc`}
+          label={t('selectAllFiltered', {count: filteredUsers.length})}
           checked={allFilteredSelected}
           onChange={toggleAllFiltered}
           disabled={filteredUsers.length === 0}
         />
-        <span className="small text-muted">Đã chọn: {selectedIds.length}</span>
+        <span className="small text-muted">{t('selectedCount', {count: selectedIds.length})}</span>
       </div>
 
       <div
@@ -185,11 +188,11 @@ function SendEmailModal({show, email, onClose}: SendEmailModalProps) {
       >
         {isLoading && (
           <div className="text-center py-4">
-            <Spinner animation="border" size="sm" /> Đang tải danh sách người dùng...
+            <Spinner animation="border" size="sm" /> {t('loadingUsers')}
           </div>
         )}
         {!isLoading && filteredUsers.length === 0 && (
-          <div className="text-center text-muted py-4">Không có người dùng nào khớp bộ lọc.</div>
+          <div className="text-center text-muted py-4">{t('noMatches')}</div>
         )}
         {!isLoading &&
           filteredUsers.map((user) => (

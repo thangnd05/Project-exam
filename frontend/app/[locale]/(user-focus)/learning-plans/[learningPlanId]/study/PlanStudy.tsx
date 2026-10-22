@@ -1,9 +1,10 @@
 'use client';
 
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import Link, { useRouter } from '@/app/i18n/navigation';
+import { useParams } from 'next/navigation';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -123,6 +124,8 @@ function PassageBox({ passage }: { passage?: PassageResponse | null }) {
 }
 
 function PlanStudy() {
+  const t = useTranslations('LearningPlans');
+  const tc = useTranslations('Common');
   const { learningPlanId } = useParams<{ learningPlanId: string }>();
   const [searchParams, setSearchParams] = useSearchParamsState();
   const router = useRouter();
@@ -232,7 +235,7 @@ function PlanStudy() {
           setFormError(
             getApiErrorMessage(
               err,
-              (err instanceof Error && err.message) || 'Nộp bài thất bại. Vui lòng thử lại.',
+              (err instanceof Error && err.message) || t('study.submitError'),
             ),
           ),
       },
@@ -242,7 +245,7 @@ function PlanStudy() {
   if (!streakReady || blocked || loading) {
     return (
       <div className={cx('wrapper')}>
-        <div className={cx('loading')}>Đang tải...</div>
+        <div className={cx('loading')}>{tc('loading')}</div>
         <StreakRestoreModal show={blocked} onClose={allow} />
       </div>
     );
@@ -253,10 +256,10 @@ function PlanStudy() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <Link href={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
-            ← Lộ trình
+            ← {t('common.plan')}
           </Link>
         </div>
-        <div className={cx('alert', 'alertDanger')}>{error || 'Không mở được ải này.'}</div>
+        <div className={cx('alert', 'alertDanger')}>{error || t('study.cannotOpen')}</div>
       </div>
     );
   }
@@ -271,11 +274,10 @@ function PlanStudy() {
       <div className={cx('wrapper')}>
         <div className={cx('alert', 'alertSuccess')}>
           <span>
-            Đã hoàn thành ải của từng phần. Làm bài thi thử đầy đủ để kiểm tra độ sẵn sàng.
+            {t('study.mockDone')}
             <br />
             <small>
-              Làm một bài <strong>thi thử trọn đề</strong>, sau đó quay lại trang lộ trình
-              hệ thống sẽ gợi ý sinh lộ trình mới từ chính bài vừa làm.
+              {t.rich('study.mockHint', { strong: (chunks) => <strong>{chunks}</strong> })}
             </small>
           </span>
           <div className={cx('actionBar')}>
@@ -283,13 +285,13 @@ function PlanStudy() {
               href={buildExamTypeDetailPath(session.examTypeId)}
               className={cx('btn', 'btnPrimary', 'btnSm')}
             >
-              Làm bài thi thử
+              {t('common.takeMock')}
             </Link>
             <Link
               href={`/learning-plans/${learningPlanId}`}
               className={cx('btn', 'btnOutline', 'btnSm')}
             >
-              Xem bước tiếp theo
+              {t('common.nextStep')}
             </Link>
           </div>
         </div>
@@ -302,28 +304,28 @@ function PlanStudy() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <Link href={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
-            ← Lộ trình
+            ← {t('common.plan')}
           </Link>
         </div>
 
         {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
-        {planNoticeText(session.noticeCode) && (
-          <div className={cx('alert', 'alertWarning')}>{planNoticeText(session.noticeCode)}</div>
+        {planNoticeText(t, session.noticeCode) && (
+          <div className={cx('alert', 'alertWarning')}>{planNoticeText(t, session.noticeCode)}</div>
         )}
 
         <div className={cx('card')}>
           <div className={cx('cardBody')}>
             <h3 className={cx('title', 'pickTitle')}>
-              Chọn phần và ải để học
+              {t('study.pickTitle')}
             </h3>
             <p className={cx('muted')} style={{ marginBottom: '1.2rem' }}>
-              Đọc tài liệu trong từng ải trước, sau đó bấm Học ải để luyện.
+              {t('study.pickDesc')}
             </p>
             <div className={cx('actionBar')}>
               <span className={cx('badge', 'badgeMuted')}>
-                Tiến độ: {session.passedTasks}/{session.totalTasks} ải
+                {t('study.pickProgress', { passed: session.passedTasks ?? 0, total: session.totalTasks ?? 0 })}
               </span>
-              <span className={cx('badge', 'badgePrimary')}>{planStageLabel(session.planStage)}</span>
+              <span className={cx('badge', 'badgePrimary')}>{planStageLabel(t, session.planStage)}</span>
             </div>
           </div>
         </div>
@@ -370,7 +372,7 @@ function PlanStudy() {
     >
       <div className={cx('headerBar')}>
         <button type="button" className={cx('btn', 'btnOutline', 'btnSm')} onClick={goToPicker}>
-          Quay lại
+          {t('common.back')}
         </button>
       </div>
 
@@ -381,22 +383,24 @@ function PlanStudy() {
           <div className={cx('activeTaskCard')}>
             <div className={cx('activeTaskHead')}>
               <div>
-                <div className={cx('statLabel')}>Đang học</div>
+                <div className={cx('statLabel')}>{t('study.studying')}</div>
                 <h3 className={cx('activeTaskTitle')}>
-                  {session.activeTask?.examPartName || 'Phần'}
-                  {' · Ải '}{taskDisplayName(session.activeTask)}
+                  {t('common.taskTitle', {
+                    part: session.activeTask?.examPartName || t('common.partFallback'),
+                    task: taskDisplayName(t, session.activeTask),
+                  })}
                 </h3>
                 <div className={cx('actionBar')}>
                   <span className={cx('badge', 'badgePrimary')}>
 
-                    {session.planStage === 'MOCK' ? 'Luyện lại' : planStageLabel(session.planStage)}
+                    {session.planStage === 'MOCK' ? t('study.retakeBadge') : planStageLabel(t, session.planStage)}
                   </span>
                   <span className={cx('badge', 'badgeMuted')}>
-                    {session.passedTasks}/{session.totalTasks} ải đã xong
+                    {t('study.tasksDone', { passed: session.passedTasks ?? 0, total: session.totalTasks ?? 0 })}
                   </span>
                   {session.passAccuracyRequired != null && (
                     <span className={cx('badge', 'badgePrimary')}>
-                      Cần ≥{session.passAccuracyRequired}% để qua ải
+                      {t('study.passNeeded', { pass: session.passAccuracyRequired })}
                     </span>
                   )}
                 </div>
@@ -421,7 +425,7 @@ function PlanStudy() {
                     size="sm"
                     className={cx('resourceBtn')}
                   >
-                    Mở tài liệu
+                    {t('common.openResource')}
                   </ButtonPrime>
                 )}
               </div>
@@ -437,10 +441,12 @@ function PlanStudy() {
                   return (
                     <div key={q.questionId} id={`q-${q.questionId}`} className={ex('question-card')}>
                       <span className={ex('q-text')}>
-                        <span className={ex('q-number')}>Câu {questionNumberById[q.questionId]}:</span>{' '}
+                        <span className={ex('q-number')}>
+                          {t('study.question', { number: questionNumberById[q.questionId] })}
+                        </span>{' '}
                         {q.questionText}
                       </span>
-                      {isMsq && <div className={cx('msqHint')}>Chọn tất cả đáp án đúng:</div>}
+                      {isMsq && <div className={cx('msqHint')}>{t('study.msqHint')}</div>}
                       <div className={ex('mcq-group')}>
                         {(q.answers || []).map((a) => {
                           const checked = isMsq
@@ -498,7 +504,7 @@ function PlanStudy() {
                         <SubmitBlock
                           onSubmit={handleSubmit}
                           isSubmitting={submitting}
-                          label="Nộp bài"
+                          label={t('study.submit')}
                         />
                       </div>
                     </Container>
@@ -526,10 +532,10 @@ function PlanStudy() {
         show={unansweredCount > 0}
         onClose={() => setUnansweredCount(0)}
         onConfirm={doSubmit}
-        title="Còn câu chưa trả lời"
-        confirmText="Vẫn nộp bài"
-        cancelText="Quay lại làm tiếp"
-        message={`Bạn còn ${unansweredCount} câu chưa trả lời  các câu này sẽ bị tính là sai khi chấm. Vẫn nộp bài?`}
+        title={t('study.unanswered.title')}
+        confirmText={t('study.unanswered.confirm')}
+        cancelText={t('study.unanswered.cancel')}
+        message={t('study.unanswered.message', { count: unansweredCount })}
       />
     </div>
   );

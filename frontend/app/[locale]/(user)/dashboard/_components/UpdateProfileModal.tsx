@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { IoPersonCircleOutline, IoCameraOutline } from 'react-icons/io5';
@@ -10,7 +11,7 @@ import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import commonModalStyles from '@/app/components/modal/CommonFormModal.module.scss';
 import styles from './UpdateProfileModal.module.scss';
-import { useMyInfo, useUpdateProfile } from '@/app/(user)/dashboard/_hooks/useUpdateProfile';
+import { useMyInfo, useUpdateProfile } from '@/app/[locale]/(user)/dashboard/_hooks/useUpdateProfile';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 
 const cmx = classNames.bind(commonModalStyles);
@@ -23,6 +24,8 @@ type UpdateProfileModalProps = {
 };
 
 function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModalProps) {
+  const t = useTranslations('Dashboard');
+  const tCommon = useTranslations('Common');
   const { userInfo, isLoading: loading, isError } = useMyInfo(show);
   const updateProfileMutation = useUpdateProfile();
   const submitting = updateProfileMutation.isPending;
@@ -60,10 +63,10 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
 
   useEffect(() => {
     if (show && isError) {
-      toast.error('Không tải được thông tin cá nhân.');
+      toast.error(t('updateProfile.toast.loadError'));
       onHide();
     }
-  }, [show, isError, onHide]);
+  }, [show, isError, onHide, t]);
 
 
   const updateField = (fieldName: string, fieldValue: string) => {
@@ -77,11 +80,11 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith('image/')) {
-        toast.warning('Vui lòng chọn file hình ảnh (jpg, png, v.v.).');
+        toast.warning(t('updateProfile.toast.invalidImage'));
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        toast.warning('Kích thước ảnh không được vượt quá 5MB.');
+        toast.warning(t('updateProfile.toast.imageTooLarge'));
         return;
       }
       setAvatarFile(file);
@@ -102,14 +105,14 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
 
   const submitUpdateProfile = async () => {
     if (!formValues.fullName || !formValues.email || !formValues.userName) {
-      toast.warning('Vui lòng nhập đầy đủ họ tên, tên đăng nhập và email.');
+      toast.warning(t('updateProfile.toast.missingFields'));
       return;
     }
 
     const userId = userInfo?.id;
 
     if (!userId) {
-      toast.error('Lỗi dữ liệu. Không tìm thấy ID người dùng.');
+      toast.error(t('updateProfile.toast.missingUserId'));
       return;
     }
 
@@ -132,20 +135,20 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
 
       await updateProfileMutation.mutateAsync({ userId, formData });
 
-      toast.success('Cập nhật thông tin thành công!');
+      toast.success(t('updateProfile.toast.success'));
       if (onUpdateSuccess) {
         onUpdateSuccess();
       }
       closeModal();
     } catch (error) {
-      const apiMessage = getApiErrorMessage(error, 'Cập nhật thất bại. Vui lòng thử lại.');
+      const apiMessage = getApiErrorMessage(error, t('updateProfile.toast.failed'));
       toast.error(apiMessage);
     }
   };
 
   if (loading && show) {
     return (
-      <CommonFormModal show={show} onHide={closeModal} title="Cập nhật hồ sơ">
+      <CommonFormModal show={show} onHide={closeModal} title={t('updateProfile.title')}>
         <div className="d-flex justify-content-center p-4">
           <Spinner animation="border" variant="primary" />
         </div>
@@ -157,12 +160,12 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
     <CommonFormModal
       show={show}
       onHide={closeModal}
-      title="Cập nhật hồ sơ"
+      title={t('updateProfile.title')}
       footer={
         <ModalActionFooter
-          cancelLabel="Hủy"
-          submitLabel="Lưu thay đổi"
-          loadingLabel="Đang lưu..."
+          cancelLabel={tCommon('cancelShort')}
+          submitLabel={t('updateProfile.submit')}
+          loadingLabel={t('saving')}
           loading={submitting}
           onCancel={closeModal}
           onSubmit={submitUpdateProfile}
@@ -175,7 +178,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
             <AvatarWithCosmetic
               src={avatarPreview}
               name={formValues.userName || formValues.fullName}
-              alt="Avatar"
+              alt={t('updateProfile.avatarAlt')}
               size={100}
             />
           ) : (
@@ -195,12 +198,12 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
           onChange={handleFileChange}
           disabled={submitting}
         />
-        <p className={cx('avatarHint')}>Bấm vào ảnh để thay đổi avatar</p>
+        <p className={cx('avatarHint')}>{t('updateProfile.avatarHint')}</p>
       </div>
 
       <div className={cmx('formGroup')}>
         <label className={cmx('label')} htmlFor="userNameInput">
-          Tên đăng nhập
+          {t('updateProfile.userName')}
         </label>
         <input
           id="userNameInput"
@@ -214,7 +217,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
 
       <div className={cmx('formGroup')}>
         <label className={cmx('label')} htmlFor="fullNameInput">
-          Họ và Tên
+          {t('updateProfile.fullName')}
         </label>
         <input
           id="fullNameInput"
@@ -229,7 +232,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
 
       <div className={cmx('formGroup')}>
         <label className={cmx('label')} htmlFor="emailInput">
-          Email
+          {t('updateProfile.email')}
         </label>
         <input
           id="emailInput"

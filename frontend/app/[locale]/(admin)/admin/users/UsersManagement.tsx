@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import {useLocale, useTranslations} from 'next-intl';
 import {Badge, Button, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Trash2} from 'lucide-react';
@@ -17,8 +18,8 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '@/app/(admin)/_components/common';
-import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
+} from '@/app/[locale]/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import {getApiErrorMessage} from '@/app/utils/apiError';
 import styles from './UsersManagement.module.scss';
 
@@ -63,6 +64,9 @@ const roleColors: Record<string, string> = {
 const ITEMS_PER_PAGE = 10;
 
 function UsersManagement() {
+  const t = useTranslations('AdminUsers');
+  const tCommon = useTranslations('Common');
+  const locale = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -114,8 +118,8 @@ function UsersManagement() {
   const submitting = deleteUserMutation.isPending;
   const errorMessage =
     deleteErrorMessage ||
-    (usersIsError ? 'Không thể tải danh sách người dùng.' : '') ||
-    (rolesIsError ? 'Không thể tải danh sách vai trò.' : '');
+    (usersIsError ? t('users.errors.loadUsers') : '') ||
+    (rolesIsError ? t('users.errors.loadRoles') : '');
 
   const roleNameById = useMemo(() => {
     const roleMap: Record<string, string> = {};
@@ -155,7 +159,7 @@ function UsersManagement() {
     const userName = createForm.userName.trim();
     const email = createForm.email.trim();
     if (!fullName || !userName || !email || !createForm.password) {
-      setCreateError('Vui lòng nhập đủ họ tên, username, email và mật khẩu.');
+      setCreateError(t('users.errors.createRequired'));
       return;
     }
     setCreateError('');
@@ -173,7 +177,7 @@ function UsersManagement() {
       setCurrentPage(1);
     } catch (error) {
       setCreateError(
-        getApiErrorMessage(error, 'Không thể tạo người dùng.'),
+        getApiErrorMessage(error, t('users.errors.create')),
       );
     }
   };
@@ -208,7 +212,7 @@ function UsersManagement() {
     const userName = editForm.userName.trim();
     const email = editForm.email.trim();
     if (!fullName || !userName || !email) {
-      setEditError('Vui lòng nhập đủ họ tên, username và email.');
+      setEditError(t('users.errors.editRequired'));
       return;
     }
     setEditError('');
@@ -226,7 +230,7 @@ function UsersManagement() {
       setEditingUser(null);
     } catch (error) {
       setEditError(
-        getApiErrorMessage(error, 'Không thể cập nhật người dùng.'),
+        getApiErrorMessage(error, t('users.errors.update')),
       );
     }
   };
@@ -240,14 +244,14 @@ function UsersManagement() {
       await deleteUserMutation.mutateAsync(userToDelete.user_id);
       setUserToDelete(null);
     } catch {
-      setDeleteErrorMessage('Không thể xóa người dùng.');
+      setDeleteErrorMessage(t('users.errors.delete'));
     }
   };
 
   const columns: AdminTableColumn[] = [
     {
       key: 'user',
-      header: 'Người dùng',
+      header: t('users.columns.user'),
       render: (user: AdminUserRow) => (
         <div className={cx('userCell')}>
           <div className={cx('userAvatar', {premium: user.is_premium})}>
@@ -262,7 +266,7 @@ function UsersManagement() {
     },
     {
       key: 'role',
-      header: 'Vai trò',
+      header: t('users.columns.role'),
       render: (user: AdminUserRow) => {
         const roleName = roleNameById[user.role_id] || 'USER';
         return (
@@ -270,10 +274,10 @@ function UsersManagement() {
         );
       },
     },
-    {key: 'email', header: 'Email', render: (user: AdminUserRow) => user.email},
+    {key: 'email', header: t('users.columns.email'), render: (user: AdminUserRow) => user.email},
     {
       key: 'status',
-      header: 'Trạng thái',
+      header: t('users.columns.status'),
       render: (user: AdminUserRow) => (
         <Badge
           bg={
@@ -285,16 +289,16 @@ function UsersManagement() {
           }
         >
           {user.verified === true
-            ? 'Đã xác thực'
+            ? t('users.status.verified')
             : user.verified === false
-              ? 'Chưa xác thực'
-              : 'Không có dữ liệu'}
+              ? t('users.status.unverified')
+              : t('users.status.unknown')}
         </Badge>
       ),
     },
     {
       key: 'premium',
-      header: 'Premium',
+      header: t('users.columns.premium'),
       render: (user: AdminUserRow) =>
         user.is_premium ? (
           <span className={cx('premiumBadge')}>Premium</span>
@@ -304,10 +308,10 @@ function UsersManagement() {
     },
     {
       key: 'created_at',
-      header: 'Ngày tạo',
+      header: t('users.columns.createdAt'),
       render: (user: AdminUserRow) =>
         user.created_at
-          ? new Date(user.created_at).toLocaleDateString('vi-VN')
+          ? new Date(user.created_at).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN')
           : '-',
     },
   ];
@@ -315,20 +319,20 @@ function UsersManagement() {
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Quản lý Users"
-        description="Quản lý tài khoản người dùng trong hệ thống"
+        title={t('users.title')}
+        description={t('users.description')}
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
-          Thêm người dùng
+          {t('users.add')}
         </Button>
       </AdminPageHeader>
 
       <StatCardGroup>
-        <StatCard label="Người dùng" value={stats.total} />
-        <StatCard label="Giáo viên" value={stats.teachers} />
-        <StatCard label="Đã xác thực" value={stats.verified} />
-        <StatCard label="Chưa xác thực" value={stats.unverified} />
+        <StatCard label={t('users.stats.users')} value={stats.total} />
+        <StatCard label={t('users.stats.teachers')} value={stats.teachers} />
+        <StatCard label={t('users.stats.verified')} value={stats.verified} />
+        <StatCard label={t('users.stats.unverified')} value={stats.unverified} />
       </StatCardGroup>
 
       <AdminToolbar
@@ -337,7 +341,7 @@ function UsersManagement() {
           setSearchTerm(value);
           setCurrentPage(1);
         }}
-        searchPlaceholder="Tìm kiếm theo tên, email, username..."
+        searchPlaceholder={t('users.searchPlaceholder')}
       >
         <Form.Select
           value={roleFilter}
@@ -346,7 +350,7 @@ function UsersManagement() {
             setCurrentPage(1);
           }}
         >
-          <option value="all">Tất cả vai trò</option>
+          <option value="all">{t('users.allRoles')}</option>
           {roles.map((role) => (
             <option key={role.role_id} value={role.role_id}>
               {role.description || role.role_name}
@@ -360,9 +364,9 @@ function UsersManagement() {
             setCurrentPage(1);
           }}
         >
-          <option value="all">Tất cả trạng thái</option>
-          <option value="verified">Đã xác thực</option>
-          <option value="unverified">Chưa xác thực</option>
+          <option value="all">{t('users.allStatuses')}</option>
+          <option value="verified">{t('users.status.verified')}</option>
+          <option value="unverified">{t('users.status.unverified')}</option>
         </Form.Select>
       </AdminToolbar>
 
@@ -378,16 +382,16 @@ function UsersManagement() {
         totalPages={totalPages}
         totalElements={totalElements}
         pageSize={ITEMS_PER_PAGE}
-        itemLabel="người dùng"
+        itemLabel={t('users.itemLabel')}
         onPageChange={(p) => setCurrentPage(p + 1)}
         rowActions={(user: AdminUserRow) => (
           <>
-            <button title="Sửa" onClick={() => openEditModal(user)}>
+            <button title={t('shared.edit')} onClick={() => openEditModal(user)}>
               <Edit size={16} />
             </button>
             <button
               className="danger"
-              title="Xóa"
+              title={t('shared.delete')}
               onClick={() => setUserToDelete(user)}
             >
               <Trash2 size={16} />
@@ -399,37 +403,37 @@ function UsersManagement() {
       <BaseModal
         show={showCreateModal}
         onClose={closeCreateModal}
-        title="Thêm người dùng"
+        title={t('users.form.createTitle')}
         maxWidth={550}
         footer={
           <ModalActionFooter
             onCancel={closeCreateModal}
             onSubmit={handleCreateUser}
-            cancelLabel="Hủy"
-            submitLabel="Tạo mới"
+            cancelLabel={tCommon('cancelShort')}
+            submitLabel={t('shared.createNew')}
             loading={creating}
           />
         }
       >
         <AdminFieldError message={createError} />
         <Form.Group className="mb-3">
-          <Form.Label>Họ và tên</Form.Label>
+          <Form.Label>{t('users.form.fullName')}</Form.Label>
           <Form.Control
             value={createForm.fullName}
             onChange={updateCreateField('fullName')}
-            placeholder="Nguyễn Văn A"
+            placeholder={t('users.form.fullNamePlaceholder')}
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Username</Form.Label>
+          <Form.Label>{t('users.form.userName')}</Form.Label>
           <Form.Control
             value={createForm.userName}
             onChange={updateCreateField('userName')}
-            placeholder="nguyenvana"
+            placeholder={t('users.form.userNamePlaceholder')}
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Email</Form.Label>
+          <Form.Label>{t('users.form.email')}</Form.Label>
           <Form.Control
             type="email"
             value={createForm.email}
@@ -438,21 +442,21 @@ function UsersManagement() {
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Mật khẩu</Form.Label>
+          <Form.Label>{t('users.form.password')}</Form.Label>
           <Form.Control
             type="password"
             value={createForm.password}
             onChange={updateCreateField('password')}
-            placeholder="Tối thiểu 6 ký tự"
+            placeholder={t('users.form.passwordPlaceholder')}
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Vai trò</Form.Label>
+          <Form.Label>{t('users.form.role')}</Form.Label>
           <Form.Select
             value={createForm.roleId}
             onChange={updateCreateField('roleId')}
           >
-            <option value="">-- Mặc định (USER) --</option>
+            <option value="">{t('users.form.defaultRole')}</option>
             {roles.map((role) => (
               <option key={role.role_id} value={role.role_id}>
                 {role.description || role.role_name}
@@ -463,14 +467,14 @@ function UsersManagement() {
         <Form.Check
           type="switch"
           id="create-user-verified"
-          label="Đánh dấu đã xác thực"
+          label={t('users.form.markVerified')}
           checked={createForm.verified}
           onChange={updateCreateField('verified')}
         />
         <Form.Check
           type="switch"
           id="create-user-premium"
-          label="Tài khoản Premium"
+          label={t('users.form.premium')}
           checked={createForm.isPremium}
           onChange={updateCreateField('isPremium')}
         />
@@ -479,35 +483,35 @@ function UsersManagement() {
       <BaseModal
         show={Boolean(editingUser)}
         onClose={closeEditModal}
-        title="Sửa người dùng"
+        title={t('users.form.editTitle')}
         maxWidth={550}
         footer={
           <ModalActionFooter
             onCancel={closeEditModal}
             onSubmit={handleUpdateUser}
-            cancelLabel="Hủy"
-            submitLabel="Lưu"
+            cancelLabel={tCommon('cancelShort')}
+            submitLabel={tCommon('save')}
             loading={updating}
           />
         }
       >
         <AdminFieldError message={editError} />
         <Form.Group className="mb-3">
-          <Form.Label>Họ và tên</Form.Label>
+          <Form.Label>{t('users.form.fullName')}</Form.Label>
           <Form.Control
             value={editForm.fullName}
             onChange={updateEditField('fullName')}
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Username</Form.Label>
+          <Form.Label>{t('users.form.userName')}</Form.Label>
           <Form.Control
             value={editForm.userName}
             onChange={updateEditField('userName')}
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Email</Form.Label>
+          <Form.Label>{t('users.form.email')}</Form.Label>
           <Form.Control
             type="email"
             value={editForm.email}
@@ -517,7 +521,7 @@ function UsersManagement() {
         <Form.Check
           type="switch"
           id="edit-user-verified"
-          label="Đã xác thực"
+          label={t('users.form.verified')}
           checked={editForm.verified}
           onChange={(event) =>
             setEditForm((previous) => ({...previous, verified: event.target.checked}))
@@ -526,7 +530,7 @@ function UsersManagement() {
         <Form.Check
           type="switch"
           id="edit-user-premium"
-          label="Tài khoản Premium"
+          label={t('users.form.premium')}
           checked={editForm.isPremium}
           onChange={(event) =>
             setEditForm((previous) => ({...previous, isPremium: event.target.checked}))
@@ -543,8 +547,8 @@ function UsersManagement() {
           setUserToDelete(null);
         }}
         onConfirm={handleDeleteUser}
-        title="Xác nhận xóa người dùng"
-        message={`Bạn có chắc muốn xóa "${userToDelete?.full_name || ''}" không?`}
+        title={t('users.confirmDelete.title')}
+        message={t('users.confirmDelete.message', {name: userToDelete?.full_name || ''})}
       />
     </div>
   );

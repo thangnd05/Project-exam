@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { useParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import classNames from 'classnames/bind';
 import { Spinner } from 'react-bootstrap';
@@ -13,6 +14,7 @@ import styles from './RecoveryResourceView.module.scss';
 const cx = classNames.bind(styles);
 
 function RecoveryResourceView() {
+  const t = useTranslations('Resources');
   const { resourceId } = useParams<{ resourceId: string }>();
   const {
     resource,
@@ -38,7 +40,7 @@ function RecoveryResourceView() {
       <div id="recovery-resource-print-root" className={cx('wrapper')}>
         <div className={cx('container', 'stateBox')}>
           <Spinner animation="border" size="sm" />
-          <span>Đang tải tài liệu...</span>
+          <span>{t('view.loading')}</span>
         </div>
       </div>
     );
@@ -60,10 +62,10 @@ function RecoveryResourceView() {
         <div className={cx('actions', 'noPrint')}>
           <button type="button" className={cx('actionBtn', 'primary')} onClick={handlePrint}>
             <Printer size={16} />
-            In / Lưu PDF
+            {t('view.print')}
           </button>
           <Link href={routes.home} className={cx('actionBtn')}>
-            Về trang chủ
+            {t('view.backHome')}
           </Link>
         </div>
 
@@ -73,8 +75,9 @@ function RecoveryResourceView() {
             <p className={cx('description')}>{resource.description}</p>
           )}
           <p className={cx('readHint', 'noPrint')}>
-            Đọc trực tiếp trên trang này. Muốn lưu offline, chọn{' '}
-            <strong>In / Lưu PDF</strong> rồi chọn máy in &quot;Lưu thành PDF&quot;.
+            {t.rich('view.readHint', {
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
         </header>
 

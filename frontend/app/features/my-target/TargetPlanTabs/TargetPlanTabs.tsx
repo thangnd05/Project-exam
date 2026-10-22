@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { useQuery } from '@tanstack/react-query';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import { useAuth } from '@/app/hooks/useAuth';
@@ -12,11 +13,11 @@ import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss'
 const cx = classNames.bind(styles);
 
 const TABS = [
-  { key: 'target', label: 'Mục tiêu', path: '/my-target' },
-  { key: 'plan', label: 'Lập lộ trình', path: '/learning-plans/generate' },
-  { key: 'compare', label: 'So sánh lộ trình', path: '/learning-plans/compare' },
-  { key: 'overview', label: 'Tổng quan', path: '/my-target/dashboard' },
-];
+  { key: 'target', path: '/my-target' },
+  { key: 'plan', path: '/learning-plans/generate' },
+  { key: 'compare', path: '/learning-plans/compare' },
+  { key: 'overview', path: '/my-target/dashboard' },
+] as const;
 
 type TargetPlanTabsProps = {
   active?: 'target' | 'plan' | 'compare' | 'overview';
@@ -26,6 +27,7 @@ type TargetPlanTabsProps = {
 };
 
 function TargetPlanTabs({ active, examTypeId, examTypes }: TargetPlanTabsProps) {
+  const t = useTranslations('MyTarget');
   const { isAuthenticated } = useAuth();
 
   // Chưa có ít nhất 2 lộ trình thì chưa có gì để so sánh, ẩn tab cho đỡ rối.
@@ -40,7 +42,7 @@ function TargetPlanTabs({ active, examTypeId, examTypes }: TargetPlanTabsProps) 
   );
 
   return (
-    <nav className={cx('pageTabs')} aria-label="Mục tiêu và lộ trình học">
+    <nav className={cx('pageTabs')} aria-label={t('tabs.ariaLabel')}>
       {tabs.map((tab) => (
         <Link
           key={tab.key}
@@ -48,7 +50,7 @@ function TargetPlanTabs({ active, examTypeId, examTypes }: TargetPlanTabsProps) 
           className={cx('pageTab', { active: tab.key === active })}
           aria-current={tab.key === active ? 'page' : undefined}
         >
-          {tab.label}
+          {t(`tabs.${tab.key}`)}
         </Link>
       ))}
     </nav>

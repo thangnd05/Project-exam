@@ -1,6 +1,7 @@
 'use client';
 
 import {forwardRef, useEffect, useImperativeHandle, useRef} from 'react';
+import {useLocale} from 'next-intl';
 
 // Phần API của grecaptcha mà component dùng tới.
 type Grecaptcha = {
@@ -16,11 +17,12 @@ declare global {
 }
 
 const SCRIPT_ID = 'google-recaptcha-script';
-const SCRIPT_SRC = 'https://www.google.com/recaptcha/api.js?render=explicit&hl=vi';
+// Ngôn ngữ của widget lấy theo trang lúc nạp script lần đầu (script chỉ nạp một lần cho cả phiên).
+const scriptSrc = (hl: string) => `https://www.google.com/recaptcha/api.js?render=explicit&hl=${hl}`;
 
 let scriptPromise: Promise<Grecaptcha> | null = null;
 
-function loadRecaptchaScript(): Promise<Grecaptcha> {
+function loadRecaptchaScript(hl: string): Promise<Grecaptcha> {
   if (window.grecaptcha?.render) {
     return Promise.resolve(window.grecaptcha);
   }
@@ -45,7 +47,7 @@ function loadRecaptchaScript(): Promise<Grecaptcha> {
 
     if (!existing) {
       script.id = SCRIPT_ID;
-      script.src = SCRIPT_SRC;
+      script.src = scriptSrc(hl);
       script.async = true;
       script.defer = true;
       document.head.appendChild(script);
@@ -72,6 +74,7 @@ const RecaptchaCheckbox = forwardRef<RecaptchaCheckboxHandle, RecaptchaCheckboxP
     const containerRef = useRef<HTMLDivElement>(null);
     const widgetIdRef = useRef<number | null>(null);
     const onChangeRef = useRef(onChange);
+    const locale = useLocale();
 
     onChangeRef.current = onChange;
 
@@ -90,7 +93,7 @@ const RecaptchaCheckbox = forwardRef<RecaptchaCheckboxHandle, RecaptchaCheckboxP
       }
       let cancelled = false;
 
-      loadRecaptchaScript()
+      loadRecaptchaScript(locale)
         .then((grecaptcha) => {
           if (cancelled || widgetIdRef.current !== null || !containerRef.current) {
             return;
@@ -109,7 +112,7 @@ const RecaptchaCheckbox = forwardRef<RecaptchaCheckboxHandle, RecaptchaCheckboxP
       return () => {
         cancelled = true;
       };
-    }, [siteKey]);
+    }, [siteKey, locale]);
 
     if (!siteKey) {
       return null;

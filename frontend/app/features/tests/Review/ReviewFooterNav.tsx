@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { IoCheckmarkCircleOutline, IoCloseOutline, IoListOutline } from 'react-icons/io5';
 import styles from '@/app/assets/styles/ReviewFooter.module.scss';
 
@@ -21,6 +22,7 @@ type ReviewFooterNavProps = {
 
 function ReviewFooterNav({ items = [], correctCount = 0, onSelect }: ReviewFooterNavProps) {
   const [open, setOpen] = useState(false);
+  const t = useTranslations('TestTaking.review');
 
   if (items.length === 0) return null;
 
@@ -36,7 +38,7 @@ function ReviewFooterNav({ items = [], correctCount = 0, onSelect }: ReviewFoote
           <div className={cx('navCard')}>
             <div className={cx('navHeader')}>
               <IoListOutline />
-              <span>Danh sách câu hỏi</span>
+              <span>{t('questionList')}</span>
             </div>
             <div className={cx('navGrid')}>
               {items.map((item, idx) => (
@@ -45,7 +47,7 @@ function ReviewFooterNav({ items = [], correctCount = 0, onSelect }: ReviewFoote
                   type="button"
                   className={cx('navItem', item.status)}
                   onClick={() => pick(item.id)}
-                  aria-label={`Câu ${idx + 1}`}
+                  aria-label={t('questionLabel', { number: idx + 1 })}
                 >
                   {idx + 1}
                 </button>
@@ -53,13 +55,13 @@ function ReviewFooterNav({ items = [], correctCount = 0, onSelect }: ReviewFoote
             </div>
             <div className={cx('navLegend')}>
               <span className={cx('legendItem')}>
-                <span className={cx('dot', 'correct')} /> Đúng
+                <span className={cx('dot', 'correct')} /> {t('legend.correct')}
               </span>
               <span className={cx('legendItem')}>
-                <span className={cx('dot', 'incorrect')} /> Sai
+                <span className={cx('dot', 'incorrect')} /> {t('legend.incorrect')}
               </span>
               <span className={cx('legendItem')}>
-                <span className={cx('dot', 'unanswered')} /> Chưa làm
+                <span className={cx('dot', 'unanswered')} /> {t('legend.unanswered')}
               </span>
             </div>
           </div>
@@ -74,12 +76,12 @@ function ReviewFooterNav({ items = [], correctCount = 0, onSelect }: ReviewFoote
             aria-expanded={open}
           >
             {open ? <IoCloseOutline size={22} /> : <IoListOutline size={22} />}
-            <span>{open ? 'Ẩn' : 'Danh sách câu'}</span>
+            <span>{open ? t('hide') : t('showList')}</span>
           </button>
           <div className={cx('footerScore')}>
             <IoCheckmarkCircleOutline aria-hidden />
             <span>
-              {correctCount}/{items.length} câu đúng
+              {t('correctCount', { correct: correctCount, total: items.length })}
             </span>
           </div>
         </Container>

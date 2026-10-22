@@ -1,12 +1,13 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import classNamesBind from 'classnames/bind';
+import { useTranslations } from 'next-intl';
+import { formatDayMonthTime } from '@/app/utils/format-date-time';
 import { FiArrowRight } from 'react-icons/fi';
 import { IoTrophyOutline } from 'react-icons/io5';
 import TestModeModal from '@/app/features/tests/TestModeModal/TestModeModal';
 import { useTestStart } from '@/app/features/tests/TestCard/hooks/useTestStart';
-import { formatDayMonthTime } from '@/app/utils/format-date-time';
 import type { TestResponse } from '@/app/types';
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './MockTestCard.module.scss';
@@ -27,6 +28,8 @@ type MockTestCardProps = {
 
 // Thẻ một đề của kỳ thi, cùng khuôn thẻ ở Kho đề thi: nhãn, tên, hàng số liệu mono, nút ở đáy.
 function MockTestCard({ test, index, kind, questions, countdowns }: MockTestCardProps) {
+  const t = useTranslations('ExamTypes.mockCard');
+  const tTests = useTranslations('Tests');
   const {
     status,
     statusLabel,
@@ -43,7 +46,7 @@ function MockTestCard({ test, index, kind, questions, countdowns }: MockTestCard
   const attempts =
     test.maxAttempts != null && test.remainingAttempts != null
       ? `${test.remainingAttempts}/${test.maxAttempts}`
-      : 'Không giới hạn';
+      : t('unlimited');
 
   return (
     <article className={cx('card', { dimmed: !canStart })}>
@@ -58,16 +61,16 @@ function MockTestCard({ test, index, kind, questions, countdowns }: MockTestCard
             )}
             {(test.costCoins ?? 0) > 0 && (
               <span className={ui('pill', test.owned ? 'pillSuccess' : 'pillWarning')}>
-                {test.owned ? 'Đã mở khoá' : `${test.costCoins} xu`}
+                {test.owned ? tTests('owned') : tTests('coins', { count: test.costCoins ?? 0 })}
               </span>
             )}
-            {guestAllowed === true && <span className={ui('pill', 'pillSuccess')}>Không cần tài khoản</span>}
+            {guestAllowed === true && <span className={ui('pill', 'pillSuccess')}>{t('noAccount')}</span>}
             {showLeaderboard && (
               <Link
                 href={buildTestPath(test, 'leaderboard')}
                 className={cx('rankLink')}
-                title="Bảng xếp hạng"
-                aria-label="Bảng xếp hạng"
+                title={tTests('leaderboard')}
+                aria-label={tTests('leaderboard')}
               >
                 <IoTrophyOutline aria-hidden="true" />
               </Link>
@@ -75,21 +78,25 @@ function MockTestCard({ test, index, kind, questions, countdowns }: MockTestCard
           </span>
         </div>
 
-        <span className={cx('index')}>Đề {String(index).padStart(2, '0')}</span>
-        <h3 className={cx('title')}>{test.title || 'Đề thi thử'}</h3>
+        <span className={cx('index')}>{t('index', { index: String(index).padStart(2, '0') })}</span>
+        <h3 className={cx('title')}>{test.title || t('fallbackTitle')}</h3>
 
         <div className={cx('stats')}>
           <div>
-            Câu: <span>{questions ?? '—'}</span>
+            {t('questions')} <span>{questions ?? '—'}</span>
           </div>
           <div>
-            Thời gian: <span>{test.durationMinutes != null ? `${test.durationMinutes}p` : 'Tự do'}</span>
+            {t('duration')}{' '}
+            <span>{test.durationMinutes != null ? t('minutes', { count: test.durationMinutes }) : t('untimed')}</span>
           </div>
           <div>
-            Lượt: <span>{attempts}</span>
+            {t('attempts')} <span>{attempts}</span>
           </div>
           <div>
-            Hạn: <span>{test.availableTo ? formatDayMonthTime(test.availableTo) : 'Không'}</span>
+            {t('deadline')}{' '}
+            <span>
+              {test.availableTo ? formatDayMonthTime(test.availableTo) : t('noDeadline')}
+            </span>
           </div>
         </div>
       </div>
@@ -101,7 +108,7 @@ function MockTestCard({ test, index, kind, questions, countdowns }: MockTestCard
           onClick={handleStart}
           disabled={!canStart}
         >
-          {needsLogin && canStart ? 'Đăng nhập để làm' : buttonText}
+          {needsLogin && canStart ? tTests('loginToStart') : buttonText}
           {canStart && <FiArrowRight aria-hidden="true" />}
         </button>
         {isAuthenticated && (
@@ -109,7 +116,7 @@ function MockTestCard({ test, index, kind, questions, countdowns }: MockTestCard
             href={buildTestPath(test, 'history')}
             className={ui('btnSecondary')}
           >
-            Lịch sử
+            {tTests('history')}
           </Link>
         )}
       </div>

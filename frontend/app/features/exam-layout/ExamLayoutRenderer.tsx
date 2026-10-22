@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { Container } from 'react-bootstrap';
 import { IoGridOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 
 import TestStartDashboard from '@/app/features/tests/TestStartDashboard';
 import QuestionAreaBlock from '@/app/features/exam-layout/blocks/QuestionAreaBlock';
@@ -97,6 +98,7 @@ function ExamLayoutRenderer({
   goToQuestion,
   canNavigateToQuestion,
 }: ExamLayoutRendererProps) {
+  const t = useTranslations('TestTaking.examLayout');
   const [showInfoPanel, setShowInfoPanel] = useState(false);
 
   const answered = Object.keys(userAnswers).length;
@@ -320,8 +322,8 @@ function ExamLayoutRenderer({
           className={cx('mobile-nav-trigger')}
           onClick={() => setShowInfoPanel((v) => !v)}
           aria-expanded={showInfoPanel}
-          aria-label="Xem danh sách câu hỏi"
-          title="Danh sách câu hỏi"
+          aria-label={t('showQuestionList')}
+          title={t('questionList')}
         >
           <IoGridOutline size={24} />
         </button>
@@ -339,7 +341,7 @@ function ExamLayoutRenderer({
           className={cx('mobile-nav-sheet')}
           onClick={(e) => e.stopPropagation()}
           role="dialog"
-          aria-label="Danh sách câu hỏi"
+          aria-label={t('questionList')}
         >
           <TestStartDashboard
             allQuestions={allQuestions}

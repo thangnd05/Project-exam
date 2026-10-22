@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
 import {useSkills, type SkillItem} from './_hooks/useSkills';
@@ -13,7 +14,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/(admin)/_components/common';
+} from '@/app/[locale]/(admin)/_components/common';
 
 const defaultFormState = {
   name: '',
@@ -21,6 +22,8 @@ const defaultFormState = {
 };
 
 function SkillsManagement() {
+  const t = useTranslations('AdminContent.skills');
+  const tc = useTranslations('Common');
   const {
     skillList,
     isLoading: loading,
@@ -38,7 +41,7 @@ function SkillsManagement() {
   const [deletingSkill, setDeletingSkill] = useState<SkillItem | null>(null);
 
   const displayError =
-    errorMessage || (isError ? 'Không thể tải danh sách kỹ năng.' : '');
+    errorMessage || (isError ? t('errors.loadFailed') : '');
 
   const filteredSkills = useMemo(() => {
     const normalizedKeyword = keyword.trim().toLowerCase();
@@ -87,12 +90,12 @@ function SkillsManagement() {
   const handleSubmit = async () => {
     const normalizedName = formState.name.trim();
     if (!normalizedName) {
-      setErrorMessage('Tên kỹ năng không được để trống.');
+      setErrorMessage(t('errors.nameRequired'));
       return;
     }
 
     if (hasDuplicateSkillName(normalizedName)) {
-      setErrorMessage('Tên kỹ năng đã tồn tại, vui lòng chọn tên khác.');
+      setErrorMessage(t('errors.nameDuplicate'));
       return;
     }
 
@@ -113,7 +116,7 @@ function SkillsManagement() {
       setShowModal(false);
       resetForm();
     } catch {
-      setErrorMessage('Không thể lưu kỹ năng. Vui lòng thử lại.');
+      setErrorMessage(t('errors.saveFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -130,52 +133,52 @@ function SkillsManagement() {
       await deleteSkill(deletingSkill.skill_id);
       setDeletingSkill(null);
     } catch {
-      setErrorMessage('Không thể xóa kỹ năng.');
+      setErrorMessage(t('errors.deleteFailed'));
     } finally {
       setSubmitting(false);
     }
   };
 
   const columns = [
-    {key: 'name', header: 'Tên kỹ năng'},
-    {key: 'description', header: 'Mô tả', render: (skill: SkillItem) => skill.description || '-'},
+    {key: 'name', header: t('name')},
+    {key: 'description', header: t('description'), render: (skill: SkillItem) => skill.description || '-'},
   ];
 
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Quản lý kỹ năng"
-        description="Quản lý danh mục kỹ năng dùng cho phần thi và quy đổi điểm."
+        title={t('title')}
+        description={t('pageDescription')}
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
-          Thêm kỹ năng
+          {t('add')}
         </Button>
       </AdminPageHeader>
 
       <AdminToolbar
         searchValue={keyword}
         onSearchChange={setKeyword}
-        searchPlaceholder="Tìm theo tên kỹ năng hoặc mô tả..."
+        searchPlaceholder={t('searchPlaceholder')}
       />
       <AdminFieldError message={displayError} />
 
       <AdminTable
         showIndex
         paginated
-        itemLabel="kỹ năng"
+        itemLabel={t('itemLabel')}
         columns={columns}
         data={filteredSkills}
         loading={loading}
         getRowKey={(skill: SkillItem) => skill.skill_id}
         rowActions={(skill: SkillItem) => (
           <>
-            <button title="Sửa" onClick={() => openEditModal(skill)}>
+            <button title={t('edit')} onClick={() => openEditModal(skill)}>
               <Edit size={14} />
             </button>
             <button
               className="danger"
-              title="Xóa"
+              title={t('delete')}
               onClick={() => setDeletingSkill(skill)}
             >
               <Trash2 size={14} />
@@ -190,7 +193,7 @@ function SkillsManagement() {
           setShowModal(false);
           resetForm();
         }}
-        title={editingSkillId ? 'Cập nhật kỹ năng' : 'Tạo kỹ năng'}
+        title={editingSkillId ? t('editTitle') : t('createTitle')}
         maxWidth={550}
         footer={
           <ModalActionFooter
@@ -202,14 +205,14 @@ function SkillsManagement() {
               resetForm();
             }}
             onSubmit={handleSubmit}
-            cancelLabel="Hủy"
-            submitLabel={editingSkillId ? 'Lưu' : 'Tạo mới'}
+            cancelLabel={tc('cancelShort')}
+            submitLabel={editingSkillId ? tc('save') : t('create')}
             loading={submitting}
           />
         }
       >
         <Form.Group className="mb-3">
-          <Form.Label>Tên kỹ năng</Form.Label>
+          <Form.Label>{t('name')}</Form.Label>
           <Form.Control
             value={formState.name}
             onChange={(event) =>
@@ -218,7 +221,7 @@ function SkillsManagement() {
           />
         </Form.Group>
         <Form.Group>
-          <Form.Label>Mô tả</Form.Label>
+          <Form.Label>{t('description')}</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
@@ -242,8 +245,8 @@ function SkillsManagement() {
           setDeletingSkill(null);
         }}
         onConfirm={handleDelete}
-        title="Xác nhận xóa kỹ năng"
-        message={`Bạn có chắc muốn xóa "${deletingSkill?.name || ''}" không?`}
+        title={t('deleteTitle')}
+        message={t('deleteMessage', {name: deletingSkill?.name || ''})}
       />
     </div>
   );

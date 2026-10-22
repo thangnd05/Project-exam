@@ -1,0 +1,63 @@
+{
+  "minutes": "{count, plural, one {# minute} other {# minutes}}",
+  "unlimited": "Unlimited",
+  "questions": "{count, plural, one {# question} other {# questions}}",
+  "owned": "Unlocked",
+  "coins": "{count, plural, one {# coin} other {# coins}}",
+  "leaderboard": "Leaderboard",
+  "history": "History",
+  "loginToStart": "Log in to start",
+  "loginFlash": "This test requires an account. Log in or sign up for free to take it.",
+  "status": {
+    "live": "Open",
+    "upcoming": "Opening soon",
+    "ended": "Closed",
+    "noAttempts": "No attempts left"
+  },
+  "action": {
+    "start": "Start",
+    "opensIn": "Opens in {time}",
+    "countdown": "{minutes}m {seconds}s",
+    "notOpen": "Not open yet",
+    "deadlinePassed": "Deadline passed",
+    "attemptsExceeded": "Attempt limit reached"
+  },
+  "card": {
+    "fallbackTitle": "Practice test",
+    "duration": "Duration:",
+    "opensAt": "Opens:",
+    "deadline": "Due:",
+    "guestAllowed": "Try it without an account",
+    "loginRequired": "Log in required to take this test",
+    "createdAt": "Created:"
+  },
+  "list": {
+    "gridView": "Grid view",
+    "tableView": "Detailed management (table view)",
+    "empty": {
+      "title": "Nothing here yet",
+      "desc": "There are no tests to show here yet."
+    }
+  },
+  "mode": {
+    "title": "Choose a mode",
+    "loadPartsError": "Couldn’t load the test sections.",
+    "otherSkill": "Other",
+    "examTab": "Mock exam",
+    "practiceTab": "Practice by section",
+    "examDesc": "Take the full test under real, timed exam conditions.",
+    "features": {
+      "timed": "Timed like the real exam",
+      "scoring": "Detailed scoring & saved history",
+      "leaderboard": "Results count toward the leaderboard"
+    },
+    "startExam": "Start mock exam",
+    "practiceHint": "Choose the sections to practice, <strong>no time limit</strong>.",
+    "guideTitle": "Overview & how to approach it",
+    "loadingParts": "Loading test sections...",
+    "noParts": "This test has no sections yet.",
+    "selectAll": "Select all {count, plural, one {# section} other {# sections}}",
+    "selected": "Selected <strong>{count}</strong> {count, plural, one {question} other {questions}}",
+    "start": "Start"
+  }
+}

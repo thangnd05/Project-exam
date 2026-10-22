@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { BookmarkCheck } from 'lucide-react';
 import { IoArrowForward, IoExitOutline, IoTrashOutline } from 'react-icons/io5';
 
@@ -11,7 +12,7 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import { buildLoginUrl } from '@/app/features/auth/authRedirect';
 import { clearGuestSessionId, setGuestClaimIntent } from '@/app/utils/guestSession';
-import { buildGeneratePlanUrl, buildTargetUrl } from '@/app/(guest)/tests/result/[userTestId]/_lib/planFromTest';
+import { buildGeneratePlanUrl, buildTargetUrl } from '@/app/[locale]/(guest)/tests/result/[userTestId]/_lib/planFromTest';
 import promptStyles from './GuestSaveBanner.module.scss';
 
 const px = classNames.bind(promptStyles);
@@ -25,6 +26,7 @@ type GuestSaveBannerProps = {
 
 function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
   const router = useRouter();
+  const t = useTranslations('TestTaking.guestSave');
   const [promptOpen, setPromptOpen] = useState(false);
   const [confirmExit, setConfirmExit] = useState(false);
 
@@ -46,7 +48,7 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
       : `/tests/result/${userTestId}`;
     setGuestClaimIntent(userTestId);
     router.push(buildLoginUrl(next, {
-      flash: 'Đăng nhập để lưu kết quả và xây lộ trình cá nhân hóa.',
+      flash: t('loginFlash'),
     }));
   };
 
@@ -66,7 +68,7 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
   const handleDiscard = () => {
     clearGuestSessionId();
     setConfirmExit(false);
-    toast.info('Đã xóa kết quả bài làm của bạn.');
+    toast.info(t('discarded'));
     router.replace('/');
   };
 
@@ -74,7 +76,7 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
     <>
       <BaseModal
         show={promptOpen}
-        title="Bạn đã có kết quả!"
+        title={t('title')}
         maxWidth={520}
         closeOnOverlay={false}
         closeOnEsc={false}
@@ -82,7 +84,7 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
       >
         <div className={px('body')}>
           <p className={px('lead')}>
-            Bạn có muốn lưu kết quả này và xây lộ trình cá nhân hóa không?
+            {t('lead')}
           </p>
 
           <div className={px('options')}>
@@ -91,9 +93,9 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
                 <BookmarkCheck size={20} aria-hidden="true" />
               </span>
               <span className={px('optionText')}>
-                <span className={px('optionTitle')}>Đăng nhập & lưu kết quả</span>
+                <span className={px('optionTitle')}>{t('saveTitle')}</span>
                 <span className={px('optionHint')}>
-                  Bài vừa làm được lưu vào tài khoản và dùng để lập lộ trình ôn tập.
+                  {t('saveHint')}
                 </span>
               </span>
               <IoArrowForward className={px('optionArrow')} aria-hidden="true" />
@@ -104,9 +106,9 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
                 <IoExitOutline aria-hidden="true" />
               </span>
               <span className={px('optionText')}>
-                <span className={px('optionTitle')}>Thoát</span>
+                <span className={px('optionTitle')}>{t('exitTitle')}</span>
                 <span className={px('optionHint')}>
-                  Kết quả của bạn sẽ bị xóa vĩnh viễn.
+                  {t('exitHint')}
                 </span>
               </span>
               <IoArrowForward className={px('optionArrow')} aria-hidden="true" />
@@ -119,12 +121,12 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
         show={confirmExit}
         onClose={cancelExit}
         onConfirm={handleDiscard}
-        title="Xóa kết quả và thoát?"
-        message="Kết quả bài làm này sẽ bị xóa vĩnh viễn, bạn không thể xem lại hay lưu vào tài khoản sau này."
+        title={t('confirmTitle')}
+        message={t('confirmMessage')}
         icon={IoTrashOutline}
         variant="danger"
-        confirmText="Xóa & thoát"
-        cancelText="Giữ lại"
+        confirmText={t('confirmText')}
+        cancelText={t('cancelText')}
       />
     </>
   );

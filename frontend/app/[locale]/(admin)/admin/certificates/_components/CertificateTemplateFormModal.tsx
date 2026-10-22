@@ -1,6 +1,7 @@
 'use client';
 
 import { Form, Row, Col } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
@@ -46,8 +47,10 @@ function CertificateTemplateFormModal({
   onSubmit,
   submitting,
 }: CertificateTemplateFormModalProps) {
+  const t = useTranslations('AdminSystem.certificates.form');
+  const tCommon = useTranslations('Common');
   const previewDesign = {
-    title: formState.title || 'Chứng nhận hoàn thành',
+    title: formState.title || t('previewTitle'),
     subtitle: formState.subtitle,
     bodyText: formState.bodyText,
     footerNote: formState.footerNote,
@@ -59,21 +62,21 @@ function CertificateTemplateFormModal({
     signatureTitle: formState.signatureTitle,
     signatureImageUrl: formState.signatureImageUrl,
     examTypeName:
-      examTypes.find((type) => type.examTypeId === formState.examTypeId)?.name || 'Loại đề',
+      examTypes.find((type) => type.examTypeId === formState.examTypeId)?.name || t('previewExamType'),
   };
 
   return (
     <BaseModal
       show={show}
       onClose={onClose}
-      title={isEditing ? 'Cập nhật mẫu chứng chỉ' : 'Tạo mẫu chứng chỉ'}
+      title={isEditing ? t('editTitle') : t('createTitle')}
       maxWidth={980}
       footer={
         <ModalActionFooter
           onCancel={onClose}
           onSubmit={onSubmit}
-          cancelLabel="Hủy"
-          submitLabel={isEditing ? 'Lưu' : 'Tạo mới'}
+          cancelLabel={tCommon('cancelShort')}
+          submitLabel={isEditing ? tCommon('save') : t('create')}
           loading={submitting}
         />
       }
@@ -81,13 +84,13 @@ function CertificateTemplateFormModal({
       <Row className="g-4">
         <Col lg={6}>
           <Form.Group className="mb-3">
-            <Form.Label>Loại đề *</Form.Label>
+            <Form.Label>{t('examType')} *</Form.Label>
             <Form.Select
               value={formState.examTypeId}
               onChange={(event) => onChangeField('examTypeId', event.target.value)}
               disabled={isEditing}
             >
-              <option value="">-- Chọn loại đề --</option>
+              <option value="">{t('selectExamType')}</option>
               {examTypes.map((type) => (
                 <option key={type.examTypeId} value={type.examTypeId}>
                   {type.name}
@@ -95,44 +98,43 @@ function CertificateTemplateFormModal({
               ))}
             </Form.Select>
             <Form.Text className="text-muted">
-              Mỗi loại đề chỉ có một mẫu, và không đổi được sau khi tạo.
+              {t('examTypeHelp')}
             </Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Điểm đạt *</Form.Label>
+            <Form.Label>{t('passScore')} *</Form.Label>
             <Form.Control
               type="number"
               value={formState.passScore}
               onChange={(event) => onChangeField('passScore', event.target.value)}
-              placeholder="VD: 720"
+              placeholder={t('passScorePlaceholder')}
             />
             <Form.Text className="text-muted">
-              Đạt từ mốc này trở lên là được cấp chứng chỉ. Thang điểm theo cách chấm của
-              loại đề (AWS: 100-1000, chuẩn AWS là 720).
+              {t('passScoreHelp')}
             </Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Tên chứng chỉ *</Form.Label>
+            <Form.Label>{t('title')} *</Form.Label>
             <Form.Control
               value={formState.title}
               onChange={(event) => onChangeField('title', event.target.value)}
-              placeholder="VD: AWS Certified Solutions Architect  Associate"
+              placeholder={t('titlePlaceholder')}
             />
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Dòng phụ</Form.Label>
+            <Form.Label>{t('subtitle')}</Form.Label>
             <Form.Control
               value={formState.subtitle}
               onChange={(event) => onChangeField('subtitle', event.target.value)}
-              placeholder="VD: Chứng nhận hoàn thành bài thi thử toàn phần"
+              placeholder={t('subtitlePlaceholder')}
             />
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Nội dung chính</Form.Label>
+            <Form.Label>{t('bodyText')}</Form.Label>
             <Form.Control
               as="textarea"
               rows={2}
@@ -141,13 +143,15 @@ function CertificateTemplateFormModal({
               placeholder="for successfully completing and passing the {examType} examination"
             />
             <Form.Text className="text-muted">
-              Câu nằm dưới tên người nhận. Bỏ trống = dùng câu mặc định theo tên loại đề.
-              Gõ <code>{'{examType}'}</code> ở chỗ muốn chèn tên loại đề (sẽ được in đậm).
+              {t.rich('bodyTextHelp', {
+                token: '{examType}',
+                code: (chunks) => <code>{chunks}</code>,
+              })}
             </Form.Text>
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Ghi chú cuối chứng chỉ</Form.Label>
+            <Form.Label>{t('footerNote')}</Form.Label>
             <Form.Control
               as="textarea"
               rows={2}
@@ -159,23 +163,23 @@ function CertificateTemplateFormModal({
           <Row>
             <Col xs={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Thời hạn (tháng)</Form.Label>
+                <Form.Label>{t('validMonths')}</Form.Label>
                 <Form.Control
                   type="number"
                   value={formState.validMonths}
                   onChange={(event) => onChangeField('validMonths', event.target.value)}
-                  placeholder="Bỏ trống = vô thời hạn"
+                  placeholder={t('validMonthsPlaceholder')}
                 />
               </Form.Group>
             </Col>
             <Col xs={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Màu nhấn</Form.Label>
+                <Form.Label>{t('accentColor')}</Form.Label>
                 <Form.Control
                   type="color"
                   value={formState.accentColor || '#a88b3a'}
                   onChange={(event) => onChangeField('accentColor', event.target.value)}
-                  title="Màu viền và tiêu đề chứng chỉ"
+                  title={t('accentColorHint')}
                 />
               </Form.Group>
             </Col>
@@ -185,7 +189,7 @@ function CertificateTemplateFormModal({
             <Form.Check
               type="switch"
               id="certificate-template-active"
-              label="Đang bật (tắt thì ngừng cấp chứng chỉ mới)"
+              label={t('activeLabel')}
               checked={formState.active !== false}
               onChange={(event) => onChangeField('active', event.target.checked)}
             />
@@ -194,18 +198,18 @@ function CertificateTemplateFormModal({
 
         <Col lg={6}>
           <Form.Group className="mb-3">
-            <Form.Label>Đơn vị cấp</Form.Label>
+            <Form.Label>{t('issuerName')}</Form.Label>
             <Form.Control
               value={formState.issuerName}
               onChange={(event) => onChangeField('issuerName', event.target.value)}
-              placeholder="VD: English Exam Platform"
+              placeholder={t('issuerPlaceholder')}
             />
           </Form.Group>
 
           <Row>
             <Col xs={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Người ký</Form.Label>
+                <Form.Label>{t('signatureName')}</Form.Label>
                 <Form.Control
                   value={formState.signatureName}
                   onChange={(event) => onChangeField('signatureName', event.target.value)}
@@ -214,7 +218,7 @@ function CertificateTemplateFormModal({
             </Col>
             <Col xs={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Chức danh</Form.Label>
+                <Form.Label>{t('signatureTitle')}</Form.Label>
                 <Form.Control
                   value={formState.signatureTitle}
                   onChange={(event) => onChangeField('signatureTitle', event.target.value)}
@@ -224,7 +228,7 @@ function CertificateTemplateFormModal({
           </Row>
 
           <Form.Group className="mb-3">
-            <Form.Label>Logo (URL)</Form.Label>
+            <Form.Label>{t('logoUrl')}</Form.Label>
             <Form.Control
               value={formState.logoUrl}
               onChange={(event) => onChangeField('logoUrl', event.target.value)}
@@ -233,7 +237,7 @@ function CertificateTemplateFormModal({
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Ảnh chữ ký (URL)</Form.Label>
+            <Form.Label>{t('signatureImageUrl')}</Form.Label>
             <Form.Control
               value={formState.signatureImageUrl}
               onChange={(event) => onChangeField('signatureImageUrl', event.target.value)}
@@ -242,7 +246,7 @@ function CertificateTemplateFormModal({
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Ảnh nền (URL)</Form.Label>
+            <Form.Label>{t('backgroundUrl')}</Form.Label>
             <Form.Control
               value={formState.backgroundUrl}
               onChange={(event) => onChangeField('backgroundUrl', event.target.value)}
@@ -250,10 +254,10 @@ function CertificateTemplateFormModal({
             />
           </Form.Group>
 
-          <Form.Label>Xem trước</Form.Label>
+          <Form.Label>{t('preview')}</Form.Label>
           <CertificateCanvas
             design={previewDesign}
-            recipientName="Nguyễn Văn A"
+            recipientName={t('previewRecipient')}
             certificateCode="EXAM-2026-XXXXXX"
             issuedAt={new Date().toISOString()}
             watermark="PREVIEW"

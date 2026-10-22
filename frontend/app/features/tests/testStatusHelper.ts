@@ -7,18 +7,28 @@ type TestScheduleLike = {
   remainingAttempts?: number | null;
 };
 
+// Trả key dịch (namespace Tests: status.*, action.*) thay cho nhãn, nơi gọi tự dịch theo ngôn ngữ đang dùng.
+export type TestStatusLabelKey = 'live' | 'upcoming' | 'ended' | 'noAttempts';
+export type TestStatusButtonKey =
+  | 'start'
+  | 'opensIn'
+  | 'notOpen'
+  | 'deadlinePassed'
+  | 'attemptsExceeded';
+
 export type TestStatusInfo = {
   status: 'open' | 'locked' | 'expired';
-  statusLabel: string;
-  buttonText: string;
+  statusLabelKey: TestStatusLabelKey;
+  buttonKey: TestStatusButtonKey;
+  // Thời gian còn lại tới lúc mở đề (ms), chỉ có khi buttonKey = 'opensIn'.
+  remainingMs?: number;
   canStart: boolean;
 };
 
-const formatCountdown = (ms: number): string => {
+// Tách mili-giây đếm ngược thành phút/giây cho key Tests.action.countdown.
+export const splitCountdown = (ms: number): { minutes: number; seconds: number } => {
     const totalSeconds = Math.floor(ms / 1000);
-    const m = Math.floor(totalSeconds / 60);
-    const s = totalSeconds % 60;
-    return `${m}p ${s}s`;
+    return { minutes: Math.floor(totalSeconds / 60), seconds: totalSeconds % 60 };
 };
 
 export const getTestStatus = (
@@ -31,33 +41,37 @@ export const getTestStatus = (
     const remainingTime = test.testId != null ? countdowns?.[test.testId] : undefined;
 
     let status: TestStatusInfo['status'] = 'open';
-    let statusLabel = 'Đang diễn ra';
-    let buttonText = 'Bắt đầu';
+    let statusLabelKey: TestStatusLabelKey = 'live';
+    let buttonKey: TestStatusButtonKey = 'start';
+    let remainingMs: number | undefined;
     let canStart = true;
 
     if (availableFrom && now < availableFrom) {
         status = 'locked';
-        statusLabel = 'Sắp mở';
-        buttonText = remainingTime
-            ? `Mở sau ${formatCountdown(remainingTime)}`
-            : 'Chưa mở';
+        statusLabelKey = 'upcoming';
+        if (remainingTime) {
+            buttonKey = 'opensIn';
+            remainingMs = remainingTime;
+        } else {
+            buttonKey = 'notOpen';
+        }
         canStart = false;
     } else if (availableTo && now > availableTo) {
         status = 'expired';
-        statusLabel = 'Đã kết thúc';
-        buttonText = 'Hết hạn nộp';
+        statusLabelKey = 'ended';
+        buttonKey = 'deadlinePassed';
         canStart = false;
     } else if (test.canDoTest === false) {
         status = 'expired';
-        statusLabel = 'Hết lượt';
-        buttonText = 'Vượt quá lượt làm';
+        statusLabelKey = 'noAttempts';
+        buttonKey = 'attemptsExceeded';
         canStart = false;
     } else if (test.maxAttempts != null && test.remainingAttempts === 0) {
         status = 'expired';
-        statusLabel = 'Hết lượt';
-        buttonText = 'Vượt quá lượt làm';
+        statusLabelKey = 'noAttempts';
+        buttonKey = 'attemptsExceeded';
         canStart = false;
     }
 
-    return { status, statusLabel, buttonText, canStart };
+    return { status, statusLabelKey, buttonKey, remainingMs, canStart };
 };

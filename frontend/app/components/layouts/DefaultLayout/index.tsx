@@ -1,6 +1,6 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@/app/i18n/navigation';
 import {useLayoutEffect, useRef} from 'react';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';

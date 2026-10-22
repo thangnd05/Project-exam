@@ -1,0 +1,73 @@
+{
+  "coins": {
+    "badgeTitle": "{balance} coins · click to see quests",
+    "menuTitleClaimable": "{count, plural, one {# reward} other {# rewards}} waiting to be claimed",
+    "menuTitle": "View quests",
+    "menuAriaClaimable": "View coin balance and quests, {count, plural, one {# reward} other {# rewards}} waiting to be claimed",
+    "menuAria": "View coin balance and quests",
+    "amount": "{amount} coins"
+  },
+  "quests": {
+    "title": "Rewards",
+    "tabQuests": "Quests",
+    "tabShop": "Shop",
+    "loading": "Loading quests...",
+    "empty": "There are no quests right now.",
+    "claimable": "Ready to claim ({count})",
+    "inProgress": "In progress ({count})",
+    "claimed": "Claimed ({count})",
+    "endsAt": "Ends: {date}",
+    "claimedBadge": "Claimed",
+    "claiming": "Claiming...",
+    "claim": "Claim coins",
+    "claimSuccess": "You received {coins, plural, one {# coin} other {# coins}}!",
+    "claimError": "Couldn’t claim this quest. Please try again."
+  },
+  "shop": {
+    "loadError": "Couldn’t load the shop.",
+    "buySuccess": "Purchased “{name}”!",
+    "buyError": "Purchase failed. Please try again.",
+    "equipError": "Couldn’t equip this item.",
+    "unequipError": "Couldn’t unequip this item.",
+    "loading": "Loading shop...",
+    "empty": "The shop has no items yet.",
+    "buying": "Buying...",
+    "buy": "Buy",
+    "notEnough": "Not enough coins",
+    "equipped": "Equipped",
+    "unequip": "Unequip",
+    "owned": "Owned",
+    "equip": "Equip"
+  },
+  "streak": {
+    "label": "day streak",
+    "lostHeading": "Your {count, plural, one {# day} other {# day}} streak was broken",
+    "lostBody": "Click the badge to restore your streak before it expires.",
+    "activeHeading": "{count, plural, one {# day} other {# day}} streak",
+    "activeBody": "Your streak grows every day you take a test or complete a task in your study plan. Miss a day and it resets to 0.",
+    "emptyHeading": "No study streak yet",
+    "emptyBody": "Take a test or complete a task in your study plan today to start a streak."
+  },
+  "celebration": {
+    "days": "{count, plural, one {# day} other {# days}}",
+    "title": "Streak kept alive!",
+    "subtitle": "You’ve studied {count, plural, one {# day} other {# days}} in a row. Come back tomorrow to keep it going!",
+    "continue": "Continue"
+  },
+  "restore": {
+    "title": "Restore streak",
+    "later": "Later",
+    "restoring": "Restoring...",
+    "restore": "Restore ({cost} coins)",
+    "notEnough": "Not enough coins",
+    "lead": "You just broke your <strong>{count, plural, one {# day} other {# day}}</strong> streak. Spend coins to restore it before you start a test. If you skip this, your streak restarts at 1 after this test.",
+    "cost": "Restore cost",
+    "balance": "Your balance",
+    "warn": "You don’t have enough coins to restore it. Complete quests to earn more coins.",
+    "success": "Your {count, plural, one {# day} other {# day}} streak has been restored!",
+    "error": "Restore failed. Please try again."
+  },
+  "hint": {
+    "ok": "Got it"
+  }
+}

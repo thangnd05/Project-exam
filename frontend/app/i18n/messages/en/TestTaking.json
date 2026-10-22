@@ -1,0 +1,329 @@
+{
+  "certificateBanner": {
+    "notPassedTitle": "No certificate this time",
+    "notPassedDesc": "You need <strong>{pointsToPass, plural, one {# more point} other {# more points}}</strong> to earn the certificate (passing score {passScore}, you scored {score}).",
+    "buildPlan": "Build a study plan",
+    "justIssuedTitle": "Congratulations! You’ve just earned a certificate",
+    "alreadyHaveTitle": "You already have a certificate for this exam type",
+    "fallbackTitle": "Certificate",
+    "issuedOn": "issued on {date}",
+    "noReissue": "retakes don’t issue a new certificate",
+    "view": "View certificate"
+  },
+  "dashboard": {
+    "title": "Question list",
+    "questionLabel": "Question {number}",
+    "ariaAnswered": ", answered",
+    "ariaFlagged": ", flagged",
+    "ariaLocked": ", locked",
+    "answered": "Answered",
+    "unanswered": "Unanswered",
+    "flagged": "Flagged ({count})"
+  },
+  "evaluation": {
+    "ratingLabels": {
+      "veryBad": "Very poor",
+      "notGood": "Poor",
+      "okay": "Average",
+      "good": "Good",
+      "veryGood": "Excellent"
+    },
+    "ratingRequired": "Please select a star rating",
+    "thanks": "Thanks for rating this test!",
+    "submitFailed": "Couldn’t send your rating. Please try again later!",
+    "later": "Maybe later",
+    "submit": "Submit rating",
+    "submitting": "Sending...",
+    "title": "How was this test?",
+    "testLabel": "Test: <strong>{title}</strong>",
+    "satisfaction": "Satisfaction",
+    "stars": "{count, plural, one {# star} other {# stars}}",
+    "feedbackLabel": "Additional feedback (optional)",
+    "feedbackPlaceholder": "Was it hard or easy? Any wrong answer keys or unclear explanations?",
+    "privacyTip": "Your rating is only sent to the admin team to improve the test and is never shown publicly."
+  },
+  "examLayout": {
+    "bannerPlaceholder": "Banner (no image yet)",
+    "bannerAlt": "Exam banner",
+    "questions": "Questions",
+    "hide": "Hide",
+    "hideQuestionList": "Hide question list",
+    "showQuestionList": "Show question list",
+    "questionList": "Question list",
+    "submit": "Submit test",
+    "submitting": "Submitting...",
+    "audioBlockedHint": "Your browser paused the audio after the page reloaded. Tap to listen, or move on to the next question.",
+    "playAudio": "Play audio",
+    "next": "Next",
+    "prev": "Previous",
+    "questionNumber": "Question {number}:",
+    "unflag": "Remove flag",
+    "flagForReview": "Flag for review",
+    "flagged": "Flagged",
+    "flag": "Flag",
+    "fillPlaceholder": "Enter your answer...",
+    "essayPlaceholder": "Write your detailed answer here...",
+    "readingMaterial": "Reading material",
+    "materialAudio": "Material / audio",
+    "loadingQuestions": "Loading questions…",
+    "practiceTitle": "Practice by section"
+  },
+  "guestSave": {
+    "loginFlash": "Sign in to save your results and build a personalized study plan.",
+    "discarded": "Your test results have been deleted.",
+    "title": "Your results are ready!",
+    "lead": "Would you like to save these results and build a personalized study plan?",
+    "saveTitle": "Sign in & save results",
+    "saveHint": "This attempt is saved to your account and used to build your study plan.",
+    "exitTitle": "Exit",
+    "exitHint": "Your results will be permanently deleted.",
+    "confirmTitle": "Delete results and exit?",
+    "confirmMessage": "These results will be permanently deleted. You won’t be able to review them or save them to an account later.",
+    "confirmText": "Delete & exit",
+    "cancelText": "Keep"
+  },
+  "history": {
+    "empty": {
+      "title": "No attempts yet",
+      "desc": "Press \"Start test\" above. Every submission is saved here so you can compare your results."
+    },
+    "stats": {
+      "label": "Overview",
+      "attempts": "Attempts",
+      "completed": "{count} completed",
+      "best": "Best score",
+      "latest": "Latest",
+      "delta": "{delta} vs. previous attempt",
+      "avgDuration": "Avg. time"
+    },
+    "attemptsTitle": "Attempts",
+    "columns": {
+      "attempt": "#",
+      "started": "Started",
+      "submitted": "Submitted",
+      "duration": "Time taken",
+      "score": "Score",
+      "status": "Status"
+    },
+    "status": {
+      "completed": "Completed",
+      "inProgress": "In progress",
+      "expired": "Expired"
+    },
+    "practice": "Section practice",
+    "bestPill": "Best",
+    "viewResult": "View results"
+  },
+  "leaderboard": {
+    "forbidden": "You don’t have permission to view this test’s leaderboard (the test belongs to a private class).",
+    "loadError": "Couldn’t load the leaderboard.",
+    "you": "You",
+    "userFallback": "User {id}",
+    "anonymous": "User",
+    "empty": {
+      "title": "No one is on the leaderboard yet",
+      "desc": "Take and submit the test to be the first."
+    },
+    "myRank": "Your rank",
+    "score": "Score",
+    "time": "Time",
+    "rankingHint": "Each person’s best score counts; on a tie, the faster attempt ranks higher.",
+    "notRanked": "You don’t have a result on this leaderboard yet. Take and submit the test to get ranked.",
+    "rankLabel": "Rank {rank}",
+    "title": "Leaderboard",
+    "showingTop": "Showing top {shown} / {total}",
+    "columns": {
+      "rank": "Rank",
+      "user": "User",
+      "duration": "Time taken"
+    }
+  },
+  "managementTable": {
+    "name": "Test name",
+    "duration": "Duration",
+    "status": "Status",
+    "totalAttempts": "Total attempts",
+    "actions": "Actions",
+    "edit": "Edit test",
+    "delete": "Delete test",
+    "viewScores": "View score details"
+  },
+  "notes": {
+    "myNotes": "My notes",
+    "titleRequired": "Please enter a note title!",
+    "updated": "Note updated!",
+    "saved": "Note saved!",
+    "saveError": "Something went wrong while saving the note!",
+    "deleted": "Note deleted!",
+    "deleteError": "Something went wrong while deleting the note!",
+    "saving": "Saving...",
+    "saveChanges": "Save changes",
+    "saveNote": "Save note",
+    "editNote": "Edit note",
+    "newNote": "New note",
+    "backToList": "Back to list",
+    "titlePlaceholder": "Note title",
+    "contentPlaceholder": "Write down what you need to remember...",
+    "writeNew": "Write a new note",
+    "loading": "Opening your notebook...",
+    "empty": "Your notebook is empty - jot down the things you tend to forget.",
+    "noContent": "No content yet",
+    "confirmDelete": "Delete?",
+    "delete": "Delete",
+    "deleteNote": "Delete note"
+  },
+  "pageHeader": {
+    "tabs": {
+      "history": "Attempt history",
+      "leaderboard": "Leaderboard"
+    },
+    "retake": "Retake",
+    "start": "Start test",
+    "fallbackTitle": "Test",
+    "meta": {
+      "questions": "{count, plural, one {# question} other {# questions}}",
+      "minutes": "{count, plural, one {# minute} other {# minutes}}",
+      "unlimited": "No time limit",
+      "attemptsLeft": "{remaining}/{max} attempts left"
+    },
+    "breadcrumbLabel": "Breadcrumb",
+    "examLibrary": "Exam library",
+    "tabsLabel": "Test pages"
+  },
+  "passageMedia": {
+    "audio": "Audio",
+    "image": "Image",
+    "document": "Document",
+    "openFile": "Open file"
+  },
+  "readinessGauge": {
+    "correctStat": "<strong>{correct}/{total}</strong> answered correctly",
+    "beginnerCta": "See the exam structure to start from the fundamentals",
+    "fullTestCta": "Take a full mock test to find out exactly where you stand"
+  },
+  "recoveryPlan": {
+    "practiceNotCounted": "Section practice doesn’t count toward your target score.",
+    "title": "Next steps",
+    "setTarget": "Set a target",
+    "signUpForPlan": "Sign up to get a study plan",
+    "createPlan": "Build a study plan"
+  },
+  "result": {
+    "loadError": "Couldn’t load the results for this test",
+    "reviewLocked": "You can view the answers only after the test window has ended.",
+    "loading": "Calculating your score...",
+    "backHome": "Back to home",
+    "titleBeginner": "Here’s your starting point",
+    "title": "Test completed!",
+    "startingScore": "Starting score",
+    "accuracy": "Accuracy",
+    "score": "Score",
+    "scale": "scale {min}–{max}",
+    "stats": {
+      "correct": "Correct",
+      "wrong": "Incorrect",
+      "total": "Total questions",
+      "time": "Time"
+    },
+    "answersLocked": "Answers will be available after the test window ends.",
+    "viewAnswers": "View answers & explanations",
+    "history": "Test history",
+    "home": "Home",
+    "planFromTest": "Build a study plan from this test",
+    "percentile": "You scored higher than <strong>{percentile}%</strong> of people who took this test"
+  },
+  "review": {
+    "questionList": "Question list",
+    "questionLabel": "Question {number}",
+    "legend": {
+      "correct": "Correct",
+      "incorrect": "Incorrect",
+      "unanswered": "Unanswered"
+    },
+    "hide": "Hide",
+    "showList": "Questions",
+    "correctCount": "{correct}/{total} correct",
+    "questionNumber": "Question {number}:",
+    "questionPrefix": "Question:",
+    "yourAnswer": "Your answer:",
+    "noAnswer": "(No answer)",
+    "correctAnswer": "Correct answer:",
+    "yourChoice": "(Your choice)",
+    "explanation": "Explanation:"
+  },
+  "start": {
+    "loginRequiredFlash": "You need to sign in to take this test!",
+    "autoSubmitRetry": "Connection lost while submitting. Retrying automatically - please don’t close this page...",
+    "submitFailed": "Submission failed! Please try again.",
+    "unlockSuccess": "Test unlocked!",
+    "unlockFailed": "Unlock failed. Please try again.",
+    "confirmSubmit": {
+      "title": "Submit test?",
+      "continue": "Keep working",
+      "submit": "Submit",
+      "unanswered": "You have <strong>{unanswered}/{total} questions</strong> unanswered. You can’t change your answers after submitting.",
+      "allAnswered": "You’ve answered all {total, plural, one {# question} other {# questions}}. You can’t change your answers after submitting.",
+      "flagged": "<strong>{count, plural, one {# question is} other {# questions are}}</strong> still flagged for review."
+    },
+    "loading": "Loading test...",
+    "back": "Back",
+    "ready": {
+      "fallbackTitle": "Ready to start",
+      "questionCount": "<strong>{count}</strong> {count, plural, one {question} other {questions}}",
+      "partCount": ", split into {count} sections",
+      "timed": "Time limit: <strong>{minutes, plural, one {# minute} other {# minutes}}</strong>, starting when you press Start",
+      "untimed": "No time limit",
+      "autosave": "Your answers are saved automatically, so you can pick up where you left off if the page reloads.",
+      "submitHint": "When you’re done, press <strong>Submit</strong> to see your score and the answers.",
+      "autoSubmit": "Your test is submitted automatically when time runs out.",
+      "start": "Start test"
+    },
+    "payment": {
+      "title": "Paid test",
+      "desc": "Pay once, keep access forever.",
+      "unlocking": "Unlocking...",
+      "unlock": "Unlock ({cost, plural, one {# coin} other {# coins}})",
+      "notEnough": "Not enough coins"
+    },
+    "noAttempts": {
+      "title": "No attempts left",
+      "desc": "You’ve used all the attempts allowed for this test."
+    },
+    "locked": {
+      "title": "The exam room isn’t open yet",
+      "desc": "Please wait a moment..."
+    },
+    "closed": {
+      "title": "The exam room is closed",
+      "desc": "Sorry, the window for taking this test has ended."
+    },
+    "error": {
+      "title": "Couldn’t load the test",
+      "desc": "Your connection may be unstable. Try reloading - any answers you’ve already given are kept."
+    }
+  },
+  "tagAnalysis": {
+    "fallbackPart": "Section",
+    "title": "Detailed analysis",
+    "columns": {
+      "category": "Question category",
+      "correct": "Correct",
+      "wrong": "Incorrect",
+      "skipped": "Skipped",
+      "accuracy": "Accuracy",
+      "questions": "Questions"
+    },
+    "questionTitle": "Question {number} - view explanation",
+    "total": "Total"
+  },
+  "testReview": {
+    "loadError": "Couldn’t load the question details. Please try again.",
+    "notReviewable": "You can view the answers only after the test window has ended.",
+    "translation": "Translation",
+    "loading": "Loading your answers...",
+    "backToResult": "Back to results",
+    "home": "Home",
+    "title": "Answer review",
+    "passageLabel": "Material / Listening passage"
+  }
+}

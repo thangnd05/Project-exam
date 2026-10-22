@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import {Spinner, Table} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
+import {useTranslations} from 'next-intl';
 
 import styles from './adminKit.module.scss';
 
@@ -58,22 +59,23 @@ function AdminTable<T extends object>({
   columns = [],
   data = [],
   loading = false,
-  emptyText = 'Không có dữ liệu.',
-  loadingText = 'Đang tải dữ liệu...',
+  emptyText,
+  loadingText,
   getRowKey,
   rowActions,
-  actionsHeader = 'Thao tác',
+  actionsHeader,
   showIndex = false,
-  indexHeader = 'STT',
+  indexHeader,
   paginated = false,
   pageSize = 10,
-  itemLabel = 'mục',
+  itemLabel,
 
   page,
   totalPages: totalPagesProp,
   totalElements,
   onPageChange,
 }: AdminTableProps<T>) {
+  const t = useTranslations('AdminCommon.table');
   const isServer = typeof onPageChange === 'function';
   const hasPager = isServer || paginated;
   const [internalPage, setInternalPage] = useState(0);
@@ -124,7 +126,7 @@ function AdminTable<T extends object>({
           <tr>
             {showIndex && (
               <th className={cx('center')} style={{width: 70}}>
-                {indexHeader}
+                {indexHeader ?? t('index')}
               </th>
             )}
             {columns.map((col) => (
@@ -136,7 +138,7 @@ function AdminTable<T extends object>({
                 {col.header}
               </th>
             ))}
-            {rowActions && <th>{actionsHeader}</th>}
+            {rowActions && <th>{actionsHeader ?? t('actions')}</th>}
           </tr>
         </thead>
         <tbody>
@@ -144,7 +146,7 @@ function AdminTable<T extends object>({
             <tr>
               <td colSpan={colSpan} className={cx('stateCell')}>
                 <Spinner size="sm" className="me-2" />
-                {loadingText}
+                {loadingText ?? t('loading')}
               </td>
             </tr>
           )}
@@ -173,7 +175,7 @@ function AdminTable<T extends object>({
           {!loading && total === 0 && (
             <tr>
               <td colSpan={colSpan} className={cx('stateCell')}>
-                {emptyText}
+                {emptyText ?? t('empty')}
               </td>
             </tr>
           )}
@@ -183,14 +185,14 @@ function AdminTable<T extends object>({
       {hasPager && !loading && total > 0 && (
         <div className={cx('tableFooter')}>
           <span className={cx('footerInfo')}>
-            Hiển thị {rangeStart} - {rangeEnd} trên tổng số {total} {itemLabel}
+            {t('range', {start: rangeStart, end: rangeEnd, total, item: itemLabel ?? t('item')})}
           </span>
           <div className={cx('pager')}>
             <button
               className={cx('pagerBtn')}
               disabled={currentPage === 0}
               onClick={() => goTo(currentPage - 1)}
-              aria-label="Trang trước"
+              aria-label={t('prevPage')}
             >
               <ChevronLeft size={16} />
             </button>
@@ -213,7 +215,7 @@ function AdminTable<T extends object>({
               className={cx('pagerBtn')}
               disabled={currentPage >= totalPages - 1}
               onClick={() => goTo(currentPage + 1)}
-              aria-label="Trang sau"
+              aria-label={t('nextPage')}
             >
               <ChevronRight size={16} />
             </button>

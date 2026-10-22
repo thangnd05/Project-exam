@@ -1,0 +1,148 @@
+{
+  "saving": "Đang lưu...",
+  "myAlbums": {
+    "loading": "Đang chuẩn bị kho tàng từ vựng...",
+    "title": "THẺ GHI NHỚ",
+    "label": "QUẢN LÝ ALBUM",
+    "createAction": "Tạo album mới",
+    "gridView": "Dạng lưới",
+    "listView": "Dạng danh sách",
+    "emptyTitle": "Chưa có album nào",
+    "emptyDescription": "Bắt đầu tạo album đầu tiên để lưu lại các từ vựng thú vị nhé!",
+    "createNow": "Tạo album ngay",
+    "wordUnit": "từ",
+    "mastered": "Đã thuộc <strong>{count}</strong> từ",
+    "continue": "Tiếp tục học",
+    "start": "Bắt đầu học",
+    "deleteTitle": "Xác nhận xóa Album",
+    "deleteMessage": "Bạn có chắc chắn muốn xóa album \"{name}\"? Mọi từ vựng trong album sẽ bị ảnh hưởng.",
+    "toast": {
+      "deleted": "Xóa Album thành công!",
+      "deleteError": " Có lỗi xảy ra khi xóa Album!"
+    }
+  },
+  "albumTable": {
+    "name": "Tên Album",
+    "description": "Mô tả",
+    "actions": "Hành động",
+    "study": "Học ngay",
+    "edit": "Sửa Album",
+    "delete": "Xóa Album"
+  },
+  "albumForm": {
+    "createTitle": "Tạo Album Mới",
+    "editTitle": "Chỉnh sửa Album",
+    "later": "Để sau",
+    "createSubmit": "Tạo Album ngay",
+    "creating": "Đang tạo...",
+    "saveChanges": "Lưu thay đổi",
+    "name": "Tên Album",
+    "namePlaceholder": "Ví dụ: Từ vựng IELTS, Giao tiếp...",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Nhập mô tả về mục tiêu của album này...",
+    "descriptionTip": "Mô tả giúp bạn ghi nhớ mục đích học tập của album.",
+    "toast": {
+      "nameRequired": " Vui lòng nhập tên Album!",
+      "created": "Tạo Album thành công!",
+      "createError": "Có lỗi xảy ra khi tạo Album!",
+      "updated": "Cập nhật Album thành công!",
+      "updateError": " Có lỗi xảy ra khi cập nhật Album!"
+    }
+  },
+  "albumDetail": {
+    "loadError": "Không thể tải danh sách từ vựng ",
+    "loading": "Đang mài giũa kiến thức...",
+    "flashcardTitle": "Học bằng Flashcard",
+    "listTitle": "Danh sách từ vựng",
+    "label": "QUẢN LÝ TỪ VỰNG",
+    "addWord": "Thêm từ vựng",
+    "importJson": "Nhập JSON",
+    "backToAlbum": "Quay lại album",
+    "practice": "Luyện tập",
+    "listMode": "Chế độ Danh sách",
+    "flashcardMode": "Chế độ Flashcard",
+    "table": {
+      "index": "STT",
+      "word": "Từ vựng",
+      "meaning": "Nghĩa",
+      "example": "Ví dụ",
+      "pronunciation": "Phát âm",
+      "actions": "Hành động"
+    },
+    "editWord": "Sửa từ vựng",
+    "deleteWord": "Xóa từ vựng",
+    "empty": "Album này còn trống",
+    "deleteTitle": "Xác nhận xóa từ vựng",
+    "deleteMessage": "Bạn có chắc chắn muốn xóa từ \"{word}\" khỏi album này?",
+    "toast": {
+      "deleted": "Đã xóa từ \"{word}\" thành công!",
+      "deleteError": "Không thể xóa từ này. Vui lòng thử lại!"
+    }
+  },
+  "vocabForm": {
+    "createTitle": "Thêm Từ Vựng Mới",
+    "editTitle": "Chỉnh Sửa Từ Vựng",
+    "createSubmit": "Lưu từ vựng ngay",
+    "saveChanges": "Lưu thay đổi",
+    "word": "Từ vựng (Tiếng Anh)",
+    "wordPlaceholder": "Ví dụ: Excellence, Innovation...",
+    "meaning": "Nghĩa (Tiếng Việt)",
+    "meaningPlaceholder": "Ví dụ: Sự xuất sắc, Đổi mới...",
+    "example": "Ví dụ minh họa",
+    "examplePlaceholder": "Nhập ví dụ giúp bạn ghi nhớ từ vựng này...",
+    "toast": {
+      "required": " Vui lòng điền đầy đủ từ vựng và nghĩa!",
+      "created": " Thêm từ vựng thành công!",
+      "createError": "Có lỗi xảy ra khi thêm từ mới!",
+      "updated": " Cập nhật từ vựng thành công!",
+      "updateError": "Có lỗi xảy ra khi cập nhật từ vựng!"
+    }
+  },
+  "bulkImport": {
+    "title": "Nhập Từ Vựng Hàng Loạt (JSON)",
+    "submit": "Bắt đầu nhập ngay",
+    "jsonData": "Dữ liệu JSON",
+    "standardize": "Chuẩn hóa bằng AI",
+    "showSample": "Xem mẫu JSON",
+    "placeholder": "Dán mảng JSON vào đây: {sample}",
+    "hint": "* Đảm bảo cấu trúc JSON là một mảng các đối tượng chứa các trường: <strong>word</strong>, <strong>meaning</strong>, <strong>example</strong> (tùy chọn).",
+    "toast": {
+      "rawTextRequired": " Vui lòng nhập văn bản thô để chuẩn hóa!",
+      "standardized": "Chuẩn hóa dữ liệu thành công!",
+      "invalidAiData": "AI trả về dữ liệu không hợp lệ. Vui lòng thử lại!",
+      "aiUnavailable": "Không thể kết nối AI. Vui lòng thử lại!",
+      "jsonRequired": "Vui lòng nhập dữ liệu JSON!",
+      "notArray": "Dữ liệu phải là một mảng (Array) các đối tượng từ vựng!",
+      "emptyArray": "Mảng từ vựng không được rỗng!",
+      "invalidJson": "Định dạng JSON không hợp lệ. Vui lòng kiểm tra lại!",
+      "imported": "Đã nhập thành công {count} từ vựng!",
+      "importError": "Có lỗi xảy ra khi nhập dữ liệu. Vui lòng kiểm tra cấu trúc JSON!"
+    }
+  },
+  "practice": {
+    "markedKnown": "Bạn đã đánh dấu từ này là đã biết!",
+    "markError": "Có lỗi xảy ra khi đánh dấu từ này!",
+    "loading": "Đang tải câu hỏi...",
+    "finishedTitle": "Chúc mừng bạn!",
+    "finishedSubtitle": "Bạn đã hoàn thành tất cả từ trong album này!",
+    "backToAlbum": "Quay lại Album",
+    "noQuestion": "Không có câu hỏi nào khả dụng",
+    "back": "Quay lại",
+    "multiChoice": "Chọn đáp án",
+    "typeWord": "Nhập từ",
+    "englishWord": "Từ tiếng Anh",
+    "englishPlaceholder": "Nhập từ tiếng Anh...",
+    "vietnameseMeaning": "Nghĩa tiếng Việt",
+    "vietnamesePlaceholder": "Nhập nghĩa tiếng Việt...",
+    "correct": "Chính xác!",
+    "incorrect": "Chưa đúng rồi!",
+    "correctWord": "Từ đúng:",
+    "meaning": "Nghĩa:",
+    "status": "Trạng thái",
+    "correctCount": "Số lần đúng",
+    "checking": "Đang chấm...",
+    "check": "Kiểm tra đáp án",
+    "next": "Câu tiếp theo",
+    "known": "Đã biết từ này"
+  }
+}

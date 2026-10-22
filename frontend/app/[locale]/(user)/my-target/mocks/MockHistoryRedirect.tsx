@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import routes from '@/app/configs/Routes';
 
 function MockHistoryRedirect() {

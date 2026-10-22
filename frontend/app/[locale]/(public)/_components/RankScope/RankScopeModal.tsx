@@ -2,10 +2,11 @@
 
 import {useState} from 'react';
 import {Modal} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 import {FiX} from 'react-icons/fi';
 
-import type {Vendor} from '@/app/(public)/_lib/certificationMeta';
+import type {Vendor} from '@/app/[locale]/(public)/_lib/certificationMeta';
 import {displayName, initials, useRankBoard} from './useRankBoard';
 import styles from './RankScopeModal.module.scss';
 
@@ -14,13 +15,8 @@ const cx = classNames.bind(styles);
 // Lấy tối đa bấy nhiêu người mỗi kỳ thi (backend giới hạn 100).
 const FULL_LIMIT = 50;
 
-const TABS: {id: Vendor | 'all'; label: string}[] = [
-  {id: 'all', label: 'Tất cả'},
-  {id: 'aws', label: 'AWS'},
-  {id: 'azure', label: 'Azure'},
-  {id: 'gcp', label: 'GCP'},
-  {id: 'other', label: 'LPIC / Khác'},
-];
+// Nhãn tab lấy từ Home.rankScope.modal.tabs theo id.
+const TABS: (Vendor | 'all')[] = ['all', 'aws', 'azure', 'gcp', 'other'];
 
 type RankScopeModalProps = {
   show: boolean;
@@ -29,10 +25,11 @@ type RankScopeModalProps = {
 };
 
 function RankScopeModal({show, onClose, onJoin}: RankScopeModalProps) {
+  const t = useTranslations('Home.rankScope');
   const [tab, setTab] = useState<Vendor | 'all'>('all');
   const {vendors, rowsFor, isLoading} = useRankBoard(FULL_LIMIT, show);
 
-  const tabs = TABS.filter((t) => t.id === 'all' || vendors.includes(t.id as Vendor));
+  const tabs = TABS.filter((id) => id === 'all' || vendors.includes(id));
   const rows = rowsFor(tab, FULL_LIMIT * Math.max(vendors.length, 1));
 
   const renderList = () => {
@@ -43,15 +40,15 @@ function RankScopeModal({show, onClose, onJoin}: RankScopeModalProps) {
     if (rows.length === 0) {
       return (
         <div className={cx('empty')}>
-          <p className={cx('emptyTitle')}>Chưa có ai lên bảng xếp hạng</p>
-          <p>Hoàn thành một đề Full Mock để trở thành người đầu tiên được ghi danh.</p>
+          <p className={cx('emptyTitle')}>{t('emptyTitle')}</p>
+          <p>{t('modal.emptyText')}</p>
         </div>
       );
     }
 
     return rows.map(({entry, exam}, i) => {
       const rank = i + 1;
-      const name = displayName(entry);
+      const name = displayName(entry, t('anonymous'));
       const tone = rank === 1 ? 'top' : rank <= 3 ? 'podium' : 'rest';
 
       return (
@@ -86,26 +83,26 @@ function RankScopeModal({show, onClose, onJoin}: RankScopeModalProps) {
       <div className={cx('head')}>
         <div>
           <h3 id="rankscope-modal-title" className={cx('title')}>
-            Bảng xếp hạng RankScope toàn hệ thống
+            {t('modal.title')}
           </h3>
-          <p className={cx('subtitle')}>Vinh danh các thí sinh đạt điểm cao nhất từ đề thi Full Mock Test</p>
+          <p className={cx('subtitle')}>{t('modal.subtitle')}</p>
         </div>
-        <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label="Đóng">
+        <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label={t('modal.close')}>
           <FiX aria-hidden="true" />
         </button>
       </div>
 
-      <div className={cx('tabs')} role="tablist" aria-label="Lọc theo hãng">
-        {tabs.map((t) => (
+      <div className={cx('tabs')} role="tablist" aria-label={t('tabsAria')}>
+        {tabs.map((id) => (
           <button
-            key={t.id}
+            key={id}
             type="button"
             role="tab"
-            aria-selected={tab === t.id}
-            className={cx('tab', {activeTab: tab === t.id})}
-            onClick={() => setTab(t.id)}
+            aria-selected={tab === id}
+            className={cx('tab', {activeTab: tab === id})}
+            onClick={() => setTab(id)}
           >
-            {t.label}
+            {t(`modal.tabs.${id}`)}
           </button>
         ))}
       </div>
@@ -115,13 +112,13 @@ function RankScopeModal({show, onClose, onJoin}: RankScopeModalProps) {
       </div>
 
       <div className={cx('foot')}>
-        <span className={cx('note')}>Cập nhật liên tục từ kết quả thi Full Mock đạt chuẩn</span>
+        <span className={cx('note')}>{t('modal.note')}</span>
         <div className={cx('footActions')}>
           <button type="button" className={cx('btnPrimary')} onClick={onJoin}>
-            Thi ngay để ghi danh
+            {t('modal.join')}
           </button>
           <button type="button" className={cx('btnSecondary')} onClick={onClose}>
-            Đóng
+            {t('modal.close')}
           </button>
         </div>
       </div>

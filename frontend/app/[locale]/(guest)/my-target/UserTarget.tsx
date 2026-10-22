@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Link, { useRouter } from '@/app/i18n/navigation';
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
 import { IoFlagOutline } from 'react-icons/io5';
@@ -37,6 +37,7 @@ const planCx = classNamesBind.bind(planStyles);
 const ui = classNamesBind.bind(uiStyles);
 
 function UserTarget() {
+  const t = useTranslations('MyTarget');
   const [searchParams, setSearchParams] = useSearchParamsState();
   const router = useRouter();
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
@@ -169,7 +170,7 @@ function UserTarget() {
 
   const handleSave = () => {
     if (!targetScore || !selectedExamTypeId) {
-      toast.warn('Nhập điểm mục tiêu trước.');
+      toast.warn(t('setTarget.toast.enterScoreFirst'));
       return;
     }
     if (!isAuthenticated) {
@@ -177,7 +178,7 @@ function UserTarget() {
       const backParams = setExamParam(searchParams, selectedExamTypeId, examTypes);
       router.push(
         buildLoginUrl(`/my-target?${backParams.toString()}`, {
-          flash: 'Bạn cần đăng nhập để lưu mục tiêu!',
+          flash: t('setTarget.toast.loginRequired'),
         }),
       );
       return;
@@ -201,17 +202,15 @@ function UserTarget() {
       {
         onSuccess: () => {
           if (isUpdate) {
-            toast.success(
-              'Đã cập nhật mục tiêu. Lộ trình đang chạy sẽ hiện nút "Cập nhật theo mục tiêu mới"  bấm là xong, không cần thi lại.',
-            );
+            toast.success(t('setTarget.toast.updated'));
             window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
           }
           // Mục tiêu đầu tiên: đi thẳng sang bước sinh lộ trình thay vì bắt người dùng tự tìm tab.
-          toast.success('Đã lưu mục tiêu! Giờ cùng sinh lộ trình học nhé.');
+          toast.success(t('setTarget.toast.saved'));
           router.push(nextAfterTarget);
         },
-        onError: () => toast.error('Lỗi khi lưu mục tiêu.'),
+        onError: () => toast.error(t('setTarget.toast.saveError')),
       },
     );
   };
@@ -223,9 +222,9 @@ function UserTarget() {
       onSuccess: () => {
         setTargetScore('');
         setCustomParts({});
-        toast.success('Đã xóa mục tiêu.');
+        toast.success(t('setTarget.toast.deleted'));
       },
-      onError: () => toast.error('Lỗi khi xóa mục tiêu.'),
+      onError: () => toast.error(t('setTarget.toast.deleteError')),
     });
   };
 
@@ -269,21 +268,23 @@ function UserTarget() {
   const estimateDiff = estimate ? estimate.totalScore - Number(targetScore) : 0;
 
   const renderSummary = () => (
-    <aside className={classNames(ui('card'), cx('summary'))} aria-label="Tóm tắt mục tiêu">
+    <aside className={classNames(ui('card'), cx('summary'))} aria-label={t('setTarget.summary.ariaLabel')}>
       <div className={cx('summaryTop')}>
-        <span className={ui('eyebrow')}>Tóm tắt</span>
+        <span className={ui('eyebrow')}>{t('setTarget.summary.eyebrow')}</span>
         <span className={ui('pill', { pillSuccess: hasSavedTarget })}>
-          {hasSavedTarget ? `Đã lưu · ${currentTarget?.targetScore} điểm` : 'Chưa lưu'}
+          {hasSavedTarget
+            ? t('setTarget.summary.saved', { score: currentTarget?.targetScore ?? 0 })
+            : t('setTarget.summary.notSaved')}
         </span>
       </div>
 
       <div className={cx('scoreStats')}>
         <div className={cx('scoreStat')}>
-          <span className={cx('statLabel')}>Mục tiêu</span>
+          <span className={cx('statLabel')}>{t('setTarget.summary.target')}</span>
           <span className={cx('statValue')}>{targetScore || '—'}</span>
         </div>
         <div className={cx('scoreStat')}>
-          <span className={cx('statLabel')}>Ước tính</span>
+          <span className={cx('statLabel')}>{t('setTarget.summary.estimate')}</span>
           <span className={cx('statValue')}>{estimate?.totalScore ?? '—'}</span>
           {estimate && (
             <span className={cx('statDiff', estimateDiff >= 0 ? 'ok' : 'short')}>
@@ -319,13 +320,16 @@ function UserTarget() {
       {estimate && (
         <p className={cx('estimateDetail')}>
           {estimate.scaled
-            ? `${formatEstimateDetail(estimate)}, cần đạt ≥ ${targetScore}`
+            ? t('setTarget.summary.estimateNeed', {
+                detail: formatEstimateDetail(estimate),
+                score: targetScore,
+              })
             : formatEstimateDetail(estimate)}
         </p>
       )}
 
       {targetScore && hasSavedTarget && (
-        <p className={cx('overwriteNote')}>Lưu lại sẽ ghi đè mục tiêu hiện tại.</p>
+        <p className={cx('overwriteNote')}>{t('setTarget.summary.overwriteNote')}</p>
       )}
 
       <div className={cx('summaryActions')}>
@@ -335,11 +339,15 @@ function UserTarget() {
           onClick={handleSave}
           disabled={loading || !targetScore}
         >
-          {loading ? 'Đang lưu...' : hasSavedTarget ? 'Cập nhật mục tiêu' : 'Lưu mục tiêu'}
+          {loading
+            ? t('setTarget.summary.saving')
+            : hasSavedTarget
+              ? t('setTarget.summary.update')
+              : t('setTarget.summary.save')}
         </button>
         {hasSavedTarget && (
           <Link href={nextAfterTarget} className={ui('btnSecondary')}>
-            Sinh lộ trình vượt ải
+            {t('setTarget.summary.generatePlan')}
             <FiArrowRight aria-hidden="true" />
           </Link>
         )}
@@ -350,7 +358,7 @@ function UserTarget() {
             onClick={handleDelete}
             disabled={loading}
           >
-            Xóa mục tiêu
+            {t('setTarget.summary.delete')}
           </button>
         )}
       </div>
@@ -361,10 +369,9 @@ function UserTarget() {
     <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
       <TargetPlanTabs active="target" examTypeId={selectedExamTypeId} examTypes={examTypes} />
       <header className={ui('pageHead')}>
-        <h1 className={ui('pageTitle')}>Mục tiêu của tôi</h1>
+        <h1 className={ui('pageTitle')}>{t('setTarget.title')}</h1>
         <p className={ui('pageSubtitle')}>
-          Chọn kỳ thi và mức điểm bạn muốn đạt. WinDe dựa vào đó để biết mỗi phần cần luyện tới đâu
-          rồi lập lộ trình cho bạn.
+          {t('setTarget.subtitle')}
         </p>
       </header>
 
@@ -378,8 +385,8 @@ function UserTarget() {
       {!selectedExamTypeId ? (
         <div className={ui('empty')}>
           <IoFlagOutline className={ui('emptyIcon')} aria-hidden="true" />
-          <h2>Chọn kỳ thi để đặt mục tiêu</h2>
-          <p>Bấm vào một kỳ thi ở trên để xem mức điểm gợi ý.</p>
+          <h2>{t('setTarget.empty.title')}</h2>
+          <p>{t('setTarget.empty.description')}</p>
         </div>
       ) : (
         <div className={cx('layout')}>
@@ -387,9 +394,9 @@ function UserTarget() {
             <ExamHeading exam={activeExam} id="target-exam-title" className={cx('examHead')} />
 
             <div className={cx('block')}>
-              <span className={classNames(ui('eyebrow'), cx('blockLabel'))}>Điểm mục tiêu</span>
+              <span className={classNames(ui('eyebrow'), cx('blockLabel'))}>{t('setTarget.scoreLabel')}</span>
               {milestones.length > 0 && (
-                <div className={cx('chips')} role="group" aria-label="Mức điểm gợi ý">
+                <div className={cx('chips')} role="group" aria-label={t('setTarget.milestonesAriaLabel')}>
                   {milestones.map((m) => (
                     <button
                       key={m.examTargetMilestoneId}
@@ -409,10 +416,10 @@ function UserTarget() {
               )}
               <div className={cx('scoreInputRow')}>
                 <label className={cx('scoreInput')}>
-                  <span className="visually-hidden">Điểm mục tiêu</span>
+                  <span className="visually-hidden">{t('setTarget.scoreLabel')}</span>
                   <input
                     type="number"
-                    placeholder={isScaled ? 'VD: 700' : 'VD: 450'}
+                    placeholder={isScaled ? t('setTarget.placeholderScaled') : t('setTarget.placeholder')}
                     value={targetScore}
                     min={0}
                     max={maxTargetScore}
@@ -425,19 +432,19 @@ function UserTarget() {
                 </label>
                 {targetScore && matchedMilestone && (
                   <span className={cx('milestoneHint')}>
-                    Mức {matchedMilestone.milestoneScore}
+                    {t('setTarget.milestoneHint', { score: matchedMilestone.milestoneScore ?? '' })}
                     {matchedMilestone.description && `: ${matchedMilestone.description}`}
                   </span>
                 )}
                 {targetScore && !matchedMilestone && (
                   <span className={cx('milestoneHint')}>
-                    Điểm tự chọn: mỗi phần thi cần đúng khoảng {evenPctForScore(targetScore)}%
+                    {t('setTarget.customHint', { pct: evenPctForScore(targetScore) })}
                   </span>
                 )}
               </div>
               {suggestedFor === selectedExamTypeId && !hasSavedTarget && (
                 <p className={cx('hint')}>
-                  Chưa biết đặt bao nhiêu? WinDe đã chọn sẵn một mức vừa sức, sau này đổi lúc nào cũng được.
+                  {t('setTarget.suggestedHint')}
                 </p>
               )}
             </div>
@@ -446,13 +453,13 @@ function UserTarget() {
               <details className={cx('advanced')} open={Object.keys(customParts).length > 0}>
                 <summary className={cx('advancedTitle')}>
                   <FiChevronRight className={cx('chevron')} aria-hidden="true" />
-                  Nâng cao: số câu cần đúng ở từng phần thi
-                  <span className={cx('optional')}>không bắt buộc</span>
+                  {t('setTarget.advanced.title')}
+                  <span className={cx('optional')}>{t('setTarget.advanced.optional')}</span>
                 </summary>
                 <p className={cx('hint')}>
                   {matchedMilestone
-                    ? 'Đã điền sẵn theo mức điểm bạn chọn. Chỉ sửa nếu bạn muốn dồn sức vào phần nào đó.'
-                    : `Đã điền sẵn: mỗi phần cần đúng khoảng ${evenPctForScore(targetScore)}%. Chỉ sửa nếu bạn muốn dồn sức vào phần nào đó.`}
+                    ? t('setTarget.advanced.milestoneHint')
+                    : t('setTarget.advanced.evenHint', { pct: evenPctForScore(targetScore) })}
                 </p>
 
                 <div className={cx('partList')}>
@@ -466,7 +473,7 @@ function UserTarget() {
                       <div key={pr.examPartId} className={cx('partRow')}>
                         <span className={cx('partName')}>
                           {getPartName(pr.examPartId)}
-                          <span className={cx('partTotal')}>{total} câu</span>
+                          <span className={cx('partTotal')}>{t('setTarget.advanced.questionCount', { count: total })}</span>
                         </span>
                         <div className={cx('partInputs')}>
                           <label className={cx('partField', { custom: isCustom })}>
@@ -480,7 +487,7 @@ function UserTarget() {
                                 handlePartChange(pr.examPartId, newPct);
                               }}
                             />
-                            <span>câu</span>
+                            <span>{t('setTarget.advanced.questionUnit')}</span>
                           </label>
                           <label className={cx('partField', { custom: isCustom })}>
                             <input
@@ -501,7 +508,7 @@ function UserTarget() {
                             tabIndex={isCustom ? undefined : -1}
                             aria-hidden={!isCustom}
                           >
-                            Đặt lại
+                            {t('setTarget.advanced.reset')}
                           </button>
                         </div>
                       </div>

@@ -1,0 +1,94 @@
+{
+  "hero": {
+    "eyebrow": "The <accent>personalized</accent> Cloud certification prep platform",
+    "headline": {
+      "line1": "Don’t just drill questions.",
+      "line2": "Understand",
+      "glow": "what you’re missing"
+    },
+    "startQuick": "Take a quick test",
+    "exploreExams": "Explore exams",
+    "highlights": {
+      "shortTests": "Tests at 25% of real exam length",
+      "domainAnalysis": "Domain-by-domain analysis",
+      "personalPlan": "Personalized study plan"
+    },
+    "providersLabel": "Question banks aligned with official blueprints"
+  },
+  "quickTest": {
+    "fallbackName": "Quick test",
+    "minutes": "{minutes} min",
+    "unlimited": "No time limit",
+    "questions": "{count, plural, one {# question} other {# questions}}",
+    "questionsUnknown": "- questions",
+    "loginFlash": "Sign in to build a personalized study plan for this exam.",
+    "confirm": {
+      "title": "Get started with {name}",
+      "practiceTitle": "Take a practice test now",
+      "practiceHintGuest": "No sign-in needed. See your weak areas as soon as you finish.",
+      "practiceHint": "See your weak areas as soon as you finish.",
+      "planTitleGuest": "Sign in to build a personalized study plan",
+      "planTitle": "Build a personalized study plan",
+      "planHint": "Set a goal and get your own study plan, with progress saved to your account."
+    },
+    "picker": {
+      "title": "Choose a quick test",
+      "loadingAria": "Loading quick tests",
+      "empty": "No quick tests are available yet.",
+      "intro": "<strong>{count, plural, one {# test} other {# tests}}</strong> ready. Take one now to see where you stand.",
+      "startAria": "Start {name}",
+      "start": "Start"
+    }
+  },
+  "rankScope": {
+    "subtitle": "Top {count} engineers with the highest scores on blueprint-aligned Full Mock exams",
+    "syncing": "Syncing...",
+    "refresh": "Refresh data",
+    "tabsAria": "Filter by provider",
+    "tabs": {
+      "all": "All",
+      "aws": "AWS",
+      "azure": "Azure",
+      "gcp": "Google Cloud",
+      "other": "Linux / Other"
+    },
+    "columns": {
+      "rank": "Rank",
+      "engineer": "Engineer",
+      "certification": "Certification",
+      "totalScore": "Total score"
+    },
+    "emptyTitle": "No one is on the leaderboard yet",
+    "emptyText": "Complete a Full Mock exam to be the first one on the board.",
+    "emptyLink": "Browse exams",
+    "viewAll": "View full leaderboard",
+    "anonymous": "Anonymous",
+    "modal": {
+      "title": "RankScope global leaderboard",
+      "subtitle": "Celebrating the top scorers on Full Mock Tests",
+      "close": "Close",
+      "tabs": {
+        "all": "All",
+        "aws": "AWS",
+        "azure": "Azure",
+        "gcp": "GCP",
+        "other": "LPIC / Other"
+      },
+      "emptyText": "Complete a Full Mock exam to be the first one listed.",
+      "note": "Continuously updated from qualifying Full Mock results",
+      "join": "Take a test to get ranked"
+    }
+  },
+  "orbit": {
+    "title": "Current certifications",
+    "lede": "Practice exams that follow 100% of the official structure from leading cloud providers.",
+    "practiceNow": "Practice now",
+    "buildPlan": "Build a study plan",
+    "badgeAria": "Practice {name}"
+  },
+  "fullSpec": {
+    "minutes": "{minutes} min",
+    "byExam": "varies",
+    "spec": "{questions} questions / {duration}"
+  }
+}

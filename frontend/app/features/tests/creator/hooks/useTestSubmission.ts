@@ -13,6 +13,7 @@ import {
   importJsonFile,
 } from '@/app/apis/questionApi';
 import { toast } from 'react-toastify';
+import { useTranslations } from 'next-intl';
 import { CREATOR_TYPES } from '@/app/features/tests/creator/hooks/useCreateTest';
 import type {
   CreatorNotification,
@@ -74,6 +75,7 @@ export const useTestSubmission = ({
     emptyQuestion,
     createInitialGroup,
 }: UseTestSubmissionOptions) => {
+    const t = useTranslations('TestCreator');
     const queryClient = useQueryClient();
     // File JSON dựng lại từ bản xem trước đã sửa, truyền vào lúc bấm lưu; ưu tiên hơn file gốc.
     const jsonFileOverride = useRef<File | null>(null);
@@ -107,8 +109,8 @@ export const useTestSubmission = ({
      */
     const assignQuestionsToParts = () => {
         const tagPartById = new Map<string, string>();
-        examTypeTags.forEach((t) => {
-            if (t.examPartId) tagPartById.set(String(t.tagId), String(t.examPartId));
+        examTypeTags.forEach((tag) => {
+            if (tag.examPartId) tagPartById.set(String(tag.tagId), String(tag.examPartId));
         });
         const partIdByName = new Map<string, string>();
         examParts.forEach((p) => partIdByName.set(String(p.name).trim().toLowerCase(), String(p.examPartId)));
@@ -131,7 +133,9 @@ export const useTestSubmission = ({
                 partIds.add(String(examParts[0].examPartId));
             }
             if (partIds.size !== 1) {
-                errors.push(`Câu ${index + 1}${partIds.size === 0 ? ' (chưa có tag của phần thi nào)' : ' (tag thuộc nhiều phần thi)'}`);
+                errors.push(partIds.size === 0
+                    ? t('submission.noPartTag', { number: index + 1 })
+                    : t('submission.multiPartTag', { number: index + 1 }));
                 return;
             }
             const partId = [...partIds][0];
@@ -151,7 +155,7 @@ export const useTestSubmission = ({
             groups.forEach((group, gIndex) => {
                 (group.questions || []).forEach((q, qIndex) => {
                     if (hasQuestionContent(q) && !hasAtLeastOneCorrectAnswer(q)) {
-                        invalidRefs.push(`Nhóm ${gIndex + 1} - Câu ${qIndex + 1}`);
+                        invalidRefs.push(t('submission.groupQuestionRef', { group: gIndex + 1, number: qIndex + 1 }));
                     }
                 });
             });
@@ -161,7 +165,7 @@ export const useTestSubmission = ({
         const invalidRefs: string[] = [];
         questions.forEach((q, index) => {
             if (hasQuestionContent(q) && !hasAtLeastOneCorrectAnswer(q)) {
-                invalidRefs.push(`Câu ${index + 1}`);
+                invalidRefs.push(t('form.editor.questionLabel', { number: index + 1 }));
             }
         });
         return invalidRefs;
@@ -188,15 +192,18 @@ export const useTestSubmission = ({
         const files = collectMediaFiles(creatorType);
         const oversized = files.find((f) => f.size > MAX_FILE_SIZE_BYTES);
         if (oversized) {
-            return `File "${oversized.name}" (${formatMB(oversized.size)}) vượt giới hạn ${formatMB(
-                MAX_FILE_SIZE_BYTES,
-            )} mỗi file.`;
+            return t('submission.fileTooLarge', {
+                name: oversized.name,
+                size: formatMB(oversized.size),
+                limit: formatMB(MAX_FILE_SIZE_BYTES),
+            });
         }
         const total = files.reduce((sum, f) => sum + f.size, 0);
         if (total > MAX_REQUEST_SIZE_BYTES) {
-            return `Tổng dung lượng file (${formatMB(total)}) vượt giới hạn ${formatMB(
-                MAX_REQUEST_SIZE_BYTES,
-            )}. Vui lòng chia nhỏ thành nhiều lần lưu.`;
+            return t('submission.totalTooLarge', {
+                total: formatMB(total),
+                limit: formatMB(MAX_REQUEST_SIZE_BYTES),
+            });
         }
         return null;
     };
@@ -344,7 +351,7 @@ export const useTestSubmission = ({
                             content: group.passage.content || '',
                             contentTranslation: group.passage.contentTranslation?.trim() || null,
                             extraContents: (group.passage.extraContents || [])
-                                .map((t) => t?.trim())
+                                .map((text) => text?.trim())
                                 .filter(Boolean),
                         },
                         questions: group.questions.map((q) => ({
@@ -382,7 +389,7 @@ export const useTestSubmission = ({
             if (creatorType === CREATOR_TYPES.TEST) {
                 setNotification({
                     type: 'success',
-                    message: 'Tạo đề thi thành công!',
+                    message: t('submission.testCreated'),
                 });
                 setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
                 setDocumentFile(null);
@@ -390,12 +397,12 @@ export const useTestSubmission = ({
             } else if (creatorType === CREATOR_TYPES.BULK) {
                 setNotification({
                     type: 'success',
-                    message: 'Đã lưu câu hỏi vào kho!',
+                    message: t('submission.questionsSaved'),
                 });
                 setQuestions([JSON.parse(JSON.stringify(emptyQuestion))]);
                 setBankJsonFile(null);
             } else if (creatorType === CREATOR_TYPES.PASSAGE) {
-                setNotification({ type: 'success', message: 'Đã lưu thành công!' });
+                setNotification({ type: 'success', message: t('submission.saved') });
                 setGroups([createInitialGroup()]);
             }
         },
@@ -411,7 +418,7 @@ export const useTestSubmission = ({
         if (creatorType === CREATOR_TYPES.TEST && effectiveTestJsonFile()) {
             // Đề từ JSON: phần thi lấy từ file, không kiểm tra câu nhập tay.
             if (!testInfo.title || !testInfo.examTypeId) {
-                toast.warning('Vui lòng nhập tiêu đề và chọn loại kỳ thi!', { autoClose: TOAST_VALIDATION_MS });
+                toast.warning(t('submission.titleAndExamTypeRequired'), { autoClose: TOAST_VALIDATION_MS });
                 return false;
             }
             try {
@@ -424,24 +431,26 @@ export const useTestSubmission = ({
 
         if (creatorType === CREATOR_TYPES.TEST) {
             if (!testInfo.title || !testInfo.examTypeId) {
-                toast.warning('Vui lòng nhập tiêu đề và chọn loại kỳ thi!', { autoClose: TOAST_VALIDATION_MS });
+                toast.warning(t('submission.titleAndExamTypeRequired'), { autoClose: TOAST_VALIDATION_MS });
                 return false;
             }
             const { partGroups, errors } = assignQuestionsToParts();
             if (errors.length > 0) {
                 toast.warning(
-                    `Chọn tag của đúng một phần thi cho mỗi câu để biết câu thuộc phần nào: ${errors.slice(0, 5).join(', ')}${errors.length > 5 ? ` và ${errors.length - 5} câu khác` : ''}`,
+                    t('submission.partTagRequired', {
+                        list: `${errors.slice(0, 5).join(', ')}${errors.length > 5 ? ` ${t('form.editor.andMore', { count: errors.length - 5 })}` : ''}`,
+                    }),
                     { autoClose: TOAST_VALIDATION_MS },
                 );
                 return false;
             }
             if (partGroups.length === 0) {
-                toast.warning('Đề chưa có câu hỏi nào có đáp án đúng.', { autoClose: TOAST_VALIDATION_MS });
+                toast.warning(t('submission.noCorrectAnswers'), { autoClose: TOAST_VALIDATION_MS });
                 return false;
             }
         } else {
             if (!testInfo.examPartId) {
-                toast.warning('Vui lòng chọn phần thi!', { autoClose: TOAST_VALIDATION_MS });
+                toast.warning(t('submission.examPartRequired'), { autoClose: TOAST_VALIDATION_MS });
                 return false;
             }
         }
@@ -459,7 +468,7 @@ export const useTestSubmission = ({
         const invalidQuestionRefs = validateCorrectAnswerSelection(creatorType);
         if (invalidQuestionRefs.length > 0) {
             toast.warning(
-                `Được để trống nội dung đáp án, nhưng mỗi câu phải chọn ít nhất 1 đáp án đúng. Vui lòng kiểm tra: ${invalidQuestionRefs.join(', ')}`,
+                t('submission.correctAnswerRequired', { list: invalidQuestionRefs.join(', ') }),
                 { autoClose: TOAST_VALIDATION_MS },
             );
             return false;

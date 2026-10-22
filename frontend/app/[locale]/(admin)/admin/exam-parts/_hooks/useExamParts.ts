@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import { useAdminCrud } from '@/app/(admin)/_hooks/useAdminCrud';
+import { useAdminCrud } from '@/app/[locale]/(admin)/_hooks/useAdminCrud';
 import {
   createExamPart,
   deleteExamPart,

@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
 import { Spinner, Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
@@ -25,6 +26,7 @@ const MyClasses = () => {
   const [selectedClass, setSelectedClass] = useState<ClassStudentResponse | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const t = useTranslations('Classes');
   const router = useRouter();
   const qc = useQueryClient();
 
@@ -37,7 +39,7 @@ const MyClasses = () => {
   } = useMyClasses();
   const deleteMutation = useDeleteClass();
 
-  const message = classesMessage || (isError ? 'Không thể kết nối đến máy chủ ' : '');
+  const message = classesMessage || (isError ? t('myClasses.connectFailed') : '');
 
   const handleViewTests = (classId: string) => {
     const path = routes.classChapterPage.replace(':classId', classId);
@@ -65,12 +67,12 @@ const MyClasses = () => {
 
     deleteMutation.mutate(selectedClass.classId, {
       onSuccess: () => {
-        toast.success(' Xóa lớp học thành công!');
+        toast.success(t('myClasses.deleteSuccess'));
         setShowDeleteModal(false);
         setSelectedClass(null);
       },
       onError: (err) => {
-        toast.error(err.response?.data?.error || ' Xóa lớp học thất bại!');
+        toast.error(err.response?.data?.error || t('myClasses.deleteFailed'));
       },
     });
   };
@@ -88,7 +90,7 @@ const MyClasses = () => {
     return (
       <div className={cx('loading-container')}>
         <Spinner animation="grow" variant="primary" />
-        <p>Đang chuẩn bị giảng đường của bạn...</p>
+        <p>{t('myClasses.loading')}</p>
       </div>
     );
   }
@@ -102,9 +104,9 @@ const MyClasses = () => {
       )}
 
       <ClassListContainer
-        title="Lớp học của tôi"
-        label="Quản lý lớp học"
-        description="Quản lý và tiếp cận kho học liệu từ các khóa học bạn tham gia"
+        title={t('myClasses.title')}
+        label={t('myClasses.label')}
+        description={t('myClasses.description')}
         teachingClasses={teachingClasses}
         learningClasses={learningClasses}
         onViewTests={handleViewTests}
@@ -131,8 +133,8 @@ const MyClasses = () => {
           setSelectedClass(null);
         }}
         onConfirm={handleConfirmDelete}
-        title="Xóa lớp học"
-        message={`Bạn có chắc chắn muốn xóa lớp "${selectedClass?.className}"? Hành động này không thể hoàn tác.`}
+        title={t('myClasses.deleteTitle')}
+        message={t('myClasses.deleteMessage', { name: String(selectedClass?.className) })}
       />
     </>
   );

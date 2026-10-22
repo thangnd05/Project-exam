@@ -1,8 +1,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 
-import { useCrudMutations } from '@/app/(admin)/_hooks/useAdminCrud';
+import { useCrudMutations } from '@/app/[locale]/(admin)/_hooks/useAdminCrud';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getExamParts } from '@/app/apis/examPartApi';
 import { getSkills } from '@/app/apis/skillApi';
@@ -29,6 +30,8 @@ const normalizeArray = <T,>(data: T[] | { content?: T[] } | null | undefined): T
   Array.isArray(data) ? data : data?.content ?? [];
 
 export function useMilestones(examTypeFilter: string) {
+  const t = useTranslations('AdminUsers');
+
   const examTypesQuery = useQuery({
     queryKey: milestonesKeys.examTypes,
     queryFn: getStandardExamTypes,
@@ -68,11 +71,11 @@ export function useMilestones(examTypeFilter: string) {
   });
 
   const loadErrorText = examTypesQuery.isError
-    ? 'Không thể tải danh sách loại kỳ thi.'
+    ? t('milestones.errors.loadExamTypes')
     : examPartsQuery.isError
-    ? 'Không thể tải danh sách phần thi.'
+    ? t('milestones.errors.loadExamParts')
     : milestonesQuery.isError
-    ? 'Không thể tải danh sách mốc điểm.'
+    ? t('milestones.errors.loadMilestones')
     : '';
 
   return {

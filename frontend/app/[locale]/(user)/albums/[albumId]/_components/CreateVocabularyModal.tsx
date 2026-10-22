@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { IoText, IoLanguage } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
-import { useCreateVocabulary } from '@/app/(user)/albums/[albumId]/_hooks/useAlbumVocabularies';
+import { useCreateVocabulary } from '@/app/[locale]/(user)/albums/[albumId]/_hooks/useAlbumVocabularies';
 
 const cx = classNames.bind(styles);
 
@@ -19,6 +20,8 @@ type CreateVocabularyModalProps = {
 };
 
 const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVocabularyModalProps) => {
+    const t = useTranslations('Vocabulary');
+    const tCommon = useTranslations('Common');
     const [newVocab, setNewVocab] = useState({
         word: '',
         meaning: '',
@@ -35,7 +38,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVoca
 
     const handleSave = (e?: React.SyntheticEvent) => {
         if (!newVocab.word.trim() || !newVocab.meaning.trim()) {
-            toast.warning(' Vui lòng điền đầy đủ từ vựng và nghĩa!');
+            toast.warning(t('vocabForm.toast.required'));
             return;
         }
 
@@ -44,14 +47,14 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVoca
             { albumId, ...newVocab },
             {
                 onSuccess: () => {
-                    toast.success(' Thêm từ vựng thành công!');
+                    toast.success(t('vocabForm.toast.created'));
                     setNewVocab({ word: '', meaning: '', example: '' });
                     onSuccess();
                     onClose();
                 },
                 onError: (err) => {
                     console.error(' Lỗi khi thêm từ:', err);
-                    toast.error('Có lỗi xảy ra khi thêm từ mới!');
+                    toast.error(t('vocabForm.toast.createError'));
                 },
             },
         );
@@ -61,12 +64,12 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVoca
         <CommonFormModal
             show={show}
             onHide={onClose}
-            title="Thêm Từ Vựng Mới"
+            title={t('vocabForm.createTitle')}
             footer={(
                 <ModalActionFooter
-                    cancelLabel="Hủy bỏ"
-                    submitLabel="Lưu từ vựng ngay"
-                    loadingLabel="Đang lưu..."
+                    cancelLabel={tCommon('cancel')}
+                    submitLabel={t('vocabForm.createSubmit')}
+                    loadingLabel={t('saving')}
                     loading={loading}
                     onCancel={onClose}
                     onSubmit={handleSave}
@@ -74,7 +77,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVoca
             )}
         >
             <div className={cx('formGroup')}>
-                <label className={cx('label')}>Từ vựng (Tiếng Anh)</label>
+                <label className={cx('label')}>{t('vocabForm.word')}</label>
                 <div className={cx('inputWrapper')}>
                     <span className={cx('inputIcon')}>
                         <IoText />
@@ -83,7 +86,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVoca
                         type="text"
                         name="word"
                         className={cx('inputControl')}
-                        placeholder="Ví dụ: Excellence, Innovation..."
+                        placeholder={t('vocabForm.wordPlaceholder')}
                         value={newVocab.word}
                         onChange={handleChange}
                         disabled={loading}
@@ -93,7 +96,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVoca
             </div>
 
             <div className={cx('formGroup')}>
-                <label className={cx('label')}>Nghĩa (Tiếng Việt)</label>
+                <label className={cx('label')}>{t('vocabForm.meaning')}</label>
                 <div className={cx('inputWrapper')}>
                     <span className={cx('inputIcon')}>
                         <IoLanguage />
@@ -102,7 +105,7 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVoca
                         type="text"
                         name="meaning"
                         className={cx('inputControl')}
-                        placeholder="Ví dụ: Sự xuất sắc, Đổi mới..."
+                        placeholder={t('vocabForm.meaningPlaceholder')}
                         value={newVocab.meaning}
                         onChange={handleChange}
                         disabled={loading}
@@ -111,12 +114,12 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVoca
             </div>
 
             <div className={cx('formGroup')}>
-                <label className={cx('label')}>Ví dụ minh họa</label>
+                <label className={cx('label')}>{t('vocabForm.example')}</label>
                 <div className={cx('inputWrapper')}>
                     <textarea
                         name="example"
                         className={cx('inputControl', 'textarea')}
-                        placeholder="Nhập ví dụ giúp bạn ghi nhớ từ vựng này..."
+                        placeholder={t('vocabForm.examplePlaceholder')}
                         value={newVocab.example}
                         onChange={handleChange}
                         disabled={loading}

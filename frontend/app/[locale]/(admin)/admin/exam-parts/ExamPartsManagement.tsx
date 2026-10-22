@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
@@ -14,7 +15,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/(admin)/_components/common';
+} from '@/app/[locale]/(admin)/_components/common';
 import type {ExamPartRequest} from '@/app/types';
 import styles from './ExamPartsManagement.module.scss';
 
@@ -39,6 +40,8 @@ const emptyForm: ExamPartFormState = {
 };
 
 function ExamPartsManagement() {
+  const t = useTranslations('AdminContent.examParts');
+  const tc = useTranslations('Common');
   const {
     examParts,
     examTypes,
@@ -62,10 +65,10 @@ function ExamPartsManagement() {
     (examTypeId: string) => {
       return (
         examTypes.find((examType) => examType.exam_type_id === examTypeId)?.name ||
-        'Không xác định'
+        t('unknownExamType')
       );
     },
-    [examTypes],
+    [examTypes, t],
   );
 
   const groupedExamParts = useMemo(() => {
@@ -139,7 +142,7 @@ function ExamPartsManagement() {
   const handleSubmit = async () => {
     const normalizedName = formState.name.trim();
     if (!normalizedName || !formState.exam_type_id) {
-      setErrorMessage('Vui lòng nhập đầy đủ dữ liệu phần thi.');
+      setErrorMessage(t('errors.required'));
       return;
     }
 
@@ -163,7 +166,7 @@ function ExamPartsManagement() {
       setShowFormModal(false);
       resetForm();
     } catch {
-      setErrorMessage('Không thể lưu phần thi. Vui lòng thử lại.');
+      setErrorMessage(t('errors.saveFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -180,7 +183,7 @@ function ExamPartsManagement() {
       await deleteMutation.mutateAsync(deletingExamPart.exam_part_id);
       setDeletingExamPart(null);
     } catch {
-      setErrorMessage('Không thể xóa phần thi.');
+      setErrorMessage(t('errors.deleteFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -194,21 +197,21 @@ function ExamPartsManagement() {
   };
 
   const columns = [
-    {key: 'display_order', header: 'Thứ tự', align: 'center'},
-    {key: 'name', header: 'Tên phần thi'},
+    {key: 'display_order', header: t('columns.order'), align: 'center'},
+    {key: 'name', header: t('columns.name')},
     {key: 'skill', header: 'Skill', render: (examPart: ExamPartItem) => getSkillName(examPart.skill_id)},
-    {key: 'default_num_questions', header: 'Số câu mặc định', align: 'center'},
+    {key: 'default_num_questions', header: t('columns.defaultNumQuestions'), align: 'center'},
   ];
 
   const renderRowActions = (examPart: ExamPartItem) => (
     <>
-      <button onClick={() => openEditModal(examPart)} title="Sửa">
+      <button onClick={() => openEditModal(examPart)} title={t('edit')}>
         <Edit size={14} />
       </button>
       <button
         className="danger"
         onClick={() => setDeletingExamPart(examPart)}
-        title="Xóa"
+        title={t('delete')}
       >
         <Trash2 size={14} />
       </button>
@@ -218,27 +221,27 @@ function ExamPartsManagement() {
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Quản lý phần thi"
-        description="Cấu hình các phần thi cho từng loại kỳ thi."
+        title={t('title')}
+        description={t('description')}
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
-          Thêm phần thi
+          {t('add')}
         </Button>
       </AdminPageHeader>
 
       <AdminToolbar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="Tìm phần thi theo tên, mô tả, loại kỳ thi..."
+        searchPlaceholder={t('searchPlaceholder')}
       >
         <Form.Select
           style={{maxWidth: 280}}
           value={examTypeFilter}
           onChange={(event) => setExamTypeFilter(event.target.value)}
-          aria-label="Lọc theo loại kỳ thi"
+          aria-label={t('filterByExamType')}
         >
-          <option value="">-- Tất cả loại kỳ thi --</option>
+          <option value="">{t('allExamTypes')}</option>
           {examTypes.map((item) => (
             <option key={item.exam_type_id} value={item.exam_type_id}>
               {item.name}
@@ -248,7 +251,7 @@ function ExamPartsManagement() {
       </AdminToolbar>
       <AdminFieldError
         message={
-          errorMessage || (isError ? 'Không thể tải dữ liệu phần thi.' : '')
+          errorMessage || (isError ? t('errors.loadFailed') : '')
         }
       />
 
@@ -266,7 +269,7 @@ function ExamPartsManagement() {
           showIndex
           columns={columns}
           data={[]}
-          emptyText="Không có phần thi nào."
+          emptyText={t('empty')}
           getRowKey={(examPart: ExamPartItem) => examPart.exam_part_id}
           rowActions={renderRowActions}
         />
@@ -277,7 +280,7 @@ function ExamPartsManagement() {
               <div className={cx('sectionHeader')}>
                 <h3>{group.examTypeName}</h3>
                 <span className={cx('sectionMeta')}>
-                  {group.parts.length} phần thi
+                  {t('partCount', {count: group.parts.length})}
                 </span>
               </div>
               <AdminTable
@@ -298,7 +301,7 @@ function ExamPartsManagement() {
           setShowFormModal(false);
           resetForm();
         }}
-        title={editingPartId ? 'Cập nhật phần thi' : 'Tạo phần thi'}
+        title={editingPartId ? t('editTitle') : t('createTitle')}
         footer={
           <ModalActionFooter
             onCancel={() => {
@@ -309,14 +312,14 @@ function ExamPartsManagement() {
               resetForm();
             }}
             onSubmit={handleSubmit}
-            cancelLabel="Hủy"
-            submitLabel={editingPartId ? 'Lưu' : 'Tạo mới'}
+            cancelLabel={tc('cancelShort')}
+            submitLabel={editingPartId ? tc('save') : t('create')}
             loading={submitting}
           />
         }
       >
           <Form.Group className="mb-3">
-            <Form.Label>Loại kỳ thi</Form.Label>
+            <Form.Label>{t('form.examType')}</Form.Label>
             <Form.Select
               value={formState.exam_type_id}
               onChange={(event) =>
@@ -326,7 +329,7 @@ function ExamPartsManagement() {
                 }))
               }
             >
-              <option value="">Chọn loại kỳ thi</option>
+              <option value="">{t('form.examTypePlaceholder')}</option>
               {examTypes.map((item) => (
                 <option key={item.exam_type_id} value={item.exam_type_id}>
                   {item.name}
@@ -335,7 +338,7 @@ function ExamPartsManagement() {
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Tên phần thi</Form.Label>
+            <Form.Label>{t('columns.name')}</Form.Label>
             <Form.Control
               value={formState.name}
               onChange={(event) =>
@@ -357,7 +360,7 @@ function ExamPartsManagement() {
                 }))
               }
             >
-              <option value="">Không gán skill</option>
+              <option value="">{t('form.noSkill')}</option>
               {skills.map((item) => (
                 <option key={item.skill_id} value={item.skill_id}>
                   {item.name}
@@ -366,7 +369,7 @@ function ExamPartsManagement() {
             </Form.Select>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Số câu mặc định</Form.Label>
+            <Form.Label>{t('columns.defaultNumQuestions')}</Form.Label>
             <Form.Control
               type="number"
               min={1}
@@ -380,7 +383,7 @@ function ExamPartsManagement() {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Thứ tự hiển thị</Form.Label>
+            <Form.Label>{t('form.displayOrder')}</Form.Label>
             <Form.Control
               type="number"
               min={1}
@@ -394,7 +397,7 @@ function ExamPartsManagement() {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Mô tả</Form.Label>
+            <Form.Label>{t('form.description')}</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
@@ -417,8 +420,8 @@ function ExamPartsManagement() {
           setDeletingExamPart(null);
         }}
         onConfirm={handleDelete}
-        title="Xác nhận xóa phần thi"
-        message={`Bạn có chắc muốn xóa "${deletingExamPart?.name || ''}" không?`}
+        title={t('deleteTitle')}
+        message={t('deleteMessage', {name: deletingExamPart?.name || ''})}
       />
     </div>
   );

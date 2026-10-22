@@ -1,0 +1,309 @@
+{
+  "shared": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "createNew": "Create",
+    "saving": "Saving...",
+    "other": "Other"
+  },
+  "milestones": {
+    "title": "Target score milestones",
+    "description": "Set score milestones and the required % for each exam part to assess user readiness.",
+    "searchPlaceholder": "Search by score or description...",
+    "selectExamType": "Select exam type",
+    "createHeading": "Add new milestone",
+    "scorePlaceholderScaled": "Score (e.g. 700)",
+    "scorePlaceholder": "Score (e.g. 450)",
+    "perPart": "≈ {percent}% per part",
+    "descriptionPlaceholder": "Description (e.g. Basic level)",
+    "add": "Add",
+    "empty": "No milestones for this exam type yet.",
+    "points": "{score, plural, one {# point} other {# points}}",
+    "editPartsTitle": "Edit % per part",
+    "partQuestionCount": "{name} ({total, plural, one {# question} other {# questions}})",
+    "questionUnit": "questions",
+    "partProgress": "{correct}/{total} questions ({percent}%)",
+    "noPartConfig": "No per-part % configured",
+    "estimateLabel": "Estimated score:",
+    "estimateDiff": "({diff} vs. milestone {score})",
+    "errors": {
+      "required": "Please select an exam type and enter a score.",
+      "create": "Couldn’t create the milestone. It may already exist.",
+      "update": "Couldn’t update the configuration.",
+      "delete": "Couldn’t delete the milestone.",
+      "loadExamTypes": "Couldn’t load exam types.",
+      "loadExamParts": "Couldn’t load exam parts.",
+      "loadMilestones": "Couldn’t load milestones."
+    },
+    "confirmDelete": {
+      "title": "Delete milestone",
+      "message": "Delete the {score}-point milestone? All of its part settings will be deleted too."
+    }
+  },
+  "permissions": {
+    "title": "Permissions (RBAC)",
+    "description": "Check the actions each role is allowed to perform. Changes take effect for users immediately.",
+    "loading": "Loading permission matrix...",
+    "saveChanges": "Save changes",
+    "actionColumn": "Action",
+    "fullAccess": "Full access",
+    "selectGroup": "Select entire group “{group}”",
+    "selectGroupAria": "{role} - select group {group}",
+    "saved": "Saved permissions for {count, plural, one {# role} other {# roles}}.",
+    "errors": {
+      "load": "Couldn’t load permission data.",
+      "save": "Couldn’t save permissions."
+    }
+  },
+  "posts": {
+    "title": "Post moderation",
+    "description": "Approve pending posts or delete inappropriate ones. Deleted posts disappear from the author’s list.",
+    "searchPlaceholder": "Search posts...",
+    "filters": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "all": "All"
+    },
+    "columns": {
+      "title": "Title",
+      "author": "Author",
+      "createdAt": "Created",
+      "status": "Status"
+    },
+    "noCategory": "No category",
+    "empty": "No posts found",
+    "itemLabel": "posts",
+    "viewDetail": "View details",
+    "approve": "Approve",
+    "deletePost": "Delete post",
+    "approveModal": {
+      "title": "Approve post",
+      "message": "Approve post \"{title}\"?"
+    },
+    "confirmDelete": {
+      "title": "Delete post",
+      "message": "Delete post \"{title}\"? This action cannot be undone."
+    },
+    "toast": {
+      "loadError": "Failed to load posts",
+      "approved": "Post approved",
+      "approveError": "Failed to approve post",
+      "deleted": "Post deleted",
+      "deleteError": "Failed to delete post"
+    }
+  },
+  "quests": {
+    "title": "Quests",
+    "description": "Create coin-reward quests based on events or time periods.",
+    "add": "Add quest",
+    "searchPlaceholder": "Search by title...",
+    "itemLabel": "quests",
+    "conditions": {
+      "none": "No condition (free coins)",
+      "completeTest": "Complete a test",
+      "streakDays": "Reach a study streak",
+      "createLearningPlan": "Create a learning plan",
+      "completeLearningPlan": "Complete a learning plan",
+      "setTarget": "Set a target",
+      "completePlanTask": "Complete a learning plan task"
+    },
+    "conditionNone": "No condition",
+    "columns": {
+      "title": "Title",
+      "condition": "Condition",
+      "coins": "Coins",
+      "time": "Period",
+      "claimed": "Claimed",
+      "status": "Status"
+    },
+    "from": "From: {date}",
+    "to": "To: {date}",
+    "active": "Active",
+    "inactive": "Off",
+    "modal": {
+      "editTitle": "Edit quest",
+      "createTitle": "Create quest"
+    },
+    "form": {
+      "title": "Title",
+      "description": "Description",
+      "rewardCoins": "Reward coins",
+      "condition": "Condition",
+      "conditionTarget": "Required count",
+      "startAt": "Start",
+      "endAt": "End",
+      "active": "Active"
+    },
+    "errors": {
+      "titleRequired": "Title is required.",
+      "rewardInvalid": "Reward coins must be a non-negative number.",
+      "save": "Couldn’t save the quest. Please try again.",
+      "delete": "Couldn’t delete the quest.",
+      "load": "Couldn’t load quests."
+    },
+    "deleted": "Quest deleted.",
+    "confirmDelete": {
+      "title": "Delete quest",
+      "message": "Are you sure you want to delete \"{title}\"?"
+    }
+  },
+  "recoveryResources": {
+    "title": "Study resources",
+    "description": "Manage lectures, videos and documents linked to knowledge tags.",
+    "add": "Add resource",
+    "searchPlaceholder": "Search by title, description, tag...",
+    "allExamTypes": "All exam types",
+    "empty": "No resources found.",
+    "sharedGroup": "Shared",
+    "partFallback": "Exam part",
+    "ungrouped": "Untagged",
+    "emptyGroup": "No resources in group \"{group}\" yet.",
+    "view": "View",
+    "download": "Download",
+    "downloadOriginal": "Download original",
+    "downloadOriginalTitle": "Download the original markdown file (admin only)",
+    "errors": {
+      "load": "Couldn’t load resources.",
+      "titleRequired": "Title is required.",
+      "fileOrUrlRequired": "Please upload a file or provide a URL.",
+      "save": "Couldn’t save the resource. Please try again.",
+      "delete": "Couldn’t delete the resource."
+    },
+    "confirmDelete": {
+      "title": "Delete resource",
+      "message": "Are you sure you want to delete \"{title}\"? The file on Cloudinary will also be deleted."
+    },
+    "form": {
+      "editTitle": "Edit resource",
+      "createTitle": "Add new resource",
+      "title": "Title",
+      "titlePlaceholder": "e.g. Tips for commonly missed question types...",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the resource content in detail...",
+      "uploadFile": "Upload file",
+      "supportedFormats": "Supports Markdown (.md), PDF, Word, images, audio, video.",
+      "currentFile": "Current file: <link>View file</link>",
+      "orUrl": "Or enter a URL",
+      "examType": "Exam type",
+      "selectExamType": "- Select exam type ",
+      "selectExamTypeFirst": "Select an exam type above to add or change tags for this resource.",
+      "tagLabel": "Tags (knowledge links)",
+      "tagHint": "The resource’s exam part is derived from its tags. A resource can have tags from multiple exam parts.",
+      "noTags": "This exam type has no tags yet. Create tags in Tag management first."
+    }
+  },
+  "roles": {
+    "title": "Roles",
+    "description": "Manage system permissions for user accounts.",
+    "add": "Add role",
+    "searchPlaceholder": "Search by role name or description...",
+    "itemLabel": "roles",
+    "columns": {
+      "name": "Role name",
+      "description": "Description",
+      "permissionCount": "Permissions"
+    },
+    "actions": {
+      "permissions": "Permissions",
+      "edit": "Edit role",
+      "delete": "Delete role"
+    },
+    "modal": {
+      "editTitle": "Edit role",
+      "createTitle": "Create role",
+      "name": "Role name",
+      "namePlaceholder": "e.g. ADMIN, TEACHER",
+      "description": "Description"
+    },
+    "permissionModal": {
+      "title": "Permissions for role: {role}",
+      "save": "Save permissions",
+      "loading": "Loading permission catalog...",
+      "hint": "Check the actions this role is allowed to perform.",
+      "selectAll": "Select all"
+    },
+    "errors": {
+      "savePermissions": "Couldn’t save permissions.",
+      "nameRequired": "Role name is required.",
+      "save": "Couldn’t save the role.",
+      "delete": "Couldn’t delete the role."
+    },
+    "confirmDelete": {
+      "title": "Delete role",
+      "message": "Are you sure you want to delete \"{name}\"?"
+    }
+  },
+  "streakRecover": {
+    "title": "Streak recovery",
+    "description": "Coin price users pay to restore a broken streak (before studying again).",
+    "loading": "Loading configuration...",
+    "cardTitle": "Recovery settings",
+    "costLabel": "Recovery price (coins)",
+    "costHint": "Set to 0 to allow free recovery.",
+    "activeLabel": "Allow streak recovery",
+    "save": "Save settings",
+    "saved": "Streak recovery settings saved.",
+    "errors": {
+      "load": "Couldn’t load the configuration.",
+      "costInvalid": "Coin price must be a non-negative number.",
+      "save": "Couldn’t save the configuration."
+    }
+  },
+  "users": {
+    "title": "Users",
+    "description": "Manage user accounts in the system",
+    "add": "Add user",
+    "stats": {
+      "users": "Users",
+      "teachers": "Teachers",
+      "verified": "Verified",
+      "unverified": "Unverified"
+    },
+    "searchPlaceholder": "Search by name, email, username...",
+    "allRoles": "All roles",
+    "allStatuses": "All statuses",
+    "itemLabel": "users",
+    "columns": {
+      "user": "User",
+      "role": "Role",
+      "email": "Email",
+      "status": "Status",
+      "premium": "Premium",
+      "createdAt": "Created"
+    },
+    "status": {
+      "verified": "Verified",
+      "unverified": "Unverified",
+      "unknown": "No data"
+    },
+    "form": {
+      "createTitle": "Add user",
+      "editTitle": "Edit user",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "John Doe",
+      "userName": "Username",
+      "userNamePlaceholder": "johndoe",
+      "email": "Email",
+      "password": "Password",
+      "passwordPlaceholder": "At least 6 characters",
+      "role": "Role",
+      "defaultRole": "-- Default (USER) --",
+      "markVerified": "Mark as verified",
+      "verified": "Verified",
+      "premium": "Premium account"
+    },
+    "errors": {
+      "loadUsers": "Couldn’t load users.",
+      "loadRoles": "Couldn’t load roles.",
+      "createRequired": "Please enter full name, username, email and password.",
+      "create": "Couldn’t create the user.",
+      "editRequired": "Please enter full name, username and email.",
+      "update": "Couldn’t update the user.",
+      "delete": "Couldn’t delete the user."
+    },
+    "confirmDelete": {
+      "title": "Delete user",
+      "message": "Are you sure you want to delete \"{name}\"?"
+    }
+  }
+}

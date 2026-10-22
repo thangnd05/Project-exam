@@ -1,6 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import { formatDayMonthTime, formatFullDateTime } from '@/app/utils/format-date-time';
 import {
     IoTimeOutline,
     IoCalendarOutline,
@@ -15,7 +17,6 @@ import classNames from 'classnames/bind';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
 import styles from '@/app/features/tests/TestCard/TestCard.module.scss';
-import {formatDayMonthTime, formatFullDateTime} from '@/app/utils/format-date-time';
 import TestModeModal from '@/app/features/tests/TestModeModal/TestModeModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { useTestStart } from '@/app/features/tests/TestCard/hooks/useTestStart';
@@ -64,6 +65,8 @@ const getSubjectBanner = (title = '', status = 'open') => {
     return DEFAULT_BANNERS[status] || DEFAULT_BANNERS.open;
 };
 
+// dd/MM HH:mm cho lịch mở/đóng đề, dd/MM/yyyy HH:mm:ss cho thời gian tạo (theo ngôn ngữ đang dùng).
+
 type TestCardProps = {
     test: TestResponse;
     countdowns?: Record<string, number>;
@@ -71,6 +74,7 @@ type TestCardProps = {
 
 function TestCard({ test, countdowns }: TestCardProps) {
     const router = useRouter();
+    const t = useTranslations('Tests');
     const {
         status,
         statusLabel,
@@ -108,37 +112,37 @@ function TestCard({ test, countdowns }: TestCardProps) {
                         ) : (
                             <IoLockClosedOutline size={14} />
                         )}
-                        {test.owned ? 'Đã mở khoá' : `${test.costCoins} xu`}
+                        {test.owned ? t('owned') : t('coins', { count: test.costCoins ?? 0 })}
                     </div>
                 )}
             </div>
 
             <div className={cx('card-body')}>
                 <h5 className={cx('title')}>
-                    {test.title || 'Bài tập luyện tập'}
+                    {test.title || t('card.fallbackTitle')}
                 </h5>
 
                 <div className={cx('info-list')}>
                     <div className={cx('info-item')}>
                         <IoTimeOutline />
                         <span>
-                            Thời lượng:{' '}
+                            {t('card.duration')}{' '}
                             <strong>
                                 {test.durationMinutes != null
-                                    ? `${test.durationMinutes} phút`
-                                    : 'Không giới hạn'}
+                                    ? t('minutes', { count: test.durationMinutes })
+                                    : t('unlimited')}
                             </strong>
                         </span>
                     </div>
 
                     <div className={cx('info-item')}>
                         <IoCalendarOutline />
-                        <span>Ngày mở: <strong>{formatDayMonthTime(test.availableFrom)}</strong></span>
+                        <span>{t('card.opensAt')} <strong>{formatDayMonthTime(test.availableFrom)}</strong></span>
                     </div>
 
                     <div className={cx('info-item')}>
                         <IoHourglassOutline />
-                        <span>Hạn nộp: <strong>{formatDayMonthTime(test.availableTo)}</strong></span>
+                        <span>{t('card.deadline')} <strong>{formatDayMonthTime(test.availableTo)}</strong></span>
                     </div>
                 </div>
 
@@ -147,15 +151,15 @@ function TestCard({ test, countdowns }: TestCardProps) {
                         {guestAllowed ? <IoPersonOutline /> : <IoLogInOutline />}
                         <span>
                             {guestAllowed
-                                ? 'Làm thử không cần tài khoản'
-                                : 'Cần đăng nhập để làm bài'}
+                                ? t('card.guestAllowed')
+                                : t('card.loginRequired')}
                         </span>
                     </div>
                 )}
 
                 <div className={cx('info-item', 'created-line')}>
                     <IoCreateOutline />
-                    <span>Thời gian tạo: <strong>{formatFullDateTime(test.createdAt)}</strong></span>
+                    <span>{t('card.createdAt')} <strong>{formatFullDateTime(test.createdAt)}</strong></span>
                 </div>
 
                 <div className={cx('btn-group', {hasRank: showLeaderboard, solo: !isAuthenticated})}>
@@ -166,7 +170,7 @@ function TestCard({ test, countdowns }: TestCardProps) {
                         onClick={handleStart}
                         disabled={!canStart}
                     >
-                        {needsLogin && canStart ? 'Đăng nhập để làm' : buttonText}
+                        {needsLogin && canStart ? t('loginToStart') : buttonText}
                     </ButtonPrime>
 
                     {isAuthenticated && (
@@ -178,7 +182,7 @@ function TestCard({ test, countdowns }: TestCardProps) {
                                 router.push(buildTestPath(test, 'history'))
                             }
                         >
-                            Lịch sử
+                            {t('history')}
                         </ButtonPrime>
                     )}
 
@@ -187,8 +191,8 @@ function TestCard({ test, countdowns }: TestCardProps) {
                             variant="outline"
                             size="sm"
                             className={cx('btn-icon-modern')}
-                            title="Bảng xếp hạng"
-                            aria-label="Bảng xếp hạng"
+                            title={t('leaderboard')}
+                            aria-label={t('leaderboard')}
                             onClick={() =>
                                 router.push(buildTestPath(test, 'leaderboard'))
                             }

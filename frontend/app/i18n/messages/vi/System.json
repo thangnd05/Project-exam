@@ -1,0 +1,20 @@
+{
+  "errorBoundary": {
+    "title": "Ôi, có gì đó trục trặc rồi!",
+    "message": "Mình xin lỗi vì sự cố. Bạn thử tải lại trang hoặc quay lại trang trước nhé!",
+    "reload": "Tải lại trang",
+    "back": "Quay lại"
+  },
+  "auth": {
+    "sessionExpired": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại."
+  },
+  "apiError": {
+    "fallback": "Đã có lỗi xảy ra. Vui lòng thử lại."
+  },
+  "globalError": {
+    "title": "Ứng dụng gặp sự cố",
+    "message": "Đã có lỗi nghiêm trọng khiến trang không tải được. Bạn thử lại giúp mình nhé.",
+    "retry": "Thử lại",
+    "codeLabel": "Mã lỗi:"
+  }
+}

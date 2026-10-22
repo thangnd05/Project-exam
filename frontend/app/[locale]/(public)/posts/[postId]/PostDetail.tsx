@@ -1,9 +1,10 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import Link, { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
+import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
 import DOMPurify from 'dompurify';
 import classNames from 'classnames/bind';
@@ -38,6 +39,9 @@ function PostDetail() {
   const { frame: cosmeticFrame, badge: cosmeticBadge } = useCosmetics();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const t = useTranslations('Posts.detail');
+  const localizeHref = useLocalizeHref();
+  const dateLocale = useLocale() === 'en' ? 'en-US' : 'vi-VN';
 
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -178,7 +182,7 @@ function PostDetail() {
   const handleSubmitComment = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!user) {
-      toast.warning('Vui lòng đăng nhập để bình luận');
+      toast.warning(t('loginToComment'));
       return;
     }
     if (!newComment.trim()) return;
@@ -238,7 +242,7 @@ function PostDetail() {
 
   const handleToggleLike = () => {
     if (!user) {
-      toast.warning('Vui lòng đăng nhập để thả tim');
+      toast.warning(t('loginToLike'));
       return;
     }
     if (isReacting) return;
@@ -267,7 +271,7 @@ function PostDetail() {
 
   const handleToggleBookmark = () => {
     if (!user) {
-      toast.warning('Vui lòng đăng nhập để lưu bài viết');
+      toast.warning(t('loginToSave'));
       return;
     }
     if (isSaving) return;
@@ -316,7 +320,7 @@ function PostDetail() {
           <div className={cx('contentBox')}>
             <div className={cx('commentMeta')}>
               <span className={cx('authorName')}>{comment.authorName}</span>
-              {comment.userId === post?.userId && <span className={cx('opTag')}>Tác giả</span>}
+              {comment.userId === post?.userId && <span className={cx('opTag')}>{t('authorTag')}</span>}
             </div>
 
             {editingCommentId === comment.id ? (
@@ -326,8 +330,8 @@ function PostDetail() {
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
                 />
-                <button className="btn btn-primary btn-sm me-2" onClick={() => handleUpdateComment(comment.id)}>Lưu</button>
-                <button className="btn btn-light btn-sm" onClick={() => setEditingCommentId(null)}>Hủy</button>
+                <button className="btn btn-primary btn-sm me-2" onClick={() => handleUpdateComment(comment.id)}>{t('save')}</button>
+                <button className="btn btn-light btn-sm" onClick={() => setEditingCommentId(null)}>{t('cancel')}</button>
               </div>
             ) : (
               <p className={cx('text')}>{comment.content}</p>
@@ -337,15 +341,15 @@ function PostDetail() {
               <button onClick={() => {
                 setReplyingToId(comment.id);
                 setReplyContent('');
-              }}>Trả lời</button>
-              <span className={cx('time')}>{new Date(comment.createdAt ?? '').toLocaleString('vi-VN')}</span>
+              }}>{t('reply')}</button>
+              <span className={cx('time')}>{new Date(comment.createdAt ?? '').toLocaleString(dateLocale)}</span>
               {user && user.userId === comment.userId && (
                 <>
                   <button onClick={() => {
                     setEditingCommentId(comment.id);
                     setEditContent(comment.content ?? '');
-                  }}>Sửa</button>
-                  <button onClick={() => setDeletingCommentId(comment.id)}>Xóa</button>
+                  }}>{t('edit')}</button>
+                  <button onClick={() => setDeletingCommentId(comment.id)}>{t('delete')}</button>
                 </>
               )}
             </div>
@@ -354,12 +358,12 @@ function PostDetail() {
               <div className="mt-3">
                 <textarea
                   className="form-control mb-2"
-                  placeholder={`Viết câu trả lời cho ${mentionName}...`}
+                  placeholder={t('replyPlaceholder', { name: mentionName })}
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
                 />
-                <button className="btn btn-primary btn-sm me-2" onClick={() => handleReply(comment.id)}>Gửi</button>
-                <button className="btn btn-light btn-sm" onClick={() => setReplyingToId(null)}>Hủy</button>
+                <button className="btn btn-primary btn-sm me-2" onClick={() => handleReply(comment.id)}>{t('send')}</button>
+                <button className="btn btn-light btn-sm" onClick={() => setReplyingToId(null)}>{t('cancel')}</button>
               </div>
             )}
           </div>
@@ -370,7 +374,7 @@ function PostDetail() {
             className={cx('toggleRepliesBtn')}
             onClick={() => setExpandedReplies(prev => ({ ...prev, [comment.id]: true }))}
           >
-            Xem tất cả {nestedReplyCount} phản hồi
+            {t('showAllReplies', { count: nestedReplyCount })}
           </button>
         )}
 
@@ -390,7 +394,7 @@ function PostDetail() {
                 className={cx('toggleRepliesBtn')}
                 onClick={() => setExpandedReplies(prev => ({ ...prev, [comment.id]: false }))}
               >
-                Ẩn bớt phản hồi
+                {t('hideReplies')}
               </button>
             )}
           </>
@@ -399,23 +403,23 @@ function PostDetail() {
     );
   };
 
-  if (loading) return <div className="text-center py-5">Đang tải bài viết...</div>;
+  if (loading) return <div className="text-center py-5">{t('loading')}</div>;
   if (isError) {
     return (
       <div className="text-center py-5">
         <p style={{ marginBottom: '1.6rem', color: 'var(--text-secondary)' }}>
-          Không tải được bài viết. Vui lòng kiểm tra kết nối và thử lại.
+          {t('loadError')}
         </p>
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-          <ButtonPrime variant="outline" onClick={() => router.push(routes.posts || '/posts')}>
-            Về danh sách
+          <ButtonPrime variant="outline" onClick={() => router.push(localizeHref(routes.posts || '/posts'))}>
+            {t('backToList')}
           </ButtonPrime>
-          <ButtonPrime onClick={() => refetch()}>Thử lại</ButtonPrime>
+          <ButtonPrime onClick={() => refetch()}>{t('retry')}</ButtonPrime>
         </div>
       </div>
     );
   }
-  if (!post) return <div className="text-center py-5">Không tìm thấy bài viết.</div>;
+  if (!post) return <div className="text-center py-5">{t('notFound')}</div>;
 
   return (
     <div className={cx('wrapperDetail')}>
@@ -446,11 +450,11 @@ function PostDetail() {
           <button className={cx('actionBtn', { active: copied })} onClick={handleCopyPostLink}>
             <div className={cx('iconCircle')}><Copy size={20} /></div>
           </button>
-          {copied && <span className={cx('copyToast')}>Đã sao chép</span>}
+          {copied && <span className={cx('copyToast')}>{t('copied')}</span>}
         </div>
 
         <div className={cx('breadcrumbs')}>
-          <Link href={routes.home}>Trang chủ</Link>
+          <Link href={routes.home}>{t('breadcrumbHome')}</Link>
           <ChevronRight size={14} />
           <Link href={routes.posts}>Blog</Link>
           <ChevronRight size={14} />
@@ -478,7 +482,7 @@ function PostDetail() {
             </div>
           </div>
           <div className={cx('metaSide')}>
-            {new Date(post.createdAt ?? '').toLocaleDateString('vi-VN')}
+            {new Date(post.createdAt ?? '').toLocaleDateString(dateLocale)}
           </div>
         </div>
 
@@ -487,7 +491,7 @@ function PostDetail() {
         </article>
 
         <section id="comments" className={cx('commentsSection')}>
-          <h3>Bình luận ({post.commentCount || 0})</h3>
+          <h3>{t('comments', { count: post.commentCount || 0 })}</h3>
 
           <form className={cx('commentForm')} onSubmit={handleSubmitComment}>
             <div className="d-flex align-items-center mb-3">
@@ -501,12 +505,12 @@ function PostDetail() {
             </div>
             <div className={cx('formContent')}>
               <textarea
-                placeholder="Chia sẻ suy nghĩ của bạn về bài viết này..."
+                placeholder={t('commentPlaceholder')}
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
               />
               <div className={cx('formActions')}>
-                <ButtonPrime type="submit" variant="primary" size="md">Đăng bình luận</ButtonPrime>
+                <ButtonPrime type="submit" variant="primary" size="md">{t('postComment')}</ButtonPrime>
               </div>
             </div>
           </form>
@@ -518,12 +522,12 @@ function PostDetail() {
 
         {relatedPosts.length > 0 && (
           <section className={cx('relatedPosts')}>
-            <h3>Bài viết liên quan</h3>
+            <h3>{t('related')}</h3>
             <div className={cx('sliderContainer')}>
               <Slider {...sliderSettings}>
                 {relatedPosts.map(rel => (
                   <div key={rel.id} className={cx('sliderItem')}>
-                    <div className={cx('relatedCard')} onClick={() => router.push(routes.postDetail.replace(':postId', rel.id))}>
+                    <div className={cx('relatedCard')} onClick={() => router.push(localizeHref(routes.postDetail.replace(':postId', rel.id)))}>
                       <div className={cx('imgWrap')}>
                         <MediaImage
                           cover
@@ -536,7 +540,7 @@ function PostDetail() {
                       </div>
                       <span className="text-primary fw-bold small mb-2 d-block">{rel.categories?.[0]?.name || 'Blog'}</span>
                       <h4>{rel.title}</h4>
-                      <div className={cx('meta')}>{new Date(rel.createdAt ?? '').toLocaleDateString('vi-VN')}</div>
+                      <div className={cx('meta')}>{new Date(rel.createdAt ?? '').toLocaleDateString(dateLocale)}</div>
                     </div>
                   </div>
                 ))}
@@ -551,8 +555,8 @@ function PostDetail() {
         show={Boolean(deletingCommentId)}
         onClose={() => setDeletingCommentId(null)}
         onConfirm={handleDeleteComment}
-        title="Xác nhận xóa bình luận"
-        message="Bạn có chắc muốn xóa bình luận này? Hành động này không thể hoàn tác."
+        title={t('deleteCommentTitle')}
+        message={t('deleteCommentMessage')}
       />
     </div>
   );

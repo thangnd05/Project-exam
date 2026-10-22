@@ -5,9 +5,11 @@ import {useQuery} from '@tanstack/react-query';
 import {Spinner} from 'react-bootstrap';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
+import {useLocale, useTranslations} from 'next-intl';
 import {CircleDollarSign, Clock, CheckCircle2} from 'lucide-react';
 
 import {getMyQuests, QUESTS_QUERY_KEY} from '@/app/apis/questApi';
+import {formatFullNumber} from '@/app/utils/formatNumber';
 import {useCoins} from '@/app/features/gamification/coin/hooks/useCoins';
 import {useClaimQuest} from '@/app/features/gamification/coin/hooks/useClaimQuest';
 import BaseModal from '@/app/components/modal/BaseModal';
@@ -48,6 +50,8 @@ type QuestModalProps = {
 
 function QuestModal({show, onClose}: QuestModalProps) {
   const {balance} = useCoins();
+  const t = useTranslations('Gamification');
+  const locale = useLocale();
   const [tab, setTab] = useState<'quests' | 'shop'>('quests');
   const claimMutation = useClaimQuest();
   const claimingId = claimMutation.isPending ? claimMutation.variables : null;
@@ -62,24 +66,23 @@ function QuestModal({show, onClose}: QuestModalProps) {
   const handleClaim = (quest: UserQuestResponse) => {
     claimMutation.mutate(quest.questId, {
       onSuccess: (result) => {
-        toast.success(`Đã nhận ${result.rewardCoins} xu!`);
+        toast.success(t('quests.claimSuccess', {coins: result.rewardCoins ?? 0}));
       },
       onError: (error) => {
         toast.error(
-          error?.response?.data?.message ||
-            'Không thể nhận nhiệm vụ. Vui lòng thử lại.',
+          error?.response?.data?.message || t('quests.claimError'),
         );
       },
     });
   };
 
   const formatEndAt = (value?: string) =>
-    value ? new Date(value).toLocaleString('vi-VN') : null;
+    value ? new Date(value).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN') : null;
 
   const balanceBadge = (
     <span className={cx('balanceBadge')}>
       <CircleDollarSign size={15} />
-      {Number(balance).toLocaleString('vi-VN')} xu
+      {t('coins.amount', {amount: formatFullNumber(balance, locale)})}
     </span>
   );
 
@@ -88,13 +91,13 @@ function QuestModal({show, onClose}: QuestModalProps) {
       return (
         <div className={cx('placeholder')}>
           <Spinner size="sm" className="me-2" />
-          Đang tải nhiệm vụ...
+          {t('quests.loading')}
         </div>
       );
     }
     if (quests.length === 0) {
       return (
-        <div className={cx('placeholder')}>Hiện chưa có nhiệm vụ nào.</div>
+        <div className={cx('placeholder')}>{t('quests.empty')}</div>
       );
     }
     const {claimable, inProgress, claimed} = groupByStatus(quests);
@@ -103,20 +106,20 @@ function QuestModal({show, onClose}: QuestModalProps) {
         {claimable.length > 0 && (
           <section>
             <h3 className={cx('groupTitle', 'groupTitleHot')}>
-              Có thể nhận ({claimable.length})
+              {t('quests.claimable', {count: claimable.length})}
             </h3>
             <div className={cx('list')}>{claimable.map(renderQuestRow)}</div>
           </section>
         )}
         {inProgress.length > 0 && (
           <section>
-            <h3 className={cx('groupTitle')}>Đang làm ({inProgress.length})</h3>
+            <h3 className={cx('groupTitle')}>{t('quests.inProgress', {count: inProgress.length})}</h3>
             <div className={cx('list')}>{inProgress.map(renderQuestRow)}</div>
           </section>
         )}
         {claimed.length > 0 && (
           <details className={cx('claimedGroup')}>
-            <summary className={cx('groupTitle')}>Đã nhận ({claimed.length})</summary>
+            <summary className={cx('groupTitle')}>{t('quests.claimed', {count: claimed.length})}</summary>
             <div className={cx('list')}>{claimed.map(renderQuestRow)}</div>
           </details>
         )}
@@ -159,7 +162,7 @@ function QuestModal({show, onClose}: QuestModalProps) {
           {quest.endAt && !quest.claimed && (
             <div className={cx('deadline')}>
               <Clock size={13} />
-              Kết thúc: {formatEndAt(quest.endAt)}
+              {t('quests.endsAt', {date: formatEndAt(quest.endAt) ?? ''})}
             </div>
           )}
         </div>
@@ -172,7 +175,7 @@ function QuestModal({show, onClose}: QuestModalProps) {
           {quest.claimed ? (
             <span className={cx('doneBadge')}>
               <CheckCircle2 size={15} />
-              Đã nhận
+              {t('quests.claimedBadge')}
             </span>
           ) : quest.eligible ? (
             <button
@@ -181,7 +184,7 @@ function QuestModal({show, onClose}: QuestModalProps) {
               disabled={claimingId === quest.questId}
               onClick={() => handleClaim(quest)}
             >
-              {claimingId === quest.questId ? 'Đang nhận...' : 'Nhận xu'}
+              {claimingId === quest.questId ? t('quests.claiming') : t('quests.claim')}
             </button>
           ) : null}
         </div>
@@ -193,7 +196,7 @@ function QuestModal({show, onClose}: QuestModalProps) {
     <BaseModal
       show={show}
       onClose={onClose}
-      title="Phần thưởng"
+      title={t('quests.title')}
       headerExtra={balanceBadge}
       maxWidth={880}
     >
@@ -203,14 +206,14 @@ function QuestModal({show, onClose}: QuestModalProps) {
           className={cx('tab', {active: tab === 'quests'})}
           onClick={() => setTab('quests')}
         >
-          Nhiệm vụ
+          {t('quests.tabQuests')}
         </button>
         <button
           type="button"
           className={cx('tab', {active: tab === 'shop'})}
           onClick={() => setTab('shop')}
         >
-          Cửa hàng
+          {t('quests.tabShop')}
         </button>
       </div>
 

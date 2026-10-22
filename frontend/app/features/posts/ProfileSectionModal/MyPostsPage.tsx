@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Link, { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import { useEffect, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { motion, type Variants } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
@@ -30,22 +30,24 @@ const cardVariants: Variants = {
   }),
 };
 
-const STATUS_LABEL: Record<string, { text: string; cls: string }> = {
-  PENDING: { text: 'Chờ duyệt', cls: 'pending' },
-  APPROVED: { text: 'Đã duyệt', cls: 'approved' },
+type StatusKey = 'all' | 'approved' | 'pending';
+
+const STATUS_LABEL: Record<string, { key: StatusKey; cls: string }> = {
+  PENDING: { key: 'pending', cls: 'pending' },
+  APPROVED: { key: 'approved', cls: 'approved' },
 };
 
-const FILTER_OPTIONS = [
-  { value: 'ALL', label: 'Tất cả' },
-  { value: 'APPROVED', label: 'Đã duyệt' },
-  { value: 'PENDING', label: 'Chờ duyệt' },
+const FILTER_OPTIONS: Array<{ value: string; labelKey: StatusKey }> = [
+  { value: 'ALL', labelKey: 'all' },
+  { value: 'APPROVED', labelKey: 'approved' },
+  { value: 'PENDING', labelKey: 'pending' },
 ];
 
-const formatDate = (value?: string | null) => {
+const formatDate = (value: string | null | undefined, locale: string) => {
   if (!value) return '--';
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return '--';
-  return d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' });
+  return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 };
 
 const formatCount = (n: unknown) => {
@@ -60,6 +62,9 @@ type MyPostsPageProps = {
 
 function MyPostsPage({ embedded = false }: MyPostsPageProps) {
   const router = useRouter();
+  const t = useTranslations('Posts');
+  const localizeHref = useLocalizeHref();
+  const dateLocale = useLocale() === 'en' ? 'en-US' : 'vi-VN';
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [editingPost, setEditingPost] = useState<PostResponse | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -92,7 +97,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
     status: statusFilter,
   });
 
-  const errorMessage = isError ? 'Không tải được danh sách bài viết của bạn.' : '';
+  const errorMessage = isError ? t('myPosts.loadError') : '';
 
   const hasActiveFilter = statusFilter !== 'ALL' || debouncedSearch.trim().length > 0;
 
@@ -103,7 +108,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
       setEditingPost(fullPost);
       setShowEditModal(true);
     } catch {
-      toast.error('Không tải được nội dung bài viết để chỉnh sửa.');
+      toast.error(t('myPosts.editLoadError'));
     } finally {
       setActionLoadingId(null);
     }
@@ -120,10 +125,10 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
     setActionLoadingId(postId);
     try {
       await deleteMutation.mutateAsync(postId);
-      toast.success('Đã xóa bài viết');
+      toast.success(t('myPosts.deleted'));
       setDeletingPost(null);
     } catch {
-      toast.error('Không thể xóa bài viết. Vui lòng thử lại.');
+      toast.error(t('myPosts.deleteError'));
     } finally {
       setActionLoadingId(null);
     }
@@ -186,11 +191,11 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
         {!embedded && (
           <header className={cx('pageHeader')}>
             <div>
-              <h1 className={cx('title')}>Bài viết của tôi</h1>
-              <p className={cx('subtitle')}>Quản lý và theo dõi trạng thái các bài viết của bạn.</p>
+              <h1 className={cx('title')}>{t('common.myPosts')}</h1>
+              <p className={cx('subtitle')}>{t('myPosts.subtitle')}</p>
             </div>
-            <button type="button" className={cx('backLink')} onClick={() => router.push(routes.dashboard)}>
-              Trở lại hồ sơ
+            <button type="button" className={cx('backLink')} onClick={() => router.push(localizeHref(routes.dashboard))}>
+              {t('common.backToProfile')}
             </button>
           </header>
         )}
@@ -200,7 +205,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
             <IoSearchOutline className={cx('searchIcon')} />
             <input
               type="text"
-              placeholder="Tìm kiếm bài viết..."
+              placeholder={t('myPosts.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -216,7 +221,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
                   setCurrentPage(0);
                 }}
               >
-                {opt.label}
+                {t(`myPosts.status.${opt.labelKey}`)}
               </button>
             ))}
           </div>
@@ -225,7 +230,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
         {loading && (
           <div className={cx('loadingWrap')}>
             <Spinner animation="border" />
-            <span>Đang tải...</span>
+            <span>{t('common.loading')}</span>
           </div>
         )}
 
@@ -236,9 +241,9 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
         {!loading && !errorMessage && posts.length === 0 && (
           <Alert variant="info" className={cx('alertBox')}>
             {hasActiveFilter ? (
-              <>Không có bài viết nào khớp với bộ lọc hiện tại.</>
+              <>{t('myPosts.emptyFiltered')}</>
             ) : (
-              <>Bạn chưa đăng bài viết nào. <Link href={routes.posts}>Tạo bài viết đầu tiên</Link>.</>
+              <>{t.rich('myPosts.empty', { link: (chunks) => <Link href={routes.posts}>{chunks}</Link> })}</>
             )}
           </Alert>
         )}
@@ -246,7 +251,10 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
         {!loading && !errorMessage && posts.length > 0 && (
           <div className={cx('list')}>
             {posts.map((post, index) => {
-              const status = (post.status && STATUS_LABEL[post.status]) || { text: post.status || '', cls: '' };
+              const statusLabel = post.status ? STATUS_LABEL[post.status] : undefined;
+              const status = statusLabel
+                ? { text: t(`myPosts.status.${statusLabel.key}`), cls: statusLabel.cls }
+                : { text: post.status || '', cls: '' };
               const detailUrl = routes.postDetail.replace(':postId', post.id);
               return (
                 <motion.article
@@ -280,7 +288,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
                   <div className={cx('cardBody')}>
                     <div className={cx('cardMeta')}>
                       <span className={cx('statusBadge', status.cls)}>{status.text.toUpperCase()}</span>
-                      <span className={cx('date')}>{formatDate(post.createdAt)}</span>
+                      <span className={cx('date')}>{formatDate(post.createdAt, dateLocale)}</span>
                     </div>
 
                     <Link href={detailUrl} className={cx('cardTitleLink')}>
@@ -291,7 +299,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
                       <span><IoEyeOutline /> {formatCount(post.viewCount)}</span>
                       <span><IoHeartOutline /> {formatCount(post.totalReacts)}</span>
                       <span><IoChatbubbleOutline /> {formatCount(post.commentCount)}</span>
-                      <span title="Lượt lưu"><IoBookmarkOutline /> {formatCount(post.saveCount)}</span>
+                      <span title={t('common.saves')}><IoBookmarkOutline /> {formatCount(post.saveCount)}</span>
                     </div>
                   </div>
 
@@ -301,14 +309,14 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
                     </Dropdown.Toggle>
                     <Dropdown.Menu className={cx('menuDropdown')}>
                       <Dropdown.Item onClick={() => handleEdit(post.id)}>
-                        <IoPencilOutline /> Chỉnh sửa
+                        <IoPencilOutline /> {t('myPosts.edit')}
                       </Dropdown.Item>
-                      <Dropdown.Item onClick={() => router.push(detailUrl)}>
-                        <IoEyeOutline /> Xem chi tiết
+                      <Dropdown.Item onClick={() => router.push(localizeHref(detailUrl))}>
+                        <IoEyeOutline /> {t('common.viewDetail')}
                       </Dropdown.Item>
                       <Dropdown.Divider />
                       <Dropdown.Item className={cx('dangerItem')} onClick={() => setDeletingPost(post)}>
-                        <IoTrashOutline /> Xóa bài viết
+                        <IoTrashOutline /> {t('myPosts.delete')}
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
@@ -333,8 +341,8 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
         show={Boolean(deletingPost)}
         onClose={() => setDeletingPost(null)}
         onConfirm={handleDelete}
-        title="Xác nhận xóa bài viết"
-        message={`Xóa bài viết "${deletingPost?.title}"? Hành động này không thể hoàn tác.`}
+        title={t('myPosts.deleteTitle')}
+        message={t('myPosts.deleteMessage', { title: deletingPost?.title ?? '' })}
       />
     </div>
   );

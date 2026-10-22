@@ -1,12 +1,15 @@
 
+import type { useTranslations } from 'next-intl';
 import { PlanTaskType, UserTestMode } from '@/app/enums';
 import type { PlanResponse, PlanTaskResponse } from '@/app/types';
 
-export const PLAN_STATUS_LABEL: Record<string, string> = {
-  ACTIVE: 'Đang học',
-  COMPLETED: 'Hoàn thành',
-  REPLACED: 'Đã thay',
-};
+export type LearningPlansT = ReturnType<typeof useTranslations<'LearningPlans'>>;
+
+export const PLAN_STATUS_LABEL = {
+  ACTIVE: 'labels.planStatus.active',
+  COMPLETED: 'labels.planStatus.completed',
+  REPLACED: 'labels.planStatus.replaced',
+} as const satisfies Record<string, Parameters<LearningPlansT>[0]>;
 
 export const PLAN_STATUS_VARIANT: Record<string, string> = {
   ACTIVE: 'badgePrimary',
@@ -14,27 +17,38 @@ export const PLAN_STATUS_VARIANT: Record<string, string> = {
   REPLACED: 'badgeMuted',
 };
 
-export const PLAN_STAGE_LABEL: Record<string, string> = {
-  FOUNDATION: 'Nền tảng',
-  MOCK: 'Thi thử',
-};
+export const PLAN_STAGE_LABEL = {
+  FOUNDATION: 'labels.planStage.foundation',
+  MOCK: 'labels.planStage.mock',
+} as const satisfies Record<string, Parameters<LearningPlansT>[0]>;
 
-export const TASK_STATUS: Record<string, { text: string; variant: string }> = {
-  PASSED: { text: 'Đã vượt', variant: 'badgeSuccess' },
-  ACTIVE: { text: 'Chưa vượt', variant: 'badgePrimary' },
-  LOCKED: { text: 'Chưa mở', variant: 'badgeMuted' },
-  SKIPPED: { text: 'Bỏ qua', variant: 'badgeMuted' },
+export type TaskStatusLabelKey =
+  | 'labels.taskStatus.passed'
+  | 'labels.taskStatus.active'
+  | 'labels.taskStatus.locked'
+  | 'labels.taskStatus.skipped';
+
+export const TASK_STATUS: Record<string, { labelKey: TaskStatusLabelKey; variant: string }> = {
+  PASSED: { labelKey: 'labels.taskStatus.passed', variant: 'badgeSuccess' },
+  ACTIVE: { labelKey: 'labels.taskStatus.active', variant: 'badgePrimary' },
+  LOCKED: { labelKey: 'labels.taskStatus.locked', variant: 'badgeMuted' },
+  SKIPPED: { labelKey: 'labels.taskStatus.skipped', variant: 'badgeMuted' },
 };
 
 export const CAPSTONE_TYPES: Set<string> = new Set(['PART_CAPSTONE_1', 'PART_CAPSTONE_2']);
 
-export const PLAN_NOTICE_TEXT: Record<string, string> = {
-  EMPTY_POOL_SKIPPED: 'Ải này chưa có câu hỏi nào trong kho nên đã được bỏ qua  hãy chọn ải khác.',
-  EMPTY_POOL_RETRY: 'Ải này hiện chưa có câu hỏi để luyện lại. Hãy chọn ải khác.',
-};
+export const PLAN_NOTICE_TEXT = {
+  EMPTY_POOL_SKIPPED: 'labels.notice.emptyPoolSkipped',
+  EMPTY_POOL_RETRY: 'labels.notice.emptyPoolRetry',
+} as const satisfies Record<string, Parameters<LearningPlansT>[0]>;
 
-export const planNoticeText = (code?: string | null): string | null =>
-  PLAN_NOTICE_TEXT[code as string] || null;
+const lookup = <M extends Record<string, string>>(map: M, code?: string | null): M[keyof M] | null =>
+  code && Object.prototype.hasOwnProperty.call(map, code) ? map[code as keyof M] : null;
+
+export const planNoticeText = (t: LearningPlansT, code?: string | null): string | null => {
+  const key = lookup(PLAN_NOTICE_TEXT, code);
+  return key ? t(key) : null;
+};
 
 export const isPracticeAttempt = (
   userTest?: { practicePartIds?: string[] | null } | null,
@@ -45,16 +59,18 @@ export const isMockAttempt = (
   userTest?: { mode?: UserTestMode; practicePartIds?: string[] | null } | null,
 ): boolean => Boolean(userTest) && userTest!.mode !== UserTestMode.PRACTICE && !isPracticeAttempt(userTest);
 
-export const taskStatusLabel = (status?: string | null): string =>
-  TASK_STATUS[status as string]?.text || status || '-';
+export const taskStatusLabel = (t: LearningPlansT, status?: string | null): string => {
+  const key = TASK_STATUS[status as string]?.labelKey;
+  return key ? t(key) : status || '-';
+};
 
 export const taskStatusVariant = (status?: string | null): string =>
   TASK_STATUS[status as string]?.variant || 'badgeMuted';
 
-export function taskDisplayName(task?: PlanTaskResponse | null): string {
+export function taskDisplayName(t: LearningPlansT, task?: PlanTaskResponse | null): string {
   if (!task) return '-';
-  if (task.taskType === PlanTaskType.PART_CAPSTONE_1) return 'Ải cuối chặng  lần 1';
-  if (task.taskType === PlanTaskType.PART_CAPSTONE_2) return 'Ải cuối chặng  lần 2';
+  if (task.taskType === PlanTaskType.PART_CAPSTONE_1) return t('labels.capstone1');
+  if (task.taskType === PlanTaskType.PART_CAPSTONE_2) return t('labels.capstone2');
   return task.tagName || '-';
 }
 
@@ -62,27 +78,39 @@ export function isCapstoneTask(task?: PlanTaskResponse | null): boolean {
   return CAPSTONE_TYPES.has(task?.taskType as string);
 }
 
-export function buildPlanSummary(plan: PlanResponse): string {
-  const target = plan.targetScore == null ? 'đạt mục tiêu' : `đạt ${plan.targetScore} điểm`;
+export function buildPlanSummary(t: LearningPlansT, plan: PlanResponse): string {
+  const target = plan.targetScore == null
+    ? t('labels.summary.target')
+    : t('labels.summary.targetScore', { score: plan.targetScore });
   if (plan.baselineReadiness == null) {
-    return `Đi theo chương trình học, chưa có chẩn đoán. ${plan.totalTasks ?? 0} ải trải đều các phần, để ${target}.`;
+    return t('labels.summary.syllabus', { total: plan.totalTasks ?? 0, target });
   }
-  return `Độ sẵn sàng ${plan.baselineReadiness}%. ${plan.totalTasks ?? 0} ải cho các phần chưa đạt mục tiêu, để ${target}.`;
+  return t('labels.summary.diagnosis', {
+    readiness: plan.baselineReadiness,
+    total: plan.totalTasks ?? 0,
+    target,
+  });
 }
 
-export function buildResyncMessage(plan?: PlanResponse | null): string {
+export function buildResyncMessage(t: LearningPlansT, plan?: PlanResponse | null): string {
   if (plan?.targetAchieved) {
-    return 'Bạn đã đạt mục tiêu mới  lộ trình hiện tại được đánh dấu hoàn thành, chưa cần lộ trình mới.';
+    return t('labels.resync.achieved');
   }
   const reopened = plan?.reopenedTasks ?? 0;
   if (reopened > 0) {
-    return `Đã cập nhật theo mục tiêu mới  ${reopened} ải phải vượt lại vì ngưỡng mới cao hơn.`;
+    return t('labels.resync.reopened', { count: reopened });
   }
-  return 'Đã cập nhật theo mục tiêu mới  tiến độ giữ nguyên.';
+  return t('labels.resync.unchanged');
 }
 
-export const planStatusLabel = (status?: string | null): string => PLAN_STATUS_LABEL[status as string] || status || '-';
+export const planStatusLabel = (t: LearningPlansT, status?: string | null): string => {
+  const key = lookup(PLAN_STATUS_LABEL, status);
+  return key ? t(key) : status || '-';
+};
 
 export const planStatusVariant = (status?: string | null): string => PLAN_STATUS_VARIANT[status as string] || 'badgeMuted';
 
-export const planStageLabel = (stage?: string | null): string => PLAN_STAGE_LABEL[stage as string] || stage || '-';
+export const planStageLabel = (t: LearningPlansT, stage?: string | null): string => {
+  const key = lookup(PLAN_STAGE_LABEL, stage);
+  return key ? t(key) : stage || '-';
+};

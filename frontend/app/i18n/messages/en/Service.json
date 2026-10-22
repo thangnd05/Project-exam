@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "title": "Terms of Service",
+    "description": "Terms of use for the WinDe Exam platform."
+  },
+  "title": "Terms of Service",
+  "updated": "Last updated: October 18, 2026 • Version 2.0 • Dispute submission channel:",
+  "intro": "Welcome to FrostScope. By accessing the website frostscope.com, taking quick assessments (Quick Scope), following a personalized learning path (My Path), using the question bank, or participating in the leaderboard (ScopeRank), you agree to comply with all of the terms and conditions set out in this document. If you do not agree with any part of these terms, please stop using our services.",
+  "nature": {
+    "title": "1. Nature of the service & disclaimer regarding exam results",
+    "body": "FrostScope is an independent technology learning platform that helps engineers and learners assess their current skills, identify knowledge gaps in each Domain, and personalize their study path for Cloud, DevOps, and Kubernetes certifications.",
+    "simulation": "<strong>Internal simulation:</strong> The quick assessments (Quick Scope) and full-length exams (Full Mock) are developed by the FrostScope team to closely follow the vendors’ publicly available Blueprint outlines. Exam results, normalized scores, and readiness indicators (Readiness) are internal educational measurement tools and <strong>do not constitute a commitment or a definitive guarantee</strong> that you will achieve an equivalent score or pass the official third-party exam.",
+    "noRepresentation": "We do not represent or act on behalf of any certifying organization and bear no legal liability for your actual exam results at official testing centers."
+  },
+  "ip": {
+    "title": "2. Intellectual property & third-party trademark notice",
+    "trademarks": "<strong>Third-party trademarks:</strong> Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), The Linux Foundation (Kubernetes, CKA, CKAD), HashiCorp, Oracle, and their related logos and badges are trademarks or registered trademarks of their respective owners.",
+    "usage": "References to certification names and the display of logos on FrostScope are solely for the purpose of identifying exams, helping learners look up exam outlines, and guiding them toward a suitable learning path. FrostScope has no sponsorship, joint venture, or official authorization relationship with these trademark owners.",
+    "ownership": "<strong>FrostScope’s ownership:</strong> The entire user interface, source code, learning-path generation algorithm structure, question system, detailed explanations, and learning materials on the platform are the exclusive intellectual property of FrostScope. Any copying, automated data extraction (scraping), redistribution, or resale of FrostScope materials in any form without prior written consent is strictly prohibited."
+  },
+  "account": {
+    "title": "3. Learner accounts & security responsibilities",
+    "intro": "When you create a FrostScope account (whether by registering directly or authenticating via Google/GitHub SSO):",
+    "items": [
+      "You agree to provide truthful and accurate information and are responsible for maintaining the confidentiality of your password and personal login sessions.",
+      "Each account is issued for the use of a single individual engineer to ensure the accuracy of the path-personalization algorithm. Sharing an account among multiple people, renting it out, or transferring it to another person is strictly prohibited.",
+      "You must notify FrostScope immediately via the support email if you detect any sign of unauthorized access to your account."
+    ]
+  },
+  "credits": {
+    "title": "4. Internal reward points (Credits) & gamification",
+    "intro": "Credits reward points are earned when learners complete daily learning goals (Daily Focus), review previously missed material (Smart Review), or contribute question error reports:",
+    "internal": "Credits are an internal digital tool used to unlock full-length practice exams (Full Mock) or learning benefits on the website.",
+    "noCash": "<strong>No cash redemption under any circumstances:</strong> Credits are not legal tender, digital currency, or financial assets. Credits have no cash redemption value, accrue no interest, and cannot be transferred or traded between accounts.",
+    "enforcement": "FrostScope has full discretion to deduct points or disable accounts if it detects the use of automated tools or cheating on tests to farm Credits illegitimately."
+  },
+  "conduct": {
+    "title": "5. Code of conduct & the ScopeRank leaderboard",
+    "intro": "The ScopeRank leaderboard honors engineers with outstanding achievements and consistent improvement. Participating users agree to comply with the following rules of conduct:",
+    "integrity": "<strong>Integrity in testing:</strong> Do not use software that tampers with test timing or scripts that automatically select answers, do not tamper with client-side code, and do not share exam content for cheating. Any results found to show signs of cheating will be voided immediately.",
+    "displayName": "<strong>Display name etiquette (Display Name):</strong> Display names and profile pictures must not contain obscene, vulgar, or discriminatory content, content that offends public morals and customs, or impersonate other individuals, organizations, or technology providers.",
+    "anonymous": "<strong>Anonymous mode:</strong> If you do not want your name and score displayed on ScopeRank, you can enable <em>\"Anonymous\"</em> mode on your personal settings page without any restriction on practice features."
+  },
+  "paid": {
+    "title": "6. Paid services & support policy",
+    "intro": "Some advanced exam packages or supplementary materials may require payment on a per-package basis:",
+    "items": [
+      "All service fees are disclosed clearly and transparently before you confirm your subscription or payment.",
+      "Due to the specific nature of digital content (exams and learning materials are made accessible immediately after payment), we apply a no-refund policy once a package has been activated and used, except in cases of prolonged technical failures originating from FrostScope’s systems that our technical team is unable to resolve within a reasonable time.",
+      "If you find an error in a question or exam, you can click the report-question button. Our academic team will verify and correct it within 48 business hours and award you Credits as thanks for your contribution."
+    ]
+  },
+  "liability": {
+    "title": "7. Limitation of liability",
+    "intro": "To the maximum extent permitted by law:",
+    "items": [
+      "FrostScope strives to keep the system running continuously 24/7 with optimal performance, but is not responsible for service interruptions caused by problems with your internet connection, force majeure events affecting public telecommunications infrastructure, or server maintenance announced in advance.",
+      "FrostScope is not liable to compensate for any indirect damages, loss of employment opportunities, third-party certification retake fees, or any financial loss arising from the use of or inability to use the platform."
+    ]
+  },
+  "termination": {
+    "title": "8. Suspension & termination of service",
+    "intro": "FrostScope reserves the right to temporarily suspend or permanently terminate a learner’s account access without prior notice if:",
+    "items": [
+      "You seriously violate any provision of this document.",
+      "You engage in cyberattacks, vulnerability scanning, reverse engineering, or deliberately cause harm to the platform’s infrastructure.",
+      "You commercialize or distribute FrostScope’s exam data to third parties without authorization."
+    ]
+  },
+  "disputes": {
+    "title": "9. Complaint handling & dispute resolution",
+    "intro": "We value learner satisfaction and are committed to resolving disputes fairly and transparently:",
+    "channel": "All complaints concerning intellectual property, question copyright, account disputes, or the terms of use should be sent directly to the official submission channel:",
+    "inbox": "Dispute inbox:",
+    "responseTime": "Committed response time: within 3 – 5 business days.",
+    "resolution": "Both parties agree to prioritize resolving any disagreement through good-faith negotiation and conciliation. If no mutual agreement can be reached, the dispute will be brought before the competent adjudicating authority in Vietnam in accordance with the law."
+  },
+  "changes": {
+    "title": "10. Effective date & amendments to these terms",
+    "body": "FrostScope reserves the right to update and amend these terms at each stage of the product’s development. Material changes will be prominently announced on the homepage or sent to your registered email at least 7 days before they officially take effect. Your continued use of the service after the updated terms take effect constitutes your acceptance of the amended terms."
+  }
+}

@@ -16,6 +16,7 @@ import { getQuestionCollections } from '@/app/apis/questionCollectionApi';
 import { buildCollectionTree } from '@/app/features/tests/collectionTree';
 import { useHasPermission } from '@/app/hooks/usePermission';
 import { toast } from 'react-toastify';
+import { useTranslations } from 'next-intl';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import classNames from 'classnames/bind';
 import {
@@ -95,6 +96,8 @@ const toList = <T,>(payload: unknown): T[] => {
 const testDetailKey = (testId?: string) => ['admin-tests', 'detail', testId ?? null];
 
 const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) => {
+  const t = useTranslations('TestCreator');
+  const tCommon = useTranslations('Common');
   const queryClient = useQueryClient();
   const canSetPricing = useHasPermission(PermissionCode.TEST_MANAGE_PRICING);
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
@@ -165,37 +168,37 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
   const updateMutation = useMutation({
     mutationFn: ({ testId, payload }: UpdateTestVariables) => updateTest(testId, payload),
     onSuccess: () => {
-      toast.success('Cập nhật đề thi thành công!');
+      toast.success(t('editTest.toast.updated'));
       onSuccess();
     },
     onError: (error: unknown) => {
       const msg = getApiErrorMessage(error, error instanceof Error ? error.message : undefined);
-      toast.error(`Lỗi khi cập nhật: ${msg}`);
+      toast.error(t('editTest.toast.updateError', { message: msg }));
     },
   });
 
   const shuffleMutation = useMutation({
     mutationFn: (testId: string) => shuffleTestQuestions(testId),
     onSuccess: async () => {
-      toast.success('Đã xáo lại thứ tự câu trong đề');
+      toast.success(t('editTest.toast.shuffled'));
       await refreshTestDetail();
     },
     onError: (error: unknown) => {
       const msg = getApiErrorMessage(error, error instanceof Error ? error.message : undefined);
-      toast.error(`Lỗi khi xáo thứ tự câu: ${msg}`);
+      toast.error(t('editTest.toast.shuffleError', { message: msg }));
     },
   });
 
   const handleShuffleNow = () => {
     const testId = test?.testId || test?.id;
     if (!testId) return;
-    if (!window.confirm('Xáo lại thứ tự câu của đề? Thứ tự mới áp dụng cho mọi lượt làm sau này.')) return;
+    if (!window.confirm(t('editTest.shuffleConfirm'))) return;
     shuffleMutation.mutate(testId);
   };
 
   const handleSave = () => {
     if (!formData.title?.trim() || !formData.examTypeId) {
-      toast.warning('Vui lòng nhập tên đề thi và chọn loại kỳ thi');
+      toast.warning(t('editTest.toast.titleAndExamTypeRequired'));
       return;
     }
 
@@ -235,7 +238,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
   const groupedQuestions = useMemo(() => {
     if (!testDetail?.parts) return [];
     return testDetail.parts.map((part, partIndex) => {
-      const partName = part.partName || `Part ${partIndex + 1}`;
+      const partName = part.partName || t('editTest.partFallback', { number: partIndex + 1 });
       const questionRows: Array<{ questionId: string; questionText: string }> = [];
       const groups = Array.isArray(part.questionGroups) ? part.questionGroups : [];
 
@@ -245,14 +248,14 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
           if (!q?.questionId) return;
           questionRows.push({
             questionId: q.questionId,
-            questionText: q.questionText || '(Không có nội dung)',
+            questionText: q.questionText || t('editTest.noContent'),
           });
         });
       });
 
       return { partName, questionRows };
     });
-  }, [testDetail]);
+  }, [testDetail, t]);
 
   const handleQuestionUpdated = async () => {
     setEditingQuestionId(null);
@@ -265,10 +268,10 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
     <BaseModal
       show={show}
       onClose={onHide}
-      title="Cập nhật bài thi"
+      title={t('editTest.title')}
       headerExtra={
         <span className={cxCreate('badge')}>
-          {test?.classId ? `Lớp: ${test.classId}` : 'Cá nhân'}
+          {test?.classId ? t('createTestModal.classBadge', { classId: test.classId }) : t('createTestModal.personalBadge')}
         </span>
       }
       maxWidth={1140}
@@ -277,9 +280,9 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
           onCancel={onHide}
           onSubmit={handleSave}
           loading={updateMutation.isPending}
-          cancelLabel="Hủy"
-          submitLabel="Lưu cập nhật"
-          loadingLabel="Đang lưu..."
+          cancelLabel={tCommon('cancelShort')}
+          submitLabel={t('editTest.submit')}
+          loadingLabel={t('editTest.saving')}
           submitIcon={IoRocketOutline}
         />
       }
@@ -287,12 +290,12 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
       <div>
         <div className={cxCreate('configCard')}>
           <div className={cxCreate('sectionTitle')}>
-            <IoSettingsOutline /> Cấu hình bài thi
+            <IoSettingsOutline /> {t('form.section.testConfig')}
           </div>
           <Row className="g-3">
             <Col md={8}>
               <div className={cxCreate('formGroupModern')}>
-                <label>Tên bài thi *</label>
+                <label>{t('editTest.name')}</label>
                 <input
                   type="text"
                   className={cxCreate('inputModern')}
@@ -300,14 +303,14 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                   onChange={(e) =>
                     setFormData({ ...formData, title: e.target.value })
                   }
-                  placeholder="Nhập tên bài thi..."
+                  placeholder={t('editTest.namePlaceholder')}
                 />
               </div>
             </Col>
 
             <Col md={4}>
               <div className={cxCreate('formGroupModern')}>
-                <label><IoImageOutline /> Link ảnh Banner</label>
+                <label><IoImageOutline /> {t('form.fields.bannerUrl')}</label>
                 <input
                   type="text"
                   className={cxCreate('inputModern')}
@@ -322,7 +325,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
             <Col md={6}>
               <div className={cxCreate('formGroupModern')}>
-                <label>Loại kỳ thi *</label>
+                <label>{t('editTest.examType')}</label>
                 <select
                   className={cxCreate('inputModern')}
                   value={formData.examTypeId}
@@ -335,7 +338,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                     });
                   }}
                 >
-                  <option value="">-- Chọn loại --</option>
+                  <option value="">{t('editTest.selectType')}</option>
 
                   {examTypes.filter((type) => !type.childCount).map((type) => (
                     <option key={type.examTypeId} value={type.examTypeId}>
@@ -348,16 +351,16 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
             <Col md={6}>
               <div className={cxCreate('formGroupModern')}>
-                <label>Phân loại bài thi (tuỳ chọn)</label>
+                <label>{t('form.fields.examCategory')}</label>
                 <select
                   className={cxCreate('inputModern')}
                   value={formData.examCategoryId}
                   onChange={(e) =>
                     setFormData({ ...formData, examCategoryId: e.target.value })
                   }
-                  aria-label="Phân loại bài thi"
+                  aria-label={t('form.fields.examCategoryAria')}
                 >
-                  <option value="">-- Không phân loại --</option>
+                  <option value="">{t('form.fields.noCategory')}</option>
                   {examCategories.map((c) => (
                     <option key={c.examCategoryId} value={c.examCategoryId}>
                       {c.name}
@@ -369,7 +372,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
             <Col md={6}>
               <div className={cxCreate('formGroupModern')}>
-                <label>Bộ đề (Collection)</label>
+                <label>{t('form.fields.testCollection')}</label>
                 <select
                   className={cxCreate('inputModern')}
                   value={formData.collectionId}
@@ -377,7 +380,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                     setFormData({ ...formData, collectionId: e.target.value })
                   }
                 >
-                  <option value="">-- Trống --</option>
+                  <option value="">{t('form.fields.emptyOption')}</option>
                   {collectionOptions.map((c) => (
                     <option key={c.collectionId} value={c.collectionId}>
                       {c.depth > 0 ? `    └ ${c.name}` : c.name}
@@ -389,7 +392,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
             <Col md={3}>
               <div className={cxCreate('formGroupModern')}>
-                <label>Thời gian làm bài (phút)</label>
+                <label>{t('editTest.duration')}</label>
                 <input
                   type="number"
                   min={0}
@@ -398,14 +401,14 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                   onChange={(e) =>
                     setFormData({ ...formData, durationMinutes: e.target.value })
                   }
-                  placeholder="Không giới hạn"
+                  placeholder={t('editTest.unlimited')}
                 />
               </div>
             </Col>
 
             <Col md={3}>
               <div className={cxCreate('formGroupModern')}>
-                <label>Số lượt làm tối đa</label>
+                <label>{t('editTest.maxAttempts')}</label>
                 <input
                   type="number"
                   min={0}
@@ -414,7 +417,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                   onChange={(e) =>
                     setFormData({ ...formData, maxAttempts: e.target.value })
                   }
-                  placeholder="Không giới hạn"
+                  placeholder={t('editTest.unlimited')}
                 />
               </div>
             </Col>
@@ -422,7 +425,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
             {canSetPricing && !test?.classId && (
               <Col md={4}>
                 <div className={cxCreate('formGroupModern')}>
-                  <label>Giá xu (0 = miễn phí)</label>
+                  <label>{t('editTest.coinPrice')}</label>
                   <input
                     type="number"
                     min={0}
@@ -431,7 +434,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                     onChange={(e) =>
                       setFormData({ ...formData, costCoins: e.target.value })
                     }
-                    placeholder="Để trống nếu không đổi"
+                    placeholder={t('editTest.coinPricePlaceholder')}
                   />
                 </div>
               </Col>
@@ -439,7 +442,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
             <Col md={4}>
               <div className={cxCreate('formGroupModern')}>
-                <label>Thời điểm bắt đầu (mở)</label>
+                <label>{t('editTest.availableFrom')}</label>
                 <input
                   type="datetime-local"
                   className={cxCreate('inputModern')}
@@ -453,7 +456,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
             <Col md={4}>
               <div className={cxCreate('formGroupModern')}>
-                <label>Thời điểm kết thúc (đóng)</label>
+                <label>{t('editTest.availableTo')}</label>
                 <input
                   type="datetime-local"
                   className={cxCreate('inputModern')}
@@ -467,7 +470,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
             <Col md={12}>
               <div className={cxCreate('formGroupModern')}>
-                <label>Mô tả</label>
+                <label>{t('form.fields.description')}</label>
                 <textarea
                   className={cxCreate('inputModern')}
                   rows={2}
@@ -475,7 +478,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  placeholder="Mô tả bài thi..."
+                  placeholder={t('editTest.descriptionPlaceholder')}
                 />
               </div>
             </Col>
@@ -484,7 +487,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
               <Form.Check
                 type="checkbox"
                 id="edit-test-shuffle-per-attempt"
-                label="Xáo trộn thứ tự câu mỗi lượt làm (mỗi người, mỗi lần làm một thứ tự khác)"
+                label={t('form.fields.shufflePerAttempt')}
                 checked={formData.shuffleQuestions}
                 onChange={(e) =>
                   setFormData({ ...formData, shuffleQuestions: e.target.checked })
@@ -496,7 +499,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
         <div className={cxCreate('configCard')} style={{ marginTop: 16 }}>
           <div className={cxCreate('sectionTitle')}>
-            <IoListOutline /> Danh sách câu hỏi trong đề
+            <IoListOutline /> {t('editTest.questionList')}
             <Button
               type="button"
               variant="outline-secondary"
@@ -504,10 +507,10 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
               className="ms-auto"
               onClick={handleShuffleNow}
               disabled={shuffleMutation.isPending || loadingDetail || groupedQuestions.length === 0}
-              title="Xáo một lần thứ tự câu trong từng phần thi và lưu lại; câu cùng đoạn văn giữ liền nhau"
+              title={t('editTest.shuffleHint')}
             >
               <IoShuffleOutline size={16} />{' '}
-              {shuffleMutation.isPending ? 'Đang xáo...' : 'Xáo thứ tự câu ngay'}
+              {shuffleMutation.isPending ? t('editTest.shuffling') : t('editTest.shuffleNow')}
             </Button>
           </div>
           {loadingDetail ? (
@@ -515,20 +518,20 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
               <Spinner animation="border" />
             </div>
           ) : detailQuery.isError ? (
-            <p className="text-danger mb-0">Không tải được danh sách câu hỏi của đề.</p>
+            <p className="text-danger mb-0">{t('editTest.loadError')}</p>
           ) : groupedQuestions.length === 0 ? (
-            <p className="text-muted mb-0">Không có câu hỏi để hiển thị.</p>
+            <p className="text-muted mb-0">{t('editTest.empty')}</p>
           ) : (
             <Accordion defaultActiveKey="0">
               {groupedQuestions.map((part, index) => (
                 <Accordion.Item eventKey={String(index)} key={`${part.partName}-${index}`}>
                   <Accordion.Header>
                     {part.partName}
-                    <span className="badge bg-secondary ms-2">{part.questionRows.length} câu</span>
+                    <span className="badge bg-secondary ms-2">{t('jsonPreview.questionCount', { count: part.questionRows.length })}</span>
                   </Accordion.Header>
                   <Accordion.Body>
                     {part.questionRows.length === 0 ? (
-                      <p className="text-muted mb-0">Part này chưa có câu hỏi.</p>
+                      <p className="text-muted mb-0">{t('editTest.partEmpty')}</p>
                     ) : (
                       <div className="d-flex flex-column gap-2">
                         {part.questionRows.map((q, qIndex) => (
@@ -543,7 +546,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                               variant="outline-primary"
                               size="sm"
                               onClick={() => setEditingQuestionId(q.questionId)}
-                              aria-label={`Sửa câu hỏi ${qIndex + 1}`}
+                              aria-label={t('editTest.editQuestion', { number: qIndex + 1 })}
                             >
                               <IoCreateOutline size={16} />
                             </Button>

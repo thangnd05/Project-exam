@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "title": "Exam Library",
+    "description": "Cloud certification practice exams on WinDe: filter by vendor and level, take a quick test or a full-length mock that mirrors the real exam."
+  },
+  "detailMeta": {
+    "title": "{name} Practice Exams",
+    "description": "{name} practice exams: take them online, get instant scoring and review detailed answer explanations."
+  },
+  "collectionMeta": {
+    "title": "{name} Exam Set",
+    "description": "{name} practice exams in this set: take them online, get instant scoring and review detailed answer explanations."
+  },
+  "spec": {
+    "questions": "{count, plural, one {# question} other {# questions}}",
+    "minutes": "{count} min",
+    "none": "Not available"
+  },
+  "quickStart": "Quick test",
+  "noQuick": "This exam doesn’t have a quick test yet",
+  "fullMock": "Full Mock exams",
+  "catalog": {
+    "title": "Exam Library",
+    "loadError": {
+      "title": "Couldn’t load the exam list",
+      "hint": "Try reloading the page."
+    },
+    "empty": {
+      "title": "No exams to show yet",
+      "hint": "Please check back later."
+    },
+    "noMatch": "No certifications match your filters",
+    "resetFilters": "Reset filters",
+    "viewFullMock": "View Full Mock exams for {name}",
+    "searchLabel": "Search exams",
+    "searchPlaceholder": "Search by exam code (SAA-C03, AZ-104...) or certification name...",
+    "showing": "Showing: <strong>{count}</strong> {count, plural, one {certification} other {certifications}}",
+    "vendorFilter": "Filter by vendor",
+    "vendorLabel": "Vendor:",
+    "levelFilter": "Filter by level",
+    "levelLabel": "Level:",
+    "all": "All",
+    "allCount": "All ({count})"
+  },
+  "detail": {
+    "fallbackTitle": "Exam",
+    "breadcrumb": "Breadcrumb",
+    "chooseExam": "Choose an exam",
+    "groupFallback": "Exam group",
+    "fullMockCount": "Full Mock exams:",
+    "quickHint": "A short test to see where you stand",
+    "myTarget": "My target",
+    "resources": "Study resources",
+    "certificate": {
+      "title": "Certification exam",
+      "count": "{count, plural, one {# test} other {# tests}}",
+      "owned": "You already hold this certificate",
+      "reward": "Score {score} to earn {title}.",
+      "rewardWithValidity": "Score {score} to earn {title} (valid for {months, plural, one {# month} other {# months}}).",
+      "genericTitle": "a certificate",
+      "kind": "Certificate"
+    },
+    "mockDesc": "Mirrors the real exam: same number of questions, same time limit.",
+    "empty": {
+      "title": "No Full Mock exams yet",
+      "desc": "Exams will appear here once they’re added to this certification. In the meantime, try a quick test."
+    }
+  },
+  "mockCard": {
+    "unlimited": "Unlimited",
+    "noAccount": "No account needed",
+    "index": "Test {index}",
+    "fallbackTitle": "Practice test",
+    "questions": "Questions:",
+    "duration": "Time:",
+    "minutes": "{count} min",
+    "untimed": "Untimed",
+    "attempts": "Attempts:",
+    "deadline": "Due:",
+    "noDeadline": "None"
+  },
+  "collection": {
+    "loading": "Loading exam set...",
+    "empty": {
+      "title": "This set has no exams yet",
+      "hint": "Please check back later."
+    },
+    "fallbackTitle": "Exam set",
+    "label": "Explore exam set",
+    "back": "Back"
+  }
+}

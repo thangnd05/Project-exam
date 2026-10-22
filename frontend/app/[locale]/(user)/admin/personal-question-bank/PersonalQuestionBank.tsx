@@ -13,6 +13,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { useBaseMetaData } from '@/app/features/tests/creator/hooks/useBaseMetaData';
 import { useHasPermission } from '@/app/hooks/usePermission';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
@@ -41,6 +42,7 @@ type DeleteQuestionTarget = {
 };
 
 const PersonalQuestionBank = () => {
+  const t = useTranslations('TestCreatorBank');
   const canAccessAdminBank = useHasPermission(PermissionCode.QUESTION_MANAGE);
   const [bankScope, setBankScope] = useState<BankScope>(
     canAccessAdminBank ? BANK_SCOPE.ADMIN : BANK_SCOPE.PERSONAL,
@@ -117,12 +119,12 @@ const PersonalQuestionBank = () => {
         await invalidateAfterDelete({ partId, chapterId });
         setNotification({
           type: 'success',
-          message: 'Đã xóa câu hỏi thành công.',
+          message: t('bank.deleted'),
         });
         setDeleteQuestionTarget(null);
       },
       onError: (error: unknown) => {
-        const message = getApiErrorMessage(error, 'Không thể xóa câu hỏi. Vui lòng thử lại.');
+        const message = getApiErrorMessage(error, t('bank.deleteError'));
         setNotification({ type: 'danger', message });
       },
     });
@@ -132,23 +134,23 @@ const PersonalQuestionBank = () => {
     <div className={cx('wrapper')}>
       <div className={cx('container')}>
         <PageHeader
-          label="Kho câu hỏi"
+          label={t('bank.label')}
           title={
             bankScope === BANK_SCOPE.CLASS
-              ? 'Kho câu hỏi lớp học'
+              ? t('bank.title.class')
               : bankScope === BANK_SCOPE.ADMIN
-                ? 'Kho đề quản trị'
-                : 'Kho câu hỏi cá nhân'
+                ? t('bank.title.admin')
+                : t('bank.title.personal')
           }
           badgeLabel={
             <>
               <Library size={16} />
               <span>
                 {bankScope === BANK_SCOPE.CLASS
-                  ? 'Quản lý câu hỏi theo từng Chương. Bấm bút chì để sửa nhanh.'
+                  ? t('bank.badge.class')
                   : bankScope === BANK_SCOPE.ADMIN
-                    ? 'Kho câu hỏi quản trị viên cung cấp, dùng làm nguồn tạo đề.'
-                    : 'Quản lý câu hỏi theo từng Part. Bấm bút chì để sửa nhanh.'}
+                    ? t('bank.badge.admin')
+                    : t('bank.badge.personal')}
               </span>
             </>
           }
@@ -167,7 +169,7 @@ const PersonalQuestionBank = () => {
 
         <div className={cx('card')}>
           <div className={cx('sectionTitle')}>
-            <School size={18} /> Bộ lọc kho câu hỏi
+            <School size={18} /> {t('bank.filters')}
           </div>
 
           <div className={cx('scopeSwitch')}>
@@ -180,7 +182,7 @@ const PersonalQuestionBank = () => {
                   setSelectedClassId('');
                 }}
               >
-                Kho đề quản trị
+                {t('bank.title.admin')}
               </ButtonPrime>
             )}
             <ButtonPrime
@@ -191,14 +193,14 @@ const PersonalQuestionBank = () => {
                 setSelectedClassId('');
               }}
             >
-              Kho cá nhân
+              {t('source.personal')}
             </ButtonPrime>
             <ButtonPrime
               size="sm"
               variant={bankScope === BANK_SCOPE.CLASS ? 'primary' : 'outline'}
               onClick={() => setBankScope(BANK_SCOPE.CLASS)}
             >
-              Kho lớp học
+              {t('source.class')}
             </ButtonPrime>
           </div>
 
@@ -208,12 +210,12 @@ const PersonalQuestionBank = () => {
                 className={cx('selectField')}
                 value={selectedClassId}
                 onChange={(e) => setSelectedClassId(e.target.value)}
-                aria-label="Chọn lớp học"
+                aria-label={t('bank.selectClassAria')}
               >
-                <option value="">-- Chọn lớp học --</option>
+                <option value="">{t('bank.selectClass')}</option>
                 {classes.map((c) => (
                   <option key={c.classId} value={c.classId}>
-                    {c.className || `Lớp ${c.classId}`}
+                    {c.className || t('bank.classFallback', { classId: c.classId })}
                   </option>
                 ))}
               </select>
@@ -224,12 +226,12 @@ const PersonalQuestionBank = () => {
                 className={cx('selectField')}
                 value={examTypeId}
                 onChange={(e) => setExamTypeId(e.target.value)}
-                aria-label="Loại kỳ thi"
+                aria-label={t('info.examTypeAria')}
               >
-                <option value="">-- Chọn loại kỳ thi --</option>
-                {examTypes.map((t) => (
-                  <option key={t.examTypeId} value={t.examTypeId}>
-                    {t.name}
+                <option value="">{t('bank.selectExamType')}</option>
+                {examTypes.map((type) => (
+                  <option key={type.examTypeId} value={type.examTypeId}>
+                    {type.name}
                   </option>
                 ))}
               </select>
@@ -239,10 +241,10 @@ const PersonalQuestionBank = () => {
               className={cx('selectField')}
               value={collectionFilter}
               onChange={(e) => setCollectionFilter(e.target.value)}
-              aria-label="Lọc theo nhóm (Collection)"
+              aria-label={t('bank.collectionFilterAria')}
             >
-              <option value="">-- Tất cả nhóm (Collection) --</option>
-              <option value="__none__">(Chưa gắn nhóm)</option>
+              <option value="">{t('bank.allCollections')}</option>
+              <option value="__none__">{t('bank.noCollectionOption')}</option>
               {buildCollectionTree(collectionsList).map((c) => (
                 <option key={c.collectionId} value={c.collectionId}>
                   {c.depth > 0 ? `    └ ${c.name}` : c.name}
@@ -251,13 +253,13 @@ const PersonalQuestionBank = () => {
             </select>
 
             {selectedIsParent && (
-              <label className={cx('includeChildrenToggle')} title="Gộp câu hỏi của các nhóm con">
+              <label className={cx('includeChildrenToggle')} title={t('bank.includeChildrenTitle')}>
                 <input
                   type="checkbox"
                   checked={includeChildCollections}
                   onChange={(e) => setIncludeChildCollections(e.target.checked)}
                 />
-                <span>Gộp nhóm con</span>
+                <span>{t('bank.includeChildren')}</span>
               </label>
             )}
           </div>
@@ -266,17 +268,17 @@ const PersonalQuestionBank = () => {
         {bankScope === BANK_SCOPE.CLASS && selectedClassId && (
           <div className={cx('card')}>
             <div className={cx('sectionTitle')}>
-              <BookOpen size={18} /> Danh sách câu hỏi theo Chương
+              <BookOpen size={18} /> {t('bank.byChapter')}
             </div>
 
             {chaptersLoading ? (
               <div className={cx('loadingWrap')}>
                 <Spinner animation="border" size="sm" />{' '}
-                <span>Đang tải danh sách chương...</span>
+                <span>{t('bank.loadingChapters')}</span>
               </div>
             ) : chapters.length === 0 ? (
               <Alert variant="info" className="mb-0">
-                Lớp này chưa có chương nào.
+                {t('bank.noChapters')}
               </Alert>
             ) : (
               chapters.map((chapter) => {
@@ -300,7 +302,7 @@ const PersonalQuestionBank = () => {
                       <span className={cx('partName')}>
                         <BookOpen size={20} /> {chapter.title}
                       </span>
-                      <span className={cx('partBadge')}>{displayCount} câu</span>
+                      <span className={cx('partBadge')}>{t('bank.questionCountRaw', { count: displayCount })}</span>
                       {cfg.expanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
                     </button>
 
@@ -309,7 +311,7 @@ const PersonalQuestionBank = () => {
                         {cfg.loading ? (
                           <div className={cx('loadingWrap')}>
                             <Spinner animation="border" size="sm" />{' '}
-                            <span>Đang tải câu hỏi...</span>
+                            <span>{t('parts.loading')}</span>
                           </div>
                         ) : (() => {
                           const visibleChapterQuestions = filterByCollection(cfg.questions || []);
@@ -317,8 +319,8 @@ const PersonalQuestionBank = () => {
                             return (
                               <Alert variant="info" className="mb-0">
                                 {collectionFilter
-                                  ? 'Không có câu hỏi nào thuộc nhóm đã chọn.'
-                                  : 'Chương này chưa có câu hỏi.'}
+                                  ? t('bank.noQuestionsInCollection')
+                                  : t('bank.chapterEmpty')}
                               </Alert>
                             );
                           }
@@ -335,17 +337,17 @@ const PersonalQuestionBank = () => {
                                       {getQuestionDisplayNumber(q, idx)}.
                                     </span>
                                     <span className={cx('questionText')}>
-                                      {q.questionText || '(Không có nội dung)'}
+                                      {q.questionText || t('parts.noContent')}
                                       {collectionName ? (
-                                        <span className={cx('collectionBadge')} title="Nhóm (Collection)">
+                                        <span className={cx('collectionBadge')} title={t('bank.collectionBadgeTitle')}>
                                           <Library size={12} /> {collectionName}
                                         </span>
                                       ) : (
                                         <span
                                           className={cx('collectionBadge', 'collectionBadgeEmpty')}
-                                          title="Chưa gắn nhóm"
+                                          title={t('bank.noCollection')}
                                         >
-                                          Chưa gắn nhóm
+                                          {t('bank.noCollection')}
                                         </span>
                                       )}
                                     </span>
@@ -355,7 +357,7 @@ const PersonalQuestionBank = () => {
                                         variant="ghost"
                                         className={cx('iconBtn')}
                                         onClick={() => setViewingQuestionId(id)}
-                                        aria-label={`Xem câu ${getQuestionDisplayNumber(q, idx)}`}
+                                        aria-label={t('bank.viewQuestion', { number: getQuestionDisplayNumber(q, idx) })}
                                       >
                                         <Eye size={16} />
                                       </ButtonPrime>
@@ -369,7 +371,7 @@ const PersonalQuestionBank = () => {
                                           setEditingPartId(null);
                                           setEditingQuestionId(id);
                                         }}
-                                        aria-label={`Sửa câu ${getQuestionDisplayNumber(q, idx)}`}
+                                        aria-label={t('bank.editQuestion', { number: getQuestionDisplayNumber(q, idx) })}
                                       >
                                         <Pencil size={16} />
                                       </ButtonPrime>
@@ -384,7 +386,7 @@ const PersonalQuestionBank = () => {
                                             chapterId: chapter.chapterId,
                                           })
                                         }
-                                        aria-label={`Xóa câu ${getQuestionDisplayNumber(q, idx)}`}
+                                        aria-label={t('bank.deleteQuestion', { number: getQuestionDisplayNumber(q, idx) })}
                                       >
                                         <Trash2 size={16} />
                                       </ButtonPrime>
@@ -411,8 +413,8 @@ const PersonalQuestionBank = () => {
               <div className={cx('sectionTitle')}>
                 <BookOpen size={18} />{' '}
                 {bankScope === BANK_SCOPE.ADMIN
-                  ? 'Câu hỏi quản trị theo Part'
-                  : 'Danh sách câu hỏi theo Part'}
+                  ? t('bank.adminByPart')
+                  : t('bank.byPart')}
               </div>
 
               {examParts.map((part) => {
@@ -437,7 +439,7 @@ const PersonalQuestionBank = () => {
                         <BookOpen size={20} /> {part.name}
                       </span>
                       <span className={cx('partBadge')}>
-                        {collectionFilter ? `${total}/${totalAll}` : total} câu
+                        {collectionFilter ? t('bank.questionCountRaw', { count: `${total}/${totalAll}` }) : t('parts.questionCount', { count: total })}
                       </span>
                       {cfg.expanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
                     </button>
@@ -447,13 +449,13 @@ const PersonalQuestionBank = () => {
                         {cfg.loading ? (
                           <div className={cx('loadingWrap')}>
                             <Spinner animation="border" size="sm" />{' '}
-                            <span>Đang tải câu hỏi...</span>
+                            <span>{t('parts.loading')}</span>
                           </div>
                         ) : total === 0 ? (
                           <Alert variant="info" className="mb-0">
                             {collectionFilter
-                              ? 'Không có câu hỏi nào thuộc nhóm đã chọn.'
-                              : 'Part này chưa có câu hỏi.'}
+                              ? t('bank.noQuestionsInCollection')
+                              : t('bank.partEmpty')}
                           </Alert>
                         ) : (
                           <ul className={cx('questionList')}>
@@ -468,17 +470,17 @@ const PersonalQuestionBank = () => {
                                     {getQuestionDisplayNumber(q, idx)}.
                                   </span>
                                   <span className={cx('questionText')}>
-                                    {q.questionText || '(Không có nội dung)'}
+                                    {q.questionText || t('parts.noContent')}
                                     {collectionName ? (
-                                      <span className={cx('collectionBadge')} title="Nhóm (Collection)">
+                                      <span className={cx('collectionBadge')} title={t('bank.collectionBadgeTitle')}>
                                         <Library size={12} /> {collectionName}
                                       </span>
                                     ) : (
                                       <span
                                         className={cx('collectionBadge', 'collectionBadgeEmpty')}
-                                        title="Chưa gắn nhóm"
+                                        title={t('bank.noCollection')}
                                       >
-                                        Chưa gắn nhóm
+                                        {t('bank.noCollection')}
                                       </span>
                                     )}
                                   </span>
@@ -488,7 +490,7 @@ const PersonalQuestionBank = () => {
                                       variant="ghost"
                                       className={cx('iconBtn')}
                                       onClick={() => setViewingQuestionId(id)}
-                                      aria-label={`Xem câu ${getQuestionDisplayNumber(q, idx)}`}
+                                      aria-label={t('bank.viewQuestion', { number: getQuestionDisplayNumber(q, idx) })}
                                     >
                                       <Eye size={16} />
                                     </ButtonPrime>
@@ -504,7 +506,7 @@ const PersonalQuestionBank = () => {
                                             setEditingChapterId(null);
                                             setEditingQuestionId(id);
                                           }}
-                                          aria-label={`Sửa câu ${getQuestionDisplayNumber(q, idx)}`}
+                                          aria-label={t('bank.editQuestion', { number: getQuestionDisplayNumber(q, idx) })}
                                         >
                                           <Pencil size={16} />
                                         </ButtonPrime>
@@ -519,7 +521,7 @@ const PersonalQuestionBank = () => {
                                               partId: part.examPartId,
                                             })
                                           }
-                                          aria-label={`Xóa câu ${getQuestionDisplayNumber(q, idx)}`}
+                                          aria-label={t('bank.deleteQuestion', { number: getQuestionDisplayNumber(q, idx) })}
                                         >
                                           <Trash2 size={16} />
                                         </ButtonPrime>
@@ -557,8 +559,8 @@ const PersonalQuestionBank = () => {
         show={Boolean(deleteQuestionTarget)}
         onClose={() => setDeleteQuestionTarget(null)}
         onConfirm={handleDeleteQuestion}
-        title="Xác nhận xóa câu hỏi"
-        message="Bạn có chắc muốn xóa câu hỏi này không? Hành động này không thể hoàn tác."
+        title={t('bank.confirmDeleteTitle')}
+        message={t('bank.confirmDeleteMessage')}
       />
     </div>
   );

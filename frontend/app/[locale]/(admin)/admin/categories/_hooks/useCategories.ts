@@ -6,7 +6,7 @@ import {
     updateCategory,
     deleteCategory,
 } from '@/app/apis/postApi';
-import { useAdminCrud } from '@/app/(admin)/_hooks/useAdminCrud';
+import { useAdminCrud } from '@/app/[locale]/(admin)/_hooks/useAdminCrud';
 import type { CategoryRequest, CategoryResponse } from '@/app/types';
 import {postCategoryKeys} from '@/app/configs/queryKeys';
 

@@ -1,9 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import {Table, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import { IoPencilOutline, IoTrashOutline, IoPlayOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import type { VocabularyAlbumResponse } from '@/app/types';
 import styles from './AlbumManagementTable.module.scss';
 
@@ -16,6 +17,7 @@ type AlbumManagementTableProps = {
 };
 
 const AlbumManagementTable = ({albums, onDelete, onEdit}: AlbumManagementTableProps) => {
+  const t = useTranslations('Vocabulary');
   const router = useRouter();
 
   return (
@@ -23,9 +25,9 @@ const AlbumManagementTable = ({albums, onDelete, onEdit}: AlbumManagementTablePr
       <Table hover className={cx('management-table')}>
         <thead>
           <tr>
-            <th>Tên Album</th>
-            <th>Mô tả</th>
-            <th className="text-center">Hành động</th>
+            <th>{t('albumTable.name')}</th>
+            <th>{t('albumTable.description')}</th>
+            <th className="text-center">{t('albumTable.actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -42,7 +44,7 @@ const AlbumManagementTable = ({albums, onDelete, onEdit}: AlbumManagementTablePr
                 </td>
                 <td>
                   <div className={cx('action-group')}>
-                    <OverlayTrigger overlay={<Tooltip>Học ngay</Tooltip>}>
+                    <OverlayTrigger overlay={<Tooltip>{t('albumTable.study')}</Tooltip>}>
                       <Button
                         variant="link"
                         className={cx('btn-action', 'stats')}
@@ -55,7 +57,7 @@ const AlbumManagementTable = ({albums, onDelete, onEdit}: AlbumManagementTablePr
                       </Button>
                     </OverlayTrigger>
 
-                    <OverlayTrigger overlay={<Tooltip>Sửa Album</Tooltip>}>
+                    <OverlayTrigger overlay={<Tooltip>{t('albumTable.edit')}</Tooltip>}>
                       <Button
                         variant="link"
                         className={cx('btn-action', 'edit')}
@@ -68,7 +70,7 @@ const AlbumManagementTable = ({albums, onDelete, onEdit}: AlbumManagementTablePr
                       </Button>
                     </OverlayTrigger>
 
-                    <OverlayTrigger overlay={<Tooltip>Xóa Album</Tooltip>}>
+                    <OverlayTrigger overlay={<Tooltip>{t('albumTable.delete')}</Tooltip>}>
                       <Button
                         variant="link"
                         className={cx('btn-action', 'delete')}

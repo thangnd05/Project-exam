@@ -1,0 +1,371 @@
+{
+  "stats": {
+    "loading": "Đang tải số liệu...",
+    "loadError": "Không tải được số liệu thống kê. Vui lòng thử lại."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Tổng quan hệ thống WinDe Exam",
+    "heatmapTitle": "Lượt truy cập theo ngày & giờ",
+    "visitsToday": "Lượt truy cập hôm nay",
+    "today": "Hôm nay",
+    "tests": "Bài thi",
+    "testsSub": "{taken} lượt · {completed} hoàn thành",
+    "questions": "Câu hỏi",
+    "questionBank": "Ngân hàng câu hỏi",
+    "classes": "Lớp học"
+  },
+  "analytics": {
+    "title": "Thống kê & Phân tích",
+    "description": "Phân tích chi tiết về hệ thống WinDe Exam",
+    "monthLabel": "Tháng {month}/{year}",
+    "yearOption": "Năm {year}",
+    "totalUsers": "Tổng người dùng",
+    "totalClasses": "Tổng số lớp học",
+    "totalAttempts": "Tổng lượt thi",
+    "examTypes": "Loại kỳ thi",
+    "locationsTitle": "Vị trí truy cập",
+    "publicVisitsInMonth": "lượt truy cập từ IP công cộng trong tháng {month}/{year}",
+    "publicVisits": "lượt truy cập từ IP công cộng",
+    "topCountries": "Top quốc gia",
+    "monthlyActivity": "Hoạt động theo tháng (truy cập, lượt thi & tỉ lệ hoàn thành)",
+    "monthlyNewUsers": "Người dùng mới theo tháng",
+    "attemptStatus": "Tình trạng lượt thi",
+    "topTests": "Bài thi nhiều nhất",
+    "topPracticeTests": "Đề thi ôn luyện nhiều nhất",
+    "status": {
+      "completed": "Hoàn thành",
+      "inProgress": "Đang làm",
+      "expired": "Hết hạn"
+    }
+  },
+  "auditLogin": {
+    "title": "Audit đăng nhập",
+    "description": "Lịch sử đăng nhập thành công / thất bại (bảng login_audit  dữ liệu demo).",
+    "time": "Thời gian",
+    "status": "Trạng thái",
+    "success": "Thành công",
+    "failed": "Thất bại",
+    "failureReason": "Lý do thất bại",
+    "searchPlaceholder": "Tìm theo user ID, action, IP, user agent, lý do...",
+    "allStatuses": "Tất cả trạng thái",
+    "empty": "Không có bản ghi phù hợp bộ lọc hiện tại.",
+    "itemLabel": "bản ghi"
+  },
+  "auditLogs": {
+    "description": "Theo doi thao tac quan tri va su kien nhay cam trong he thong.",
+    "time": "Thời gian",
+    "action": "Hành động",
+    "details": "Nội dung thay đổi",
+    "actor": "Người thực hiện",
+    "status": "Trạng thái",
+    "success": "Thanh cong",
+    "failed": "That bai",
+    "searchPlaceholder": "Tim action, endpoint, resource, nguoi thao tac...",
+    "allStatuses": "Tat ca trang thai",
+    "itemLabel": "bản ghi"
+  },
+  "categories": {
+    "title": "Quản lý danh mục bài viết",
+    "description": "Tạo và quản lý các danh mục blog",
+    "add": "Thêm danh mục",
+    "searchPlaceholder": "Tìm kiếm danh mục...",
+    "itemLabel": "danh mục",
+    "name": "Tên danh mục",
+    "namePlaceholder": "Nhập tên danh mục...",
+    "editTitle": "Sửa danh mục",
+    "createTitle": "Thêm danh mục mới",
+    "deleteTitle": "Xác nhận xóa danh mục",
+    "deleteMessage": "Bạn có chắc chắn muốn xóa danh mục \"{name}\"? Hành động này không thể hoàn tác.",
+    "toast": {
+      "deleted": "Xóa danh mục thành công",
+      "deleteError": "Lỗi khi xóa danh mục",
+      "updated": "Cập nhật danh mục thành công",
+      "created": "Tạo danh mục thành công",
+      "saveError": "Lỗi khi lưu danh mục"
+    }
+  },
+  "certificates": {
+    "title": "Chứng chỉ",
+    "description": "Cấu hình mẫu chứng chỉ theo loại đề và quản lý các chứng chỉ đã cấp cho người học.",
+    "addTemplate": "Thêm mẫu chứng chỉ",
+    "stats": {
+      "templates": "Mẫu chứng chỉ",
+      "activeTemplates": "Mẫu đang bật",
+      "validCertificates": "Chứng chỉ còn hiệu lực"
+    },
+    "tabs": {
+      "templates": "Mẫu chứng chỉ",
+      "issued": "Chứng chỉ đã cấp"
+    },
+    "columns": {
+      "examType": "Loại đề",
+      "title": "Tên chứng chỉ",
+      "passScore": "Điểm đạt",
+      "validity": "Thời hạn",
+      "issued": "Đã cấp",
+      "status": "Trạng thái",
+      "recipient": "Người nhận",
+      "code": "Mã chứng chỉ",
+      "test": "Bài thi",
+      "score": "Điểm",
+      "issuedAt": "Ngày cấp"
+    },
+    "validMonths": "{count} tháng",
+    "noExpiry": "Vô thời hạn",
+    "enabled": "Đang bật",
+    "disabled": "Đang tắt",
+    "statusRevoked": "Đã thu hồi",
+    "statusExpired": "Hết hạn",
+    "statusActive": "Còn hiệu lực",
+    "allStatuses": "Tất cả trạng thái",
+    "templateSearchPlaceholder": "Tìm theo tên chứng chỉ hoặc loại đề...",
+    "templatesEmpty": "Chưa có mẫu chứng chỉ nào. Hãy tạo mẫu cho loại đề bạn muốn cấp chứng chỉ.",
+    "issuedSearchPlaceholder": "Tìm theo tên người nhận hoặc mã chứng chỉ...",
+    "issuedEmpty": "Chưa có chứng chỉ nào được cấp.",
+    "itemLabel": "chứng chỉ",
+    "revokeTitle": "Thu hồi chứng chỉ",
+    "deletePermanently": "Xoá hẳn chứng chỉ",
+    "revoke": "Thu hồi",
+    "deleteTemplateMessage": "Xoá mẫu chứng chỉ \"{title}\"? Loại đề này sẽ ngừng cấp chứng chỉ mới. Chứng chỉ đã cấp vẫn giữ nguyên vì đã lưu bản chụp riêng.",
+    "deleteCertificateMessage": "Xoá hẳn chứng chỉ {code} của {name}? Mã này sẽ không tra cứu được nữa và không khôi phục lại được. Nếu chỉ muốn vô hiệu hoá mà vẫn giữ dấu vết thì dùng thu hồi.",
+    "revokeMessage": "Thu hồi chứng chỉ {code} của {name}? Trang tra cứu sẽ báo chứng chỉ không còn giá trị, và người này có thể được cấp lại nếu đạt ở lần thi sau.",
+    "errors": {
+      "examTypeRequired": "Vui lòng chọn loại đề.",
+      "passScoreNumber": "Điểm đạt phải là một con số.",
+      "titleRequired": "Tên chứng chỉ không được để trống.",
+      "saveFailed": "Không thể lưu mẫu chứng chỉ. Vui lòng thử lại.",
+      "deleteTemplateFailed": "Không thể xoá mẫu chứng chỉ này.",
+      "deleteCertificateFailed": "Không thể xoá chứng chỉ này.",
+      "revokeFailed": "Không thể thu hồi chứng chỉ này.",
+      "loadTemplates": "Không tải được danh sách mẫu chứng chỉ.",
+      "loadIssued": "Không tải được danh sách chứng chỉ đã cấp."
+    },
+    "form": {
+      "previewTitle": "Chứng nhận hoàn thành",
+      "previewExamType": "Loại đề",
+      "previewRecipient": "Nguyễn Văn A",
+      "editTitle": "Cập nhật mẫu chứng chỉ",
+      "createTitle": "Tạo mẫu chứng chỉ",
+      "create": "Tạo mới",
+      "examType": "Loại đề",
+      "selectExamType": "-- Chọn loại đề --",
+      "examTypeHelp": "Mỗi loại đề chỉ có một mẫu, và không đổi được sau khi tạo.",
+      "passScore": "Điểm đạt",
+      "passScorePlaceholder": "VD: 720",
+      "passScoreHelp": "Đạt từ mốc này trở lên là được cấp chứng chỉ. Thang điểm theo cách chấm của loại đề (AWS: 100-1000, chuẩn AWS là 720).",
+      "title": "Tên chứng chỉ",
+      "titlePlaceholder": "VD: AWS Certified Solutions Architect  Associate",
+      "subtitle": "Dòng phụ",
+      "subtitlePlaceholder": "VD: Chứng nhận hoàn thành bài thi thử toàn phần",
+      "bodyText": "Nội dung chính",
+      "bodyTextHelp": "Câu nằm dưới tên người nhận. Bỏ trống = dùng câu mặc định theo tên loại đề. Gõ <code>{token}</code> ở chỗ muốn chèn tên loại đề (sẽ được in đậm).",
+      "footerNote": "Ghi chú cuối chứng chỉ",
+      "validMonths": "Thời hạn (tháng)",
+      "validMonthsPlaceholder": "Bỏ trống = vô thời hạn",
+      "accentColor": "Màu nhấn",
+      "accentColorHint": "Màu viền và tiêu đề chứng chỉ",
+      "activeLabel": "Đang bật (tắt thì ngừng cấp chứng chỉ mới)",
+      "issuerName": "Đơn vị cấp",
+      "issuerPlaceholder": "VD: English Exam Platform",
+      "signatureName": "Người ký",
+      "signatureTitle": "Chức danh",
+      "logoUrl": "Logo (URL)",
+      "signatureImageUrl": "Ảnh chữ ký (URL)",
+      "backgroundUrl": "Ảnh nền (URL)",
+      "preview": "Xem trước"
+    }
+  },
+  "coins": {
+    "title": "Quản lý xu",
+    "description": "Xem và điều chỉnh số xu của người dùng.",
+    "add": "Thêm ví xu",
+    "editTitle": "Cập nhật số xu",
+    "searchPlaceholder": "Tìm theo tên đăng nhập, họ tên hoặc email...",
+    "itemLabel": "ví",
+    "user": "Người dùng",
+    "balance": "Số xu",
+    "updatedAt": "Cập nhật",
+    "selectUser": "-- Chọn người dùng --",
+    "deleteTitle": "Xác nhận xóa ví xu",
+    "deleteMessage": "Bạn có chắc muốn xóa ví xu của \"{name}\" không?",
+    "errors": {
+      "balanceInvalid": "Số xu phải là số không âm.",
+      "userRequired": "Vui lòng chọn người dùng.",
+      "saveFailed": "Không thể lưu ví xu. Vui lòng thử lại.",
+      "deleteFailed": "Không thể xóa ví xu.",
+      "loadFailed": "Không thể tải danh sách ví xu."
+    }
+  },
+  "cosmetics": {
+    "title": "Cửa hàng xu  Trang trí",
+    "description": "Quản lý khung avatar & huy hiệu user đổi bằng xu.",
+    "add": "Thêm vật phẩm",
+    "editTitle": "Cập nhật vật phẩm",
+    "searchPlaceholder": "Tìm theo tên...",
+    "itemLabel": "vật phẩm",
+    "preview": "Xem trước",
+    "name": "Tên",
+    "type": "Loại",
+    "cost": "Giá xu",
+    "status": "Trạng thái",
+    "onSale": "Đang bán",
+    "off": "Tắt",
+    "fieldDescription": "Mô tả",
+    "frameStyle": "Kiểu khung",
+    "displayOrder": "Thứ tự hiển thị",
+    "types": {
+      "frame": "Khung avatar",
+      "badge": "Huy hiệu"
+    },
+    "frameStyles": {
+      "color": "Màu / gradient",
+      "effect": "Hiệu ứng CSS",
+      "image": "Ảnh overlay"
+    },
+    "effects": {
+      "glow": "Glow (phát sáng vàng)",
+      "pulse": "Pulse (nhịp xanh)",
+      "rotate": "Rotate (viền xoay)",
+      "rainbow": "Rainbow (cầu vồng xoay)"
+    },
+    "badgeImageUrl": "URL ảnh huy hiệu (PNG/GIF)",
+    "badgeImagePlaceholder": "https://.../badge.gif  để trống nếu dùng emoji",
+    "badgeImageHelp": "Có URL ảnh thì dùng ảnh; bỏ trống thì dùng emoji bên dưới.",
+    "emojiPlaceholder": "vd: 👑 🏆 ⭐ 🔥",
+    "colorPlaceholder": "vd: linear-gradient(135deg,#f59f00,#f08c00) hoặc #ff5252",
+    "effect": "Hiệu ứng",
+    "selectEffect": "-- Chọn hiệu ứng --",
+    "frameImageUrl": "URL ảnh khung (PNG/GIF trong suốt)",
+    "frameImageHelp": "Ảnh nên có nền trong suốt, giữa rỗng để lộ avatar.",
+    "deleteTitle": "Xác nhận xóa vật phẩm",
+    "deleteMessage": "Bạn có chắc muốn xóa \"{name}\" không?",
+    "errors": {
+      "loadFailed": "Không thể tải danh sách vật phẩm.",
+      "nameRequired": "Tên không được để trống.",
+      "costInvalid": "Giá xu phải là số không âm.",
+      "saveFailed": "Không thể lưu vật phẩm.",
+      "deleteFailed": "Không thể xóa vật phẩm."
+    }
+  },
+  "emails": {
+    "title": "Email hệ thống",
+    "description": "Sửa nội dung email tự động và soạn email gửi cho người dùng.",
+    "compose": "Soạn email mới",
+    "tabs": {
+      "auto": "Mẫu tự động",
+      "manual": "Soạn & gửi"
+    },
+    "stats": {
+      "composed": "Email đã soạn",
+      "sentPage": "Đã gửi (trang này)",
+      "failedPage": "Lỗi (trang này)",
+      "pendingPage": "Đang chờ (trang này)"
+    },
+    "columns": {
+      "status": "Trạng thái",
+      "sent": "Đã gửi",
+      "failed": "Lỗi",
+      "template": "Mẫu email",
+      "subject": "Tiêu đề",
+      "recipients": "Người nhận",
+      "pending": "Đang chờ",
+      "createdAt": "Ngày tạo"
+    },
+    "enabled": "Đang bật",
+    "disabled": "Đang tắt",
+    "searchPlaceholder": "Tìm theo tên mẫu hoặc mã...",
+    "autoEmpty": "Chưa có mẫu email nào.",
+    "manualEmpty": "Chưa có email nào được soạn.",
+    "itemLabel": "email",
+    "actions": {
+      "edit": "Sửa nội dung",
+      "log": "Nhật ký gửi",
+      "send": "Chọn người nhận và gửi"
+    },
+    "deleteTitle": "Xác nhận xóa email",
+    "deleteMessage": "Xóa \"{name}\" sẽ xóa cả nhật ký gửi của nó. Bạn có chắc không?",
+    "toast": {
+      "deleted": "Đã xóa email."
+    },
+    "errors": {
+      "deleteFailed": "Không xóa được email."
+    },
+    "recipients": {
+      "title": "Nhật ký gửi: {name}",
+      "recipient": "Người nhận",
+      "deletedAccount": "(tài khoản đã xóa)",
+      "status": "Trạng thái",
+      "error": "Lỗi",
+      "sentAt": "Gửi lúc",
+      "queuedAt": "Xếp hàng lúc",
+      "statuses": {
+        "SENT": "Đã gửi",
+        "FAILED": "Lỗi",
+        "PENDING": "Đang chờ"
+      },
+      "stats": {
+        "total": "Tổng lượt gửi",
+        "sent": "Thành công",
+        "failed": "Lỗi",
+        "pending": "Đang chờ"
+      },
+      "retry": "Gửi lại {count} email lỗi",
+      "autoNoRetry": "Email tự động không gửi lại được  nội dung phụ thuộc dữ liệu của lần gửi đó.",
+      "empty": "Email này chưa gửi cho ai.",
+      "itemLabel": "lượt gửi",
+      "retryQueued": "Đã đưa các email lỗi vào hàng gửi lại.",
+      "retryFailed": "Không gửi lại được."
+    },
+    "send": {
+      "title": "Gửi email: {name}",
+      "submit": "Gửi cho {count} người",
+      "searchPlaceholder": "Tìm theo tên, tài khoản hoặc email...",
+      "allRoles": "Mọi vai trò",
+      "premiumFilters": {
+        "all": "Tất cả",
+        "premium": "Premium",
+        "normal": "Thường"
+      },
+      "selectAllFiltered": "Chọn tất cả {count} người đang lọc",
+      "selectedCount": "Đã chọn: {count}",
+      "loadingUsers": "Đang tải danh sách người dùng...",
+      "noMatches": "Không có người dùng nào khớp bộ lọc.",
+      "noRecipients": "Hãy chọn ít nhất một người nhận.",
+      "queued": "Đã đưa {count} email vào hàng gửi.",
+      "sendFailed": "Không gửi được email."
+    },
+    "editor": {
+      "editTitle": "Sửa nội dung: {name}",
+      "createTitle": "Soạn email mới",
+      "submit": "Lưu nội dung",
+      "saved": "Đã lưu nội dung email.",
+      "testQueued": "Đã đưa email thử vào hàng gửi, kiểm tra hộp thư sau ít giây.",
+      "autoTemplate": "Mẫu tự động <b>{code}</b>  {description}",
+      "name": "Tên gợi nhớ",
+      "namePlaceholder": "Ví dụ: Thông báo bảo trì hệ thống",
+      "subject": "Tiêu đề email",
+      "body": "Nội dung",
+      "handwrittenWarning": "Nội dung này có khối HTML viết tay (nút bấm, khung màu). Trình soạn thảo không hiểu chúng nên nếu bạn sửa ở đây thì các khối đó sẽ mất định dạng.",
+      "bodyPlaceholder": "Viết nội dung email tại đây...",
+      "layoutHint": "Đây là khung bọc ngoài mọi email nên chỉ sửa được ở dạng HTML. Giữ nguyên vị trí <code>{token}</code>  đó là chỗ nội dung từng email được chèn vào.",
+      "variablesHint": "Biến dùng được (bấm để chèn vào cuối nội dung):",
+      "activeAuto": "Đang bật (tắt là ngừng gửi loại email này)",
+      "active": "Đang bật",
+      "preview": "Xem trước",
+      "testTo": "Gửi thử tới",
+      "testToPlaceholder": "Bỏ trống để gửi về email của bạn",
+      "testSend": "Gửi thử",
+      "previewHint": "Bản xem trước (đã lồng vào khung chung, biến thay bằng dữ liệu của bạn):",
+      "previewFrameTitle": "Xem trước email",
+      "errors": {
+        "subjectRequired": "Tiêu đề email không được để trống.",
+        "bodyRequired": "Nội dung email không được để trống.",
+        "saveFailed": "Không thể lưu email. Vui lòng thử lại.",
+        "previewFailed": "Không tạo được bản xem trước.",
+        "saveBeforeTest": "Hãy lưu email trước khi gửi thử.",
+        "testFailed": "Không gửi thử được."
+      }
+    }
+  }
+}

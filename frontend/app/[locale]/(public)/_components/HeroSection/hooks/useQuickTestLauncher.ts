@@ -1,7 +1,8 @@
 'use client';
 
 import {useCallback, useState} from 'react';
-import {useRouter} from 'next/navigation';
+import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
+import {useTranslations} from 'next-intl';
 
 import {getUserTarget} from '@/app/apis/userTargetApi';
 import routes, { buildTestPath } from '@/app/configs/Routes';
@@ -12,7 +13,9 @@ import {buildLoginUrl} from '@/app/features/auth/authRedirect';
 // Luồng bắt đầu đề kiểm tra nhanh, dùng chung cho hero trang chủ và kho kỳ thi:
 // chọn đề -> hộp xác nhận trình độ -> vào làm bài hoặc sinh lộ trình theo syllabus.
 export function useQuickTestLauncher() {
+  const t = useTranslations('Home.quickTest');
   const router = useRouter();
+  const localizeHref = useLocalizeHref();
   const {isAuthenticated, loading: authLoading} = useAuth();
   const [pendingTest, setPendingTest] = useState<QuickChallengeCardResponse | null>(null);
 
@@ -28,9 +31,9 @@ export function useQuickTestLauncher() {
   const confirmStart = useCallback(
     (test: QuickChallengeCardResponse) => {
       setPendingTest(null);
-      router.push(buildTestPath(test, 'start'));
+      router.push(localizeHref(buildTestPath(test, 'start')));
     },
-    [router],
+    [router, localizeHref],
   );
 
   const startSyllabusPlan = useCallback(
@@ -38,7 +41,7 @@ export function useQuickTestLauncher() {
       setPendingTest(null);
       const examTypeId = test.examTypeId;
       if (!examTypeId) {
-        router.push(routes.examTypes);
+        router.push(localizeHref(routes.examTypes));
         return;
       }
 
@@ -54,9 +57,9 @@ export function useQuickTestLauncher() {
 
       // Khách đăng nhập trước, xong quay về đúng bước đặt mục tiêu rồi sinh lộ trình.
       if (!authLoading && !isAuthenticated) {
-        router.push(buildLoginUrl(targetUrl, {
-          flash: 'Đăng nhập để xây lộ trình cá nhân hóa cho kỳ thi này.',
-        }));
+        router.push(localizeHref(buildLoginUrl(targetUrl, {
+          flash: t('loginFlash'),
+        })));
         return;
       }
 
@@ -64,15 +67,15 @@ export function useQuickTestLauncher() {
       try {
         const target = await getUserTarget(examTypeId);
         if (!target?.hasTarget) {
-          router.push(targetUrl);
+          router.push(localizeHref(targetUrl));
           return;
         }
       } catch {
         // Không kiểm tra được mục tiêu thì cứ sang trang sinh lộ trình, ở đó vẫn xử lý được.
       }
-      router.push(planUrl);
+      router.push(localizeHref(planUrl));
     },
-    [router, isAuthenticated, authLoading],
+    [router, isAuthenticated, authLoading, t, localizeHref],
   );
 
   return {

@@ -7,7 +7,7 @@ import {getQuickChallengeLeaderboard} from '@/app/apis/userTestApi';
 import {examTypeKeys} from '@/app/configs/queryKeys';
 import type {QuickLeaderboardEntry} from '@/app/types/attempt';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
-import {badgeUrl, parseCode, parseVendor, type Vendor} from '@/app/(public)/_lib/certificationMeta';
+import {badgeUrl, parseCode, parseVendor, type Vendor} from '@/app/[locale]/(public)/_lib/certificationMeta';
 
 export type RankExam = {
   examTypeId: string;
@@ -59,8 +59,8 @@ export const initials = (name: string) => {
   return (words[words.length - 2][0] + words[words.length - 1][0]).toUpperCase();
 };
 
-export const displayName = (entry: QuickLeaderboardEntry) =>
-  entry.displayName || entry.userName || 'Ẩn danh';
+export const displayName = (entry: QuickLeaderboardEntry, anonymous: string) =>
+  entry.displayName || entry.userName || anonymous;
 
 // API chỉ trả bảng xếp hạng theo từng kỳ thi, nên lấy top `limit` của mỗi kỳ rồi gộp và xếp lại.
 export function useRankBoard(limit: number, enabled = true) {

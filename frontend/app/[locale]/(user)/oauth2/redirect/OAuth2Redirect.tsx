@@ -1,15 +1,18 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/app/hooks/useAuth';
 import { fetchCurrentUser } from '@/app/features/auth/hooks/useAuthActions';
 import { claimGuestAfterLogin, takeOAuthRedirect } from '@/app/features/auth/authRedirect';
+import { localizeHref, splitLocale } from '@/app/i18n/routing';
 
 // Quá thời gian này mà chưa lấy được tài khoản thì trả về trang đăng nhập, không để người dùng đứng chờ mãi.
 const SYNC_TIMEOUT_MS = 15000;
 
 function OAuth2Redirect() {
+    const t = useTranslations('Auth');
     const router = useRouter();
     const { login } = useAuth();
 
@@ -19,7 +22,9 @@ function OAuth2Redirect() {
         const fail = (error: 'oauth2_failed' | 'oauth2_timeout') => {
             if (finished) return;
             finished = true;
-            router.replace(`/login?error=${error}`);
+            // Backend trả về /oauth2/redirect không tiền tố, nên lấy ngôn ngữ từ trang đã lưu trước khi đi OAuth.
+            const { locale } = splitLocale(takeOAuthRedirect('/'));
+            router.replace(localizeHref(`/login?error=${error}`, locale));
         };
 
         const timeoutId = setTimeout(() => fail('oauth2_timeout'), SYNC_TIMEOUT_MS);
@@ -59,7 +64,7 @@ function OAuth2Redirect() {
     return (
         <div className="flex justify-center items-center h-screen">
             <div className="text-center">
-                <p className="text-lg">Đang hoàn tất đăng nhập...</p>
+                <p className="text-lg">{t('oauth.completing')}</p>
 
             </div>
         </div>

@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
 import { formatDateTime24 as formatDateTime } from '@/app/utils/format-date-time';
@@ -21,6 +22,8 @@ function pct(v?: number | string | null) {
 }
 
 function TaskHistory() {
+  const t = useTranslations('LearningPlans');
+  const tc = useTranslations('Common');
   const { learningPlanId, taskId } = useParams<{ learningPlanId: string; taskId: string }>();
   const { plan, sessions, isLoading: loading, sessionsError, error } = useTaskHistory(
     learningPlanId,
@@ -37,7 +40,7 @@ function TaskHistory() {
   if (loading) {
     return (
       <div className={cx('wrapper')}>
-        <div className={cx('loading')}>Đang tải...</div>
+        <div className={cx('loading')}>{tc('loading')}</div>
       </div>
     );
   }
@@ -52,9 +55,9 @@ function TaskHistory() {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('alert', 'alertWarning')}>
-          <span>Không tìm thấy ải này trong lộ trình.</span>
+          <span>{t('history.notFound')}</span>
           <Link href={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnOutline', 'btnSm')}>
-            Về lộ trình
+            {t('history.backToPlan')}
           </Link>
         </div>
       </div>
@@ -73,39 +76,42 @@ function TaskHistory() {
           href={`/learning-plans/${learningPlanId}`}
           className={cx('btn', 'btnGhost', 'btnSm')}
         >
-          ← Lộ trình {plan.planSequence ?? '?'}
+          ← {t('common.planName', { sequence: plan.planSequence ?? '?' })}
         </Link>
         <Link
           href={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}
           className={cx('btn', 'btnPrimary', 'btnSm')}
         >
-          Học tiếp ải này
+          {t('history.continueTask')}
         </Link>
       </div>
 
       <h2 className={cx('title')}>
-        {task.examPartName || 'Phần'} · Ải {taskDisplayName(task)}
+        {t('common.taskTitle', {
+          part: task.examPartName || t('common.partFallback'),
+          task: taskDisplayName(t, task),
+        })}
       </h2>
       <div className={cx('actionBar')} style={{ marginBottom: '2rem' }}>
         <span className={cx('badge', 'badgeMuted')}>
-          Trạng thái: {taskStatusLabel(task.status)}
+          {t('history.status', { status: taskStatusLabel(t, task.status) })}
         </span>
         <span className={cx('badge', 'badgeMuted')}>
-          Cần ≥ {pass != null ? `${pass}%` : '-'} để vượt ải
+          {t('history.passNeeded', { pass: pass != null ? `${pass}%` : '-' })}
         </span>
       </div>
 
       <div className={cx('statGrid')}>
         <div className={cx('statTile')}>
-          <div className={cx('statLabel')}>Lúc chẩn đoán</div>
+          <div className={cx('statLabel')}>{t('history.baseline')}</div>
           <div className={cx('statValue')}>{pct(baseline)}</div>
           <div className={cx('statHint')}>
-            Sai {task.wrongCountAtDiagnosis ?? '-'} câu
+            {t('history.wrongCount', { count: task.wrongCountAtDiagnosis ?? '-' })}
           </div>
         </div>
 
         <div className={cx('statTile')}>
-          <div className={cx('statLabel')}>Tốt nhất khi luyện</div>
+          <div className={cx('statLabel')}>{t('history.best')}</div>
           <div className={cx('statValue')}>{pct(best)}</div>
           {delta != null && (
             <div
@@ -115,23 +121,23 @@ function TaskHistory() {
                 muted: delta === 0,
               })}
             >
-              {delta > 0 ? '+' : ''}{delta.toFixed(1)}% vs chẩn đoán
+              {t('history.deltaVsBaseline', { delta: `${delta > 0 ? '+' : ''}${delta.toFixed(1)}` })}
             </div>
           )}
         </div>
 
         <div className={cx('statTile')}>
-          <div className={cx('statLabel')}>Số lần luyện</div>
+          <div className={cx('statLabel')}>{t('history.attempts')}</div>
           <div className={cx('statValue')}>{task.attemptCount ?? 0}</div>
-          <div className={cx('statHint')}>lượt luyện</div>
+          <div className={cx('statHint')}>{t('history.attemptsUnit')}</div>
         </div>
 
         <div className={cx('statTile')}>
-          <div className={cx('statLabel')}>Ngưỡng vượt ải</div>
+          <div className={cx('statLabel')}>{t('history.threshold')}</div>
           <div className={cx('statValue')}>{pass != null ? `${pass}%` : '-'}</div>
           {best != null && pass != null && (
             <div className={cx('statHint', best >= pass ? 'successText' : 'warningText')}>
-              {best >= pass ? 'Đã đạt ngưỡng' : `Còn ${(pass - best).toFixed(1)}%`}
+              {best >= pass ? t('history.reached') : t('history.remaining', { gap: (pass - best).toFixed(1) })}
             </div>
           )}
         </div>
@@ -139,38 +145,38 @@ function TaskHistory() {
 
       {baseline != null && best != null && (
         <div className={cx('card')}>
-          <div className={cx('cardHeader')}>Tiến triển (chẩn đoán → tốt nhất)</div>
+          <div className={cx('cardHeader')}>{t('history.progressCard')}</div>
           <div className={cx('cardBody')}>
             <div className={cx('progressBar')}>
               <div
                 className={cx('progressBaseline')}
                 style={{ width: `${Math.min(100, baseline)}%` }}
-                title={`Ban đầu ${pct(baseline)}`}
+                title={t('history.baselineTitle', { value: pct(baseline) })}
               />
               <div
                 className={cx('progressBest', { reached: pass != null && best >= pass })}
                 style={{ width: `${Math.min(100, best)}%` }}
-                title={`Tốt nhất ${pct(best)}`}
+                title={t('history.bestTitle', { value: pct(best) })}
               />
               {pass != null && (
                 <div
                   className={cx('progressPassLine')}
                   style={{ left: `${pass}%` }}
-                  title={`Ngưỡng vượt ải ${pass}%`}
+                  title={t('history.thresholdTitle', { pass })}
                 />
               )}
             </div>
             <div className={cx('progressLegend')}>
               <span>0%</span>
               <span className={cx('dangerText')}>
-                Pass {pass != null ? `${pass}%` : '-'}
+                {t('history.passLegend', { pass: pass != null ? `${pass}%` : '-' })}
               </span>
               <span>100%</span>
             </div>
             <div style={{ marginTop: '0.8rem', fontSize: 'var(--font-size-sm)' }}>
-              <span className={cx('badge', 'badgeWarning')}>Ban đầu</span>{' '}
+              <span className={cx('badge', 'badgeWarning')}>{t('history.baselineBadge')}</span>{' '}
               {pct(baseline)}{' '}·{' '}
-              <span className={cx('badge', pass != null && best >= pass ? 'badgeSuccess' : 'badgePrimary')}>Tốt nhất</span>{' '}
+              <span className={cx('badge', pass != null && best >= pass ? 'badgeSuccess' : 'badgePrimary')}>{t('history.bestBadge')}</span>{' '}
               {pct(best)}
             </div>
           </div>
@@ -179,7 +185,7 @@ function TaskHistory() {
 
       {task.studyResource && (
         <div className={cx('card')}>
-          <div className={cx('cardHeader')}>Tài liệu được gắn cho ải</div>
+          <div className={cx('cardHeader')}>{t('history.resourceCard')}</div>
           <div className={cx('cardBody')}>
             <RecoveryResourceLink resource={task.studyResource}>
               {task.studyResource.title}
@@ -194,7 +200,7 @@ function TaskHistory() {
       )}
 
       <div className={cx('card')}>
-        <div className={cx('cardHeader')}>Lịch sử các lần luyện</div>
+        <div className={cx('cardHeader')}>{t('history.sessionsCard')}</div>
         {sessionsError && (
           <div className={cx('cardBody')}>
             <div className={cx('alert', 'alertDanger')} style={{ marginBottom: 0 }}>
@@ -204,7 +210,7 @@ function TaskHistory() {
         )}
         {!sessionsError && sessions.length === 0 && (
           <div className={cx('cardBody', 'muted')}>
-            Chưa có lần luyện nào cho ải này.
+            {t('history.noSessions')}
           </div>
         )}
         {!sessionsError && sessions.length > 0 && (
@@ -212,12 +218,12 @@ function TaskHistory() {
             <thead>
               <tr>
                 <th>#</th>
-                <th>Bắt đầu</th>
-                <th>Nộp</th>
-                <th className={cx('right')}>Số câu</th>
-                <th className={cx('right')}>Độ chính xác</th>
-                <th>Kết quả</th>
-                <th className={cx('right')}>Bài làm</th>
+                <th>{t('history.table.started')}</th>
+                <th>{t('history.table.submitted')}</th>
+                <th className={cx('right')}>{t('history.table.questions')}</th>
+                <th className={cx('right')}>{t('history.table.accuracy')}</th>
+                <th>{t('history.table.result')}</th>
+                <th className={cx('right')}>{t('history.table.review')}</th>
               </tr>
             </thead>
             <tbody>
@@ -232,11 +238,11 @@ function TaskHistory() {
                   </td>
                   <td>
                     {s.status === SessionStatus.IN_PROGRESS ? (
-                      <span className={cx('badge', 'badgeWarning')}>Đang làm</span>
+                      <span className={cx('badge', 'badgeWarning')}>{t('history.inProgress')}</span>
                     ) : s.passed === true ? (
-                      <span className={cx('badge', 'badgeSuccess')}>Đạt</span>
+                      <span className={cx('badge', 'badgeSuccess')}>{t('history.passed')}</span>
                     ) : s.passed === false ? (
-                      <span className={cx('badge', 'badgeMuted')}>Chưa đạt</span>
+                      <span className={cx('badge', 'badgeMuted')}>{t('history.failed')}</span>
                     ) : (
                       <span className={cx('muted', 'small')}>-</span>
                     )}
@@ -247,7 +253,7 @@ function TaskHistory() {
                         href={`/learning-plans/${learningPlanId}/sessions/${s.sessionId}/review?taskId=${taskId}`}
                         className={cx('btn', 'btnOutline', 'btnSm')}
                       >
-                        Xem đáp án
+                        {t('history.viewAnswers')}
                       </Link>
                     ) : (
                       <span className={cx('muted', 'small')}>-</span>

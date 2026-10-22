@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Badge, Button, Form } from 'react-bootstrap';
 import { Edit, Plus, Trash2, ShieldX } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
@@ -17,8 +18,8 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '@/app/(admin)/_components/common';
-import type { AdminTableColumn } from '@/app/(admin)/_components/common/AdminTable';
+} from '@/app/[locale]/(admin)/_components/common';
+import type { AdminTableColumn } from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import { CertificateStatus } from '@/app/enums';
 import type {
   CertificateResponse,
@@ -69,9 +70,12 @@ const buildPayload = (formState: CertificateTemplateFormState): CertificateTempl
   active: formState.active !== false,
 });
 
-const formatDate = (value?: string) => (value ? new Date(value).toLocaleDateString('vi-VN') : '-');
+const formatDate = (locale: string, value?: string) =>
+  value ? new Date(value).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN') : '-';
 
 function CertificatesManagement() {
+  const t = useTranslations('AdminSystem.certificates');
+  const locale = useLocale();
   const [tab, setTab] = useState('templates');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -164,15 +168,15 @@ function CertificatesManagement() {
 
   const handleSubmit = async () => {
     if (!formState.examTypeId) {
-      setErrorMessage('Vui lòng chọn loại đề.');
+      setErrorMessage(t('errors.examTypeRequired'));
       return;
     }
     if (formState.passScore === '' || Number.isNaN(Number(formState.passScore))) {
-      setErrorMessage('Điểm đạt phải là một con số.');
+      setErrorMessage(t('errors.passScoreNumber'));
       return;
     }
     if (!formState.title.trim()) {
-      setErrorMessage('Tên chứng chỉ không được để trống.');
+      setErrorMessage(t('errors.titleRequired'));
       return;
     }
 
@@ -188,7 +192,7 @@ function CertificatesManagement() {
       setFormState(emptyForm);
       setEditingId(null);
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu mẫu chứng chỉ. Vui lòng thử lại.'));
+      setErrorMessage(getApiErrorMessage(error, t('errors.saveFailed')));
     }
   };
 
@@ -198,7 +202,7 @@ function CertificatesManagement() {
       await deleteMutation.mutateAsync(deletingTemplate.templateId);
       setDeletingTemplate(null);
     } catch {
-      setErrorMessage('Không thể xoá mẫu chứng chỉ này.');
+      setErrorMessage(t('errors.deleteTemplateFailed'));
     }
   };
 
@@ -208,7 +212,7 @@ function CertificatesManagement() {
       await deleteIssuedMutation.mutateAsync(deletingCertificate.certificateId);
       setDeletingCertificate(null);
     } catch {
-      setErrorMessage('Không thể xoá chứng chỉ này.');
+      setErrorMessage(t('errors.deleteCertificateFailed'));
     }
   };
 
@@ -221,53 +225,53 @@ function CertificatesManagement() {
       });
       setRevokingCertificate(null);
     } catch {
-      setErrorMessage('Không thể thu hồi chứng chỉ này.');
+      setErrorMessage(t('errors.revokeFailed'));
     }
   };
 
   const templateColumns: AdminTableColumn[] = [
-    { key: 'examTypeName', header: 'Loại đề', render: (item: CertificateTemplateResponse) => item.examTypeName || '-' },
-    { key: 'title', header: 'Tên chứng chỉ' },
+    { key: 'examTypeName', header: t('columns.examType'), render: (item: CertificateTemplateResponse) => item.examTypeName || '-' },
+    { key: 'title', header: t('columns.title') },
     {
       key: 'passScore',
-      header: 'Điểm đạt',
+      header: t('columns.passScore'),
       render: (item: CertificateTemplateResponse) => <Badge bg="primary">{item.passScore}</Badge>,
     },
     {
       key: 'validMonths',
-      header: 'Thời hạn',
-      render: (item: CertificateTemplateResponse) => (item.validMonths ? `${item.validMonths} tháng` : 'Vô thời hạn'),
+      header: t('columns.validity'),
+      render: (item: CertificateTemplateResponse) => (item.validMonths ? t('validMonths', { count: item.validMonths }) : t('noExpiry')),
     },
-    { key: 'issuedCount', header: 'Đã cấp', render: (item: CertificateTemplateResponse) => item.issuedCount ?? 0 },
+    { key: 'issuedCount', header: t('columns.issued'), render: (item: CertificateTemplateResponse) => item.issuedCount ?? 0 },
     {
       key: 'active',
-      header: 'Trạng thái',
+      header: t('columns.status'),
       render: (item: CertificateTemplateResponse) =>
         item.active ? (
-          <Badge bg="success">Đang bật</Badge>
+          <Badge bg="success">{t('enabled')}</Badge>
         ) : (
-          <Badge bg="secondary">Đang tắt</Badge>
+          <Badge bg="secondary">{t('disabled')}</Badge>
         ),
     },
   ];
 
   const issuedColumns: AdminTableColumn[] = [
-    { key: 'recipientName', header: 'Người nhận' },
+    { key: 'recipientName', header: t('columns.recipient') },
     {
       key: 'certificateCode',
-      header: 'Mã chứng chỉ',
+      header: t('columns.code'),
       render: (item: CertificateResponse) => <code>{item.certificateCode}</code>,
     },
-    { key: 'testTitle', header: 'Bài thi', render: (item: CertificateResponse) => item.testTitle || '-' },
-    { key: 'score', header: 'Điểm' },
-    { key: 'issuedAt', header: 'Ngày cấp', render: (item: CertificateResponse) => formatDate(item.issuedAt) },
+    { key: 'testTitle', header: t('columns.test'), render: (item: CertificateResponse) => item.testTitle || '-' },
+    { key: 'score', header: t('columns.score') },
+    { key: 'issuedAt', header: t('columns.issuedAt'), render: (item: CertificateResponse) => formatDate(locale, item.issuedAt) },
     {
       key: 'status',
-      header: 'Trạng thái',
+      header: t('columns.status'),
       render: (item: CertificateResponse) => {
-        if (item.status === CertificateStatus.REVOKED) return <Badge bg="danger">Đã thu hồi</Badge>;
-        if (item.expired) return <Badge bg="warning" text="dark">Hết hạn</Badge>;
-        return <Badge bg="success">Còn hiệu lực</Badge>;
+        if (item.status === CertificateStatus.REVOKED) return <Badge bg="danger">{t('statusRevoked')}</Badge>;
+        if (item.expired) return <Badge bg="warning" text="dark">{t('statusExpired')}</Badge>;
+        return <Badge bg="success">{t('statusActive')}</Badge>;
       },
     },
   ];
@@ -275,33 +279,33 @@ function CertificatesManagement() {
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Chứng chỉ"
-        description="Cấu hình mẫu chứng chỉ theo loại đề và quản lý các chứng chỉ đã cấp cho người học."
+        title={t('title')}
+        description={t('description')}
       >
         {tab === 'templates' && (
           <Button onClick={openCreateModal}>
             <Plus size={16} className="me-1" />
-            Thêm mẫu chứng chỉ
+            {t('addTemplate')}
           </Button>
         )}
       </AdminPageHeader>
 
       <StatCardGroup>
-        <StatCard label="Mẫu chứng chỉ" value={templates.length} />
-        <StatCard label="Mẫu đang bật" value={activeTemplates} />
-        <StatCard label="Chứng chỉ còn hiệu lực" value={totalIssued} />
+        <StatCard label={t('stats.templates')} value={templates.length} />
+        <StatCard label={t('stats.activeTemplates')} value={activeTemplates} />
+        <StatCard label={t('stats.validCertificates')} value={totalIssued} />
       </StatCardGroup>
 
       <AdminFieldError message={errorMessage} />
-      {isError && <AdminFieldError message="Không tải được danh sách mẫu chứng chỉ." />}
-      {issuedError && <AdminFieldError message="Không tải được danh sách chứng chỉ đã cấp." />}
+      {isError && <AdminFieldError message={t('errors.loadTemplates')} />}
+      {issuedError && <AdminFieldError message={t('errors.loadIssued')} />}
 
       <AdminTabs
         activeKey={tab}
         onSelect={setTab as (key?: string) => void}
         items={[
-          {key: 'templates', label: 'Mẫu chứng chỉ'},
-          {key: 'issued', label: 'Chứng chỉ đã cấp'},
+          {key: 'templates', label: t('tabs.templates')},
+          {key: 'issued', label: t('tabs.issued')},
         ]}
       />
 
@@ -310,14 +314,14 @@ function CertificatesManagement() {
           <AdminToolbar
             searchValue={templateSearch}
             onSearchChange={setTemplateSearch}
-            searchPlaceholder="Tìm theo tên chứng chỉ hoặc loại đề..."
+            searchPlaceholder={t('templateSearchPlaceholder')}
           />
           <AdminTable
             columns={templateColumns}
             data={filteredTemplates}
             loading={isLoading}
             getRowKey={(item: CertificateTemplateResponse) => item.templateId}
-            emptyText="Chưa có mẫu chứng chỉ nào. Hãy tạo mẫu cho loại đề bạn muốn cấp chứng chỉ."
+            emptyText={t('templatesEmpty')}
             rowActions={(item: CertificateTemplateResponse) => (
               <>
                 <Button variant="light" size="sm" onClick={() => openEditModal(item)}>
@@ -342,7 +346,7 @@ function CertificatesManagement() {
               setIssuedKeyword(value);
               setIssuedPage(0);
             }}
-            searchPlaceholder="Tìm theo tên người nhận hoặc mã chứng chỉ..."
+            searchPlaceholder={t('issuedSearchPlaceholder')}
           >
             <Form.Select
               value={issuedStatus}
@@ -352,9 +356,9 @@ function CertificatesManagement() {
               }}
               style={{ width: 200 }}
             >
-              <option value="">Tất cả trạng thái</option>
-              <option value="ACTIVE">Còn hiệu lực</option>
-              <option value="REVOKED">Đã thu hồi</option>
+              <option value="">{t('allStatuses')}</option>
+              <option value="ACTIVE">{t('statusActive')}</option>
+              <option value="REVOKED">{t('statusRevoked')}</option>
             </Form.Select>
           </AdminToolbar>
 
@@ -363,8 +367,8 @@ function CertificatesManagement() {
             data={certificates}
             loading={issuedLoading}
             getRowKey={(item: CertificateResponse) => item.certificateId}
-            emptyText="Chưa có chứng chỉ nào được cấp."
-            itemLabel="chứng chỉ"
+            emptyText={t('issuedEmpty')}
+            itemLabel={t('itemLabel')}
             pageSize={PAGE_SIZE}
             page={issuedPage}
             totalPages={totalPages}
@@ -376,7 +380,7 @@ function CertificatesManagement() {
                   <Button
                     variant="light"
                     size="sm"
-                    title="Thu hồi chứng chỉ"
+                    title={t('revokeTitle')}
                     onClick={() => setRevokingCertificate(item)}
                   >
                     <ShieldX size={16} />
@@ -385,7 +389,7 @@ function CertificatesManagement() {
                 <Button
                   variant="light"
                   size="sm"
-                  title="Xoá hẳn chứng chỉ"
+                  title={t('deletePermanently')}
                   onClick={() => setDeletingCertificate(item)}
                 >
                   <Trash2 size={16} />
@@ -411,27 +415,29 @@ function CertificatesManagement() {
         show={Boolean(deletingTemplate)}
         onClose={() => setDeletingTemplate(null)}
         onConfirm={handleConfirmDelete}
-        message={`Xoá mẫu chứng chỉ "${deletingTemplate?.title || ''}"? Loại đề này sẽ ngừng cấp chứng chỉ mới. Chứng chỉ đã cấp vẫn giữ nguyên vì đã lưu bản chụp riêng.`}
+        message={t('deleteTemplateMessage', { title: deletingTemplate?.title || '' })}
       />
 
       <ConfirmDeleteModal
         show={Boolean(deletingCertificate)}
         onClose={() => setDeletingCertificate(null)}
         onConfirm={handleConfirmDeleteIssued}
-        message={`Xoá hẳn chứng chỉ ${deletingCertificate?.certificateCode || ''} của ${
-          deletingCertificate?.recipientName || ''
-        }? Mã này sẽ không tra cứu được nữa và không khôi phục lại được. Nếu chỉ muốn vô hiệu hoá mà vẫn giữ dấu vết thì dùng thu hồi.`}
+        message={t('deleteCertificateMessage', {
+          code: deletingCertificate?.certificateCode || '',
+          name: deletingCertificate?.recipientName || '',
+        })}
       />
 
       <ConfirmModal
         show={Boolean(revokingCertificate)}
         onClose={() => setRevokingCertificate(null)}
         onConfirm={handleConfirmRevoke}
-        title="Thu hồi chứng chỉ"
-        message={`Thu hồi chứng chỉ ${revokingCertificate?.certificateCode || ''} của ${
-          revokingCertificate?.recipientName || ''
-        }? Trang tra cứu sẽ báo chứng chỉ không còn giá trị, và người này có thể được cấp lại nếu đạt ở lần thi sau.`}
-        confirmText="Thu hồi"
+        title={t('revokeTitle')}
+        message={t('revokeMessage', {
+          code: revokingCertificate?.certificateCode || '',
+          name: revokingCertificate?.recipientName || '',
+        })}
+        confirmText={t('revoke')}
         variant="danger"
       />
     </div>

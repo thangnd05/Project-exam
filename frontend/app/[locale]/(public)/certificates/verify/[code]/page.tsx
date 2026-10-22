@@ -1,14 +1,20 @@
-import CertificateVerify from '@/app/(public)/certificates/verify/CertificateVerify';
+import { getTranslations } from 'next-intl/server';
+import CertificateVerify from '@/app/[locale]/(public)/certificates/verify/CertificateVerify';
+import { localeAlternates } from '@/app/i18n/metadata';
+import type { Locale } from '@/app/i18n/routing';
 
-export function generateMetadata() {
-  const title = 'Xác thực chứng chỉ';
-  const description =
-    'Kiểm tra tính hợp lệ của chứng chỉ do WinDe Exam cấp bằng mã chứng chỉ in trên bản chứng chỉ.';
+export async function generateMetadata({ params }: PageProps<'/[locale]/certificates/verify/[code]'>) {
+  const { locale: rawLocale, code } = await params;
+  const locale = rawLocale as Locale;
+  const t = await getTranslations({ locale, namespace: 'Certificates' });
+  const title = t('codeMeta.title');
+  const description = t('codeMeta.description');
 
   return {
     title,
     description,
     robots: { index: false, follow: true },
+    alternates: localeAlternates(locale, `/certificates/verify/${code}`),
     openGraph: { type: 'website', title, description },
   };
 }

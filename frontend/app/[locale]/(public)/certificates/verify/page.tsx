@@ -1,11 +1,20 @@
+import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { localeAlternates } from '@/app/i18n/metadata';
+import type { Locale } from '@/app/i18n/routing';
 import CertificateVerify from './CertificateVerify';
 
-export const metadata = {
-  title: 'Tra cứu chứng chỉ',
-  description:
-    'Xác thực chứng chỉ do WinDe Exam cấp bằng mã tra cứu, xem danh mục chứng chỉ đang cấp và các chứng chỉ vừa được cấp.',
-};
+export async function generateMetadata({ params }: PageProps<'/[locale]/certificates/verify'>) {
+  const locale = (await params).locale as Locale;
+  const t = await getTranslations({ locale, namespace: 'Certificates' });
+  return {
+    title: t('meta.title'),
+    description: t('meta.description'),
+    alternates: localeAlternates(locale, '/certificates/verify'),
+  };
+}
 
-export default function Page() {
+export default async function Page({ params }: PageProps<'/[locale]/certificates/verify'>) {
+  const locale = (await params).locale as Locale;
+  setRequestLocale(locale);
   return <CertificateVerify />;
 }

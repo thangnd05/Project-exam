@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import styles from '@/app/features/tests/CreateTestModal.module.scss';
 import { CREATOR_TYPES } from '@/app/features/tests/creator/hooks/useCreateTest';
 import type { CreatorType } from '@/app/features/tests/creator/hooks/useCreateTest';
@@ -13,6 +14,7 @@ type CreatorTabsProps = {
 };
 
 const CreatorTabs = ({ activeCreatorType, setCreatorType }: CreatorTabsProps) => {
+    const t = useTranslations('TestCreator');
     return (
         <div className={cx('creatorTypeTabs')}>
             <button
@@ -20,28 +22,28 @@ const CreatorTabs = ({ activeCreatorType, setCreatorType }: CreatorTabsProps) =>
                 className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.TEST })}
                 onClick={() => setCreatorType(CREATOR_TYPES.TEST)}
             >
-                Tạo đề thi
+                {t('creatorTabs.test')}
             </button>
             <button
                 type="button"
                 className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.BANK })}
                 onClick={() => setCreatorType(CREATOR_TYPES.BANK)}
             >
-                Tạo đề từ kho
+                {t('creatorTabs.bank')}
             </button>
             <button
                 type="button"
                 className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.BULK })}
                 onClick={() => setCreatorType(CREATOR_TYPES.BULK)}
             >
-                Tạo câu hỏi số lượng lớn vào kho đề
+                {t('creatorTabs.bulk')}
             </button>
             <button
                 type="button"
                 className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.PASSAGE })}
                 onClick={() => setCreatorType(CREATOR_TYPES.PASSAGE)}
             >
-                Tạo nhóm câu hỏi theo đoạn vào kho đề
+                {t('creatorTabs.passage')}
             </button>
         </div>
     );

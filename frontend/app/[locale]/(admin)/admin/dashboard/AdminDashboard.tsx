@@ -5,10 +5,11 @@ import { Row, Col, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { Calendar } from 'lucide-react';
-import TrafficHeatmap from '@/app/(admin)/_components/TrafficHeatmap';
-import OverviewCard from '@/app/(admin)/_components/OverviewCard';
+import { useLocale, useTranslations } from 'next-intl';
+import TrafficHeatmap from '@/app/[locale]/(admin)/_components/TrafficHeatmap';
+import OverviewCard from '@/app/[locale]/(admin)/_components/OverviewCard';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
-import { useDashboardStats, useTrafficHeatmap } from '@/app/(admin)/_hooks/useDashboardStats';
+import { useDashboardStats, useTrafficHeatmap } from '@/app/[locale]/(admin)/_hooks/useDashboardStats';
 
 const localISODate = (d: Date = new Date()) => {
     const local = new Date(d.getTime() - d.getTimezoneOffset() * 60000);
@@ -22,6 +23,7 @@ const cx = classNames.bind(styles);
 const TrafficHeatmapCard = ({ delay }: { delay: number }) => {
     const today = localISODate();
     const [endDate, setEndDate] = useState(today);
+    const t = useTranslations('AdminSystem.dashboard');
     const { heatmap = [] } = useTrafficHeatmap(endDate);
 
     return (
@@ -32,7 +34,7 @@ const TrafficHeatmapCard = ({ delay }: { delay: number }) => {
             className={cx('chartCard')}
         >
             <div className={cx('chartHeader')}>
-                <h3>Lượt truy cập theo ngày & giờ</h3>
+                <h3>{t('heatmapTitle')}</h3>
                 <input
                     type="date"
                     className={cx('dateInput')}
@@ -48,16 +50,18 @@ const TrafficHeatmapCard = ({ delay }: { delay: number }) => {
 
 const AdminDashboard = () => {
     const { stats, traffic, isLoading, isError } = useDashboardStats();
+    const t = useTranslations('AdminSystem');
+    const locale = useLocale();
 
     return (
         <div className={cx('dashboard')}>
             <PageHeader
-                label="Tổng quan hệ thống WinDe Exam"
-                title="Dashboard"
+                label={t('dashboard.description')}
+                title={t('dashboard.title')}
             >
                 <span className={cx('dateBadge')}>
                     <Calendar size={16} />
-                    {new Date().toLocaleDateString('vi-VN', {
+                    {new Date().toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
@@ -69,11 +73,11 @@ const AdminDashboard = () => {
             {isLoading ? (
                 <div className={cx('loadingState')}>
                     <Spinner animation="border" variant="primary" />
-                    <span>Đang tải số liệu...</span>
+                    <span>{t('stats.loading')}</span>
                 </div>
             ) : isError ? (
                 <div className={cx('loadingState')}>
-                    <span>Không tải được số liệu thống kê. Vui lòng thử lại.</span>
+                    <span>{t('stats.loadError')}</span>
                 </div>
             ) : (
                 <>
@@ -81,32 +85,32 @@ const AdminDashboard = () => {
                     <Row className={cx('kpiRow')}>
                         <Col lg={3} md={6} sm={12}>
                             <OverviewCard
-                                label="Lượt truy cập hôm nay"
+                                label={t('dashboard.visitsToday')}
                                 value={traffic.visitsToday}
-                                period="Hôm nay"
+                                period={t('dashboard.today')}
                                 delay={0}
                             />
                         </Col>
                         <Col lg={3} md={6} sm={12}>
                             <OverviewCard
                                 value={stats.totalTests ?? 0}
-                                label="Bài thi"
-                                sub={`${stats.totalExamsTaken ?? 0} lượt · ${stats.completedExams ?? 0} hoàn thành`}
+                                label={t('dashboard.tests')}
+                                sub={t('dashboard.testsSub', { taken: stats.totalExamsTaken ?? 0, completed: stats.completedExams ?? 0 })}
                                 delay={0.05}
                             />
                         </Col>
                         <Col lg={3} md={6} sm={12}>
                             <OverviewCard
                                 value={stats.totalQuestions ?? 0}
-                                label="Câu hỏi"
-                                sub="Ngân hàng câu hỏi"
+                                label={t('dashboard.questions')}
+                                sub={t('dashboard.questionBank')}
                                 delay={0.1}
                             />
                         </Col>
                         <Col lg={3} md={6} sm={12}>
                             <OverviewCard
                                 value={stats.totalClasses ?? 0}
-                                label="Lớp học"
+                                label={t('dashboard.classes')}
                                 delay={0.15}
                             />
                         </Col>

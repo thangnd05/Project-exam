@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { useState } from 'react';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { Award, Maximize2 } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -22,6 +23,7 @@ const isRecent = (value?: string) =>
   Boolean(value) && Date.now() - new Date(value as string).getTime() < NEW_DAYS * DAY_MS;
 
 function CertificateWall() {
+  const t = useTranslations('Certificates');
   const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
     usePublicCertificates();
   const [previewCode, setPreviewCode] = useState<string | null>(null);
@@ -38,11 +40,11 @@ function CertificateWall() {
   return (
     <section className={cx('section')}>
       <header className={cx('sectionHead')}>
-        <h2>Chứng chỉ đã cấp</h2>
+        <h2>{t('wall.title')}</h2>
         <p>
           {total > 0
-            ? `${total} chứng chỉ còn hiệu lực do WinDe Exam cấp, mới nhất trước.`
-            : 'Các chứng chỉ còn hiệu lực do WinDe Exam cấp.'}
+            ? t('wall.summary', { total })
+            : t('wall.summaryEmpty')}
         </p>
       </header>
 
@@ -54,12 +56,12 @@ function CertificateWall() {
         </ul>
       )}
 
-      {isError && <div className={cx('state')}>Không tải được danh sách chứng chỉ.</div>}
+      {isError && <div className={cx('state')}>{t('wall.loadError')}</div>}
 
       {!isLoading && !isError && certificates.length === 0 && (
         <div className={cx('empty')}>
           <Award size={36} />
-          <p>Chưa có chứng chỉ nào được cấp.</p>
+          <p>{t('wall.empty')}</p>
         </div>
       )}
 
@@ -71,7 +73,10 @@ function CertificateWall() {
                 className={cx('card')}
                 href={`/certificates/verify/${certificate.certificateCode}`}
                 onClick={(event) => handleCardClick(event, certificate.certificateCode)}
-                aria-label={`Xem chứng chỉ ${certificate.certificateCode} của ${certificate.recipientName}`}
+                aria-label={t('wall.cardLabel', {
+                  code: certificate.certificateCode ?? '',
+                  name: certificate.recipientName ?? '',
+                })}
               >
                 <CertificateCanvas
                   design={certificate.design}
@@ -90,12 +95,12 @@ function CertificateWall() {
                         : undefined
                     }
                   >
-                    Mới
+                    {t('wall.newBadge')}
                   </span>
                 )}
 
                 <span className={cx('overlay')} aria-hidden="true">
-                  <Maximize2 size={16} /> Xem chứng chỉ
+                  <Maximize2 size={16} /> {t('wall.viewCertificate')}
                 </span>
               </Link>
             </li>
@@ -110,7 +115,7 @@ function CertificateWall() {
             onClick={() => fetchNextPage()}
             loading={isFetchingNextPage}
           >
-            Xem thêm
+            {t('wall.loadMore')}
           </ButtonPrime>
         </div>
       )}

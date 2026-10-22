@@ -4,6 +4,7 @@ import { useMounted } from '@/app/hooks/useMounted';
 import {useEffect} from 'react';
 import ReactDOM from 'react-dom';
 import {IoClose} from 'react-icons/io5';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import styles from './BaseModal.module.scss';
 
@@ -34,6 +35,8 @@ function BaseModal({
   showCloseButton = true,
   children,
 }: BaseModalProps) {
+  const tCommon = useTranslations('Common');
+
   useEffect(() => {
     if (!show) return undefined;
 
@@ -77,7 +80,7 @@ function BaseModal({
               type="button"
               className={cx('closeBtn')}
               onClick={onClose}
-              aria-label="Đóng"
+              aria-label={tCommon('close')}
             >
               <IoClose />
             </button>

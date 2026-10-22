@@ -1,5 +1,5 @@
 import classNames from 'classnames/bind';
-import { badgeUrl, parseCode } from '@/app/(public)/_lib/certificationMeta';
+import { badgeUrl, parseCode } from '@/app/[locale]/(public)/_lib/certificationMeta';
 import type { ExamTypeResponse } from '@/app/types/exam-type';
 import styles from './ExamHeading.module.scss';
 

@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Tài liệu",
+    "description": "Tài liệu ôn thi trên WinDe, chia theo từng kỳ thi."
+  },
+  "library": {
+    "pageTitle": "Kho tài liệu",
+    "searchLabel": "Tìm tài liệu",
+    "searchPlaceholder": "Tìm theo tên tài liệu, phần thi, dịch vụ (CodePipeline, VPC...)",
+    "showing": "Hiển thị: <strong>{count}</strong> tài liệu",
+    "resetFilters": "Đặt lại bộ lọc",
+    "examFilterLabel": "Lọc theo kỳ thi",
+    "examLabel": "Kỳ thi:",
+    "partFilterLabel": "Lọc theo phần thi",
+    "partLabel": "Phần thi:",
+    "allParts": "Tất cả",
+    "unassignedExam": "Chưa gắn kỳ thi",
+    "otherVendor": "Khác",
+    "readResource": "Đọc tài liệu",
+    "loadError": {
+      "title": "Không tải được tài liệu",
+      "message": "Thử tải lại trang."
+    },
+    "empty": {
+      "title": "Chưa có tài liệu",
+      "message": "Tài liệu sẽ xuất hiện ở đây khi được gắn vào kỳ thi."
+    },
+    "noMatch": {
+      "title": "Không có tài liệu khớp"
+    }
+  },
+  "view": {
+    "loading": "Đang tải tài liệu...",
+    "loadError": "Không thể mở tài liệu markdown. Vui lòng thử lại sau.",
+    "print": "In / Lưu PDF",
+    "backHome": "Về trang chủ",
+    "readHint": "Đọc trực tiếp trên trang này. Muốn lưu offline, chọn <strong>In / Lưu PDF</strong> rồi chọn máy in \"Lưu thành PDF\"."
+  }
+}

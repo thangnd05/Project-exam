@@ -1,0 +1,103 @@
+{
+  "saving": "Saving...",
+  "profile": {
+    "loadError": "Couldn’t load your profile. Please try again later.",
+    "defaultName": "User",
+    "loading": "Loading profile...",
+    "title": "Profile overview",
+    "subtitle": "Your account details and study progress at a glance.",
+    "email": "Email",
+    "role": "Role",
+    "joinedAt": "Joined",
+    "status": "Status",
+    "verified": "Verified",
+    "unverified": "Not verified",
+    "updateInfo": "Update profile",
+    "changePassword": "Change password",
+    "noData": "No profile data to display."
+  },
+  "quickActions": {
+    "title": "Quick access",
+    "newTest": "Take a new test",
+    "flashcards": "Flashcards",
+    "myClasses": "My classes",
+    "questionBank": "Question bank",
+    "myPosts": "My posts",
+    "savedPosts": "Saved posts"
+  },
+  "stats": {
+    "totalAttempts": "Total attempts",
+    "savedFlashcards": "Saved flashcards",
+    "currentClasses": "Current classes"
+  },
+  "activity": {
+    "testTime": "Test time",
+    "summary": "{duration} of tests · {days, plural, one {# active day} other {# active days}}",
+    "loading": "Loading activity...",
+    "noActivity": "No activity this month",
+    "monthlyTitle": "Study time by month",
+    "yearOption": "{year}",
+    "noYearData": "No study data for this year yet",
+    "monthLabel": "{month, select, 1 {January} 2 {February} 3 {March} 4 {April} 5 {May} 6 {June} 7 {July} 8 {August} 9 {September} 10 {October} 11 {November} 12 {December} other {Month {month}}} {year}",
+    "monthShort": "{month, select, 1 {Jan} 2 {Feb} 3 {Mar} 4 {Apr} 5 {May} 6 {Jun} 7 {Jul} 8 {Aug} 9 {Sep} 10 {Oct} 11 {Nov} 12 {Dec} other {M{month}}}",
+    "dayLabel": "Day {day}",
+    "tooltipTime": "Time",
+    "tooltipStudyTime": "Study time",
+    "minuteUnit": "m"
+  },
+  "duration": {
+    "hoursMinutes": "{h}h {m}m",
+    "hours": "{h}h",
+    "minutes": "{m}m"
+  },
+  "targets": {
+    "title": "My targets",
+    "manage": "Manage targets",
+    "loading": "Loading targets...",
+    "empty": "You haven’t set any targets yet. Set a target to personalize your study plan.",
+    "setNow": "Set a target now",
+    "achieved": "Achieved",
+    "score": "{score} points",
+    "readiness": "Readiness: {pct}%",
+    "dashboard": "Dashboard",
+    "generatePlan": "Generate plan",
+    "collapse": "Show less",
+    "showMore": "Show {count, plural, one {# more target} other {# more targets}}"
+  },
+  "changePassword": {
+    "title": "Change password",
+    "submit": "Update password",
+    "oldPassword": "Current password",
+    "oldPasswordPlaceholder": "Enter your current password",
+    "newPassword": "New password",
+    "newPasswordPlaceholder": "Enter a new password",
+    "confirmPassword": "Confirm new password",
+    "confirmPasswordPlaceholder": "Re-enter the new password",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "toast": {
+      "missingFields": "Please fill in all password fields.",
+      "mismatch": "The new password confirmation doesn’t match.",
+      "success": "Password changed successfully.",
+      "failed": "Failed to change password. Please try again."
+    }
+  },
+  "updateProfile": {
+    "title": "Update profile",
+    "submit": "Save changes",
+    "avatarAlt": "Avatar",
+    "avatarHint": "Click the image to change your avatar",
+    "userName": "Username",
+    "fullName": "Full name",
+    "email": "Email",
+    "toast": {
+      "loadError": "Couldn’t load your personal information.",
+      "invalidImage": "Please choose an image file (jpg, png, etc.).",
+      "imageTooLarge": "Image size must not exceed 5MB.",
+      "missingFields": "Please enter your full name, username and email.",
+      "missingUserId": "Data error: user ID not found.",
+      "success": "Profile updated successfully!",
+      "failed": "Update failed. Please try again."
+    }
+  }
+}

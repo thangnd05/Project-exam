@@ -1,9 +1,11 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useEffect, useMemo } from "react";
 import { Container, Spinner, Alert } from "react-bootstrap";
 import classNames from "classnames/bind";
+import { useTranslations } from "next-intl";
 import { IoHomeOutline } from "react-icons/io5";
 
 import { useAuth } from "@/app/hooks/useAuth";
@@ -87,6 +89,7 @@ const getQuestionStatus = (q: QuestionAdminResponse, userAnswer?: UserAnswerResp
 const TestReview = () => {
   const { userTestId } = useParams<{ userTestId: string }>();
   const router = useRouter();
+  const t = useTranslations("TestTaking.testReview");
   const { isAuthenticated, loading: authLoading } = useAuth();
   const isGuest = !authLoading && !isAuthenticated;
   const guestCfg = useMemo(
@@ -109,9 +112,9 @@ const TestReview = () => {
 
   const loading = authLoading || isLoading;
   const error = isError
-    ? "Không thể tải chi tiết câu hỏi. Vui lòng thử lại."
+    ? t("loadError")
     : notReviewable
-      ? "Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc."
+      ? t("notReviewable")
       : "";
 
   const flatQuestions = useMemo(() => {
@@ -241,8 +244,8 @@ const TestReview = () => {
           mediaList.map((m: LooseMedia, idx: number) => {
             const type = (m.mediaType ?? m.media_type ?? "").toUpperCase();
             if (type === "TEXT") {
-              const t = m.content ?? m.content_text;
-              return t ? renderPassageText(t, `media-${idx}`) : null;
+              const text = m.content ?? m.content_text;
+              return text ? renderPassageText(text, `media-${idx}`) : null;
             }
             const url = m.mediaUrl ?? m.media_url;
             if (!url) return null;
@@ -286,7 +289,7 @@ const TestReview = () => {
 
         {translation && (
           <details className={cx("passage-translation")}>
-            <summary>Bản dịch</summary>
+            <summary>{t("translation")}</summary>
             <div
               className={cx("passage-content")}
               style={{ whiteSpace: "pre-wrap", marginTop: 8 }}
@@ -304,7 +307,7 @@ const TestReview = () => {
       <div className={cx("wrapper")}>
         <Container className={cx("state-box")}>
           <Spinner animation="border" variant="primary" />
-          <p className="fw-bold text-primary">Đang tải chi tiết bài làm...</p>
+          <p className="fw-bold text-primary">{t("loading")}</p>
         </Container>
       </div>
     );
@@ -318,7 +321,7 @@ const TestReview = () => {
             variant="outline"
             onClick={() => router.push(`/tests/result/${userTestId}`)}
           >
-            Quay lại kết quả
+            {t("backToResult")}
           </ButtonPrime>
         </Container>
       </div>
@@ -332,14 +335,14 @@ const TestReview = () => {
             variant="outline"
             onClick={() => router.push(`/tests/result/${userTestId}`)}
           >
-            Quay lại kết quả
+            {t("backToResult")}
           </ButtonPrime>
           <ButtonPrime variant="ghost" onClick={() => router.push("/")}>
-            <IoHomeOutline /> Trang chủ
+            <IoHomeOutline /> {t("home")}
           </ButtonPrime>
         </div>
 
-        <h2 className={cx("section-title")}>Chi tiết bài làm</h2>
+        <h2 className={cx("section-title")}>{t("title")}</h2>
 
         {test?.parts?.map((part, i) => (
           <div key={part.testPartId || i} className={cx("part-section")}>
@@ -369,7 +372,7 @@ const TestReview = () => {
                 >
                   {splitLayout ? (
                     <>
-                      <div className={cx("passage-column")} aria-label="Tài liệu / Đoạn nghe">
+                      <div className={cx("passage-column")} aria-label={t("passageLabel")}>
                         {renderPassage(group.passage, firstQ)}
                       </div>
                       <div className={cx("question-column")}>{questionList}</div>

@@ -1,6 +1,7 @@
 'use client';
 
 import {Form} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 
@@ -32,23 +33,25 @@ function TagFormModal({
   onClose,
   onSubmit,
 }: TagFormModalProps) {
+  const t = useTranslations('AdminContent.tags.form');
+  const tc = useTranslations('Common');
   return (
     <BaseModal
       show={show}
       onClose={onClose}
-      title={isEditing ? 'Cập nhật Tag' : 'Tạo Tag mới'}
+      title={isEditing ? t('editTitle') : t('createTitle')}
       maxWidth={680}
       footer={
         <ModalActionFooter
           onCancel={onClose}
           onSubmit={onSubmit}
-          cancelLabel="Hủy"
-          submitLabel={isEditing ? 'Lưu' : 'Tạo mới'}
+          cancelLabel={tc('cancelShort')}
+          submitLabel={isEditing ? tc('save') : t('create')}
         />
       }
     >
         <Form.Group className="mb-3">
-          <Form.Label>Loại kỳ thi</Form.Label>
+          <Form.Label>{t('examType')}</Form.Label>
           <Form.Select
             value={formState.examTypeId || ''}
             onChange={(e) => onChangeField('examTypeId', e.target.value)}
@@ -56,7 +59,7 @@ function TagFormModal({
             title={examTypes.find((et) => et.id === formState.examTypeId)?.name}
           >
             <option value="" disabled>
-              -- Chọn loại kỳ thi --
+              {t('examTypePlaceholder')}
             </option>
             {examTypes.map((et) => (
               <option key={et.id} value={et.id}>
@@ -66,12 +69,12 @@ function TagFormModal({
           </Form.Select>
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Phần thi</Form.Label>
+          <Form.Label>{t('examPart')}</Form.Label>
           <Form.Select
             value={formState.examPartId || ''}
             onChange={(e) => onChangeField('examPartId', e.target.value || null)}
           >
-            <option value="">-- Dùng chung mọi phần thi --</option>
+            <option value="">{t('sharedOption')}</option>
             {examParts.map((p) => (
               <option key={p.examPartId} value={p.examPartId}>
                 {p.name}
@@ -79,24 +82,24 @@ function TagFormModal({
             ))}
           </Form.Select>
           <Form.Text className="text-muted">
-            Câu hỏi chỉ gắn được tag cùng phần thi hoặc tag dùng chung.
+            {t('examPartHelp')}
           </Form.Text>
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Tên Tag</Form.Label>
+          <Form.Label>{t('name')}</Form.Label>
           <Form.Control
             value={formState.name}
             onChange={(e) => onChangeField('name', e.target.value)}
-            placeholder="VD: Ngữ pháp, Giới từ, AWS S3..."
+            placeholder={t('namePlaceholder')}
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Thứ tự hiển thị</Form.Label>
+          <Form.Label>{t('sortOrder')}</Form.Label>
           <Form.Control
             type="number"
             min={0}
             value={formState.sortOrder ?? ''}
-            placeholder="Số nhỏ hơn hiện trước"
+            placeholder={t('sortOrderPlaceholder')}
             onChange={(event) => {
               const raw = event.target.value;
               if (raw === '') {
@@ -108,7 +111,7 @@ function TagFormModal({
             }}
           />
           <Form.Text className="text-muted">
-            Trong cùng một phần thi, số nhỏ hơn được xếp trước. Để trống nếu chưa sắp.
+            {t('sortOrderHelp')}
           </Form.Text>
         </Form.Group>
     </BaseModal>

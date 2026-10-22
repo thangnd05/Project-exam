@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "mainNavigation": "Điều hướng chính",
+    "home": "Trang chủ",
+    "examTypes": "Kho đề thi",
+    "resources": "Tài liệu",
+    "learningPlans": "Lộ trình",
+    "login": "Đăng nhập",
+    "signup": "Đăng ký",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "myCertificates": "Chứng chỉ của tôi",
+    "createTest": "Tạo bài kiểm tra",
+    "account": "Tài khoản {name}",
+    "menu": "Menu",
+    "close": "Đóng"
+  },
+  "streakHint": {
+    "title": "Chuỗi ngày học và xu",
+    "streak": "🔥 Chuỗi tăng mỗi ngày bạn làm bài hoặc học một nhiệm vụ trong lộ trình. Bỏ một ngày là chuỗi về 0.",
+    "coins": "🪙 Hoàn thành nhiệm vụ để nhận xu, dùng xu đổi khung và huy hiệu cho avatar. Bấm vào số xu để xem nhiệm vụ, chấm đỏ nghĩa là có thưởng chưa nhận."
+  },
+  "appearance": {
+    "title": "Giao diện",
+    "mode": "Chế độ",
+    "light": "Sáng",
+    "dark": "Tối",
+    "palette": "Bảng màu",
+    "paletteFrost": "Băng lạnh",
+    "paletteGold": "Vàng đồng",
+    "language": "Ngôn ngữ"
+  },
+  "footer": {
+    "homeAria": "FrostScope - Trang chủ",
+    "tagline": "Nền tảng ôn thi chứng chỉ Cloud cá nhân hóa",
+    "description": "Đánh giá năng lực Cloud & DevOps, nhận diện điểm yếu và luyện thi chứng chỉ theo đúng phần kiến thức bạn cần cải thiện.",
+    "practice": "Luyện thi",
+    "examTypes": "Kho đề thi",
+    "certifications": "Chứng chỉ",
+    "leaderboard": "Bảng xếp hạng",
+    "quickTest": "Kiểm tra nhanh",
+    "generatePlan": "Tạo lộ trình học",
+    "aboutUs": "Về chúng tôi",
+    "about": "About us",
+    "contact": "Contact",
+    "legal": "Pháp lý",
+    "policy": "Chính sách",
+    "terms": "Điều khoản và điều kiện",
+    "trademarkNote": "All related logos are trademarks of their respective owners.",
+    "copyright": "Bản quyền {year} FrostScope. Nền tảng ôn thi chứng chỉ Cloud cá nhân hóa.",
+    "language": "Ngôn ngữ"
+  },
+  "scrollToTop": "Lên đầu trang"
+}

@@ -1,10 +1,12 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useMemo } from "react";
 import { Container, Spinner, Alert } from "react-bootstrap";
 import { toast } from "react-toastify";
 import classNames from "classnames/bind";
+import { useTranslations } from "next-intl";
 import {
   IoCheckmarkCircle,
   IoHomeOutline,
@@ -20,7 +22,7 @@ import { useMounted } from "@/app/hooks/useMounted";
 import { getGuestSessionId, guestHeaders } from "@/app/utils/guestSession";
 import { isBeginnerLevel } from "@/app/features/learning-plans/learnerLevel";
 import { getScoreScale } from "@/app/features/exam-types/scoreScale";
-import { buildPlanFromTestUrl } from "@/app/(guest)/tests/result/[userTestId]/_lib/planFromTest";
+import { buildPlanFromTestUrl } from "@/app/[locale]/(guest)/tests/result/[userTestId]/_lib/planFromTest";
 import { useTestResult } from "./_hooks/useTestResult";
 import { useTestEvaluationPrompt } from "./_hooks/useTestEvaluationPrompt";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";
@@ -38,6 +40,7 @@ const cx = classNames.bind(styles);
 const TestResult = () => {
   const { userTestId } = useParams<{ userTestId: string }>();
   const router = useRouter();
+  const t = useTranslations("TestTaking.result");
   const { isAuthenticated, loading: authLoading } = useAuth();
   const isGuest = !authLoading && !isAuthenticated;
   const guestCfg = useMemo(
@@ -64,7 +67,7 @@ const TestResult = () => {
   );
 
   const loading = authLoading || isLoading;
-  const error = isError ? "Không thể tải kết quả bài thi này" : "";
+  const error = isError ? t("loadError") : "";
 
   const scoreScale = getScoreScale(enhanced);
 
@@ -85,7 +88,7 @@ const TestResult = () => {
 
   const handleShowDetail = () => {
     if (!canReview) {
-      toast.warning("Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc.");
+      toast.warning(t("reviewLocked"));
       return;
     }
     router.push(`/tests/result/${userTestId}/review`);
@@ -106,7 +109,7 @@ const TestResult = () => {
         <Container className="d-flex flex-column align-items-center justify-content-center">
           <Spinner animation="border" />
           <p className="mt-3 fw-bold text-primary">
-            Đang tổng hợp điểm số của bạn...
+            {t("loading")}
           </p>
         </Container>
       </div>
@@ -118,7 +121,7 @@ const TestResult = () => {
         <Container>
           <Alert variant="danger">{error}</Alert>
           <ButtonPrime variant="primary" className="mt-3" onClick={() => router.push("/")}>
-            Quay lại trang chủ
+            {t("backHome")}
           </ButtonPrime>
         </Container>
       </div>
@@ -134,14 +137,14 @@ const TestResult = () => {
         <div className={cx("result-layout")}>
 
           <div className={cx("result-card")}>
-            <h1>{isBeginner ? "Đây là điểm xuất phát" : "Hoàn thành bài thi!"}</h1>
+            <h1>{isBeginner ? t("titleBeginner") : t("title")}</h1>
 
             <div className={cx("result-body")}>
               <div className={cx("score-display")}>
                 {isQuickChallenge ? (
                   <>
                     <span className={cx("label")}>
-                      {isBeginner ? "Điểm xuất phát" : "Độ chính xác"}
+                      {isBeginner ? t("startingScore") : t("accuracy")}
                     </span>
                     <div className={cx("points")}>
                       {enhanced?.percentage ?? 0}%
@@ -149,13 +152,13 @@ const TestResult = () => {
                   </>
                 ) : (
                   <>
-                    <span className={cx("label")}>Điểm số</span>
+                    <span className={cx("label")}>{t("score")}</span>
                     <div className={cx("points")}>
                       {Math.round(Number(result?.totalScore ?? 0))}
                     </div>
                     {scoreScale.scaled && (
                       <span className={cx("scale-hint")}>
-                        thang {scoreScale.min}–{scoreScale.max}
+                        {t("scale", { min: scoreScale.min, max: scoreScale.max })}
                       </span>
                     )}
                   </>
@@ -167,7 +170,7 @@ const TestResult = () => {
                   <IoCheckmarkCircle size={24} />
                   <div className={cx("stat-text")}>
                     <span className={cx("stat-val")}>{result?.correct || 0}</span>
-                    <span className={cx("stat-label")}>Câu đúng</span>
+                    <span className={cx("stat-label")}>{t("stats.correct")}</span>
                   </div>
                 </div>
 
@@ -175,7 +178,7 @@ const TestResult = () => {
                   <IoStatsChartOutline size={24} />
                   <div className={cx("stat-text")}>
                     <span className={cx("stat-val")}>{result?.wrong || 0}</span>
-                    <span className={cx("stat-label")}>Câu sai</span>
+                    <span className={cx("stat-label")}>{t("stats.wrong")}</span>
                   </div>
                 </div>
 
@@ -183,7 +186,7 @@ const TestResult = () => {
                   <IoSchoolOutline size={24} />
                   <div className={cx("stat-text")}>
                     <span className={cx("stat-val")}>{result?.total || 0}</span>
-                    <span className={cx("stat-label")}>Tổng số câu</span>
+                    <span className={cx("stat-label")}>{t("stats.total")}</span>
                   </div>
                 </div>
 
@@ -193,7 +196,7 @@ const TestResult = () => {
                     <span className={cx("stat-val")}>
                       {formatTime(result?.startedAt, result?.finishedAt)}
                     </span>
-                    <span className={cx("stat-label")}>Thời gian</span>
+                    <span className={cx("stat-label")}>{t("stats.time")}</span>
                   </div>
                 </div>
               </div>
@@ -204,7 +207,7 @@ const TestResult = () => {
                 <div className={cx("lock-message")}>
                   <IoLockClosedOutline />
                   <span>
-                    Đáp án sẽ hiển thị sau khi thời gian làm bài kết thúc.
+                    {t("answersLocked")}
                   </span>
                 </div>
               )}
@@ -215,7 +218,7 @@ const TestResult = () => {
                 onClick={handleShowDetail}
               >
                 {!canReview ? <IoLockClosedOutline /> : <IoStatsChartOutline />}
-                Xem đáp án & giải thích
+                {t("viewAnswers")}
               </ButtonPrime>
 
               {!isGuest && testId && (
@@ -223,16 +226,16 @@ const TestResult = () => {
                   variant="ghost"
                   onClick={() => router.push(buildTestPath({ testId }, 'history'))}
                 >
-                  <IoSchoolOutline /> Lịch sử bài thi
+                  <IoSchoolOutline /> {t("history")}
                 </ButtonPrime>
               )}
 
               <ButtonPrime variant="ghost" onClick={() => router.push("/")}>
-                <IoHomeOutline /> Trang chủ
+                <IoHomeOutline /> {t("home")}
               </ButtonPrime>
 
               <ButtonPrime variant="primary" onClick={handlePlanFromTest}>
-                <IoCalendarOutline /> Lập lộ trình từ bài này
+                <IoCalendarOutline /> {t("planFromTest")}
               </ButtonPrime>
             </div>
           </div>
@@ -244,7 +247,10 @@ const TestResult = () => {
               <div className={cx("diagnosis-side")}>
                 {enhanced.percentile != null && (
                   <div className={cx("percentile-box")}>
-                    Bạn làm tốt hơn <strong>{enhanced.percentile}%</strong> người đã từng làm bài này
+                    {t.rich("percentile", {
+                      percentile: enhanced.percentile,
+                      strong: (chunks) => <strong>{chunks}</strong>,
+                    })}
                   </div>
                 )}
 

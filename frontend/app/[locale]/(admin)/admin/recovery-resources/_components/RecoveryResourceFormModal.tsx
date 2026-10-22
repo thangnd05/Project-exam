@@ -1,11 +1,12 @@
 'use client';
 
+import {useTranslations} from 'next-intl';
 import {Form} from 'react-bootstrap';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import TagSelector from '@/app/features/tests/TagSelector/TagSelector';
 import type {TagResponse} from '@/app/types';
-import type {RecoveryExamTypeOption} from '@/app/(admin)/admin/recovery-resources/_hooks/useRecoveryResources';
+import type {RecoveryExamTypeOption} from '@/app/[locale]/(admin)/admin/recovery-resources/_hooks/useRecoveryResources';
 
 export interface RecoveryResourceFormState {
   title: string;
@@ -47,67 +48,71 @@ function RecoveryResourceFormModal({
   onSubmit,
   submitting,
 }: RecoveryResourceFormModalProps) {
+  const t = useTranslations('AdminUsers');
+  const tCommon = useTranslations('Common');
   const selectedTagIds = formState.tagIds || [];
 
   return (
     <BaseModal
       show={show}
       onClose={onClose}
-      title={isEditing ? 'Cập nhật tài liệu' : 'Thêm tài liệu mới'}
+      title={isEditing ? t('recoveryResources.form.editTitle') : t('recoveryResources.form.createTitle')}
       maxWidth={800}
       footer={
         <ModalActionFooter
           onCancel={onClose}
           onSubmit={onSubmit}
-          cancelLabel="Hủy"
-          submitLabel={isEditing ? 'Lưu' : 'Tạo mới'}
-          loadingLabel="Đang lưu..."
+          cancelLabel={tCommon('cancelShort')}
+          submitLabel={isEditing ? tCommon('save') : t('shared.createNew')}
+          loadingLabel={t('shared.saving')}
           loading={submitting}
         />
       }
     >
         <Form.Group className="mb-3">
-          <Form.Label>Tiêu đề</Form.Label>
+          <Form.Label>{t('recoveryResources.form.title')}</Form.Label>
           <Form.Control
             value={formState.title}
             onChange={(e) => onChangeField('title', e.target.value)}
-            placeholder="VD: Mẹo giải dạng bài hay sai..."
+            placeholder={t('recoveryResources.form.titlePlaceholder')}
           />
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Mô tả</Form.Label>
+          <Form.Label>{t('recoveryResources.form.description')}</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
             value={formState.description}
             onChange={(e) => onChangeField('description', e.target.value)}
-            placeholder="Mô tả chi tiết nội dung tài liệu..."
+            placeholder={t('recoveryResources.form.descriptionPlaceholder')}
           />
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Upload file</Form.Label>
+          <Form.Label>{t('recoveryResources.form.uploadFile')}</Form.Label>
           <Form.Control
             type="file"
             accept=".md,.markdown,.pdf,.doc,.docx,image/*,audio/*,video/*,text/markdown"
             onChange={(e) => onFileChange((e.target as HTMLInputElement).files![0] || null)}
           />
           <Form.Text className="text-muted">
-            Hỗ trợ Markdown (.md), PDF, Word, ảnh, audio, video.
+            {t('recoveryResources.form.supportedFormats')}
           </Form.Text>
           {selectedFile && (
             <Form.Text className="text-muted d-block">{selectedFile.name}</Form.Text>
           )}
           {isEditing && !selectedFile && formState.url && (
             <Form.Text className="text-muted d-block mt-1">
-              File hiện tại: <a href={formState.url} target="_blank" rel="noreferrer">Xem file</a>
+              {t.rich('recoveryResources.form.currentFile', {
+                link: (chunks) => <a href={formState.url} target="_blank" rel="noreferrer">{chunks}</a>,
+              })}
             </Form.Text>
           )}
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Hoặc nhập URL</Form.Label>
+          <Form.Label>{t('recoveryResources.form.orUrl')}</Form.Label>
           <Form.Control
             value={formState.url}
             onChange={(e) => onChangeField('url', e.target.value)}
@@ -116,12 +121,12 @@ function RecoveryResourceFormModal({
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Loại kỳ thi</Form.Label>
+          <Form.Label>{t('recoveryResources.form.examType')}</Form.Label>
           <Form.Select
             value={formExamTypeId}
             onChange={(e) => onExamTypeChange(e.target.value)}
           >
-            <option value="">- Chọn loại kỳ thi </option>
+            <option value="">{t('recoveryResources.form.selectExamType')}</option>
             {examTypes.map((et) => (
               <option key={et.id} value={et.id}>
                 {et.name}
@@ -133,7 +138,7 @@ function RecoveryResourceFormModal({
         <Form.Group className="mb-3">
           {!formExamTypeId ? (
             <Form.Text className="text-muted">
-              Chọn loại kỳ thi ở trên để gắn hoặc thay đổi tag cho tài liệu.
+              {t('recoveryResources.form.selectExamTypeFirst')}
             </Form.Text>
           ) : availableTags.length > 0 ? (
             <>
@@ -141,15 +146,15 @@ function RecoveryResourceFormModal({
                 tags={availableTags}
                 selectedIds={selectedTagIds}
                 onToggle={onToggleTag}
-                label="Gắn Tag (liên kết kiến thức)"
+                label={t('recoveryResources.form.tagLabel')}
               />
               <Form.Text className="text-muted">
-                Phần thi của tài liệu được lấy theo tag. Một tài liệu có thể gắn tag của nhiều phần thi.
+                {t('recoveryResources.form.tagHint')}
               </Form.Text>
             </>
           ) : (
             <Form.Text className="text-muted">
-              Loại kỳ thi này chưa có tag. Tạo tag tại mục Quản lý Tag trước.
+              {t('recoveryResources.form.noTags')}
             </Form.Text>
           )}
         </Form.Group>

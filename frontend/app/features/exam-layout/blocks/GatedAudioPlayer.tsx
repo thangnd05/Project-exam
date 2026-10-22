@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { IoPlay } from 'react-icons/io5';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
@@ -18,6 +19,7 @@ type GatedAudioPlayerProps = {
 type PlayerPhase = 'loading' | 'playing' | 'armNeeded' | 'ended';
 
 function GatedAudioPlayer({ urls = [], onCompleted }: GatedAudioPlayerProps) {
+  const t = useTranslations('TestTaking.examLayout');
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const completedRef = useRef(false);
 
@@ -94,16 +96,15 @@ function GatedAudioPlayer({ urls = [], onCompleted }: GatedAudioPlayerProps) {
         <div className={cx('player')}>
           <div className={cx('info')}>
             <div className={cx('hint')}>
-              Trình duyệt tạm dừng audio sau khi tải lại trang. Nhấn để nghe, hoặc chuyển sang câu
-              tiếp.
+              {t('audioBlockedHint')}
             </div>
           </div>
           <div className={cx('armRow')}>
             <ButtonPrime variant="primary" size="md" onClick={tryPlay}>
-              <IoPlay /> Phát audio
+              <IoPlay /> {t('playAudio')}
             </ButtonPrime>
             <ButtonPrime variant="ghost" size="md" onClick={complete}>
-              Câu tiếp
+              {t('next')}
             </ButtonPrime>
           </div>
         </div>

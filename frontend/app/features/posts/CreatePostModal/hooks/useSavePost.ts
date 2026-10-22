@@ -1,6 +1,7 @@
 'use client';
 
 import { useMutation } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import { uploadPostImage, createPost, updatePost } from '@/app/apis/postApi';
 import { getApiErrorMessage } from '@/app/utils/apiError';
@@ -25,6 +26,8 @@ interface SavePostVariables {
 }
 
 export function useSavePost({ onSuccess }: { onSuccess?: () => void } = {}) {
+  const t = useTranslations('Posts.save');
+
   return useMutation({
     mutationFn: async ({
       title,
@@ -41,7 +44,7 @@ export function useSavePost({ onSuccess }: { onSuccess?: () => void } = {}) {
       const imagesToUpload = inlineImages.filter((img) => finalContent.includes(img.base64Url));
 
       if (imagesToUpload.length > 0) {
-        toast.info(`Đang tải lên ${imagesToUpload.length} ảnh trong nội dung...`, { autoClose: 2000 });
+        toast.info(t('uploadingImages', { count: imagesToUpload.length }), { autoClose: 2000 });
         for (const img of imagesToUpload) {
           const imgFormData = new FormData();
           imgFormData.append('image', img.file);
@@ -51,7 +54,7 @@ export function useSavePost({ onSuccess }: { onSuccess?: () => void } = {}) {
             const cloudUrl = data.url;
             finalContent = finalContent.split(img.base64Url).join(cloudUrl);
           } catch {
-            toast.error(` Lỗi tải ảnh ${img.file.name} lên Cloudinary!`);
+            toast.error(t('uploadImageError', { name: img.file.name }));
           }
         }
       }
@@ -72,10 +75,10 @@ export function useSavePost({ onSuccess }: { onSuccess?: () => void } = {}) {
 
       if (isEditing) {
         await updatePost(editingPostId as string, formData);
-        toast.success('Cập nhật bài viết thành công!');
+        toast.success(t('updated'));
       } else {
         await createPost(formData);
-        toast.success('Đăng bài viết thành công!');
+        toast.success(t('created'));
       }
     },
     onSuccess: () => {
@@ -83,7 +86,7 @@ export function useSavePost({ onSuccess }: { onSuccess?: () => void } = {}) {
     },
     onError: (err, variables) => {
       toast.error(
-        getApiErrorMessage(err, variables.isEditing ? 'Lỗi khi cập nhật bài viết!' : 'Lỗi khi đăng bài viết!'),
+        getApiErrorMessage(err, variables.isEditing ? t('updateError') : t('createError')),
       );
     },
   });

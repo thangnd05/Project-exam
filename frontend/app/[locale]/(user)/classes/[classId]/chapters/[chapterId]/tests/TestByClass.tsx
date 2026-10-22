@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { IoDocumentTextOutline, IoAddCircleOutline } from 'react-icons/io5';
@@ -17,6 +18,7 @@ import type { TestResponse } from '@/app/types';
 const cx = classNames.bind(styles);
 
 function TestByClass() {
+  const t = useTranslations('Classes');
   const { classId, chapterId } = useParams<{ classId: string; chapterId: string }>();
   const { className, tests, isLoading, refetchTests, deleteTestMutation } =
     useTestByClass(classId, chapterId);
@@ -38,10 +40,10 @@ function TestByClass() {
 
     try {
       await deleteTestMutation.mutateAsync(testToDelete.testId);
-      toast.success('Xóa bài kiểm tra thành công!');
+      toast.success(t('classTests.deleteSuccess'));
     } catch (err) {
       console.error(' Lỗi xóa bài test:', err);
-      toast.error('Không thể xóa bài kiểm tra. Vui lòng thử lại.');
+      toast.error(t('classTests.deleteFailed'));
     } finally {
       setShowDeleteModal(false);
       setTestToDelete(null);
@@ -70,7 +72,7 @@ function TestByClass() {
         style={{ minHeight: '60vh' }}
       >
         <Spinner animation="grow" variant="primary" />
-        <p className="mt-3 fw-bold text-primary">Đang tải phòng thi...</p>
+        <p className="mt-3 fw-bold text-primary">{t('classTests.loading')}</p>
       </div>
     );
   }
@@ -78,17 +80,17 @@ function TestByClass() {
   const emptyState = (
     <div className={cx('empty-state')}>
       <IoDocumentTextOutline className={cx('icon')} />
-      <h4>Chưa có bài kiểm tra nào được công bố</h4>
-      <p>Giáo viên của bạn sẽ sớm cập nhật các bài thi tại đây.</p>
+      <h4>{t('classTests.emptyTitle')}</h4>
+      <p>{t('classTests.emptyDescription')}</p>
     </div>
   );
 
   return (
     <>
       <TestListContainer
-        title={className || 'Lớp học hiện tại'}
-        label="Phòng thi của lớp"
-        actionText="Tạo bài kiểm tra mới"
+        title={className || t('classTests.classFallback')}
+        label={t('classTests.label')}
+        actionText={t('classTests.create')}
         actionIcon={IoAddCircleOutline}
         onAction={() => setShowCreateTestModal(true)}
         tests={tests}
@@ -107,7 +109,7 @@ function TestByClass() {
         onSuccess={() => {
           refetchTests();
           setShowCreateTestModal(false);
-          toast.success('Tạo bài kiểm tra mới thành công!');
+          toast.success(t('classTests.createSuccess'));
         }}
       />
 
@@ -118,9 +120,10 @@ function TestByClass() {
           setTestToDelete(null);
         }}
         onConfirm={handleConfirmDeleteTest}
-        title="Xác nhận xóa bài kiểm tra"
-        message={`Bạn có chắc chắn muốn xóa bài kiểm tra "${testToDelete?.title || 'này'
-          }"? Hành động này không thể hoàn tác.`}
+        title={t('classTests.deleteTitle')}
+        message={testToDelete?.title
+          ? t('classTests.deleteMessage', { title: testToDelete.title })
+          : t('classTests.deleteMessageUntitled')}
       />
     </>
   );

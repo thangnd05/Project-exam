@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import Link, { useRouter } from '@/app/i18n/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { isAxiosError } from 'axios';
 import classNames from 'classnames/bind';
 import { FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
@@ -10,8 +11,8 @@ import { MdCheckCircle, MdErrorOutline } from 'react-icons/md';
 import routes from '@/app/configs/Routes';
 import { useResetPasswordMutation, useResetTokenQuery } from '@/app/features/auth/hooks/useAuthActions';
 import type { ResetTokenInvalidReason } from '@/app/types';
-import style from '@/app/(auth)/_components/auth/AuthRecovery.module.scss';
-import { PASSWORD_HINT, isPasswordValid } from '@/app/(auth)/_components/auth/passwordRules';
+import style from '@/app/[locale]/(auth)/_components/auth/AuthRecovery.module.scss';
+import { PASSWORD_MAX_LENGTH, isPasswordValid } from '@/app/[locale]/(auth)/_components/auth/passwordRules';
 
 const cx = classNames.bind(style);
 
@@ -44,24 +45,21 @@ function clearStoredToken() {
   }
 }
 
-const INVALID_REASON_TEXT: Record<ResetTokenInvalidReason, string> = {
-  MISSING: 'Liên kết không chứa mã đặt lại mật khẩu. Hãy mở đúng liên kết trong email của bạn.',
-  INVALID: 'Liên kết đặt lại mật khẩu không hợp lệ hoặc đã bị thay thế bởi một yêu cầu mới hơn.',
-  USED: 'Liên kết này đã được sử dụng. Mỗi liên kết chỉ dùng được một lần.',
-  EXPIRED: 'Liên kết đã hết hạn. Vui lòng yêu cầu một liên kết mới.',
-};
+type AuthT = ReturnType<typeof useTranslations<'Auth'>>;
 
-function formatRemaining(seconds: number) {
+function formatRemaining(seconds: number, t: AuthT) {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  if (mins <= 0) return `${secs} giây`;
-  return `${mins} phút ${secs.toString().padStart(2, '0')} giây`;
+  if (mins <= 0) return t('reset.remainingSeconds', { secs });
+  return t('reset.remainingMinutes', { mins, secs: secs.toString().padStart(2, '0') });
 }
 
 function ResetPassword() {
+  const t = useTranslations('Auth');
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlToken = (searchParams.get('token') || '').trim();
+  const passwordHint = t('reset.passwordHint', { max: PASSWORD_MAX_LENGTH });
 
   // null = chưa đọc xong token, khác với '' nghĩa là không có token.
   const [token, setToken] = useState<string | null>(null);
@@ -131,15 +129,15 @@ function ResetPassword() {
     setFormError('');
 
     if (!passwordOk) {
-      setFormError(`Mật khẩu mới chưa hợp lệ. ${PASSWORD_HINT}`);
+      setFormError(t('reset.invalidPassword', { hint: passwordHint }));
       return;
     }
     if (!confirmOk) {
-      setFormError('Mật khẩu xác nhận không khớp.');
+      setFormError(t('reset.confirmMismatch'));
       return;
     }
     if (!token) {
-      setFormError('Không tìm thấy mã đặt lại mật khẩu. Vui lòng mở lại liên kết trong email.');
+      setFormError(t('reset.tokenMissing'));
       return;
     }
 
@@ -155,14 +153,14 @@ function ResetPassword() {
       const response = isAxiosError<{ message?: string }>(err) ? err.response : undefined;
       const status = response?.status;
       if (status === 429) {
-        setFormError('Bạn thao tác quá nhanh. Vui lòng chờ một lát rồi thử lại.');
+        setFormError(t('reset.tooFast'));
         return;
       }
       setFormError(
         response?.data?.message ||
           (response
-            ? 'Không đặt lại được mật khẩu. Vui lòng thử lại.'
-            : 'Không thể kết nối đến máy chủ. Kiểm tra kết nối mạng của bạn.'),
+            ? t('reset.resetFailed')
+            : t('common.networkError')),
       );
       // Token có thể vừa bị vô hiệu hoá -> kiểm tra lại trạng thái.
       if (status === 400) tokenQuery.refetch();
@@ -175,7 +173,7 @@ function ResetPassword() {
         <div className={cx('card')}>
           <div className={cx('loadingState')}>
             <span className={cx('loadingSpinner')} />
-            <span>Đang kiểm tra liên kết...</span>
+            <span>{t('reset.checkingLink')}</span>
           </div>
         </div>
       </div>
@@ -185,9 +183,12 @@ function ResetPassword() {
   const tokenInvalid = !token || tokenQuery.isError || tokenQuery.data?.valid === false;
 
   if (tokenInvalid && !done) {
-    const reason: ResetTokenInvalidReason = !token
+    const rawReason: ResetTokenInvalidReason = !token
       ? 'MISSING'
       : (tokenQuery.data?.reason as ResetTokenInvalidReason) || 'INVALID';
+    const reason: ResetTokenInvalidReason = ['MISSING', 'INVALID', 'USED', 'EXPIRED'].includes(rawReason)
+      ? rawReason
+      : 'INVALID';
 
     return (
       <div className={cx('page')}>
@@ -195,22 +196,22 @@ function ResetPassword() {
           <div className={cx('badge', 'danger')}>
             <MdErrorOutline />
           </div>
-          <h1 className={cx('title')}>Liên kết không dùng được</h1>
+          <h1 className={cx('title')}>{t('reset.linkUnusable')}</h1>
           <p className={cx('subtitle')}>
             {tokenQuery.isError
-              ? 'Không kiểm tra được liên kết. Vui lòng thử lại hoặc yêu cầu liên kết mới.'
-              : INVALID_REASON_TEXT[reason]}
+              ? t('reset.checkFailed')
+              : t(`reset.invalidReason.${reason}`)}
           </p>
 
           <div className={cx('actions')}>
             <Link href={routes.forgot} className={cx('submitBtn')} style={{ textDecoration: 'none' }}>
-              Yêu cầu liên kết mới
+              {t('reset.requestNewLink')}
             </Link>
           </div>
 
           <p className={cx('footer')}>
             <Link href={routes.login} className={cx('back-link')}>
-              Quay lại đăng nhập
+              {t('common.backToLogin')}
             </Link>
           </p>
         </div>
@@ -225,14 +226,13 @@ function ResetPassword() {
           <div className={cx('badge', 'success')}>
             <MdCheckCircle />
           </div>
-          <h1 className={cx('title')}>Đã đổi mật khẩu</h1>
+          <h1 className={cx('title')}>{t('reset.doneTitle')}</h1>
           <p className={cx('subtitle')}>
-            Mật khẩu của bạn đã được cập nhật. Mọi phiên đăng nhập cũ đã bị đăng xuất để đảm bảo an
-            toàn. Đang chuyển tới trang đăng nhập sau {countdown}s...
+            {t('reset.doneDescription', { countdown })}
           </p>
           <div className={cx('actions')}>
             <Link href={routes.login} className={cx('submitBtn')} style={{ textDecoration: 'none' }}>
-              Đăng nhập ngay
+              {t('common.signInNow')}
             </Link>
           </div>
         </div>
@@ -248,26 +248,29 @@ function ResetPassword() {
         <div className={cx('badge')}>
           <FiLock />
         </div>
-        <h1 className={cx('title')}>Đặt lại mật khẩu</h1>
+        <h1 className={cx('title')}>{t('reset.title')}</h1>
         <p className={cx('subtitle')}>
           {tokenQuery.data?.maskedEmail ? (
-            <>
-              Tạo mật khẩu mới cho tài khoản <strong>{tokenQuery.data.maskedEmail}</strong>.
-            </>
+            t.rich('reset.subtitleFor', {
+              email: tokenQuery.data.maskedEmail,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })
           ) : (
-            'Tạo mật khẩu mới cho tài khoản của bạn.'
+            t('reset.subtitle')
           )}
           {remaining !== null && !expired && (
             <>
               <br />
-              Liên kết còn hiệu lực trong {formatRemaining(remaining)}.
+              {t('reset.validFor', { time: formatRemaining(remaining, t) })}
             </>
           )}
         </p>
 
         {expired && (
           <div className={cx('alert', 'alertError')} style={{ marginBottom: 16 }}>
-            Liên kết đã hết hạn. Vui lòng <Link href={routes.forgot}>yêu cầu liên kết mới</Link>.
+            {t.rich('reset.expired', {
+              link: (chunks) => <Link href={routes.forgot}>{chunks}</Link>,
+            })}
           </div>
         )}
 
@@ -279,11 +282,11 @@ function ResetPassword() {
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="new-password"
                 autoFocus
-                aria-label="Mật khẩu mới"
+                aria-label={t('reset.newPassword')}
                 className={cx('input', 'hasToggle', {
                   invalid: touched.password && newPassword.length > 0 && !passwordOk,
                 })}
-                placeholder="Mật khẩu mới"
+                placeholder={t('reset.newPassword')}
                 value={newPassword}
                 disabled={isSubmitting || expired}
                 onChange={(e) => {
@@ -296,13 +299,13 @@ function ResetPassword() {
                 type="button"
                 className={cx('toggle')}
                 onClick={() => setShowPassword((prev) => !prev)}
-                aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
               >
                 {showPassword ? <FiEyeOff /> : <FiEye />}
               </button>
             </div>
 
-            <span className={cx('hint')}>{PASSWORD_HINT}</span>
+            <span className={cx('hint')}>{passwordHint}</span>
           </div>
 
           <div className={cx('field')}>
@@ -311,11 +314,11 @@ function ResetPassword() {
                 id="confirm-password"
                 type={showConfirm ? 'text' : 'password'}
                 autoComplete="new-password"
-                aria-label="Xác nhận mật khẩu mới"
+                aria-label={t('reset.confirmPassword')}
                 className={cx('input', 'hasToggle', {
                   invalid: touched.confirm && confirmPassword.length > 0 && !confirmOk,
                 })}
-                placeholder="Xác nhận mật khẩu mới"
+                placeholder={t('reset.confirmPassword')}
                 value={confirmPassword}
                 disabled={isSubmitting || expired}
                 onChange={(e) => {
@@ -328,25 +331,25 @@ function ResetPassword() {
                 type="button"
                 className={cx('toggle')}
                 onClick={() => setShowConfirm((prev) => !prev)}
-                aria-label={showConfirm ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                aria-label={showConfirm ? t('common.hidePassword') : t('common.showPassword')}
               >
                 {showConfirm ? <FiEyeOff /> : <FiEye />}
               </button>
             </div>
             {touched.confirm && confirmPassword.length > 0 && !confirmOk && (
-              <span className={cx('fieldError')}>Mật khẩu xác nhận không khớp.</span>
+              <span className={cx('fieldError')}>{t('reset.confirmMismatch')}</span>
             )}
           </div>
 
           {formError && <div className={cx('alert', 'alertError')}>{formError}</div>}
 
           <Link href={routes.login} className={cx('back-link')}>
-            Quay lại đăng nhập
+            {t('common.backToLogin')}
           </Link>
 
           <button type="submit" className={cx('submitBtn')} disabled={!canSubmit || expired}>
             {isSubmitting && <span className={cx('spinner')} />}
-            {isSubmitting ? 'Đang cập nhật...' : 'Đặt lại mật khẩu'}
+            {isSubmitting ? t('reset.updating') : t('reset.submit')}
           </button>
         </form>
       </div>

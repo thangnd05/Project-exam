@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import { FiArrowRight } from 'react-icons/fi';
@@ -40,6 +41,7 @@ const READINESS_TONE: Record<string, string> = {
 };
 
 function TargetDashboard() {
+  const t = useTranslations('MyTarget');
   const [searchParams, setSearchParams] = useSearchParamsState();
   // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ngay khi danh sách về (xem bên dưới).
   const [examTypeId, setExamTypeId] = useState('');
@@ -120,9 +122,9 @@ function TargetDashboard() {
     <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
       <TargetPlanTabs active="overview" examTypeId={examTypeId} examTypes={examTypes} />
       <header className={ui('pageHead')}>
-        <h1 className={ui('pageTitle')}>Tổng quan mục tiêu</h1>
+        <h1 className={ui('pageTitle')}>{t('dashboard.title')}</h1>
         <p className={ui('pageSubtitle')}>
-          Bài thi thử gần nhất so với mục tiêu, lộ trình đang học và % đúng từng phần thi.
+          {t('dashboard.subtitle')}
         </p>
       </header>
 
@@ -146,10 +148,10 @@ function TargetDashboard() {
       {!loading && !target?.hasTarget && examTypeId && (
         <div className={ui('empty')}>
           <IoFlagOutline className={ui('emptyIcon')} aria-hidden="true" />
-          <h2>Chưa đặt mục tiêu cho kỳ thi này</h2>
-          <p>Đặt mức điểm muốn đạt để xem tiến độ từng phần và sinh lộ trình phù hợp.</p>
+          <h2>{t('dashboard.noTarget.title')}</h2>
+          <p>{t('dashboard.noTarget.description')}</p>
           <Link href={withExam('/my-target', examTypeId, examTypes)} className={ui('btnPrimary')}>
-            Đặt mục tiêu
+            {t('dashboard.noTarget.cta')}
           </Link>
         </div>
       )}
@@ -160,16 +162,17 @@ function TargetDashboard() {
             <div className={classNames(ui('notice', 'noticeSuccess'), pageCx('achieved'))}>
               <IoTrophyOutline className={pageCx('achievedIcon')} aria-hidden="true" />
               <span>
-                <strong>Bạn đã đạt mục tiêu {target.targetScore}!</strong>
+                <strong>{t('dashboard.achievedTitle', { score: target.targetScore ?? '' })}</strong>
+                {' '}
                 {target.achievedAt
-                  ? ` Đạt lúc ${formatDate(target.achievedAt)}.`
-                  : ` Bài thi thử gần nhất: ${latestEnhanced?.totalScore} điểm.`}
+                  ? t('dashboard.achievedAt', { date: formatDate(target.achievedAt) })
+                  : t('dashboard.latestMockScore', { score: latestEnhanced?.totalScore ?? 0 })}
               </span>
               <Link
                 href={withExam('/my-target/achieved', examTypeId, examTypes)}
                 className={ui('btnPrimary', 'btnSm')}
               >
-                Đặt mục tiêu mới
+                {t('dashboard.newTarget')}
               </Link>
             </div>
           )}
@@ -183,7 +186,7 @@ function TargetDashboard() {
 
             <div className={pageCx('stats')}>
               <div className={pageCx('stat')}>
-                <span className={ui('eyebrow')}>Mục tiêu điểm</span>
+                <span className={ui('eyebrow')}>{t('dashboard.targetScore')}</span>
                 <span className={pageCx('statValue')}>{target.targetScore}</span>
                 {mockScore != null ? (
                   <>
@@ -194,24 +197,27 @@ function TargetDashboard() {
                       />
                     </div>
                     <span className={pageCx('statMeta')}>
-                      Gần nhất <strong>{mockScore}</strong>
+                      {t.rich('dashboard.latest', {
+                        score: mockScore,
+                        strong: (chunks) => <strong>{chunks}</strong>,
+                      })}
                       {' · '}
                       {scoreProgress.reached
-                        ? 'đã đạt'
+                        ? t('dashboard.reached')
                         : scoreProgress.gap != null
-                          ? `còn ${scoreProgress.gap}đ`
+                          ? t('dashboard.gap', { gap: scoreProgress.gap })
                           : ''}
                     </span>
                   </>
                 ) : (
                   <span className={pageCx('statHint')}>
-                    Chưa có bài thi thử nào, làm bài để xem tiến độ.
+                    {t('dashboard.noMock')}
                   </span>
                 )}
               </div>
 
               <div className={pageCx('stat')}>
-                <span className={ui('eyebrow')}>Độ sẵn sàng</span>
+                <span className={ui('eyebrow')}>{t('dashboard.readiness')}</span>
                 <span className={pageCx('statValue')}>
                   {enhancedMatchesType ? `${latestEnhanced?.readinessScore ?? '-'}%` : '—'}
                 </span>
@@ -222,50 +228,51 @@ function TargetDashboard() {
                       getReadinessClassName(readinessLevel, (key) => ui('pill', READINESS_TONE[key])),
                     )}
                   >
-                    {getReadinessLabel(readinessLevel)}
+                    {getReadinessLabel(readinessLevel, t)}
                   </span>
                 ) : (
                   <span className={pageCx('statHint')}>
-                    {enhancedMatchesType ? '' : 'Chưa có bài thi thử cho kỳ thi này.'}
+                    {enhancedMatchesType ? '' : t('dashboard.noMockForExam')}
                   </span>
                 )}
               </div>
 
               <div className={pageCx('stat')}>
-                <span className={ui('eyebrow')}>Lộ trình đang học</span>
+                <span className={ui('eyebrow')}>{t('dashboard.activePlan')}</span>
                 {activePlan ? (
                   <>
                     <span className={pageCx('statValue', 'statValueText')}>
-                      Lộ trình {activePlan.planSequence ?? '?'}
+                      {t('dashboard.planName', { seq: activePlan.planSequence ?? '?' })}
                     </span>
                     <span className={pageCx('statMeta')}>
                       {activePlan.baselineReadiness != null
-                        ? `Ban đầu ${activePlan.baselineReadiness}%`
-                        : 'Theo chương trình học'}
+                        ? t('dashboard.baseline', { pct: activePlan.baselineReadiness })
+                        : t('dashboard.byCurriculum')}
                       {' · '}
-                      <strong>
-                        {activePlan.passedTasks ?? 0}/{activePlan.totalTasks ?? 0}
-                      </strong>{' '}
-                      ải
+                      {t.rich('dashboard.stages', {
+                        passed: activePlan.passedTasks ?? 0,
+                        total: activePlan.totalTasks ?? 0,
+                        strong: (chunks) => <strong>{chunks}</strong>,
+                      })}
                     </span>
                     <Link
                       href={`/learning-plans/${activePlan.learningPlanId}`}
                       className={classNames(ui('btnPrimary', 'btnSm'), pageCx('statAction'))}
                     >
-                      Mở lộ trình
+                      {t('dashboard.openPlan')}
                       <FiArrowRight aria-hidden="true" />
                     </Link>
                   </>
                 ) : (
                   <>
-                    <span className={pageCx('statValue', 'statValueText', 'muted')}>Chưa có</span>
-                    <span className={pageCx('statHint')}>Chưa có lộ trình đang học.</span>
+                    <span className={pageCx('statValue', 'statValueText', 'muted')}>{t('dashboard.none')}</span>
+                    <span className={pageCx('statHint')}>{t('dashboard.noActivePlan')}</span>
                     {latestMock?.userTestId && (
                       <Link
                         href={`/learning-plans/generate?userTestId=${latestMock.userTestId}`}
                         className={classNames(ui('btnPrimary', 'btnSm'), pageCx('statAction'))}
                       >
-                        Sinh lộ trình
+                        {t('dashboard.generatePlan')}
                         <FiArrowRight aria-hidden="true" />
                       </Link>
                     )}
@@ -278,9 +285,9 @@ function TargetDashboard() {
           <section className={ui('card')} aria-labelledby="overview-parts-title">
             <div className={ui('cardHead')}>
               <h3 id="overview-parts-title" className={ui('cardTitle')}>
-                % đúng từng phần
+                {t('dashboard.parts.title')}
               </h3>
-              <span className={ui('cardMeta')}>hiện tại so với mục tiêu</span>
+              <span className={ui('cardMeta')}>{t('dashboard.parts.meta')}</span>
             </div>
             <TargetDashboardPartChart rows={partChartRows} />
           </section>

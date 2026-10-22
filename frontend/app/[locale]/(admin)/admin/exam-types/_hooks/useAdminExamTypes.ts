@@ -10,7 +10,7 @@ import {
   updateExamType,
   updateExamTypeLayout,
 } from '@/app/apis/examTypeApi';
-import {useAdminCrud} from '@/app/(admin)/_hooks/useAdminCrud';
+import {useAdminCrud} from '@/app/[locale]/(admin)/_hooks/useAdminCrud';
 import {examTypeKeys} from '@/app/configs/queryKeys';
 import type {ExamTypeLayoutResponse, ExamTypeRequest, ExamTypeResponse} from '@/app/types';
 

@@ -2,13 +2,15 @@
 
 import { useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 
 import {formatDateTime} from '@/app/utils/format-date-time';
-import {AdminPageHeader, AdminTable, AdminToolbar} from '@/app/(admin)/_components/common';
-import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
+import {AdminPageHeader, AdminTable, AdminToolbar} from '@/app/[locale]/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import {useLoginAudit, type LoginAuditRow} from './_hooks/useLoginAudit';
 
 function LoginAudit() {
+  const t = useTranslations('AdminSystem.auditLogin');
   const ITEMS_PER_PAGE = 20;
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -44,7 +46,7 @@ function LoginAudit() {
   const columns: AdminTableColumn[] = [
     {
       key: 'login_time',
-      header: 'Thời gian',
+      header: t('time'),
       render: (row: LoginAuditRow) => formatDateTime(row.login_time),
     },
     {key: 'action', header: 'Action', render: (row: LoginAuditRow) => row.action || '-'},
@@ -52,16 +54,16 @@ function LoginAudit() {
     {key: 'ip_address', header: 'IP', render: (row: LoginAuditRow) => row.ip_address || '-'},
     {
       key: 'status',
-      header: 'Trạng thái',
+      header: t('status'),
       render: (row: LoginAuditRow) => (
         <Badge bg={row.status === 'SUCCESS' ? 'success' : 'danger'}>
-          {row.status === 'SUCCESS' ? 'Thành công' : 'Thất bại'}
+          {row.status === 'SUCCESS' ? t('success') : t('failed')}
         </Badge>
       ),
     },
     {
       key: 'failure_reason',
-      header: 'Lý do thất bại',
+      header: t('failureReason'),
       render: (row: LoginAuditRow) => row.failure_reason || '-',
     },
     {
@@ -80,22 +82,22 @@ function LoginAudit() {
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Audit đăng nhập"
-        description="Lịch sử đăng nhập thành công / thất bại (bảng login_audit  dữ liệu demo)."
+        title={t('title')}
+        description={t('description')}
       />
 
       <AdminToolbar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="Tìm theo user ID, action, IP, user agent, lý do..."
+        searchPlaceholder={t('searchPlaceholder')}
       >
         <Form.Select
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value)}
         >
-          <option value="all">Tất cả trạng thái</option>
-          <option value="success">Thành công</option>
-          <option value="failed">Thất bại</option>
+          <option value="all">{t('allStatuses')}</option>
+          <option value="success">{t('success')}</option>
+          <option value="failed">{t('failed')}</option>
         </Form.Select>
       </AdminToolbar>
 
@@ -104,13 +106,13 @@ function LoginAudit() {
         columns={columns}
         data={filteredRows}
         loading={loading}
-        emptyText="Không có bản ghi phù hợp bộ lọc hiện tại."
+        emptyText={t('empty')}
         getRowKey={(row: LoginAuditRow) => row.id}
         page={currentPage - 1}
         totalPages={totalPages}
         totalElements={totalElements}
         pageSize={ITEMS_PER_PAGE}
-        itemLabel="bản ghi"
+        itemLabel={t('itemLabel')}
         onPageChange={(p) => setCurrentPage(p + 1)}
       />
     </div>

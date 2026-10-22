@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { IoCodeSlashOutline, IoFlashOutline } from 'react-icons/io5';
 import { standardizeVocabularies } from '@/app/apis/vocabularyApi';
 import { toast } from 'react-toastify';
@@ -9,7 +10,7 @@ import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
-import { useBulkCreateVocabularies } from '@/app/(user)/albums/[albumId]/_hooks/useAlbumVocabularies';
+import { useBulkCreateVocabularies } from '@/app/[locale]/(user)/albums/[albumId]/_hooks/useAlbumVocabularies';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import type { VocabularyRequest } from '@/app/types';
 
@@ -23,6 +24,8 @@ type BulkCreateVocabularyModalProps = {
 };
 
 const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCreateVocabularyModalProps) => {
+    const t = useTranslations('Vocabulary');
+    const tCommon = useTranslations('Common');
     const [aiLoading, setAiLoading] = useState(false);
     const [jsonInput, setJsonInput] = useState('');
 
@@ -31,7 +34,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
 
     const handleStandardize = async () => {
         if (!jsonInput.trim()) {
-            toast.warning(' Vui lòng nhập văn bản thô để chuẩn hóa!');
+            toast.warning(t('bulkImport.toast.rawTextRequired'));
             return;
         }
 
@@ -46,17 +49,17 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
             JSON.parse(cleanedJson);
 
             setJsonInput(cleanedJson);
-            toast.success('Chuẩn hóa dữ liệu thành công!');
+            toast.success(t('bulkImport.toast.standardized'));
         } catch (err) {
             console.error('Lỗi chuẩn hóa AI:', err);
 
             let errorMsg;
             if (err instanceof SyntaxError) {
-                errorMsg = 'AI trả về dữ liệu không hợp lệ. Vui lòng thử lại!';
+                errorMsg = t('bulkImport.toast.invalidAiData');
             } else {
                 errorMsg = getApiErrorMessage(err, '')
                     || (err instanceof Error ? err.message : '')
-                    || 'Không thể kết nối AI. Vui lòng thử lại!';
+                    || t('bulkImport.toast.aiUnavailable');
             }
             toast.error(errorMsg);
         } finally {
@@ -68,7 +71,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
         e?.preventDefault();
 
         if (!jsonInput.trim()) {
-            toast.warning('Vui lòng nhập dữ liệu JSON!');
+            toast.warning(t('bulkImport.toast.jsonRequired'));
             return;
         }
 
@@ -76,15 +79,15 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
         try {
             payload = JSON.parse(jsonInput);
             if (!Array.isArray(payload)) {
-                toast.error('Dữ liệu phải là một mảng (Array) các đối tượng từ vựng!');
+                toast.error(t('bulkImport.toast.notArray'));
                 return;
             }
             if (payload.length === 0) {
-                toast.error('Mảng từ vựng không được rỗng!');
+                toast.error(t('bulkImport.toast.emptyArray'));
                 return;
             }
         } catch {
-            toast.error('Định dạng JSON không hợp lệ. Vui lòng kiểm tra lại!');
+            toast.error(t('bulkImport.toast.invalidJson'));
             return;
         }
 
@@ -95,7 +98,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
 
         bulkCreateMutation.mutate(processedPayload, {
             onSuccess: () => {
-                toast.success(`Đã nhập thành công ${processedPayload.length} từ vựng!`);
+                toast.success(t('bulkImport.toast.imported', { count: processedPayload.length }));
                 setJsonInput('');
                 onSuccess();
                 onClose();
@@ -104,7 +107,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
                 console.error('Lỗi khi nhập bulk:', err);
                 const msg = getApiErrorMessage(
                     err,
-                    'Có lỗi xảy ra khi nhập dữ liệu. Vui lòng kiểm tra cấu trúc JSON!',
+                    t('bulkImport.toast.importError'),
                 );
                 toast.error(msg);
             },
@@ -128,13 +131,13 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
         <CommonFormModal
             show={show}
             onHide={onClose}
-            title="Nhập Từ Vựng Hàng Loạt (JSON)"
+            title={t('bulkImport.title')}
             size="lg"
             footer={(
                 <ModalActionFooter
-                    cancelLabel="Hủy bỏ"
-                    submitLabel="Bắt đầu nhập ngay"
-                    loadingLabel="Đang xử lý..."
+                    cancelLabel={tCommon('cancel')}
+                    submitLabel={t('bulkImport.submit')}
+                    loadingLabel={tCommon('processing')}
                     loading={loading}
                     onCancel={onClose}
                     onSubmit={handleSave}
@@ -143,7 +146,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
         >
             <div className={cx('formGroup')}>
                 <div className="d-flex justify-content-between align-items-center mb-2">
-                    <label className={cx('label', 'mb-0')}>Dữ liệu JSON</label>
+                    <label className={cx('label', 'mb-0')}>{t('bulkImport.jsonData')}</label>
                     <div className="d-flex gap-2">
                         <ButtonPrime
                             type="button"
@@ -153,7 +156,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
                             disabled={aiLoading || loading}
                         >
                             <IoFlashOutline className="me-1" />
-                            {aiLoading ? 'Đang xử lý...' : 'Chuẩn hóa bằng AI'}
+                            {aiLoading ? tCommon('processing') : t('bulkImport.standardize')}
                         </ButtonPrime>
                         <ButtonPrime
                             type="button"
@@ -163,14 +166,14 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
                             disabled={aiLoading || loading}
                         >
                             <IoCodeSlashOutline className="me-1" />
-                            Xem mẫu JSON
+                            {t('bulkImport.showSample')}
                         </ButtonPrime>
                     </div>
                 </div>
                 <div className={cx('inputWrapper')}>
                     <textarea
                         className={cx('inputControl', 'textarea')}
-                        placeholder='Dán mảng JSON vào đây: [{"word": "...", "meaning": "..."}, ...]'
+                        placeholder={t('bulkImport.placeholder', { sample: '[{"word": "...", "meaning": "..."}, ...]' })}
                         value={jsonInput}
                         onChange={(e) => setJsonInput(e.target.value)}
                         disabled={loading || aiLoading}
@@ -179,7 +182,9 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
                     />
                 </div>
                 <small className="text-muted mt-2 d-block">
-                    * Đảm bảo cấu trúc JSON là một mảng các đối tượng chứa các trường: <strong>word</strong>, <strong>meaning</strong>, <strong>example</strong> (tùy chọn).
+                    {t.rich('bulkImport.hint', {
+                        strong: (chunks) => <strong>{chunks}</strong>,
+                    })}
                 </small>
             </div>
         </CommonFormModal>

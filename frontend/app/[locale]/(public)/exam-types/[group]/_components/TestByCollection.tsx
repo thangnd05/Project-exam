@@ -1,14 +1,16 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Spinner } from 'react-bootstrap';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 import routes from '@/app/configs/Routes';
 
 import TestListContainer from '@/app/features/tests/TestListContainer/TestListContainer';
 import Pagination from '@/app/components/Pagination/Pagination';
-import { useCollectionTests, useCollectionName } from '@/app/(public)/exam-types/[group]/_hooks/useCollectionTests';
+import { useCollectionTests, useCollectionName } from '@/app/[locale]/(public)/exam-types/[group]/_hooks/useCollectionTests';
 
 const PAGE_SIZE = 12;
 
@@ -21,6 +23,8 @@ type TestByCollectionProps = {
 function TestByCollection({ examTypeId, examHref }: TestByCollectionProps) {
   const { collectionId } = useParams<{ collectionId: string }>();
   const router = useRouter();
+  const localizeHref = useLocalizeHref();
+  const t = useTranslations('ExamTypes.collection');
 
   const [countdowns, setCountdowns] = useState<Record<string, number>>({});
   const [currentPage, setCurrentPage] = useState(0);
@@ -51,7 +55,7 @@ function TestByCollection({ examTypeId, examHref }: TestByCollectionProps) {
         style={{ minHeight: '60vh' }}
       >
         <Spinner animation="grow" variant="info" />
-        <p className="mt-3 fw-bold text-info">Đang tải bộ đề...</p>
+        <p className="mt-3 fw-bold text-info">{t('loading')}</p>
       </div>
     );
   }
@@ -59,18 +63,18 @@ function TestByCollection({ examTypeId, examHref }: TestByCollectionProps) {
   const emptyState = (
     <div style={{ textAlign: 'center', padding: '40px 0' }}>
       <IoDocumentTextOutline style={{ fontSize: '4rem', color: '#94a3b8' }} />
-      <h4 style={{ marginTop: 12 }}>Bộ đề này chưa có đề nào</h4>
-      <p className="text-muted">Vui lòng quay lại sau.</p>
+      <h4 style={{ marginTop: 12 }}>{t('empty.title')}</h4>
+      <p className="text-muted">{t('empty.hint')}</p>
     </div>
   );
 
-  const goBack = () => router.push(examHref || routes.home);
+  const goBack = () => router.push(localizeHref(examHref || routes.home));
 
   return (
     <TestListContainer
-      title={folderName || 'Bộ đề'}
-      label="Khám phá bộ đề"
-      secondaryActionText="Quay lại"
+      title={folderName || t('fallbackTitle')}
+      label={t('label')}
+      secondaryActionText={t('back')}
       onSecondaryAction={goBack}
       tests={tests}
       countdowns={countdowns}

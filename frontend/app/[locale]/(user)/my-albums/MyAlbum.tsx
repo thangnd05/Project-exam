@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Spinner, Container } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -41,6 +42,7 @@ const albumCardVariants: Variants = {
 };
 
 function MyAlbum() {
+  const t = useTranslations('Vocabulary');
   const [showModal, setShowModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -61,11 +63,11 @@ function MyAlbum() {
 
     deleteAlbumMutation.mutate(albumToDelete.albumId, {
       onSuccess: () => {
-        toast.success("Xóa Album thành công!");
+        toast.success(t('myAlbums.toast.deleted'));
       },
       onError: (err) => {
         console.error(' Lỗi xóa album:', err);
-        toast.error(" Có lỗi xảy ra khi xóa Album!");
+        toast.error(t('myAlbums.toast.deleteError'));
       },
       onSettled: () => {
         setShowDeleteModal(false);
@@ -83,7 +85,7 @@ function MyAlbum() {
     return (
       <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
         <Spinner animation="grow" variant="primary" />
-        <p className="mt-3 fw-bold text-primary fs-4">Đang chuẩn bị kho tàng từ vựng...</p>
+        <p className="mt-3 fw-bold text-primary fs-4">{t('myAlbums.loading')}</p>
       </div>
     );
 
@@ -92,9 +94,9 @@ function MyAlbum() {
       <Container>
 
         <PageHeader
-          title="THẺ GHI NHỚ"
-          label="QUẢN LÝ ALBUM"
-          actionText="Tạo album mới"
+          title={t('myAlbums.title')}
+          label={t('myAlbums.label')}
+          actionText={t('myAlbums.createAction')}
           actionIcon={IoAdd}
           onAction={() => setShowModal(true)}
         >
@@ -102,8 +104,8 @@ function MyAlbum() {
             activeKey={viewMode}
             onChange={setViewMode}
             options={[
-              { key: 'grid', title: 'Dạng lưới', icon: IoGridOutline },
-              { key: 'table', title: 'Dạng danh sách', icon: IoListOutline },
+              { key: 'grid', title: t('myAlbums.gridView'), icon: IoGridOutline },
+              { key: 'table', title: t('myAlbums.listView'), icon: IoListOutline },
             ]}
           />
         </PageHeader>
@@ -119,11 +121,11 @@ function MyAlbum() {
               <div className={cx('empty-icon')}>
                 <IoFolderOpenOutline />
               </div>
-              <h4>Chưa có album nào</h4>
-              <p>Bắt đầu tạo album đầu tiên để lưu lại các từ vựng thú vị nhé!</p>
+              <h4>{t('myAlbums.emptyTitle')}</h4>
+              <p>{t('myAlbums.emptyDescription')}</p>
               <button className={cx('btn-create-empty')} onClick={() => setShowModal(true)}>
                 <IoAddCircleOutline />
-                Tạo album ngay
+                {t('myAlbums.createNow')}
               </button>
             </motion.div>
           ) : viewMode === 'grid' ? (
@@ -164,17 +166,20 @@ function MyAlbum() {
                       <div className={cx('progress-stats')}>
                         <div className={cx('stat-total')}>
                           <span className={cx('stat-num')}>{total}</span>
-                          <span className={cx('stat-unit')}>từ</span>
+                          <span className={cx('stat-unit')}>{t('myAlbums.wordUnit', { count: total })}</span>
                         </div>
                         <div className={cx('stat-sub')}>
-                          Đã thuộc <strong>{mastered}</strong> từ
+                          {t.rich('myAlbums.mastered', {
+                            count: mastered,
+                            strong: (chunks) => <strong>{chunks}</strong>,
+                          })}
                         </div>
                       </div>
                     </div>
 
                     <div className={cx('cta')}>
                       <ButtonPrime variant="primary" fullWidth>
-                        {hasStarted ? 'Tiếp tục học' : 'Bắt đầu học'}
+                        {hasStarted ? t('myAlbums.continue') : t('myAlbums.start')}
                       </ButtonPrime>
                     </div>
                   </motion.div>
@@ -214,8 +219,8 @@ function MyAlbum() {
           setAlbumToDelete(null);
         }}
         onConfirm={handleConfirmDelete}
-        title="Xác nhận xóa Album"
-        message={`Bạn có chắc chắn muốn xóa album "${albumToDelete?.name}"? Mọi từ vựng trong album sẽ bị ảnh hưởng.`}
+        title={t('myAlbums.deleteTitle')}
+        message={t('myAlbums.deleteMessage', { name: albumToDelete?.name ?? '' })}
       />
     </div>
   );

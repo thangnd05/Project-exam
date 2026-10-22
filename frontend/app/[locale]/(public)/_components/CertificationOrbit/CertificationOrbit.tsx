@@ -2,15 +2,16 @@
 
 import {useState} from 'react';
 import Image from 'next/image';
-import {useRouter} from 'next/navigation';
+import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
+import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 
 import routes from '@/app/configs/Routes';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
-import QuickTestConfirmModal from '@/app/(public)/_components/HeroSection/QuickTestConfirmModal';
-import QuickTestPickerModal from '@/app/(public)/_components/HeroSection/QuickTestPickerModal';
-import {useQuickChallengeTests} from '@/app/(public)/_components/HeroSection/hooks/useQuickChallengeTests';
-import {useQuickTestLauncher} from '@/app/(public)/_components/HeroSection/hooks/useQuickTestLauncher';
+import QuickTestConfirmModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestConfirmModal';
+import QuickTestPickerModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestPickerModal';
+import {useQuickChallengeTests} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickChallengeTests';
+import {useQuickTestLauncher} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickTestLauncher';
 import styles from './CertificationOrbit.module.scss';
 
 const cx = classNames.bind(styles);
@@ -73,7 +74,9 @@ const badgePosition = (radius: number, angle: number) => {
 };
 
 function CertificationOrbit() {
+  const t = useTranslations('Home.orbit');
   const router = useRouter();
+  const localizeHref = useLocalizeHref();
   const {quickTests, isLoading} = useQuickChallengeTests();
   const {pendingTest, requestStart, closeConfirm, confirmStart, startSyllabusPlan, isGuest} =
     useQuickTestLauncher();
@@ -85,7 +88,7 @@ function CertificationOrbit() {
       setPickerOpen(true);
       return;
     }
-    router.push(routes.examTypes);
+    router.push(localizeHref(routes.examTypes));
   };
 
   const pickTest = (test: QuickChallengeCardResponse) => {
@@ -101,16 +104,16 @@ function CertificationOrbit() {
         <div className={cx('canvas')}>
           <div className={cx('core')}>
             <div className={cx('coreHalo')} aria-hidden="true" />
-            <h2 className={cx('title')}>Các chứng chỉ hiện hành</h2>
+            <h2 className={cx('title')}>{t('title')}</h2>
             <p className={cx('lede')}>
-              Hệ thống đề thi thử bám sát 100% cấu trúc chính thức từ các nhà cung cấp cloud hàng đầu.
+              {t('lede')}
             </p>
             <div className={cx('actions')}>
               <button type="button" className={cx('btnPrimary')} onClick={openPicker}>
-                Thi thử ngay
+                {t('practiceNow')}
               </button>
-              <button type="button" className={cx('btnGhost')} onClick={() => router.push(routes.learningPlans)}>
-                Lên lộ trình
+              <button type="button" className={cx('btnGhost')} onClick={() => router.push(localizeHref(routes.learningPlans))}>
+                {t('buildPlan')}
               </button>
             </div>
           </div>
@@ -132,7 +135,7 @@ function CertificationOrbit() {
                       type="button"
                       className={cx('badge')}
                       onClick={openPicker}
-                      aria-label={`Thi thử ${badge.label}`}
+                      aria-label={t('badgeAria', {name: badge.label})}
                     >
                       <Image
                         src={`/images/certifications/${badge.file}.webp`}

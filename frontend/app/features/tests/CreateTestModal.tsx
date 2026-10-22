@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import BaseModal from '@/app/components/modal/BaseModal';
 import CreateTestFormBody from '@/app/features/tests/creator/CreateTestFormBody';
 import type { CreateTestMode } from '@/app/features/tests/creator/CreateTestFormBody';
@@ -25,6 +26,7 @@ const CreateTestModal = ({
   chapterId,
   onSuccess,
 }: CreateTestModalProps) => {
+  const t = useTranslations('TestCreator');
   const handleSuccess = () => {
     onSuccess?.();
     onClose();
@@ -34,10 +36,10 @@ const CreateTestModal = ({
     <BaseModal
       show={show}
       onClose={onClose}
-      title="Khởi tạo bài thi"
+      title={t('createTestModal.title')}
       headerExtra={
         <span className={cx('headerBadge')}>
-          {mode === 'class' ? `Lớp: ${classId}` : 'Cá nhân'}
+          {mode === 'class' ? t('createTestModal.classBadge', { classId: classId ?? '' }) : t('createTestModal.personalBadge')}
         </span>
       }
     >

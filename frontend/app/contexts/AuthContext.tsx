@@ -2,11 +2,13 @@
 
 import { createContext, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import { queryClient } from '@/app/configs/queryClient';
 import { getCurrentUser, logout as logoutRequest } from '@/app/apis/authApi';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
+import { splitLocale } from '@/app/i18n/routing';
 import routes from '@/app/configs/Routes';
 import type { UserResponse } from '@/app/types';
 
@@ -82,6 +84,7 @@ const normalizeUser = (data: UserResponse): AuthUser => ({
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const t = useTranslations('System');
 
   const expiredToastShownRef = useRef(false);
 
@@ -127,12 +130,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         expiredToastShownRef.current = true;
         const reason =
           (e as CustomEvent<{ reason?: string }>)?.detail?.reason ||
-          'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.';
+          t('auth.sessionExpired');
         toast.info(reason);
       }
 
       const publicPaths = [routes.login, routes.forgot, routes.reset];
-      const onPublicPage = publicPaths.some((p) => window.location.pathname.startsWith(p));
+      const onPublicPage = publicPaths.some((p) => splitLocale(window.location.pathname).pathname.startsWith(p));
       if (!onPublicPage) {
         // Kèm from để đăng nhập lại xong quay về đúng trang đang xem.
         window.location.href = buildLoginUrlFromHere();
@@ -141,7 +144,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     window.addEventListener('auth:expired', handleAuthExpired);
     return () => window.removeEventListener('auth:expired', handleAuthExpired);
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     userRef.current = user;

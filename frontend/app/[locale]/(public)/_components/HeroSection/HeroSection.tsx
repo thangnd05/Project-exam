@@ -1,8 +1,9 @@
 'use client';
-import { useRouter } from 'next/navigation';
+import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import { useCallback, useState } from 'react';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { FiCheck } from 'react-icons/fi';
 import routes from '@/app/configs/Routes';
 import type { QuickChallengeCardResponse } from '@/app/types/test';
@@ -14,7 +15,7 @@ import QuickTestPickerModal from './QuickTestPickerModal';
 
 const cx = classNames.bind(styles);
 
-const HIGHLIGHTS = ['Đề rút gọn 25% độ dài thật', 'Phân tích theo từng Domain', 'Lộ trình cá nhân hóa'];
+const HIGHLIGHTS = ['shortTests', 'domainAnalysis', 'personalPlan'] as const;
 
 // Logo hãng trong public/images/providers, hiển thị trắng đơn sắc trên nền tối.
 const PROVIDERS = [
@@ -32,7 +33,9 @@ const rise = (delay = 0) => ({
 });
 
 function HeroSection() {
+  const t = useTranslations('Home.hero');
   const router = useRouter();
+  const localizeHref = useLocalizeHref();
   const { quickTests, isLoading: loading } = useQuickChallengeTests();
   const { pendingTest, requestStart, closeConfirm, confirmStart, startSyllabusPlan, isGuest } =
     useQuickTestLauncher();
@@ -44,8 +47,8 @@ function HeroSection() {
       setPickerOpen(true);
       return;
     }
-    router.push(routes.examTypes);
-  }, [loading, quickTests.length, router]);
+    router.push(localizeHref(routes.examTypes));
+  }, [loading, quickTests.length, router, localizeHref]);
 
   const handlePickTest = useCallback(
     (test: QuickChallengeCardResponse) => {
@@ -61,32 +64,32 @@ function HeroSection() {
         <div className={cx('grid')}>
           <div className={cx('copy')}>
             <motion.p className={cx('eyebrow')} {...rise()}>
-              Nền tảng luyện thi chứng chỉ Cloud <span>cá nhân hóa</span>
+              {t.rich('eyebrow', { accent: (chunks) => <span>{chunks}</span> })}
             </motion.p>
 
             <motion.h1 className={cx('headline')} {...rise(0.08)}>
               <span className={cx('headlineMuted')}>
-                Đừng chỉ luyện đề.
+                {t('headline.line1')}
                 <br />
-                Hãy hiểu{' '}
+                {t('headline.line2')}{' '}
               </span>
-              <span className={cx('headlineGlow')}>mình đang thiếu gì</span>
+              <span className={cx('headlineGlow')}>{t('headline.glow')}</span>
             </motion.h1>
 
             <motion.div className={cx('actions')} {...rise(0.16)}>
               <button type="button" className={cx('btnPrimary')} onClick={handleStartQuick}>
-                Làm bài kiểm tra nhanh
+                {t('startQuick')}
               </button>
               <a href="#certifications" className={cx('btnGhost')}>
-                Khám phá kỳ thi
+                {t('exploreExams')}
               </a>
             </motion.div>
 
             <motion.ul className={cx('highlights')} {...rise(0.24)}>
-              {HIGHLIGHTS.map((text) => (
-                <li key={text}>
+              {HIGHLIGHTS.map((key) => (
+                <li key={key}>
                   <FiCheck aria-hidden="true" />
-                  <span>{text}</span>
+                  <span>{t(`highlights.${key}`)}</span>
                 </li>
               ))}
             </motion.ul>
@@ -109,7 +112,7 @@ function HeroSection() {
       </div>
 
       <div className={cx('providers')}>
-        <p className={cx('providersLabel')}>Hệ thống kho đề bám sát Blueprint</p>
+        <p className={cx('providersLabel')}>{t('providersLabel')}</p>
         <ul className={cx('providerList')}>
           {PROVIDERS.map((p) => (
             <li key={p.file} title={p.name}>

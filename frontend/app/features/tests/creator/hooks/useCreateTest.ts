@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useBaseMetaData } from '@/app/features/tests/creator/hooks/useBaseMetaData';
 import { durationMinutesFromExamType } from '@/app/features/exam-types/hooks/useExamTypes';
 import { useTestSubmission } from '@/app/features/tests/creator/hooks/useTestSubmission';
@@ -134,6 +135,7 @@ export const useCreateTest = ({
   chapterId,
   creatorType = CREATOR_TYPES.TEST,
 }: UseCreateTestOptions) => {
+  const t = useTranslations('TestCreator');
   const [testInfo, setTestInfo] = useState<TestInfoForm>({
     title: '',
     description: '',
@@ -167,7 +169,7 @@ export const useCreateTest = ({
   const availableTags = useMemo(
     () => creatorType === CREATOR_TYPES.TEST
       ? examTypeTags
-      : examTypeTags.filter((t) => !t.examPartId || t.examPartId === testInfo.examPartId),
+      : examTypeTags.filter((tag) => !tag.examPartId || tag.examPartId === testInfo.examPartId),
     [creatorType, examTypeTags, testInfo.examPartId],
   );
 
@@ -204,7 +206,7 @@ export const useCreateTest = ({
 
   const addQuestion = () => {
     if (questions.length >= MAX_QUESTIONS) {
-      setNotification({ type: 'warning', message: `Hệ thống giới hạn tối đa ${MAX_QUESTIONS} câu hỏi mỗi lần tạo.` });
+      setNotification({ type: 'warning', message: t('hookMessages.maxQuestions', { max: MAX_QUESTIONS }) });
       return;
     }
     setQuestions([...questions, cloneEmptyQuestion()]);
@@ -254,7 +256,7 @@ export const useCreateTest = ({
     const newQ = [...questions];
     const currentAnswers = newQ[qIndex].answers || [];
     if (currentAnswers.length >= MAX_ANSWERS) {
-      setNotification({ type: 'warning', message: `Tối đa ${MAX_ANSWERS} đáp án cho mỗi câu.` });
+      setNotification({ type: 'warning', message: t('hookMessages.maxAnswers', { max: MAX_ANSWERS }) });
       return;
     }
     const nextAnswer: DraftAnswer = {
@@ -270,7 +272,7 @@ export const useCreateTest = ({
     const newQ = [...questions];
     const currentAnswers = newQ[qIndex].answers || [];
     if (currentAnswers.length <= MIN_ANSWERS) {
-      setNotification({ type: 'warning', message: `Mỗi câu phải có ít nhất ${MIN_ANSWERS} đáp án.` });
+      setNotification({ type: 'warning', message: t('hookMessages.minAnswers', { min: MIN_ANSWERS }) });
       return;
     }
     const removedAnswer = currentAnswers[aIndex];
@@ -290,7 +292,7 @@ export const useCreateTest = ({
 
     const oversizedFile = files.find((f) => f.size > MAX_FILE_SIZE);
     if (oversizedFile) {
-      setNotification({ type: 'warning', message: `File "${oversizedFile.name}" vượt quá ${MAX_FILE_SIZE / 1024 / 1024}MB.` });
+      setNotification({ type: 'warning', message: t('hookMessages.fileTooLarge', { name: oversizedFile.name, size: MAX_FILE_SIZE / 1024 / 1024 }) });
       return;
     }
 
@@ -315,7 +317,7 @@ export const useCreateTest = ({
 
   const addGroup = () => {
     if (groups.length >= MAX_QUESTIONS) {
-      setNotification({ type: 'warning', message: `Hệ thống giới hạn tối đa ${MAX_QUESTIONS} nhóm mỗi lần tạo.` });
+      setNotification({ type: 'warning', message: t('hookMessages.maxGroups', { max: MAX_QUESTIONS }) });
       return;
     }
     setGroups([...groups, createInitialGroup()]);
@@ -345,7 +347,7 @@ export const useCreateTest = ({
 
     const oversizedFile = files.find((f) => f.size > MAX_FILE_SIZE);
     if (oversizedFile) {
-      setNotification({ type: 'warning', message: `File "${oversizedFile.name}" vượt quá ${MAX_FILE_SIZE / 1024 / 1024}MB.` });
+      setNotification({ type: 'warning', message: t('hookMessages.fileTooLarge', { name: oversizedFile.name, size: MAX_FILE_SIZE / 1024 / 1024 }) });
       return;
     }
 
@@ -448,7 +450,7 @@ export const useCreateTest = ({
     const newGroups = [...groups];
     const currentAnswers = newGroups[gIndex].questions[qIndex].answers || [];
     if (currentAnswers.length >= MAX_ANSWERS) {
-      setNotification({ type: 'warning', message: `Tối đa ${MAX_ANSWERS} đáp án cho mỗi câu.` });
+      setNotification({ type: 'warning', message: t('hookMessages.maxAnswers', { max: MAX_ANSWERS }) });
       return;
     }
     const nextAnswer: DraftAnswer = {
@@ -464,7 +466,7 @@ export const useCreateTest = ({
     const newGroups = [...groups];
     const currentAnswers = newGroups[gIndex].questions[qIndex].answers || [];
     if (currentAnswers.length <= MIN_ANSWERS) {
-      setNotification({ type: 'warning', message: `Mỗi câu phải có ít nhất ${MIN_ANSWERS} đáp án.` });
+      setNotification({ type: 'warning', message: t('hookMessages.minAnswers', { min: MIN_ANSWERS }) });
       return;
     }
     const removedAnswer = currentAnswers[aIndex];

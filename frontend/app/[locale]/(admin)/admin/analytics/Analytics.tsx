@@ -5,34 +5,35 @@ import dynamic from 'next/dynamic';
 import { Row, Col, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
-import { TopTestsTable } from '@/app/(admin)/_components/ContentInsightsTables';
-import { TopCountriesList } from '@/app/(admin)/_components/TopCountriesList';
-import { AdminPageHeader } from '@/app/(admin)/_components/common';
-import OverviewCard from '@/app/(admin)/_components/OverviewCard';
+import { useLocale, useTranslations } from 'next-intl';
+import { TopTestsTable } from '@/app/[locale]/(admin)/_components/ContentInsightsTables';
+import { TopCountriesList } from '@/app/[locale]/(admin)/_components/TopCountriesList';
+import { AdminPageHeader } from '@/app/[locale]/(admin)/_components/common';
+import OverviewCard from '@/app/[locale]/(admin)/_components/OverviewCard';
 import {
     useDashboardStats,
     useMonthlyPerformance,
     useContentInsights,
     useTrafficLocations,
-} from '@/app/(admin)/_hooks/useDashboardStats';
+} from '@/app/[locale]/(admin)/_hooks/useDashboardStats';
 
 import styles from './Analytics.module.scss';
 
 const cx = classNames.bind(styles);
 
 const MonthlyActivityCombo = dynamic(
-    () => import('@/app/(admin)/_components/AdminCharts').then((m) => m.MonthlyActivityCombo),
+    () => import('@/app/[locale]/(admin)/_components/AdminCharts').then((m) => m.MonthlyActivityCombo),
     { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },
 );
 const MonthlyNewUsersLine = dynamic(
-    () => import('@/app/(admin)/_components/AdminCharts').then((m) => m.MonthlyNewUsersLine),
+    () => import('@/app/[locale]/(admin)/_components/AdminCharts').then((m) => m.MonthlyNewUsersLine),
     { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },
 );
 const ExamTypeDonut = dynamic(
-    () => import('@/app/(admin)/_components/AdminCharts').then((m) => m.ExamTypeDonut),
+    () => import('@/app/[locale]/(admin)/_components/AdminCharts').then((m) => m.ExamTypeDonut),
     { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },
 );
-const LocationsMap = dynamic(() => import('@/app/(admin)/_components/LocationsMap'), {
+const LocationsMap = dynamic(() => import('@/app/[locale]/(admin)/_components/LocationsMap'), {
     ssr: false,
     loading: () => <Spinner animation="border" size="sm" />,
 });
@@ -61,9 +62,18 @@ const ChartCard = ({ icon, title, height, delay, action, children }: ChartCardPr
     </motion.div>
 );
 
-const monthLabel = (month: string) => {
+type AnalyticsT = ReturnType<typeof useTranslations<'AdminSystem.analytics'>>;
+
+const monthLabel = (t: AnalyticsT, month: string) => {
     const [y, m] = (month || '').split('-');
-    return y && m ? `Tháng ${Number(m)}/${y}` : month;
+    return y && m ? t('monthLabel', { month: String(Number(m)), year: y }) : month;
+};
+
+// Tên trạng thái do API trả về (tiếng Việt cố định) -> khoá dịch
+const STATUS_KEYS: Record<string, 'completed' | 'inProgress' | 'expired'> = {
+    'Hoàn thành': 'completed',
+    'Đang làm': 'inProgress',
+    'Hết hạn': 'expired',
 };
 
 const currentMonthKey = () => {
@@ -73,6 +83,13 @@ const currentMonthKey = () => {
 
 const Analytics = () => {
     const { stats, statusDistribution, isLoading, isError } = useDashboardStats();
+    const t = useTranslations('AdminSystem.analytics');
+    const tStats = useTranslations('AdminSystem.stats');
+    const locale = useLocale();
+    const statusData = statusDistribution.map((item) => {
+        const key = item.name ? STATUS_KEYS[item.name] : undefined;
+        return key ? { ...item, name: t(`status.${key}`) } : item;
+    });
 
     const currentYear = new Date().getFullYear();
     const [perfYear, setPerfYear] = useState(currentYear);
@@ -98,7 +115,7 @@ const Analytics = () => {
             onChange={(e) => setLocMonth(e.target.value)}
         >
             {monthOptions.map((m) => (
-                <option key={m} value={m}>{monthLabel(m)}</option>
+                <option key={m} value={m}>{monthLabel(t, m)}</option>
             ))}
         </select>
     );
@@ -110,7 +127,7 @@ const Analytics = () => {
             onChange={(e) => setPerfYear(Number(e.target.value))}
         >
             {availableYears.map((y) => (
-                <option key={y} value={y}>Năm {y}</option>
+                <option key={y} value={y}>{t('yearOption', { year: y })}</option>
             ))}
         </select>
     );
@@ -118,18 +135,18 @@ const Analytics = () => {
     return (
         <div className={cx('analyticsPage')}>
             <AdminPageHeader
-                title="Thống kê & Phân tích"
-                description="Phân tích chi tiết về hệ thống WinDe Exam"
+                title={t('title')}
+                description={t('description')}
             />
 
             {isLoading ? (
                 <div className={cx('loadingState')}>
                     <Spinner animation="border" variant="primary" />
-                    <span>Đang tải số liệu...</span>
+                    <span>{tStats('loading')}</span>
                 </div>
             ) : isError ? (
                 <div className={cx('loadingState')}>
-                    <span>Không tải được số liệu thống kê. Vui lòng thử lại.</span>
+                    <span>{tStats('loadError')}</span>
                 </div>
             ) : (
                 <>
@@ -137,28 +154,28 @@ const Analytics = () => {
                         <Col lg={3} md={6}>
                             <OverviewCard
                                 value={stats.totalUsers ?? 0}
-                                label="Tổng người dùng"
+                                label={t('totalUsers')}
                                 delay={0.1}
                             />
                         </Col>
                         <Col lg={3} md={6}>
                             <OverviewCard
                                 value={stats.totalClasses ?? 0}
-                                label="Tổng số lớp học"
+                                label={t('totalClasses')}
                                 delay={0.15}
                             />
                         </Col>
                         <Col lg={3} md={6}>
                             <OverviewCard
                                 value={stats.totalExamsTaken ?? 0}
-                                label="Tổng lượt thi"
+                                label={t('totalAttempts')}
                                 delay={0.2}
                             />
                         </Col>
                         <Col lg={3} md={6}>
                             <OverviewCard
                                 value={stats.totalExamTypes ?? 0}
-                                label="Loại kỳ thi"
+                                label={t('examTypes')}
                                 delay={0.25}
                             />
                         </Col>
@@ -166,11 +183,16 @@ const Analytics = () => {
 
                     <Row className={cx('chartsRow')}>
                         <Col lg={8}>
-                            <ChartCard title="Vị trí truy cập" delay={0.3} action={monthSelect}>
+                            <ChartCard title={t('locationsTitle')} delay={0.3} action={monthSelect}>
                                 <div className={cx('monthSummary')}>
-                                    <span className={cx('summaryValue')}>{locTotalVisits.toLocaleString('vi-VN')}</span>
+                                    <span className={cx('summaryValue')}>{locTotalVisits.toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN')}</span>
                                     <span className={cx('summaryLabel')}>
-                                        lượt truy cập từ IP công cộng trong {monthLabel(locMonth).toLowerCase()}
+                                        {locMonth.includes('-')
+                                            ? t('publicVisitsInMonth', {
+                                                  month: String(Number(locMonth.split('-')[1])),
+                                                  year: locMonth.split('-')[0],
+                                              })
+                                            : t('publicVisits')}
                                     </span>
                                 </div>
                                 <LocationsMap countries={locCountries} />
@@ -178,9 +200,9 @@ const Analytics = () => {
                         </Col>
                         <Col lg={4}>
                             <ChartCard
-                                title="Top quốc gia"
+                                title={t('topCountries')}
                                 delay={0.35}
-                                action={<span className={cx('monthTag')}>{monthLabel(locMonth)}</span>}
+                                action={<span className={cx('monthTag')}>{monthLabel(t, locMonth)}</span>}
                             >
                                 <TopCountriesList countries={locCountries} />
                             </ChartCard>
@@ -190,7 +212,7 @@ const Analytics = () => {
                     <Row className={cx('chartsRow')}>
                         <Col lg={12}>
                             <ChartCard
-                                title="Hoạt động theo tháng (truy cập, lượt thi & tỉ lệ hoàn thành)"
+                                title={t('monthlyActivity')}
                                 height={360}
                                 delay={0.4}
                                 action={yearSelect}
@@ -203,7 +225,7 @@ const Analytics = () => {
                     <Row className={cx('chartsRow')}>
                         <Col lg={8}>
                             <ChartCard
-                                title="Người dùng mới theo tháng"
+                                title={t('monthlyNewUsers')}
                                 height={300}
                                 delay={0.5}
                                 action={yearSelect}
@@ -212,20 +234,20 @@ const Analytics = () => {
                             </ChartCard>
                         </Col>
                         <Col lg={4}>
-                            <ChartCard title="Tình trạng lượt thi" height={300} delay={0.55}>
-                                <ExamTypeDonut data={statusDistribution} />
+                            <ChartCard title={t('attemptStatus')} height={300} delay={0.55}>
+                                <ExamTypeDonut data={statusData} />
                             </ChartCard>
                         </Col>
                     </Row>
 
                     <Row className={cx('chartsRow')}>
                         <Col lg={6}>
-                            <ChartCard title="Bài thi nhiều nhất" delay={0.6}>
+                            <ChartCard title={t('topTests')} delay={0.6}>
                                 <TopTestsTable data={topTests} />
                             </ChartCard>
                         </Col>
                         <Col lg={6}>
-                            <ChartCard title="Đề thi ôn luyện nhiều nhất" delay={0.65}>
+                            <ChartCard title={t('topPracticeTests')} delay={0.65}>
                                 <TopTestsTable data={topPracticeTests} />
                             </ChartCard>
                         </Col>

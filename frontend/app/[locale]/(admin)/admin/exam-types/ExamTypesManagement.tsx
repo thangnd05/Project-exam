@@ -1,8 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useCallback, useMemo, useState } from 'react';
 import {Badge, Button, Spinner} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Paintbrush, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
 
@@ -10,12 +11,12 @@ import routes from '@/app/configs/Routes';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ExamTypeFormModal, {type ExamTypeFormState} from './_components/ExamTypeFormModal';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
-import {useAdminExamTypes} from '@/app/(admin)/admin/exam-types/_hooks/useAdminExamTypes';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/[locale]/(admin)/_components/common';
+import {useAdminExamTypes} from '@/app/[locale]/(admin)/admin/exam-types/_hooks/useAdminExamTypes';
 import type {ExamTypeRequest, ExamTypeResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
 
-import styles from '@/app/(admin)/_components/common/adminTree.module.scss';
+import styles from '@/app/[locale]/(admin)/_components/common/adminTree.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -101,6 +102,7 @@ type ExamTypeTreeNodeProps = {
 };
 
 function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEditLayout, onDelete, onAddChild, keyword}: ExamTypeTreeNodeProps) {
+  const t = useTranslations('AdminContent.examTypes');
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedIds.has(node.exam_type_id);
   const kw = keyword.trim().toLowerCase();
@@ -133,27 +135,27 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
           </span>
           <span className={cx('collectionName', {root: level === 0})}>{node.name}</span>
           {node.slug && <code className={cx('description')}>/{node.slug}</code>}
-          {hasChildren &&<span className={cx('childCount')}>{node.children!.length} loại con</span>}
-          {node.flexible && <Badge bg="info">Linh hoạt</Badge>}
+          {hasChildren &&<span className={cx('childCount')}>{t('childCount', {count: node.children!.length})}</span>}
+          {node.flexible && <Badge bg="info">{t('flexible')}</Badge>}
           <Badge bg="primary">{node.scoring_method} · {node.score_min}–{node.score_max}</Badge>
           {node.duration_minutes !== '' && node.duration_minutes != null && (
-            <span className={cx('description')}>{node.duration_minutes} phút</span>
+            <span className={cx('description')}>{t('minutes', {count: Number(node.duration_minutes)})}</span>
           )}
           {node.description && <span className={cx('description')}>- {node.description}</span>}
         </div>
         <div className={cx('treeNodeActions')}>
           {level === 0 && (
-            <button className={cx('addBtn')} onClick={() => onAddChild(node)} title="Thêm loại con">
+            <button className={cx('addBtn')} onClick={() => onAddChild(node)} title={t('addChild')}>
               <Plus size={16} />
             </button>
           )}
-          <button onClick={() => onEditLayout(node)} title="Thiết kế giao diện làm bài">
+          <button onClick={() => onEditLayout(node)} title={t('editLayout')}>
             <Paintbrush size={16} />
           </button>
-          <button onClick={() => onEdit(node)} title="Sửa">
+          <button onClick={() => onEdit(node)} title={t('edit')}>
             <Edit size={16} />
           </button>
-          <button className={cx('deleteBtn')} onClick={() => onDelete(node)} title="Xóa">
+          <button className={cx('deleteBtn')} onClick={() => onDelete(node)} title={t('delete')}>
             <Trash2 size={16} />
           </button>
         </div>
@@ -186,6 +188,8 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
 }
 
 function ExamTypesManagement() {
+  const t = useTranslations('AdminContent.examTypes');
+  const tc = useTranslations('Common');
   const router = useRouter();
   const {examTypeList, isLoading: loading, isError, createMutation, updateMutation, deleteMutation} =
     useAdminExamTypes();
@@ -206,22 +210,22 @@ function ExamTypesManagement() {
     () =>
       new Set(
         examTypes
-          .filter((t) => t.child_count > 0 && !collapsedIds.has(t.exam_type_id))
-          .map((t) => t.exam_type_id),
+          .filter((item) => item.child_count > 0 && !collapsedIds.has(item.exam_type_id))
+          .map((item) => item.exam_type_id),
       ),
     [examTypes, collapsedIds],
   );
 
   const examTypeTree = useMemo(() => {
-    const byId = new Map(examTypes.map((t) => [t.exam_type_id, t]));
+    const byId = new Map(examTypes.map((item) => [item.exam_type_id, item]));
     const childrenOf = new Map<string, ExamTypeItem[]>();
     const roots: ExamTypeItem[] = [];
-    examTypes.forEach((t) => {
-      if (t.parent_id && byId.has(t.parent_id)) {
-        if (!childrenOf.has(t.parent_id)) childrenOf.set(t.parent_id, []);
-        childrenOf.get(t.parent_id)!.push(t);
+    examTypes.forEach((item) => {
+      if (item.parent_id && byId.has(item.parent_id)) {
+        if (!childrenOf.has(item.parent_id)) childrenOf.set(item.parent_id, []);
+        childrenOf.get(item.parent_id)!.push(item);
       } else {
-        roots.push(t);
+        roots.push(item);
       }
     });
     const byName = (a: ExamTypeItem, b: ExamTypeItem) => a.name.localeCompare(b.name);
@@ -241,16 +245,16 @@ function ExamTypesManagement() {
 
   const expandAll = useCallback(() => setCollapsedIds(new Set()), []);
   const collapseAll = useCallback(
-    () => setCollapsedIds(new Set(examTypes.filter((t) => t.child_count > 0).map((t) => t.exam_type_id))),
+    () => setCollapsedIds(new Set(examTypes.filter((item) => item.child_count > 0).map((item) => item.exam_type_id))),
     [examTypes],
   );
 
   const parentOptions = useMemo(
-    () => examTypes.filter((t) => !t.parent_id && t.exam_type_id !== editingTypeId),
+    () => examTypes.filter((item) => !item.parent_id && item.exam_type_id !== editingTypeId),
     [examTypes, editingTypeId],
   );
   const editingHasChildren = useMemo(
-    () => Boolean(editingTypeId) && examTypes.some((t) => t.parent_id === editingTypeId),
+    () => Boolean(editingTypeId) && examTypes.some((item) => item.parent_id === editingTypeId),
     [examTypes, editingTypeId],
   );
 
@@ -298,21 +302,21 @@ function ExamTypesManagement() {
     const parsedDuration = durationValue ? Number(durationValue) : null;
 
     if (!normalizedName) {
-      setErrorMessage('Tên loại kỳ thi không được để trống.');
+      setErrorMessage(t('errors.nameRequired'));
       return;
     }
     if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(formState.slug.trim())) {
-      setErrorMessage('Slug bắt buộc, chỉ gồm chữ thường không dấu, số và gạch ngang, vd: saa-c03.');
+      setErrorMessage(t('errors.slugInvalid'));
       return;
     }
     if (durationValue && (!Number.isFinite(parsedDuration) || (parsedDuration as number) <= 0)) {
-      setErrorMessage('Thời lượng phải là số lớn hơn 0 hoặc để trống.');
+      setErrorMessage(t('errors.durationInvalid'));
       return;
     }
     const scoreMin = Number(String(formState.score_min).trim());
     const scoreMax = Number(String(formState.score_max).trim());
     if (!Number.isInteger(scoreMin) || !Number.isInteger(scoreMax) || scoreMin < 0 || scoreMin >= scoreMax) {
-      setErrorMessage('Thang điểm không hợp lệ: cần 0 ≤ điểm tối thiểu < điểm tối đa.');
+      setErrorMessage(t('errors.scoreRangeInvalid'));
       return;
     }
 
@@ -338,7 +342,7 @@ function ExamTypesManagement() {
       resetForm();
     } catch (error) {
       setErrorMessage(
-        getApiErrorMessage(error, 'Không thể lưu loại kỳ thi. Vui lòng thử lại.'),
+        getApiErrorMessage(error, t('errors.saveFailed')),
       );
     } finally {
       setSubmitting(false);
@@ -354,7 +358,7 @@ function ExamTypesManagement() {
       setDeletingExamType(null);
     } catch (error) {
       setErrorMessage(
-        getApiErrorMessage(error, 'Không thể xóa loại kỳ thi này.'),
+        getApiErrorMessage(error, t('errors.deleteFailed')),
       );
     } finally {
       setSubmitting(false);
@@ -362,48 +366,48 @@ function ExamTypesManagement() {
   };
 
   const deleteMessage = deletingExamType && deletingExamType.child_count > 0
-    ? `Loại "${deletingExamType?.name}" đang chứa ${deletingExamType.child_count} loại con  backend sẽ chặn xoá. Hãy xoá/tách loại con trước.`
-    : `Bạn có chắc muốn xóa "${deletingExamType?.name || ''}" không?`;
+    ? t('deleteBlockedMessage', {name: deletingExamType?.name, count: deletingExamType.child_count})
+    : t('deleteMessage', {name: deletingExamType?.name || ''});
 
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Quản lý loại kỳ thi"
-        description='Cấu hình loại kỳ thi; hỗ trợ 2 cấp gom nhóm (vd "AWS" chứa các chứng chỉ con).'
+        title={t('title')}
+        description={t('description')}
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
-          Thêm loại kỳ thi
+          {t('add')}
         </Button>
       </AdminPageHeader>
 
       <AdminToolbar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="Tìm theo tên, mô tả, phương thức chấm..."
+        searchPlaceholder={t('searchPlaceholder')}
       />
       <AdminFieldError
-        message={errorMessage || (isError ? 'Không thể tải danh sách loại kỳ thi.' : '')}
+        message={errorMessage || (isError ? t('errors.loadFailed') : '')}
       />
 
       <div className={cx('treeWrapper')}>
         <div className={cx('treeToolbar')}>
-          <span className={cx('treeCount')}>{examTypes.length} loại kỳ thi</span>
+          <span className={cx('treeCount')}>{t('count', {count: examTypes.length})}</span>
           <div className={cx('treeToolbarActions')}>
-            <button onClick={expandAll}>Mở tất cả</button>
-            <button onClick={collapseAll}>Thu gọn</button>
+            <button onClick={expandAll}>{t('expandAll')}</button>
+            <button onClick={collapseAll}>{t('collapseAll')}</button>
           </div>
         </div>
 
         {loading && (
           <div className="text-center py-4">
             <Spinner size="sm" className="me-2" />
-            Đang tải...
+            {tc('loading')}
           </div>
         )}
 
         {!loading && examTypes.length === 0 && (
-          <div className="text-center py-4 text-muted">Chưa có loại kỳ thi nào.</div>
+          <div className="text-center py-4 text-muted">{t('empty')}</div>
         )}
 
         {!loading &&
@@ -446,7 +450,7 @@ function ExamTypesManagement() {
           setDeletingExamType(null);
         }}
         onConfirm={handleConfirmDelete}
-        title="Xác nhận xóa loại kỳ thi"
+        title={t('deleteTitle')}
         message={deleteMessage}
       />
     </div>

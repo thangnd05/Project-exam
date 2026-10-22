@@ -79,6 +79,15 @@ export const BLOCK_META: Record<string, { label: string }> = {
   [BLOCK_TYPES.TITLE]: { label: 'Tiêu đề' },
 };
 
+// Nhãn mặc định cũ từng được lưu kèm cấu hình bố cục. Gặp đúng các giá trị này (hoặc để trống) thì coi như
+// chưa đặt nhãn riêng, block tự dùng nhãn đã dịch theo ngôn ngữ đang xem.
+const LEGACY_DEFAULT_LABELS = ['Nộp bài thi', 'Câu hỏi', 'Ẩn'];
+
+export const customBlockLabel = (label?: string | null): string | undefined => {
+  const trimmed = label?.trim();
+  return trimmed && !LEGACY_DEFAULT_LABELS.includes(trimmed) ? label! : undefined;
+};
+
 export const ADDABLE_BLOCK_TYPES: string[] = [BLOCK_TYPES.BANNER];
 
 export const defaultLayoutConfig: LayoutConfig = {
@@ -106,7 +115,7 @@ export const defaultLayoutConfig: LayoutConfig = {
       align: 'left',
       order: 1,
       visible: true,
-      props: { toggleLabel: 'Câu hỏi', hideLabel: 'Ẩn' },
+      props: {},
     },
     {
       id: 'timer',
@@ -133,7 +142,7 @@ export const defaultLayoutConfig: LayoutConfig = {
       align: 'right',
       order: 4,
       visible: true,
-      props: { label: 'Nộp bài thi' },
+      props: {},
     },
   ],
 };

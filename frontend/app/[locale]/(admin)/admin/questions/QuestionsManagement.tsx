@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { Edit, Trash2 } from 'lucide-react';
@@ -11,8 +12,8 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '@/app/(admin)/_components/common';
-import type { AdminTableColumn } from '@/app/(admin)/_components/common/AdminTable';
+} from '@/app/[locale]/(admin)/_components/common';
+import type { AdminTableColumn } from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import EditQuestionModal from '@/app/features/tests/EditQuestionModal';
@@ -35,20 +36,24 @@ const cx = classNames.bind(styles);
 
 const PAGE_SIZE = 20;
 
-const QUESTION_TYPE_LABEL: Record<string, string> = {
-  [QuestionType.MCQ]: 'Một đáp án',
-  [QuestionType.MSQ]: 'Nhiều đáp án',
-  [QuestionType.FILL_BLANK]: 'Điền từ',
-  [QuestionType.ESSAY]: 'Tự luận',
-};
+const QUESTION_TYPES = [
+  QuestionType.MCQ,
+  QuestionType.MSQ,
+  QuestionType.FILL_BLANK,
+  QuestionType.ESSAY,
+] as const;
 
-const truncate = (text: string | undefined, max = 140) => {
+const isKnownQuestionType = (value: string): value is (typeof QUESTION_TYPES)[number] =>
+  (QUESTION_TYPES as readonly string[]).includes(value);
+
+const truncate = (text: string | undefined, emptyLabel: string, max = 140) => {
   const value = (text || '').replace(/\s+/g, ' ').trim();
-  if (!value) return '(trống)';
+  if (!value) return emptyLabel;
   return value.length > max ? `${value.slice(0, max)}…` : value;
 };
 
 function QuestionsManagement() {
+  const t = useTranslations('AdminContent.questions');
   const [page, setPage] = useState(0);
   const [keyword, setKeyword] = useState('');
   const [examTypeId, setExamTypeId] = useState('');
@@ -144,11 +149,11 @@ function QuestionsManagement() {
           const missing = result.missingQuestionIds?.length ?? 0;
           toast.success(
             missing > 0
-              ? `Đã sửa ${result.updatedCount} câu, ${missing} câu không còn tồn tại.`
-              : `Đã sửa ${result.updatedCount} câu.`,
+              ? t('bulkSuccessWithMissing', { count: result.updatedCount, missing })
+              : t('bulkSuccess', { count: result.updatedCount }),
           );
         },
-        onError: (error) => setBulkError(getApiErrorMessage(error, 'Sửa hàng loạt thất bại.')),
+        onError: (error) => setBulkError(getApiErrorMessage(error, t('bulkFailed'))),
       },
     );
   };
@@ -157,11 +162,11 @@ function QuestionsManagement() {
     if (!deletingQuestion) return;
     deleteMutation.mutate(deletingQuestion.questionId, {
       onSuccess: () => {
-        toast.success('Đã xóa câu hỏi.');
+        toast.success(t('deleteSuccess'));
         setDeletingQuestion(null);
       },
       onError: (error) => {
-        toast.error(getApiErrorMessage(error, 'Xóa câu hỏi thất bại.'));
+        toast.error(getApiErrorMessage(error, t('deleteFailed')));
         setDeletingQuestion(null);
       },
     });
@@ -178,7 +183,7 @@ function QuestionsManagement() {
           className={cx('checkbox')}
           checked={allOnPageSelected}
           onChange={toggleAllOnPage}
-          aria-label="Chọn tất cả câu trong trang"
+          aria-label={t('selectAllOnPage')}
         />
       ),
       render: (row: AdminQuestionListItem) => (
@@ -187,19 +192,23 @@ function QuestionsManagement() {
           className={cx('checkbox')}
           checked={selectedIds.has(row.questionId)}
           onChange={() => toggleOne(row.questionId)}
-          aria-label={`Chọn câu ${row.questionNumber ?? ''}`}
+          aria-label={t('selectQuestion', { number: row.questionNumber ?? '' })}
         />
       ),
     },
     {
       key: 'questionText',
-      header: 'Nội dung câu hỏi',
+      header: t('columns.questionText'),
       render: (row: AdminQuestionListItem) => (
         <div className={cx('questionCell')}>
-          <span className={cx('questionText')}>{truncate(row.questionText)}</span>
+          <span className={cx('questionText')}>{truncate(row.questionText, t('emptyText'))}</span>
           <span className={cx('questionMeta')}>
             {row.questionNumber != null && <span>#{row.questionNumber}</span>}
-            <span>{QUESTION_TYPE_LABEL[row.questionType || ''] || row.questionType}</span>
+            <span>
+              {row.questionType && isKnownQuestionType(row.questionType)
+                ? t(`questionTypes.${row.questionType}`)
+                : row.questionType}
+            </span>
             {(row.tagNames || []).map((name) => (
               <span key={name} className={cx('tagChip')}>
                 {name}
@@ -211,7 +220,7 @@ function QuestionsManagement() {
     },
     {
       key: 'examPartName',
-      header: 'Loại đề / Phần thi',
+      header: t('columns.examPart'),
       width: 200,
       render: (row: AdminQuestionListItem) => (
         <div className={cx('stackedCell')}>
@@ -222,14 +231,14 @@ function QuestionsManagement() {
     },
     {
       key: 'collectionName',
-      header: 'Bộ sưu tập',
+      header: t('columns.collection'),
       width: 170,
       render: (row: AdminQuestionListItem) =>
-        row.collectionName || <span className={cx('muted')}>Chưa xếp</span>,
+        row.collectionName || <span className={cx('muted')}>{t('unclassified')}</span>,
     },
     {
       key: 'usageScope',
-      header: 'Mục đích',
+      header: t('columns.usageScope'),
       width: 130,
       align: 'center',
       render: (row: AdminQuestionListItem) => (
@@ -238,7 +247,7 @@ function QuestionsManagement() {
             practice: row.usageScope === QuestionUsageScope.PRACTICE,
           })}
         >
-          {row.usageScope === QuestionUsageScope.PRACTICE ? 'Ôn tập' : 'Thi'}
+          {row.usageScope === QuestionUsageScope.PRACTICE ? t('scope.practice') : t('scope.exam')}
         </span>
       ),
     },
@@ -251,17 +260,17 @@ function QuestionsManagement() {
   return (
     <div className={cx('wrapper')}>
       <AdminPageHeader
-        title="Quản lý câu hỏi"
-        description="Duyệt toàn bộ ngân hàng câu hỏi, sửa từng câu hoặc sửa hàng loạt thuộc tính chung."
+        title={t('title')}
+        description={t('description')}
       />
 
       <StatCardGroup>
-        <StatCard label="Câu khớp bộ lọc" value={totalElements} />
+        <StatCard label={t('stats.matching')} value={totalElements} />
         <StatCard
-          label="Câu ôn tập trong trang"
+          label={t('stats.practiceOnPage')}
           value={`${practiceOnPage}/${questions.length}`}
         />
-        <StatCard label="Đang chọn" value={selectedIds.size} />
+        <StatCard label={t('stats.selected')} value={selectedIds.size} />
       </StatCardGroup>
 
       <AdminToolbar
@@ -270,7 +279,7 @@ function QuestionsManagement() {
           setKeyword(value);
           resetToFirstPage();
         }}
-        searchPlaceholder="Tìm trong nội dung câu hỏi..."
+        searchPlaceholder={t('searchPlaceholder')}
       >
         <ButtonPrime
           variant="primary"
@@ -280,7 +289,7 @@ function QuestionsManagement() {
             setShowBulkModal(true);
           }}
         >
-          Sửa hàng loạt ({selectedIds.size})
+          {t('bulkEdit', { count: selectedIds.size })}
         </ButtonPrime>
       </AdminToolbar>
 
@@ -295,7 +304,7 @@ function QuestionsManagement() {
             resetToFirstPage();
           }}
         >
-          <option value="">Tất cả loại đề</option>
+          <option value="">{t('filters.allExamTypes')}</option>
           {examTypes.map((type) => (
             <option key={type.examTypeId} value={type.examTypeId}>
               {type.name}
@@ -317,7 +326,7 @@ function QuestionsManagement() {
             resetToFirstPage();
           }}
         >
-          <option value="">{examTypeId ? 'Tất cả phần thi' : 'Chọn loại đề trước'}</option>
+          <option value="">{examTypeId ? t('filters.allExamParts') : t('filters.selectExamTypeFirst')}</option>
           {examParts.map((part) => (
             <option key={part.examPartId} value={part.examPartId}>
               {part.name}
@@ -334,7 +343,7 @@ function QuestionsManagement() {
             resetToFirstPage();
           }}
         >
-          <option value="">{examTypeId ? 'Tất cả tag' : 'Chọn loại đề để lọc tag'}</option>
+          <option value="">{examTypeId ? t('filters.allTags') : t('filters.selectExamTypeForTags')}</option>
           {visibleTags.map((tag) => (
             <option key={tag.tagId} value={tag.tagId}>
               {!examPartId && tag.examPartName ? `${tag.name} (${tag.examPartName})` : tag.name}
@@ -350,8 +359,8 @@ function QuestionsManagement() {
             resetToFirstPage();
           }}
         >
-          <option value="">Tất cả bộ sưu tập</option>
-          <option value={UNCLASSIFIED_COLLECTION}>Chưa xếp bộ sưu tập</option>
+          <option value="">{t('filters.allCollections')}</option>
+          <option value={UNCLASSIFIED_COLLECTION}>{t('filters.unclassifiedCollection')}</option>
           {buildCollectionTree(questionCollections).map((c) => (
             <option key={c.collectionId} value={c.collectionId}>
               {c.depth > 0 ? `    └ ${c.name}` : c.name}
@@ -367,9 +376,9 @@ function QuestionsManagement() {
             resetToFirstPage();
           }}
         >
-          <option value="">Thi và ôn tập</option>
-          <option value={QuestionUsageScope.EXAM}>Chỉ câu thi</option>
-          <option value={QuestionUsageScope.PRACTICE}>Chỉ câu ôn tập</option>
+          <option value="">{t('filters.allScopes')}</option>
+          <option value={QuestionUsageScope.EXAM}>{t('filters.examOnly')}</option>
+          <option value={QuestionUsageScope.PRACTICE}>{t('filters.practiceOnly')}</option>
         </select>
 
         <select
@@ -380,10 +389,10 @@ function QuestionsManagement() {
             resetToFirstPage();
           }}
         >
-          <option value="">Mọi dạng câu</option>
-          {Object.entries(QUESTION_TYPE_LABEL).map(([value, label]) => (
+          <option value="">{t('filters.allQuestionTypes')}</option>
+          {QUESTION_TYPES.map((value) => (
             <option key={value} value={value}>
-              {label}
+              {t(`questionTypes.${value}`)}
             </option>
           ))}
         </select>
@@ -391,7 +400,7 @@ function QuestionsManagement() {
 
       {isError && (
         <div className={cx('errorBox')}>
-          Không tải được danh sách câu hỏi. Thử lại hoặc kiểm tra quyền QUESTION:MANAGE.
+          {t('loadFailed')}
         </div>
       )}
 
@@ -400,8 +409,8 @@ function QuestionsManagement() {
         data={questions}
         loading={isLoading}
         getRowKey={(row: AdminQuestionListItem) => row.questionId}
-        emptyText="Không có câu hỏi nào khớp bộ lọc."
-        itemLabel="câu hỏi"
+        emptyText={t('empty')}
+        itemLabel={t('itemLabel')}
         page={page}
         pageSize={PAGE_SIZE}
         totalPages={totalPages}
@@ -412,7 +421,7 @@ function QuestionsManagement() {
             <button
               type="button"
               className={cx('rowBtn')}
-              title="Sửa câu này"
+              title={t('editQuestion')}
               onClick={() => setEditingQuestionId(row.questionId)}
             >
               <Edit size={16} />
@@ -420,7 +429,7 @@ function QuestionsManagement() {
             <button
               type="button"
               className={cx('rowBtn', 'danger')}
-              title="Xóa câu này"
+              title={t('deleteQuestion')}
               onClick={() => setDeletingQuestion(row)}
             >
               <Trash2 size={16} />
@@ -450,13 +459,10 @@ function QuestionsManagement() {
         show={!!deletingQuestion}
         onClose={() => setDeletingQuestion(null)}
         onConfirm={handleDelete}
-        title="Xóa câu hỏi"
-        message={
-          <>
-            Xóa câu &ldquo;{truncate(deletingQuestion?.questionText, 80)}&rdquo;? Câu này sẽ bị
-            gỡ khỏi mọi đề đang chứa nó; kết quả các bài đã làm vẫn được giữ lại.
-          </>
-        }
+        title={t('deleteTitle')}
+        message={t('deleteMessage', {
+          text: truncate(deletingQuestion?.questionText, t('emptyText'), 80),
+        })}
       />
     </div>
   );

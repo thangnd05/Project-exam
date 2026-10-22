@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import {
   getMyClassBankCount,
   getMyClassBankQuestions,
@@ -97,6 +98,7 @@ export function usePersonalQuestionBank({
   collectionFilter,
   includeChildCollections,
 }: UsePersonalQuestionBankParams) {
+  const t = useTranslations('TestCreatorBank');
   const queryClient = useQueryClient();
   const [expandedParts, setExpandedParts] = useState<Set<string>>(() => new Set());
   const [expandedChapters, setExpandedChapters] = useState<Set<string>>(() => new Set());
@@ -128,14 +130,14 @@ export function usePersonalQuestionBank({
   const collectionsMap = useMemo(() => {
     const map: Record<string, string> = {};
     collectionsList.forEach((c) => {
-      if (c?.collectionId) map[c.collectionId] = c.name || '(Không tên)';
+      if (c?.collectionId) map[c.collectionId] = c.name || t('bank.unnamed');
     });
     return map;
-  }, [collectionsList]);
+  }, [collectionsList, t]);
 
   const getCollectionName = (id?: string) => {
     if (!id) return '';
-    return collectionsMap[id] || '(Không xác định)';
+    return collectionsMap[id] || t('bank.unknown');
   };
 
   const selectedIsParent = isParentCollection(collectionsList, collectionFilter);
@@ -251,11 +253,11 @@ export function usePersonalQuestionBank({
   // Thông báo lỗi tải dữ liệu, suy ra trực tiếp từ trạng thái các query
   // (thứ tự ưu tiên giữ như trước: lỗi ghi sau cùng thắng).
   const loadError = anyChapterQuestionError
-    ? 'Không tải được câu hỏi của chương này.'
+    ? t('bank.errors.chapterQuestions')
     : chaptersQuery.isError
-      ? 'Không tải được danh sách chương.'
+      ? t('bank.errors.chapters')
       : anyPartError
-        ? 'Không tải được danh sách câu hỏi.'
+        ? t('bank.errors.questions')
         : null;
 
   const toggleChapterExpanded = (chapterId: string) => {

@@ -2,7 +2,8 @@
 
 import { useMemo } from 'react';
 import classNames from 'classnames/bind';
-import { parseCode, parseVendor } from '@/app/(public)/_lib/certificationMeta';
+import { useTranslations } from 'next-intl';
+import { parseCode, parseVendor } from '@/app/[locale]/(public)/_lib/certificationMeta';
 import type { ExamTypeResponse } from '@/app/types/exam-type';
 import styles from './ExamPillPicker.module.scss';
 
@@ -25,11 +26,13 @@ function ExamPillPicker({
   examTypes,
   value,
   onChange,
-  label = 'Kỳ thi',
+  label,
   allLabel,
   counts,
   className,
 }: ExamPillPickerProps) {
+  const t = useTranslations('MyTarget');
+  const pickerLabel = label ?? t('examPicker.label');
   const pills = useMemo(
     () =>
       examTypes.map((exam) => {
@@ -50,8 +53,8 @@ function ExamPillPicker({
   const countOf = (id: string) => (counts && counts[id] != null ? ` (${counts[id]})` : '');
 
   return (
-    <div className={cx('row', className)} role="group" aria-label={`Chọn ${label.toLowerCase()}`}>
-      <span className={cx('label')}>{label}:</span>
+    <div className={cx('row', className)} role="group" aria-label={t('examPicker.ariaLabel', { label: pickerLabel.toLowerCase() })}>
+      <span className={cx('label')}>{pickerLabel}:</span>
       {allLabel && (
         <button
           type="button"

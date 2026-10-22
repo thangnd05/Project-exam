@@ -1,0 +1,73 @@
+{
+  "coins": {
+    "badgeTitle": "{balance} xu  bấm để xem nhiệm vụ",
+    "menuTitleClaimable": "Có {count} phần thưởng chưa nhận",
+    "menuTitle": "Xem nhiệm vụ",
+    "menuAriaClaimable": "Xem số dư xu và nhiệm vụ, có {count} phần thưởng chưa nhận",
+    "menuAria": "Xem số dư xu và nhiệm vụ",
+    "amount": "{amount} xu"
+  },
+  "quests": {
+    "title": "Phần thưởng",
+    "tabQuests": "Nhiệm vụ",
+    "tabShop": "Cửa hàng",
+    "loading": "Đang tải nhiệm vụ...",
+    "empty": "Hiện chưa có nhiệm vụ nào.",
+    "claimable": "Có thể nhận ({count})",
+    "inProgress": "Đang làm ({count})",
+    "claimed": "Đã nhận ({count})",
+    "endsAt": "Kết thúc: {date}",
+    "claimedBadge": "Đã nhận",
+    "claiming": "Đang nhận...",
+    "claim": "Nhận xu",
+    "claimSuccess": "Đã nhận {coins} xu!",
+    "claimError": "Không thể nhận nhiệm vụ. Vui lòng thử lại."
+  },
+  "shop": {
+    "loadError": "Không thể tải cửa hàng.",
+    "buySuccess": "Đã mua \"{name}\"!",
+    "buyError": "Mua thất bại. Vui lòng thử lại.",
+    "equipError": "Không thể đeo vật phẩm.",
+    "unequipError": "Không thể tháo vật phẩm.",
+    "loading": "Đang tải cửa hàng...",
+    "empty": "Cửa hàng chưa có vật phẩm nào.",
+    "buying": "Đang mua...",
+    "buy": "Mua",
+    "notEnough": "Không đủ xu",
+    "equipped": "Đang đeo",
+    "unequip": "Tháo",
+    "owned": "Đã sở hữu",
+    "equip": "Đeo"
+  },
+  "streak": {
+    "label": "ngày liên tiếp",
+    "lostHeading": "Đã đứt chuỗi {count} ngày",
+    "lostBody": "Bấm vào huy hiệu để khôi phục chuỗi trước khi hết hạn.",
+    "activeHeading": "Chuỗi {count} ngày liên tiếp",
+    "activeBody": "Chuỗi tăng mỗi ngày bạn làm bài hoặc học một nhiệm vụ trong lộ trình. Bỏ một ngày là chuỗi về 0.",
+    "emptyHeading": "Chưa có chuỗi ngày học",
+    "emptyBody": "Làm một bài hoặc học một nhiệm vụ trong lộ trình hôm nay để bắt đầu chuỗi."
+  },
+  "celebration": {
+    "days": "{count} ngày",
+    "title": "Giữ lửa thành công!",
+    "subtitle": "Bạn đã học {count} ngày liên tiếp. Quay lại ngày mai để nối dài chuỗi nhé!",
+    "continue": "Tiếp tục"
+  },
+  "restore": {
+    "title": "Khôi phục chuỗi",
+    "later": "Để sau",
+    "restoring": "Đang khôi phục...",
+    "restore": "Khôi phục ({cost} xu)",
+    "notEnough": "Không đủ xu",
+    "lead": "Bạn vừa làm đứt chuỗi <strong>{count} ngày</strong>. Khôi phục bằng xu để nối lại trước khi làm bài. Nếu để sau, xong bài này chuỗi bắt đầu lại từ 1.",
+    "cost": "Chi phí khôi phục",
+    "balance": "Số dư của bạn",
+    "warn": "Bạn không đủ xu để khôi phục. Hãy làm nhiệm vụ để kiếm thêm xu.",
+    "success": "Đã khôi phục chuỗi {count} ngày!",
+    "error": "Khôi phục thất bại. Vui lòng thử lại."
+  },
+  "hint": {
+    "ok": "Đã hiểu"
+  }
+}

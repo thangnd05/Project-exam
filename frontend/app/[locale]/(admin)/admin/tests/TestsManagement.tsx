@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 import {Edit, Trash2} from 'lucide-react';
 
 import BaseModal from '@/app/components/modal/BaseModal';
@@ -11,7 +12,7 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/(admin)/_components/common';
+} from '@/app/[locale]/(admin)/_components/common';
 import { useAdminTests } from './_hooks/useAdminTests';
 import type { CreateTestRequest, ExamTypeResponse, TestAdminResponse, UserResponse } from '@/app/types';
 
@@ -48,6 +49,8 @@ const createEmptyForm = (examTypes: ExamTypeResponse[] = []): TestFormState => (
 });
 
 function TestsManagement() {
+  const t = useTranslations('AdminContent.tests');
+  const tc = useTranslations('Common');
   const {
     tests,
     examTypes,
@@ -131,7 +134,7 @@ function TestsManagement() {
       setShowFormModal(false);
       resetForm();
     } catch {
-      setErrorMessage('Không thể lưu đề thi. Vui lòng thử lại.');
+      setErrorMessage(t('errors.saveFailed'));
     }
   };
 
@@ -140,15 +143,15 @@ function TestsManagement() {
     try {
       await deleteTest(testId);
     } catch {
-      setErrorMessage('Không thể xóa đề thi.');
+      setErrorMessage(t('errors.deleteFailed'));
     }
   };
 
   const columns = [
-    {key: 'title', header: 'Tiêu đề'},
+    {key: 'title', header: t('columns.title')},
     {
       key: 'examTypeId',
-      header: 'Loại kỳ thi',
+      header: t('columns.examType'),
       render: (test: AdminTestRow) => (
         <Badge bg="secondary">
           {examTypes.find(
@@ -159,24 +162,24 @@ function TestsManagement() {
     },
     {
       key: 'durationMinutes',
-      header: 'Thời lượng',
+      header: t('columns.duration'),
       render: (test: AdminTestRow) =>
         test.durationMinutes != null && String(test.durationMinutes) !== ''
-          ? `${test.durationMinutes} phút`
-          : 'Không giới hạn',
+          ? t('minutes', {count: Number(test.durationMinutes)})
+          : t('unlimited'),
     },
-    {key: 'maxAttempts', header: 'Số lần làm tối đa'},
+    {key: 'maxAttempts', header: t('columns.maxAttempts')},
     {
       key: 'classChapter',
-      header: 'Lớp / chương',
+      header: t('columns.classChapter'),
       render: (test: AdminTestRow) =>
         test.classId != null || test.chapterId != null
-          ? `Lớp ${test.classId ?? '-'} / Chương ${test.chapterId ?? '-'}`
+          ? t('classChapter', {classId: test.classId ?? '-', chapterId: test.chapterId ?? '-'})
           : '-',
     },
     {
       key: 'createdBy',
-      header: 'Người tạo',
+      header: t('columns.createdBy'),
       render: (test: AdminTestRow) =>
         getUserDisplayName(
           users.find(
@@ -189,40 +192,40 @@ function TestsManagement() {
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Quản lý đề thi"
-        description="Sửa, xóa đề thi theo loại kỳ thi."
+        title={t('title')}
+        description={t('description')}
       />
 
       <AdminToolbar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="Tìm theo tiêu đề, mô tả, loại kỳ thi..."
+        searchPlaceholder={t('searchPlaceholder')}
       />
       <AdminFieldError
         message={
           errorMessage ||
-          (isError ? 'Không thể tải dữ liệu đề thi từ hệ thống.' : '')
+          (isError ? t('errors.loadFailed') : '')
         }
       />
 
       <AdminTable
         showIndex
         paginated
-        itemLabel="đề thi"
+        itemLabel={t('itemLabel')}
         columns={columns}
         data={filteredTests}
         loading={loading}
         getRowKey={(test: AdminTestRow) => test.testId}
         rowActions={(test: AdminTestRow) => (
           <>
-            <button type="button" onClick={() => openEditModal(test)} title="Sửa">
+            <button type="button" onClick={() => openEditModal(test)} title={t('edit')}>
               <Edit size={14} />
             </button>
             <button
               type="button"
               className="danger"
               onClick={() => handleDelete(test.testId)}
-              title="Xóa"
+              title={t('delete')}
               disabled={submitting}
             >
               <Trash2 size={14} />
@@ -237,7 +240,7 @@ function TestsManagement() {
           setShowFormModal(false);
           resetForm();
         }}
-        title="Cập nhật đề thi"
+        title={t('form.editTitle')}
         maxWidth={800}
         footer={
           <ModalActionFooter
@@ -246,14 +249,14 @@ function TestsManagement() {
               resetForm();
             }}
             onSubmit={handleSubmit}
-            cancelLabel="Hủy"
-            submitLabel="Lưu"
+            cancelLabel={tc('cancelShort')}
+            submitLabel={tc('save')}
             loading={submitting || loading}
           />
         }
       >
           <Form.Group className="mb-3">
-            <Form.Label>Tiêu đề</Form.Label>
+            <Form.Label>{t('columns.title')}</Form.Label>
             <Form.Control
               value={formState.title}
               onChange={(event) =>
@@ -262,7 +265,7 @@ function TestsManagement() {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Mô tả</Form.Label>
+            <Form.Label>{t('form.description')}</Form.Label>
             <Form.Control
               as="textarea"
               rows={2}
@@ -276,7 +279,7 @@ function TestsManagement() {
             />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Loại kỳ thi</Form.Label>
+            <Form.Label>{t('columns.examType')}</Form.Label>
             <Form.Select
               value={formExamTypeId}
               onChange={(event) =>
@@ -295,7 +298,7 @@ function TestsManagement() {
           </Form.Group>
           <div className="row">
             <Form.Group className="mb-3 col-md-6">
-              <Form.Label>Thời lượng (phút)</Form.Label>
+              <Form.Label>{t('form.duration')}</Form.Label>
               <Form.Control
                 type="number"
                 min={1}
@@ -309,7 +312,7 @@ function TestsManagement() {
               />
             </Form.Group>
             <Form.Group className="mb-3 col-md-6">
-              <Form.Label>Số lần làm tối đa</Form.Label>
+              <Form.Label>{t('columns.maxAttempts')}</Form.Label>
               <Form.Control
                 type="number"
                 min={1}
@@ -325,11 +328,11 @@ function TestsManagement() {
           </div>
           <div className="row">
             <Form.Group className="mb-3 col-md-6">
-              <Form.Label>ID lớp (tuỳ chọn)</Form.Label>
+              <Form.Label>{t('form.classId')}</Form.Label>
               <Form.Control
                 type="text"
                 inputMode="numeric"
-                placeholder="Để trống nếu không gắn lớp"
+                placeholder={t('form.classIdPlaceholder')}
                 value={formState.classId}
                 onChange={(event) =>
                   setFormState((previous) => ({...previous, classId: event.target.value}))
@@ -337,11 +340,11 @@ function TestsManagement() {
               />
             </Form.Group>
             <Form.Group className="mb-3 col-md-6">
-              <Form.Label>ID chương (tuỳ chọn)</Form.Label>
+              <Form.Label>{t('form.chapterId')}</Form.Label>
               <Form.Control
                 type="text"
                 inputMode="numeric"
-                placeholder="Để trống nếu không gắn chương"
+                placeholder={t('form.chapterIdPlaceholder')}
                 value={formState.chapterId}
                 onChange={(event) =>
                   setFormState((previous) => ({

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import {
   IoAddOutline,
   IoArrowBackOutline,
@@ -30,6 +31,8 @@ type NotesPanelProps = {
 };
 
 function NotesPanel({ show, onClose }: NotesPanelProps) {
+  const t = useTranslations('TestTaking.notes');
+  const tCommon = useTranslations('Common');
   const [view, setView] = useState<'list' | 'editor'>('list');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState(EMPTY_DRAFT);
@@ -66,7 +69,7 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
 
   const handleSave = () => {
     if (!draft.title.trim()) {
-      toast.warning('Vui lòng nhập tiêu đề ghi chú!');
+      toast.warning(t('titleRequired'));
       return;
     }
 
@@ -74,12 +77,12 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
       { noteId: editingId, payload: { title: draft.title.trim(), content: draft.content } },
       {
         onSuccess: () => {
-          toast.success(editingId ? 'Đã cập nhật ghi chú!' : 'Đã lưu ghi chú!');
+          toast.success(editingId ? t('updated') : t('saved'));
           backToList();
         },
         onError: (err) => {
           console.error(err);
-          toast.error(err.response?.data?.message || 'Có lỗi xảy ra khi lưu ghi chú!');
+          toast.error(err.response?.data?.message || t('saveError'));
         },
       },
     );
@@ -87,10 +90,10 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
 
   const handleDelete = (noteId: string) => {
     deleteNoteMutation.mutate(noteId, {
-      onSuccess: () => toast.success('Đã xóa ghi chú!'),
+      onSuccess: () => toast.success(t('deleted')),
       onError: (err) => {
         console.error('Lỗi xóa ghi chú:', err);
-        toast.error('Có lỗi xảy ra khi xóa ghi chú!');
+        toast.error(t('deleteError'));
       },
       onSettled: () => setConfirmingId(null),
     });
@@ -101,10 +104,10 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
   const footer = isEditor ? (
     <>
       <ButtonPrime variant="ghost" size="lg" onClick={backToList} disabled={saving}>
-        Hủy
+        {tCommon('cancelShort')}
       </ButtonPrime>
       <ButtonPrime variant="primary" size="lg" onClick={handleSave} disabled={saving}>
-        {saving ? 'Đang lưu...' : editingId ? 'Lưu thay đổi' : 'Lưu ghi chú'}
+        {saving ? t('saving') : editingId ? t('saveChanges') : t('saveNote')}
       </ButtonPrime>
     </>
   ) : null;
@@ -113,7 +116,7 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
     <BaseModal
       show={show}
       onClose={onClose}
-      title={isEditor ? (editingId ? 'Sửa ghi chú' : 'Ghi chú mới') : 'Ghi chú của tôi'}
+      title={isEditor ? (editingId ? t('editNote') : t('newNote')) : t('myNotes')}
       headerExtra={
         !isEditor && notes.length > 0 ? (
           <span className={cx('countBadge')}>{notes.length}</span>
@@ -126,13 +129,13 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
         <div className={cx('editor')}>
           <button type="button" className={cx('backBtn')} onClick={backToList}>
             <IoArrowBackOutline />
-            Về danh sách
+            {t('backToList')}
           </button>
 
           <input
             type="text"
             className={cx('titleInput')}
-            placeholder="Tiêu đề ghi chú"
+            placeholder={t('titlePlaceholder')}
             value={draft.title}
             maxLength={200}
             onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))}
@@ -142,7 +145,7 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
 
           <textarea
             className={cx('contentInput')}
-            placeholder="Viết lại điều bạn cần nhớ..."
+            placeholder={t('contentPlaceholder')}
             value={draft.content}
             maxLength={20000}
             onChange={(e) => setDraft((d) => ({ ...d, content: e.target.value }))}
@@ -154,18 +157,18 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
         <div className={cx('list')}>
           <button type="button" className={cx('newBtn')} onClick={() => openEditor(null)}>
             <IoAddOutline />
-            Viết ghi chú mới
+            {t('writeNew')}
           </button>
 
           {isLoading ? (
             <div className={cx('stateBox')}>
               <Spinner animation="border" variant="primary" size="sm" />
-              <span>Đang mở sổ tay...</span>
+              <span>{t('loading')}</span>
             </div>
           ) : notes.length === 0 ? (
             <div className={cx('stateBox', 'empty')}>
               <IoDocumentTextOutline className={cx('emptyIcon')} />
-              <span>Sổ tay còn trống - ghi lại điều bạn hay quên nhé.</span>
+              <span>{t('empty')}</span>
             </div>
           ) : (
             notes.map((note) => (
@@ -179,28 +182,28 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
                   {note.content ? (
                     <p className={cx('notePreview')}>{note.content}</p>
                   ) : (
-                    <p className={cx('notePreview', 'isEmpty')}>Chưa có nội dung</p>
+                    <p className={cx('notePreview', 'isEmpty')}>{t('noContent')}</p>
                   )}
                   <span className={cx('noteTime')}>{formatDateTime(note.updatedAt)}</span>
                 </button>
 
                 {confirmingId === note.noteId ? (
                   <div className={cx('confirmBox')}>
-                    <span>Xóa?</span>
+                    <span>{t('confirmDelete')}</span>
                     <button
                       type="button"
                       className={cx('confirmYes')}
                       onClick={() => handleDelete(note.noteId)}
                       disabled={deleteNoteMutation.isPending}
                     >
-                      Xóa
+                      {t('delete')}
                     </button>
                     <button
                       type="button"
                       className={cx('confirmNo')}
                       onClick={() => setConfirmingId(null)}
                     >
-                      Hủy
+                      {tCommon('cancelShort')}
                     </button>
                   </div>
                 ) : (
@@ -208,7 +211,7 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
                     <button
                       type="button"
                       className={cx('iconBtn')}
-                      title="Sửa ghi chú"
+                      title={t('editNote')}
                       onClick={() => openEditor(note)}
                     >
                       <IoCreateOutline />
@@ -216,7 +219,7 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
                     <button
                       type="button"
                       className={cx('iconBtn', 'danger')}
-                      title="Xóa ghi chú"
+                      title={t('deleteNote')}
                       onClick={() => setConfirmingId(note.noteId)}
                     >
                       <IoTrashOutline />

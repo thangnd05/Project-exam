@@ -3,6 +3,7 @@
 import { Modal, Button } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import style from '@/app/features/gamification/streak/StreakCelebration.module.scss';
 import { useStreak } from '@/app/features/gamification/streak/hooks/useStreak';
 import { FaFire } from 'react-icons/fa6';
@@ -11,6 +12,7 @@ const cx = classNames.bind(style);
 
 function StreakCelebration() {
   const { currentStreak, justIncreased, clearJustIncreased } = useStreak();
+  const t = useTranslations('Gamification.celebration');
 
   return (
     <Modal
@@ -28,13 +30,13 @@ function StreakCelebration() {
         >
           <FaFire />
         </motion.div>
-        <h3 className={cx('count')}>{currentStreak} ngày</h3>
-        <p className={cx('title')}>Giữ lửa thành công!</p>
+        <h3 className={cx('count')}>{t('days', { count: currentStreak })}</h3>
+        <p className={cx('title')}>{t('title')}</p>
         <p className={cx('subtitle')}>
-          Bạn đã học {currentStreak} ngày liên tiếp. Quay lại ngày mai để nối dài chuỗi nhé!
+          {t('subtitle', { count: currentStreak })}
         </p>
         <Button className={cx('btn')} onClick={clearJustIncreased}>
-          Tiếp tục
+          {t('continue')}
         </Button>
       </Modal.Body>
     </Modal>

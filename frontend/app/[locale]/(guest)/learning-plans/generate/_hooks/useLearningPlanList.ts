@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import type { ExamTypeResponse, PlanResponse } from '@/app/types';
@@ -67,6 +68,7 @@ export function useLearningPlanList({
   initialExamTypeId = '',
   refreshKey = 0,
 }: UseLearningPlanListOptions = {}) {
+  const t = useTranslations('LearningPlans');
   const [internalExamTypeId, setInternalExamTypeId] = useState(initialExamTypeId);
 
   const filterExamTypeId = controlledExamTypeId !== undefined
@@ -99,7 +101,7 @@ export function useLearningPlanList({
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error
-      ? getApiErrorMessage(query.error, query.error.message || 'Không tải được danh sách lộ trình')
+      ? getApiErrorMessage(query.error, query.error.message || t('planList.loadError'))
       : null,
     filterExamTypeId,
     setFilterExamTypeId,

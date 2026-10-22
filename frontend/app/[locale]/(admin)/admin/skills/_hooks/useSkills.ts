@@ -1,7 +1,7 @@
 'use client';
 
 import {createSkill, deleteSkill, getSkills, updateSkill} from '@/app/apis/skillApi';
-import {useAdminCrud} from '@/app/(admin)/_hooks/useAdminCrud';
+import {useAdminCrud} from '@/app/[locale]/(admin)/_hooks/useAdminCrud';
 import type {SkillRequest, SkillResponse} from '@/app/types';
 import {skillKeys} from '@/app/configs/queryKeys';
 

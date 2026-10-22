@@ -1,13 +1,14 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
+import {useTranslations} from 'next-intl';
 import {Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {ChevronDown, ChevronRight, Edit, FileText, Plus, Trash2} from 'lucide-react';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import TagFormModal, {type TagFormState} from './_components/TagFormModal';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/[locale]/(admin)/_components/common';
 import {useAdminExamTypesForTags, useExamPartsForTags, useTagList, useTags, type AdminTag} from './_hooks/useTags';
 import type {TagRequest, TagResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
@@ -46,9 +47,10 @@ type PartGroupNodeProps = {
 };
 
 function PartGroupNode({group, isExpanded, searchTerm, onToggle, onAddToPart, onEdit, onDelete}: PartGroupNodeProps) {
+  const t = useTranslations('AdminContent.tags');
   const keyword = searchTerm.trim().toLowerCase();
   const visibleTags = keyword
-    ? group.tags.filter((t) => t.name.toLowerCase().includes(keyword))
+    ? group.tags.filter((tag) => tag.name.toLowerCase().includes(keyword))
     : group.tags;
   if (keyword && visibleTags.length === 0) return null;
 
@@ -68,14 +70,14 @@ function PartGroupNode({group, isExpanded, searchTerm, onToggle, onAddToPart, on
           )}
           <span className={cx('tagName', 'root', {sharedGroup: !group.examPartId})}>{group.name}</span>
           {group.displayOrder != null && (
-            <span className={cx('sortOrder')} title="Thứ tự phần thi">
+            <span className={cx('sortOrder')} title={t('partOrder')}>
               {group.displayOrder}
             </span>
           )}
-          <span className={cx('childCount')} title="Số tag">{group.tags.length}</span>
+          <span className={cx('childCount')} title={t('tagCount')}>{group.tags.length}</span>
         </div>
         <div className={cx('treeNodeActions')}>
-          <button onClick={() => onAddToPart(group.examPartId)} title="Thêm tag vào phần thi này">
+          <button onClick={() => onAddToPart(group.examPartId)} title={t('addToPart')}>
             <Plus size={16} />
           </button>
         </div>
@@ -87,22 +89,22 @@ function PartGroupNode({group, isExpanded, searchTerm, onToggle, onAddToPart, on
               <div className={cx('treeNodeLeft')}>
                 <span className={cx('expandPlaceholder')} />
                 <span className={cx('tagName')}>{tag.name}</span>
-                <span className={cx('sortOrder')} title="Thứ tự hiển thị">
+                <span className={cx('sortOrder')} title={t('sortOrder')}>
                   {tag.sortOrder ?? '—'}
                 </span>
                 <span
                   className={cx('resourceCount', {empty: !tag.resourceCount})}
-                  title={tag.resourceCount ? `${tag.resourceCount} tài liệu gắn tag này` : 'Chưa có tài liệu'}
+                  title={tag.resourceCount ? t('resourceCount', {count: tag.resourceCount}) : t('noResources')}
                 >
                   <FileText size={12} />
                   {tag.resourceCount ?? 0}
                 </span>
               </div>
               <div className={cx('treeNodeActions')}>
-                <button onClick={() => onEdit(tag)} title="Sửa">
+                <button onClick={() => onEdit(tag)} title={t('edit')}>
                   <Edit size={16} />
                 </button>
-                <button onClick={() => onDelete(tag)} title="Xóa">
+                <button onClick={() => onDelete(tag)} title={t('delete')}>
                   <Trash2 size={16} />
                 </button>
               </div>
@@ -115,6 +117,8 @@ function PartGroupNode({group, isExpanded, searchTerm, onToggle, onAddToPart, on
 }
 
 function TagsManagement() {
+  const t = useTranslations('AdminContent.tags');
+  const tc = useTranslations('Common');
   const [chosenExamTypeId, setSelectedExamTypeId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
@@ -135,17 +139,17 @@ function TagsManagement() {
     const groups: PartGroup[] = examParts.map((p) => ({
       key: p.examPartId,
       examPartId: p.examPartId,
-      name: p.name || '(Chưa đặt tên)',
+      name: p.name || t('unnamedPart'),
       displayOrder: p.displayOrder,
-      tags: tags.filter((t) => t.examPartId === p.examPartId),
+      tags: tags.filter((tag) => tag.examPartId === p.examPartId),
     }));
     const knownPartIds = new Set(examParts.map((p) => p.examPartId));
-    const shared = tags.filter((t) => !t.examPartId || !knownPartIds.has(t.examPartId));
+    const shared = tags.filter((tag) => !tag.examPartId || !knownPartIds.has(tag.examPartId));
     if (shared.length > 0) {
-      groups.push({key: SHARED_GROUP_KEY, examPartId: null, name: 'Dùng chung mọi phần thi', tags: shared});
+      groups.push({key: SHARED_GROUP_KEY, examPartId: null, name: t('sharedGroup'), tags: shared});
     }
     return groups;
-  }, [examParts, tags]);
+  }, [examParts, tags, t]);
 
   const {createMutation, updateMutation, deleteMutation} = useTags();
   const submitting =
@@ -208,11 +212,11 @@ function TagsManagement() {
   const handleSubmit = () => {
     const examTypeId = formState.examTypeId || selectedExamTypeId;
     if (!examTypeId) {
-      setErrorMessage('Vui lòng chọn loại kỳ thi.');
+      setErrorMessage(t('errors.examTypeRequired'));
       return;
     }
     if (!formState.name.trim()) {
-      setErrorMessage('Tên tag không được để trống.');
+      setErrorMessage(t('errors.nameRequired'));
       return;
     }
     setErrorMessage('');
@@ -239,7 +243,7 @@ function TagsManagement() {
       });
     };
     const onError = (error: unknown) => {
-      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu tag. Vui lòng thử lại.'));
+      setErrorMessage(getApiErrorMessage(error, t('errors.saveFailed')));
     };
 
     if (editingTagId) {
@@ -254,26 +258,26 @@ function TagsManagement() {
     setErrorMessage('');
     deleteMutation.mutate(deletingTag.tagId, {
       onSuccess: () => setDeletingTag(null),
-      onError: () => setErrorMessage('Không thể xóa tag này.'),
+      onError: () => setErrorMessage(t('errors.deleteFailed')),
     });
   };
 
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Quản lý Tag câu hỏi"
-        description="Phân loại câu hỏi theo chủ đề, kỹ năng chi tiết."
+        title={t('title')}
+        description={t('description')}
       >
         <Button onClick={() => openCreateModal()} disabled={!selectedExamTypeId}>
           <Plus size={16} className="me-1" />
-          Thêm Tag
+          {t('add')}
         </Button>
       </AdminPageHeader>
 
       <AdminToolbar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="Tìm theo tên tag..."
+        searchPlaceholder={t('searchPlaceholder')}
       >
         <Form.Select
           style={{maxWidth: 260}}
@@ -288,27 +292,27 @@ function TagsManagement() {
         </Form.Select>
       </AdminToolbar>
 
-      <AdminFieldError message={errorMessage || (tagLoadError ? 'Không thể tải danh sách tag.' : '')} />
+      <AdminFieldError message={errorMessage || (tagLoadError ? t('errors.loadFailed') : '')} />
 
       <div className={cx('treeWrapper')}>
         <div className={cx('treeToolbar')}>
-          <span className={cx('treeCount')}>{tags.length} tags</span>
+          <span className={cx('treeCount')}>{t('count', {count: tags.length})}</span>
           <div className={cx('treeToolbarActions')}>
-            <button onClick={expandAll}>Mở tất cả</button>
-            <button onClick={collapseAll}>Thu gọn</button>
+            <button onClick={expandAll}>{t('expandAll')}</button>
+            <button onClick={collapseAll}>{t('collapseAll')}</button>
           </div>
         </div>
 
         {loading && (
           <div className="text-center py-4">
             <Spinner size="sm" className="me-2" />
-            Đang tải...
+            {tc('loading')}
           </div>
         )}
 
         {!loading && partGroups.length === 0 && (
           <div className="text-center py-4 text-muted">
-            Loại kỳ thi này chưa có phần thi và tag nào.
+            {t('empty')}
           </div>
         )}
 
@@ -349,8 +353,8 @@ function TagsManagement() {
           setDeletingTag(null);
         }}
         onConfirm={handleConfirmDelete}
-        title="Xác nhận xóa Tag"
-        message={`Bạn có chắc muốn xóa tag "${deletingTag?.name || ''}" không? Tag sẽ bị gỡ khỏi các câu hỏi và tài liệu đang gắn.`}
+        title={t('deleteTitle')}
+        message={t('deleteMessage', {name: deletingTag?.name || ''})}
       />
     </div>
   );

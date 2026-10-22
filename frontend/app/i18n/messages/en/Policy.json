@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "title": "Privacy Policy",
+    "description": "How WinDe Exam collects and uses your data."
+  },
+  "title": "Privacy Policy",
+  "updated": "Last updated: October 18, 2026 • Version 2.0 • Dispute resolution channel:",
+  "intro": "FrostScope is committed to protecting the privacy and personal data of every learner who accesses the platform, takes quick assessments (Quick Scope), follows a personalized learning path (My Path), or appears on the leaderboard (ScopeRank). This policy sets out clearly how we collect, use, store, and protect your information.",
+  "collect": {
+    "title": "1. Information we collect",
+    "intro": "We collect only the data necessary to operate the learning and skills-assessment experience:",
+    "account": "<strong>1.1. Account information:</strong> Full name or display name (Display Name), email address, and encrypted password. If you sign in through Google SSO or GitHub SSO, we receive your user identifier and the email address authorized by the respective service.",
+    "assessment": "<strong>1.2. Skills-assessment & learning data:</strong> The certification you are targeting, your planned exam date, your practice exam history (Quick Mock, Full Mock), the time taken to answer each question, your confidence level when selecting answers, and your mastery distribution across each official Domain Blueprint.",
+    "technical": "<strong>1.3. Automatically collected technical data:</strong> IP address, browser type, operating system, and session information, used to ensure security and keep you signed in."
+  },
+  "purpose": {
+    "title": "2. Purposes of processing learning data",
+    "intro": "All collected data is used solely for the following purposes:",
+    "items": [
+      "Knowledge gap analysis (Gap Report): Precisely identifying the areas of knowledge in each Domain where you are still weak, so you do not have to re-study everything you have already mastered.",
+      "Adaptive learning path (My Path): Delivering focused daily exercises (Daily Focus) and triggering the spaced-repetition algorithm (Smart Review) right when your knowledge is about to fade.",
+      "Readiness measurement (Readiness): Estimating your actual level of confidence before the official exam date and recommending when to take the Full Mock Test.",
+      "Ensuring platform integrity: Preventing result manipulation, spam, and exploitation of loopholes in reward-point accumulation."
+    ]
+  },
+  "scopeRank": {
+    "title": "3. The ScopeRank leaderboard and privacy",
+    "intro": "The ScopeRank leaderboard is designed to encourage learning and healthy competition within the engineering community:",
+    "public": "<strong>Publicly displayed information:</strong> The system displays only your display name, avatar, the certification you are preparing for, your total normalized score, and your improvement progress. Your email address, phone number, and other private personal information are never displayed under any circumstances.",
+    "private": "<strong>Right to anonymity (Private Mode):</strong> You have full discretion to enable private mode in your account settings at any time to hide your scores and profile from the public leaderboard, without affecting your personal learning progress."
+  },
+  "credits": {
+    "title": "4. Internal reward points (Credits) & learning transactions",
+    "intro": "The Credits reward system is an internal gamification mechanism that supports learning:",
+    "items": [
+      "Credits are used to unlock full-length practice exam sets (Full Mock) or advanced exercises.",
+      "Credits are not cash and are not financial assets; they have no cash redemption value and may not be bought, sold, or transferred between accounts.",
+      "The history of Credits added and deducted is transparently recorded in your account."
+    ]
+  },
+  "ip": {
+    "title": "5. Intellectual property & third-party trademark notice",
+    "trademarks": "Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), The Linux Foundation (Kubernetes, CKA, CKAD), HashiCorp, Oracle, and their related logos and badges are registered trademarks of their respective owners.",
+    "independent": "FrostScope is an independent training platform and is not sponsored by, authorized by, or officially affiliated with any of the organizations listed above. Our exams, questions, and learning paths are developed independently and closely follow the publicly available exam outlines (Exam Blueprint).",
+    "copyright": "Any questions or notices regarding content copyright should be sent to: <link>{email}</link>."
+  },
+  "noSale": {
+    "title": "6. Our commitment not to sell user data",
+    "commitment": "FrostScope is absolutely committed to <strong>not selling, renting, exchanging, or otherwise commercializing</strong> your personal data or exam history to any third party for advertising or marketing purposes.",
+    "processing": "Data is technically processed only by cloud server infrastructure providers that meet international security standards (SOC 2, ISO 27001) and are bound by strict confidentiality obligations, or pursuant to a written request from a competent judicial authority as provided by law."
+  },
+  "security": {
+    "title": "7. Storage and security standards",
+    "intro": "We apply modern information security standards:",
+    "items": [
+      "All data in transit is encrypted using the HTTPS protocol with TLS 1.3.",
+      "User passwords are securely protected with a one-way salted hash and are never stored in plain text.",
+      "The principle of least privilege (Least Privilege) is applied to technical staff who access the database systems."
+    ]
+  },
+  "rights": {
+    "title": "8. Learners’ rights over personal data",
+    "intro": "You have full control over your own data:",
+    "items": [
+      "The right to access and review your complete exam history and domain mastery rates in your account overview.",
+      "The right to update or change your display name, password, and exam goal at any time.",
+      "The right to request the permanent deletion of your account and all associated data from the system by sending a request to the support email. Requests will be fully processed within 14 business days."
+    ]
+  },
+  "disputes": {
+    "title": "9. Complaints & dispute resolution",
+    "intro": "All complaints and disputes concerning privacy, data leaks, or exam content copyright should be sent directly to our dedicated channel:",
+    "inbox": "Dispute inbox:",
+    "responseTime": "Committed response time: within 3 – 5 business days.",
+    "general": "For questions about your account, technical support, and general use of the service, please contact: <link>{email}</link>."
+  },
+  "changes": {
+    "title": "10. Effective date and policy changes",
+    "body": "This policy takes effect from its date of issue. FrostScope may amend its content to comply with legal regulations and to reflect new platform features. When there are material changes affecting learners’ rights, we will notify you in advance by email or by displaying a clear notice on the website before the effective date."
+  }
+}

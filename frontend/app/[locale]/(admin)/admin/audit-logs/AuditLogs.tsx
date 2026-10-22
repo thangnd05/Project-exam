@@ -2,10 +2,11 @@
 
 import { useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 
 import {formatDateTime} from '@/app/utils/format-date-time';
-import {AdminPageHeader, AdminTable, AdminToolbar} from '@/app/(admin)/_components/common';
-import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
+import {AdminPageHeader, AdminTable, AdminToolbar} from '@/app/[locale]/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import {useAuditLogs, type AuditLogRow} from './_hooks/useAuditLogs';
 
 const methodColorMap: Record<string, string> = {
@@ -17,6 +18,7 @@ const methodColorMap: Record<string, string> = {
 };
 
 function AuditLogs() {
+  const t = useTranslations('AdminSystem.auditLogs');
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -54,10 +56,10 @@ function AuditLogs() {
   const columns: AdminTableColumn[] = [
     {
       key: 'created_at',
-      header: 'Thời gian',
+      header: t('time'),
       render: (log: AuditLogRow) => formatDateTime(log.created_at),
     },
-    {key: 'action', header: 'Hành động'},
+    {key: 'action', header: t('action')},
     {
       key: 'endpoint',
       header: 'API',
@@ -72,7 +74,7 @@ function AuditLogs() {
     },
     {
       key: 'details',
-      header: 'Nội dung thay đổi',
+      header: t('details'),
       render: (log: AuditLogRow) =>
         log.details ? (
           <span title={log.details} style={{whiteSpace: 'pre-wrap', wordBreak: 'break-word'}}>
@@ -84,16 +86,16 @@ function AuditLogs() {
     },
     {
       key: 'user_name',
-      header: 'Người thực hiện',
+      header: t('actor'),
       render: (log: AuditLogRow) => log.user_name || log.full_name || 'Unknown',
     },
     {key: 'ip_address', header: 'IP', render: (log: AuditLogRow) => log.ip_address || '-'},
     {
       key: 'success',
-      header: 'Trạng thái',
+      header: t('status'),
       render: (log: AuditLogRow) => (
         <Badge bg={log.success ? 'success' : 'danger'}>
-          {log.success ? 'Thanh cong' : 'That bai'}
+          {log.success ? t('success') : t('failed')}
         </Badge>
       ),
     },
@@ -103,22 +105,22 @@ function AuditLogs() {
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
         title="Audit Logs"
-        description="Theo doi thao tac quan tri va su kien nhay cam trong he thong."
+        description={t('description')}
       />
 
       <AdminToolbar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="Tim action, endpoint, resource, nguoi thao tac..."
+        searchPlaceholder={t('searchPlaceholder')}
       >
         <Form.Select
           value={statusFilter}
           onChange={(event) => setStatusFilter(event.target.value)}
           style={{maxWidth: 200}}
         >
-          <option value="all">Tat ca trang thai</option>
-          <option value="success">Thanh cong</option>
-          <option value="failed">That bai</option>
+          <option value="all">{t('allStatuses')}</option>
+          <option value="success">{t('success')}</option>
+          <option value="failed">{t('failed')}</option>
         </Form.Select>
       </AdminToolbar>
 
@@ -132,7 +134,7 @@ function AuditLogs() {
         totalPages={totalPages}
         totalElements={totalElements}
         pageSize={ITEMS_PER_PAGE}
-        itemLabel="bản ghi"
+        itemLabel={t('itemLabel')}
         onPageChange={(p) => setCurrentPage(p + 1)}
       />
     </div>

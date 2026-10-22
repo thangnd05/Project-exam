@@ -1,10 +1,10 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Link, { useRouter } from '@/app/i18n/navigation';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import { examTypeIdFromParams, setExamParam, useNormalizeExamParam } from '@/app/features/exam-types/hooks/useExamParam';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import { FiAlertTriangle, FiBookOpen, FiTarget } from 'react-icons/fi';
@@ -41,34 +41,29 @@ const planCx = classNamesBind.bind(planStyles);
 
 const PLAN_SOURCES: {
   value: PlanSource;
-  title: string;
-  subtitle: string;
-  desc: string;
+  labelKey: 'syllabus' | 'diagnosis';
   icon: React.ElementType;
 }[] = [
   {
     value: 'SYLLABUS',
-    title: 'Chương trình học',
-    subtitle: 'Tôi mới bắt đầu, chưa làm bài nào',
-    desc: 'Đi tuần tự hết các chủ điểm của từng phần. Làm bài thi thử sau để sinh lộ trình sát hơn.',
+    labelKey: 'syllabus',
     icon: FiBookOpen,
   },
   {
     value: 'DIAGNOSIS',
-    title: 'Kết quả một bài thi',
-    subtitle: 'Chẩn đoán điểm yếu của tôi',
-    desc: 'Ưu tiên các chủ điểm bạn làm sai nhiều nhất trong bài đã chọn.',
+    labelKey: 'diagnosis',
     icon: FiTarget,
   },
 ];
 
 function GeneratePlan() {
+  const t = useTranslations('LearningPlans');
   const router = useRouter();
   const [searchParams, setSearchParams] = useSearchParamsState();
   const { isAuthenticated, loading: authLoading } = useAuth();
   // Khách vẫn xem được trang, chỉ khi bấm thao tác mới bị đưa sang đăng nhập.
   const isGuest = !authLoading && !isAuthenticated;
-  const requireLogin = () => router.push(buildLoginUrlFromHere('Bạn cần đăng nhập để sinh lộ trình!'));
+  const requireLogin = () => router.push(buildLoginUrlFromHere(t('generate.loginRequired')));
 
   const forcedSyllabus = searchParams.get('source') === 'syllabus';
   const userTestIdFromUrl = searchParams.get('userTestId') || '';
@@ -226,7 +221,7 @@ function GeneratePlan() {
         setError(
           getApiErrorMessage(
             err,
-            (err instanceof Error && err.message) || 'Lỗi không xác định',
+            (err instanceof Error && err.message) || t('generate.unknownError'),
           ),
         );
       },
@@ -253,12 +248,13 @@ function GeneratePlan() {
         (planSource === 'DIAGNOSIS' && (!userTestId || filteredUserTests.length === 0))));
 
   const renderTestPicker = () => {
+    const tr = t;
     if (isGuest) {
       return (
         <div className={ui('notice', 'noticeInfo')}>
-          <span>Đăng nhập để chọn bài thi bạn đã làm.</span>
+          <span>{t('generate.picker.guestNotice')}</span>
           <button type="button" className={ui('btnPrimary', 'btnSm')} onClick={requireLogin}>
-            Đăng nhập
+            {t('common.login')}
           </button>
         </div>
       );
@@ -270,13 +266,13 @@ function GeneratePlan() {
       return (
         <div className={ui('notice', 'noticeWarning')}>
           <span>
-            Bạn chưa có bài thi nào đã hoàn thành. Hãy làm một bài thử thách nhanh hoặc thi thử trước.
+            {t('generate.picker.noTests')}
           </span>
           <Link
             href={sourceExamTypeId ? buildExamTypeDetailPath(sourceExamTypeId) : routes.examTypes}
             className={ui('btnSecondary', 'btnSm')}
           >
-            Chọn bài để làm
+            {t('generate.picker.chooseTest')}
           </Link>
         </div>
       );
@@ -285,17 +281,18 @@ function GeneratePlan() {
       return (
         <div className={ui('notice', 'noticeWarning')}>
           <span>
-            Chưa có bài hoàn thành cho &quot;{sourceExamTypeName || 'kỳ thi đã chọn'}&quot;. Hãy làm
-            bài thi thử của kỳ thi này hoặc đổi kỳ thi khác.
+            {t('generate.picker.noTestsForExam', {
+              exam: sourceExamTypeName || t('generate.picker.selectedExamFallback'),
+            })}
           </span>
           <Link href={buildExamTypeDetailPath(sourceExamTypeId)} className={ui('btnSecondary', 'btnSm')}>
-            Xem đề thi
+            {t('generate.picker.viewExams')}
           </Link>
         </div>
       );
     }
     return (
-      <div className={cx('testList')} role="radiogroup" aria-label="Bài thi đã làm">
+      <div className={cx('testList')} role="radiogroup" aria-label={t('generate.picker.ariaLabel')}>
         {filteredUserTests.map((t) => (
           <label
             key={t.userTestId}
@@ -310,13 +307,13 @@ function GeneratePlan() {
               disabled={formLocked}
             />
             <span className={cx('testText')}>
-              <span className={cx('testTitle')}>{t.testTitle || 'Bài thi'}</span>
+              <span className={cx('testTitle')}>{t.testTitle || tr('generate.picker.testFallback')}</span>
               <span className={cx('testMeta')}>{formatDate(t.finishedAt)}</span>
             </span>
-            {isPracticeAttempt(t) && <span className={ui('pill')}>Luyện theo phần</span>}
+            {isPracticeAttempt(t) && <span className={ui('pill')}>{tr('generate.picker.practicePill')}</span>}
             <span className={cx('testScore')}>
               {t.totalScore ?? '-'}
-              <small>điểm</small>
+              <small>{tr('generate.picker.points')}</small>
             </span>
           </label>
         ))}
@@ -328,10 +325,9 @@ function GeneratePlan() {
     <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
       <TargetPlanTabs active="plan" examTypeId={sourceExamTypeId} examTypes={examTypes} />
       <header className={ui('pageHead')}>
-        <h1 className={ui('pageTitle')}>Sinh lộ trình vượt ải</h1>
+        <h1 className={ui('pageTitle')}>{t('generate.title')}</h1>
         <p className={ui('pageSubtitle')}>
-          Lộ trình chia thành các chặng, mỗi chặng là một phần thi. Mỗi chặng gồm nhiều ải luyện ngắn
-          về một chủ đề, làm đủ % câu đúng là vượt.
+          {t('generate.subtitle')}
         </p>
       </header>
 
@@ -344,9 +340,14 @@ function GeneratePlan() {
 
       {sourceExamTypeId && targetError && (
         <div className={ui('notice', 'noticeDanger')}>
-          <span>Không tải được mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot;: {targetError}.</span>
+          <span>
+            {t('generate.targetError', {
+              exam: sourceExamTypeName || t('generate.thisExamFallback'),
+              error: targetError,
+            })}
+          </span>
           <button type="button" className={ui('btnSecondary', 'btnSm')} onClick={() => refetchTarget()}>
-            Thử lại
+            {t('common.retry')}
           </button>
         </div>
       )}
@@ -354,19 +355,10 @@ function GeneratePlan() {
       {isAuthenticated && sourceExamTypeId && !loadingTarget && !targetError && !hasTarget && (
         <div className={ui('notice', planSource === 'SYLLABUS' ? 'noticeInfo' : 'noticeWarning')}>
           <span>
-            {planSource === 'SYLLABUS' ? (
-              <>
-                Bạn chưa đặt mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot; nên
-                ngưỡng vượt ải tạm dùng mức mặc định. Cứ sinh lộ trình và học trước; khi nào đặt
-                mục tiêu, bấm <strong>Cập nhật theo mục tiêu mới</strong> là lộ trình áp ngưỡng
-                đúng mà vẫn giữ tiến độ.
-              </>
-            ) : (
-              <>
-                Bạn chưa đặt mục tiêu cho &quot;{sourceExamTypeName || 'kỳ thi này'}&quot;.
-                Sang tab <strong>Mục tiêu</strong> đặt trước (có mốc gợi ý sẵn), rồi quay lại đây sinh lộ trình.
-              </>
-            )}
+            {t.rich(planSource === 'SYLLABUS' ? 'generate.noTarget.syllabus' : 'generate.noTarget.diagnosis', {
+              exam: sourceExamTypeName || t('generate.thisExamFallback'),
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </span>
           <Link
             href={`/my-target?${new URLSearchParams({
@@ -378,7 +370,7 @@ function GeneratePlan() {
             }).toString()}`}
             className={ui('btnPrimary', 'btnSm')}
           >
-            Đặt mục tiêu
+            {t('generate.noTarget.setTarget')}
           </Link>
         </div>
       )}
@@ -388,8 +380,8 @@ function GeneratePlan() {
           <ExamHeading exam={sourceExamType} className={cx('examHead')} />
 
           <div className={cx('block')}>
-            <span className={classNames(ui('eyebrow'), cx('blockLabel'))}>Lộ trình dựa trên</span>
-            <div className={cx('sourceGrid')} role="radiogroup" aria-label="Lộ trình dựa trên">
+            <span className={classNames(ui('eyebrow'), cx('blockLabel'))}>{t('generate.form.basedOn')}</span>
+            <div className={cx('sourceGrid')} role="radiogroup" aria-label={t('generate.form.basedOn')}>
               {PLAN_SOURCES.map((option) => {
                 const Icon = option.icon;
                 const selected = planSource === option.value;
@@ -410,9 +402,9 @@ function GeneratePlan() {
                       <Icon />
                     </span>
                     <span className={cx('sourceText')}>
-                      <span className={cx('sourceTitle')}>{option.title}</span>
-                      <span className={cx('sourceSubtitle')}>{option.subtitle}</span>
-                      <span className={cx('sourceDesc')}>{option.desc}</span>
+                      <span className={cx('sourceTitle')}>{t(`generate.sources.${option.labelKey}.title`)}</span>
+                      <span className={cx('sourceSubtitle')}>{t(`generate.sources.${option.labelKey}.subtitle`)}</span>
+                      <span className={cx('sourceDesc')}>{t(`generate.sources.${option.labelKey}.desc`)}</span>
                     </span>
                   </label>
                 );
@@ -423,16 +415,15 @@ function GeneratePlan() {
           {planSource === 'DIAGNOSIS' && (
             <div className={cx('block')}>
               <div className={cx('blockHead')}>
-                <span className={ui('eyebrow')}>Chọn bài thi muốn lập lộ trình</span>
-                <span className={ui('hint')}>Chỉ hiện bài đã hoàn thành của kỳ thi này.</span>
+                <span className={ui('eyebrow')}>{t('generate.form.pickTest')}</span>
+                <span className={ui('hint')}>{t('generate.form.pickTestHint')}</span>
               </div>
               {renderTestPicker()}
               {isPracticeAttempt(selectedTest) && (
                 <p className={cx('practiceWarning')}>
                   <FiAlertTriangle aria-hidden="true" />
                   <span>
-                    Bài này chỉ luyện một phần đề nên lộ trình sinh ra chỉ phủ các phần đã luyện.
-                    Muốn lộ trình đầy đủ, hãy chọn một bài thi thử trọn đề.
+                    {t('generate.form.practiceWarning')}
                   </span>
                 </p>
               )}
@@ -441,45 +432,52 @@ function GeneratePlan() {
 
           <div className={cx('submitRow')}>
             <button type="submit" className={ui('btnPrimary')} disabled={submitDisabled}>
-              {submitting ? 'Đang sinh lộ trình...' : 'Sinh lộ trình'}
+              {submitting ? t('generate.form.submitting') : t('generate.form.submit')}
             </button>
             {isGuest && (
               <span className={ui('hint')}>
-                <button type="button" className={ui('textBtn')} onClick={requireLogin}>
-                  Đăng nhập
-                </button>{' '}
-                để sinh, lưu và theo dõi tiến độ lộ trình.
+                {t.rich('generate.form.guestHint', {
+                  login: (chunks) => (
+                    <button type="button" className={ui('textBtn')} onClick={requireLogin}>
+                      {chunks}
+                    </button>
+                  ),
+                })}
               </span>
             )}
           </div>
         </form>
 
-        <aside className={classNames(ui('card'), cx('steps'))} aria-label="Các bước">
-          <span className={ui('eyebrow')}>Cách hoạt động</span>
+        <aside className={classNames(ui('card'), cx('steps'))} aria-label={t('generate.steps.ariaLabel')}>
+          <span className={ui('eyebrow')}>{t('generate.steps.heading')}</span>
           <ol className={cx('stepList')}>
             <li>
               <span className={cx('stepNum')}>01</span>
               <div>
-                <h3>{planSource === 'SYLLABUS' ? 'Chọn kỳ thi muốn học' : 'Chọn bài thi đã làm'}</h3>
+                <h3>
+                  {planSource === 'SYLLABUS'
+                    ? t('generate.steps.step1SyllabusTitle')
+                    : t('generate.steps.step1DiagnosisTitle')}
+                </h3>
                 <p>
                   {planSource === 'SYLLABUS'
-                    ? 'Chưa làm bài nào cũng được, lộ trình đi theo chương trình của kỳ thi.'
-                    : 'Hệ thống chẩn đoán điểm yếu của bạn từ bài này.'}
+                    ? t('generate.steps.step1SyllabusDesc')
+                    : t('generate.steps.step1DiagnosisDesc')}
                 </p>
               </div>
             </li>
             <li>
               <span className={cx('stepNum')}>02</span>
               <div>
-                <h3>Sinh lộ trình</h3>
-                <p>Mỗi chặng là một phần thi, gồm nhiều ải ngắn theo chủ đề.</p>
+                <h3>{t('generate.steps.step2Title')}</h3>
+                <p>{t('generate.steps.step2Desc')}</p>
               </div>
             </li>
             <li>
               <span className={cx('stepNum')}>03</span>
               <div>
-                <h3>Vượt ải rồi thi thử</h3>
-                <p>Vượt hết ải thì làm bài thi thử để kiểm tra lại và cập nhật lộ trình.</p>
+                <h3>{t('generate.steps.step3Title')}</h3>
+                <p>{t('generate.steps.step3Desc')}</p>
               </div>
             </li>
           </ol>
@@ -495,9 +493,10 @@ function GeneratePlan() {
       {result?.targetAchieved && (
         <div className={ui('notice', 'noticeSuccess')}>
           <span>
-            <strong>Bạn đã đạt mục tiêu</strong> (mức sẵn sàng {result.baselineReadiness ?? 0}%), chưa cần
-            sinh lộ trình mới. Bạn có thể đặt mục tiêu cao hơn trong tab Mục tiêu, hoặc tiếp tục làm bài
-            thi thử để duy trì phong độ.
+            {t.rich('generate.targetAchieved', {
+              readiness: result.baselineReadiness ?? 0,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </span>
         </div>
       )}
@@ -506,11 +505,15 @@ function GeneratePlan() {
         show={confirmReplaceOpen}
         onClose={() => setConfirmReplaceOpen(false)}
         onConfirm={runGenerate}
-        title="Thay lộ trình đang học?"
-        confirmText="Sinh lộ trình mới"
+        title={t('generate.confirmReplace.title')}
+        confirmText={t('common.newPlan')}
         message={
           activePlan
-            ? `Bạn đang học Lộ trình ${activePlan.planSequence ?? ''} (${activePlan.passedTasks ?? 0}/${activePlan.totalTasks ?? 0} ải đã vượt). Sinh lộ trình mới sẽ thay thế lộ trình này; lộ trình cũ vẫn được lưu với trạng thái "Đã thay" và có thể chuyển lại sau.`
+            ? t('generate.confirmReplace.message', {
+              sequence: activePlan.planSequence ?? '',
+              passed: activePlan.passedTasks ?? 0,
+              total: activePlan.totalTasks ?? 0,
+            })
             : ''
         }
       />
@@ -524,7 +527,7 @@ function GeneratePlan() {
           initialExamTypeId={examTypeIdFromUrl}
           refreshKey={listRefreshKey}
           showExamTypeBadge
-          title="Lộ trình đã sinh"
+          title={t('common.listTitle')}
           emptyMessage={null}
           showRefreshButton={false}
         />

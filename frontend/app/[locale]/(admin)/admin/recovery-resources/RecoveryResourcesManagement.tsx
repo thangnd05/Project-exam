@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import {useLocale, useTranslations} from 'next-intl';
 import {Badge, Button, Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Download, Edit, ExternalLink, Plus, Trash2} from 'lucide-react';
@@ -10,7 +11,7 @@ import RecoveryResourceFormModal, {
   type RecoveryResourceFormState,
 } from './_components/RecoveryResourceFormModal';
 import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/[locale]/(admin)/_components/common';
 import {isMarkdownResource} from '@/app/features/resources/recoveryResource';
 import type {RecoveryResourceRequest, RecoveryResourceResponse, TagResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
@@ -45,15 +46,17 @@ function ResourceCard({
   formatDate,
   cx,
 }: ResourceCardProps) {
+  const t = useTranslations('AdminUsers');
+
   return (
     <div className={cx('resourceCard')}>
       <div className={cx('cardHeader')}>
         <h3 className={cx('cardTitle')}>{resource.title}</h3>
         <div className={cx('cardActions')}>
-          <button type="button" onClick={() => onEdit(resource)} title="Sửa">
+          <button type="button" onClick={() => onEdit(resource)} title={t('shared.edit')}>
             <Edit size={16} />
           </button>
-          <button type="button" onClick={() => onDelete(resource)} title="Xóa">
+          <button type="button" onClick={() => onDelete(resource)} title={t('shared.delete')}>
             <Trash2 size={16} />
           </button>
         </div>
@@ -86,17 +89,17 @@ function ResourceCard({
         <span>{formatDate(resource.createdAt)}</span>
         <div className={cx('footerActions')}>
           <RecoveryResourceLink resource={resource} className={cx('viewLink')}>
-            <ExternalLink size={14} /> Xem
+            <ExternalLink size={14} /> {t('recoveryResources.view')}
           </RecoveryResourceLink>
           {resource.url && (
             <button
               type="button"
               className={cx('viewLink')}
               onClick={() => onDownload(resource.url as string, resource.originalFileName)}
-              title={isMarkdownResource(resource) ? 'Tải file markdown gốc (dành cho quản trị)' : 'Tải về'}
+              title={isMarkdownResource(resource) ? t('recoveryResources.downloadOriginalTitle') : t('recoveryResources.download')}
             >
               <Download size={14} />
-              {isMarkdownResource(resource) ? 'Tải file gốc' : 'Tải về'}
+              {isMarkdownResource(resource) ? t('recoveryResources.downloadOriginal') : t('recoveryResources.download')}
             </button>
           )}
         </div>
@@ -106,6 +109,9 @@ function ResourceCard({
 }
 
 function RecoveryResourcesManagement() {
+  const t = useTranslations('AdminUsers');
+  const tCommon = useTranslations('Common');
+  const locale = useLocale();
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
@@ -131,7 +137,7 @@ function RecoveryResourcesManagement() {
   const availableTags = useTagsByExamType(selectedExamTypeId);
   const formAvailableTags = useTagsByExamType(formExamTypeId);
 
-  const fetchError = resourcesError ? 'Không thể tải danh sách tài liệu.' : '';
+  const fetchError = resourcesError ? t('recoveryResources.errors.load') : '';
 
   // Đổi kỳ thi hoặc danh sách tag thì chọn lại nhóm tag đầu tiên
   const [prevTagSource, setPrevTagSource] = useState({examTypeId: selectedExamTypeId, tags: availableTags});
@@ -186,7 +192,7 @@ function RecoveryResourcesManagement() {
     availableTags.forEach((tag) => {
       const key = groupKeyOf(tag);
       if (!groupMap.has(key)) {
-        const name = key === SHARED_PART_KEY ? 'Dùng chung' : tag.examPartName || 'Phần thi';
+        const name = key === SHARED_PART_KEY ? t('recoveryResources.sharedGroup') : tag.examPartName || t('recoveryResources.partFallback');
         groupMap.set(key, {parentTag: {tagId: key, name}, resources: []});
       }
     });
@@ -248,7 +254,7 @@ function RecoveryResourcesManagement() {
     });
 
     return {groups, ungrouped};
-  }, [selectedExamTypeId, availableTags, filteredResources]);
+  }, [selectedExamTypeId, availableTags, filteredResources, t]);
 
   const activeParentGroup = useMemo(() => {
     if (!parentTagGroups || !selectedParentTagId) {
@@ -257,7 +263,7 @@ function RecoveryResourcesManagement() {
 
     if (selectedParentTagId === '__ungrouped__') {
       return {
-        title: 'Chưa gán tag',
+        title: t('recoveryResources.ungrouped'),
         resources: parentTagGroups.ungrouped,
       };
     }
@@ -274,7 +280,7 @@ function RecoveryResourcesManagement() {
       title: group.parentTag.name,
       resources: group.resources,
     };
-  }, [parentTagGroups, selectedParentTagId]);
+  }, [parentTagGroups, selectedParentTagId, t]);
 
   const renderResourceCard = (resource: RecoveryResourceResponse) => (
     <ResourceCard
@@ -338,11 +344,11 @@ function RecoveryResourcesManagement() {
 
   const handleSubmit = async () => {
     if (!formState.title.trim()) {
-      setErrorMessage('Tiêu đề không được để trống.');
+      setErrorMessage(t('recoveryResources.errors.titleRequired'));
       return;
     }
     if (!selectedFile && !formState.url.trim() && !editingId) {
-      setErrorMessage('Vui lòng upload file hoặc cung cấp URL.');
+      setErrorMessage(t('recoveryResources.errors.fileOrUrlRequired'));
       return;
     }
     setSubmitting(true);
@@ -363,7 +369,7 @@ function RecoveryResourcesManagement() {
       setShowFormModal(false);
       resetForm();
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu tài liệu. Vui lòng thử lại.'));
+      setErrorMessage(getApiErrorMessage(error, t('recoveryResources.errors.save')));
     } finally {
       setSubmitting(false);
     }
@@ -377,7 +383,7 @@ function RecoveryResourcesManagement() {
       await deleteMutation.mutateAsync(deletingResource.resourceId);
       setDeletingResource(null);
     } catch {
-      setErrorMessage('Không thể xóa tài liệu.');
+      setErrorMessage(t('recoveryResources.errors.delete'));
     } finally {
       setSubmitting(false);
     }
@@ -403,32 +409,32 @@ function RecoveryResourcesManagement() {
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '';
-    return new Date(dateStr).toLocaleDateString('vi-VN');
+    return new Date(dateStr).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN');
   };
 
   return (
     <div className={cx('resourcesPage')}>
       <AdminPageHeader
-        title="Kho tài liệu ôn tập"
-        description="Quản lý bài giảng, video, tài liệu gắn với các Tag kiến thức."
+        title={t('recoveryResources.title')}
+        description={t('recoveryResources.description')}
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
-          Thêm tài liệu
+          {t('recoveryResources.add')}
         </Button>
       </AdminPageHeader>
 
       <AdminToolbar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="Tìm theo tiêu đề, mô tả, tag..."
+        searchPlaceholder={t('recoveryResources.searchPlaceholder')}
       >
         <Form.Select
           style={{maxWidth: 200}}
           value={selectedExamTypeId}
           onChange={(e) => setSelectedExamTypeId(e.target.value)}
         >
-          <option value="">Tất cả loại kỳ thi</option>
+          <option value="">{t('recoveryResources.allExamTypes')}</option>
           {examTypes.map((et) => (
             <option key={et.id} value={et.id}>{et.name}</option>
           ))}
@@ -440,12 +446,12 @@ function RecoveryResourcesManagement() {
       {loading && (
         <div className="text-center py-5">
           <Spinner size="sm" className="me-2" />
-          Đang tải...
+          {tCommon('loading')}
         </div>
       )}
 
       {!loading && !parentTagGroups && filteredResources.length === 0 && (
-        <div className="text-center py-5 text-muted">Không có tài liệu nào.</div>
+        <div className="text-center py-5 text-muted">{t('recoveryResources.empty')}</div>
       )}
 
       {!loading && filteredResources.length > 0 && !parentTagGroups && (
@@ -478,7 +484,7 @@ function RecoveryResourcesManagement() {
                 })}
                 onClick={() => setSelectedParentTagId('__ungrouped__')}
               >
-                <span className={cx('parentTabTitle')}>Chưa gán tag</span>
+                <span className={cx('parentTabTitle')}>{t('recoveryResources.ungrouped')}</span>
                 <span className={cx('parentTabCount')}>{parentTagGroups.ungrouped.length}</span>
               </button>
             )}
@@ -492,7 +498,7 @@ function RecoveryResourcesManagement() {
                 </div>
               ) : (
                 <div className={cx('emptyGroup')}>
-                  Chưa có tài liệu trong nhóm &quot;{activeParentGroup.title}&quot;.
+                  {t('recoveryResources.emptyGroup', {group: activeParentGroup.title})}
                 </div>
               )}
             </div>
@@ -530,8 +536,8 @@ function RecoveryResourcesManagement() {
           setDeletingResource(null);
         }}
         onConfirm={handleConfirmDelete}
-        title="Xác nhận xóa tài liệu"
-        message={`Bạn có chắc muốn xóa "${deletingResource?.title || ''}" không? File trên Cloudinary cũng sẽ bị xóa.`}
+        title={t('recoveryResources.confirmDelete.title')}
+        message={t('recoveryResources.confirmDelete.message', {title: deletingResource?.title || ''})}
       />
     </div>
   );

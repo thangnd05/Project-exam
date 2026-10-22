@@ -1,0 +1,27 @@
+{
+  "loading": "Đang tải...",
+  "processing": "Đang xử lý...",
+  "close": "Đóng",
+  "confirm": "Xác nhận",
+  "cancel": "Hủy bỏ",
+  "cancelShort": "Hủy",
+  "save": "Lưu",
+  "error": {
+    "title": "Trang gặp sự cố",
+    "message": "Đã có lỗi xảy ra khi tải nội dung. Bạn thử lại giúp mình nhé - nếu vẫn lỗi thì tải lại trang.",
+    "retry": "Thử lại",
+    "reload": "Tải lại trang",
+    "code": "Mã lỗi: {digest}"
+  },
+  "confirmDelete": {
+    "title": "Xác nhận xóa",
+    "message": "Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác.",
+    "confirm": "Đồng ý xóa"
+  },
+  "notFound": {
+    "pageTitle": "Không tìm thấy trang",
+    "title": "Ơ, trang này đi đâu mất rồi?",
+    "description": "Đường dẫn bạn truy cập không tồn tại hoặc đã bị xóa. Hãy giúp mình click vào nút bên dưới",
+    "backHome": "Quay về trang chủ"
+  }
+}

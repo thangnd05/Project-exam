@@ -8,6 +8,7 @@ import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import TagSelector from '@/app/features/tests/TagSelector/TagSelector';
 import { buildCollectionTree } from '@/app/features/tests/collectionTree';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { CheckCircle2, Pencil, Trash2 } from 'lucide-react';
 import { PassageMediaList } from '@/app/features/tests/passageMedia';
 import { useEditQuestionModal } from '@/app/features/tests/hooks/useEditQuestionModal';
@@ -31,6 +32,8 @@ type EditQuestionModalProps = {
 };
 
 const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestionModalProps) => {
+  const t = useTranslations('TestCreator');
+  const tCommon = useTranslations('Common');
   const {
     loading,
     saving,
@@ -65,16 +68,16 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
       <BaseModal
         show={show}
         onClose={onHide}
-        title="Cập nhật câu hỏi"
+        title={t('editQuestion.title')}
         maxWidth={800}
         footer={
           <ModalActionFooter
             onCancel={onHide}
             onSubmit={handleSave}
             loading={saving || loading}
-            cancelLabel="Hủy"
-            submitLabel="Lưu cập nhật"
-            loadingLabel="Đang lưu..."
+            cancelLabel={tCommon('cancelShort')}
+            submitLabel={t('editTest.submit')}
+            loadingLabel={t('editTest.saving')}
             submitIcon={CheckCircle2}
           />
         }
@@ -83,13 +86,13 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
           {loading ? (
             <div className="text-center py-5">
               <Spinner animation="border" variant="primary" />
-              <p className="mt-2 text-muted">Đang tải dữ liệu...</p>
+              <p className="mt-2 text-muted">{t('editQuestion.loading')}</p>
             </div>
           ) : (
             <div className={cxCreate('partBlock')}>
               <Row className="g-3">
                 <Col md={12}>
-                  <label className={cx('formLabel')}>Nội dung câu hỏi</label>
+                  <label className={cx('formLabel')}>{t('editQuestion.questionText')}</label>
                   <textarea
                     className={cxCreate('inputModern')}
                     rows={3}
@@ -111,7 +114,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                 )}
 
                 <Col md={12}>
-                  <label className={cx('formLabel')}>Mục đích sử dụng</label>
+                  <label className={cx('formLabel')}>{t('editQuestion.usageScope')}</label>
                   <select
                     className={cxCreate('inputModern')}
                     value={formData.usageScope}
@@ -123,16 +126,16 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                     }
                   >
                     <option value={QuestionUsageScope.EXAM}>
-                      Câu thi &mdash; chỉ dùng khi ra đề
+                      {t('editQuestion.usageExam')}
                     </option>
                     <option value={QuestionUsageScope.PRACTICE}>
-                      Câu ôn tập &mdash; chỉ dùng cho lộ trình
+                      {t('editQuestion.usagePractice')}
                     </option>
                   </select>
                 </Col>
 
                 <Col md={12}>
-                  <label className={cx('formLabel')}>Nguồn (Collection)</label>
+                  <label className={cx('formLabel')}>{t('editQuestion.collection')}</label>
                   <select
                     className={cxCreate('inputModern')}
                     value={formData.collectionId}
@@ -140,7 +143,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                       setFormData({ ...formData, collectionId: e.target.value })
                     }
                   >
-                    <option value="">-- Không chỉ định --</option>
+                    <option value="">{t('editQuestion.noCollection')}</option>
                     {buildCollectionTree(questionCollections).map((c) => (
                       <option key={c.collectionId} value={c.collectionId}>
                         {c.depth > 0 ? `    └ ${c.name}` : c.name}
@@ -151,12 +154,12 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
 
                 <Col md={12}>
                   <div className={cx('sectionTitle')}>
-                    Tùy chọn đoạn văn / Audio (Passage)
+                    {t('editQuestion.passageSection')}
                   </div>
                 </Col>
 
                 <Col md={4}>
-                  <label className={cx('formLabel')}>Loại Passage</label>
+                  <label className={cx('formLabel')}>{t('editQuestion.passageType')}</label>
                   <select
                     className={cxCreate('inputModern')}
                     value={formData.passage.passageType}
@@ -164,14 +167,14 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                       handlePassageChange('passageType', e.target.value)
                     }
                   >
-                    <option value="READING">Đọc (ảnh)</option>
-                    <option value="LISTENING">Nghe (audio)</option>
+                    <option value="READING">{t('editQuestion.reading')}</option>
+                    <option value="LISTENING">{t('editQuestion.listening')}</option>
                   </select>
                 </Col>
 
                 <Col md={8}>
                   <label className={cx('formLabel')}>
-                    Đường dẫn Audio/Media (nếu có)
+                    {t('editQuestion.mediaUrl')}
                   </label>
                   <input
                     type="text"
@@ -186,7 +189,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
 
                 <Col md={12}>
                   <label className={cx('formLabel')}>
-                    Upload thêm file (ảnh / audio)
+                    {t('editQuestion.uploadMore')}
                   </label>
                   <input
                     type="file"
@@ -203,8 +206,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                   />
                   {newFiles.length > 0 && (
                     <small className="text-muted d-block mt-1">
-                      Đã chọn {newFiles.length} file mới để append vào
-                      passage_media.
+                      {t('editQuestion.newFilesSelected', { count: newFiles.length })}
                     </small>
                   )}
                 </Col>
@@ -212,7 +214,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                 {existingMedia.length > 0 && (
                   <Col md={12}>
                     <label className={cx('formLabel')}>
-                      Media passage hiện có
+                      {t('editQuestion.existingMedia')}
                     </label>
                     <PassageMediaList
                       items={existingMedia}
@@ -229,7 +231,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                             onClick={() => setConfirmDeleteMedia(item)}
                           >
                             {deleting ? <Spinner size="sm" /> : <Trash2 size={16} />}
-                            {!deleting && <span className="ms-1">Xóa</span>}
+                            {!deleting && <span className="ms-1">{t('editQuestion.delete')}</span>}
                           </ButtonPrime>
                         );
                       }}
@@ -238,7 +240,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                 )}
 
                 <Col md={12}>
-                  <label className={cx('formLabel')}>Nội dung Passage</label>
+                  <label className={cx('formLabel')}>{t('editQuestion.passageContent')}</label>
                   <textarea
                     className={cxCreate('inputModern')}
                     rows={4}
@@ -246,7 +248,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                     onChange={(e) =>
                       handlePassageChange('content', e.target.value)
                     }
-                    placeholder="Văn bản bài đọc / Script..."
+                    placeholder={t('editQuestion.passageContentPlaceholder')}
                   />
                 </Col>
 
@@ -260,12 +262,12 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                         alignItems: 'center',
                       }}
                     >
-                      <span>Đoạn văn bổ sung {idx + 2}</span>
+                      <span>{t('form.passage.extraText', { number: idx + 2 })}</span>
                       <ButtonPrime
                         variant="dangerGhost"
                         size="icon"
                         onClick={() => removeExtraContent(idx)}
-                        aria-label={`Xóa đoạn văn bổ sung ${idx + 2}`}
+                        aria-label={t('form.passage.removeExtraText', { number: idx + 2 })}
                       >
                         <Trash2 size={18} />
                       </ButtonPrime>
@@ -275,19 +277,19 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                       rows={4}
                       value={text}
                       onChange={(e) => updateExtraContent(idx, e.target.value)}
-                      placeholder={`Nội dung đoạn văn thứ ${idx + 2}...`}
+                      placeholder={t('form.passage.extraTextPlaceholder', { number: idx + 2 })}
                     />
                   </Col>
                 ))}
 
                 <Col md={12}>
                   <ButtonPrime variant="outline" size="sm" onClick={addExtraContent}>
-                    <Pencil className="me-1" size={16} /> Thêm đoạn văn
+                    <Pencil className="me-1" size={16} /> {t('form.passage.addText')}
                   </ButtonPrime>
                 </Col>
 
                 <Col md={12}>
-                  <label className={cx('formLabel')}>Bản dịch Passage</label>
+                  <label className={cx('formLabel')}>{t('editQuestion.translation')}</label>
                   <textarea
                     className={cxCreate('inputModern')}
                     rows={4}
@@ -295,7 +297,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                     onChange={(e) =>
                       handlePassageChange('contentTranslation', e.target.value)
                     }
-                    placeholder="Bản dịch của văn bản / script (tùy chọn)..."
+                    placeholder={t('editQuestion.translationPlaceholder')}
                   />
                 </Col>
 
@@ -309,18 +311,18 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                       gap: '1.2rem',
                     }}
                   >
-                    <span>Đáp án</span>
+                    <span>{t('editQuestion.answers')}</span>
                     <label
                       className="d-flex align-items-center gap-1 mb-0 fw-normal"
                       style={{ fontSize: '1.3rem', cursor: 'pointer' }}
-                      title="Cho phép nhiều đáp án đúng (chấm đúng-hết)"
+                      title={t('questionBlock.multipleCorrectHint')}
                     >
                       <input
                         type="checkbox"
                         checked={isMsq}
                         onChange={(e) => toggleMsq(e.target.checked)}
                       />
-                      Nhiều đáp án đúng
+                      {t('questionBlock.multipleCorrect')}
                     </label>
                   </div>
                 </Col>
@@ -349,7 +351,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                         onChange={(e) =>
                           handleOptionChange(idx, 'content', e.target.value)
                         }
-                        placeholder={`Nội dung ${opt.answerLabel}...`}
+                        placeholder={t('editQuestion.answerPlaceholder', { label: opt.answerLabel })}
                       />
                       <ButtonPrime
                         variant="dangerGhost"
@@ -357,7 +359,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                         className="ms-2"
                         onClick={() => removeAnswer(idx)}
                         disabled={formData.options.length <= 2}
-                        aria-label={`Xóa đáp án ${opt.answerLabel}`}
+                        aria-label={t('questionBlock.removeAnswer', { label: opt.answerLabel })}
                       >
                         <Trash2 size={18} />
                       </ButtonPrime>
@@ -372,13 +374,13 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                     onClick={addAnswer}
                     disabled={formData.options.length >= 10}
                   >
-                    <Pencil className="me-1" size={16} /> Thêm đáp án
+                    <Pencil className="me-1" size={16} /> {t('questionBlock.addAnswer')}
                   </ButtonPrime>
                 </Col>
 
                 <Col md={12} className="mt-3">
                   <div className={cx('sectionTitle')}>
-                    Giải thích đáp án (không bắt buộc)
+                    {t('questionBlock.explanation')}
                   </div>
                   <textarea
                     className={cxCreate('inputModern', 'explanationTextarea')}
@@ -387,7 +389,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                     onChange={(e) =>
                       setFormData({ ...formData, explanation: e.target.value })
                     }
-                    placeholder="Nhập giải thích đáp án (hiển thị cho học sinh khi xem lại bài)..."
+                    placeholder={t('questionBlock.explanationPlaceholder')}
                   />
                 </Col>
               </Row>
@@ -404,8 +406,8 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
           setConfirmDeleteMedia(null);
           handleDeleteExistingMedia(item);
         }}
-        title="Xác nhận xóa media"
-        message="Bạn chắc chắn muốn xóa media này? Hành động này không thể hoàn tác."
+        title={t('editQuestion.confirmDeleteMediaTitle')}
+        message={t('editQuestion.confirmDeleteMediaMessage')}
       />
     </>
   );

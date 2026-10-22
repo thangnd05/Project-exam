@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import Link, { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import { useEffect, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { motion, type Variants } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
@@ -28,11 +28,11 @@ const cardVariants: Variants = {
   }),
 };
 
-const formatDate = (value?: string | null) => {
+const formatDate = (value: string | null | undefined, locale: string) => {
   if (!value) return '--';
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) return '--';
-  return d.toLocaleDateString('vi-VN', { day: 'numeric', month: 'long', year: 'numeric' });
+  return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
 };
 
 const formatCount = (n: unknown) => {
@@ -47,6 +47,9 @@ type SavedPostsPageProps = {
 
 function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
   const router = useRouter();
+  const t = useTranslations('Posts');
+  const localizeHref = useLocalizeHref();
+  const dateLocale = useLocale() === 'en' ? 'en-US' : 'vi-VN';
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -67,7 +70,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
     keyword: debouncedSearch,
   });
   const loading = isLoading;
-  const errorMessage = isError ? 'Không tải được danh sách bài đã lưu.' : '';
+  const errorMessage = isError ? t('saved.loadError') : '';
 
   const unsaveMutation = useUnsavePost();
 
@@ -79,10 +82,10 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
     setActionLoadingId(postId);
     try {
       await unsaveMutation.mutateAsync(postId);
-      toast.success('Đã bỏ lưu');
+      toast.success(t('saved.unsaved'));
       setUnsavingPost(null);
     } catch {
-      toast.error('Không thể bỏ lưu. Vui lòng thử lại.');
+      toast.error(t('saved.unsaveError'));
     } finally {
       setActionLoadingId(null);
     }
@@ -143,11 +146,11 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
         {!embedded && (
           <header className={cx('pageHeader')}>
             <div>
-              <h1 className={cx('title')}>Bài viết đã lưu</h1>
-              <p className={cx('subtitle')}>Những bài viết bạn đã đánh dấu để xem lại.</p>
+              <h1 className={cx('title')}>{t('saved.title')}</h1>
+              <p className={cx('subtitle')}>{t('saved.subtitle')}</p>
             </div>
-            <button type="button" className={cx('backLink')} onClick={() => router.push(routes.dashboard)}>
-              Trở lại hồ sơ
+            <button type="button" className={cx('backLink')} onClick={() => router.push(localizeHref(routes.dashboard))}>
+              {t('common.backToProfile')}
             </button>
           </header>
         )}
@@ -157,7 +160,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
             <IoSearchOutline className={cx('searchIcon')} />
             <input
               type="text"
-              placeholder="Tìm trong bài đã lưu..."
+              placeholder={t('saved.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -167,7 +170,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
         {loading && (
           <div className={cx('loadingWrap')}>
             <Spinner animation="border" />
-            <span>Đang tải...</span>
+            <span>{t('common.loading')}</span>
           </div>
         )}
 
@@ -178,9 +181,9 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
         {!loading && !errorMessage && posts.length === 0 && (
           <Alert variant="info" className={cx('alertBox')}>
             {hasActiveFilter ? (
-              <>Không có bài viết nào khớp với từ khóa.</>
+              <>{t('saved.emptyFiltered')}</>
             ) : (
-              <>Bạn chưa lưu bài viết nào. Mở một bài và bấm icon <IoBookmarkOutline /> để lưu lại.</>
+              <>{t.rich('saved.empty', { icon: () => <IoBookmarkOutline /> })}</>
             )}
           </Alert>
         )}
@@ -230,9 +233,9 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
                             referrerPolicy="no-referrer"
                           />
                         )}
-                        <span>{post.authorName || 'Ẩn danh'}</span>
+                        <span>{post.authorName || t('saved.anonymous')}</span>
                       </span>
-                      <span className={cx('date')}>{formatDate(post.createdAt)}</span>
+                      <span className={cx('date')}>{formatDate(post.createdAt, dateLocale)}</span>
                     </div>
 
                     <Link href={detailUrl} className={cx('cardTitleLink')}>
@@ -243,7 +246,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
                       <span><IoEyeOutline /> {formatCount(post.viewCount)}</span>
                       <span><IoHeartOutline /> {formatCount(post.totalReacts)}</span>
                       <span><IoChatbubbleOutline /> {formatCount(post.commentCount)}</span>
-                      <span title="Lượt lưu"><IoBookmarkOutline /> {formatCount(post.saveCount)}</span>
+                      <span title={t('common.saves')}><IoBookmarkOutline /> {formatCount(post.saveCount)}</span>
                     </div>
                   </div>
 
@@ -252,12 +255,12 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
                       <IoEllipsisVertical />
                     </Dropdown.Toggle>
                     <Dropdown.Menu className={cx('menuDropdown')}>
-                      <Dropdown.Item onClick={() => router.push(detailUrl)}>
-                        <IoEyeOutline /> Xem chi tiết
+                      <Dropdown.Item onClick={() => router.push(localizeHref(detailUrl))}>
+                        <IoEyeOutline /> {t('common.viewDetail')}
                       </Dropdown.Item>
                       <Dropdown.Divider />
                       <Dropdown.Item className={cx('dangerItem')} onClick={() => setUnsavingPost(post)}>
-                        <IoBookmarkOutline /> Bỏ lưu
+                        <IoBookmarkOutline /> {t('saved.unsave')}
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
@@ -275,9 +278,10 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
         onClose={() => setUnsavingPost(null)}
         onConfirm={handleUnsave}
         icon={IoBookmarkOutline}
-        title="Bỏ lưu bài viết"
-        message={`Bỏ lưu bài viết "${unsavingPost?.title}"?`}
-        confirmText="Bỏ lưu"
+        title={t('saved.unsaveTitle')}
+        message={t('saved.unsaveMessage', { title: unsavingPost?.title ?? '' })}
+        confirmText={t('saved.unsave')}
+        cancelText={t('saved.cancel')}
       />
     </div>
   );

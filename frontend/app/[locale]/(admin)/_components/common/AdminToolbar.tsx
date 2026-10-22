@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import {useTranslations} from 'next-intl';
 import styles from './adminKit.module.scss';
 import AdminSearchInput from './AdminSearchInput';
 
@@ -16,16 +17,17 @@ type AdminToolbarProps = {
 function AdminToolbar({
   searchValue = '',
   onSearchChange,
-  searchPlaceholder = 'Tìm kiếm...',
+  searchPlaceholder,
   children,
 }: AdminToolbarProps) {
+  const t = useTranslations('AdminCommon');
   return (
     <div className={cx('toolbar')}>
       {onSearchChange && (
         <AdminSearchInput
           value={searchValue}
           onChange={onSearchChange}
-          placeholder={searchPlaceholder}
+          placeholder={searchPlaceholder ?? t('searchPlaceholder')}
         />
       )}
       {children && <div className={cx('toolbarActions')}>{children}</div>}

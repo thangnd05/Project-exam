@@ -3,6 +3,7 @@
 import {useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
+import {useTranslations} from 'next-intl';
 
 import {useAdminCosmetics} from './_hooks/useAdminCosmetics';
 import BaseModal from '@/app/components/modal/BaseModal';
@@ -15,18 +16,18 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/(admin)/_components/common';
-import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
+} from '@/app/[locale]/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import {CosmeticType} from '@/app/enums';
 import type {CosmeticRequest, CosmeticResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
 
 const TYPES = [
-  {value: CosmeticType.FRAME, label: 'Khung avatar'},
-  {value: CosmeticType.BADGE, label: 'Huy hiệu'},
-];
+  {value: CosmeticType.FRAME, label: 'frame'},
+  {value: CosmeticType.BADGE, label: 'badge'},
+] as const;
 
-const TYPE_ORDER = TYPES.map((t) => t.value);
+const TYPE_ORDER: CosmeticType[] = TYPES.map((type) => type.value);
 
 interface CosmeticGroup {
   type?: CosmeticType;
@@ -54,17 +55,17 @@ function groupByType(items: CosmeticResponse[]): CosmeticGroup[] {
 }
 
 const FRAME_STYLES = [
-  {value: 'COLOR', label: 'Màu / gradient'},
-  {value: 'EFFECT', label: 'Hiệu ứng CSS'},
-  {value: 'IMAGE', label: 'Ảnh overlay'},
-];
+  {value: 'COLOR', label: 'color'},
+  {value: 'EFFECT', label: 'effect'},
+  {value: 'IMAGE', label: 'image'},
+] as const;
 
 const EFFECT_PRESETS = [
-  {value: 'glow', label: 'Glow (phát sáng vàng)'},
-  {value: 'pulse', label: 'Pulse (nhịp xanh)'},
-  {value: 'rotate', label: 'Rotate (viền xoay)'},
-  {value: 'rainbow', label: 'Rainbow (cầu vồng xoay)'},
-];
+  {value: 'glow', label: 'glow'},
+  {value: 'pulse', label: 'pulse'},
+  {value: 'rotate', label: 'rotate'},
+  {value: 'rainbow', label: 'rainbow'},
+] as const;
 
 interface CosmeticFormState {
   name: string;
@@ -110,6 +111,9 @@ function CosmeticPreview({
 }
 
 function CosmeticsManagement() {
+  const t = useTranslations('AdminSystem.cosmetics');
+  const tAdmin = useTranslations('AdminCommon');
+  const tCommon = useTranslations('Common');
   const {
     items,
     isLoading: loading,
@@ -130,7 +134,7 @@ function CosmeticsManagement() {
   const [deleting, setDeleting] = useState<CosmeticResponse | null>(null);
 
   const submitting = isSubmitting || isDeleting;
-  const listErrorMessage = isError ? 'Không thể tải danh sách vật phẩm.' : '';
+  const listErrorMessage = isError ? t('errors.loadFailed') : '';
 
   const filtered = useMemo(() => {
     const normalized = keyword.trim().toLowerCase();
@@ -175,12 +179,12 @@ function CosmeticsManagement() {
 
   const handleSubmit = async () => {
     if (!formState.name.trim()) {
-      setErrorMessage('Tên không được để trống.');
+      setErrorMessage(t('errors.nameRequired'));
       return;
     }
     const cost = Number(formState.costCoins);
     if (Number.isNaN(cost) || cost < 0) {
-      setErrorMessage('Giá xu phải là số không âm.');
+      setErrorMessage(t('errors.costInvalid'));
       return;
     }
 
@@ -207,7 +211,7 @@ function CosmeticsManagement() {
       setShowModal(false);
       resetForm();
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu vật phẩm.'));
+      setErrorMessage(getApiErrorMessage(error, t('errors.saveFailed')));
     }
   };
 
@@ -217,42 +221,49 @@ function CosmeticsManagement() {
       await deleteCosmetic(deleting.cosmeticId);
       setDeleting(null);
     } catch {
-      setErrorMessage('Không thể xóa vật phẩm.');
+      setErrorMessage(t('errors.deleteFailed'));
     }
   };
 
   const columns: AdminTableColumn[] = [
     {
       key: 'preview',
-      header: 'Xem trước',
+      header: t('preview'),
       render: (item: CosmeticResponse) => <CosmeticPreview item={item} />,
     },
-    {key: 'name', header: 'Tên'},
-    {key: 'typeLabel', header: 'Loại'},
-    {key: 'costCoins', header: 'Giá xu'},
+    {key: 'name', header: t('name')},
+    {
+      key: 'typeLabel',
+      header: t('type'),
+      render: (item: CosmeticResponse) => {
+        const type = TYPES.find((option) => option.value === item.type);
+        return type ? t(`types.${type.label}`) : item.typeLabel;
+      },
+    },
+    {key: 'costCoins', header: t('cost')},
     {
       key: 'status',
-      header: 'Trạng thái',
-      render: (item: CosmeticResponse) => (item.active ? 'Đang bán' : 'Tắt'),
+      header: t('status'),
+      render: (item: CosmeticResponse) => (item.active ? t('onSale') : t('off')),
     },
   ];
 
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Cửa hàng xu  Trang trí"
-        description="Quản lý khung avatar & huy hiệu user đổi bằng xu."
+        title={t('title')}
+        description={t('description')}
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
-          Thêm vật phẩm
+          {t('add')}
         </Button>
       </AdminPageHeader>
 
       <AdminToolbar
         searchValue={keyword}
         onSearchChange={setKeyword}
-        searchPlaceholder="Tìm theo tên..."
+        searchPlaceholder={t('searchPlaceholder')}
       />
       <AdminFieldError
         message={!showModal ? errorMessage || listErrorMessage : ''}
@@ -261,19 +272,19 @@ function CosmeticsManagement() {
       <AdminTable
         showIndex
         paginated
-        itemLabel="vật phẩm"
+        itemLabel={t('itemLabel')}
         columns={columns}
         data={orderedItems}
         loading={loading}
         getRowKey={(item: CosmeticResponse) => item.cosmeticId}
         rowActions={(item: CosmeticResponse) => (
           <>
-            <button title="Sửa" onClick={() => openEditModal(item)}>
+            <button title={tAdmin('actions.edit')} onClick={() => openEditModal(item)}>
               <Edit size={14} />
             </button>
             <button
               className="danger"
-              title="Xóa"
+              title={tAdmin('actions.delete')}
               onClick={() => setDeleting(item)}
             >
               <Trash2 size={14} />
@@ -289,7 +300,7 @@ function CosmeticsManagement() {
           setShowModal(false);
           resetForm();
         }}
-        title={editingId ? 'Cập nhật vật phẩm' : 'Thêm vật phẩm'}
+        title={editingId ? t('editTitle') : t('add')}
         maxWidth={550}
         footer={
           <ModalActionFooter
@@ -299,9 +310,9 @@ function CosmeticsManagement() {
               resetForm();
             }}
             onSubmit={handleSubmit}
-            cancelLabel="Hủy"
-            submitLabel={editingId ? 'Lưu' : 'Tạo mới'}
-            loadingLabel="Đang lưu..."
+            cancelLabel={tCommon('cancelShort')}
+            submitLabel={editingId ? tCommon('save') : tAdmin('actions.create')}
+            loadingLabel={tAdmin('saving')}
             loading={submitting}
           />
         }
@@ -317,7 +328,7 @@ function CosmeticsManagement() {
           />
         </div>
         <Form.Group className="mb-3">
-          <Form.Label>Tên</Form.Label>
+          <Form.Label>{t('name')}</Form.Label>
           <Form.Control
             value={formState.name}
             onChange={(e) =>
@@ -326,7 +337,7 @@ function CosmeticsManagement() {
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Mô tả</Form.Label>
+          <Form.Label>{t('fieldDescription')}</Form.Label>
           <Form.Control
             as="textarea"
             rows={2}
@@ -338,7 +349,7 @@ function CosmeticsManagement() {
         </Form.Group>
         <div className="d-flex gap-2 mb-3">
           <Form.Group className="flex-fill">
-            <Form.Label>Loại</Form.Label>
+            <Form.Label>{t('type')}</Form.Label>
             <Form.Select
               value={formState.type}
               onChange={(e) =>
@@ -348,16 +359,16 @@ function CosmeticsManagement() {
                 }))
               }
             >
-              {TYPES.map((t) => (
-                <option key={t.value} value={t.value}>
-                  {t.label}
+              {TYPES.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {t(`types.${type.label}`)}
                 </option>
               ))}
             </Form.Select>
           </Form.Group>
           {formState.type === CosmeticType.FRAME && (
             <Form.Group className="flex-fill">
-              <Form.Label>Kiểu khung</Form.Label>
+              <Form.Label>{t('frameStyle')}</Form.Label>
               <Form.Select
                 value={formState.frameStyle}
                 onChange={(e) =>
@@ -366,7 +377,7 @@ function CosmeticsManagement() {
               >
                 {FRAME_STYLES.map((s) => (
                   <option key={s.value} value={s.value}>
-                    {s.label}
+                    {t(`frameStyles.${s.label}`)}
                   </option>
                 ))}
               </Form.Select>
@@ -377,16 +388,16 @@ function CosmeticsManagement() {
         {formState.type === CosmeticType.BADGE && (
           <>
             <Form.Group className="mb-3">
-              <Form.Label>URL ảnh huy hiệu (PNG/GIF)</Form.Label>
+              <Form.Label>{t('badgeImageUrl')}</Form.Label>
               <Form.Control
                 value={formState.imageUrl}
                 onChange={(e) =>
                   setFormState((p) => ({...p, imageUrl: e.target.value}))
                 }
-                placeholder="https://.../badge.gif  để trống nếu dùng emoji"
+                placeholder={t('badgeImagePlaceholder')}
               />
               <Form.Text muted>
-                Có URL ảnh thì dùng ảnh; bỏ trống thì dùng emoji bên dưới.
+                {t('badgeImageHelp')}
               </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3">
@@ -396,7 +407,7 @@ function CosmeticsManagement() {
                 onChange={(e) =>
                   setFormState((p) => ({...p, assetValue: e.target.value}))
                 }
-                placeholder="vd: 👑 🏆 ⭐ 🔥"
+                placeholder={t('emojiPlaceholder')}
               />
             </Form.Group>
           </>
@@ -405,13 +416,13 @@ function CosmeticsManagement() {
         {formState.type === CosmeticType.FRAME &&
           formState.frameStyle === 'COLOR' && (
             <Form.Group className="mb-3">
-              <Form.Label>Màu / gradient</Form.Label>
+              <Form.Label>{t('frameStyles.color')}</Form.Label>
               <Form.Control
                 value={formState.assetValue}
                 onChange={(e) =>
                   setFormState((p) => ({...p, assetValue: e.target.value}))
                 }
-                placeholder="vd: linear-gradient(135deg,#f59f00,#f08c00) hoặc #ff5252"
+                placeholder={t('colorPlaceholder')}
               />
             </Form.Group>
           )}
@@ -419,17 +430,17 @@ function CosmeticsManagement() {
         {formState.type === CosmeticType.FRAME &&
           formState.frameStyle === 'EFFECT' && (
             <Form.Group className="mb-3">
-              <Form.Label>Hiệu ứng</Form.Label>
+              <Form.Label>{t('effect')}</Form.Label>
               <Form.Select
                 value={formState.assetValue}
                 onChange={(e) =>
                   setFormState((p) => ({...p, assetValue: e.target.value}))
                 }
               >
-                <option value="">-- Chọn hiệu ứng --</option>
+                <option value="">{t('selectEffect')}</option>
                 {EFFECT_PRESETS.map((ef) => (
                   <option key={ef.value} value={ef.value}>
-                    {ef.label}
+                    {t(`effects.${ef.label}`)}
                   </option>
                 ))}
               </Form.Select>
@@ -439,7 +450,7 @@ function CosmeticsManagement() {
         {formState.type === CosmeticType.FRAME &&
           formState.frameStyle === 'IMAGE' && (
             <Form.Group className="mb-3">
-              <Form.Label>URL ảnh khung (PNG/GIF trong suốt)</Form.Label>
+              <Form.Label>{t('frameImageUrl')}</Form.Label>
               <Form.Control
                 value={formState.imageUrl}
                 onChange={(e) =>
@@ -448,13 +459,13 @@ function CosmeticsManagement() {
                 placeholder="https://.../frame.png"
               />
               <Form.Text muted>
-                Ảnh nên có nền trong suốt, giữa rỗng để lộ avatar.
+                {t('frameImageHelp')}
               </Form.Text>
             </Form.Group>
           )}
         <div className="d-flex gap-2 mb-3">
           <Form.Group className="flex-fill">
-            <Form.Label>Giá xu</Form.Label>
+            <Form.Label>{t('cost')}</Form.Label>
             <Form.Control
               type="number"
               min={0}
@@ -465,7 +476,7 @@ function CosmeticsManagement() {
             />
           </Form.Group>
           <Form.Group className="flex-fill">
-            <Form.Label>Thứ tự hiển thị</Form.Label>
+            <Form.Label>{t('displayOrder')}</Form.Label>
             <Form.Control
               type="number"
               value={formState.displayOrder}
@@ -477,7 +488,7 @@ function CosmeticsManagement() {
         </div>
         <Form.Check
           type="switch"
-          label="Đang bán"
+          label={t('onSale')}
           checked={formState.active}
           onChange={(e) =>
             setFormState((p) => ({...p, active: e.target.checked}))
@@ -493,8 +504,8 @@ function CosmeticsManagement() {
           setDeleting(null);
         }}
         onConfirm={handleDelete}
-        title="Xác nhận xóa vật phẩm"
-        message={`Bạn có chắc muốn xóa "${deleting?.name || ''}" không?`}
+        title={t('deleteTitle')}
+        message={t('deleteMessage', {name: deleting?.name || ''})}
       />
     </div>
   );

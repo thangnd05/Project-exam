@@ -1,3 +1,6 @@
+import {useCallback} from 'react';
+import {useTranslations} from 'next-intl';
+
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 
 export type Vendor = 'aws' | 'azure' | 'gcp' | 'other';
@@ -103,8 +106,39 @@ export const FULL_QUESTIONS: Record<string, number> = {
   'DOP-C02': 75,
 };
 
-export const formatFullSpec = (durationMinutes: number | null | undefined, code: string) => {
-  const questions = FULL_QUESTIONS[code];
-  const minutes = durationMinutes ? `${durationMinutes}p` : 'theo đề';
-  return questions ? `${questions} câu / ${minutes}` : minutes;
+// Chữ hiển thị của formatFullSpec. Mặc định tiếng Việt cho nơi gọi cũ; trang đã dịch dùng useFormatFullSpec().
+export type FullSpecLabels = {
+  minutes: (minutes: number) => string;
+  byExam: string;
+  spec: (questions: number, duration: string) => string;
 };
+
+const VI_FULL_SPEC: FullSpecLabels = {
+  minutes: (minutes) => `${minutes}p`,
+  byExam: 'theo đề',
+  spec: (questions, duration) => `${questions} câu / ${duration}`,
+};
+
+export const formatFullSpec = (
+  durationMinutes: number | null | undefined,
+  code: string,
+  labels: FullSpecLabels = VI_FULL_SPEC,
+) => {
+  const questions = FULL_QUESTIONS[code];
+  const minutes = durationMinutes ? labels.minutes(durationMinutes) : labels.byExam;
+  return questions ? labels.spec(questions, minutes) : minutes;
+};
+
+// formatFullSpec theo ngôn ngữ đang chọn (chữ lấy từ Home.fullSpec).
+export function useFormatFullSpec() {
+  const t = useTranslations('Home.fullSpec');
+  return useCallback(
+    (durationMinutes: number | null | undefined, code: string) =>
+      formatFullSpec(durationMinutes, code, {
+        minutes: (minutes) => t('minutes', {minutes}),
+        byExam: t('byExam'),
+        spec: (questions, duration) => t('spec', {questions, duration}),
+      }),
+    [t],
+  );
+}

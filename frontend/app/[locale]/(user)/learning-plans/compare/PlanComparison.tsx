@@ -1,10 +1,11 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import { examTypeIdFromParams, setExamParam, useNormalizeExamParam } from '@/app/features/exam-types/hooks/useExamParam';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
@@ -24,6 +25,8 @@ const PlanComparisonCharts = dynamic(() => import('./_components/PlanComparisonC
 });
 
 function PlanComparison() {
+  const t = useTranslations('LearningPlans');
+  const tc = useTranslations('Common');
   const [searchParams, setSearchParams] = useSearchParamsState();
   // ?exam=<slug> chỉ dịch ra id khi danh sách kỳ thi tải xong, nên bắt đầu rỗng rồi chọn ngay khi danh sách về (xem bên dưới).
   const [examTypeId, setExamTypeId] = useState('');
@@ -59,7 +62,7 @@ function PlanComparison() {
 
       return {
         key: p.learningPlanId,
-        label: `Lộ trình ${p.planSequence ?? '?'}`,
+        label: t('common.planName', { sequence: p.planSequence ?? '?' }),
         readiness,
         status: p.status,
         planStage: p.planStage,
@@ -67,18 +70,18 @@ function PlanComparison() {
         diffVsPrev,
       };
     });
-  }, [sorted]);
+  }, [sorted, t]);
 
   return (
     <div className={cx('wrapper')}>
       <TargetPlanTabs active="compare" examTypeId={examTypeId} examTypes={examTypes} />
       <div className={cx('headerBar')}>
-        <h2 className={cx('title')}>So sánh các lộ trình</h2>
+        <h2 className={cx('title')}>{t('compare.title')}</h2>
       </div>
 
       <div className={cx('filterRow')}>
         <div className={cx('fieldGroup')}>
-          <label className={cx('fieldLabel')}>Loại kỳ thi</label>
+          <label className={cx('fieldLabel')}>{t('compare.examType')}</label>
           <select
             className={cx('select')}
             value={examTypeId}
@@ -95,13 +98,13 @@ function PlanComparison() {
       </div>
 
       {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
-      {loading && <div className={cx('loading')}>Đang tải...</div>}
+      {loading && <div className={cx('loading')}>{tc('loading')}</div>}
 
       {!loading && sorted.length === 0 && (
         <div className={cx('alert', 'alertInfo')}>
-          <span>Chưa có lộ trình nào cho kỳ thi này.</span>
+          <span>{t('common.noPlansForExam')}</span>
           <ButtonPrime as="link" href="/learning-plans/generate" variant="primary" size="sm">
-            Sinh lộ trình đầu tiên
+            {t('compare.generateFirst')}
           </ButtonPrime>
         </div>
       )}
@@ -126,15 +129,15 @@ function PlanComparison() {
                   })}
                 >
                   <div className={cx('planHead')}>
-                    <span className={cx('planNo')}>Lộ trình {p.planSequence ?? '?'}</span>
+                    <span className={cx('planNo')}>{t('common.planName', { sequence: p.planSequence ?? '?' })}</span>
                     <span className={cx('badge', planStatusVariant(p.status))}>
-                      {planStatusLabel(p.status)}
+                      {planStatusLabel(t, p.status)}
                     </span>
                   </div>
 
                   <ul className={cx('metaList')}>
                     <li>
-                      <strong>Độ sẵn sàng ban đầu:</strong>
+                      <strong>{t('common.baselineReadiness')}</strong>
                       {cur != null ? ` ${cur}%` : ' '}
                       {diff != null && (
                         <span
@@ -144,28 +147,28 @@ function PlanComparison() {
                             flat: diff === 0,
                           })}
                         >
-                          ({diff > 0 ? '+' : ''}{diff}% so với lộ trình #{prev?.planSequence})
+                          {t('compare.diffVsPrev', { diff: `${diff > 0 ? '+' : ''}${diff}`, sequence: prev?.planSequence ?? '' })}
                         </span>
                       )}
                     </li>
-                    <li><strong>Giai đoạn:</strong> {planStageLabel(p.planStage)}</li>
+                    <li><strong>{t('common.stage')}</strong> {planStageLabel(t, p.planStage)}</li>
                     <li>
-                      <strong>Ải đã qua:</strong>{' '}
+                      <strong>{t('compare.tasksPassed')}</strong>{' '}
                       {p.passedTasks ?? 0}/{p.totalTasks ?? 0}
                     </li>
                     <li>
-                      <strong>Bài thi nguồn:</strong>{' '}
+                      <strong>{t('compare.sourceTest')}</strong>{' '}
                       {p.sourceUserTestId ? (
-                        <Link href={`/tests/result/${p.sourceUserTestId}`}>Xem kết quả</Link>
+                        <Link href={`/tests/result/${p.sourceUserTestId}`}>{t('compare.viewResult')}</Link>
                       ) : '-'}
                     </li>
                     <li className={cx('muted')}>
-                      Tạo: {formatDate(p.createdAt)}
+                      {t('compare.createdAt', { date: formatDate(p.createdAt) })}
                     </li>
                     {p.replacedByPlanId && (
                       <li>
                         <Link href={`/learning-plans/${p.replacedByPlanId}`}>
-                          Đã thay bằng lộ trình kế tiếp
+                          {t('compare.replacedBy')}
                         </Link>
                       </li>
                     )}
@@ -178,7 +181,7 @@ function PlanComparison() {
                       variant="outline"
                       size="sm"
                     >
-                      Chi tiết
+                      {t('compare.details')}
                     </ButtonPrime>
                     {p.status === LearningPlanStatus.ACTIVE && (
                       <ButtonPrime
@@ -187,7 +190,7 @@ function PlanComparison() {
                         variant="primary"
                         size="sm"
                       >
-                        Học tiếp
+                        {t('compare.continue')}
                       </ButtonPrime>
                     )}
                   </div>

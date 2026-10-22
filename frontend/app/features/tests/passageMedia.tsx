@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import type { QuestionAdminResponse } from '@/app/types';
 
 import styles from '@/app/features/tests/EditQuestionModal.module.scss';
@@ -60,7 +61,7 @@ export const resolveMediaKind = (item?: PassageMediaItem | null) => {
   return 'DOCUMENT';
 };
 
-const KIND_LABEL: Record<string, string> = {AUDIO: 'Audio', IMAGE: 'Ảnh', DOCUMENT: 'Tài liệu'};
+const KIND_LABEL_KEY = {AUDIO: 'audio', IMAGE: 'image', DOCUMENT: 'document'} as const;
 
 type PassageMediaCardProps = {
   item: PassageMediaItem;
@@ -71,15 +72,16 @@ type PassageMediaCardProps = {
 export function PassageMediaCard({item, index, actions = null}: PassageMediaCardProps) {
   const url = item.mediaUrl;
   const kind = resolveMediaKind(item);
+  const t = useTranslations('TestTaking.passageMedia');
 
   return (
     <div className={cx('existingMediaCard')}>
       <div className={cx('existingMediaMeta')}>
         <span>
-          {KIND_LABEL[kind]}{' '}
+          {t(KIND_LABEL_KEY[kind])}{' '}
           ·{' '}
           <a href={url} target="_blank" rel="noreferrer">
-            Mở file
+            {t('openFile')}
           </a>
         </span>
         {actions}

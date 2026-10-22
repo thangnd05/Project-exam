@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Badge, Button } from 'react-bootstrap';
 import { Eye, CheckCircle, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -10,9 +11,9 @@ import routes from '@/app/configs/Routes';
 import useDebouncedValue from '@/app/hooks/useDebouncedValue';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
-import { AdminPageHeader, AdminTable, AdminToolbar } from '@/app/(admin)/_components/common';
-import type { AdminTableColumn } from '@/app/(admin)/_components/common/AdminTable';
-import styles from '@/app/(admin)/_components/common/adminKit.module.scss';
+import { AdminPageHeader, AdminTable, AdminToolbar } from '@/app/[locale]/(admin)/_components/common';
+import type { AdminTableColumn } from '@/app/[locale]/(admin)/_components/common/AdminTable';
+import styles from '@/app/[locale]/(admin)/_components/common/adminKit.module.scss';
 import { PostStatus } from '@/app/enums';
 import type { PostSummaryResponse } from '@/app/types';
 
@@ -22,12 +23,14 @@ import { useAdminPosts, useApprovePost, useDeletePost } from './_hooks/useAdminP
 const STATUS_VARIANT: Record<string, string> = { APPROVED: 'success', PENDING: 'warning' };
 
 const STATUS_FILTERS = [
-    { value: 'PENDING', label: 'Chờ duyệt' },
-    { value: 'APPROVED', label: 'Đã duyệt' },
-    { value: 'ALL', label: 'Tất cả' },
-];
+    { value: 'PENDING', labelKey: 'pending' },
+    { value: 'APPROVED', labelKey: 'approved' },
+    { value: 'ALL', labelKey: 'all' },
+] as const;
 
 const PostsManagement = () => {
+    const t = useTranslations('AdminUsers');
+    const locale = useLocale();
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('PENDING');
     const [currentPage, setCurrentPage] = useState(0);
@@ -61,19 +64,19 @@ const PostsManagement = () => {
 
     useEffect(() => {
         if (isError) {
-            toast.error('Lỗi khi tải danh sách bài viết');
+            toast.error(t('posts.toast.loadError'));
         }
-    }, [isError]);
+    }, [isError, t]);
 
     const handleApprove = () => {
         if (!approvingPost) return;
         approvePost.mutate(approvingPost.id, {
             onSuccess: () => {
-                toast.success('Đã duyệt bài viết');
+                toast.success(t('posts.toast.approved'));
                 setApprovingPost(null);
             },
             onError: () => {
-                toast.error('Lỗi khi duyệt bài viết');
+                toast.error(t('posts.toast.approveError'));
             },
         });
     };
@@ -82,11 +85,11 @@ const PostsManagement = () => {
         if (!deletingPost) return;
         deletePostMutation.mutate(deletingPost.id, {
             onSuccess: () => {
-                toast.success('Đã xóa bài viết');
+                toast.success(t('posts.toast.deleted'));
                 setDeletingPost(null);
             },
             onError: () => {
-                toast.error('Lỗi khi xóa bài viết');
+                toast.error(t('posts.toast.deleteError'));
             },
         });
     };
@@ -94,26 +97,26 @@ const PostsManagement = () => {
     const columns: AdminTableColumn[] = [
         {
             key: 'title',
-            header: 'Tiêu đề',
+            header: t('posts.columns.title'),
             render: (post: PostSummaryResponse) => (
                 <div>
                     <div className="fw-semibold">{post.title}</div>
                     <div className="small text-secondary">
-                        {post.categories?.[0]?.name || 'Không có danh mục'}
+                        {post.categories?.[0]?.name || t('posts.noCategory')}
                     </div>
                 </div>
             ),
         },
-        { key: 'authorName', header: 'Tác giả' },
+        { key: 'authorName', header: t('posts.columns.author') },
         {
             key: 'createdAt',
-            header: 'Ngày tạo',
+            header: t('posts.columns.createdAt'),
             render: (post: PostSummaryResponse) =>
-                new Date(post.createdAt as string).toLocaleDateString('vi-VN'),
+                new Date(post.createdAt as string).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN'),
         },
         {
             key: 'status',
-            header: 'Trạng thái',
+            header: t('posts.columns.status'),
             render: (post: PostSummaryResponse) => (
                 <Badge bg={STATUS_VARIANT[post.status as string] || 'secondary'}>{post.status}</Badge>
             ),
@@ -123,14 +126,14 @@ const PostsManagement = () => {
     return (
         <div className="d-flex flex-column gap-3">
             <AdminPageHeader
-                title="Duyệt bài viết"
-                description="Duyệt bài chờ duyệt hoặc xóa bài không phù hợp. Bài bị xóa sẽ biến mất khỏi danh sách của tác giả."
+                title={t('posts.title')}
+                description={t('posts.description')}
             />
 
             <AdminToolbar
                 searchValue={searchQuery}
                 onSearchChange={(value: string) => setSearchQuery(value)}
-                searchPlaceholder="Tìm kiếm bài viết..."
+                searchPlaceholder={t('posts.searchPlaceholder')}
             >
                 <div className="d-flex gap-2">
                     {STATUS_FILTERS.map((item) => (
@@ -140,7 +143,7 @@ const PostsManagement = () => {
                             className={cx('pillBtn', {active: statusFilter === item.value})}
                             onClick={() => setStatusFilter(item.value)}
                         >
-                            {item.label}
+                            {t(`posts.filters.${item.labelKey}`)}
                         </Button>
                     ))}
                 </div>
@@ -151,18 +154,18 @@ const PostsManagement = () => {
                 columns={columns}
                 data={posts}
                 loading={loading}
-                emptyText="Không có dữ liệu bài viết"
+                emptyText={t('posts.empty')}
                 getRowKey={(post: PostSummaryResponse) => post.id}
                 page={currentPage}
                 totalPages={totalPages}
                 totalElements={totalElements}
                 pageSize={PAGE_SIZE}
-                itemLabel="bài viết"
+                itemLabel={t('posts.itemLabel')}
                 onPageChange={setCurrentPage}
                 rowActions={(post: PostSummaryResponse) => (
                     <>
                         <button
-                            title="Xem chi tiết"
+                            title={t('posts.viewDetail')}
                             onClick={() =>
                                 window.open(
                                     routes.postDetail.replace(':postId', post.id),
@@ -173,13 +176,13 @@ const PostsManagement = () => {
                             <Eye size={14} />
                         </button>
                         {post.status !== PostStatus.APPROVED && (
-                            <button title="Duyệt" onClick={() => setApprovingPost(post)}>
+                            <button title={t('posts.approve')} onClick={() => setApprovingPost(post)}>
                                 <CheckCircle size={14} />
                             </button>
                         )}
                         <button
                             className="danger"
-                            title="Xóa bài viết"
+                            title={t('posts.deletePost')}
                             onClick={() => setDeletingPost(post)}
                         >
                             <Trash2 size={14} />
@@ -193,17 +196,17 @@ const PostsManagement = () => {
                 onClose={() => setApprovingPost(null)}
                 onConfirm={handleApprove}
                 icon={CheckCircle}
-                title="Duyệt bài viết"
-                message={`Duyệt bài viết "${approvingPost?.title}"?`}
-                confirmText="Duyệt"
+                title={t('posts.approveModal.title')}
+                message={t('posts.approveModal.message', { title: approvingPost?.title ?? '' })}
+                confirmText={t('posts.approve')}
             />
 
             <ConfirmDeleteModal
                 show={Boolean(deletingPost)}
                 onClose={() => setDeletingPost(null)}
                 onConfirm={handleDelete}
-                title="Xác nhận xóa bài viết"
-                message={`Xóa bài viết "${deletingPost?.title}"? Hành động này không thể hoàn tác.`}
+                title={t('posts.confirmDelete.title')}
+                message={t('posts.confirmDelete.message', { title: deletingPost?.title ?? '' })}
             />
         </div>
     );

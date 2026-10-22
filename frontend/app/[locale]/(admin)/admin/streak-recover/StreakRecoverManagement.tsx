@@ -1,16 +1,18 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Form, Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { Flame } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import { AdminCard, AdminFieldError, AdminPageHeader } from '@/app/(admin)/_components/common';
+import { AdminCard, AdminFieldError, AdminPageHeader } from '@/app/[locale]/(admin)/_components/common';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { useStreakRecoverConfig } from './_hooks/useStreakRecoverConfig';
 
 function StreakRecoverManagement() {
+  const t = useTranslations('AdminUsers');
   const [costCoins, setCostCoins] = useState<number | string>(50);
   const [active, setActive] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
@@ -27,12 +29,12 @@ function StreakRecoverManagement() {
     }
   }
 
-  const displayedError = errorMessage || (isError ? 'Không thể tải cấu hình.' : '');
+  const displayedError = errorMessage || (isError ? t('streakRecover.errors.load') : '');
 
   const handleSave = async () => {
     const cost = Number(costCoins);
     if (Number.isNaN(cost) || cost < 0) {
-      setErrorMessage('Giá xu phải là số không âm.');
+      setErrorMessage(t('streakRecover.errors.costInvalid'));
       return;
     }
     setErrorMessage('');
@@ -40,23 +42,23 @@ function StreakRecoverManagement() {
       const data = await updateConfig({ costCoins: cost, active });
       setCostCoins(data?.costCoins ?? cost);
       setActive(data?.active !== false);
-      toast.success('Đã lưu cấu hình khôi phục chuỗi.');
+      toast.success(t('streakRecover.saved'));
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu cấu hình.'));
+      setErrorMessage(getApiErrorMessage(error, t('streakRecover.errors.save')));
     }
   };
 
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Khôi phục chuỗi ngày"
-        description="Giá xu user phải trả để nối lại chuỗi đã đứt (khi chưa học lại)."
+        title={t('streakRecover.title')}
+        description={t('streakRecover.description')}
       />
 
       {isLoading ? (
         <div className="text-center text-secondary py-4">
           <Spinner size="sm" className="me-2" />
-          Đang tải cấu hình...
+          {t('streakRecover.loading')}
         </div>
       ) : (
         <AdminCard maxWidth={480}>
@@ -65,24 +67,24 @@ function StreakRecoverManagement() {
             style={{ fontSize: '1.6rem', color: '#f08c00' }}
           >
             <Flame size={28} />
-            <span>Cấu hình tính năng khôi phục</span>
+            <span>{t('streakRecover.cardTitle')}</span>
           </div>
 
           <Form.Group className="mb-3">
-            <Form.Label>Giá khôi phục (xu)</Form.Label>
+            <Form.Label>{t('streakRecover.costLabel')}</Form.Label>
             <Form.Control
               type="number"
               min={0}
               value={costCoins}
               onChange={(e) => setCostCoins(e.target.value)}
             />
-            <Form.Text muted>Đặt 0 nếu muốn cho khôi phục miễn phí.</Form.Text>
+            <Form.Text muted>{t('streakRecover.costHint')}</Form.Text>
           </Form.Group>
 
           <Form.Check
             type="switch"
             id="streak-recover-active"
-            label="Cho phép khôi phục chuỗi"
+            label={t('streakRecover.activeLabel')}
             checked={active}
             onChange={(e) => setActive(e.target.checked)}
             className="mb-3"
@@ -91,7 +93,7 @@ function StreakRecoverManagement() {
           <AdminFieldError message={displayedError} />
 
           <ButtonPrime onClick={handleSave} disabled={isSaving}>
-            {isSaving ? 'Đang lưu...' : 'Lưu cấu hình'}
+            {isSaving ? t('shared.saving') : t('streakRecover.save')}
           </ButtonPrime>
         </AdminCard>
       )}

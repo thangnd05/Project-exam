@@ -2,6 +2,7 @@
 
 import {useQuery} from '@tanstack/react-query';
 import {isAxiosError} from 'axios';
+import {useTranslations} from 'next-intl';
 
 import {getLeaderboardByTest} from '@/app/apis/userTestApi';
 import type {LeaderboardMyRank, TestLeaderboardResponse, UserTestResponse} from '@/app/types';
@@ -31,6 +32,7 @@ const normalizeLeaderboard = (data: TestLeaderboardResponse) => {
 };
 
 export function useTestLeaderboard(testId?: string) {
+  const t = useTranslations('TestTaking.leaderboard');
   const leaderboardQuery = useQuery({
     queryKey: testLeaderboardKeys.leaderboard(testId),
     queryFn: () => getLeaderboardByTest(testId as string),
@@ -44,8 +46,8 @@ export function useTestLeaderboard(testId?: string) {
   if (leaderboardQuery.isError) {
     errorMessage =
       isAxiosError(leaderboardQuery.error) && leaderboardQuery.error.response?.status === 403
-        ? 'Bạn không có quyền xem bảng xếp hạng của đề này (đề thuộc lớp riêng).'
-        : 'Không tải được bảng xếp hạng từ hệ thống.';
+        ? t('forbidden')
+        : t('loadError');
   }
 
   return {

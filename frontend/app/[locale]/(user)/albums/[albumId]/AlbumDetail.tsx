@@ -1,7 +1,9 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAlbumVocabularies, useDeleteVocabulary } from './_hooks/useAlbumVocabularies';
 import { getTtsUrl } from '@/app/utils/mediaUrl';
 import {
@@ -26,6 +28,7 @@ import styles from './AlbumDetail.module.scss';
 const cx = classNames.bind(styles);
 
 const AlbumDetail = () => {
+  const t = useTranslations('Vocabulary');
   const { albumId } = useParams<{ albumId: string }>();
   const [showModal, setShowModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -44,7 +47,7 @@ const AlbumDetail = () => {
     isError,
     refetch: fetchVocabularies,
   } = useAlbumVocabularies(albumId);
-  const errorMsg = isError ? 'Không thể tải danh sách từ vựng ' : '';
+  const errorMsg = isError ? t('albumDetail.loadError') : '';
   const deleteMutation = useDeleteVocabulary(albumId);
 
   useEffect(() => {
@@ -69,10 +72,10 @@ const AlbumDetail = () => {
     if (!vocabToDelete) return;
     try {
       await deleteMutation.mutateAsync(vocabToDelete.vocabId);
-      toast.success(`Đã xóa từ "${vocabToDelete.word}" thành công!`);
+      toast.success(t('albumDetail.toast.deleted', { word: vocabToDelete.word ?? '' }));
     } catch (err) {
       console.error(' Lỗi khi xóa:', err);
-      toast.error('Không thể xóa từ này. Vui lòng thử lại!');
+      toast.error(t('albumDetail.toast.deleteError'));
     } finally {
       setShowDeleteModal(false);
       setVocabToDelete(null);
@@ -88,7 +91,7 @@ const AlbumDetail = () => {
     return (
       <div className={cx('loading-box')}>
         <Spinner animation="grow" variant="primary" />
-        <p>Đang mài giũa kiến thức...</p>
+        <p>{t('albumDetail.loading')}</p>
       </div>
     );
 
@@ -105,20 +108,20 @@ const AlbumDetail = () => {
       <Container>
 
         <PageHeader
-          title={flashMode ? 'Học bằng Flashcard' : 'Danh sách từ vựng'}
-          label="QUẢN LÝ TỪ VỰNG"
+          title={flashMode ? t('albumDetail.flashcardTitle') : t('albumDetail.listTitle')}
+          label={t('albumDetail.label')}
           onAction={() => setShowModal(true)}
-          actionText="Thêm từ vựng"
+          actionText={t('albumDetail.addWord')}
           actionIcon={IoAdd}
           onSecondaryAction={() => setShowBulkModal(true)}
-          secondaryActionText="Nhập JSON"
+          secondaryActionText={t('albumDetail.importJson')}
           secondaryActionIcon={IoCodeSlashOutline}
         />
 
         <div className={cx('custom-actions')}>
           <ButtonPrime variant="ghost" onClick={() => router.back()}>
             <IoChevronBack />
-            Quay lại album
+            {t('albumDetail.backToAlbum')}
           </ButtonPrime>
 
           <div className={cx('mode-group')}>
@@ -128,7 +131,7 @@ const AlbumDetail = () => {
               disabled={vocabularies.length === 0}
             >
               <IoSchoolOutline />
-              Luyện tập
+              {t('albumDetail.practice')}
             </button>
 
             <button
@@ -140,7 +143,7 @@ const AlbumDetail = () => {
               disabled={vocabularies.length === 0}
             >
               {flashMode ? <IoListOutline /> : <IoFlashOutline />}
-              {flashMode ? 'Chế độ Danh sách' : 'Chế độ Flashcard'}
+              {flashMode ? t('albumDetail.listMode') : t('albumDetail.flashcardMode')}
             </button>
           </div>
         </div>
@@ -206,12 +209,12 @@ const AlbumDetail = () => {
             <Table responsive hover>
               <thead>
                 <tr>
-                  <th>STT</th>
-                  <th>Từ vựng</th>
-                  <th>Nghĩa</th>
-                  <th>Ví dụ</th>
-                  <th>Phát âm</th>
-                  <th className="text-center">Hành động</th>
+                  <th>{t('albumDetail.table.index')}</th>
+                  <th>{t('albumDetail.table.word')}</th>
+                  <th>{t('albumDetail.table.meaning')}</th>
+                  <th>{t('albumDetail.table.example')}</th>
+                  <th>{t('albumDetail.table.pronunciation')}</th>
+                  <th className="text-center">{t('albumDetail.table.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -239,14 +242,14 @@ const AlbumDetail = () => {
                         <button
                           className="btn btn-link text-primary p-0"
                           onClick={() => handleEditClick(vocab)}
-                          title="Sửa từ vựng"
+                          title={t('albumDetail.editWord')}
                         >
                           <IoPencilOutline size={22} />
                         </button>
                         <button
                           className="btn btn-link text-danger p-0"
                           onClick={() => handleDeleteClick(vocab)}
-                          title="Xóa từ vựng"
+                          title={t('albumDetail.deleteWord')}
                         >
                           <IoTrashOutline size={22} />
                         </button>
@@ -259,7 +262,7 @@ const AlbumDetail = () => {
             {vocabularies.length === 0 && (
               <div className="text-center py-5 text-muted">
                 <IoSchoolOutline size={64} className="mb-3 opacity-25" />
-                <h5>Album này còn trống</h5>
+                <h5>{t('albumDetail.empty')}</h5>
               </div>
             )}
           </div>
@@ -294,8 +297,8 @@ const AlbumDetail = () => {
         show={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleConfirmDelete}
-        title="Xác nhận xóa từ vựng"
-        message={`Bạn có chắc chắn muốn xóa từ "${vocabToDelete?.word}" khỏi album này?`}
+        title={t('albumDetail.deleteTitle')}
+        message={t('albumDetail.deleteMessage', { word: vocabToDelete?.word ?? '' })}
       />
     </div>
   );

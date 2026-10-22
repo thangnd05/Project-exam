@@ -3,6 +3,7 @@
 import {useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
+import {useTranslations} from 'next-intl';
 
 import {getMyQuests, QUESTS_QUERY_KEY} from '@/app/apis/questApi';
 import {useAuth} from '@/app/hooks/useAuth';
@@ -20,6 +21,7 @@ type CoinQuestMenuProps = {
 function CoinQuestMenu({variant = 'default', className}: CoinQuestMenuProps) {
   const [open, setOpen] = useState(false);
   const {isAuthenticated} = useAuth();
+  const t = useTranslations('Gamification.coins');
 
   // Có thưởng chưa nhận thì chấm báo trên nút xu, để người dùng biết mở nhiệm vụ ra.
   const {data: quests = []} = useQuery({
@@ -35,11 +37,11 @@ function CoinQuestMenu({variant = 'default', className}: CoinQuestMenuProps) {
         type="button"
         className={cx('trigger', className)}
         onClick={() => setOpen(true)}
-        title={claimableCount > 0 ? `Có ${claimableCount} phần thưởng chưa nhận` : 'Xem nhiệm vụ'}
+        title={claimableCount > 0 ? t('menuTitleClaimable', {count: claimableCount}) : t('menuTitle')}
         aria-label={
           claimableCount > 0
-            ? `Xem số dư xu và nhiệm vụ, có ${claimableCount} phần thưởng chưa nhận`
-            : 'Xem số dư xu và nhiệm vụ'
+            ? t('menuAriaClaimable', {count: claimableCount})
+            : t('menuAria')
         }
       >
         <CoinBadge variant={variant} />

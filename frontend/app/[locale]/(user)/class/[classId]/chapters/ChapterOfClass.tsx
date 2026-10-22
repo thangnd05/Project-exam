@@ -1,7 +1,9 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Container, Spinner, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
@@ -23,6 +25,8 @@ const cx = classNames.bind(styles);
 
 const ChapterOfClass = () => {
   const { classId } = useParams<{ classId: string }>();
+  const t = useTranslations('Classes');
+  const locale = useLocale();
   const router = useRouter();
 
   const {
@@ -35,7 +39,7 @@ const ChapterOfClass = () => {
     refetchChapters,
   } = useChaptersOfClass(classId);
 
-  const message = isError ? 'Không thể tải danh sách chương ' : '';
+  const message = isError ? t('chapters.loadFailed') : '';
 
   const [showCreateChapter, setShowCreateChapter] = useState(false);
   const [showUpdateChapter, setShowUpdateChapter] = useState(false);
@@ -68,9 +72,9 @@ const ChapterOfClass = () => {
 
     try {
       await deleteChapterMutation.mutateAsync(selectedChapter.chapterId);
-      toast.success('Xóa chương thành công!');
+      toast.success(t('chapters.deleteSuccess'));
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Không thể xóa chương. Vui lòng thử lại.'));
+      toast.error(getApiErrorMessage(error, t('chapters.deleteFailed')));
     } finally {
       setShowDeleteChapter(false);
       setSelectedChapter(null);
@@ -81,7 +85,7 @@ const ChapterOfClass = () => {
     return (
       <div className={cx('loading')}>
         <Spinner animation="border" />
-        <p>Đang tải chương học...</p>
+        <p>{t('chapters.loading')}</p>
       </div>
     );
   }
@@ -90,14 +94,14 @@ const ChapterOfClass = () => {
     <div className={cx('wrapper')}>
       <Container className={cx('container')}>
         <button className={cx('btn-back')} onClick={() => router.back()}>
-          Quay lại lớp học
+          {t('chapters.backToClass')}
         </button>
 
         <PageHeader
-          title={className || 'Chương trình học tập'}
-          label="Danh sách nội dung học tập"
-          badgeLabel={`Mã classQr: ${classQr}`}
-          actionText="Tạo chương mới"
+          title={className || t('chapters.defaultTitle')}
+          label={t('chapters.label')}
+          badgeLabel={t('chapters.classCode', { code: classQr })}
+          actionText={t('chapters.create')}
           actionIcon={IoAdd}
           onAction={() => setShowCreateChapter(true)}
         >
@@ -105,8 +109,8 @@ const ChapterOfClass = () => {
             activeKey={viewMode}
             onChange={setViewMode}
             options={[
-              { key: 'grid', title: 'Dạng lưới', icon: IoGridOutline },
-              { key: 'list', title: 'Dạng danh sách', icon: IoListOutline },
+              { key: 'grid', title: t('common.viewGrid'), icon: IoGridOutline },
+              { key: 'list', title: t('chapters.viewList'), icon: IoListOutline },
             ]}
           />
         </PageHeader>
@@ -120,8 +124,8 @@ const ChapterOfClass = () => {
         {chapters.length === 0 ? (
           <div className={cx('empty')}>
             <IoDocumentTextOutline size={100} />
-            <h4>Lớp học hiện tại chưa có chương mục nào</h4>
-            <p>Vui lòng quay lại sau hoặc liên hệ giáo viên</p>
+            <h4>{t('chapters.emptyTitle')}</h4>
+            <p>{t('chapters.emptyDescription')}</p>
           </div>
         ) : (
           <>
@@ -147,10 +151,11 @@ const ChapterOfClass = () => {
                     <div className={cx('chapter-info')}>
                       <IoCalendarOutline />
                       <span>
-                        Cập nhật:{' '}
-                        {new Date(chapter.createdAt!).toLocaleDateString(
-                          'vi-VN',
-                        )}
+                        {t('chapters.updatedAt', {
+                          date: new Date(chapter.createdAt!).toLocaleDateString(
+                            locale === 'en' ? 'en-US' : 'vi-VN',
+                          ),
+                        })}
                       </span>
                     </div>
 
@@ -158,7 +163,7 @@ const ChapterOfClass = () => {
                       className={cx('btn-view')}
                       onClick={() => handleViewTests(chapter.chapterId)}
                     >
-                      Bắt đầu học ngay
+                      {t('chapters.startLearning')}
                     </button>
                   </div>
                 ))}
@@ -203,9 +208,8 @@ const ChapterOfClass = () => {
           setSelectedChapter(null);
         }}
         onConfirm={handleConfirmDeleteChapter}
-        title="Xác nhận xóa chương"
-        message={`Bạn có chắc chắn muốn xóa chương "${selectedChapter?.title || ''
-          }"?`}
+        title={t('chapters.deleteTitle')}
+        message={t('chapters.deleteMessage', { title: selectedChapter?.title || '' })}
       />
     </div>
   );

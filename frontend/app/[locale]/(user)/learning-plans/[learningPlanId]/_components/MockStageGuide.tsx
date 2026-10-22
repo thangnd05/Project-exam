@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
@@ -27,6 +28,7 @@ type MockStageGuideProps = {
 };
 
 function MockStageGuide({ plan }: MockStageGuideProps) {
+  const t = useTranslations('LearningPlans');
   const testsQuery = useQuery({
     queryKey: completedUserTestKeys.byExamType(plan.examTypeId),
     queryFn: () => getMyCompletedUserTests(plan.examTypeId),
@@ -43,19 +45,19 @@ function MockStageGuide({ plan }: MockStageGuideProps) {
     <div className={cx('card')}>
       <div className={cx('cardBody')}>
         <h3 className={cx('sectionTitle')} style={{ marginBottom: 4 }}>
-          Tiếp theo làm gì?
+          {t('mockGuide.heading')}
         </h3>
         <p className={cx('muted')} style={{ marginBottom: '1.2rem' }}>
-          Bạn đã xong phần luyện ải. Còn 2 bước nữa để khép vòng lặp học:
+          {t('mockGuide.intro')}
         </p>
 
         <div className={cx('stepsGuide')}>
           <div className={cx('stepItem')}>
             <span className={cx('stepNum')}>1</span>
             <div>
-              <div className={cx('stepTitle')}>Làm một bài thi thử trọn đề</div>
+              <div className={cx('stepTitle')}>{t('mockGuide.step1Title')}</div>
               <div className={cx('stepDesc')}>
-                Bài thi thử đầy đủ chấm lại độ sẵn sàng thật sau khi luyện, chính xác hơn luyện lẻ từng phần.
+                {t('mockGuide.step1Desc')}
               </div>
               {!freshMock && (
                 <Link
@@ -63,7 +65,7 @@ function MockStageGuide({ plan }: MockStageGuideProps) {
                   className={cx('btn', 'btnPrimary', 'btnSm')}
                   style={{ marginTop: 8 }}
                 >
-                  Chọn đề thi thử
+                  {t('mockGuide.chooseMock')}
                 </Link>
               )}
             </div>
@@ -71,9 +73,9 @@ function MockStageGuide({ plan }: MockStageGuideProps) {
           <div className={cx('stepItem')}>
             <span className={cx('stepNum')}>2</span>
             <div>
-              <div className={cx('stepTitle')}>Sinh lộ trình mới từ chính bài đó</div>
+              <div className={cx('stepTitle')}>{t('mockGuide.step2Title')}</div>
               <div className={cx('stepDesc')}>
-                Hệ thống chẩn đoán lại điểm yếu từ bài mới và tạo lộ trình tiếp theo. Lặp đến khi đạt mục tiêu.
+                {t('mockGuide.step2Desc')}
               </div>
             </div>
           </div>
@@ -82,27 +84,26 @@ function MockStageGuide({ plan }: MockStageGuideProps) {
         {freshMock ? (
           <div className={cx('alert', 'alertSuccess')} style={{ marginTop: '1.2rem' }}>
             <span>
-              Bạn đã có bài mới hoàn thành:{' '}
+              {t('mockGuide.freshMock')}{' '}
               <strong>
                 {freshMock.testTitle ? `${freshMock.testTitle}  ` : ''}
                 {formatDate(freshMock.finishedAt)}
-                {freshMock.totalScore != null ? ` · Điểm ${freshMock.totalScore}` : ''}
+                {freshMock.totalScore != null ? ` · ${t('mockGuide.score', { score: freshMock.totalScore })}` : ''}
               </strong>
               {isPracticeAttempt(freshMock) && (
                 <>
                   {' '}
-                  <small>(bài luyện theo phần, lộ trình sinh ra chỉ phủ các phần đã luyện)</small>
+                  <small>{t('mockGuide.practiceNote')}</small>
                 </>
               )}
             </span>
             <Link href={generateTo} className={cx('btn', 'btnPrimary', 'btnSm')}>
-              Sinh lộ trình từ bài này
+              {t('mockGuide.generateFromThis')}
             </Link>
           </div>
         ) : (
           <p className={cx('muted')} style={{ marginTop: '1.2rem', marginBottom: 0 }}>
-            Sau khi nộp bài thi thử, quay lại đây  nút <strong>Sinh lộ trình từ bài này</strong> sẽ
-            hiện sẵn để bạn không phải tự tìm.
+            {t.rich('mockGuide.afterSubmit', { strong: (chunks) => <strong>{chunks}</strong> })}
           </p>
         )}
       </div>

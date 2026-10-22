@@ -1,0 +1,63 @@
+{
+  "minutes": "{count} phút",
+  "unlimited": "Không giới hạn",
+  "questions": "{count} câu",
+  "owned": "Đã mở khoá",
+  "coins": "{count} xu",
+  "leaderboard": "Bảng xếp hạng",
+  "history": "Lịch sử",
+  "loginToStart": "Đăng nhập để làm",
+  "loginFlash": "Đề này cần tài khoản. Đăng nhập hoặc đăng ký miễn phí để làm bài.",
+  "status": {
+    "live": "Đang diễn ra",
+    "upcoming": "Sắp mở",
+    "ended": "Đã kết thúc",
+    "noAttempts": "Hết lượt"
+  },
+  "action": {
+    "start": "Bắt đầu",
+    "opensIn": "Mở sau {time}",
+    "countdown": "{minutes}p {seconds}s",
+    "notOpen": "Chưa mở",
+    "deadlinePassed": "Hết hạn nộp",
+    "attemptsExceeded": "Vượt quá lượt làm"
+  },
+  "card": {
+    "fallbackTitle": "Bài tập luyện tập",
+    "duration": "Thời lượng:",
+    "opensAt": "Ngày mở:",
+    "deadline": "Hạn nộp:",
+    "guestAllowed": "Làm thử không cần tài khoản",
+    "loginRequired": "Cần đăng nhập để làm bài",
+    "createdAt": "Thời gian tạo:"
+  },
+  "list": {
+    "gridView": "Dạng lưới",
+    "tableView": "Quản lý chi tiết (Dạng bảng)",
+    "empty": {
+      "title": "Kho lưu trữ hiện đang trống",
+      "desc": "Chưa có bài kiểm tra nào được hiển thị ở đây."
+    }
+  },
+  "mode": {
+    "title": "Chọn chế độ",
+    "loadPartsError": "Không tải được danh sách phần thi.",
+    "otherSkill": "Khác",
+    "examTab": "Thi thử",
+    "practiceTab": "Luyện theo phần",
+    "examDesc": "Làm đầy đủ đề như thi thật, có tính giờ.",
+    "features": {
+      "timed": "Tính giờ như phòng thi thật",
+      "scoring": "Chấm điểm chi tiết & lưu lịch sử",
+      "leaderboard": "Ghi nhận thành tích lên bảng xếp hạng"
+    },
+    "startExam": "Bắt đầu thi thử",
+    "practiceHint": "Chọn phần muốn luyện, <strong>không giới hạn thời gian</strong>.",
+    "guideTitle": "Giới thiệu & cách làm",
+    "loadingParts": "Đang tải danh sách phần thi...",
+    "noParts": "Đề này chưa có phần thi nào.",
+    "selectAll": "Chọn tất cả {count} phần",
+    "selected": "Đã chọn <strong>{count}</strong> câu",
+    "start": "Bắt đầu"
+  }
+}

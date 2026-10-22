@@ -4,10 +4,12 @@ import {useEffect, useState} from 'react';
 import classNames from 'classnames/bind';
 import styles from './ScrollToTop.module.scss';
 import { FaArrowUp } from 'react-icons/fa6';
+import { useTranslations } from 'next-intl';
 
 const cx = classNames.bind(styles);
 
 function ScrollToTop() {
+  const t = useTranslations('Layout');
   const [showScroll, setShowScroll] = useState(false);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ function ScrollToTop() {
       type="button"
       className={cx('scrollTopBtn', {visible: showScroll})}
       onClick={scrollToTop}
-      aria-label="Lên đầu trang"
+      aria-label={t('scrollToTop')}
       aria-hidden={!showScroll}
       tabIndex={showScroll ? 0 : -1}
     >

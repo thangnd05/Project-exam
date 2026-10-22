@@ -1,7 +1,9 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Container, Spinner, Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { Search } from 'lucide-react';
@@ -19,6 +21,8 @@ const cx = classNames.bind(styles);
 function CertificateVerify() {
   const { code } = useParams<{ code?: string }>();
   const router = useRouter();
+  const t = useTranslations('Certificates');
+  const localizeHref = useLocalizeHref();
   const [searchCode, setSearchCode] = useState(code || '');
 
   const { data: result, isLoading, isError } = useCertificateVerification(code);
@@ -27,7 +31,7 @@ function CertificateVerify() {
     event.preventDefault();
     const trimmed = searchCode.trim();
     if (trimmed) {
-      router.push(`/certificates/verify/${encodeURIComponent(trimmed)}`);
+      router.push(localizeHref(`/certificates/verify/${encodeURIComponent(trimmed)}`));
     }
   };
 
@@ -40,32 +44,34 @@ function CertificateVerify() {
     <div className={cx('wrapper')}>
       <Container className={cx('container')}>
         <header className={cx('head')}>
-          <h1>Tra cứu chứng chỉ</h1>
-          <p>Nhập mã in trên chứng chỉ để kiểm tra tính xác thực.</p>
+          <h1>{t('verify.title')}</h1>
+          <p>{t('verify.subtitle')}</p>
         </header>
 
         <Form className={cx('searchForm')} onSubmit={handleSearch}>
           <Form.Control
             value={searchCode}
             onChange={(event) => setSearchCode(event.target.value)}
-            placeholder="VD: EXAM-2026-8F3K9Q"
-            aria-label="Mã chứng chỉ"
+            placeholder={t('verify.codePlaceholder')}
+            aria-label={t('verify.codeLabel')}
           />
           <ButtonPrime type="submit" variant="primary" className={cx('searchButton')}>
-            <Search size={16} /> Tra cứu
+            <Search size={16} /> {t('verify.submit')}
           </ButtonPrime>
         </Form>
 
         {!code && (
           <p className={cx('hint')}>
-            Mã tra cứu nằm ở cạnh dưới tấm chứng chỉ, dạng <code>EXAM-2026-XXXXXX</code>.
+            {t.rich('verify.hint', {
+              code: (chunks) => <code>{chunks}</code>,
+            })}
           </p>
         )}
 
         {isLoading && code && (
           <div className={cx('state')}>
             <Spinner animation="border" />
-            <p>Đang kiểm tra mã {code}...</p>
+            <p>{t('verify.checking', { code })}</p>
           </div>
         )}
 
@@ -86,8 +92,8 @@ function CertificateVerify() {
           <div className={cx('status', view.tone)}>
             <StateIcon size={26} className={cx('statusIcon')} />
             <div className={cx('statusText')}>
-              <h2 className={cx('statusHeading')}>{view.heading}</h2>
-              <p className={cx('statusMessage')}>{view.message}</p>
+              <h2 className={cx('statusHeading')}>{t(view.heading)}</h2>
+              <p className={cx('statusMessage')}>{t(view.message)}</p>
             </div>
           </div>
         )}

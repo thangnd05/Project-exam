@@ -23,6 +23,7 @@ import {
     Legend,
 } from 'recharts';
 import type { TooltipContentProps } from 'recharts';
+import { useTranslations } from 'next-intl';
 import { brandColors } from '@/app/assets/styles/brandColors';
 import type { MonthPerformance, NameValue } from '@/app/types/admin';
 
@@ -53,91 +54,97 @@ const TOOLTIP_STYLE = {
     cursor: { fill: 'rgba(148, 163, 184, 0.1)' },
 };
 
-export const WeeklyActivityArea = ({ data }: { data: DayTrafficDatum[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
-            <defs>
-                <linearGradient id="acUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={VIZ.primary} stopOpacity={0.25} />
-                    <stop offset="100%" stopColor={VIZ.primary} stopOpacity={0} />
-                </linearGradient>
-                <linearGradient id="acExams" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.25} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
-                </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
-            <XAxis dataKey="day" axisLine={false} tickLine={false} tick={AXIS_TICK} dy={8} />
-            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} />
-            <Tooltip {...TOOLTIP_STYLE} />
-            <Legend />
-            <Area
-                type="monotone"
-                dataKey="users"
-                name="Người dùng mới"
-                stroke={VIZ.primary}
-                strokeWidth={3}
-                fill="url(#acUsers)"
-                dot={{ r: 3, fill: VIZ.primary }}
-                activeDot={{ r: 6 }}
-            />
-            <Area
-                type="monotone"
-                dataKey="exams"
-                name="Bài thi"
-                stroke="#10b981"
-                strokeWidth={3}
-                fill="url(#acExams)"
-                dot={{ r: 3, fill: '#10b981' }}
-                activeDot={{ r: 6 }}
-            />
-        </AreaChart>
-    </ResponsiveContainer>
-);
+export const WeeklyActivityArea = ({ data }: { data: DayTrafficDatum[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
+                <defs>
+                    <linearGradient id="acUsers" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={VIZ.primary} stopOpacity={0.25} />
+                        <stop offset="100%" stopColor={VIZ.primary} stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="acExams" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity={0.25} />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={AXIS_TICK} dy={8} />
+                <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} />
+                <Tooltip {...TOOLTIP_STYLE} />
+                <Legend />
+                <Area
+                    type="monotone"
+                    dataKey="users"
+                    name={t('newUsers')}
+                    stroke={VIZ.primary}
+                    strokeWidth={3}
+                    fill="url(#acUsers)"
+                    dot={{ r: 3, fill: VIZ.primary }}
+                    activeDot={{ r: 6 }}
+                />
+                <Area
+                    type="monotone"
+                    dataKey="exams"
+                    name={t('exams')}
+                    stroke="#10b981"
+                    strokeWidth={3}
+                    fill="url(#acExams)"
+                    dot={{ r: 3, fill: '#10b981' }}
+                    activeDot={{ r: 6 }}
+                />
+            </AreaChart>
+        </ResponsiveContainer>
+    );
+};
 
-export const MonthlyPerformanceCombo = ({ data }: { data: MonthPerformance[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <defs>
-                <linearGradient id="acTests" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={VIZ.primary} />
-                    <stop offset="100%" stopColor={brand.brand400} />
-                </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
-            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
-            <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={AXIS_TICK} />
-            <YAxis
-                yAxisId="right"
-                orientation="right"
-                domain={[0, 100]}
-                axisLine={false}
-                tickLine={false}
-                tick={AXIS_TICK}
-            />
-            <Tooltip {...TOOLTIP_STYLE} />
-            <Legend />
-            <Bar
-                yAxisId="left"
-                dataKey="tests"
-                name="Số bài thi"
-                fill="url(#acTests)"
-                radius={[6, 6, 0, 0]}
-                barSize={28}
-            />
-            <Line
-                yAxisId="right"
-                type="monotone"
-                dataKey="rate"
-                name="Tỉ lệ hoàn thành (%)"
-                stroke={VIZ.accent}
-                strokeWidth={3}
-                dot={{ r: 4, fill: VIZ.accent }}
-                activeDot={{ r: 6 }}
-            />
-        </ComposedChart>
-    </ResponsiveContainer>
-);
+export const MonthlyPerformanceCombo = ({ data }: { data: MonthPerformance[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                    <linearGradient id="acTests" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={VIZ.primary} />
+                        <stop offset="100%" stopColor={brand.brand400} />
+                    </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+                <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    domain={[0, 100]}
+                    axisLine={false}
+                    tickLine={false}
+                    tick={AXIS_TICK}
+                />
+                <Tooltip {...TOOLTIP_STYLE} />
+                <Legend />
+                <Bar
+                    yAxisId="left"
+                    dataKey="tests"
+                    name={t('testCount')}
+                    fill="url(#acTests)"
+                    radius={[6, 6, 0, 0]}
+                    barSize={28}
+                />
+                <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="rate"
+                    name={t('completionRatePercent')}
+                    stroke={VIZ.accent}
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: VIZ.accent }}
+                    activeDot={{ r: 6 }}
+                />
+            </ComposedChart>
+        </ResponsiveContainer>
+    );
+};
 
 export const ExamTypeDonut = ({ data }: { data: NameValue[] }) => (
     <ResponsiveContainer width="100%" height="100%">
@@ -164,52 +171,59 @@ export const ExamTypeDonut = ({ data }: { data: NameValue[] }) => (
     </ResponsiveContainer>
 );
 
-export const MonthlyNewUsersBar = ({ data }: { data: MonthPerformance[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <defs>
-                <linearGradient id="acNewUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#8b5cf6" />
-                    <stop offset="100%" stopColor="#c4b5fd" />
-                </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
-            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
-            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
-            <Tooltip {...TOOLTIP_STYLE} />
-            <Bar dataKey="newUsers" name="Người dùng mới" fill="url(#acNewUsers)" radius={[6, 6, 0, 0]} barSize={28} />
-        </BarChart>
-    </ResponsiveContainer>
-);
+export const MonthlyNewUsersBar = ({ data }: { data: MonthPerformance[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                    <linearGradient id="acNewUsers" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#8b5cf6" />
+                        <stop offset="100%" stopColor="#c4b5fd" />
+                    </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+                <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip {...TOOLTIP_STYLE} />
+                <Bar dataKey="newUsers" name={t('newUsers')} fill="url(#acNewUsers)" radius={[6, 6, 0, 0]} barSize={28} />
+            </BarChart>
+        </ResponsiveContainer>
+    );
+};
 
-export const MonthlyNewUsersLine = ({ data }: { data: MonthPerformance[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <defs>
-                <linearGradient id="acNewUsersLine" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={VIZ.primary} stopOpacity={0.18} />
-                    <stop offset="100%" stopColor={VIZ.primary} stopOpacity={0} />
-                </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
-            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
-            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
-            <Tooltip {...TOOLTIP_STYLE} />
-            <Area
-                type="monotone"
-                dataKey="newUsers"
-                name="Người dùng mới"
-                stroke={VIZ.primary}
-                strokeWidth={2.5}
-                fill="url(#acNewUsersLine)"
-                dot={{ r: 3, fill: VIZ.primary }}
-                activeDot={{ r: 6 }}
-            />
-        </AreaChart>
-    </ResponsiveContainer>
-);
+export const MonthlyNewUsersLine = ({ data }: { data: MonthPerformance[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                    <linearGradient id="acNewUsersLine" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={VIZ.primary} stopOpacity={0.18} />
+                        <stop offset="100%" stopColor={VIZ.primary} stopOpacity={0} />
+                    </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+                <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip {...TOOLTIP_STYLE} />
+                <Area
+                    type="monotone"
+                    dataKey="newUsers"
+                    name={t('newUsers')}
+                    stroke={VIZ.primary}
+                    strokeWidth={2.5}
+                    fill="url(#acNewUsersLine)"
+                    dot={{ r: 3, fill: VIZ.primary }}
+                    activeDot={{ r: 6 }}
+                />
+            </AreaChart>
+        </ResponsiveContainer>
+    );
+};
 
 const MonthlyVisitsTooltip = ({ active, payload, label }: ChartTooltipProps) => {
+    const t = useTranslations('AdminCommon.charts');
     if (!active || !payload?.length) return null;
     const row = payload[0].payload ?? {};
     const peak = row.peakHour;
@@ -217,33 +231,37 @@ const MonthlyVisitsTooltip = ({ active, payload, label }: ChartTooltipProps) => 
     return (
         <div style={{ ...TOOLTIP_STYLE.contentStyle, padding: '8px 12px' }}>
             <div style={TOOLTIP_STYLE.labelStyle}>{label}</div>
-            <div>Lượt truy cập: <strong>{row.visits ?? 0}</strong></div>
+            <div>{t.rich('tooltipVisits', { value: row.visits ?? 0, strong: (chunks) => <strong>{chunks}</strong> })}</div>
             <div style={{ color: '#64748b', marginTop: 2 }}>
-                {hasPeak ? `Giờ cao điểm: ${String(peak).padStart(2, '0')}:00` : 'Chưa có truy cập'}
+                {hasPeak ? t('peakHour', { hour: String(peak).padStart(2, '0') }) : t('noVisits')}
             </div>
         </div>
     );
 };
 
-export const MonthlyVisitsBar = ({ data }: { data: MonthPerformance[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <defs>
-                <linearGradient id="acVisitsMonth" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={VIZ.primary} />
-                    <stop offset="100%" stopColor={brand.brand300} />
-                </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
-            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
-            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
-            <Tooltip {...TOOLTIP_STYLE} content={<MonthlyVisitsTooltip />} />
-            <Bar dataKey="visits" name="Lượt truy cập" fill="url(#acVisitsMonth)" radius={[6, 6, 0, 0]} barSize={28} />
-        </BarChart>
-    </ResponsiveContainer>
-);
+export const MonthlyVisitsBar = ({ data }: { data: MonthPerformance[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                    <linearGradient id="acVisitsMonth" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={VIZ.primary} />
+                        <stop offset="100%" stopColor={brand.brand300} />
+                    </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+                <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip {...TOOLTIP_STYLE} content={<MonthlyVisitsTooltip />} />
+                <Bar dataKey="visits" name={t('visits')} fill="url(#acVisitsMonth)" radius={[6, 6, 0, 0]} barSize={28} />
+            </BarChart>
+        </ResponsiveContainer>
+    );
+};
 
 const MonthlyActivityTooltip = ({ active, payload, label }: ChartTooltipProps) => {
+    const t = useTranslations('AdminCommon.charts');
     if (!active || !payload?.length) return null;
     const row = payload[0].payload ?? {};
     const peak = row.peakHour;
@@ -251,85 +269,94 @@ const MonthlyActivityTooltip = ({ active, payload, label }: ChartTooltipProps) =
     return (
         <div style={{ ...TOOLTIP_STYLE.contentStyle, padding: '8px 12px' }}>
             <div style={TOOLTIP_STYLE.labelStyle}>{label}</div>
-            <div>Lượt truy cập: <strong>{row.visits ?? 0}</strong></div>
-            <div>Lượt thi: <strong>{row.tests ?? 0}</strong></div>
-            <div>Tỉ lệ hoàn thành: <strong>{row.rate ?? 0}%</strong></div>
+            <div>{t.rich('tooltipVisits', { value: row.visits ?? 0, strong: (chunks) => <strong>{chunks}</strong> })}</div>
+            <div>{t.rich('tooltipAttempts', { value: row.tests ?? 0, strong: (chunks) => <strong>{chunks}</strong> })}</div>
+            <div>{t.rich('tooltipCompletionRate', { value: row.rate ?? 0, strong: (chunks) => <strong>{chunks}</strong> })}</div>
             <div style={{ color: '#64748b', marginTop: 2 }}>
-                {hasPeak ? `Giờ cao điểm: ${String(peak).padStart(2, '0')}:00` : 'Chưa có truy cập'}
+                {hasPeak ? t('peakHour', { hour: String(peak).padStart(2, '0') }) : t('noVisits')}
             </div>
         </div>
     );
 };
 
-export const MonthlyActivityCombo = ({ data }: { data: MonthPerformance[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
-            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
-            <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
-            <YAxis
-                yAxisId="right"
-                orientation="right"
-                domain={[0, 100]}
-                axisLine={false}
-                tickLine={false}
-                tick={AXIS_TICK}
-                unit="%"
-            />
-            <Tooltip {...TOOLTIP_STYLE} content={<MonthlyActivityTooltip />} />
-            <Legend />
-            <Bar yAxisId="left" dataKey="visits" name="Lượt truy cập" fill={VIZ.muted} radius={[4, 4, 0, 0]} barSize={16} />
-            <Bar yAxisId="left" dataKey="tests" name="Lượt thi" fill={VIZ.primary} radius={[4, 4, 0, 0]} barSize={16} />
-            <Line
-                yAxisId="right"
-                type="monotone"
-                dataKey="rate"
-                name="Tỉ lệ hoàn thành (%)"
-                stroke={VIZ.accent}
-                strokeWidth={2.5}
-                dot={{ r: 3, fill: VIZ.accent }}
-                activeDot={{ r: 6 }}
-            />
-        </ComposedChart>
-    </ResponsiveContainer>
-);
+export const MonthlyActivityCombo = ({ data }: { data: MonthPerformance[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+                <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    domain={[0, 100]}
+                    axisLine={false}
+                    tickLine={false}
+                    tick={AXIS_TICK}
+                    unit="%"
+                />
+                <Tooltip {...TOOLTIP_STYLE} content={<MonthlyActivityTooltip />} />
+                <Legend />
+                <Bar yAxisId="left" dataKey="visits" name={t('visits')} fill={VIZ.muted} radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar yAxisId="left" dataKey="tests" name={t('attempts')} fill={VIZ.primary} radius={[4, 4, 0, 0]} barSize={16} />
+                <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="rate"
+                    name={t('completionRatePercent')}
+                    stroke={VIZ.accent}
+                    strokeWidth={2.5}
+                    dot={{ r: 3, fill: VIZ.accent }}
+                    activeDot={{ r: 6 }}
+                />
+            </ComposedChart>
+        </ResponsiveContainer>
+    );
+};
 
-export const SkillRadar = ({ data }: { data: NameValue[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={data} outerRadius="70%">
-            <PolarGrid stroke="rgba(201, 168, 75, 0.18)" />
-            <PolarAngleAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} />
-            <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
-            <Radar
-                name="Kỹ năng TB"
-                dataKey="value"
-                stroke={VIZ.primary}
-                strokeWidth={2}
-                fill={VIZ.primary}
-                fillOpacity={0.3}
-            />
-            <Tooltip {...TOOLTIP_STYLE} />
-        </RadarChart>
-    </ResponsiveContainer>
-);
+export const SkillRadar = ({ data }: { data: NameValue[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <RadarChart data={data} outerRadius="70%">
+                <PolarGrid stroke="rgba(201, 168, 75, 0.18)" />
+                <PolarAngleAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} />
+                <PolarRadiusAxis domain={[0, 100]} tick={false} axisLine={false} />
+                <Radar
+                    name={t('avgSkill')}
+                    dataKey="value"
+                    stroke={VIZ.primary}
+                    strokeWidth={2}
+                    fill={VIZ.primary}
+                    fillOpacity={0.3}
+                />
+                <Tooltip {...TOOLTIP_STYLE} />
+            </RadarChart>
+        </ResponsiveContainer>
+    );
+};
 
-export const UserGrowthBar = ({ data }: { data: DayTrafficDatum[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <defs>
-                <linearGradient id="acGrowth" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" />
-                    <stop offset="100%" stopColor="#34d399" />
-                </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
-            <XAxis dataKey="day" axisLine={false} tickLine={false} tick={AXIS_TICK} />
-            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} />
-            <Tooltip {...TOOLTIP_STYLE} />
-            <Bar dataKey="users" name="Người dùng" fill="url(#acGrowth)" radius={[6, 6, 0, 0]} barSize={32} />
-        </BarChart>
-    </ResponsiveContainer>
-);
+export const UserGrowthBar = ({ data }: { data: DayTrafficDatum[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                    <linearGradient id="acGrowth" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="100%" stopColor="#34d399" />
+                    </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+                <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} />
+                <Tooltip {...TOOLTIP_STYLE} />
+                <Bar dataKey="users" name={t('users')} fill="url(#acGrowth)" radius={[6, 6, 0, 0]} barSize={32} />
+            </BarChart>
+        </ResponsiveContainer>
+    );
+};
 
 export const SparkArea = ({
     data,
@@ -363,93 +390,105 @@ export const SparkBar = ({
     </ResponsiveContainer>
 );
 
-export const TrafficStackedBar = ({ data }: { data: DayTrafficDatum[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
-            <XAxis dataKey="day" axisLine={false} tickLine={false} tick={AXIS_TICK} dy={8} />
-            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
-            <Tooltip {...TOOLTIP_STYLE} />
-            <Legend />
-            <Bar dataKey="users" name="Đã đăng nhập" stackId="1" fill={VIZ.primary} radius={[0, 0, 0, 0]} barSize={26} />
-            <Bar dataKey="guests" name="Khách" stackId="1" fill="#10b981" radius={[4, 4, 0, 0]} barSize={26} />
-        </BarChart>
-    </ResponsiveContainer>
-);
+export const TrafficStackedBar = ({ data }: { data: DayTrafficDatum[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={AXIS_TICK} dy={8} />
+                <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip {...TOOLTIP_STYLE} />
+                <Legend />
+                <Bar dataKey="users" name={t('loggedIn')} stackId="1" fill={VIZ.primary} radius={[0, 0, 0, 0]} barSize={26} />
+                <Bar dataKey="guests" name={t('guests')} stackId="1" fill="#10b981" radius={[4, 4, 0, 0]} barSize={26} />
+            </BarChart>
+        </ResponsiveContainer>
+    );
+};
 
-export const TrafficAreaChart = ({ data }: { data: DayTrafficDatum[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
-            <defs>
-                <linearGradient id="acVisitUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={VIZ.primary} stopOpacity={0.35} />
-                    <stop offset="100%" stopColor={VIZ.primary} stopOpacity={0.02} />
-                </linearGradient>
-                <linearGradient id="acVisitGuests" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
-                </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
-            <XAxis dataKey="day" axisLine={false} tickLine={false} tick={AXIS_TICK} dy={8} />
-            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
-            <Tooltip {...TOOLTIP_STYLE} />
-            <Legend />
-            <Area
-                type="monotone"
-                dataKey="users"
-                name="Đã đăng nhập"
-                stackId="1"
-                stroke={VIZ.primary}
-                strokeWidth={2}
-                fill="url(#acVisitUsers)"
-            />
-            <Area
-                type="monotone"
-                dataKey="guests"
-                name="Khách"
-                stackId="1"
-                stroke="#10b981"
-                strokeWidth={2}
-                fill="url(#acVisitGuests)"
-            />
-        </AreaChart>
-    </ResponsiveContainer>
-);
+export const TrafficAreaChart = ({ data }: { data: DayTrafficDatum[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
+                <defs>
+                    <linearGradient id="acVisitUsers" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={VIZ.primary} stopOpacity={0.35} />
+                        <stop offset="100%" stopColor={VIZ.primary} stopOpacity={0.02} />
+                    </linearGradient>
+                    <linearGradient id="acVisitGuests" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" stopOpacity={0.35} />
+                        <stop offset="100%" stopColor="#10b981" stopOpacity={0.02} />
+                    </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={AXIS_TICK} dy={8} />
+                <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip {...TOOLTIP_STYLE} />
+                <Legend />
+                <Area
+                    type="monotone"
+                    dataKey="users"
+                    name={t('loggedIn')}
+                    stackId="1"
+                    stroke={VIZ.primary}
+                    strokeWidth={2}
+                    fill="url(#acVisitUsers)"
+                />
+                <Area
+                    type="monotone"
+                    dataKey="guests"
+                    name={t('guests')}
+                    stackId="1"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    fill="url(#acVisitGuests)"
+                />
+            </AreaChart>
+        </ResponsiveContainer>
+    );
+};
 
-export const TrafficHourBar = ({ data }: { data: HourDatum[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <defs>
-                <linearGradient id="acVisitHour" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#6366f1" />
-                    <stop offset="100%" stopColor="#a5b4fc" />
-                </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
-            <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ ...AXIS_TICK, fontSize: 10 }} interval={2} />
-            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
-            <Tooltip {...TOOLTIP_STYLE} />
-            <Bar dataKey="visits" name="Lượt truy cập" fill="url(#acVisitHour)" radius={[4, 4, 0, 0]} />
-        </BarChart>
-    </ResponsiveContainer>
-);
+export const TrafficHourBar = ({ data }: { data: HourDatum[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                    <linearGradient id="acVisitHour" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#6366f1" />
+                        <stop offset="100%" stopColor="#a5b4fc" />
+                    </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+                <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{ ...AXIS_TICK, fontSize: 10 }} interval={2} />
+                <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
+                <Tooltip {...TOOLTIP_STYLE} />
+                <Bar dataKey="visits" name={t('visits')} fill="url(#acVisitHour)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+        </ResponsiveContainer>
+    );
+};
 
-export const ScoreDistributionBar = ({ data }: { data: ScoreRangeDatum[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <defs>
-                <linearGradient id="acScore" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#10b981" />
-                    <stop offset="50%" stopColor={VIZ.accent} />
-                    <stop offset="100%" stopColor="#ef4444" />
-                </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
-            <XAxis dataKey="range" axisLine={false} tickLine={false} tick={AXIS_TICK} />
-            <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} />
-            <Tooltip {...TOOLTIP_STYLE} />
-            <Bar dataKey="count" name="Học viên" fill="url(#acScore)" radius={[6, 6, 0, 0]} barSize={48} />
-        </BarChart>
-    </ResponsiveContainer>
-);
+export const ScoreDistributionBar = ({ data }: { data: ScoreRangeDatum[] }) => {
+    const t = useTranslations('AdminCommon.charts');
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+                <defs>
+                    <linearGradient id="acScore" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="50%" stopColor={VIZ.accent} />
+                        <stop offset="100%" stopColor="#ef4444" />
+                    </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
+                <XAxis dataKey="range" axisLine={false} tickLine={false} tick={AXIS_TICK} />
+                <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} />
+                <Tooltip {...TOOLTIP_STYLE} />
+                <Bar dataKey="count" name={t('students')} fill="url(#acScore)" radius={[6, 6, 0, 0]} barSize={48} />
+            </BarChart>
+        </ResponsiveContainer>
+    );
+};

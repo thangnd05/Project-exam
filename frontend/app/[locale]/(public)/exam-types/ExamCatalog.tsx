@@ -1,7 +1,8 @@
 'use client';
 import {useMemo, useState} from 'react';
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import {useQuery} from '@tanstack/react-query';
+import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 import {Container} from 'react-bootstrap';
 import {FiArrowRight} from 'react-icons/fi';
@@ -12,21 +13,21 @@ import {buildExamTypeDetailPath} from '@/app/configs/Routes';
 import {examTypeKeys} from '@/app/configs/queryKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import type {QuickChallengeCardResponse} from '@/app/types/test';
-import QuickTestConfirmModal from '@/app/(public)/_components/HeroSection/QuickTestConfirmModal';
-import {useQuickChallengeTests} from '@/app/(public)/_components/HeroSection/hooks/useQuickChallengeTests';
-import {useQuickTestLauncher} from '@/app/(public)/_components/HeroSection/hooks/useQuickTestLauncher';
+import QuickTestConfirmModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestConfirmModal';
+import {useQuickChallengeTests} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickChallengeTests';
+import {useQuickTestLauncher} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickTestLauncher';
 import {
   LEVELS,
   VENDORS,
   badgeUrl,
-  formatFullSpec,
   parseCode,
   parseLevel,
   parseVendor,
+  useFormatFullSpec,
   type Level,
   type Vendor,
-} from '@/app/(public)/_lib/certificationMeta';
-import ExamBadge from '@/app/(public)/_components/ExamBadge/ExamBadge';
+} from '@/app/[locale]/(public)/_lib/certificationMeta';
+import ExamBadge from '@/app/[locale]/(public)/_components/ExamBadge/ExamBadge';
 import styles from './ExamCatalog.module.scss';
 
 const cx = classNames.bind(styles);
@@ -85,13 +86,16 @@ const vendorTag = ({vendor, exam}: CatalogExam) => {
   return /oracle/i.test(exam.name ?? '') ? {label: 'Oracle', tone: 'oracle'} : {label: 'Linux', tone: 'linux'};
 };
 
-const formatQuick = (test?: QuickChallengeCardResponse) => {
-  if (!test) return 'Chưa có';
-  const minutes = test.durationMinutes ? ` / ${test.durationMinutes}p` : '';
-  return `${test.totalQuestions} câu${minutes}`;
-};
-
 function ExamCatalog() {
+  const t = useTranslations('ExamTypes');
+  const formatFullSpec = useFormatFullSpec();
+
+  const formatQuick = (test?: QuickChallengeCardResponse) => {
+    if (!test) return t('spec.none');
+    const minutes = test.durationMinutes ? ` / ${t('spec.minutes', {count: test.durationMinutes})}` : '';
+    return `${t('spec.questions', {count: test.totalQuestions})}${minutes}`;
+  };
+
   const {data: exams = [], isLoading, isError} = useQuery({
     queryKey: examTypeKeys.standard,
     queryFn: getStandardExamTypes,
@@ -149,8 +153,8 @@ function ExamCatalog() {
       return (
         <div className={cx('empty-state')}>
           <IoAlertCircleOutline className={cx('icon')} />
-          <h4>Không tải được danh sách kỳ thi</h4>
-          <p>Thử tải lại trang.</p>
+          <h4>{t('catalog.loadError.title')}</h4>
+          <p>{t('catalog.loadError.hint')}</p>
         </div>
       );
     }
@@ -159,8 +163,8 @@ function ExamCatalog() {
       return (
         <div className={cx('empty-state')}>
           <IoDocumentTextOutline className={cx('icon')} />
-          <h4>Chưa có kỳ thi để hiển thị</h4>
-          <p>Vui lòng quay lại sau.</p>
+          <h4>{t('catalog.empty.title')}</h4>
+          <p>{t('catalog.empty.hint')}</p>
         </div>
       );
     }
@@ -169,9 +173,9 @@ function ExamCatalog() {
       return (
         <div className={cx('empty-state')}>
           <IoSearchOutline className={cx('icon')} />
-          <h4>Không có chứng chỉ nào khớp bộ lọc</h4>
+          <h4>{t('catalog.noMatch')}</h4>
           <button type="button" className={cx('textBtn')} onClick={resetFilters}>
-            Đặt lại bộ lọc
+            {t('catalog.resetFilters')}
           </button>
         </div>
       );
@@ -221,12 +225,12 @@ function ExamCatalog() {
                   className={cx('btnPrimary')}
                   onClick={() => requestStart(quick ?? null)}
                   disabled={!quick}
-                  title={quick ? undefined : 'Kỳ thi này chưa có đề kiểm tra nhanh'}
+                  title={quick ? undefined : t('noQuick')}
                 >
-                  Thi nhanh
+                  {t('quickStart')}
                 </button>
-                <Link href={href} className={cx('btnSecondary')} title={`Xem các đề Full Mock của ${code || title}`}>
-                  Đề Full Mock
+                <Link href={href} className={cx('btnSecondary')} title={t('catalog.viewFullMock', {name: code || title})}>
+                  {t('fullMock')}
                   <FiArrowRight aria-hidden="true" />
                 </Link>
               </div>
@@ -240,39 +244,42 @@ function ExamCatalog() {
   return (
     <div className={cx('wrapper')}>
       <Container>
-        <h1 className="visually-hidden">Kho đề thi</h1>
+        <h1 className="visually-hidden">{t('catalog.title')}</h1>
 
         <div className={cx('controls')}>
           <div className={cx('searchRow')}>
             <label className={cx('search')}>
               <IoSearchOutline className={cx('searchIcon')} aria-hidden="true" />
-              <span className="visually-hidden">Tìm kỳ thi</span>
+              <span className="visually-hidden">{t('catalog.searchLabel')}</span>
               <input
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Tìm theo mã kỳ thi (SAA-C03, AZ-104...) hoặc tên chứng chỉ..."
+                placeholder={t('catalog.searchPlaceholder')}
               />
             </label>
             <div className={cx('counter')}>
               <span>
-                Hiển thị: <strong>{visible.length}</strong> chứng chỉ
+                {t.rich('catalog.showing', {
+                  count: visible.length,
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
               </span>
               <button type="button" className={cx('textBtn')} onClick={resetFilters}>
-                Đặt lại bộ lọc
+                {t('catalog.resetFilters')}
               </button>
             </div>
           </div>
 
-          <div className={cx('filterRow')} role="group" aria-label="Lọc theo hãng">
-            <span className={cx('filterLabel')}>Hãng:</span>
+          <div className={cx('filterRow')} role="group" aria-label={t('catalog.vendorFilter')}>
+            <span className={cx('filterLabel')}>{t('catalog.vendorLabel')}</span>
             <button
               type="button"
               className={cx('vendorTab', {active: vendor === 'all'})}
               aria-pressed={vendor === 'all'}
               onClick={() => setVendor('all')}
             >
-              Tất cả ({exams.length})
+              {t('catalog.allCount', {count: exams.length})}
             </button>
             {vendorTabs.map((v) => (
               <button
@@ -288,9 +295,9 @@ function ExamCatalog() {
             ))}
           </div>
 
-          <div className={cx('filterRow')} role="group" aria-label="Lọc theo cấp độ">
-            <span className={cx('filterLabel')}>Cấp độ:</span>
-            {[{id: 'all' as const, label: 'Tất cả'}, ...LEVELS].map((l) => (
+          <div className={cx('filterRow')} role="group" aria-label={t('catalog.levelFilter')}>
+            <span className={cx('filterLabel')}>{t('catalog.levelLabel')}</span>
+            {[{id: 'all' as const, label: t('catalog.all')}, ...LEVELS].map((l) => (
               <button
                 key={l.id}
                 type="button"

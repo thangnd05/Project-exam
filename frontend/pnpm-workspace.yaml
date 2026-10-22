@@ -4,6 +4,8 @@ overrides:
 
 allowBuilds:
   '@parcel/watcher': true
+  # next-intl chỉ dùng @swc/core cho tính năng tự trích message (không dùng); binary đã có sẵn qua optionalDependencies
+  '@swc/core': false
   esbuild: true
   # resolver native của eslint-import-resolver-typescript (kéo theo eslint-config-next)
   unrs-resolver: true

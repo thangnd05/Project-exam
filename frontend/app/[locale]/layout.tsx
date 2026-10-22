@@ -1,11 +1,16 @@
 import { Inter, Playfair_Display } from 'next/font/google';
-import Script from 'next/script';
+import { notFound } from 'next/navigation';
+import { hasLocale, NextIntlClientProvider } from 'next-intl';
+import { getTranslations, setRequestLocale } from 'next-intl/server';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-toastify/dist/ReactToastify.css';
 import '@/app/assets/styles/GlobalStyles/GlobalStyles.scss';
 import '@/app/assets/styles/global-overrides.scss';
-import Providers from './providers';
-import { DEFAULT_PALETTE, PALETTE_STORAGE_KEY, PALETTES, THEME_STORAGE_KEY } from '@/app/constants/theme';
+import Providers from '@/app/providers';
+import ThemeInitScript from '@/app/components/layouts/ThemeInitScript';
+import { routing } from '@/app/i18n/routing';
+import { OG_LOCALES } from '@/app/i18n/metadata';
+import { DEFAULT_PALETTE } from '@/app/constants/theme';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -22,43 +27,52 @@ const playfair = Playfair_Display({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 const SITE_NAME = 'WinDe Exam';
-const DESCRIPTION =
-  'Nền tảng luyện thi & thi thử chứng chỉ trực tuyến: đề bám sát format thật, ' +
-  'chấm điểm tự động, chẩn đoán điểm yếu và lộ trình học cá nhân hoá.';
-const TITLE = `${SITE_NAME} - Luyện thi & thi thử chứng chỉ trực tuyến`;
 
-export const metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: TITLE,
-    template: `%s | ${SITE_NAME}`,
-  },
-  description: DESCRIPTION,
-  applicationName: SITE_NAME,
-  manifest: '/site.webmanifest',
-  icons: {
-    icon: [
-      { url: '/favicons/frostscope-32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicons/frostscope-192.png', sizes: '192x192', type: 'image/png' },
-    ],
-    apple: { url: '/favicons/frostscope-180.png', sizes: '180x180', type: 'image/png' },
-  },
-  openGraph: {
-    type: 'website',
-    siteName: SITE_NAME,
-    locale: 'vi_VN',
-    url: SITE_URL,
-    title: TITLE,
-    description: DESCRIPTION,
-    images: [{ url: '/favicons/frostscope-512.png', width: 512, height: 512, alt: SITE_NAME }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: TITLE,
-    description: DESCRIPTION,
-    images: ['/favicons/frostscope-512.png'],
-  },
-};
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({ params }: LayoutProps<'/[locale]'>) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return {};
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
+  const title = t('title', { siteName: SITE_NAME });
+  const description = t('description');
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: title,
+      template: `%s | ${SITE_NAME}`,
+    },
+    description,
+    applicationName: SITE_NAME,
+    manifest: '/site.webmanifest',
+    icons: {
+      icon: [
+        { url: '/favicons/frostscope-32.png', sizes: '32x32', type: 'image/png' },
+        { url: '/favicons/frostscope-192.png', sizes: '192x192', type: 'image/png' },
+      ],
+      apple: { url: '/favicons/frostscope-180.png', sizes: '180x180', type: 'image/png' },
+    },
+    openGraph: {
+      type: 'website',
+      siteName: SITE_NAME,
+      locale: OG_LOCALES[locale],
+      alternateLocale: routing.locales.filter((l) => l !== locale).map((l) => OG_LOCALES[l]),
+      url: locale === routing.defaultLocale ? SITE_URL : `${SITE_URL}/${locale}`,
+      title,
+      description,
+      images: [{ url: '/favicons/frostscope-512.png', width: 512, height: 512, alt: SITE_NAME }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ['/favicons/frostscope-512.png'],
+    },
+  };
+}
 
 export const viewport = {
   width: 'device-width',
@@ -66,26 +80,30 @@ export const viewport = {
   themeColor: '#101820',
 };
 
-// Áp theme sáng/tối và bảng màu đã lưu trước khi vẽ trang để không nháy màu mặc định.
-const THEME_INIT_SCRIPT = `(function(){try{var d=document.documentElement;if(localStorage.getItem(${JSON.stringify(THEME_STORAGE_KEY)})==='dark'){d.setAttribute('data-theme','dark');d.setAttribute('data-bs-theme','dark')}var p=localStorage.getItem(${JSON.stringify(PALETTE_STORAGE_KEY)});if(${JSON.stringify(PALETTES)}.indexOf(p)>-1){d.setAttribute('data-palette',p)}}catch(e){}})();`;
+// Layout gốc thật nằm ở đây (không phải app/layout.tsx) để <html lang> đổi theo ngôn ngữ của URL.
+export default async function LocaleLayout({ children, params }: LayoutProps<'/[locale]'>) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  // Cho next-intl biết ngôn ngữ từ params thay vì đọc header, nhờ vậy trang vẫn render tĩnh được.
+  setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'Metadata' });
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
-      lang="vi"
+      lang={locale}
       className={`${inter.variable} ${playfair.variable}`}
       data-palette={DEFAULT_PALETTE}
       suppressHydrationWarning
     >
       <head>
-        <Script id="theme-init" strategy="beforeInteractive">
-          {THEME_INIT_SCRIPT}
-        </Script>
+        <ThemeInitScript />
       </head>
       <body>
-        <noscript>Bạn cần bật JavaScript để dùng ứng dụng này.</noscript>
+        <noscript>{t('noscript')}</noscript>
         <div id="root">
-          <Providers>{children}</Providers>
+          <NextIntlClientProvider>
+            <Providers>{children}</Providers>
+          </NextIntlClientProvider>
         </div>
       </body>
     </html>

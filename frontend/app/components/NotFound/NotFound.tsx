@@ -1,12 +1,14 @@
 'use client';
 
 import classNames from "classnames/bind";
+import { useTranslations } from "next-intl";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";
 import styles from "./NotFound.module.scss";
 
 const cx = classNames.bind(styles);
 
 export default function NotFound() {
+    const t = useTranslations("Common.notFound");
     return (
         <div className={cx("wrapper")}>
             <div className={cx("card")}>
@@ -72,14 +74,14 @@ export default function NotFound() {
 
                 <h1 className={cx("code")}>404</h1>
 
-                <h2 className={cx("title")}>Ơ, trang này đi đâu mất rồi?</h2>
+                <h2 className={cx("title")}>{t("title")}</h2>
 
                 <p className={cx("desc")}>
-                    Đường dẫn bạn truy cập không tồn tại hoặc đã bị xóa. Hãy giúp mình click vào nút bên dưới
+                    {t("description")}
                 </p>
 
                 <ButtonPrime as="link" href="/" variant="primary" size="lg">
-                    Quay về trang chủ
+                    {t("backHome")}
                 </ButtonPrime>
             </div>
         </div>

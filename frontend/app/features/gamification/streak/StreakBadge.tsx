@@ -2,6 +2,7 @@
 
 import { useId, useState } from 'react';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import style from '@/app/features/gamification/streak/StreakBadge.module.scss';
 import { useStreak } from '@/app/features/gamification/streak/hooks/useStreak';
 import StreakRestoreModal from '@/app/features/gamification/streak/StreakRestoreModal';
@@ -29,6 +30,7 @@ type StreakBadgeProps = {
 function StreakBadge({ className, variant = 'default' }: StreakBadgeProps) {
   const { currentStreak, lostStreak, canRecover } = useStreak();
   const [showRestore, setShowRestore] = useState(false);
+  const t = useTranslations('Gamification.streak');
 
   const active = currentStreak > 0;
   const recoverable = canRecover && lostStreak > 0;
@@ -37,17 +39,17 @@ function StreakBadge({ className, variant = 'default' }: StreakBadgeProps) {
   const tooltipId = useId();
   const tooltip = recoverable
     ? {
-        heading: `Đã đứt chuỗi ${lostStreak} ngày`,
-        body: 'Bấm vào huy hiệu để khôi phục chuỗi trước khi hết hạn.',
+        heading: t('lostHeading', { count: lostStreak }),
+        body: t('lostBody'),
       }
     : active
       ? {
-          heading: `Chuỗi ${currentStreak} ngày liên tiếp`,
-          body: 'Chuỗi tăng mỗi ngày bạn làm bài hoặc học một nhiệm vụ trong lộ trình. Bỏ một ngày là chuỗi về 0.',
+          heading: t('activeHeading', { count: currentStreak }),
+          body: t('activeBody'),
         }
       : {
-          heading: 'Chưa có chuỗi ngày học',
-          body: 'Làm một bài hoặc học một nhiệm vụ trong lộ trình hôm nay để bắt đầu chuỗi.',
+          heading: t('emptyHeading'),
+          body: t('emptyBody'),
         };
 
   return (
@@ -75,7 +77,7 @@ function StreakBadge({ className, variant = 'default' }: StreakBadgeProps) {
       >
         <FlameIcon className={cx('icon')} />
         <span className={cx('count')}>{display}</span>
-        <span className={cx('label')}>ngày liên tiếp</span>
+        <span className={cx('label')}>{t('label')}</span>
       </div>
       <span id={tooltipId} role="tooltip" className={cx('tooltip', { activeTip: active || recoverable })}>
         <span className={cx('tooltipHeading')}>{tooltip.heading}</span>

@@ -1,8 +1,9 @@
 'use client';
 
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Alert } from "react-bootstrap";
 import { useJoinClass } from '@/app/features/classes/hooks/useMyClasses';
 import classNames from "classnames/bind";
@@ -21,6 +22,8 @@ type JoinClassModalProps = {
 };
 
 function JoinClassModal({ show, onClose }: JoinClassModalProps) {
+    const t = useTranslations("Classes");
+    const tCommon = useTranslations("Common");
     const [code, setCode] = useState("");
 
     const [message, setMessage] = useState("");
@@ -36,7 +39,7 @@ function JoinClassModal({ show, onClose }: JoinClassModalProps) {
 
         if (!user) {
             setType("warning");
-            setMessage(" Bạn cần đăng nhập trước khi tham gia lớp!");
+            setMessage(t("joinClass.loginRequired"));
 
             setTimeout(() => {
                 onClose();
@@ -48,7 +51,7 @@ function JoinClassModal({ show, onClose }: JoinClassModalProps) {
 
         if (!code.trim()) {
             setType("danger");
-            setMessage("Vui lòng nhập mã classQr!");
+            setMessage(t("joinClass.codeRequired"));
             return;
         }
 
@@ -57,7 +60,7 @@ function JoinClassModal({ show, onClose }: JoinClassModalProps) {
             {
                 onSuccess: () => {
                     setType("success");
-                    setMessage(" Gửi yêu cầu tham gia lớp thành công!");
+                    setMessage(t("joinClass.success"));
 
                     setTimeout(() => {
                         setCode("");
@@ -69,7 +72,7 @@ function JoinClassModal({ show, onClose }: JoinClassModalProps) {
                     setType("danger");
                     setMessage(
                         err.response?.data?.message ||
-                        " Không có lớp nào với mã tham gia này!"
+                        t("joinClass.notFound")
                     );
                 },
             }
@@ -80,12 +83,12 @@ function JoinClassModal({ show, onClose }: JoinClassModalProps) {
         <CommonFormModal
             show={show}
             onHide={onClose}
-            title="Tham gia lớp học"
+            title={t("joinClass.title")}
             footer={(
                 <ModalActionFooter
-                    cancelLabel="Để sau"
-                    submitLabel="Tham gia ngay"
-                    loadingLabel="Đang xử lý..."
+                    cancelLabel={t("common.later")}
+                    submitLabel={t("joinClass.submit")}
+                    loadingLabel={tCommon("processing")}
                     loading={loading}
                     onCancel={onClose}
                     onSubmit={handleJoin}
@@ -103,7 +106,7 @@ function JoinClassModal({ show, onClose }: JoinClassModalProps) {
             )}
 
             <div className={cx("formGroup")}>
-                <label className={cx("label")}>Mã classQr</label>
+                <label className={cx("label")}>{t("joinClass.codeLabel")}</label>
 
                 <div className={cx("inputWrapper")}>
                     <span className={cx("inputIcon")}>
@@ -113,7 +116,7 @@ function JoinClassModal({ show, onClose }: JoinClassModalProps) {
                     <input
                         type="text"
                         className={cx("inputControl")}
-                        placeholder="Ví dụ: AB12CD34"
+                        placeholder={t("joinClass.codePlaceholder")}
                         value={code}
                         onChange={(e) => setCode(e.target.value)}
                         disabled={loading}
@@ -122,7 +125,7 @@ function JoinClassModal({ show, onClose }: JoinClassModalProps) {
 
                 <div className={cx("tip")}>
                     <FaInfoCircle />
-                    <span>Liên hệ giáo viên để lấy mã classQr chính xác.</span>
+                    <span>{t("joinClass.codeTip")}</span>
                 </div>
             </div>
         </CommonFormModal>

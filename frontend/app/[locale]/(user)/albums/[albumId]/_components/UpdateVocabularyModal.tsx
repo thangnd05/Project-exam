@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { IoText, IoLanguage } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -8,7 +9,7 @@ import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
 import type { VocabularyResponse } from '@/app/types';
-import { useUpdateVocabulary } from '@/app/(user)/albums/[albumId]/_hooks/useAlbumVocabularies';
+import { useUpdateVocabulary } from '@/app/[locale]/(user)/albums/[albumId]/_hooks/useAlbumVocabularies';
 
 const cx = classNames.bind(styles);
 
@@ -20,6 +21,8 @@ type UpdateVocabularyModalProps = {
 };
 
 const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabularyModalProps) => {
+    const t = useTranslations('Vocabulary');
+    const tCommon = useTranslations('Common');
     const [editVocab, setEditVocab] = useState({
         word: '',
         meaning: '',
@@ -42,13 +45,13 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabu
 
     const updateMutation = useUpdateVocabulary({
         onSuccess: () => {
-            toast.success(' Cập nhật từ vựng thành công!');
+            toast.success(t('vocabForm.toast.updated'));
             onSuccess();
             onClose();
         },
         onError: (err) => {
             console.error(' Lỗi khi cập nhật từ:', err);
-            toast.error('Có lỗi xảy ra khi cập nhật từ vựng!');
+            toast.error(t('vocabForm.toast.updateError'));
         },
     });
     const loading = updateMutation.isPending;
@@ -60,7 +63,7 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabu
 
     const handleUpdate = (e?: React.SyntheticEvent) => {
         if (!editVocab.word.trim() || !editVocab.meaning.trim()) {
-            toast.warning(' Vui lòng điền đầy đủ từ vựng và nghĩa!');
+            toast.warning(t('vocabForm.toast.required'));
             return;
         }
 
@@ -75,12 +78,12 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabu
         <CommonFormModal
             show={show}
             onHide={onClose}
-            title="Chỉnh Sửa Từ Vựng"
+            title={t('vocabForm.editTitle')}
             footer={(
                 <ModalActionFooter
-                    cancelLabel="Hủy bỏ"
-                    submitLabel="Lưu thay đổi"
-                    loadingLabel="Đang lưu..."
+                    cancelLabel={tCommon('cancel')}
+                    submitLabel={t('vocabForm.saveChanges')}
+                    loadingLabel={t('saving')}
                     loading={loading}
                     onCancel={onClose}
                     onSubmit={handleUpdate}
@@ -88,7 +91,7 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabu
             )}
         >
             <div className={cx('formGroup')}>
-                <label className={cx('label')}>Từ vựng (Tiếng Anh)</label>
+                <label className={cx('label')}>{t('vocabForm.word')}</label>
                 <div className={cx('inputWrapper')}>
                     <span className={cx('inputIcon')}>
                         <IoText />
@@ -97,7 +100,7 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabu
                         type="text"
                         name="word"
                         className={cx('inputControl')}
-                        placeholder="Ví dụ: Excellence, Innovation..."
+                        placeholder={t('vocabForm.wordPlaceholder')}
                         value={editVocab.word}
                         onChange={handleChange}
                         disabled={loading}
@@ -107,7 +110,7 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabu
             </div>
 
             <div className={cx('formGroup')}>
-                <label className={cx('label')}>Nghĩa (Tiếng Việt)</label>
+                <label className={cx('label')}>{t('vocabForm.meaning')}</label>
                 <div className={cx('inputWrapper')}>
                     <span className={cx('inputIcon')}>
                         <IoLanguage />
@@ -116,7 +119,7 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabu
                         type="text"
                         name="meaning"
                         className={cx('inputControl')}
-                        placeholder="Ví dụ: Sự xuất sắc, Đổi mới..."
+                        placeholder={t('vocabForm.meaningPlaceholder')}
                         value={editVocab.meaning}
                         onChange={handleChange}
                         disabled={loading}
@@ -125,12 +128,12 @@ const UpdateVocabularyModal = ({ show, onClose, onSuccess, vocab }: UpdateVocabu
             </div>
 
             <div className={cx('formGroup')}>
-                <label className={cx('label')}>Ví dụ minh họa</label>
+                <label className={cx('label')}>{t('vocabForm.example')}</label>
                 <div className={cx('inputWrapper')}>
                     <textarea
                         name="example"
                         className={cx('inputControl', 'textarea')}
-                        placeholder="Nhập ví dụ giúp bạn ghi nhớ từ vựng này..."
+                        placeholder={t('vocabForm.examplePlaceholder')}
                         value={editVocab.example}
                         onChange={handleChange}
                         disabled={loading}

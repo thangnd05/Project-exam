@@ -8,7 +8,7 @@ import type {
   QuestionIndexMap,
 } from '@/app/features/exam-layout/examLayoutTypes';
 import type { LayoutConfig } from '@/app/features/exam-layout/layoutSchema';
-import { isListeningStep, passageHasAudio } from '@/app/(guest-exam)/tests/[testId]/start/_lib/passageUtils';
+import { isListeningStep, passageHasAudio } from '@/app/[locale]/(guest-exam)/tests/[testId]/start/_lib/passageUtils';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
 type UseExamFlowNavigationParams = {

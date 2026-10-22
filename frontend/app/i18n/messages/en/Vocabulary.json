@@ -1,0 +1,148 @@
+{
+  "saving": "Saving...",
+  "myAlbums": {
+    "loading": "Preparing your vocabulary collection...",
+    "title": "FLASHCARDS",
+    "label": "ALBUM MANAGEMENT",
+    "createAction": "Create new album",
+    "gridView": "Grid view",
+    "listView": "List view",
+    "emptyTitle": "No albums yet",
+    "emptyDescription": "Create your first album to save interesting words!",
+    "createNow": "Create an album now",
+    "wordUnit": "{count, plural, one {word} other {words}}",
+    "mastered": "Mastered <strong>{count}</strong> {count, plural, one {word} other {words}}",
+    "continue": "Continue studying",
+    "start": "Start studying",
+    "deleteTitle": "Delete album",
+    "deleteMessage": "Are you sure you want to delete the album \"{name}\"? All words in the album will be affected.",
+    "toast": {
+      "deleted": "Album deleted successfully!",
+      "deleteError": "Something went wrong while deleting the album!"
+    }
+  },
+  "albumTable": {
+    "name": "Album name",
+    "description": "Description",
+    "actions": "Actions",
+    "study": "Study now",
+    "edit": "Edit album",
+    "delete": "Delete album"
+  },
+  "albumForm": {
+    "createTitle": "Create new album",
+    "editTitle": "Edit album",
+    "later": "Later",
+    "createSubmit": "Create album",
+    "creating": "Creating...",
+    "saveChanges": "Save changes",
+    "name": "Album name",
+    "namePlaceholder": "e.g. AWS terms, Networking...",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the goal of this album...",
+    "descriptionTip": "A description helps you remember what this album is for.",
+    "toast": {
+      "nameRequired": "Please enter an album name!",
+      "created": "Album created successfully!",
+      "createError": "Something went wrong while creating the album!",
+      "updated": "Album updated successfully!",
+      "updateError": "Something went wrong while updating the album!"
+    }
+  },
+  "albumDetail": {
+    "loadError": "Couldn’t load the word list",
+    "loading": "Sharpening your knowledge...",
+    "flashcardTitle": "Study with flashcards",
+    "listTitle": "Word list",
+    "label": "VOCABULARY MANAGEMENT",
+    "addWord": "Add word",
+    "importJson": "Import JSON",
+    "backToAlbum": "Back to album",
+    "practice": "Practice",
+    "listMode": "List mode",
+    "flashcardMode": "Flashcard mode",
+    "table": {
+      "index": "#",
+      "word": "Word",
+      "meaning": "Meaning",
+      "example": "Example",
+      "pronunciation": "Pronunciation",
+      "actions": "Actions"
+    },
+    "editWord": "Edit word",
+    "deleteWord": "Delete word",
+    "empty": "This album is empty",
+    "deleteTitle": "Delete word",
+    "deleteMessage": "Are you sure you want to remove \"{word}\" from this album?",
+    "toast": {
+      "deleted": "Deleted \"{word}\" successfully!",
+      "deleteError": "Couldn’t delete this word. Please try again!"
+    }
+  },
+  "vocabForm": {
+    "createTitle": "Add new word",
+    "editTitle": "Edit word",
+    "createSubmit": "Save word",
+    "saveChanges": "Save changes",
+    "word": "Word (English)",
+    "wordPlaceholder": "e.g. Excellence, Innovation...",
+    "meaning": "Meaning (Vietnamese)",
+    "meaningPlaceholder": "e.g. Sự xuất sắc, Đổi mới...",
+    "example": "Example sentence",
+    "examplePlaceholder": "Enter an example to help you remember this word...",
+    "toast": {
+      "required": "Please fill in both the word and its meaning!",
+      "created": "Word added successfully!",
+      "createError": "Something went wrong while adding the word!",
+      "updated": "Word updated successfully!",
+      "updateError": "Something went wrong while updating the word!"
+    }
+  },
+  "bulkImport": {
+    "title": "Bulk import words (JSON)",
+    "submit": "Start import",
+    "jsonData": "JSON data",
+    "standardize": "Normalize with AI",
+    "showSample": "Show JSON sample",
+    "placeholder": "Paste a JSON array here: {sample}",
+    "hint": "* Make sure the JSON is an array of objects with the fields: <strong>word</strong>, <strong>meaning</strong>, <strong>example</strong> (optional).",
+    "toast": {
+      "rawTextRequired": "Please enter raw text to normalize!",
+      "standardized": "Data normalized successfully!",
+      "invalidAiData": "The AI returned invalid data. Please try again!",
+      "aiUnavailable": "Couldn’t connect to the AI. Please try again!",
+      "jsonRequired": "Please enter JSON data!",
+      "notArray": "The data must be an array of word objects!",
+      "emptyArray": "The word array must not be empty!",
+      "invalidJson": "Invalid JSON format. Please check it again!",
+      "imported": "Imported {count, plural, one {# word} other {# words}} successfully!",
+      "importError": "Something went wrong while importing. Please check the JSON structure!"
+    }
+  },
+  "practice": {
+    "markedKnown": "You marked this word as known!",
+    "markError": "Something went wrong while marking this word!",
+    "loading": "Loading question...",
+    "finishedTitle": "Congratulations!",
+    "finishedSubtitle": "You’ve completed every word in this album!",
+    "backToAlbum": "Back to album",
+    "noQuestion": "No questions available",
+    "back": "Back",
+    "multiChoice": "Choose the answer",
+    "typeWord": "Type the word",
+    "englishWord": "English word",
+    "englishPlaceholder": "Type the English word...",
+    "vietnameseMeaning": "Vietnamese meaning",
+    "vietnamesePlaceholder": "Type the Vietnamese meaning...",
+    "correct": "Correct!",
+    "incorrect": "Not quite!",
+    "correctWord": "Correct word:",
+    "meaning": "Meaning:",
+    "status": "Status",
+    "correctCount": "Times correct",
+    "checking": "Checking...",
+    "check": "Check answer",
+    "next": "Next question",
+    "known": "I know this word"
+  }
+}

@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { forwardRef } from 'react';
+import { useTranslations } from 'next-intl';
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, Ref } from 'react';
 import classNames from 'classnames/bind';
 import styles from './Button.module.scss';
@@ -40,6 +41,7 @@ const ButtonPrime = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPrim
   },
   ref,
 ) {
+  const tCommon = useTranslations('Common');
   const classes = cx(
     'button',
     variant,
@@ -60,7 +62,7 @@ const ButtonPrime = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPrim
         aria-disabled={disabled || loading}
         {...linkRest}
       >
-        {loading ? 'Đang xử lý...' : children}
+        {loading ? tCommon('processing') : children}
       </Link>
     );
   }
@@ -68,7 +70,7 @@ const ButtonPrime = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPrim
   if (as === 'a') {
     return (
       <a ref={ref as Ref<HTMLAnchorElement>} className={classes} aria-disabled={disabled || loading} {...rest}>
-        {loading ? 'Đang xử lý...' : children}
+        {loading ? tCommon('processing') : children}
       </a>
     );
   }
@@ -82,7 +84,7 @@ const ButtonPrime = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPrim
       aria-busy={loading}
       {...rest}
     >
-      {loading ? 'Đang xử lý...' : children}
+      {loading ? tCommon('processing') : children}
     </button>
   );
 });

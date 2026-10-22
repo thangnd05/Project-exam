@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useMemo, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { Alert, Spinner } from 'react-bootstrap';
 import { IoClipboardOutline, IoLockClosedOutline, IoSchoolOutline, IoStatsChartOutline } from 'react-icons/io5';
@@ -33,39 +34,44 @@ const MonthlyTimeLine = dynamic(
 
 const TARGET_VISIBLE_COUNT = 2;
 
-const formatDateTime = (value?: string | null) => {
+type DashboardT = ReturnType<typeof useTranslations<'Dashboard'>>;
+
+const formatDateTime = (value: string | null | undefined, intlLocale: string) => {
   if (!value) return '--';
   const parsedDate = new Date(value);
   if (Number.isNaN(parsedDate.getTime())) return '--';
-  return parsedDate.toLocaleString('vi-VN');
+  return parsedDate.toLocaleString(intlLocale);
 };
 
-const formatNumber = (value: unknown) => {
+const formatNumber = (value: unknown, intlLocale: string) => {
   const safeValue = Number(value) || 0;
-  return safeValue.toLocaleString('vi-VN');
+  return safeValue.toLocaleString(intlLocale);
 };
 
-const formatMonthLabel = (value?: string) => {
+const formatMonthLabel = (value: string | undefined, t: DashboardT) => {
   if (!value) return '';
   const [year, month] = value.split('-');
-  return `Tháng ${Number(month)}/${year}`;
+  return t('activity.monthLabel', { month: String(Number(month)), year });
 };
 
-const formatMonthShort = (value?: string) => {
+const formatMonthShort = (value: string | undefined, t: DashboardT) => {
   if (!value) return '';
   const [, month] = value.split('-');
-  return `T${Number(month)}`;
+  return t('activity.monthShort', { month: String(Number(month)) });
 };
 
-const formatDuration = (minutes: unknown) => {
+const formatDuration = (minutes: unknown, t: DashboardT) => {
   const total = Math.max(0, Math.round(Number(minutes) || 0));
   const h = Math.floor(total / 60);
   const m = total % 60;
-  if (h > 0) return m > 0 ? `${h}h ${m}p` : `${h}h`;
-  return `${m}p`;
+  if (h > 0) return m > 0 ? t('duration.hoursMinutes', { h, m }) : t('duration.hours', { h });
+  return t('duration.minutes', { m });
 };
 
 function ProfileOverview() {
+  const t = useTranslations('Dashboard');
+  const tCommon = useTranslations('Common');
+  const intlLocale = useLocale() === 'en' ? 'en-US' : 'vi-VN';
   const router = useRouter();
   const { frame: cosmeticFrame, badge: cosmeticBadge } = useCosmetics();
   const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
@@ -85,7 +91,7 @@ function ProfileOverview() {
   const { activity, loadingActivity } = useMyActivity(selectedMonth, selectedYear);
 
   const errorMessage = profileError
-    ? 'Không tải được thông tin hồ sơ. Vui lòng thử lại sau.'
+    ? t('profile.loadError')
     : '';
 
   // Chưa chọn tháng/năm thì lấy theo kỳ mà backend trả về (điều chỉnh state ngay khi render).
@@ -96,8 +102,8 @@ function ProfileOverview() {
 
   const fullName = useMemo(() => {
     if (!profileOverview) return '';
-    return profileOverview.fullName || profileOverview.userName || 'Người dùng';
-  }, [profileOverview]);
+    return profileOverview.fullName || profileOverview.userName || t('profile.defaultName');
+  }, [profileOverview, t]);
 
   const activityDays = useMemo(() => activity?.days || [], [activity]);
   const activityHasData = useMemo(
@@ -109,9 +115,9 @@ function ProfileOverview() {
     () =>
       (activity?.monthlyTime || []).map((m) => ({
         ...m,
-        label: formatMonthShort(m.month),
+        label: formatMonthShort(m.month, t),
       })),
-    [activity]
+    [activity, t]
   );
   const monthlyHasData = useMemo(
     () => monthlyTimeData.some((m) => m.minutes > 0),
@@ -122,7 +128,7 @@ function ProfileOverview() {
     return (
       <div className={cx('loadingWrap')}>
         <Spinner animation="border" />
-        <span>Đang tải hồ sơ...</span>
+        <span>{t('profile.loading')}</span>
       </div>
     );
   }
@@ -132,10 +138,10 @@ function ProfileOverview() {
       <div className={cx('container')}>
         <header className={cx('header')}>
           <h1 className={cx('title')}>
-            Tổng quan cá nhân
+            {t('profile.title')}
           </h1>
           <p className={cx('subtitle')}>
-            Tổng quan thông tin tài khoản và phân tích tiến độ học tập.
+            {t('profile.subtitle')}
           </p>
         </header>
 
@@ -167,21 +173,21 @@ function ProfileOverview() {
 
                   <div className={cx('metaList')}>
                     <span className={cx('metaItem')}>
-                      <span className={cx('metaLabel')}>Email</span>
+                      <span className={cx('metaLabel')}>{t('profile.email')}</span>
                       {profileOverview.email || '--'}
                     </span>
                     <span className={cx('metaItem')}>
-                      <span className={cx('metaLabel')}>Vai trò</span>
+                      <span className={cx('metaLabel')}>{t('profile.role')}</span>
                       {profileOverview.roleName}
                     </span>
                     <span className={cx('metaItem')}>
-                      <span className={cx('metaLabel')}>Ngày tham gia</span>
-                      {formatDateTime(profileOverview.createdAt)}
+                      <span className={cx('metaLabel')}>{t('profile.joinedAt')}</span>
+                      {formatDateTime(profileOverview.createdAt, intlLocale)}
                     </span>
                     <span className={cx('metaItem')}>
-                      <span className={cx('metaLabel')}>Trạng thái</span>
+                      <span className={cx('metaLabel')}>{t('profile.status')}</span>
                       <span className={cx({ verifiedText: profileOverview.verified })}>
-                        {profileOverview.verified ? 'Đã xác minh' : 'Chưa xác minh'}
+                        {profileOverview.verified ? t('profile.verified') : t('profile.unverified')}
                       </span>
                     </span>
                   </div>
@@ -192,7 +198,7 @@ function ProfileOverview() {
                       fullWidth
                       onClick={() => setShowUpdateProfileModal(true)}
                     >
-                      Cập nhật thông tin
+                      {t('profile.updateInfo')}
                     </ButtonPrime>
                     <ButtonPrime
                       variant="outline"
@@ -200,32 +206,32 @@ function ProfileOverview() {
                       onClick={() => setShowChangePasswordModal(true)}
                     >
                       <IoLockClosedOutline />
-                      Đổi mật khẩu
+                      {t('profile.changePassword')}
                     </ButtonPrime>
                   </div>
                 </div>
               </section>
 
               <section className={cx('quickActionsCard')}>
-                <h3 className={cx('cardTitle')}>Truy cập nhanh</h3>
+                <h3 className={cx('cardTitle')}>{t('quickActions.title')}</h3>
                 <div className={cx('quickActionsList')}>
                   <button onClick={() => router.push(routes.home)} className={cx('actionBtn')}>
-                    <span>Làm bài thi mới</span>
+                    <span>{t('quickActions.newTest')}</span>
                   </button>
                   <button onClick={() => router.push(routes.myAlbums)} className={cx('actionBtn')}>
-                    <span>Thẻ ghi nhớ</span>
+                    <span>{t('quickActions.flashcards')}</span>
                   </button>
                   <button onClick={() => router.push(routes.myClasses)} className={cx('actionBtn')}>
-                    <span>Lớp học của tôi</span>
+                    <span>{t('quickActions.myClasses')}</span>
                   </button>
                   <button onClick={() => router.push(routes.personalQuestionBank)} className={cx('actionBtn')}>
-                    <span>Ngân hàng câu hỏi</span>
+                    <span>{t('quickActions.questionBank')}</span>
                   </button>
                   <button onClick={() => setActiveSection('posts')} className={cx('actionBtn')}>
-                    <span>Bài viết của tôi</span>
+                    <span>{t('quickActions.myPosts')}</span>
                   </button>
                   <button onClick={() => setActiveSection('saved')} className={cx('actionBtn')}>
-                    <span>Bài đã lưu</span>
+                    <span>{t('quickActions.savedPosts')}</span>
                   </button>
                 </div>
               </section>
@@ -238,8 +244,8 @@ function ProfileOverview() {
                     <IoStatsChartOutline />
                   </div>
                   <div className={cx('statInfo')}>
-                    <span className={cx('statLabel')}>Tổng bài làm</span>
-                    <strong className={cx('statValue')}>{formatNumber(profileOverview.testStats?.totalAttempts)}</strong>
+                    <span className={cx('statLabel')}>{t('stats.totalAttempts')}</span>
+                    <strong className={cx('statValue')}>{formatNumber(profileOverview.testStats?.totalAttempts, intlLocale)}</strong>
                   </div>
                 </article>
 
@@ -248,8 +254,8 @@ function ProfileOverview() {
                     <IoClipboardOutline />
                   </div>
                   <div className={cx('statInfo')}>
-                    <span className={cx('statLabel')}>Thẻ ghi nhớ đã lưu</span>
-                    <strong className={cx('statValue')}>{formatNumber(profileOverview.vocabularyStats?.totalVocabulary)}</strong>
+                    <span className={cx('statLabel')}>{t('stats.savedFlashcards')}</span>
+                    <strong className={cx('statValue')}>{formatNumber(profileOverview.vocabularyStats?.totalVocabulary, intlLocale)}</strong>
                   </div>
                 </article>
 
@@ -258,8 +264,8 @@ function ProfileOverview() {
                     <IoSchoolOutline />
                   </div>
                   <div className={cx('statInfo')}>
-                    <span className={cx('statLabel')}>Lớp học hiện tại</span>
-                    <strong className={cx('statValue')}>{formatNumber(profileOverview.classStats?.approvedClassCount)}</strong>
+                    <span className={cx('statLabel')}>{t('stats.currentClasses')}</span>
+                    <strong className={cx('statValue')}>{formatNumber(profileOverview.classStats?.approvedClassCount, intlLocale)}</strong>
                   </div>
                 </article>
               </section>
@@ -267,7 +273,7 @@ function ProfileOverview() {
               <section className={cx('chartsRow')}>
                 <article className={cx('chartCard')}>
                   <div className={cx('chartHeader')}>
-                    <h3 className={cx('cardTitle')}>Thời gian làm bài</h3>
+                    <h3 className={cx('cardTitle')}>{t('activity.testTime')}</h3>
                     <select
                       className={cx('monthSelect')}
                       value={selectedMonth}
@@ -276,30 +282,33 @@ function ProfileOverview() {
                     >
                       {(activity?.availableMonths || (selectedMonth ? [selectedMonth] : [])).map((m) => (
                         <option key={m} value={m}>
-                          {formatMonthLabel(m)}
+                          {formatMonthLabel(m, t)}
                         </option>
                       ))}
                     </select>
                   </div>
                   {activity && (
                     <p className={cx('chartSubtitle')}>
-                      {formatDuration(activity.totalMinutes)} làm bài · {activity.activeDays} ngày hoạt động
+                      {t('activity.summary', {
+                        duration: formatDuration(activity.totalMinutes, t),
+                        days: activity.activeDays ?? 0,
+                      })}
                     </p>
                   )}
                   <div className={cx('chartContainer')}>
                     {loadingActivity ? (
-                      <div className={cx('noDataMessage')}>Đang tải hoạt động...</div>
+                      <div className={cx('noDataMessage')}>{t('activity.loading')}</div>
                     ) : activityHasData ? (
                       <DailyActivityBar data={activityDays} />
                     ) : (
-                      <div className={cx('noDataMessage')}>Không có hoạt động trong tháng này</div>
+                      <div className={cx('noDataMessage')}>{t('activity.noActivity')}</div>
                     )}
                   </div>
                 </article>
 
                 <article className={cx('chartCard')}>
                   <div className={cx('chartHeader')}>
-                    <h3 className={cx('cardTitle')}>Thời gian học theo tháng</h3>
+                    <h3 className={cx('cardTitle')}>{t('activity.monthlyTitle')}</h3>
                     <select
                       className={cx('monthSelect')}
                       value={selectedYear}
@@ -308,18 +317,18 @@ function ProfileOverview() {
                     >
                       {(activity?.availableYears || (selectedYear ? [selectedYear] : [])).map((y) => (
                         <option key={y} value={y}>
-                          Năm {y}
+                          {t('activity.yearOption', { year: y })}
                         </option>
                       ))}
                     </select>
                   </div>
                   <div className={cx('chartContainer')}>
                     {loadingActivity ? (
-                      <div className={cx('noDataMessage')}>Đang tải...</div>
+                      <div className={cx('noDataMessage')}>{tCommon('loading')}</div>
                     ) : monthlyHasData ? (
-                      <MonthlyTimeLine data={monthlyTimeData} formatMonthLabel={formatMonthLabel} />
+                      <MonthlyTimeLine data={monthlyTimeData} formatMonthLabel={(value) => formatMonthLabel(value, t)} />
                     ) : (
-                      <div className={cx('noDataMessage')}>Chưa có dữ liệu học trong năm này</div>
+                      <div className={cx('noDataMessage')}>{t('activity.noYearData')}</div>
                     )}
                   </div>
                 </article>
@@ -329,29 +338,29 @@ function ProfileOverview() {
                 <article className={cx('statCard', 'targetSummaryCard')}>
                   <div className={cx('targetHeader')}>
                     <h3 className={cx('cardTitle')}>
-                      Mục tiêu của tôi
+                      {t('targets.title')}
                     </h3>
                     <ButtonPrime
                       variant="outline"
                       size="sm"
                       onClick={() => router.push(routes.myTarget)}
                     >
-                      Quản lý mục tiêu
+                      {t('targets.manage')}
                     </ButtonPrime>
                   </div>
 
                   {loadingTargets ? (
-                    <div className={cx('noDataMessage')}>Đang tải mục tiêu...</div>
+                    <div className={cx('noDataMessage')}>{t('targets.loading')}</div>
                   ) : myTargets.length === 0 ? (
                     <div className={cx('targetEmpty')}>
                       <p className={cx('targetEmptyText')}>
-                        Bạn chưa đặt mục tiêu nào. Đặt mục tiêu để cá nhân hóa lộ trình học.
+                        {t('targets.empty')}
                       </p>
                       <ButtonPrime
                         variant="primary"
                         onClick={() => router.push(routes.myTarget)}
                       >
-                        Đặt mục tiêu ngay
+                        {t('targets.setNow')}
                       </ButtonPrime>
                     </div>
                   ) : (
@@ -369,12 +378,12 @@ function ProfileOverview() {
                                 <span className={cx('targetExamName')}>{target.examTypeName}</span>
                                 {isAchieved && (
                                   <span className={cx('targetAchievedBadge')}>
-                                    Đã đạt
+                                    {t('targets.achieved')}
                                   </span>
                                 )}
                               </div>
                               <span className={cx('targetScore')}>
-                                {formatNumber(target.targetScore)} điểm
+                                {t('targets.score', { score: formatNumber(target.targetScore, intlLocale) })}
                               </span>
                             </div>
 
@@ -386,7 +395,7 @@ function ProfileOverview() {
                                 />
                               </div>
                               <span className={cx('targetProgressLabel')}>
-                                Sẵn sàng: {readiness}%
+                                {t('targets.readiness', { pct: readiness })}
                               </span>
                             </div>
 
@@ -409,7 +418,7 @@ function ProfileOverview() {
                                   router.push(`${routes.targetDashboard}?examTypeId=${encodeURIComponent(target.examTypeId ?? '')}`)
                                 }
                               >
-                                Dashboard
+                                {t('targets.dashboard')}
                               </ButtonPrime>
                               <ButtonPrime
                                 variant="outline"
@@ -419,7 +428,7 @@ function ProfileOverview() {
                                   router.push(`${routes.generatePlan}?examTypeId=${encodeURIComponent(target.examTypeId ?? '')}`)
                                 }
                               >
-                                Sinh lộ trình
+                                {t('targets.generatePlan')}
                               </ButtonPrime>
                             </div>
                           </article>
@@ -434,8 +443,8 @@ function ProfileOverview() {
                           onClick={() => setShowAllTargets((prev) => !prev)}
                         >
                           {showAllTargets
-                            ? 'Thu gọn'
-                            : `Xem thêm ${myTargets.length - TARGET_VISIBLE_COUNT} mục tiêu`}
+                            ? t('targets.collapse')
+                            : t('targets.showMore', { count: myTargets.length - TARGET_VISIBLE_COUNT })}
                         </ButtonPrime>
                       )}
                     </div>
@@ -449,7 +458,7 @@ function ProfileOverview() {
 
         {!errorMessage && !profileOverview && (
           <Alert variant="info" className={cx('alertBox')}>
-            Không có dữ liệu hồ sơ để hiển thị.
+            {t('profile.noData')}
           </Alert>
         )}
       </div>

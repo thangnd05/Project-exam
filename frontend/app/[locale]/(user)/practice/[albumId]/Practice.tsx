@@ -2,6 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { getTtsUrl } from '@/app/utils/mediaUrl';
 import { useStreak } from '@/app/features/gamification/streak/hooks/useStreak';
 import { useStreakRestoreGate } from '@/app/features/gamification/streak/hooks/useStreakRestoreGate';
@@ -38,6 +39,8 @@ type AutoplayAudioElement = HTMLAudioElement & {
 };
 
 const Practice = () => {
+    const t = useTranslations('Vocabulary');
+    const tCommon = useTranslations('Common');
     const {albumId} = useParams<{ albumId: string }>();
     const [question, setQuestion] = useState<PracticeQuestionResponse | null>(null);
     const [loading, setLoading] = useState(true);
@@ -46,7 +49,7 @@ const Practice = () => {
     const [result, setResult] = useState<PracticeCheckResponse | null>(null);
     const [finished, setFinished] = useState(false);
     const [loadingNext, setLoadingNext] = useState(false);
-    const [knownMessage, setKnownMessage] = useState('');
+    const [knownMessage, setKnownMessage] = useState<'' | 'markedKnown' | 'markError'>('');
     const audioRef = useRef<AutoplayAudioElement | null>(null);
     const { refreshStreak } = useStreak();
     const { blocked, allow, streakReady } = useStreakRestoreGate();
@@ -149,7 +152,7 @@ const Practice = () => {
         markMutation.mutate(question.vocabId, {
             onSuccess: () => {
                 refreshStreak();
-                setKnownMessage('Bạn đã đánh dấu từ này là đã biết!');
+                setKnownMessage('markedKnown');
                 setTimeout(() => setKnownMessage(''), 2000);
                 setTimeout(() => {
                     fetchQuestion();
@@ -157,7 +160,7 @@ const Practice = () => {
             },
             onError: (err) => {
                 console.error('Lỗi khi đánh dấu đã biết:', err);
-                setKnownMessage('Có lỗi xảy ra khi đánh dấu từ này!');
+                setKnownMessage('markError');
             },
         });
     };
@@ -172,7 +175,7 @@ const Practice = () => {
                         className={cx('loadingContent')}
                     >
                         <Spinner animation="border" variant="primary" className={cx('spinner')} />
-                        <p className={cx('loadingText')}>Đang tải câu hỏi...</p>
+                        <p className={cx('loadingText')}>{t('practice.loading')}</p>
                     </motion.div>
                 </Container>
                 <StreakRestoreModal show={blocked} onClose={allow} />
@@ -192,14 +195,14 @@ const Practice = () => {
                         <div className={cx('finishedIcon')}>
                             <Trophy size={64} />
                         </div>
-                        <h2 className={cx('finishedTitle')}>Chúc mừng bạn!</h2>
+                        <h2 className={cx('finishedTitle')}>{t('practice.finishedTitle')}</h2>
                         <p className={cx('finishedSubtitle')}>
-                            Bạn đã hoàn thành tất cả từ trong album này!
+                            {t('practice.finishedSubtitle')}
                         </p>
 
                         <ButtonPrime variant="primary" size="lg" onClick={() => window.history.back()}>
                             <ArrowLeft size={20} />
-                            Quay lại Album
+                            {t('practice.backToAlbum')}
                         </ButtonPrime>
                     </motion.div>
                 </Container>
@@ -213,9 +216,9 @@ const Practice = () => {
                 <Container className={cx('emptyContainer')}>
                     <div className={cx('emptyContent')}>
                         <BookOpen size={64} className={cx('emptyIcon')} />
-                        <h3>Không có câu hỏi nào khả dụng</h3>
+                        <h3>{t('practice.noQuestion')}</h3>
                         <ButtonPrime variant="outline" onClick={() => window.history.back()}>
-                            Quay lại
+                            {t('practice.back')}
                         </ButtonPrime>
                     </div>
                 </Container>
@@ -238,10 +241,10 @@ const Practice = () => {
                             initial={{opacity: 0, y: -20}}
                             animate={{opacity: 1, y: 0}}
                             exit={{opacity: 0, y: -20}}
-                            className={cx('toast', knownMessage.includes('lỗi') ? 'error' : 'success')}
+                            className={cx('toast', knownMessage === 'markError' ? 'error' : 'success')}
                         >
                             <Sparkles size={18} />
-                            <span>{knownMessage}</span>
+                            <span>{t(`practice.${knownMessage}`)}</span>
                         </motion.div>
                     )}
                 </AnimatePresence>
@@ -254,7 +257,7 @@ const Practice = () => {
                     <div className={cx('headerLeft')}>
                         <div className={cx('typeBadge')}>
                             {isMultiChoice ? <Target size={16} /> : <BookOpen size={16} />}
-                            <span>{isMultiChoice ? 'Chọn đáp án' : 'Nhập từ'}</span>
+                            <span>{isMultiChoice ? t('practice.multiChoice') : t('practice.typeWord')}</span>
                         </div>
                     </div>
                 </motion.div>
@@ -329,12 +332,12 @@ const Practice = () => {
                         ) : (
                             <div className={cx('inputGroup')}>
                                 <div className={cx('inputWrapper')}>
-                                    <label className={cx('inputLabel')}>Từ tiếng Anh</label>
+                                    <label className={cx('inputLabel')}>{t('practice.englishWord')}</label>
                                     <input
                                         type="text"
                                         value={userAnswer.english}
                                         onChange={(e) => setUserAnswer({...userAnswer, english: e.target.value})}
-                                        placeholder="Nhập từ tiếng Anh..."
+                                        placeholder={t('practice.englishPlaceholder')}
                                         className={cx('textInput')}
                                         autoComplete="off"
                                     />
@@ -345,12 +348,12 @@ const Practice = () => {
                                     )}
                                 </div>
                                 <div className={cx('inputWrapper')}>
-                                    <label className={cx('inputLabel')}>Nghĩa tiếng Việt</label>
+                                    <label className={cx('inputLabel')}>{t('practice.vietnameseMeaning')}</label>
                                     <input
                                         type="text"
                                         value={userAnswer.vietnamese}
                                         onChange={(e) => setUserAnswer({...userAnswer, vietnamese: e.target.value})}
-                                        placeholder="Nhập nghĩa tiếng Việt..."
+                                        placeholder={t('practice.vietnamesePlaceholder')}
                                         className={cx('textInput')}
                                         autoComplete="off"
                                     />
@@ -370,12 +373,12 @@ const Practice = () => {
                                         {result.correct ? (
                                             <>
                                                 <CheckCircle size={24} className={cx('resultIcon')} />
-                                                <span className={cx('resultTitle')}>Chính xác!</span>
+                                                <span className={cx('resultTitle')}>{t('practice.correct')}</span>
                                             </>
                                         ) : (
                                             <>
                                                 <XCircle size={24} className={cx('resultIcon')} />
-                                                <span className={cx('resultTitle')}>Chưa đúng rồi!</span>
+                                                <span className={cx('resultTitle')}>{t('practice.incorrect')}</span>
                                             </>
                                         )}
                                     </div>
@@ -383,11 +386,11 @@ const Practice = () => {
                                     {!result.correct && (
                                         <div className={cx('correctAnswer')}>
                                             <div className={cx('answerRow')}>
-                                                <span className={cx('answerLabel')}>Từ đúng:</span>
+                                                <span className={cx('answerLabel')}>{t('practice.correctWord')}</span>
                                                 <span className={cx('answerWord')}>{question.word}</span>
                                             </div>
                                             <div className={cx('answerRow')}>
-                                                <span className={cx('answerLabel')}>Nghĩa:</span>
+                                                <span className={cx('answerLabel')}>{t('practice.meaning')}</span>
                                                 <span className={cx('answerMeaning')}>{question.meaning}</span>
                                             </div>
                                         </div>
@@ -395,11 +398,11 @@ const Practice = () => {
 
                                     <div className={cx('resultStats')}>
                                         <div className={cx('statItem')}>
-                                            <span className={cx('statLabel')}>Trạng thái</span>
+                                            <span className={cx('statLabel')}>{t('practice.status')}</span>
                                             <span className={cx('statValue')}>{result.status}</span>
                                         </div>
                                         <div className={cx('statItem')}>
-                                            <span className={cx('statLabel')}>Số lần đúng</span>
+                                            <span className={cx('statLabel')}>{t('practice.correctCount')}</span>
                                             <span className={cx('statValue')}>{result.correctCount}</span>
                                         </div>
                                     </div>
@@ -415,7 +418,7 @@ const Practice = () => {
                                     onClick={handleSubmit}
                                     disabled={!canSubmit || checkMutation.isPending}
                                 >
-                                    {checkMutation.isPending ? 'Đang chấm...' : 'Kiểm tra đáp án'}
+                                    {checkMutation.isPending ? t('practice.checking') : t('practice.check')}
                                 </ButtonPrime>
                             ) : (
                                 <>
@@ -430,7 +433,7 @@ const Practice = () => {
                                         ) : (
                                             <>
                                                 <SkipForward size={18} />
-                                                Câu tiếp theo
+                                                {t('practice.next')}
                                                 <ChevronRight size={18} />
                                             </>
                                         )}
@@ -442,7 +445,7 @@ const Practice = () => {
                                         disabled={markingKnown}
                                     >
                                         <Sparkles size={18} />
-                                        {markingKnown ? 'Đang xử lý...' : 'Đã biết từ này'}
+                                        {markingKnown ? tCommon('processing') : t('practice.known')}
                                     </ButtonPrime>
                                 </>
                             )}

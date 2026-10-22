@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 
 import styles from './TrafficHeatmap.module.scss';
 import type { DayHours } from '@/app/types/admin';
@@ -10,8 +11,9 @@ const cx = classNames.bind(styles);
 const HOUR_TICKS = [0, 3, 6, 9, 12, 15, 18, 21];
 
 const TrafficHeatmap = ({ data = [] }: { data?: DayHours[] }) => {
+    const t = useTranslations('AdminCommon.heatmap');
     if (!data.length) {
-        return <div className={cx('empty')}>Chưa có dữ liệu truy cập</div>;
+        return <div className={cx('empty')}>{t('empty')}</div>;
     }
 
     const max = data.reduce(
@@ -21,8 +23,8 @@ const TrafficHeatmap = ({ data = [] }: { data?: DayHours[] }) => {
 
     const shade = (v: number) => {
         if (!v) return '#f1f5f9';
-        const t = 0.18 + 0.82 * (v / max);
-        return `rgba(201, 168, 75, ${t})`;
+        const alpha = 0.18 + 0.82 * (v / max);
+        return `rgba(201, 168, 75, ${alpha})`;
     };
 
     return (
@@ -36,7 +38,7 @@ const TrafficHeatmap = ({ data = [] }: { data?: DayHours[] }) => {
                                 key={h}
                                 className={cx('cell')}
                                 style={{ background: shade(v) }}
-                                title={`${row.day} ${String(h).padStart(2, '0')}:00  ${v} lượt truy cập`}
+                                title={t('cellTitle', { day: row.day ?? '', hour: String(h).padStart(2, '0'), count: v })}
                             />
                         ))}
                     </div>
@@ -55,9 +57,9 @@ const TrafficHeatmap = ({ data = [] }: { data?: DayHours[] }) => {
             </div>
 
             <div className={cx('legend')}>
-                <span>Ít</span>
+                <span>{t('less')}</span>
                 <span className={cx('legendScale')} />
-                <span>Nhiều</span>
+                <span>{t('more')}</span>
             </div>
         </div>
     );

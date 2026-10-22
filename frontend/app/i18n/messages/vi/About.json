@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "title": "Giới thiệu",
+    "description": "Câu chuyện và sứ mệnh của WinDe Exam."
+  },
+  "title": "Giới thiệu về hệ thống {name}",
+  "intro": "Xin chào! Chào mừng bạn đến với <strong>{name}</strong>  nền tảng học tập và kiểm tra trực tuyến hiện đại, được xây dựng để hỗ trợ giáo viên và học sinh trong việc tạo, tham gia và quản lý bài thi một cách nhanh chóng, thuận tiện và hiệu quả.",
+  "goals": {
+    "title": "Mục tiêu phát triển",
+    "intro": "Ứng dụng được thiết kế nhằm giúp các trường học, trung tâm hoặc cá nhân có thể dễ dàng:",
+    "items": [
+      "Tạo bài kiểm tra theo từng kỹ năng hoặc môn học.",
+      "Quản lý lớp học, danh sách học viên và bài thi theo từng lớp.",
+      "Theo dõi tiến độ làm bài, chấm điểm tự động và hiển thị kết quả ngay lập tức.",
+      "Tổ chức kỳ thi online có thời gian, số lần làm và giới hạn truy cập theo lớp."
+    ]
+  },
+  "features": {
+    "title": "Tính năng nổi bật",
+    "items": [
+      { "label": "Tạo đề thi linh hoạt:", "text": "Giáo viên có thể tự tạo đề hoặc chọn câu hỏi từ ngân hàng đề." },
+      { "label": "Quản lý lớp học:", "text": "Tạo lớp, duyệt học viên tham gia, và theo dõi tiến trình học tập." },
+      { "label": "Phân quyền người dùng:", "text": "Phân biệt rõ vai trò." },
+      { "label": "Lưu trữ đa phương tiện:", "text": "Hỗ trợ chèn hình ảnh, âm thanh và tài liệu cho từng câu hỏi." },
+      { "label": "Báo cáo thống kê:", "text": "Tổng hợp điểm, thời gian làm bài và kết quả học tập chi tiết." }
+    ]
+  },
+  "community": {
+    "title": "Định hướng cộng đồng",
+    "body": "<strong>{name}</strong> không chỉ là nơi kiểm tra kiến thức, mà còn là môi trường học tập tương tác, nơi giáo viên có thể chia sẻ tài liệu, và học viên có thể học hỏi lẫn nhau thông qua các lớp học trực tuyến."
+  },
+  "contact": {
+    "title": "Liên hệ & Góp ý",
+    "body": "Nếu bạn có góp ý hoặc mong muốn cải thiện tính năng nào, hãy liên hệ với chúng tôi. Mỗi phản hồi đều giúp <strong>{name}</strong> phục vụ bạn tốt hơn."
+  },
+  "thankYou": "Cảm ơn bạn đã tin tưởng và sử dụng hệ thống. Chúc bạn học tập và giảng dạy hiệu quả!"
+}

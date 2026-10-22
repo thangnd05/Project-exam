@@ -2,6 +2,7 @@
 
 import {Table, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import {IoPencilOutline, IoTrashOutline} from 'react-icons/io5';
+import {useLocale, useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 import styles from './ChapterManagementTable.module.scss';
 import type { ChapterResponse } from '@/app/types';
@@ -16,14 +17,16 @@ type ChapterManagementTableProps = {
 };
 
 function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}: ChapterManagementTableProps) {
+  const t = useTranslations('Classes');
+  const locale = useLocale();
   return (
     <div className={cx('table-responsive')}>
       <Table hover className={cx('management-table')}>
         <thead>
           <tr>
-            <th>Tên chương</th>
-            <th>Thời gian tạo</th>
-            <th className="text-center">Hành động</th>
+            <th>{t('common.chapterName')}</th>
+            <th>{t('chapterTable.createdAt')}</th>
+            <th className="text-center">{t('common.actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -44,12 +47,12 @@ function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}: Chapt
               </td>
               <td>
                 <span className={cx('chapter-date')}>
-                  {new Date(chapter.createdAt!).toLocaleDateString('vi-VN')}
+                  {new Date(chapter.createdAt!).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN')}
                 </span>
               </td>
               <td>
                 <div className={cx('action-group')}>
-                  <OverlayTrigger overlay={<Tooltip>Sửa chương</Tooltip>}>
+                  <OverlayTrigger overlay={<Tooltip>{t('chapterTable.edit')}</Tooltip>}>
                     <Button
                       variant="link"
                       className={cx('btn-action', 'edit')}
@@ -62,7 +65,7 @@ function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}: Chapt
                     </Button>
                   </OverlayTrigger>
 
-                  <OverlayTrigger overlay={<Tooltip>Xóa chương</Tooltip>}>
+                  <OverlayTrigger overlay={<Tooltip>{t('chapterTable.delete')}</Tooltip>}>
                     <Button
                       variant="link"
                       className={cx('btn-action', 'delete')}

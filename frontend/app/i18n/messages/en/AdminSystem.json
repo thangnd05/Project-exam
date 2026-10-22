@@ -1,0 +1,371 @@
+{
+  "stats": {
+    "loading": "Loading statistics...",
+    "loadError": "Could not load statistics. Please try again."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "WinDe Exam system overview",
+    "heatmapTitle": "Visits by day & hour",
+    "visitsToday": "Visits today",
+    "today": "Today",
+    "tests": "Tests",
+    "testsSub": "{taken, plural, one {# attempt} other {# attempts}} · {completed} completed",
+    "questions": "Questions",
+    "questionBank": "Question bank",
+    "classes": "Classes"
+  },
+  "analytics": {
+    "title": "Statistics & Analytics",
+    "description": "Detailed analytics for the WinDe Exam system",
+    "monthLabel": "{month, select, 1 {January} 2 {February} 3 {March} 4 {April} 5 {May} 6 {June} 7 {July} 8 {August} 9 {September} 10 {October} 11 {November} 12 {December} other {{month}}} {year}",
+    "yearOption": "{year}",
+    "totalUsers": "Total users",
+    "totalClasses": "Total classes",
+    "totalAttempts": "Total attempts",
+    "examTypes": "Exam types",
+    "locationsTitle": "Visitor locations",
+    "publicVisitsInMonth": "visits from public IPs in {month, select, 1 {January} 2 {February} 3 {March} 4 {April} 5 {May} 6 {June} 7 {July} 8 {August} 9 {September} 10 {October} 11 {November} 12 {December} other {{month}}} {year}",
+    "publicVisits": "visits from public IPs",
+    "topCountries": "Top countries",
+    "monthlyActivity": "Monthly activity (visits, attempts & completion rate)",
+    "monthlyNewUsers": "New users by month",
+    "attemptStatus": "Attempt status",
+    "topTests": "Most-taken tests",
+    "topPracticeTests": "Most-practiced tests",
+    "status": {
+      "completed": "Completed",
+      "inProgress": "In progress",
+      "expired": "Expired"
+    }
+  },
+  "auditLogin": {
+    "title": "Login audit",
+    "description": "Successful / failed sign-in history (login_audit table, demo data).",
+    "time": "Time",
+    "status": "Status",
+    "success": "Success",
+    "failed": "Failed",
+    "failureReason": "Failure reason",
+    "searchPlaceholder": "Search by user ID, action, IP, user agent, reason...",
+    "allStatuses": "All statuses",
+    "empty": "No records match the current filters.",
+    "itemLabel": "records"
+  },
+  "auditLogs": {
+    "description": "Track admin actions and sensitive events in the system.",
+    "time": "Time",
+    "action": "Action",
+    "details": "Changes",
+    "actor": "Performed by",
+    "status": "Status",
+    "success": "Success",
+    "failed": "Failed",
+    "searchPlaceholder": "Search action, endpoint, resource, actor...",
+    "allStatuses": "All statuses",
+    "itemLabel": "records"
+  },
+  "categories": {
+    "title": "Post categories",
+    "description": "Create and manage blog categories",
+    "add": "Add category",
+    "searchPlaceholder": "Search categories...",
+    "itemLabel": "categories",
+    "name": "Category name",
+    "namePlaceholder": "Enter category name...",
+    "editTitle": "Edit category",
+    "createTitle": "Add new category",
+    "deleteTitle": "Delete category",
+    "deleteMessage": "Are you sure you want to delete the category \"{name}\"? This action cannot be undone.",
+    "toast": {
+      "deleted": "Category deleted",
+      "deleteError": "Failed to delete category",
+      "updated": "Category updated",
+      "created": "Category created",
+      "saveError": "Failed to save category"
+    }
+  },
+  "certificates": {
+    "title": "Certificates",
+    "description": "Configure certificate templates per exam type and manage certificates issued to learners.",
+    "addTemplate": "Add certificate template",
+    "stats": {
+      "templates": "Certificate templates",
+      "activeTemplates": "Active templates",
+      "validCertificates": "Valid certificates"
+    },
+    "tabs": {
+      "templates": "Certificate templates",
+      "issued": "Issued certificates"
+    },
+    "columns": {
+      "examType": "Exam type",
+      "title": "Certificate name",
+      "passScore": "Pass score",
+      "validity": "Validity",
+      "issued": "Issued",
+      "status": "Status",
+      "recipient": "Recipient",
+      "code": "Certificate code",
+      "test": "Test",
+      "score": "Score",
+      "issuedAt": "Issued on"
+    },
+    "validMonths": "{count, plural, one {# month} other {# months}}",
+    "noExpiry": "No expiry",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "statusRevoked": "Revoked",
+    "statusExpired": "Expired",
+    "statusActive": "Valid",
+    "allStatuses": "All statuses",
+    "templateSearchPlaceholder": "Search by certificate name or exam type...",
+    "templatesEmpty": "No certificate templates yet. Create one for each exam type you want to certify.",
+    "issuedSearchPlaceholder": "Search by recipient name or certificate code...",
+    "issuedEmpty": "No certificates issued yet.",
+    "itemLabel": "certificates",
+    "revokeTitle": "Revoke certificate",
+    "deletePermanently": "Permanently delete certificate",
+    "revoke": "Revoke",
+    "deleteTemplateMessage": "Delete the certificate template \"{title}\"? This exam type will stop issuing new certificates. Already issued certificates stay unchanged because they store their own snapshot.",
+    "deleteCertificateMessage": "Permanently delete certificate {code} of {name}? This code will no longer be verifiable and cannot be restored. To only invalidate it while keeping a record, use revoke instead.",
+    "revokeMessage": "Revoke certificate {code} of {name}? The verification page will show it as no longer valid, and this person can be certified again after passing a later attempt.",
+    "errors": {
+      "examTypeRequired": "Please select an exam type.",
+      "passScoreNumber": "Pass score must be a number.",
+      "titleRequired": "Certificate name is required.",
+      "saveFailed": "Could not save the certificate template. Please try again.",
+      "deleteTemplateFailed": "Could not delete this certificate template.",
+      "deleteCertificateFailed": "Could not delete this certificate.",
+      "revokeFailed": "Could not revoke this certificate.",
+      "loadTemplates": "Could not load certificate templates.",
+      "loadIssued": "Could not load issued certificates."
+    },
+    "form": {
+      "previewTitle": "Certificate of Completion",
+      "previewExamType": "Exam type",
+      "previewRecipient": "John Doe",
+      "editTitle": "Update certificate template",
+      "createTitle": "Create certificate template",
+      "create": "Create",
+      "examType": "Exam type",
+      "selectExamType": "-- Select exam type --",
+      "examTypeHelp": "Each exam type has only one template, and it cannot be changed after creation.",
+      "passScore": "Pass score",
+      "passScorePlaceholder": "e.g. 720",
+      "passScoreHelp": "Scoring at or above this mark earns a certificate. Uses the exam type’s scoring scale (AWS: 100-1000, AWS passing score is 720).",
+      "title": "Certificate name",
+      "titlePlaceholder": "e.g. AWS Certified Solutions Architect – Associate",
+      "subtitle": "Subtitle",
+      "subtitlePlaceholder": "e.g. Certificate of completion for the full mock exam",
+      "bodyText": "Main text",
+      "bodyTextHelp": "Line shown below the recipient name. Leave empty to use the default sentence based on the exam type name. Type <code>{token}</code> where you want the exam type name inserted (it will be bold).",
+      "footerNote": "Footer note",
+      "validMonths": "Validity (months)",
+      "validMonthsPlaceholder": "Leave empty = no expiry",
+      "accentColor": "Accent color",
+      "accentColorHint": "Certificate border and title color",
+      "activeLabel": "Enabled (disable to stop issuing new certificates)",
+      "issuerName": "Issuer",
+      "issuerPlaceholder": "e.g. English Exam Platform",
+      "signatureName": "Signatory",
+      "signatureTitle": "Position",
+      "logoUrl": "Logo (URL)",
+      "signatureImageUrl": "Signature image (URL)",
+      "backgroundUrl": "Background image (URL)",
+      "preview": "Preview"
+    }
+  },
+  "coins": {
+    "title": "Coins",
+    "description": "View and adjust users’ coin balances.",
+    "add": "Add coin wallet",
+    "editTitle": "Update coin balance",
+    "searchPlaceholder": "Search by username, full name or email...",
+    "itemLabel": "wallets",
+    "user": "User",
+    "balance": "Coins",
+    "updatedAt": "Updated",
+    "selectUser": "-- Select user --",
+    "deleteTitle": "Delete coin wallet",
+    "deleteMessage": "Are you sure you want to delete the coin wallet of \"{name}\"?",
+    "errors": {
+      "balanceInvalid": "Coins must be a non-negative number.",
+      "userRequired": "Please select a user.",
+      "saveFailed": "Could not save the coin wallet. Please try again.",
+      "deleteFailed": "Could not delete the coin wallet.",
+      "loadFailed": "Could not load coin wallets."
+    }
+  },
+  "cosmetics": {
+    "title": "Coin shop – Cosmetics",
+    "description": "Manage avatar frames & badges users redeem with coins.",
+    "add": "Add item",
+    "editTitle": "Update item",
+    "searchPlaceholder": "Search by name...",
+    "itemLabel": "items",
+    "preview": "Preview",
+    "name": "Name",
+    "type": "Type",
+    "cost": "Coin price",
+    "status": "Status",
+    "onSale": "On sale",
+    "off": "Off",
+    "fieldDescription": "Description",
+    "frameStyle": "Frame style",
+    "displayOrder": "Display order",
+    "types": {
+      "frame": "Avatar frame",
+      "badge": "Badge"
+    },
+    "frameStyles": {
+      "color": "Color / gradient",
+      "effect": "CSS effect",
+      "image": "Image overlay"
+    },
+    "effects": {
+      "glow": "Glow (golden glow)",
+      "pulse": "Pulse (blue pulse)",
+      "rotate": "Rotate (spinning border)",
+      "rainbow": "Rainbow (spinning rainbow)"
+    },
+    "badgeImageUrl": "Badge image URL (PNG/GIF)",
+    "badgeImagePlaceholder": "https://.../badge.gif – leave empty to use an emoji",
+    "badgeImageHelp": "If an image URL is set it is used; otherwise the emoji below is used.",
+    "emojiPlaceholder": "e.g. 👑 🏆 ⭐ 🔥",
+    "colorPlaceholder": "e.g. linear-gradient(135deg,#f59f00,#f08c00) or #ff5252",
+    "effect": "Effect",
+    "selectEffect": "-- Select effect --",
+    "frameImageUrl": "Frame image URL (transparent PNG/GIF)",
+    "frameImageHelp": "The image should have a transparent background with an empty center to reveal the avatar.",
+    "deleteTitle": "Delete item",
+    "deleteMessage": "Are you sure you want to delete \"{name}\"?",
+    "errors": {
+      "loadFailed": "Could not load items.",
+      "nameRequired": "Name is required.",
+      "costInvalid": "Coin price must be a non-negative number.",
+      "saveFailed": "Could not save the item.",
+      "deleteFailed": "Could not delete the item."
+    }
+  },
+  "emails": {
+    "title": "System emails",
+    "description": "Edit automatic email content and compose emails to send to users.",
+    "compose": "Compose new email",
+    "tabs": {
+      "auto": "Automatic templates",
+      "manual": "Compose & send"
+    },
+    "stats": {
+      "composed": "Composed emails",
+      "sentPage": "Sent (this page)",
+      "failedPage": "Failed (this page)",
+      "pendingPage": "Pending (this page)"
+    },
+    "columns": {
+      "status": "Status",
+      "sent": "Sent",
+      "failed": "Failed",
+      "template": "Email template",
+      "subject": "Subject",
+      "recipients": "Recipients",
+      "pending": "Pending",
+      "createdAt": "Created"
+    },
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "searchPlaceholder": "Search by template name or code...",
+    "autoEmpty": "No email templates yet.",
+    "manualEmpty": "No emails composed yet.",
+    "itemLabel": "emails",
+    "actions": {
+      "edit": "Edit content",
+      "log": "Send log",
+      "send": "Choose recipients and send"
+    },
+    "deleteTitle": "Delete email",
+    "deleteMessage": "Deleting \"{name}\" also deletes its send log. Are you sure?",
+    "toast": {
+      "deleted": "Email deleted."
+    },
+    "errors": {
+      "deleteFailed": "Could not delete the email."
+    },
+    "recipients": {
+      "title": "Send log: {name}",
+      "recipient": "Recipient",
+      "deletedAccount": "(deleted account)",
+      "status": "Status",
+      "error": "Error",
+      "sentAt": "Sent at",
+      "queuedAt": "Queued at",
+      "statuses": {
+        "SENT": "Sent",
+        "FAILED": "Failed",
+        "PENDING": "Pending"
+      },
+      "stats": {
+        "total": "Total sends",
+        "sent": "Succeeded",
+        "failed": "Failed",
+        "pending": "Pending"
+      },
+      "retry": "Resend {count, plural, one {# failed email} other {# failed emails}}",
+      "autoNoRetry": "Automatic emails cannot be resent – their content depends on the data of that send.",
+      "empty": "This email has not been sent to anyone yet.",
+      "itemLabel": "sends",
+      "retryQueued": "Failed emails have been queued for resending.",
+      "retryFailed": "Could not resend."
+    },
+    "send": {
+      "title": "Send email: {name}",
+      "submit": "Send to {count, plural, one {# person} other {# people}}",
+      "searchPlaceholder": "Search by name, username or email...",
+      "allRoles": "All roles",
+      "premiumFilters": {
+        "all": "All",
+        "premium": "Premium",
+        "normal": "Regular"
+      },
+      "selectAllFiltered": "Select all {count} filtered {count, plural, one {user} other {users}}",
+      "selectedCount": "Selected: {count}",
+      "loadingUsers": "Loading users...",
+      "noMatches": "No users match the filters.",
+      "noRecipients": "Please select at least one recipient.",
+      "queued": "Queued {count, plural, one {# email} other {# emails}} for sending.",
+      "sendFailed": "Could not send the email."
+    },
+    "editor": {
+      "editTitle": "Edit content: {name}",
+      "createTitle": "Compose new email",
+      "submit": "Save content",
+      "saved": "Email content saved.",
+      "testQueued": "Test email queued, check your inbox in a few seconds.",
+      "autoTemplate": "Automatic template <b>{code}</b> – {description}",
+      "name": "Display name",
+      "namePlaceholder": "e.g. System maintenance notice",
+      "subject": "Email subject",
+      "body": "Content",
+      "handwrittenWarning": "This content contains hand-written HTML blocks (buttons, colored boxes). The editor does not understand them, so editing here will break their formatting.",
+      "bodyPlaceholder": "Write the email content here...",
+      "layoutHint": "This is the outer frame wrapping every email, so it can only be edited as HTML. Keep <code>{token}</code> in place – that is where each email’s content is inserted.",
+      "variablesHint": "Available variables (click to append to the content):",
+      "activeAuto": "Enabled (disable to stop sending this email type)",
+      "active": "Enabled",
+      "preview": "Preview",
+      "testTo": "Send test to",
+      "testToPlaceholder": "Leave empty to send to your own email",
+      "testSend": "Send test",
+      "previewHint": "Preview (wrapped in the shared frame, variables replaced with your data):",
+      "previewFrameTitle": "Email preview",
+      "errors": {
+        "subjectRequired": "Email subject is required.",
+        "bodyRequired": "Email content is required.",
+        "saveFailed": "Could not save the email. Please try again.",
+        "previewFailed": "Could not generate the preview.",
+        "saveBeforeTest": "Please save the email before sending a test.",
+        "testFailed": "Could not send the test email."
+      }
+    }
+  }
+}

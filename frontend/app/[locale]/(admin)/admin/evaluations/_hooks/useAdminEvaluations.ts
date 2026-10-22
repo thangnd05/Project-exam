@@ -8,7 +8,7 @@ import {
   getAdminEvaluations,
   getEvaluationStatsByTest,
 } from '@/app/apis/evaluationApi';
-import {useCrudMutations} from '@/app/(admin)/_hooks/useAdminCrud';
+import {useCrudMutations} from '@/app/[locale]/(admin)/_hooks/useAdminCrud';
 import type {EvaluationResponse, PageResponse} from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 
@@ -43,7 +43,7 @@ const normalizeEvaluation = (evaluation: EvaluationResponse): AdminEvaluation =>
   rating: Number(evaluation.rating || 0),
   created_at: evaluation.createdAt || null,
   user_id: evaluation.userId ? String(evaluation.userId) : '',
-  username: evaluation.username || 'Ẩn danh',
+  username: evaluation.username || '',
   test_id: evaluation.testId ?? null,
   test_title: evaluation.testTitle ?? null,
 });

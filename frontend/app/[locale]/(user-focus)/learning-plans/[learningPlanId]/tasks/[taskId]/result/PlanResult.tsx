@@ -1,7 +1,9 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import PlanCongratsModal, { markCongratsSeen } from '@/app/features/learning-plans/PlanCongratsModal/PlanCongratsModal';
 import PlanResultView from '@/app/features/learning-plans/PlanResultView/PlanResultView';
@@ -14,6 +16,8 @@ import { PlanStage } from '@/app/enums';
 const cx = classNames.bind(styles);
 
 function PlanResult() {
+  const t = useTranslations('LearningPlans');
+  const tc = useTranslations('Common');
   const { learningPlanId, taskId } = useParams<{ learningPlanId: string; taskId: string }>();
   const router = useRouter();
   const [showCongrats, setShowCongrats] = useState(false);
@@ -49,7 +53,7 @@ function PlanResult() {
   if (isLoading) {
     return (
       <div className={cx('wrapper')}>
-        <div className={cx('loading')}>Đang tải...</div>
+        <div className={cx('loading')}>{tc('loading')}</div>
       </div>
     );
   }
@@ -59,11 +63,11 @@ function PlanResult() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <button type="button" className={cx('btn', 'btnGhost', 'btnSm')} onClick={goToPicker}>
-            ← Lộ trình
+            ← {t('common.plan')}
           </button>
         </div>
         <div className={cx('alert', 'alertDanger')}>
-          {loadError || 'Chưa có kết quả cho ải này.'}
+          {loadError || t('result.noResult')}
         </div>
       </div>
     );

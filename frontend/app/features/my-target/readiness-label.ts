@@ -1,25 +1,18 @@
+import { createTranslator, type useTranslations } from 'next-intl';
 import type { EnhancedResultResponse, PartBreakdownResponse } from '@/app/types';
+import viMyTarget from '@/app/i18n/messages/vi/MyTarget.json';
 
-type ReadinessCopy = { label: string; message: string };
+export type MyTargetTranslator = ReturnType<typeof useTranslations<'MyTarget'>>;
 
-const READINESS_COPY: Record<string, ReadinessCopy> = {
-  READY: {
-    label: 'Sẵn sàng',
-    message: 'Bạn có thể cân nhắc đăng ký thi nếu duy trì kết quả ổn định.',
-  },
-  ALMOST_READY: {
-    label: 'Gần sẵn sàng',
-    message: 'Tập trung sửa các lỗi hay sai và làm thêm một đề thi thử để chắc chắn.',
-  },
-  NEEDS_IMPROVEMENT: {
-    label: 'Cần cải thiện',
-    message: 'Bạn gần đạt nhưng còn lĩnh vực yếu có thể kéo tụt điểm.',
-  },
-  NOT_READY: {
-    label: 'Chưa sẵn sàng',
-    message: 'Bạn cần củng cố nền tảng trước khi làm đề thi thử tiếp.',
-  },
-};
+type ReadinessLevelKey = 'READY' | 'ALMOST_READY' | 'NEEDS_IMPROVEMENT' | 'NOT_READY';
+type QuickTierLevel = 'EXCELLENT' | 'GOOD' | 'FAIR' | 'WEAK';
+
+const READINESS_LEVELS: readonly ReadinessLevelKey[] = [
+  'READY',
+  'ALMOST_READY',
+  'NEEDS_IMPROVEMENT',
+  'NOT_READY',
+];
 
 const READINESS_CLASS: Record<string, string> = {
   READY: 'readinessReady',
@@ -28,27 +21,40 @@ const READINESS_CLASS: Record<string, string> = {
   NOT_READY: 'readinessNotReady',
 };
 
-const QUICK_CHALLENGE_TIERS = [
-  { min: 85, level: 'EXCELLENT', title: 'Xuất sắc' },
-  { min: 60, level: 'GOOD', title: 'Khá tốt' },
-  { min: 30, level: 'FAIR', title: 'Tạm ổn' },
-  { min: 0, level: 'WEAK', title: 'Cần luyện thêm' },
+const QUICK_CHALLENGE_TIERS: { min: number; level: QuickTierLevel }[] = [
+  { min: 85, level: 'EXCELLENT' },
+  { min: 60, level: 'GOOD' },
+  { min: 30, level: 'FAIR' },
+  { min: 0, level: 'WEAK' },
 ];
 
 const NEXT_READINESS_STEP = 10;
 
-function readinessCopy(level?: string | null): ReadinessCopy {
-  return (level && READINESS_COPY[level]) || READINESS_COPY.NOT_READY;
+// Chỗ gọi không truyền t thì dùng bản tiếng Việt (giữ tương thích cho các trang gọi cũ).
+let viTranslator: MyTargetTranslator | null = null;
+function fallbackT(): MyTargetTranslator {
+  if (!viTranslator) {
+    viTranslator = createTranslator({
+      locale: 'vi',
+      messages: { MyTarget: viMyTarget },
+      namespace: 'MyTarget',
+    }) as unknown as MyTargetTranslator;
+  }
+  return viTranslator;
 }
 
-export function getReadinessLabel(level?: string | null): string {
+function readinessLevelKey(level?: string | null): ReadinessLevelKey {
+  return READINESS_LEVELS.find((l) => l === level) ?? 'NOT_READY';
+}
+
+export function getReadinessLabel(level?: string | null, t: MyTargetTranslator = fallbackT()): string {
   if (!level) return '-';
-  return readinessCopy(level).label;
+  return t(`readiness.levels.${readinessLevelKey(level)}.label`);
 }
 
-export function getReadinessMessage(level?: string | null): string | null {
+export function getReadinessMessage(level?: string | null, t: MyTargetTranslator = fallbackT()): string | null {
   if (!level) return null;
-  return readinessCopy(level).message;
+  return t(`readiness.levels.${readinessLevelKey(level)}.message`);
 }
 
 export function getReadinessClassName(
@@ -79,12 +85,13 @@ export function buildGaugeView(
     | 'readinessScore'
     | 'readinessLevel'
   >,
-  options?: { isBeginner?: boolean; isPractice?: boolean },
+  options?: { isBeginner?: boolean; isPractice?: boolean; t?: MyTargetTranslator },
 ): GaugeView {
   const {
     examCategoryCode, percentage, hasTarget, targetScore,
     totalScore, readinessScore, readinessLevel,
   } = enhanced;
+  const t = options?.t ?? fallbackT();
 
   if (examCategoryCode === 'QUICK_CHALLENGE') {
     const pct = percentage ?? 0;
@@ -92,20 +99,19 @@ export function buildGaugeView(
       return {
         gaugePercentage: pct,
         displayValue: `${pct}%`,
-        gaugeLabel: 'Điểm xuất phát',
-        gaugeTitle: 'Mốc bắt đầu của bạn',
-        gaugeMessage: 'Bạn chưa học kỳ này nên điểm thấp là bình thường. Con số này dùng để '
-          + 'xếp bước bắt đầu, không phải kết quả thi.',
+        gaugeLabel: t('readiness.gauge.startLabel'),
+        gaugeTitle: t('readiness.gauge.startTitle'),
+        gaugeMessage: t('readiness.gauge.startMessage'),
         gaugeLevel: 'STARTING',
       };
     }
-    const tier = QUICK_CHALLENGE_TIERS.find((t) => pct >= t.min)
+    const tier = QUICK_CHALLENGE_TIERS.find((tr) => pct >= tr.min)
       ?? QUICK_CHALLENGE_TIERS[QUICK_CHALLENGE_TIERS.length - 1];
     return {
       gaugePercentage: pct,
       displayValue: `${pct}%`,
-      gaugeLabel: 'Độ chính xác',
-      gaugeTitle: tier.title,
+      gaugeLabel: t('readiness.gauge.accuracy'),
+      gaugeTitle: t(`readiness.quickTiers.${tier.level}`),
       gaugeMessage: null,
       gaugeLevel: tier.level,
     };
@@ -118,23 +124,23 @@ export function buildGaugeView(
     return {
       gaugePercentage: Math.min(100, Math.round((ts / targetScore) * 100)),
       displayValue: `${ts}/${targetScore}`,
-      gaugeLabel: 'Mục tiêu',
-      gaugeTitle: targetMet ? 'Đạt mục tiêu!' : 'Chưa đạt mục tiêu',
+      gaugeLabel: t('readiness.gauge.target'),
+      gaugeTitle: targetMet ? t('readiness.gauge.targetMet') : t('readiness.gauge.targetNotMet'),
       gaugeMessage: targetMet
-        ? `Chúc mừng! Bạn đã đạt mức điểm mục tiêu ${targetScore} đề ra.`
-        : `Bạn còn thiếu ${targetScore - ts} điểm nữa để đạt mục tiêu.`,
+        ? t('readiness.gauge.targetMetMessage', { score: targetScore })
+        : t('readiness.gauge.targetGapMessage', { gap: targetScore - ts }),
       gaugeLevel: null,
     };
   }
 
   const score = readinessScore ?? 0;
-  const copy = readinessCopy(readinessLevel);
+  const levelKey = readinessLevelKey(readinessLevel);
   return {
     gaugePercentage: score,
     displayValue: `${score}%`,
-    gaugeLabel: 'Độ sẵn sàng',
-    gaugeTitle: copy.label,
-    gaugeMessage: copy.message,
+    gaugeLabel: t('readiness.gauge.readiness'),
+    gaugeTitle: t(`readiness.levels.${levelKey}.label`),
+    gaugeMessage: t(`readiness.levels.${levelKey}.message`),
     gaugeLevel: null,
   };
 }
@@ -144,21 +150,21 @@ export function buildRecoveryMessage({
   isTargetMet,
   readinessScore,
   readinessLevel,
+  t = fallbackT(),
 }: {
   hasTarget?: boolean;
   isTargetMet?: boolean | null;
   readinessScore?: number | null;
   readinessLevel?: string | null;
+  t?: MyTargetTranslator;
 }): string | null {
   if (hasTarget && isTargetMet !== true) {
-    return 'Bạn chưa đạt điểm mục tiêu. '
-      + 'Hãy lập lộ trình học để luyện đúng những phần thi còn yếu.';
+    return t('readiness.recovery.targetNotMet');
   }
   if (!hasTarget && readinessLevel !== 'READY') {
     const score = readinessScore ?? 0;
     const next = Math.min(score + NEXT_READINESS_STEP, 100);
-    return `Bước tiếp theo: nâng mức sẵn sàng từ ${score}% lên ${next}%. `
-      + 'Hãy đặt điểm mục tiêu để WinDe lập lộ trình học phù hợp với bạn.';
+    return t('readiness.recovery.nextStep', { score, next });
   }
   return null;
 }
@@ -166,21 +172,26 @@ export function buildRecoveryMessage({
 // Bài luyện theo phần: so từng Part đã luyện với mục tiêu % của chính Part đó.
 export function buildPracticeRecoveryMessage(
   parts: Pick<PartBreakdownResponse, 'partName' | 'percentage' | 'targetPercentage' | 'isTargetMet'>[],
+  t: MyTargetTranslator = fallbackT(),
 ): { message: string; allMet: boolean } | null {
   const withTarget = parts.filter((p) => p.targetPercentage != null);
   if (withTarget.length === 0) return null;
   const missed = withTarget.filter((p) => p.isTargetMet !== true);
   if (missed.length === 0) {
     return {
-      message: 'Các phần đã luyện đều đạt mục tiêu. Làm bài thi thử trọn đề để kiểm tra điểm tổng.',
+      message: t('readiness.recovery.practiceAllMet'),
       allMet: true,
     };
   }
   const detail = missed
-    .map((p) => `${p.partName} (${Math.round(p.percentage)}% / cần ${Math.round(p.targetPercentage!)}%)`)
+    .map((p) => t('readiness.recovery.practicePart', {
+      part: p.partName ?? '',
+      pct: Math.round(p.percentage),
+      target: Math.round(p.targetPercentage!),
+    }))
     .join(', ');
   return {
-    message: `${detail} chưa đạt mục tiêu. Hãy lập lộ trình để luyện đúng phần này.`,
+    message: t('readiness.recovery.practiceMissed', { detail }),
     allMet: false,
   };
 }

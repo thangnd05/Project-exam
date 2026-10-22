@@ -2,7 +2,7 @@
 
 import {useQuery} from '@tanstack/react-query';
 import {keepPreviousData} from '@/app/configs/queryClient';
-import {useAdminCrud} from '@/app/(admin)/_hooks/useAdminCrud';
+import {useAdminCrud} from '@/app/[locale]/(admin)/_hooks/useAdminCrud';
 
 import {getExamTypes} from '@/app/apis/examTypeApi';
 import {getTagsFlatByExamType} from '@/app/apis/tagApi';

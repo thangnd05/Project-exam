@@ -2,17 +2,18 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {Form, Button, Spinner} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/(admin)/_components/common';
+import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/[locale]/(admin)/_components/common';
 import {useAdminQuestionCollections, type CollectionItem} from './_hooks/useAdminQuestionCollections';
 import type {QuestionCollectionRequest} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
-import styles from '@/app/(admin)/_components/common/adminTree.module.scss';
+import styles from '@/app/[locale]/(admin)/_components/common/adminTree.module.scss';
 
 const cx = classNames.bind(styles);
 
@@ -50,6 +51,7 @@ type CollectionTreeNodeProps = {
 };
 
 function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onDelete, onAddChild, keyword, examTypeName}: CollectionTreeNodeProps) {
+  const t = useTranslations('AdminContent.questionCollections');
   const hasChildren = node.children && node.children.length > 0;
   const isExpanded = expandedIds.has(node.collection_id);
   const kw = keyword.trim().toLowerCase();
@@ -82,29 +84,29 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
             <span className={cx('examTypeBadge')}>{examTypeName(node.exam_type_id)}</span>
           )}
           {hasChildren && (
-            <span className={cx('childCount')}>{node.children!.length} nhóm con</span>
+            <span className={cx('childCount')}>{t('childCount', {count: node.children!.length})}</span>
           )}
           <span
             className={cx('questionCount', {empty: !node.question_count})}
-            title="Số câu hỏi gắn trực tiếp vào nhóm này"
+            title={t('questionCountTitle')}
           >
-            {node.question_count} câu
+            {t('questionCount', {count: node.question_count})}
             {hasChildren && node.total_question_count > node.question_count
-              ? ` · ${node.total_question_count} gộp con`
+              ? ` · ${t('totalWithChildren', {count: node.total_question_count})}`
               : ''}
           </span>
           {node.description && <span className={cx('description')}>- {node.description}</span>}
         </div>
         <div className={cx('treeNodeActions')}>
           {level === 0 && (
-            <button className={cx('addBtn')} onClick={() => onAddChild(node)} title="Thêm nhóm con">
+            <button className={cx('addBtn')} onClick={() => onAddChild(node)} title={t('addChild')}>
               <Plus size={16} />
             </button>
           )}
-          <button onClick={() => onEdit(node)} title="Sửa">
+          <button onClick={() => onEdit(node)} title={t('edit')}>
             <Edit size={16} />
           </button>
-          <button className={cx('deleteBtn')} onClick={() => onDelete(node)} title="Xóa">
+          <button className={cx('deleteBtn')} onClick={() => onDelete(node)} title={t('delete')}>
             <Trash2 size={16} />
           </button>
         </div>
@@ -137,6 +139,8 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
 }
 
 function QuestionCollectionsManagement() {
+  const t = useTranslations('AdminContent.questionCollections');
+  const tc = useTranslations('Common');
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -171,7 +175,7 @@ function QuestionCollectionsManagement() {
   }, [collectionsLoaded, collectionList, applyDefaultExpanded]);
 
   const examTypeName = useCallback(
-    (id: string) => examTypes.find((t) => String(t.examTypeId) === String(id))?.name || '',
+    (id: string) => examTypes.find((et) => String(et.examTypeId) === String(id))?.name || '',
     [examTypes],
   );
 
@@ -257,7 +261,7 @@ function QuestionCollectionsManagement() {
   const handleSubmit = async () => {
     const normalizedName = formState.name.trim();
     if (!normalizedName) {
-      setErrorMessage('Tên bộ sưu tập không được để trống.');
+      setErrorMessage(t('errors.nameRequired'));
       return;
     }
 
@@ -292,7 +296,7 @@ function QuestionCollectionsManagement() {
       setShowModal(false);
       resetForm();
     } catch (error) {
-      setErrorMessage(extractApiErrorMessage(error, 'Không thể lưu bộ sưu tập.'));
+      setErrorMessage(extractApiErrorMessage(error, t('errors.saveFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -308,7 +312,7 @@ function QuestionCollectionsManagement() {
       const {data: fresh} = await refetchCollections();
       applyDefaultExpanded(Array.isArray(fresh) ? fresh : []);
     } catch (error) {
-      setErrorMessage(extractApiErrorMessage(error, 'Không thể xoá bộ sưu tập.'));
+      setErrorMessage(extractApiErrorMessage(error, t('errors.deleteFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -317,58 +321,58 @@ function QuestionCollectionsManagement() {
   const deleteBlockReason = (() => {
     if (!deletingItem) return '';
     if (deletingItem.question_count > 0) {
-      return `Bộ sưu tập "${deletingItem.name}" đang chứa ${deletingItem.question_count} câu hỏi  backend sẽ chặn xoá. Hãy bỏ liên kết các câu hỏi trước.`;
+      return t('deleteBlockedQuestions', {name: deletingItem.name, count: deletingItem.question_count});
     }
     if (deletingItem.child_count > 0) {
-      return `Bộ sưu tập "${deletingItem.name}" đang chứa ${deletingItem.child_count} nhóm con  backend sẽ chặn xoá. Hãy xoá/tách nhóm con trước.`;
+      return t('deleteBlockedChildren', {name: deletingItem.name, count: deletingItem.child_count});
     }
-    return `Bạn có chắc muốn xóa "${deletingItem.name || ''}" không?`;
+    return t('deleteMessage', {name: deletingItem.name || ''});
   })();
 
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Quản lý bộ sưu tập câu hỏi"
-        description='Gom nhóm câu hỏi theo nguồn, hỗ trợ 2 cấp (vd "ETS 2026" chứa "ETS 2026 1").'
+        title={t('title')}
+        description={t('description')}
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
-          Thêm bộ sưu tập
+          {t('add')}
         </Button>
       </AdminPageHeader>
 
       <AdminToolbar
         searchValue={keyword}
         onSearchChange={setKeyword}
-        searchPlaceholder="Tìm theo tên bộ sưu tập hoặc mô tả..."
+        searchPlaceholder={t('searchPlaceholder')}
       />
       <AdminFieldError
         message={
           errorMessage ||
           (collectionsError
-            ? extractApiErrorMessage(collectionsErrorObj, 'Không thể tải danh sách bộ sưu tập.')
+            ? extractApiErrorMessage(collectionsErrorObj, t('errors.loadFailed'))
             : '')
         }
       />
 
       <div className={cx('treeWrapper')}>
         <div className={cx('treeToolbar')}>
-          <span className={cx('treeCount')}>{collectionList.length} bộ sưu tập</span>
+          <span className={cx('treeCount')}>{t('count', {count: collectionList.length})}</span>
           <div className={cx('treeToolbarActions')}>
-            <button onClick={expandAll}>Mở tất cả</button>
-            <button onClick={collapseAll}>Thu gọn</button>
+            <button onClick={expandAll}>{t('expandAll')}</button>
+            <button onClick={collapseAll}>{t('collapseAll')}</button>
           </div>
         </div>
 
         {loading && (
           <div className="text-center py-4">
             <Spinner size="sm" className="me-2" />
-            Đang tải...
+            {tc('loading')}
           </div>
         )}
 
         {!loading && collectionList.length === 0 && (
-          <div className="text-center py-4 text-muted">Chưa có bộ sưu tập nào.</div>
+          <div className="text-center py-4 text-muted">{t('empty')}</div>
         )}
 
         {!loading &&
@@ -395,7 +399,7 @@ function QuestionCollectionsManagement() {
           setShowModal(false);
           resetForm();
         }}
-        title={editingId ? 'Cập nhật bộ sưu tập' : 'Tạo bộ sưu tập'}
+        title={editingId ? t('form.editTitle') : t('form.createTitle')}
         footer={
           <ModalActionFooter
             onCancel={() => {
@@ -404,41 +408,41 @@ function QuestionCollectionsManagement() {
               resetForm();
             }}
             onSubmit={handleSubmit}
-            cancelLabel="Hủy"
-            submitLabel={editingId ? 'Lưu' : 'Tạo mới'}
-            loadingLabel="Đang lưu..."
+            cancelLabel={tc('cancelShort')}
+            submitLabel={editingId ? tc('save') : t('form.create')}
+            loadingLabel={t('form.saving')}
             loading={submitting}
           />
         }
       >
         <Form.Group className="mb-3">
-          <Form.Label>Tên bộ sưu tập</Form.Label>
+          <Form.Label>{t('form.name')}</Form.Label>
           <Form.Control
             value={formState.name}
             onChange={(event) => setFormState((prev) => ({...prev, name: event.target.value}))}
-            placeholder="VD: ETS 2026, ETS 2026 1, Cambridge 16..."
+            placeholder={t('form.namePlaceholder')}
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Vị trí sắp xếp (tùy chọn)</Form.Label>
+          <Form.Label>{t('form.displayOrder')}</Form.Label>
           <Form.Control
             type="number"
             value={formState.displayOrder}
             onChange={(event) => setFormState((prev) => ({...prev, displayOrder: event.target.value}))}
-            placeholder="VD: 1, 2, 3... (số nhỏ lên trước)"
+            placeholder={t('form.displayOrderPlaceholder')}
           />
           <Form.Text muted>
-            Đặt số để ghim thứ tự hiển thị. Để trống thì tự sắp theo tên (ví dụ "ETS 2026 2" đứng trước "ETS 2026 10").
+            {t('form.displayOrderHelp')}
           </Form.Text>
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Thuộc nhóm cha (tùy chọn)</Form.Label>
+          <Form.Label>{t('form.parent')}</Form.Label>
           <Form.Select
             value={editingHasChildren ? '' : formState.parentId}
             disabled={editingHasChildren}
             onChange={(event) => setFormState((prev) => ({...prev, parentId: event.target.value}))}
           >
-            <option value="">-- Không có (là nhóm cấp 1) --</option>
+            <option value="">{t('form.noParent')}</option>
             {parentOptions.map((c) => (
               <option key={c.collection_id} value={c.collection_id}>
                 {c.name}
@@ -447,43 +451,43 @@ function QuestionCollectionsManagement() {
           </Form.Select>
           <Form.Text muted>
             {editingHasChildren
-              ? 'Nhóm này đang chứa nhóm con nên không thể trở thành nhóm con của bộ khác.'
-              : 'Chọn nhóm cha để gom vào, ví dụ "ETS 2026" chứa "ETS 2026 1". Chỉ hỗ trợ 2 cấp.'}
+              ? t('form.parentLockedHelp')
+              : t('form.parentHelp')}
           </Form.Text>
         </Form.Group>
 
         {!(editingHasChildren ? false : Boolean(formState.parentId)) ? (
           <Form.Group className="mb-3">
-            <Form.Label>Loại kỳ thi (cho bộ đề)</Form.Label>
+            <Form.Label>{t('form.examTypeForSet')}</Form.Label>
             <Form.Select
               value={formState.examTypeId}
               onChange={(event) => setFormState((prev) => ({...prev, examTypeId: event.target.value}))}
             >
-              <option value="">-- Chưa gắn loại kỳ thi --</option>
-              {examTypes.map((t) => (
-                <option key={t.examTypeId} value={t.examTypeId}>
-                  {t.name}
+              <option value="">{t('form.noExamType')}</option>
+              {examTypes.map((et) => (
+                <option key={et.examTypeId} value={et.examTypeId}>
+                  {et.name}
                 </option>
               ))}
             </Form.Select>
             <Form.Text muted>
-              Gắn loại kỳ thi để bộ đề này xuất hiện như một folder ở trang "Khám phá bộ đề".
+              {t('form.examTypeHelp')}
             </Form.Text>
           </Form.Group>
         ) : (
           <Form.Group className="mb-3">
-            <Form.Label>Loại kỳ thi</Form.Label>
-            <Form.Control plaintext readOnly value={examTypeName(formState.examTypeId) || 'Kế thừa từ nhóm cha'} />
+            <Form.Label>{t('form.examType')}</Form.Label>
+            <Form.Control plaintext readOnly value={examTypeName(formState.examTypeId) || t('form.inheritedExamType')} />
           </Form.Group>
         )}
         <Form.Group>
-          <Form.Label>Mô tả</Form.Label>
+          <Form.Label>{t('form.description')}</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
             value={formState.description}
             onChange={(event) => setFormState((prev) => ({...prev, description: event.target.value}))}
-            placeholder="Mô tả ngắn về bộ sưu tập (tùy chọn)"
+            placeholder={t('form.descriptionPlaceholder')}
           />
         </Form.Group>
         <AdminFieldError message={errorMessage} />
@@ -496,7 +500,7 @@ function QuestionCollectionsManagement() {
           setDeletingItem(null);
         }}
         onConfirm={handleDelete}
-        title="Xác nhận xóa bộ sưu tập"
+        title={t('deleteTitle')}
         message={deleteBlockReason}
       />
     </div>

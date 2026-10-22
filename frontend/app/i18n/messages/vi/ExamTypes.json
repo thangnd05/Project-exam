@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "title": "Kho đề thi",
+    "description": "Kho đề thi chứng chỉ Cloud trên WinDe: lọc theo hãng và cấp độ, thi nhanh hoặc làm đề full sát format thật."
+  },
+  "detailMeta": {
+    "title": "Đề thi {name}",
+    "description": "Danh sách đề thi thử {name}: làm bài online, chấm điểm tự động và xem đáp án chi tiết."
+  },
+  "collectionMeta": {
+    "title": "Bộ đề {name}",
+    "description": "Các đề thi thử {name} trong bộ đề: làm bài online, chấm điểm tự động và xem đáp án chi tiết."
+  },
+  "spec": {
+    "questions": "{count} câu",
+    "minutes": "{count}p",
+    "none": "Chưa có"
+  },
+  "quickStart": "Thi nhanh",
+  "noQuick": "Kỳ thi này chưa có đề kiểm tra nhanh",
+  "fullMock": "Đề Full Mock",
+  "catalog": {
+    "title": "Kho đề thi",
+    "loadError": {
+      "title": "Không tải được danh sách kỳ thi",
+      "hint": "Thử tải lại trang."
+    },
+    "empty": {
+      "title": "Chưa có kỳ thi để hiển thị",
+      "hint": "Vui lòng quay lại sau."
+    },
+    "noMatch": "Không có chứng chỉ nào khớp bộ lọc",
+    "resetFilters": "Đặt lại bộ lọc",
+    "viewFullMock": "Xem các đề Full Mock của {name}",
+    "searchLabel": "Tìm kỳ thi",
+    "searchPlaceholder": "Tìm theo mã kỳ thi (SAA-C03, AZ-104...) hoặc tên chứng chỉ...",
+    "showing": "Hiển thị: <strong>{count}</strong> chứng chỉ",
+    "vendorFilter": "Lọc theo hãng",
+    "vendorLabel": "Hãng:",
+    "levelFilter": "Lọc theo cấp độ",
+    "levelLabel": "Cấp độ:",
+    "all": "Tất cả",
+    "allCount": "Tất cả ({count})"
+  },
+  "detail": {
+    "fallbackTitle": "Kỳ thi",
+    "breadcrumb": "Đường dẫn",
+    "chooseExam": "Chọn kỳ thi",
+    "groupFallback": "Nhóm kỳ thi",
+    "fullMockCount": "Đề Full Mock:",
+    "quickHint": "Đề ngắn để biết mình đang ở mức nào",
+    "myTarget": "Mục tiêu của tôi",
+    "resources": "Tài liệu ôn",
+    "certificate": {
+      "title": "Thi lấy chứng chỉ",
+      "count": "{count} đề",
+      "owned": "Bạn đã có chứng chỉ này",
+      "reward": "Đạt {score} điểm để nhận {title}.",
+      "rewardWithValidity": "Đạt {score} điểm để nhận {title} (hiệu lực {months} tháng).",
+      "genericTitle": "chứng chỉ",
+      "kind": "Chứng chỉ"
+    },
+    "mockDesc": "Mô phỏng đề thật: đủ số câu, đủ thời gian.",
+    "empty": {
+      "title": "Chưa có đề Full Mock",
+      "desc": "Đề sẽ xuất hiện ở đây khi được thêm vào kỳ thi này. Trong lúc chờ, thử làm đề nhanh."
+    }
+  },
+  "mockCard": {
+    "unlimited": "Không giới hạn",
+    "noAccount": "Không cần tài khoản",
+    "index": "Đề {index}",
+    "fallbackTitle": "Đề thi thử",
+    "questions": "Câu:",
+    "duration": "Thời gian:",
+    "minutes": "{count}p",
+    "untimed": "Tự do",
+    "attempts": "Lượt:",
+    "deadline": "Hạn:",
+    "noDeadline": "Không"
+  },
+  "collection": {
+    "loading": "Đang tải bộ đề...",
+    "empty": {
+      "title": "Bộ đề này chưa có đề nào",
+      "hint": "Vui lòng quay lại sau."
+    },
+    "fallbackTitle": "Bộ đề",
+    "label": "Khám phá bộ đề",
+    "back": "Quay lại"
+  }
+}

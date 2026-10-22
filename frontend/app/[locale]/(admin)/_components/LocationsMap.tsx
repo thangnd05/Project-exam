@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 import worldGeo from 'world-atlas/countries-110m.json';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 
 import styles from './LocationsMap.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
@@ -33,6 +34,7 @@ type GeoFeature = { rsmKey: string; properties: { name?: string } };
 const isRealCountry = (c: CountryTraffic) => c.code && c.code !== 'LO' && c.code !== '??';
 
 const LocationsMap = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
+    const t = useTranslations('AdminCommon.locations');
     const [hover, setHover] = useState<{ name?: string; v: number } | null>(null);
 
     const counts: Record<string, number> = {};
@@ -47,8 +49,8 @@ const LocationsMap = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
     const fill = (name?: string) => {
         const v = counts[norm(name)];
         if (!v) return '#e9eef5';
-        const t = 0.25 + 0.75 * (v / max);
-        return `rgba(201, 168, 75, ${t})`;
+        const alpha = 0.25 + 0.75 * (v / max);
+        return `rgba(201, 168, 75, ${alpha})`;
     };
 
     return (
@@ -86,10 +88,10 @@ const LocationsMap = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
             </ComposableMap>
             <div className={cx('caption')}>
                 {hover
-                    ? `${hover.name}: ${hover.v} lượt`
+                    ? t('hoverCount', { name: hover.name ?? '', count: hover.v })
                     : hasData
-                        ? 'Di chuột lên bản đồ để xem chi tiết'
-                        : 'Chưa có lượt truy cập từ IP công cộng (local hiển thị "Local")'}
+                        ? t('hoverHint')
+                        : t('noPublicVisits')}
             </div>
         </div>
     );

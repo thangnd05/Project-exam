@@ -6,6 +6,7 @@ import {
   IoTrashOutline,
   IoPeopleOutline,
 } from 'react-icons/io5';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import styles from './ClassManagementTable.module.scss';
 import type { ClassStudentResponse } from '@/app/types';
@@ -22,15 +23,16 @@ type ClassManagementTableProps = {
 };
 
 const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }: ClassManagementTableProps) => {
+  const t = useTranslations('Classes');
   return (
     <div className={cx('table-responsive')}>
       <Table hover className={cx('management-table')}>
         <thead>
           <tr>
-            <th>Tên lớp học</th>
-            <th>Vai trò</th>
-            <th>Mã lớp</th>
-            <th className="text-center">Hành động</th>
+            <th>{t('common.className')}</th>
+            <th>{t('classTable.role')}</th>
+            <th>{t('classTable.classCode')}</th>
+            <th className="text-center">{t('common.actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -40,7 +42,7 @@ const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }: C
                 <strong>{clazz.className}</strong>
               </td>
               <td className={cx('class-role')}>
-                {clazz.isTeacher ? 'Giáo viên' : 'Học sinh'}
+                {clazz.isTeacher ? t('common.teacher') : t('common.student')}
               </td>
               <td className={cx('class-id')}>
                 {clazz.classQr}
@@ -48,7 +50,7 @@ const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }: C
               <td>
                 <div className={cx('action-group')}>
                   {onEdit && (
-                    <OverlayTrigger overlay={<Tooltip>Sửa lớp học</Tooltip>}>
+                    <OverlayTrigger overlay={<Tooltip>{t('classTable.edit')}</Tooltip>}>
                       <button
                         className={cx('btn-action', 'edit')}
                         onClick={() => onEdit(clazz)}
@@ -59,7 +61,7 @@ const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }: C
                   )}
 
                   {onDelete && (
-                    <OverlayTrigger overlay={<Tooltip>Xóa lớp học</Tooltip>}>
+                    <OverlayTrigger overlay={<Tooltip>{t('classTable.delete')}</Tooltip>}>
                       <button
                         className={cx('btn-action', 'delete')}
                         onClick={() => onDelete(clazz)}
@@ -70,7 +72,7 @@ const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }: C
                   )}
 
                   {onManageStudents && (
-                    <OverlayTrigger overlay={<Tooltip>Quản lý học sinh</Tooltip>}>
+                    <OverlayTrigger overlay={<Tooltip>{t('common.manageStudents')}</Tooltip>}>
                       <button
                         className={cx('btn-action', 'manage')}
                         onClick={() => onManageStudents(clazz.classId)}

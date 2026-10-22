@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import styles from '@/app/features/tests/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -17,18 +18,19 @@ type PagerProps = {
 
 /** Phân trang danh sách câu hỏi: vẽ cả nghìn câu một lúc làm trang giật. */
 const Pager = ({ page, pageCount, onChange }: PagerProps) => {
+  const t = useTranslations('TestCreator');
   if (pageCount <= 1) return null;
   return (
     <div className={cx('pager')}>
       <button type="button" className={cx('pagerBtn')} disabled={page <= 0} onClick={() => onChange(0)}>
-        « Đầu
+        {t('pager.first')}
       </button>
       <button type="button" className={cx('pagerBtn')} disabled={page <= 0} onClick={() => onChange(page - 1)}>
-        ‹ Trước
+        {t('pager.prev')}
       </button>
       <span className={cx('pagerInfo')}>
-        Trang
-        <select value={page} onChange={(e) => onChange(Number(e.target.value))} aria-label="Chọn trang">
+        {t('pager.page')}
+        <select value={page} onChange={(e) => onChange(Number(e.target.value))} aria-label={t('pager.selectPage')}>
           {Array.from({ length: pageCount }, (_, i) => (
             <option key={i} value={i}>{i + 1}</option>
           ))}
@@ -36,10 +38,10 @@ const Pager = ({ page, pageCount, onChange }: PagerProps) => {
         / {pageCount}
       </span>
       <button type="button" className={cx('pagerBtn')} disabled={page >= pageCount - 1} onClick={() => onChange(page + 1)}>
-        Sau ›
+        {t('pager.next')}
       </button>
       <button type="button" className={cx('pagerBtn')} disabled={page >= pageCount - 1} onClick={() => onChange(pageCount - 1)}>
-        Cuối »
+        {t('pager.last')}
       </button>
     </div>
   );

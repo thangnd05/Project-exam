@@ -3,6 +3,7 @@
 import {useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Coins, Edit, Plus, Trash2} from 'lucide-react';
+import {useLocale, useTranslations} from 'next-intl';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
@@ -13,8 +14,8 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/(admin)/_components/common';
-import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
+} from '@/app/[locale]/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import type {CoinWalletResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
 import { useAdminCoins, useCoinUserOptions } from './_hooks/useAdminCoins';
@@ -30,6 +31,10 @@ const defaultFormState: CoinFormState = {
 };
 
 function CoinsManagement() {
+  const t = useTranslations('AdminSystem.coins');
+  const tAdmin = useTranslations('AdminCommon');
+  const tCommon = useTranslations('Common');
+  const locale = useLocale();
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingWallet, setEditingWallet] = useState<CoinWalletResponse | null>(null);
@@ -91,11 +96,11 @@ function CoinsManagement() {
   const handleSubmit = () => {
     const balanceNumber = Number(formState.balance);
     if (Number.isNaN(balanceNumber) || balanceNumber < 0) {
-      setErrorMessage('Số xu phải là số không âm.');
+      setErrorMessage(t('errors.balanceInvalid'));
       return;
     }
     if (!editingWallet && !formState.userId) {
-      setErrorMessage('Vui lòng chọn người dùng.');
+      setErrorMessage(t('errors.userRequired'));
       return;
     }
 
@@ -106,7 +111,7 @@ function CoinsManagement() {
     };
     const onError = (error: unknown) =>
       setErrorMessage(
-        getApiErrorMessage(error, 'Không thể lưu ví xu. Vui lòng thử lại.'),
+        getApiErrorMessage(error, t('errors.saveFailed')),
       );
 
     if (editingWallet) {
@@ -129,14 +134,14 @@ function CoinsManagement() {
     setErrorMessage('');
     deleteMutation.mutate(deletingWallet.userId as string, {
       onSuccess: () => setDeletingWallet(null),
-      onError: () => setErrorMessage('Không thể xóa ví xu.'),
+      onError: () => setErrorMessage(t('errors.deleteFailed')),
     });
   };
 
   const columns: AdminTableColumn[] = [
     {
       key: 'user',
-      header: 'Người dùng',
+      header: t('user'),
       render: (wallet: CoinWalletResponse) => (
         <div className="d-flex flex-column">
           <span className="fw-semibold">{wallet.userName || '-'}</span>
@@ -147,7 +152,7 @@ function CoinsManagement() {
     {key: 'email', header: 'Email', render: (wallet: CoinWalletResponse) => wallet.email || '-'},
     {
       key: 'balance',
-      header: 'Số xu',
+      header: t('balance'),
       render: (wallet: CoinWalletResponse) => (
         <span className="d-inline-flex align-items-center gap-1">
           <Coins size={14} />
@@ -157,33 +162,33 @@ function CoinsManagement() {
     },
     {
       key: 'updatedAt',
-      header: 'Cập nhật',
+      header: t('updatedAt'),
       render: (wallet: CoinWalletResponse) =>
-        wallet.updatedAt ? new Date(wallet.updatedAt).toLocaleString('vi-VN') : '-',
+        wallet.updatedAt ? new Date(wallet.updatedAt).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN') : '-',
     },
   ];
 
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Quản lý xu"
-        description="Xem và điều chỉnh số xu của người dùng."
+        title={t('title')}
+        description={t('description')}
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
-          Thêm ví xu
+          {t('add')}
         </Button>
       </AdminPageHeader>
 
       <AdminToolbar
         searchValue={keyword}
         onSearchChange={setKeyword}
-        searchPlaceholder="Tìm theo tên đăng nhập, họ tên hoặc email..."
+        searchPlaceholder={t('searchPlaceholder')}
       />
       {!showModal && (
         <AdminFieldError
           message={
-            errorMessage || (isError ? 'Không thể tải danh sách ví xu.' : '')
+            errorMessage || (isError ? t('errors.loadFailed') : '')
           }
         />
       )}
@@ -191,19 +196,19 @@ function CoinsManagement() {
       <AdminTable
         showIndex
         paginated
-        itemLabel="ví"
+        itemLabel={t('itemLabel')}
         columns={columns}
         data={filteredWallets}
         loading={loading}
         getRowKey={(wallet: CoinWalletResponse) => wallet.userId as string}
         rowActions={(wallet: CoinWalletResponse) => (
           <>
-            <button title="Sửa" onClick={() => openEditModal(wallet)}>
+            <button title={tAdmin('actions.edit')} onClick={() => openEditModal(wallet)}>
               <Edit size={14} />
             </button>
             <button
               className="danger"
-              title="Xóa"
+              title={tAdmin('actions.delete')}
               onClick={() => setDeletingWallet(wallet)}
             >
               <Trash2 size={14} />
@@ -221,7 +226,7 @@ function CoinsManagement() {
           setShowModal(false);
           resetForm();
         }}
-        title={editingWallet ? 'Cập nhật số xu' : 'Thêm ví xu'}
+        title={editingWallet ? t('editTitle') : t('add')}
         maxWidth={550}
         footer={
           <ModalActionFooter
@@ -233,14 +238,14 @@ function CoinsManagement() {
               resetForm();
             }}
             onSubmit={handleSubmit}
-            cancelLabel="Hủy"
-            submitLabel={editingWallet ? 'Lưu' : 'Tạo mới'}
+            cancelLabel={tCommon('cancelShort')}
+            submitLabel={editingWallet ? tCommon('save') : tAdmin('actions.create')}
             loading={submitting}
           />
         }
       >
         <Form.Group className="mb-3">
-          <Form.Label>Người dùng</Form.Label>
+          <Form.Label>{t('user')}</Form.Label>
           {editingWallet ? (
             <Form.Control value={editingWallet.userName || editingWallet.userId} disabled />
           ) : (
@@ -250,7 +255,7 @@ function CoinsManagement() {
                 setFormState((previous) => ({...previous, userId: event.target.value}))
               }
             >
-              <option value="">-- Chọn người dùng --</option>
+              <option value="">{t('selectUser')}</option>
               {userOptions.map((user) => (
                 <option key={user.id} value={user.id}>
                   {user.userName} {user.email ? `(${user.email})` : ''}
@@ -260,7 +265,7 @@ function CoinsManagement() {
           )}
         </Form.Group>
         <Form.Group>
-          <Form.Label>Số xu</Form.Label>
+          <Form.Label>{t('balance')}</Form.Label>
           <Form.Control
             type="number"
             min={0}
@@ -282,10 +287,8 @@ function CoinsManagement() {
           setDeletingWallet(null);
         }}
         onConfirm={handleDelete}
-        title="Xác nhận xóa ví xu"
-        message={`Bạn có chắc muốn xóa ví xu của "${
-          deletingWallet?.userName || ''
-        }" không?`}
+        title={t('deleteTitle')}
+        message={t('deleteMessage', {name: deletingWallet?.userName || ''})}
       />
     </div>
   );

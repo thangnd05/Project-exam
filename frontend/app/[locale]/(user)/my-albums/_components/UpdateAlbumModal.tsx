@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from 'react-toastify';
 import classNames from "classnames/bind";
 import { FaEdit, FaInfoCircle } from "react-icons/fa";
@@ -9,7 +10,7 @@ import CommonFormModal from "@/app/components/modal/CommonFormModal";
 import ModalActionFooter from "@/app/components/modal/ModalActionFooter";
 import styles from "@/app/components/modal/CommonFormModal.module.scss";
 import type { VocabularyAlbumResponse } from "@/app/types";
-import { useUpdateAlbum } from "@/app/(user)/my-albums/_hooks/useAlbums";
+import { useUpdateAlbum } from "@/app/[locale]/(user)/my-albums/_hooks/useAlbums";
 import { getApiErrorMessage } from "@/app/utils/apiError";
 
 const cx = classNames.bind(styles);
@@ -22,18 +23,20 @@ type UpdateAlbumModalProps = {
 };
 
 function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalProps) {
+    const t = useTranslations('Vocabulary');
+    const tCommon = useTranslations('Common');
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
 
     const updateMutation = useUpdateAlbum({
         onSuccess: () => {
-            toast.success("Cập nhật Album thành công!");
+            toast.success(t('albumForm.toast.updated'));
             onClose();
             if (onSuccess) onSuccess();
         },
         onError: (err) => {
             console.error(err);
-            toast.error(getApiErrorMessage(err, " Có lỗi xảy ra khi cập nhật Album!"));
+            toast.error(getApiErrorMessage(err, t('albumForm.toast.updateError')));
         },
     });
     const loading = updateMutation.isPending;
@@ -51,7 +54,7 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalP
 
     const handleUpdate = () => {
         if (!name.trim()) {
-            toast.warning(" Vui lòng nhập tên Album!");
+            toast.warning(t('albumForm.toast.nameRequired'));
             return;
         }
 
@@ -67,12 +70,12 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalP
         <CommonFormModal
             show={show}
             onHide={onClose}
-            title="Chỉnh sửa Album"
+            title={t('albumForm.editTitle')}
             footer={(
                 <ModalActionFooter
-                    cancelLabel="Hủy"
-                    submitLabel="Lưu thay đổi"
-                    loadingLabel="Đang lưu..."
+                    cancelLabel={tCommon('cancelShort')}
+                    submitLabel={t('albumForm.saveChanges')}
+                    loadingLabel={t('saving')}
                     loading={loading}
                     onCancel={onClose}
                     onSubmit={handleUpdate}
@@ -81,7 +84,7 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalP
             )}
         >
             <div className={cx("formGroup")}>
-                <label className={cx("label")}>Tên Album</label>
+                <label className={cx("label")}>{t('albumForm.name')}</label>
                 <div className={cx("inputWrapper")}>
                     <span className={cx("inputIcon")}>
                         <FaEdit />
@@ -89,7 +92,7 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalP
                     <input
                         type="text"
                         className={cx("inputControl")}
-                        placeholder="Ví dụ: Từ vựng IELTS, Giao tiếp..."
+                        placeholder={t('albumForm.namePlaceholder')}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         disabled={loading}
@@ -99,11 +102,11 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalP
             </div>
 
             <div className={cx("formGroup")}>
-                <label className={cx("label")}>Mô tả</label>
+                <label className={cx("label")}>{t('albumForm.description')}</label>
                 <div className={cx("inputWrapper")}>
                     <textarea
                         className={cx("inputControl", "textarea")}
-                        placeholder="Nhập mô tả về mục tiêu của album này..."
+                        placeholder={t('albumForm.descriptionPlaceholder')}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         disabled={loading}
@@ -112,7 +115,7 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalP
                 </div>
                 <div className={cx("tip")}>
                     <FaInfoCircle />
-                    <span>Mô tả giúp bạn ghi nhớ mục đích học tập của album.</span>
+                    <span>{t('albumForm.descriptionTip')}</span>
                 </div>
             </div>
         </CommonFormModal>

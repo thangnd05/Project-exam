@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "title": "Certificate lookup",
+    "description": "Verify certificates issued by WinDe Exam with a lookup code, and browse recently issued certificates."
+  },
+  "codeMeta": {
+    "title": "Certificate verification",
+    "description": "Check whether a WinDe Exam certificate is valid using the code printed on it."
+  },
+  "verify": {
+    "title": "Certificate lookup",
+    "subtitle": "Enter the code printed on the certificate to verify it.",
+    "codePlaceholder": "e.g. EXAM-2026-8F3K9Q",
+    "codeLabel": "Certificate code",
+    "submit": "Look up",
+    "hint": "The lookup code is printed along the bottom edge of the certificate, in the form <code>EXAM-2026-XXXXXX</code>.",
+    "checking": "Checking code {code}..."
+  },
+  "state": {
+    "VALID": {
+      "heading": "Valid certificate",
+      "message": "This certificate was issued by our system and is currently valid."
+    },
+    "REVOKED": {
+      "heading": "Certificate revoked",
+      "message": "This certificate was issued but has since been revoked and is no longer valid."
+    },
+    "EXPIRED": {
+      "heading": "Certificate expired",
+      "message": "This certificate has passed its validity period."
+    },
+    "NOT_FOUND": {
+      "heading": "Certificate not found",
+      "message": "No certificate matches this code. Please double-check the lookup code."
+    }
+  },
+  "wall": {
+    "title": "Issued certificates",
+    "summary": "{total, plural, one {# valid certificate} other {# valid certificates}} issued by WinDe Exam, newest first.",
+    "summaryEmpty": "Valid certificates issued by WinDe Exam.",
+    "loadError": "Couldn’t load the certificate list.",
+    "empty": "No certificates have been issued yet.",
+    "cardLabel": "View certificate {code} for {name}",
+    "newBadge": "New",
+    "viewCertificate": "View certificate",
+    "loadMore": "Load more"
+  },
+  "preview": {
+    "fallbackTitle": "Certificate",
+    "loading": "Loading certificate {code}..."
+  }
+}

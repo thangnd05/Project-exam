@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
+import { useTranslations } from 'next-intl';
 import { getQuestionById } from '@/app/apis/questionApi';
 import { getExamPartById } from '@/app/apis/examPartApi';
 import { getTagsFlatByExamType } from '@/app/apis/tagApi';
@@ -130,6 +131,7 @@ export function useEditQuestionModal({
   onHide,
   onSuccess,
 }: UseEditQuestionModalParams) {
+  const t = useTranslations('TestCreator');
   const [newFiles, setNewFiles] = useState<File[]>([]);
   const [extraContents, setExtraContents] = useState<string[]>([]);
   const [existingMedia, setExistingMedia] = useState<PassageMediaItem[]>([]);
@@ -204,15 +206,15 @@ export function useEditQuestionModal({
     setFormData(formFromQuestion(questionDetail));
     setExistingMedia(getPassageMediaItems(questionDetail));
     setExtraContents(getExtraTextContents(questionDetail));
-    setSelectedTagIds((questionDetail.tags || []).map((t) => t.tagId));
+    setSelectedTagIds((questionDetail.tags || []).map((tag) => tag.tagId));
   }
   const loading = !!openedFor && seededFor !== openedFor && !detailQuery.isError;
 
   useEffect(() => {
     if (!openedFor || !detailQuery.isError) return;
-    toast.error('Không thể tải dữ liệu câu hỏi');
+    toast.error(t('editQuestion.toast.loadError'));
     onHideRef.current?.();
-  }, [openedFor, detailQuery.isError]);
+  }, [openedFor, detailQuery.isError, t]);
 
   const handlePassageChange = (field: keyof EditPassageForm, value: string) => {
     setFormData((prev) => ({
@@ -271,7 +273,7 @@ export function useEditQuestionModal({
 
   const addAnswer = () => {
     if (formData.options.length >= 10) {
-      toast.warning('Tối đa 10 đáp án.');
+      toast.warning(t('editQuestion.toast.maxAnswers'));
       return;
     }
     const nextLabel = getAnswerLabelByIndex(formData.options.length);
@@ -286,7 +288,7 @@ export function useEditQuestionModal({
 
   const removeAnswer = (idx: number) => {
     if (formData.options.length <= 2) {
-      toast.warning('Tối thiểu phải có 2 đáp án.');
+      toast.warning(t('editQuestion.toast.minAnswers'));
       return;
     }
     setFormData({
@@ -308,7 +310,7 @@ export function useEditQuestionModal({
 
   const handleDeleteExistingMedia = (item: PassageMediaItem | null) => {
     if (!item?.id) {
-      toast.info('Media này không có id để xóa trực tiếp.');
+      toast.info(t('editQuestion.toast.mediaNoId'));
       return;
     }
 
@@ -323,11 +325,11 @@ export function useEditQuestionModal({
               passage: { ...prev.passage, mediaUrl: '' },
             }));
           }
-          toast.success('Đã xóa media');
+          toast.success(t('editQuestion.toast.mediaDeleted'));
         },
         onError: (error: unknown) => {
           const msg = getApiErrorMessage(error, error instanceof Error ? error.message : undefined);
-          toast.error(`Xóa media thất bại: ${msg}`);
+          toast.error(t('editQuestion.toast.mediaDeleteError', { message: msg }));
         },
       },
     );
@@ -335,15 +337,15 @@ export function useEditQuestionModal({
 
   // Chỉ tag dùng chung hoặc cùng phần thi với câu hỏi mới gắn được.
   const partTags = useMemo(
-    () => availableTags.filter((t) => !t.examPartId || t.examPartId === formData.examPartId),
+    () => availableTags.filter((tag) => !tag.examPartId || tag.examPartId === formData.examPartId),
     [availableTags, formData.examPartId],
   );
-  const partTagIds = useMemo(() => new Set(partTags.map((t) => t.tagId)), [partTags]);
+  const partTagIds = useMemo(() => new Set(partTags.map((tag) => tag.tagId)), [partTags]);
 
   const handleSave = () => {
     const correctCount = formData.options.filter((opt) => opt.isCorrect).length;
     if (correctCount === 0) {
-      toast.warning('Vui lòng chọn ít nhất một đáp án đúng.');
+      toast.warning(t('editQuestion.toast.correctAnswerRequired'));
       return;
     }
 
@@ -367,7 +369,7 @@ export function useEditQuestionModal({
       tagIds: selectedTagIds.filter((id) => partTagIds.has(id)),
     };
 
-    const cleanExtraContents = extraContents.map((t) => t?.trim()).filter(Boolean);
+    const cleanExtraContents = extraContents.map((text) => text?.trim()).filter(Boolean);
     const hasPassage =
       formData.passage.content?.trim() !== '' ||
       formData.passage.contentTranslation?.trim() !== '' ||
@@ -403,12 +405,12 @@ export function useEditQuestionModal({
       { questionId: questionId as string, data: data as QuestionCreateRequest | FormData, config },
       {
         onSuccess: () => {
-          toast.success('Cập nhật câu hỏi thành công!');
+          toast.success(t('editQuestion.toast.updated'));
           onSuccess();
         },
         onError: (error: unknown) => {
           const msg = getApiErrorMessage(error, error instanceof Error ? error.message : undefined);
-          toast.error(`Lỗi khi cập nhật: ${msg}`);
+          toast.error(t('editTest.toast.updateError', { message: msg }));
         },
       },
     );

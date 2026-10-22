@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { Badge } from 'react-bootstrap';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import styles from '@/app/features/tests/TagSelector/TagSelector.module.scss';
 import type { TagResponse } from '@/app/types';
 
@@ -20,19 +21,21 @@ type TagSelectorProps = {
 
 type PartGroup = { key: string; name: string; tags: TagResponse[] };
 
-const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân loại' }: TagSelectorProps) => {
+const TagSelector = ({ tags = [], selectedIds = [], onToggle, label: labelProp }: TagSelectorProps) => {
+    const t = useTranslations('TestCreator');
+    const label = labelProp ?? t('tagSelector.label');
     // Tag được nhóm theo phần thi; thứ tự nhóm theo thứ tự tag backend trả về.
     const groups = useMemo(() => {
         const map = new Map<string, PartGroup>();
-        tags.forEach((t) => {
-            const key = t.examPartId || SHARED_PART_KEY;
+        tags.forEach((tag) => {
+            const key = tag.examPartId || SHARED_PART_KEY;
             if (!map.has(key)) {
-                map.set(key, { key, name: t.examPartId ? t.examPartName || 'Phần thi' : 'Dùng chung', tags: [] });
+                map.set(key, { key, name: tag.examPartId ? tag.examPartName || t('tagSelector.part') : t('tagSelector.shared'), tags: [] });
             }
-            map.get(key)!.tags.push(t);
+            map.get(key)!.tags.push(tag);
         });
         return Array.from(map.values());
-    }, [tags]);
+    }, [tags, t]);
 
     const [openOverride, setOpenOverride] = useState<Record<string, boolean>>({});
 
@@ -56,7 +59,7 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label = 'Tag phân
     };
 
     const renderGroup = (group: PartGroup) => {
-        const selCount = group.tags.filter((t) => selectedSet.has(t.tagId)).length;
+        const selCount = group.tags.filter((tag) => selectedSet.has(tag.tagId)).length;
         const open = openOverride[group.key] !== undefined ? openOverride[group.key] : true;
         return (
             <div key={group.key} className={cx('group')}>

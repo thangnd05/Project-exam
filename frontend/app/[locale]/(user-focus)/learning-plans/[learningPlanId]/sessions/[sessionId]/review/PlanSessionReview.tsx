@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import Link, { useRouter } from '@/app/i18n/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import PlanResultView from '@/app/features/learning-plans/PlanResultView/PlanResultView';
 import { toPlanResult } from '@/app/features/learning-plans/planResult';
 import { usePlanSessionReview } from './_hooks/usePlanSessionReview';
@@ -11,6 +12,8 @@ import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss'
 const cx = classNames.bind(styles);
 
 function PlanSessionReview() {
+  const t = useTranslations('LearningPlans');
+  const tc = useTranslations('Common');
   const { learningPlanId, sessionId } = useParams<{ learningPlanId: string; sessionId: string }>();
   const searchParams = useSearchParams();
   const taskId = searchParams.get('taskId');
@@ -34,7 +37,7 @@ function PlanSessionReview() {
   if (isLoading) {
     return (
       <div className={cx('wrapper')}>
-        <div className={cx('loading')}>Đang tải...</div>
+        <div className={cx('loading')}>{tc('loading')}</div>
       </div>
     );
   }
@@ -46,11 +49,11 @@ function PlanSessionReview() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <Link href={backTo} className={cx('btn', 'btnGhost', 'btnSm')}>
-            ← {taskId ? 'Lịch sử ải' : 'Lộ trình'}
+            ← {taskId ? t('review.taskHistory') : t('common.plan')}
           </Link>
         </div>
         <div className={cx('alert', 'alertDanger')}>
-          {loadError || 'Không có bài làm nào cho lượt luyện này.'}
+          {loadError || t('review.noReview')}
         </div>
       </div>
     );
@@ -60,7 +63,7 @@ function PlanSessionReview() {
     <div className={cx('wrapper', 'studyWide')}>
       <div className={cx('headerBar')}>
         <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
-          Quay lại
+          {t('common.back')}
         </Link>
       </div>
       <PlanResultView

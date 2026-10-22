@@ -2,6 +2,7 @@
 
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 import styles from './ContentInsightsTables.module.scss';
 import type { ContentTestStat } from '@/app/types/admin';
@@ -26,38 +27,41 @@ const EmptyRow = ({ colSpan, message }: { colSpan: number; message: string }) =>
     </tr>
 );
 
-export const TopTestsTable = ({ data = [] }: { data?: ContentTestStat[] }) => (
-    <div className={cx('tableWrap')}>
-        <table className={cx('table')}>
-            <thead>
-                <tr>
-                    <th className={cx('rank')}>#</th>
-                    <th>Bài thi</th>
-                    <th className={cx('num')}>Lượt làm</th>
-                    <th className={cx('rateCol')}>Tỉ lệ hoàn thành</th>
-                </tr>
-            </thead>
-            <tbody>
-                {data.length === 0 ? (
-                    <EmptyRow colSpan={4} message="Chưa có lượt làm bài nào." />
-                ) : (
-                    data.map((t, i) => (
-                        <motion.tr
-                            key={t.testId}
-                            initial={{ opacity: 0, x: -8 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.03 }}
-                        >
-                            <td className={cx('rank')}>{i + 1}</td>
-                            <td className={cx('title')} title={t.title}>{t.title}</td>
-                            <td className={cx('num')}>{t.attempts}</td>
-                            <td className={cx('rateCol')}>
-                                <RateBar value={t.completionRate} />
-                            </td>
-                        </motion.tr>
-                    ))
-                )}
-            </tbody>
-        </table>
-    </div>
-);
+export const TopTestsTable = ({ data = [] }: { data?: ContentTestStat[] }) => {
+    const t = useTranslations('AdminCommon.contentInsights');
+    return (
+        <div className={cx('tableWrap')}>
+            <table className={cx('table')}>
+                <thead>
+                    <tr>
+                        <th className={cx('rank')}>#</th>
+                        <th>{t('test')}</th>
+                        <th className={cx('num')}>{t('attempts')}</th>
+                        <th className={cx('rateCol')}>{t('completionRate')}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {data.length === 0 ? (
+                        <EmptyRow colSpan={4} message={t('empty')} />
+                    ) : (
+                        data.map((row, i) => (
+                            <motion.tr
+                                key={row.testId}
+                                initial={{ opacity: 0, x: -8 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: i * 0.03 }}
+                            >
+                                <td className={cx('rank')}>{i + 1}</td>
+                                <td className={cx('title')} title={row.title}>{row.title}</td>
+                                <td className={cx('num')}>{row.attempts}</td>
+                                <td className={cx('rateCol')}>
+                                    <RateBar value={row.completionRate} />
+                                </td>
+                            </motion.tr>
+                        ))
+                    )}
+                </tbody>
+            </table>
+        </div>
+    );
+};

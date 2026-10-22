@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 
 import MediaImage from '@/app/components/MediaImage/MediaImage';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
@@ -14,14 +15,15 @@ type BannerBlockProps = {
 };
 
 function BannerBlock({ url, showPlaceholder = false }: BannerBlockProps) {
+  const t = useTranslations('TestTaking.examLayout');
   if (!url) {
     return showPlaceholder ? (
-      <div className={cx('bannerPlaceholder')}>Banner (chưa có ảnh)</div>
+      <div className={cx('bannerPlaceholder')}>{t('bannerPlaceholder')}</div>
     ) : null;
   }
   return (
     <div className={cx('banner')}>
-      <MediaImage src={getFullMediaUrl(url)} alt="Banner bài thi" width={1600} height={400} sizes="100vw" />
+      <MediaImage src={getFullMediaUrl(url)} alt={t('bannerAlt')} width={1600} height={400} sizes="100vw" />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import Link, { usePathname, useRouter } from '@/app/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import {Button, Dropdown} from 'react-bootstrap';
 import Image from 'next/image';
 import {useEffect, useRef, useState} from 'react';
@@ -123,6 +123,7 @@ function Header() {
   // const [showClassMenu, setShowClassMenu] = useState(false);
   // const classMenuTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
+  const t = useTranslations('Layout');
   const pathname = usePathname();
   const pillRef = useRef<HTMLDivElement>(null);
   const onLight = useLightBehind(pillRef, pathname);
@@ -166,11 +167,11 @@ function Header() {
     <FirstTimeHint
       hintKey="streak-coins"
       enabled={Boolean(user)}
-      title="Chuỗi ngày học và xu"
+      title={t('streakHint.title')}
       body={
         <>
-          <p>🔥 Chuỗi tăng mỗi ngày bạn làm bài hoặc học một nhiệm vụ trong lộ trình. Bỏ một ngày là chuỗi về 0.</p>
-          <p>🪙 Hoàn thành nhiệm vụ để nhận xu, dùng xu đổi khung và huy hiệu cho avatar. Bấm vào số xu để xem nhiệm vụ, chấm đỏ nghĩa là có thưởng chưa nhận.</p>
+          <p>{t('streakHint.streak')}</p>
+          <p>{t('streakHint.coins')}</p>
         </>
       }
     >
@@ -233,7 +234,7 @@ function Header() {
             </Link>
           </div>
 
-          <nav className={cx('zoneCenter')} aria-label="Điều hướng chính">
+          <nav className={cx('zoneCenter')} aria-label={t('nav.mainNavigation')}>
             <div className={cx('navTrack')}>
               {/* <Link
                 href={routes.certificateVerifyHome}
@@ -247,7 +248,7 @@ function Header() {
                   active: pathname === routes.examTypes || pathname.startsWith('/exam-types/'),
                 })}
               >
-                Kho đề thi
+                {t('nav.examTypes')}
               </Link>
               <Link
                 href={routes.resources}
@@ -255,7 +256,7 @@ function Header() {
                   active: pathname === routes.resources || pathname.startsWith('/resources/'),
                 })}
               >
-                Tài liệu
+                {t('nav.resources')}
               </Link>
               {/* <Link
                 href={routes.posts}
@@ -271,7 +272,7 @@ function Header() {
                   active: pathname.startsWith(routes.myTarget) || pathname.startsWith(routes.learningPlans),
                 })}
               >
-                Lộ trình
+                {t('nav.learningPlans')}
               </Link>
               {/* <Link
                 href={routes.myAlbums}
@@ -340,10 +341,10 @@ function Header() {
               {!user ? (
                 <div className={cx('authLinks')}>
                   <Link href={buildLoginUrl(pathname === routes.home ? null : pathname, {mode: 'signin'})} className={cx('home')}>
-                    Đăng nhập
+                    {t('nav.login')}
                   </Link>
                   <Link href={buildLoginUrl(pathname === routes.home ? null : pathname, {mode: 'signup'})} className={cx('ctaBtn')}>
-                    <span>Đăng ký</span>
+                    <span>{t('nav.signup')}</span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                     </svg>
@@ -358,7 +359,7 @@ function Header() {
                         className={cx('ctaBtn')}
                         onClick={handleCreateTest}
                       >
-                        Tạo bài kiểm tra
+                        {t('nav.createTest')}
                       </Button>
                     </div>
                   )}
@@ -373,7 +374,7 @@ function Header() {
                       className={cx('user-info')}
                       role="button"
                       tabIndex={0}
-                      aria-label={`Tài khoản ${user.userName || ''}`}
+                      aria-label={t('nav.account', {name: user.userName || ''})}
                     >
                       <AvatarWithCosmetic
                         src={user?.avatarUrl}
@@ -393,14 +394,14 @@ function Header() {
                         {user.email && <p className={cx('dropdownEmail')}>{user.email}</p>}
                       </div>
                       <Dropdown.Item as={Link} href={routes.dashboard}>
-                        Hồ sơ
+                        {t('nav.profile')}
                       </Dropdown.Item>
                       <Dropdown.Item as={Link} href={routes.myCertificates}>
-                        Chứng chỉ của tôi
+                        {t('nav.myCertificates')}
                       </Dropdown.Item>
                       <Dropdown.Divider className={cx('dropdownDivider')} />
                       <Dropdown.Item onClick={handleLogout} className={cx('logoutItem')}>
-                        Đăng xuất
+                        {t('nav.logout')}
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>

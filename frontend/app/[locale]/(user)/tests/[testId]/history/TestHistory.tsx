@@ -1,8 +1,9 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { Container } from 'react-bootstrap';
 import classNamesBind from 'classnames/bind';
+import { useLocale, useTranslations } from 'next-intl';
 import { FiArrowRight } from 'react-icons/fi';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 
@@ -18,9 +19,9 @@ import { useTestHistory } from './_hooks/useTestHistory';
 const cx = classNamesBind.bind(styles);
 const ui = classNamesBind.bind(uiStyles);
 
-const formatDateTime = (dateStr?: string) => {
+const formatDateTime = (dateStr: string | undefined, locale: string) => {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleString('vi-VN', {
+  return new Date(dateStr).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN', {
     hour12: false,
     day: '2-digit',
     month: '2-digit',
@@ -45,9 +46,11 @@ const formatScore = (score?: number | null) => {
   return Number.isInteger(score) ? String(score) : score.toFixed(1);
 };
 
-const STATUS: Record<string, { label: string; tone: string | null }> = {
-  [UserTestStatus.COMPLETED]: { label: 'Hoàn thành', tone: 'pillSuccess' },
-  [UserTestStatus.IN_PROGRESS]: { label: 'Đang làm', tone: 'pillBrand' },
+type StatusLabelKey = 'completed' | 'inProgress' | 'expired';
+
+const STATUS: Record<string, { labelKey: StatusLabelKey; tone: string | null }> = {
+  [UserTestStatus.COMPLETED]: { labelKey: 'completed', tone: 'pillSuccess' },
+  [UserTestStatus.IN_PROGRESS]: { labelKey: 'inProgress', tone: 'pillBrand' },
 };
 
 function summarize(attempts: UserTestResponse[]) {
@@ -68,6 +71,8 @@ function summarize(attempts: UserTestResponse[]) {
 
 // testRef do page server tra từ slug trên URL (/tests/aws-dop-c02-test-1/history) rồi truyền xuống.
 function TestHistory({ testRef }: { testRef: TestRef }) {
+  const t = useTranslations('TestTaking.history');
+  const locale = useLocale();
   const { attempts, testInfo, isLoading } = useTestHistory(testRef.testId);
   const summary = summarize(attempts);
 
@@ -85,36 +90,36 @@ function TestHistory({ testRef }: { testRef: TestRef }) {
       return (
         <div className={ui('empty')}>
           <IoDocumentTextOutline className={ui('emptyIcon')} aria-hidden="true" />
-          <h2>Chưa có lần làm bài nào</h2>
-          <p>Bấm &quot;Bắt đầu làm bài&quot; ở trên. Mỗi lần nộp bài sẽ được lưu lại ở đây để bạn so sánh.</p>
+          <h2>{t('empty.title')}</h2>
+          <p>{t('empty.desc')}</p>
         </div>
       );
     }
 
     return (
       <>
-        <section className={cx('stats')} aria-label="Tổng quan">
+        <section className={cx('stats')} aria-label={t('stats.label')}>
           <div className={cx('stat')}>
-            <span className={ui('eyebrow')}>Lượt đã làm</span>
+            <span className={ui('eyebrow')}>{t('stats.attempts')}</span>
             <span className={cx('statValue')}>{attempts.length}</span>
-            <span className={cx('statMeta')}>{summary.completedCount} lượt hoàn thành</span>
+            <span className={cx('statMeta')}>{t('stats.completed', { count: summary.completedCount })}</span>
           </div>
           <div className={cx('stat')}>
-            <span className={ui('eyebrow')}>Điểm cao nhất</span>
+            <span className={ui('eyebrow')}>{t('stats.best')}</span>
             <span className={cx('statValue')}>{formatScore(summary.best)}</span>
           </div>
           <div className={cx('stat')}>
-            <span className={ui('eyebrow')}>Lần gần nhất</span>
+            <span className={ui('eyebrow')}>{t('stats.latest')}</span>
             <span className={cx('statValue')}>{formatScore(summary.latest)}</span>
             {summary.delta != null && (
               <span className={cx('statMeta', summary.delta > 0 ? 'up' : summary.delta < 0 ? 'down' : null)}>
                 {summary.delta > 0 ? '+' : ''}
-                {formatScore(summary.delta)} so với lần trước
+                {t('stats.delta', { delta: formatScore(summary.delta) })}
               </span>
             )}
           </div>
           <div className={cx('stat')}>
-            <span className={ui('eyebrow')}>Thời gian TB</span>
+            <span className={ui('eyebrow')}>{t('stats.avgDuration')}</span>
             <span className={cx('statValue')}>{formatDuration(summary.avgDuration)}</span>
           </div>
         </section>
@@ -122,7 +127,7 @@ function TestHistory({ testRef }: { testRef: TestRef }) {
         <section aria-labelledby="attempts-title">
           <div className={cx('sectionHead')}>
             <h2 id="attempts-title" className={cx('sectionTitle')}>
-              Các lần làm bài
+              {t('attemptsTitle')}
             </h2>
             <span className={cx('sectionCount')}>{attempts.length}</span>
           </div>
@@ -131,18 +136,18 @@ function TestHistory({ testRef }: { testRef: TestRef }) {
             <table className={cx('table')}>
               <thead>
                 <tr>
-                  <th>Lần</th>
-                  <th>Bắt đầu</th>
-                  <th>Nộp bài</th>
-                  <th>Thời gian làm</th>
-                  <th className={cx('right')}>Điểm</th>
-                  <th>Trạng thái</th>
+                  <th>{t('columns.attempt')}</th>
+                  <th>{t('columns.started')}</th>
+                  <th>{t('columns.submitted')}</th>
+                  <th>{t('columns.duration')}</th>
+                  <th className={cx('right')}>{t('columns.score')}</th>
+                  <th>{t('columns.status')}</th>
                   <th></th>
                 </tr>
               </thead>
               <tbody>
                 {attempts.map((a, i) => {
-                  const status = STATUS[a.status as string] ?? { label: 'Hết hạn', tone: 'pillWarning' };
+                  const status = STATUS[a.status as string] ?? { labelKey: 'expired', tone: 'pillWarning' };
                   const isBest =
                     a.status === UserTestStatus.COMPLETED &&
                     summary.completedCount > 1 &&
@@ -152,25 +157,25 @@ function TestHistory({ testRef }: { testRef: TestRef }) {
                       <td>
                         <span className={cx('attemptCell')}>
                           <span className={cx('rank')}>#{attempts.length - i}</span>
-                          {isPracticeAttempt(a) && <span className={ui('pill')}>Luyện theo phần</span>}
+                          {isPracticeAttempt(a) && <span className={ui('pill')}>{t('practice')}</span>}
                         </span>
                       </td>
-                      <td className={cx('mono', 'dim')}>{formatDateTime(a.startedAt)}</td>
-                      <td className={cx('mono', 'dim')}>{formatDateTime(a.finishedAt)}</td>
+                      <td className={cx('mono', 'dim')}>{formatDateTime(a.startedAt, locale)}</td>
+                      <td className={cx('mono', 'dim')}>{formatDateTime(a.finishedAt, locale)}</td>
                       <td className={cx('mono', 'dim')}>{formatDuration(a.durationTaken)}</td>
                       <td className={cx('right')}>
                         <span className={cx('attemptCell', 'attemptCellEnd')}>
-                          {isBest && <span className={ui('pill', 'pillSuccess')}>Cao nhất</span>}
+                          {isBest && <span className={ui('pill', 'pillSuccess')}>{t('bestPill')}</span>}
                           <span className={cx('score')}>{formatScore(a.totalScore)}</span>
                         </span>
                       </td>
                       <td>
-                        <span className={ui('pill', status.tone)}>{status.label}</span>
+                        <span className={ui('pill', status.tone)}>{t(`status.${status.labelKey}`)}</span>
                       </td>
                       <td className={cx('right')}>
                         {a.status === UserTestStatus.COMPLETED ? (
                           <Link href={`/tests/result/${a.userTestId}`} className={ui('btnSecondary', 'btnSm')}>
-                            Xem kết quả
+                            {t('viewResult')}
                             <FiArrowRight aria-hidden="true" />
                           </Link>
                         ) : (

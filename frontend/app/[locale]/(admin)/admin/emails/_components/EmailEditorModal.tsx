@@ -4,17 +4,18 @@ import {useMemo, useState} from 'react';
 import {Form} from 'react-bootstrap';
 import {Eye, Send} from 'lucide-react';
 import {toast} from 'react-toastify';
+import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 import RichTextEditor from '@/app/components/RichTextEditor/RichTextEditor';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import {AdminFieldError} from '@/app/(admin)/_components/common';
+import {AdminFieldError} from '@/app/[locale]/(admin)/_components/common';
 import {EmailType} from '@/app/enums';
 import type {EmailResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
-import {useEmailMutations} from '@/app/(admin)/admin/emails/_hooks/useAdminEmails';
+import {useEmailMutations} from '@/app/[locale]/(admin)/admin/emails/_hooks/useAdminEmails';
 import styles from './EmailEditorModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -56,6 +57,8 @@ type EmailEditorModalProps = {
 };
 
 function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
+  const t = useTranslations('AdminSystem.emails.editor');
+  const tCommon = useTranslations('Common');
   const isAuto = email?.type === EmailType.AUTO;
   const isEditing = Boolean(email?.emailId);
   const isLayout = email?.code === 'LAYOUT_BASE';
@@ -102,11 +105,11 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
 
   const validate = () => {
     if (!form.subject.trim()) {
-      setErrorMessage('Tiêu đề email không được để trống.');
+      setErrorMessage(t('errors.subjectRequired'));
       return false;
     }
     if (!form.bodyHtml.trim()) {
-      setErrorMessage('Nội dung email không được để trống.');
+      setErrorMessage(t('errors.bodyRequired'));
       return false;
     }
     return true;
@@ -131,10 +134,10 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
       } else {
         await createEmail(payload);
       }
-      toast.success('Đã lưu nội dung email.');
+      toast.success(t('saved'));
       onClose();
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, 'Không thể lưu email. Vui lòng thử lại.'));
+      setErrorMessage(getApiErrorMessage(error, t('errors.saveFailed')));
     } finally {
       setSubmitting(false);
     }
@@ -149,14 +152,14 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
       const result = await previewEmail({subject: form.subject, bodyHtml: form.bodyHtml});
       setPreviewHtml(result.bodyHtml ?? '');
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, 'Không tạo được bản xem trước.'));
+      setErrorMessage(getApiErrorMessage(error, t('errors.previewFailed')));
     }
   };
 
   const handleTestSend = async () => {
     setErrorMessage('');
     if (!isEditing) {
-      setErrorMessage('Hãy lưu email trước khi gửi thử.');
+      setErrorMessage(t('errors.saveBeforeTest'));
       return;
     }
     if (!validate()) {
@@ -167,9 +170,9 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
         emailId: email!.emailId,
         payload: {subject: form.subject, bodyHtml: form.bodyHtml, toEmail: testEmail || undefined},
       });
-      toast.info('Đã đưa email thử vào hàng gửi, kiểm tra hộp thư sau ít giây.');
+      toast.info(t('testQueued'));
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, 'Không gửi thử được.'));
+      setErrorMessage(getApiErrorMessage(error, t('errors.testFailed')));
     }
   };
 
@@ -181,49 +184,52 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
     <BaseModal
       show={show}
       onClose={submitting ? undefined : onClose}
-      title={isEditing ? `Sửa nội dung: ${email?.name || email?.subject}` : 'Soạn email mới'}
+      title={isEditing ? t('editTitle', {name: email?.name || email?.subject || ''}) : t('createTitle')}
       maxWidth={860}
       footer={
         <ModalActionFooter
           onCancel={onClose}
           onSubmit={handleSubmit}
-          cancelLabel="Đóng"
-          submitLabel="Lưu nội dung"
+          cancelLabel={tCommon('close')}
+          submitLabel={t('submit')}
           loading={submitting}
         />
       }
     >
       {isAuto && (
         <div className="alert alert-info py-2 small">
-          Mẫu tự động <b>{email!.code}</b>  {email!.description}
+          {t.rich('autoTemplate', {
+            code: email!.code ?? '',
+            description: email!.description ?? '',
+            b: (chunks) => <b>{chunks}</b>,
+          })}
         </div>
       )}
 
       {!isAuto && (
         <Form.Group className="mb-3">
-          <Form.Label>Tên gợi nhớ</Form.Label>
+          <Form.Label>{t('name')}</Form.Label>
           <Form.Control
             value={form.name}
-            placeholder="Ví dụ: Thông báo bảo trì hệ thống"
+            placeholder={t('namePlaceholder')}
             onChange={(event) => setField('name', event.target.value)}
           />
         </Form.Group>
       )}
 
       <Form.Group className="mb-3">
-        <Form.Label>Tiêu đề email</Form.Label>
+        <Form.Label>{t('subject')}</Form.Label>
         <Form.Control
           value={form.subject}
           onChange={(event) => setField('subject', event.target.value)}
         />
       </Form.Group>
 
-      <Form.Label>Nội dung</Form.Label>
+      <Form.Label>{t('body')}</Form.Label>
 
       {!isLayout && hasHandwrittenLayout && (
         <div className="alert alert-warning py-2 small">
-          Nội dung này có khối HTML viết tay (nút bấm, khung màu). Trình soạn thảo không
-          hiểu chúng nên nếu bạn sửa ở đây thì các khối đó sẽ mất định dạng.
+          {t('handwrittenWarning')}
         </div>
       )}
 
@@ -239,7 +245,7 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
             }}
             modules={QUILL_MODULES}
             formats={QUILL_FORMATS}
-            placeholder="Viết nội dung email tại đây..."
+            placeholder={t('bodyPlaceholder')}
           />
         </div>
       ) : (
@@ -256,14 +262,16 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
 
       {isLayout && (
         <div className="alert alert-secondary py-2 small">
-          Đây là khung bọc ngoài mọi email nên chỉ sửa được ở dạng HTML. Giữ nguyên vị trí{' '}
-          <code>{'{{content}}'}</code>  đó là chỗ nội dung từng email được chèn vào.
+          {t.rich('layoutHint', {
+            token: '{{content}}',
+            code: (chunks) => <code>{chunks}</code>,
+          })}
         </div>
       )}
 
       {(email?.availableVars?.length ?? 0) > 0 && (
         <div className="mb-3 small text-muted">
-          Biến dùng được (bấm để chèn vào cuối nội dung):{' '}
+          {t('variablesHint')}{' '}
           {email!.availableVars!.map((variable) => (
             <button
               key={variable}
@@ -280,7 +288,7 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
       <Form.Check
         type="switch"
         className="mb-3"
-        label={isAuto ? 'Đang bật (tắt là ngừng gửi loại email này)' : 'Đang bật'}
+        label={isAuto ? t('activeAuto') : t('active')}
         checked={form.active}
         onChange={(event) => setField('active', event.target.checked)}
       />
@@ -288,30 +296,30 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
       <div className="d-flex flex-wrap align-items-end gap-2 mb-3">
         <ButtonPrime type="button" variant="outline" onClick={handlePreview}>
           <Eye size={16} className="me-1" />
-          Xem trước
+          {t('preview')}
         </ButtonPrime>
         <div className="flex-fill" style={{minWidth: '20rem'}}>
-          <Form.Label className="small mb-1">Gửi thử tới</Form.Label>
+          <Form.Label className="small mb-1">{t('testTo')}</Form.Label>
           <Form.Control
             type="email"
-            placeholder="Bỏ trống để gửi về email của bạn"
+            placeholder={t('testToPlaceholder')}
             value={testEmail}
             onChange={(event) => setTestEmail(event.target.value)}
           />
         </div>
         <ButtonPrime type="button" variant="outline" onClick={handleTestSend}>
           <Send size={16} className="me-1" />
-          Gửi thử
+          {t('testSend')}
         </ButtonPrime>
       </div>
 
       {previewHtml && (
         <div className="mb-2">
           <div className="small text-muted mb-1">
-            Bản xem trước (đã lồng vào khung chung, biến thay bằng dữ liệu của bạn):
+            {t('previewHint')}
           </div>
           <iframe
-            title="Xem trước email"
+            title={t('previewFrameTitle')}
             srcDoc={previewHtml}
             sandbox=""
             style={{width: '100%', height: '32rem', border: '1px solid var(--border-color)', borderRadius: '0.8rem'}}

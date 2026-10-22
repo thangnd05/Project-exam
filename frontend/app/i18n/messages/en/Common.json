@@ -1,0 +1,27 @@
+{
+  "loading": "Loading...",
+  "processing": "Processing...",
+  "close": "Close",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "cancelShort": "Cancel",
+  "save": "Save",
+  "error": {
+    "title": "Something went wrong",
+    "message": "An error occurred while loading this content. Please try again, and if it still fails, reload the page.",
+    "retry": "Try again",
+    "reload": "Reload page",
+    "code": "Error code: {digest}"
+  },
+  "confirmDelete": {
+    "title": "Confirm deletion",
+    "message": "Are you sure you want to delete this item? This action cannot be undone.",
+    "confirm": "Yes, delete"
+  },
+  "notFound": {
+    "pageTitle": "Page not found",
+    "title": "Oops, where did this page go?",
+    "description": "The link you followed doesn't exist or has been removed. Use the button below to head back.",
+    "backHome": "Back to homepage"
+  }
+}

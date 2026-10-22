@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter } from '@/app/i18n/navigation';
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Spinner } from 'react-bootstrap';
 import routes from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
@@ -36,6 +37,7 @@ type AuthGuardProps = {
 
 function AuthGuard({ children, requiredPermission, allowGuest = false }: AuthGuardProps) {
   const { isAuthenticated, loading, permissions } = useAuth();
+  const t = useTranslations('Auth');
   const router = useRouter();
   const pathname = usePathname();
 
@@ -50,16 +52,16 @@ function AuthGuard({ children, requiredPermission, allowGuest = false }: AuthGua
     if (needsLogin) {
       const params = new URLSearchParams({
         from: pathname,
-        flash: 'Bạn cần đăng nhập để truy cập trang này!',
+        flash: t('guard.loginRequired'),
       });
       router.replace(`${routes.login}?${params.toString()}`);
     } else if (lacksPermission) {
       router.replace(routes.notFoundPage);
     }
-  }, [needsLogin, lacksPermission, pathname, router]);
+  }, [needsLogin, lacksPermission, pathname, router, t]);
 
-  if (loading) return <Fallback label="Đang kiểm tra đăng nhập..." />;
-  if (needsLogin || lacksPermission) return <Fallback label="Đang chuyển hướng..." />;
+  if (loading) return <Fallback label={t('guard.checking')} />;
+  if (needsLogin || lacksPermission) return <Fallback label={t('guard.redirecting')} />;
 
   return children;
 }

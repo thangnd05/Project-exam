@@ -1,0 +1,186 @@
+{
+  "page": {
+    "label": "Tạo đề thi",
+    "title": "Tạo đề thi từ kho câu hỏi",
+    "badge": "Cấu hình từng Part (random hoặc chọn thủ công) rồi tạo đề từ kho cá nhân.",
+    "hint": "Mỗi part: <strong>Random theo số lượng</strong> (BE lấy ngẫu nhiên từ kho cá nhân) hoặc <strong>Chọn thủ công</strong>. Với part có passage (vd. Part 3, 4, 6, 7): chọn theo <strong>nhóm (cùng passage)</strong> để giữ tính tương đồng, không chọn lẻ từng câu.",
+    "noQuestions": "Chưa có câu hỏi trong kho (cá nhân) cho part này."
+  },
+  "info": {
+    "section": "Thông tin đề thi",
+    "title": "Tiêu đề đề thi *",
+    "titlePlaceholder": "Nhập tiêu đề đề thi",
+    "titleAria": "Tiêu đề đề thi",
+    "duration": "Thời gian (phút)",
+    "durationPlaceholder": "VD: 60",
+    "durationAria": "Thời gian làm bài",
+    "examType": "Loại kỳ thi *",
+    "examTypeAria": "Loại kỳ thi",
+    "selectPlaceholder": "-- Chọn --",
+    "collection": "Bộ đề (Collection)",
+    "collectionAria": "Bộ đề",
+    "emptyOption": "-- Trống --",
+    "maxAttempts": "Số lượt làm tối đa",
+    "maxAttemptsPlaceholder": "Để trống = không giới hạn",
+    "maxAttemptsAria": "Số lượt làm",
+    "category": "Phân loại bài thi (tuỳ chọn)",
+    "categoryAria": "Phân loại bài thi",
+    "noCategory": "-- Không phân loại --",
+    "description": "Mô tả",
+    "descriptionPlaceholder": "Mô tả ngắn (tùy chọn)",
+    "descriptionAria": "Mô tả đề thi"
+  },
+  "source": {
+    "section": "Chọn nguồn kho câu hỏi",
+    "hint": "Chọn kho lấy câu hỏi để tạo đề. <strong>Kho cá nhân</strong> chứa các câu hỏi do chính bạn lưu.",
+    "classHint": "<strong>Kho lớp học</strong> là kho câu hỏi của lớp hiện tại  có thể lọc theo chapter.",
+    "adminHint": "<strong>Kho quản trị</strong> là kho do admin cung cấp, dùng làm nguồn tạo đề.",
+    "personal": "Kho cá nhân",
+    "class": "Kho lớp học",
+    "admin": "Kho quản trị",
+    "chapterFilter": "Lọc theo chapter",
+    "chapterAria": "Chọn chapter trong lớp",
+    "allChaptersOption": "Tất cả chapter của lớp",
+    "chapterFallback": "Chapter {chapterId}",
+    "chapter": "Chapter",
+    "allChapters": "Tất cả chapter"
+  },
+  "scope": {
+    "label": "Phạm vi câu hỏi",
+    "exam": {
+      "label": "Câu thi",
+      "hint": "Chỉ lấy câu hỏi dành cho thi — đây là mặc định."
+    },
+    "practice": {
+      "label": "Câu ôn tập",
+      "hint": "Chỉ lấy câu hỏi ôn tập (lộ trình). Câu vẫn giữ nguyên trạng thái ôn tập sau khi đưa vào đề."
+    },
+    "all": {
+      "label": "Cả hai",
+      "hint": "Lấy cả câu thi lẫn câu ôn tập trong cùng một kho."
+    }
+  },
+  "modes": {
+    "random": "Random theo số lượng",
+    "byCollection": "Random theo bộ đề",
+    "byCollectionNoCollectionTitle": "Chưa chọn Bộ đề ở mục 1 → sẽ lấy toàn kho",
+    "sequential": "Lấy tuần tự",
+    "manual": "Chọn thủ công"
+  },
+  "parts": {
+    "section": "Cấu hình từng Part",
+    "modesHint": "Mỗi part: <strong>Random theo số lượng</strong> (lấy ngẫu nhiên toàn kho), <strong>Random theo bộ đề</strong>, <strong>Lấy tuần tự</strong> hoặc <strong>Chọn thủ công</strong>.",
+    "collectionSelectedHint": "Đã chọn Bộ đề → Random theo bộ đề / Tuần tự / Thủ công chỉ lấy câu trong bộ đề đó.",
+    "collectionNotSelectedHint": "Chọn Bộ đề ở mục 1 để giới hạn nguồn câu theo bộ đề.",
+    "passageHint": "Với part có passage (vd. Part 3, 4, 6, 7): chọn theo <strong>nhóm (cùng passage)</strong> để giữ tính tương đồng, không chọn lẻ từng câu.",
+    "applyByCollectionTitle": "Lấy toàn bộ câu trong bộ đề cho tất cả Part",
+    "applyByCollectionNoCollectionTitle": "Chưa chọn Bộ đề → sẽ lấy toàn bộ kho cho tất cả Part",
+    "applyByCollection": "Random theo bộ đề · tất cả Part",
+    "applyRandomTitle": "Đặt tất cả Part về Random theo số lượng",
+    "applyRandom": "Random số lượng · tất cả Part",
+    "questionCount": "{count} câu",
+    "randomCount": "Số câu lấy ngẫu nhiên:",
+    "randomAria": "Số câu random {part}",
+    "maxInBank": "Tối đa {count} câu trong kho",
+    "maxInCollection": "Tối đa {count} câu trong bộ đề",
+    "byCollectionHint": "Lấy toàn bộ {count} câu trong bộ đề (xáo trộn thứ tự, giữ trọn cụm passage).",
+    "byCollectionNoCollectionHint": "Chưa chọn Bộ đề ở mục 1 → sẽ lấy toàn bộ {count} câu trong kho.",
+    "fromIndex": "Từ câu:",
+    "fromAria": "Từ câu {part}",
+    "toIndex": "Đến câu:",
+    "toAria": "Đến câu {part}",
+    "loading": "Đang tải câu hỏi...",
+    "empty": {
+      "collection": "Bộ đề đã chọn chưa có câu hỏi cho part này.",
+      "admin": "Kho quản trị chưa có câu hỏi cho part này.",
+      "classChapter": "Kho lớp học (chapter đã chọn) chưa có câu hỏi cho part này.",
+      "class": "Kho lớp học chưa có câu hỏi cho part này.",
+      "personal": "Chưa có câu hỏi trong kho cá nhân cho part này."
+    },
+    "filteringBy": "Đang lọc theo <strong>{scope}</strong> — thử đổi phạm vi ở mục 2.",
+    "selectAll": "Chọn tất cả ({count} câu)",
+    "selectAllAria": "Chọn tất cả {part}",
+    "passageGroup": "Nhóm passage ({count} câu)",
+    "standalone": "Câu độc lập ({count} câu)",
+    "noContent": "(Không có nội dung)",
+    "practiceBadgeTitle": "Câu ôn tập — vẫn giữ nguyên trạng thái ôn tập sau khi đưa vào đề",
+    "practiceBadge": "Ôn tập",
+    "editQuestion": "Sửa câu hỏi này",
+    "total": "Tổng số câu sẽ đưa vào đề: <strong>{count}</strong>"
+  },
+  "submit": {
+    "later": "Để sau",
+    "creating": "Đang tạo đề...",
+    "submit": "Tạo đề thi từ kho",
+    "created": "Đã tạo đề thi từ kho câu hỏi!",
+    "titleRequired": "Vui lòng điền tiêu đề và chọn loại kỳ thi.",
+    "partRequired": "Vui lòng cấu hình ít nhất một part có câu hỏi (số câu > 0 hoặc chọn thủ công).",
+    "errors": {
+      "noTestId": "Không nhận được testId từ server.",
+      "noPartId": "Không nhận được testPartId cho part {part}.",
+      "prefix": "Lỗi: {message}"
+    }
+  },
+  "bank": {
+    "unnamed": "(Không tên)",
+    "unknown": "(Không xác định)",
+    "errors": {
+      "chapterQuestions": "Không tải được câu hỏi của chương này.",
+      "chapters": "Không tải được danh sách chương.",
+      "questions": "Không tải được danh sách câu hỏi."
+    },
+    "deleted": "Đã xóa câu hỏi thành công.",
+    "deleteError": "Không thể xóa câu hỏi. Vui lòng thử lại.",
+    "label": "Kho câu hỏi",
+    "title": {
+      "class": "Kho câu hỏi lớp học",
+      "admin": "Kho đề quản trị",
+      "personal": "Kho câu hỏi cá nhân"
+    },
+    "badge": {
+      "class": "Quản lý câu hỏi theo từng Chương. Bấm bút chì để sửa nhanh.",
+      "admin": "Kho câu hỏi quản trị viên cung cấp, dùng làm nguồn tạo đề.",
+      "personal": "Quản lý câu hỏi theo từng Part. Bấm bút chì để sửa nhanh."
+    },
+    "filters": "Bộ lọc kho câu hỏi",
+    "selectClassAria": "Chọn lớp học",
+    "selectClass": "-- Chọn lớp học --",
+    "classFallback": "Lớp {classId}",
+    "selectExamType": "-- Chọn loại kỳ thi --",
+    "collectionFilterAria": "Lọc theo nhóm (Collection)",
+    "allCollections": "-- Tất cả nhóm (Collection) --",
+    "noCollectionOption": "(Chưa gắn nhóm)",
+    "includeChildrenTitle": "Gộp câu hỏi của các nhóm con",
+    "includeChildren": "Gộp nhóm con",
+    "byChapter": "Danh sách câu hỏi theo Chương",
+    "loadingChapters": "Đang tải danh sách chương...",
+    "noChapters": "Lớp này chưa có chương nào.",
+    "questionCountRaw": "{count} câu",
+    "noQuestionsInCollection": "Không có câu hỏi nào thuộc nhóm đã chọn.",
+    "chapterEmpty": "Chương này chưa có câu hỏi.",
+    "collectionBadgeTitle": "Nhóm (Collection)",
+    "noCollection": "Chưa gắn nhóm",
+    "viewQuestion": "Xem câu {number}",
+    "editQuestion": "Sửa câu {number}",
+    "deleteQuestion": "Xóa câu {number}",
+    "adminByPart": "Câu hỏi quản trị theo Part",
+    "byPart": "Danh sách câu hỏi theo Part",
+    "partEmpty": "Part này chưa có câu hỏi.",
+    "confirmDeleteTitle": "Xác nhận xóa câu hỏi",
+    "confirmDeleteMessage": "Bạn có chắc muốn xóa câu hỏi này không? Hành động này không thể hoàn tác."
+  },
+  "view": {
+    "loadError": "Không thể tải dữ liệu câu hỏi",
+    "title": "Chi tiết câu hỏi",
+    "loading": "Đang tải dữ liệu...",
+    "empty": "Không có dữ liệu để hiển thị.",
+    "questionText": "Nội dung câu hỏi",
+    "passage": "Đoạn văn / Media",
+    "translation": "Bản dịch",
+    "answers": "Đáp án",
+    "noAnswers": "Câu hỏi này chưa có đáp án.",
+    "blank": "(Trống)",
+    "correct": "Đáp án đúng",
+    "explanation": "Giải thích đáp án"
+  }
+}

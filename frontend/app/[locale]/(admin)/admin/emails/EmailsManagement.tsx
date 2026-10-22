@@ -4,6 +4,7 @@ import {useMemo, useState} from 'react';
 import {Button} from 'react-bootstrap';
 import {Edit, History, Plus, Send, Trash2} from 'lucide-react';
 import {toast} from 'react-toastify';
+import {useLocale, useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -14,11 +15,11 @@ import {
   AdminToolbar,
   StatCard,
   StatCardGroup,
-} from '@/app/(admin)/_components/common';
-import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
+} from '@/app/[locale]/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import type {EmailResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
-import styles from '@/app/(admin)/_components/common/adminKit.module.scss';
+import styles from '@/app/[locale]/(admin)/_components/common/adminKit.module.scss';
 import EmailEditorModal from './_components/EmailEditorModal';
 import EmailRecipientsModal from './_components/EmailRecipientsModal';
 import SendEmailModal from './_components/SendEmailModal';
@@ -29,11 +30,14 @@ const cx = classNames.bind(styles);
 const PAGE_SIZE = 10;
 
 const TABS = [
-  {key: 'auto', label: 'Mẫu tự động'},
-  {key: 'manual', label: 'Soạn & gửi'},
-];
+  {key: 'auto', label: 'auto'},
+  {key: 'manual', label: 'manual'},
+] as const;
 
 function EmailsManagement() {
+  const t = useTranslations('AdminSystem.emails');
+  const tAdmin = useTranslations('AdminCommon');
+  const locale = useLocale();
   const [activeTab, setActiveTab] = useState('auto');
   const [keyword, setKeyword] = useState('');
   const [manualPage, setManualPage] = useState(0);
@@ -93,31 +97,31 @@ function EmailsManagement() {
     setErrorMessage('');
     try {
       await removeEmail(deletingEmail!.emailId);
-      toast.success('Đã xóa email.');
+      toast.success(t('toast.deleted'));
       setDeletingEmail(null);
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, 'Không xóa được email.'));
+      setErrorMessage(getApiErrorMessage(error, t('errors.deleteFailed')));
     }
   };
 
-  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString('vi-VN') : '-');
+  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN') : '-');
 
   const statusColumn: AdminTableColumn = {
     key: 'active',
-    header: 'Trạng thái',
+    header: t('columns.status'),
     render: (email: EmailResponse) =>
       email.active ? (
-        <span className="badge bg-success">Đang bật</span>
+        <span className="badge bg-success">{t('enabled')}</span>
       ) : (
-        <span className="badge bg-secondary">Đang tắt</span>
+        <span className="badge bg-secondary">{t('disabled')}</span>
       ),
   };
 
   const sendCountColumns: AdminTableColumn[] = [
-    {key: 'sentCount', header: 'Đã gửi', render: (email: EmailResponse) => email.sentCount},
+    {key: 'sentCount', header: t('columns.sent'), render: (email: EmailResponse) => email.sentCount},
     {
       key: 'failedCount',
-      header: 'Lỗi',
+      header: t('columns.failed'),
       render: (email: EmailResponse) =>
         email.failedCount > 0 ? (
           <span className="text-danger fw-semibold">{email.failedCount}</span>
@@ -130,7 +134,7 @@ function EmailsManagement() {
   const autoColumns: AdminTableColumn[] = [
     {
       key: 'name',
-      header: 'Mẫu email',
+      header: t('columns.template'),
       render: (email: EmailResponse) => (
         <div className="d-flex flex-column">
           <span className="fw-semibold">{email.name}</span>
@@ -139,7 +143,7 @@ function EmailsManagement() {
         </div>
       ),
     },
-    {key: 'subject', header: 'Tiêu đề', render: (email: EmailResponse) => email.subject},
+    {key: 'subject', header: t('columns.subject'), render: (email: EmailResponse) => email.subject},
     statusColumn,
     ...sendCountColumns,
   ];
@@ -155,15 +159,15 @@ function EmailsManagement() {
         </div>
       ),
     },
-    {key: 'totalCount', header: 'Người nhận', render: (email: EmailResponse) => email.totalCount},
+    {key: 'totalCount', header: t('columns.recipients'), render: (email: EmailResponse) => email.totalCount},
     ...sendCountColumns,
     {
       key: 'pendingCount',
-      header: 'Đang chờ',
+      header: t('columns.pending'),
       render: (email: EmailResponse) => email.pendingCount,
     },
     statusColumn,
-    {key: 'createdAt', header: 'Ngày tạo', render: (email: EmailResponse) => formatDate(email.createdAt)},
+    {key: 'createdAt', header: t('columns.createdAt'), render: (email: EmailResponse) => formatDate(email.createdAt)},
   ];
 
   const isAutoTab = activeTab === 'auto';
@@ -171,13 +175,13 @@ function EmailsManagement() {
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Email hệ thống"
-        description="Sửa nội dung email tự động và soạn email gửi cho người dùng."
+        title={t('title')}
+        description={t('description')}
       >
         {!isAutoTab && (
           <Button onClick={() => openEditor(null)}>
             <Plus size={16} className="me-1" />
-            Soạn email mới
+            {t('compose')}
           </Button>
         )}
       </AdminPageHeader>
@@ -191,17 +195,17 @@ function EmailsManagement() {
             className={cx('pillBtn', {active: activeTab === tab.key})}
             onClick={() => setActiveTab(tab.key)}
           >
-            {tab.label}
+            {t(`tabs.${tab.label}`)}
           </Button>
         ))}
       </div>
 
       {!isAutoTab && (
         <StatCardGroup>
-          <StatCard label="Email đã soạn" value={manualData.totalElements} />
-          <StatCard label="Đã gửi (trang này)" value={manualStats.sent} />
-          <StatCard label="Lỗi (trang này)" value={manualStats.failed} />
-          <StatCard label="Đang chờ (trang này)" value={manualStats.pending} />
+          <StatCard label={t('stats.composed')} value={manualData.totalElements} />
+          <StatCard label={t('stats.sentPage')} value={manualStats.sent} />
+          <StatCard label={t('stats.failedPage')} value={manualStats.failed} />
+          <StatCard label={t('stats.pendingPage')} value={manualStats.pending} />
         </StatCardGroup>
       )}
 
@@ -209,7 +213,7 @@ function EmailsManagement() {
         <AdminToolbar
           searchValue={keyword}
           onSearchChange={setKeyword}
-          searchPlaceholder="Tìm theo tên mẫu hoặc mã..."
+          searchPlaceholder={t('searchPlaceholder')}
         />
       )}
 
@@ -222,13 +226,13 @@ function EmailsManagement() {
           data={filteredAuto}
           loading={autoLoading}
           getRowKey={(email: EmailResponse) => email.emailId}
-          emptyText="Chưa có mẫu email nào."
+          emptyText={t('autoEmpty')}
           rowActions={(email: EmailResponse) => (
             <>
-              <button title="Sửa nội dung" onClick={() => openEditor(email)}>
+              <button title={t('actions.edit')} onClick={() => openEditor(email)}>
                 <Edit size={14} />
               </button>
-              <button title="Nhật ký gửi" onClick={() => setLogEmailId(email.emailId)}>
+              <button title={t('actions.log')} onClick={() => setLogEmailId(email.emailId)}>
                 <History size={14} />
               </button>
             </>
@@ -241,24 +245,24 @@ function EmailsManagement() {
           data={manualData.content}
           loading={manualLoading}
           getRowKey={(email: EmailResponse) => email.emailId}
-          emptyText="Chưa có email nào được soạn."
-          itemLabel="email"
+          emptyText={t('manualEmpty')}
+          itemLabel={t('itemLabel')}
           page={manualData.currentPage}
           totalPages={manualData.totalPages}
           totalElements={manualData.totalElements}
           onPageChange={setManualPage}
           rowActions={(email: EmailResponse) => (
             <>
-              <button title="Sửa nội dung" onClick={() => openEditor(email)}>
+              <button title={t('actions.edit')} onClick={() => openEditor(email)}>
                 <Edit size={14} />
               </button>
-              <button title="Chọn người nhận và gửi" onClick={() => setSendingEmail(email)}>
+              <button title={t('actions.send')} onClick={() => setSendingEmail(email)}>
                 <Send size={14} />
               </button>
-              <button title="Nhật ký gửi" onClick={() => setLogEmailId(email.emailId)}>
+              <button title={t('actions.log')} onClick={() => setLogEmailId(email.emailId)}>
                 <History size={14} />
               </button>
-              <button className="danger" title="Xóa" onClick={() => setDeletingEmail(email)}>
+              <button className="danger" title={tAdmin('actions.delete')} onClick={() => setDeletingEmail(email)}>
                 <Trash2 size={14} />
               </button>
             </>
@@ -284,8 +288,8 @@ function EmailsManagement() {
         show={Boolean(deletingEmail)}
         onClose={() => setDeletingEmail(null)}
         onConfirm={handleDelete}
-        title="Xác nhận xóa email"
-        message={`Xóa "${deletingEmail?.name || deletingEmail?.subject || ''}" sẽ xóa cả nhật ký gửi của nó. Bạn có chắc không?`}
+        title={t('deleteTitle')}
+        message={t('deleteMessage', {name: deletingEmail?.name || deletingEmail?.subject || ''})}
       />
     </div>
   );

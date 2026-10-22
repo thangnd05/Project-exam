@@ -1,10 +1,11 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
+import { useTranslations } from 'next-intl';
 import { ClipboardCheck, Play } from 'lucide-react';
 import MockStageGuide from './_components/MockStageGuide';
 import PlanCongratsModal, {
@@ -19,8 +20,8 @@ import {
   planStageLabel,
   planStatusLabel,
   taskDisplayName,
+  type LearningPlansT,
 } from '@/app/features/learning-plans/planLabels';
-import { TERM_TIPS } from '@/app/features/learning-plans/termTips';
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
@@ -36,26 +37,28 @@ function findRecommendedTask(plan?: PlanResponse | null): PlanTaskResponse | nul
     .find((t) => t.taskId === plan.recommendedTaskId) || null;
 }
 
-function progressCheer(passed: number, total: number, pct: number) {
-  if (total === 0) return 'Lộ trình đang chờ ải đầu tiên.';
-  if (passed === 0) return 'Vượt ải đầu tiên hôm nay để khởi động lộ trình.';
-  if (pct >= 100) return 'Bạn đã vượt toàn bộ ải  đến lúc thi thử để chốt kết quả!';
-  if (pct >= 75) return `Chỉ còn ${total - passed} ải nữa là hết lộ trình. Về đích thôi!`;
-  if (pct >= 40) return `Đã đi được hơn nửa chặng  còn ${total - passed} ải.`;
-  return `Đã vượt ${passed} ải, đang có đà. Giữ nhịp mỗi ngày một ải nhé.`;
+function progressCheer(t: LearningPlansT, passed: number, total: number, pct: number) {
+  if (total === 0) return t('detail.cheer.waiting');
+  if (passed === 0) return t('detail.cheer.firstTask');
+  if (pct >= 100) return t('detail.cheer.allDone');
+  if (pct >= 75) return t('detail.cheer.almost', { remaining: total - passed });
+  if (pct >= 40) return t('detail.cheer.halfway', { remaining: total - passed });
+  return t('detail.cheer.momentum', { passed });
 }
 
 function PlanDetail() {
+  const t = useTranslations('LearningPlans');
+  const tc = useTranslations('Common');
   const { learningPlanId } = useParams<{ learningPlanId: string }>();
   const { plan, error, isLoading: loading } = usePlanDetail(learningPlanId);
   const [showCongrats, setShowCongrats] = useState(false);
 
   const resyncMutation = useResyncPlan({
     onSuccess: (updatedPlan) => {
-      toast.success(buildResyncMessage(updatedPlan));
+      toast.success(buildResyncMessage(t, updatedPlan));
     },
     onError: (err) => {
-      toast.error(err?.response?.data?.message || 'Không cập nhật được lộ trình');
+      toast.error(err?.response?.data?.message || t('common.resyncError'));
     },
   });
 
@@ -80,14 +83,14 @@ function PlanDetail() {
   };
 
   if (loading) {
-    return <div className={cx('wrapper')}><div className={cx('loading')}>Đang tải...</div></div>;
+    return <div className={cx('wrapper')}><div className={cx('loading')}>{tc('loading')}</div></div>;
   }
   if (error && !plan) {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <Link href="/learning-plans/generate" className={cx('btn', 'btnOutline', 'btnSm')}>
-            Quay lại
+            {t('common.back')}
           </Link>
         </div>
         <div className={cx('alert', 'alertDanger')}>{error}</div>
@@ -123,14 +126,14 @@ function PlanDetail() {
       />
       <div className={cx('headerBar')}>
         <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
-          Quay lại
+          {t('common.back')}
         </Link>
         <div className={cx('headerActions')}>
           <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
-            Tất cả lộ trình
+            {t('detail.allPlans')}
           </Link>
           <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
-            Sinh lộ trình mới
+            {t('common.newPlan')}
           </Link>
         </div>
       </div>
@@ -139,13 +142,13 @@ function PlanDetail() {
 
       {isReplaced && (
         <div className={cx('alert', 'alertWarning')}>
-          <span>Lộ trình này đã được thay bằng lộ trình mới hơn.</span>
+          <span>{t('detail.replaced')}</span>
           {plan.replacedByPlanId && (
             <Link
               href={`/learning-plans/${plan.replacedByPlanId}`}
               className={cx('btn', 'btnPrimary', 'btnSm')}
             >
-              Xem lộ trình mới
+              {t('detail.viewNewPlan')}
             </Link>
           )}
         </div>
@@ -154,10 +157,10 @@ function PlanDetail() {
       {!isReplaced && plan.targetOutdated && (
         <div className={cx('alert', 'alertWarning')}>
           <span>
-            Lộ trình này sinh theo <strong>mục tiêu cũ</strong>  ngưỡng vượt ải chưa áp
-            mục tiêu hiện tại. Cập nhật lại ngay
-            {plan.sourceUserTestId ? ' từ chính bài chẩn đoán cũ,' : ','}{' '}
-            <strong>không cần thi lại</strong>  tiến độ các ải đã vượt được giữ nguyên.
+            {t.rich(
+              plan.sourceUserTestId ? 'detail.targetOutdatedWithSource' : 'detail.targetOutdatedNoSource',
+              { strong: (chunks) => <strong>{chunks}</strong> },
+            )}
           </span>
           <button
             type="button"
@@ -165,32 +168,35 @@ function PlanDetail() {
             disabled={resyncMutation.isPending}
             onClick={() => resyncMutation.mutate(plan.learningPlanId)}
           >
-            {resyncMutation.isPending ? 'Đang cập nhật...' : 'Cập nhật theo mục tiêu mới'}
+            {resyncMutation.isPending ? t('common.updating') : t('detail.resyncNow')}
           </button>
           <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
-            Sinh lộ trình từ bài thi khác
+            {t('detail.fromOtherTest')}
           </Link>
         </div>
       )}
 
       <PageHeader
         compact
-        label={`Lộ trình ${plan.planSequence ?? '?'} · ${planStatusLabel(plan.status)}`}
+        label={`${t('common.planName', { sequence: plan.planSequence ?? '?' })} · ${planStatusLabel(t, plan.status)}`}
         title={
           plan.planStage === PlanStage.MOCK
-            ? 'Đã vượt hết ải  sẵn sàng thi thử!'
+            ? t('detail.titleMock')
             : recommendedTask
-              ? `Ải tiếp theo: ${recommendedTask.examPartName} · ${taskDisplayName(recommendedTask)}`
-              : 'Chinh phục từng ải để chạm mục tiêu'
+              ? t('detail.titleNext', {
+                part: recommendedTask.examPartName ?? '',
+                task: taskDisplayName(t, recommendedTask),
+              })
+              : t('detail.titleDefault')
         }
-        description={progressCheer(passedTasks, totalTasks, progressPct)}
+        description={progressCheer(t, passedTasks, totalTasks, progressPct)}
         meta={
           <div className={cx('planHeroBadges')}>
             <span className={cx('planHeroBadge')}>
-              Giai đoạn: {planStageLabel(plan.planStage)}
+              {t('detail.stage', { stage: planStageLabel(t, plan.planStage) })}
             </span>
             {plan.targetScore != null && (
-              <span className={cx('planHeroBadge')}>Mục tiêu: {plan.targetScore} điểm</span>
+              <span className={cx('planHeroBadge')}>{t('detail.target', { score: plan.targetScore })}</span>
             )}
           </div>
         }
@@ -198,7 +204,11 @@ function PlanDetail() {
           <>
             <div className={cx('planHeroProgressLabel')}>
               <span>
-                Tiến độ: <strong>{passedTasks}/{totalTasks}</strong> ải đã xong
+                {t.rich('detail.progress', {
+                  passed: passedTasks,
+                  total: totalTasks,
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
               </span>
               <strong>{progressPct}%</strong>
             </div>
@@ -214,9 +224,9 @@ function PlanDetail() {
         {!isReplaced && isMockStage && (
           <div className={cx('planHeroCtaBox')}>
             <Link href={mockTestsTo} className={cx('planHeroCta')}>
-              <ClipboardCheck size={16} /> Làm bài thi thử
+              <ClipboardCheck size={16} /> {t('common.takeMock')}
             </Link>
-            <span className={cx('planHeroCtaHint')}>Chấm lại độ sẵn sàng thật</span>
+            <span className={cx('planHeroCtaHint')}>{t('detail.mockCtaHint')}</span>
           </div>
         )}
 
@@ -225,7 +235,7 @@ function PlanDetail() {
             href={`/learning-plans/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
             className={cx('planHeroCta')}
           >
-            <Play size={16} /> Vào ải ngay
+            <Play size={16} /> {t('detail.enterTask')}
           </Link>
         )}
       </PageHeader>
@@ -235,21 +245,20 @@ function PlanDetail() {
       {plan.diagnosisSourcePractice && (
         <div className={cx('alert', 'alertWarning')}>
           <span>
-            Lộ trình này chẩn đoán từ một <strong>bài luyện theo phần</strong> nên chỉ phủ các phần
-            đã luyện. Làm bài thi thử trọn đề rồi sinh lại để có lộ trình đầy đủ.
+            {t.rich('detail.practiceSource', { strong: (chunks) => <strong>{chunks}</strong> })}
           </span>
           <Link
             href={`/learning-plans/generate?examTypeId=${plan.examTypeId}`}
             className={cx('btn', 'btnPrimary', 'btnSm')}
           >
-            Sinh lộ trình mới
+            {t('common.newPlan')}
           </Link>
         </div>
       )}
 
       {(plan.partsWithoutTasks?.length ?? 0) > 0 && (
         <div className={cx('alert', 'alertWarning')}>
-          Các phần thi sau chưa đạt mục tiêu nhưng tạm thời chưa có bài luyện, WinDe đang bổ sung:{' '}
+          {t('detail.partsWithoutTasks')}{' '}
           <strong>{plan.partsWithoutTasks!.join(', ')}</strong>
         </div>
       )}
@@ -261,10 +270,9 @@ function PlanDetail() {
           recommendedTaskId={plan.recommendedTaskId}
           studyAction="link"
           roadmapHeading={{
-            title: 'Bản đồ ải của bạn',
-            tip: TERM_TIPS.task,
-            description: `${partGroups.length} chặng · ${totalTasks} ải. Mỗi chặng là một phần thi, `
-              + 'mỗi ải là một lượt luyện ngắn về một chủ đề  đạt đủ % câu đúng là vượt ải.',
+            title: t('detail.roadmapTitle'),
+            tip: t('termTips.task'),
+            description: t('detail.roadmapDesc', { parts: partGroups.length, tasks: totalTasks }),
           }}
         />
       )}

@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
+import { useTranslations } from 'next-intl';
 import { getResourceById, viewResourceContent } from '@/app/apis/recoveryResourceApi';
 import { isMarkdownResource } from '@/app/features/resources/recoveryResource';
 import { getApiBaseUrl } from '@/app/utils/mediaUrl';
@@ -27,6 +28,7 @@ type RecoveryResourceView = {
 const EMPTY_VIEW: RecoveryResourceView = { resource: null, markdownHtml: '' };
 
 export function useRecoveryResourceView(resourceId?: string) {
+  const t = useTranslations('Resources');
   const query = useQuery({
     queryKey: recoveryResourceViewKeys.detail(resourceId),
     queryFn: async (): Promise<RecoveryResourceView> => {
@@ -53,8 +55,6 @@ export function useRecoveryResourceView(resourceId?: string) {
     resource,
     markdownHtml,
     isLoading: query.isLoading,
-    errorMessage: query.isError
-      ? 'Không thể mở tài liệu markdown. Vui lòng thử lại sau.'
-      : '',
+    errorMessage: query.isError ? t('view.loadError') : '',
   };
 }

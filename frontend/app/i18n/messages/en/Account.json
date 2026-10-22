@@ -1,0 +1,32 @@
+{
+  "certificates": {
+    "loading": "Loading certificates...",
+    "myCertificates": "My certificates"
+  },
+  "certificateDetail": {
+    "copied": "Verification link copied!",
+    "copyFailed": "Your browser blocked copying. Please copy the link below manually.",
+    "notFound": "This certificate doesn’t exist or you don’t have permission to view it.",
+    "backToList": "Back to certificates",
+    "copyLink": "Copy verification link",
+    "print": "Print / Save as PDF",
+    "revoked": "This certificate has been revoked.",
+    "revokedWithReason": "This certificate has been revoked: {reason}",
+    "expired": "This certificate has expired. Retake the mock exam to earn a new one."
+  },
+  "myCertificates": {
+    "label": "Achievements",
+    "description": "Certificates are issued when you reach the passing score on a full-length mock exam. Each exam type issues only one certificate.",
+    "activeCount": "{count, plural, one {# active certificate} other {# active certificates}}",
+    "loadFailed": "Couldn’t load your certificates. Please try again.",
+    "emptyTitle": "You don’t have any certificates yet",
+    "emptyDescription": "Complete a full-length mock exam and reach the passing score to earn your first certificate.",
+    "findMockTest": "Find a mock exam",
+    "viewAria": "View certificate {title}",
+    "fallbackTitle": "Certificate",
+    "issuedOn": "Issued {date}",
+    "expiresOn": "Expires {date}",
+    "viewDownload": "View & download",
+    "verifyPage": "Verification page"
+  }
+}

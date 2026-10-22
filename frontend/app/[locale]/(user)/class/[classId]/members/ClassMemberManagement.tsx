@@ -1,7 +1,9 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { IoPeopleOutline, IoCheckmarkCircle, IoTimeOutline, IoPersonRemoveOutline, IoSearchOutline, IoRefreshOutline, IoChevronDown, IoChevronUp } from 'react-icons/io5';
@@ -32,6 +34,8 @@ const EmptyState = ({ message, icon: Icon }: { message: string; icon: React.Elem
 
 const ClassMemberManagement = () => {
   const { classId } = useParams<{ classId: string }>();
+  const t = useTranslations('Classes');
+  const locale = useLocale();
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -57,25 +61,25 @@ const ClassMemberManagement = () => {
         classId: String(classId),
         userId: String(userId),
       });
-      toast.success('Duyệt học sinh thành công!');
+      toast.success(t('members.approveSuccess'));
     } catch (err) {
       console.error('Lỗi duyệt học sinh:', err);
-      const msg = getApiErrorMessage(err, 'Không thể duyệt học sinh');
+      const msg = getApiErrorMessage(err, t('members.approveFailed'));
       toast.error(msg);
     }
   };
 
   const handleApproveAll = async () => {
     if (pendingMembers.length === 0) {
-      toast.warning('Không có học sinh nào đang chờ duyệt');
+      toast.warning(t('members.noPending'));
       return;
     }
     try {
       const result = await approveAllMutation.mutateAsync(classId);
-      toast.success(result.message || 'Đã duyệt tất cả học sinh!');
+      toast.success(result.message || t('members.approveAllSuccess'));
     } catch (err) {
       console.error('Lỗi duyệt tất cả:', err);
-      const msg = getApiErrorMessage(err, 'Không thể duyệt tất cả');
+      const msg = getApiErrorMessage(err, t('members.approveAllFailed'));
       toast.error(msg);
     }
   };
@@ -87,12 +91,12 @@ const ClassMemberManagement = () => {
         classId: String(classId),
         userId: String(memberToDelete.userId),
       });
-      toast.success('Đã xóa học sinh khỏi lớp!');
+      toast.success(t('members.removeSuccess'));
       setShowDeleteModal(false);
       setMemberToDelete(null);
     } catch (err) {
       console.error('Lỗi xóa học sinh:', err);
-      const msg = getApiErrorMessage(err, 'Không thể xóa học sinh');
+      const msg = getApiErrorMessage(err, t('members.removeFailed'));
       toast.error(msg);
     }
   };
@@ -132,7 +136,7 @@ const ClassMemberManagement = () => {
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return '-';
     const d = new Date(dateStr);
-    return d.toLocaleDateString('vi-VN', {
+    return d.toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -143,8 +147,8 @@ const ClassMemberManagement = () => {
 
   const getStatusBadge = (status?: ClassMemberStatus) => {
     const statusMap: Record<string, { variant: string; label?: React.ReactNode; icon?: React.ReactNode }> = {
-      APPROVED: { variant: 'success', label: 'Đã duyệt' },
-      PENDING: { variant: 'warning', label: 'Chờ duyệt'},
+      APPROVED: { variant: 'success', label: t('common.approved') },
+      PENDING: { variant: 'warning', label: t('common.pending')},
     };
     const s = statusMap[status as string] || { variant: 'secondary', label: status, icon: null };
     return (
@@ -162,7 +166,7 @@ const ClassMemberManagement = () => {
   const renderMemberRow = (member: ClassMemberResponse, showActions = false) => (
     <tr key={member.id} className={cx('member-row')}>
       <td className={cx('td-id')}>
-        <span className={cx('user-id')}>{member.fullName || 'Chưa cập nhật tên'}</span>
+        <span className={cx('user-id')}>{member.fullName || t('members.unnamed')}</span>
       </td>
       <td className={cx('td-joined')}>{formatDate(member.joinedAt)}</td>
       <td className={cx('td-status')}>{getStatusBadge(member.status)}</td>
@@ -175,10 +179,10 @@ const ClassMemberManagement = () => {
                 size="sm"
                 onClick={() => handleApproveMember(member.userId)}
                 disabled={actionLoading}
-                title="Duyệt học sinh"
+                title={t('members.approveTitle')}
               >
                 <IoCheckmarkCircle />
-                <span>Duyệt</span>
+                <span>{t('members.approve')}</span>
               </ButtonPrime>
             )}
             <ButtonPrime
@@ -189,10 +193,10 @@ const ClassMemberManagement = () => {
                 setShowDeleteModal(true);
               }}
               disabled={actionLoading}
-              title="Xóa khỏi lớp"
+              title={t('members.removeTitle')}
             >
               <IoPersonRemoveOutline />
-              <span>Xóa</span>
+              <span>{t('members.remove')}</span>
             </ButtonPrime>
           </div>
         </td>
@@ -206,7 +210,7 @@ const ClassMemberManagement = () => {
       <div className={cx('wrapper')}>
         <div className={cx('loading-container')}>
           <Spinner animation="grow" variant="primary" />
-          <p>Đang tải danh sách học sinh...</p>
+          <p>{t('members.loading')}</p>
         </div>
       </div>
     );
@@ -220,28 +224,28 @@ const ClassMemberManagement = () => {
     <div className={cx('wrapper')}>
 
       <button className={cx('back-btn')} onClick={() => router.back()}>
-        <span>Quay lại</span>
+        <span>{t('members.back')}</span>
       </button>
 
       <PageHeader
-        title={classInfo?.className || `Lớp #${classId}`}
-        label="Quản lý học sinh"
-        badgeLabel={classInfo?.classQr ? `Mã lớp: ${classInfo.classQr}` : undefined}
+        title={classInfo?.className || t('members.classFallback', { id: classId })}
+        label={t('common.manageStudents')}
+        badgeLabel={classInfo?.classQr ? t('members.classCode', { code: classInfo.classQr }) : undefined}
       >
         <div className={cx('header-stats')}>
           <div className={cx('stat-item')}>
             <span className={cx('stat-number')}>{approvedMembers.length}</span>
-            <span className={cx('stat-label')}>Đã duyệt</span>
+            <span className={cx('stat-label')}>{t('common.approved')}</span>
           </div>
           <div className={cx('stat-divider')} />
           <div className={cx('stat-item', 'pending')}>
             <span className={cx('stat-number')}>{pendingMembers.length}</span>
-            <span className={cx('stat-label')}>Chờ duyệt</span>
+            <span className={cx('stat-label')}>{t('common.pending')}</span>
           </div>
           <div className={cx('stat-divider')} />
           <div className={cx('stat-item')}>
             <span className={cx('stat-number')}>{allMembers.length}</span>
-            <span className={cx('stat-label')}>Tổng cộng</span>
+            <span className={cx('stat-label')}>{t('members.total')}</span>
           </div>
         </div>
       </PageHeader>
@@ -251,7 +255,7 @@ const ClassMemberManagement = () => {
           <IoSearchOutline className={cx('search-icon')} />
           <input
             type="text"
-            placeholder="Tìm kiếm theo tên học sinh..."
+            placeholder={t('members.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={cx('search-input')}
@@ -262,11 +266,11 @@ const ClassMemberManagement = () => {
           <ButtonPrime
             variant="outline"
             onClick={() =>
-              refreshMembers().then(() => toast.success('Đã làm mới!'))
+              refreshMembers().then(() => toast.success(t('members.refreshed')))
             }
           >
             <IoRefreshOutline />
-            <span>Làm mới</span>
+            <span>{t('members.refresh')}</span>
           </ButtonPrime>
 
           {pendingMembers.length > 0 && (
@@ -275,7 +279,7 @@ const ClassMemberManagement = () => {
               onClick={handleApproveAll}
               disabled={actionLoading}
             >
-              <span>Duyệt tất cả ({pendingMembers.length})</span>
+              <span>{t('members.approveAll', { count: pendingMembers.length })}</span>
             </ButtonPrime>
           )}
         </div>
@@ -288,7 +292,7 @@ const ClassMemberManagement = () => {
             eventKey="approved"
             title={
               <span className={cx('tab-title')}>
-                Đã duyệt
+                {t('common.approved')}
                 <Badge bg="success" pill className={cx('tab-badge')}>
                   {approvedMembers.length}
                 </Badge>
@@ -300,8 +304,8 @@ const ClassMemberManagement = () => {
                 <EmptyState
                   message={
                     searchTerm
-                      ? 'Không tìm thấy học sinh nào'
-                      : 'Chưa có học sinh nào được duyệt'
+                      ? t('members.noMatch')
+                      : t('members.noApproved')
                   }
                   icon={IoPeopleOutline}
                 />
@@ -314,16 +318,16 @@ const ClassMemberManagement = () => {
                           className={cx('th-sortable')}
                           onClick={() => handleSort('fullName')}
                         >
-                          Họ và tên học sinh {renderSortIcon('fullName')}
+                          {t('members.fullName')} {renderSortIcon('fullName')}
                         </th>
                         <th
                           className={cx('th-sortable')}
                           onClick={() => handleSort('joinedAt')}
                         >
-                          Ngày tham gia {renderSortIcon('joinedAt')}
+                          {t('members.joinedAt')} {renderSortIcon('joinedAt')}
                         </th>
-                        <th>Trạng thái</th>
-                        <th>Thao tác</th>
+                        <th>{t('members.status')}</th>
+                        <th>{t('members.actions')}</th>
                       </tr>
                     </thead>
                     <tbody>{filteredApproved.map((m) => renderMemberRow(m, true))}</tbody>
@@ -337,7 +341,7 @@ const ClassMemberManagement = () => {
             eventKey="pending"
             title={
               <span className={cx('tab-title')}>
-                Chờ duyệt
+                {t('common.pending')}
                 {pendingMembers.length > 0 && (
                   <Badge bg="warning" pill className={cx('tab-badge', 'pending')}>
                     {pendingMembers.length}
@@ -351,8 +355,8 @@ const ClassMemberManagement = () => {
                 <EmptyState
                   message={
                     searchTerm
-                      ? 'Không tìm thấy học sinh nào đang chờ'
-                      : 'Không có học sinh nào đang chờ duyệt'
+                      ? t('members.noPendingMatch')
+                      : t('members.noPending')
                   }
                   icon={IoTimeOutline}
                 />
@@ -361,8 +365,10 @@ const ClassMemberManagement = () => {
                   <div className={cx('pending-notice')}>
                     <IoTimeOutline />
                     <span>
-                      Có <strong>{filteredPending.length}</strong> học sinh đang chờ được
-                      duyệt
+                      {t.rich('members.pendingNotice', {
+                        count: filteredPending.length,
+                        strong: (chunks) => <strong>{chunks}</strong>,
+                      })}
                     </span>
                   </div>
                   <div className={cx('table-wrapper')}>
@@ -373,16 +379,16 @@ const ClassMemberManagement = () => {
                             className={cx('th-sortable')}
                             onClick={() => handleSort('fullName')}
                           >
-                            Họ và tên học sinh {renderSortIcon('fullName')}
+                            {t('members.fullName')} {renderSortIcon('fullName')}
                           </th>
                           <th
                             className={cx('th-sortable')}
                             onClick={() => handleSort('joinedAt')}
                           >
-                            Ngày yêu cầu {renderSortIcon('joinedAt')}
+                            {t('members.requestedAt')} {renderSortIcon('joinedAt')}
                           </th>
-                          <th>Trạng thái</th>
-                          <th>Thao tác</th>
+                          <th>{t('members.status')}</th>
+                          <th>{t('members.actions')}</th>
                         </tr>
                       </thead>
                       <tbody>{filteredPending.map((m) => renderMemberRow(m, true))}</tbody>
@@ -402,10 +408,10 @@ const ClassMemberManagement = () => {
           setMemberToDelete(null);
         }}
         onConfirm={handleRemoveMember}
-        title="Xóa học sinh khỏi lớp"
-        message={`Bạn có chắc chắn muốn xóa học sinh "${
-          memberToDelete?.fullName || memberToDelete?.userId
-        }" khỏi lớp này?`}
+        title={t('members.removeModalTitle')}
+        message={t('members.removeModalMessage', {
+          name: String(memberToDelete?.fullName || memberToDelete?.userId),
+        })}
       />
     </div>
   );

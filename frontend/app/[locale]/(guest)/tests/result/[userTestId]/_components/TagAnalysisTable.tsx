@@ -1,8 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useMemo, useState } from "react";
 import classNames from "classnames/bind";
+import { useLocale, useTranslations } from "next-intl";
 import styles from "./TagAnalysisTable.module.scss";
 import type { EnhancedResultResponse, TagBreakdownResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
@@ -35,26 +36,29 @@ type TagAnalysisTableProps = {
 
 function TagAnalysisTable({ enhanced, userTestId }: TagAnalysisTableProps) {
   const router = useRouter();
+  const t = useTranslations("TestTaking.tagAnalysis");
+  const locale = useLocale();
+  const fallbackPartLabel = t("fallbackPart");
 
   const tabs = useMemo(() => {
     const parts = enhanced?.partBreakdown || [];
     const partTabs = parts.map((p) => ({
       key: p.examPartId,
-      label: p.partName || "Phần",
+      label: p.partName || fallbackPartLabel,
       tags: p.tags || EMPTY_LIST,
     }));
 
     return partTabs;
-  }, [enhanced]);
+  }, [enhanced, fallbackPartLabel]);
 
   const [active, setActive] = useState<string | undefined>(() => tabs[0]?.key);
 
   const current = tabs.find((t) => t.key === active) || tabs[0];
   const rows = useMemo(() => {
     const list = [...(current?.tags || [])];
-    list.sort((a, b) => (a.tagName || "").localeCompare(b.tagName || "", "vi"));
+    list.sort((a, b) => (a.tagName || "").localeCompare(b.tagName || "", locale));
     return list;
-  }, [current]);
+  }, [current, locale]);
 
   const totals = useMemo(() => computeTotals(current?.tags || []), [current]);
 
@@ -67,17 +71,17 @@ function TagAnalysisTable({ enhanced, userTestId }: TagAnalysisTableProps) {
 
   return (
     <div className={cx("wrapper")}>
-      <h2 className={cx("title")}>Phân tích chi tiết</h2>
+      <h2 className={cx("title")}>{t("title")}</h2>
 
       <div className={cx("tabs")}>
-        {tabs.map((t) => (
+        {tabs.map((tab) => (
           <button
-            key={t.key}
+            key={tab.key}
             type="button"
-            className={cx("tab", { active: t.key === current?.key })}
-            onClick={() => setActive(t.key)}
+            className={cx("tab", { active: tab.key === current?.key })}
+            onClick={() => setActive(tab.key)}
           >
-            {t.label}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -86,12 +90,12 @@ function TagAnalysisTable({ enhanced, userTestId }: TagAnalysisTableProps) {
         <table className={cx("table")}>
           <thead>
             <tr>
-              <th className={cx("col-name")}>Phân loại câu hỏi</th>
-              <th>Số câu đúng</th>
-              <th>Số câu sai</th>
-              <th>Số câu bỏ qua</th>
-              <th>Độ chính xác</th>
-              <th className={cx("col-list")}>Danh sách câu hỏi</th>
+              <th className={cx("col-name")}>{t("columns.category")}</th>
+              <th>{t("columns.correct")}</th>
+              <th>{t("columns.wrong")}</th>
+              <th>{t("columns.skipped")}</th>
+              <th>{t("columns.accuracy")}</th>
+              <th className={cx("col-list")}>{t("columns.questions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -110,7 +114,7 @@ function TagAnalysisTable({ enhanced, userTestId }: TagAnalysisTableProps) {
                         type="button"
                         className={cx("q-circle", q.status)}
                         onClick={() => goToQuestion(q.questionId)}
-                        title={`Câu ${q.questionNumber}  xem giải thích`}
+                        title={t("questionTitle", { number: q.questionNumber })}
                       >
                         {q.questionNumber}
                       </button>
@@ -121,7 +125,7 @@ function TagAnalysisTable({ enhanced, userTestId }: TagAnalysisTableProps) {
             ))}
 
             <tr className={cx("total-row")}>
-              <td className={cx("col-name")}>Tổng</td>
+              <td className={cx("col-name")}>{t("total")}</td>
               <td>{totals.correct}</td>
               <td>{totals.wrong}</td>
               <td>{totals.skipped}</td>

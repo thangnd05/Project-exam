@@ -1,0 +1,32 @@
+{
+  "certificates": {
+    "loading": "Đang tải chứng chỉ...",
+    "myCertificates": "Chứng chỉ của tôi"
+  },
+  "certificateDetail": {
+    "copied": "Đã sao chép link tra cứu chứng chỉ!",
+    "copyFailed": "Trình duyệt không cho sao chép. Bạn hãy copy thủ công link phía dưới.",
+    "notFound": "Không tìm thấy chứng chỉ này hoặc bạn không có quyền xem.",
+    "backToList": "Về danh sách chứng chỉ",
+    "copyLink": "Copy link tra cứu",
+    "print": "In / Lưu PDF",
+    "revoked": "Chứng chỉ này đã bị thu hồi.",
+    "revokedWithReason": "Chứng chỉ này đã bị thu hồi: {reason}",
+    "expired": "Chứng chỉ đã hết hiệu lực. Bạn có thể thi lại bài thi thử để được cấp chứng chỉ mới."
+  },
+  "myCertificates": {
+    "label": "Thành tích",
+    "description": "Chứng chỉ được cấp khi bạn đạt điểm yêu cầu ở bài thi thử toàn phần. Mỗi loại đề chỉ cấp một chứng chỉ.",
+    "activeCount": "{count} chứng chỉ còn hiệu lực",
+    "loadFailed": "Không tải được danh sách chứng chỉ. Vui lòng thử lại.",
+    "emptyTitle": "Bạn chưa có chứng chỉ nào",
+    "emptyDescription": "Hoàn thành một bài thi thử toàn phần và đạt điểm yêu cầu để nhận chứng chỉ đầu tiên.",
+    "findMockTest": "Tìm bài thi thử",
+    "viewAria": "Xem chứng chỉ {title}",
+    "fallbackTitle": "Chứng chỉ",
+    "issuedOn": "Cấp ngày {date}",
+    "expiresOn": "Hết hạn {date}",
+    "viewDownload": "Xem & tải về",
+    "verifyPage": "Trang tra cứu"
+  }
+}

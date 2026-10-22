@@ -1,0 +1,103 @@
+{
+  "saving": "Đang lưu...",
+  "profile": {
+    "loadError": "Không tải được thông tin hồ sơ. Vui lòng thử lại sau.",
+    "defaultName": "Người dùng",
+    "loading": "Đang tải hồ sơ...",
+    "title": "Tổng quan cá nhân",
+    "subtitle": "Tổng quan thông tin tài khoản và phân tích tiến độ học tập.",
+    "email": "Email",
+    "role": "Vai trò",
+    "joinedAt": "Ngày tham gia",
+    "status": "Trạng thái",
+    "verified": "Đã xác minh",
+    "unverified": "Chưa xác minh",
+    "updateInfo": "Cập nhật thông tin",
+    "changePassword": "Đổi mật khẩu",
+    "noData": "Không có dữ liệu hồ sơ để hiển thị."
+  },
+  "quickActions": {
+    "title": "Truy cập nhanh",
+    "newTest": "Làm bài thi mới",
+    "flashcards": "Thẻ ghi nhớ",
+    "myClasses": "Lớp học của tôi",
+    "questionBank": "Ngân hàng câu hỏi",
+    "myPosts": "Bài viết của tôi",
+    "savedPosts": "Bài đã lưu"
+  },
+  "stats": {
+    "totalAttempts": "Tổng bài làm",
+    "savedFlashcards": "Thẻ ghi nhớ đã lưu",
+    "currentClasses": "Lớp học hiện tại"
+  },
+  "activity": {
+    "testTime": "Thời gian làm bài",
+    "summary": "{duration} làm bài · {days} ngày hoạt động",
+    "loading": "Đang tải hoạt động...",
+    "noActivity": "Không có hoạt động trong tháng này",
+    "monthlyTitle": "Thời gian học theo tháng",
+    "yearOption": "Năm {year}",
+    "noYearData": "Chưa có dữ liệu học trong năm này",
+    "monthLabel": "Tháng {month}/{year}",
+    "monthShort": "T{month}",
+    "dayLabel": "Ngày {day}",
+    "tooltipTime": "Thời gian",
+    "tooltipStudyTime": "Thời gian học",
+    "minuteUnit": "p"
+  },
+  "duration": {
+    "hoursMinutes": "{h}h {m}p",
+    "hours": "{h}h",
+    "minutes": "{m}p"
+  },
+  "targets": {
+    "title": "Mục tiêu của tôi",
+    "manage": "Quản lý mục tiêu",
+    "loading": "Đang tải mục tiêu...",
+    "empty": "Bạn chưa đặt mục tiêu nào. Đặt mục tiêu để cá nhân hóa lộ trình học.",
+    "setNow": "Đặt mục tiêu ngay",
+    "achieved": "Đã đạt",
+    "score": "{score} điểm",
+    "readiness": "Sẵn sàng: {pct}%",
+    "dashboard": "Dashboard",
+    "generatePlan": "Sinh lộ trình",
+    "collapse": "Thu gọn",
+    "showMore": "Xem thêm {count} mục tiêu"
+  },
+  "changePassword": {
+    "title": "Đổi mật khẩu",
+    "submit": "Cập nhật mật khẩu",
+    "oldPassword": "Mật khẩu cũ",
+    "oldPasswordPlaceholder": "Nhập mật khẩu hiện tại",
+    "newPassword": "Mật khẩu mới",
+    "newPasswordPlaceholder": "Nhập mật khẩu mới",
+    "confirmPassword": "Xác nhận mật khẩu mới",
+    "confirmPasswordPlaceholder": "Nhập lại mật khẩu mới",
+    "hidePassword": "Ẩn mật khẩu",
+    "showPassword": "Hiện mật khẩu",
+    "toast": {
+      "missingFields": "Vui lòng nhập đầy đủ thông tin đổi mật khẩu.",
+      "mismatch": "Xác nhận mật khẩu mới không khớp.",
+      "success": "Đổi mật khẩu thành công.",
+      "failed": "Đổi mật khẩu thất bại. Vui lòng thử lại."
+    }
+  },
+  "updateProfile": {
+    "title": "Cập nhật hồ sơ",
+    "submit": "Lưu thay đổi",
+    "avatarAlt": "Avatar",
+    "avatarHint": "Bấm vào ảnh để thay đổi avatar",
+    "userName": "Tên đăng nhập",
+    "fullName": "Họ và Tên",
+    "email": "Email",
+    "toast": {
+      "loadError": "Không tải được thông tin cá nhân.",
+      "invalidImage": "Vui lòng chọn file hình ảnh (jpg, png, v.v.).",
+      "imageTooLarge": "Kích thước ảnh không được vượt quá 5MB.",
+      "missingFields": "Vui lòng nhập đầy đủ họ tên, tên đăng nhập và email.",
+      "missingUserId": "Lỗi dữ liệu. Không tìm thấy ID người dùng.",
+      "success": "Cập nhật thông tin thành công!",
+      "failed": "Cập nhật thất bại. Vui lòng thử lại."
+    }
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "searchPlaceholder": "Search...",
+  "table": {
+    "index": "#",
+    "actions": "Actions",
+    "loading": "Loading data...",
+    "empty": "No data.",
+    "item": "items",
+    "range": "Showing {start} - {end} of {total} {item}",
+    "prevPage": "Previous page",
+    "nextPage": "Next page"
+  },
+  "layout": {
+    "backHome": "Back to home",
+    "groups": {
+      "overview": "Overview",
+      "users": "Users",
+      "examSystem": "Exam system",
+      "content": "Content",
+      "community": "Community",
+      "gamification": "Gamification",
+      "system": "System",
+      "security": "Security"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "analytics": "Analytics",
+      "users": "Users",
+      "roles": "Roles",
+      "permissions": "Permissions (RBAC)",
+      "examTypes": "Exam types",
+      "tags": "Question tags",
+      "examCategories": "Exam categories",
+      "examParts": "Exam parts",
+      "skills": "Skills",
+      "questions": "Questions",
+      "questionCollections": "Question collections",
+      "scoringConversion": "Score conversion",
+      "milestones": "Target score milestones",
+      "tests": "Tests",
+      "recoveryResources": "Resource library",
+      "certificates": "Certificates",
+      "categories": "Categories",
+      "posts": "Post moderation",
+      "evaluations": "Test reviews",
+      "coins": "Coins",
+      "quests": "Quests",
+      "cosmetics": "Cosmetics shop",
+      "streakRecover": "Streak recovery",
+      "emails": "System emails",
+      "auditLogs": "Audit logs",
+      "loginAudit": "Login audit"
+    }
+  },
+  "charts": {
+    "newUsers": "New users",
+    "exams": "Tests",
+    "testCount": "Tests taken",
+    "completionRatePercent": "Completion rate (%)",
+    "visits": "Visits",
+    "attempts": "Attempts",
+    "avgSkill": "Avg. skill",
+    "users": "Users",
+    "loggedIn": "Signed in",
+    "guests": "Guests",
+    "students": "Learners",
+    "tooltipVisits": "Visits: <strong>{value}</strong>",
+    "tooltipAttempts": "Attempts: <strong>{value}</strong>",
+    "tooltipCompletionRate": "Completion rate: <strong>{value}%</strong>",
+    "peakHour": "Peak hour: {hour}:00",
+    "noVisits": "No visits yet"
+  },
+  "locations": {
+    "hoverCount": "{name}: {count, plural, one {# visit} other {# visits}}",
+    "hoverHint": "Hover over the map to see details",
+    "noPublicVisits": "No visits from public IPs yet (local traffic shows as \"Local\")",
+    "noLocationData": "No location data yet"
+  },
+  "heatmap": {
+    "empty": "No traffic data yet",
+    "cellTitle": "{day} {hour}:00  {count, plural, one {# visit} other {# visits}}",
+    "less": "Less",
+    "more": "More"
+  },
+  "contentInsights": {
+    "test": "Test",
+    "attempts": "Attempts",
+    "completionRate": "Completion rate",
+    "empty": "No attempts yet."
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create"
+  },
+  "saving": "Saving..."
+}

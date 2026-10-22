@@ -10,6 +10,7 @@ import { createTestPart } from '@/app/apis/testPartApi';
 import { buildCollectionTree, getCollectionWithDescendantIds } from '@/app/features/tests/collectionTree';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
+import { useTranslations } from 'next-intl';
 import {
   IoLibraryOutline,
   IoSettingsOutline,
@@ -64,23 +65,24 @@ type BankSource = (typeof BANK_SOURCES)[keyof typeof BANK_SOURCES];
 
 const ALL_CHAPTERS = '__ALL__';
 
-const BANK_SCOPE_OPTIONS: { value: QuestionBankScope; label: string; hint: string }[] = [
+// label/hint là khóa dịch (namespace TestCreatorBank).
+const BANK_SCOPE_OPTIONS = [
   {
     value: QuestionBankScope.EXAM,
-    label: 'Câu thi',
-    hint: 'Chỉ lấy câu hỏi dành cho thi — đây là mặc định.',
+    label: 'scope.exam.label',
+    hint: 'scope.exam.hint',
   },
   {
     value: QuestionBankScope.PRACTICE,
-    label: 'Câu ôn tập',
-    hint: 'Chỉ lấy câu hỏi ôn tập (lộ trình). Câu vẫn giữ nguyên trạng thái ôn tập sau khi đưa vào đề.',
+    label: 'scope.practice.label',
+    hint: 'scope.practice.hint',
   },
   {
     value: QuestionBankScope.ALL,
-    label: 'Cả hai',
-    hint: 'Lấy cả câu thi lẫn câu ôn tập trong cùng một kho.',
+    label: 'scope.all.label',
+    hint: 'scope.all.hint',
   },
-];
+] as const satisfies readonly { value: QuestionBankScope; label: string; hint: string }[];
 
 type BankTestInfo = {
   title: string;
@@ -105,6 +107,7 @@ type CreateFromBankBodyProps = {
 };
 
 const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, chapterId }: CreateFromBankBodyProps) => {
+  const t = useTranslations('TestCreatorBank');
   const isClassMode = mode === 'class' && !!classId;
 
   const canAccessAdminBank = useHasPermission(PermissionCode.QUESTION_MANAGE);
@@ -257,7 +260,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
       } as unknown as CreateTestRequest);
 
       const newTestId = testData.testId;
-      if (!newTestId) throw new Error('Không nhận được testId từ server.');
+      if (!newTestId) throw new Error(t('submit.errors.noTestId'));
 
       for (const part of partsToAdd) {
         const cfg = partConfigs[part.examPartId];
@@ -270,7 +273,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
           numQuestions,
         });
         const newPartId = partData.testPartId;
-        if (!newPartId) throw new Error(`Không nhận được testPartId cho part ${part.name}.`);
+        if (!newPartId) throw new Error(t('submit.errors.noPartId', { part: part.name ?? '' }));
 
         if (cfg.mode === SELECTION_MODES.MANUAL) {
           const scopedIds = new Set(getScopedQuestions(cfg).map((q) => q.questionId ?? q.id));
@@ -300,7 +303,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     },
     onSuccess: () => {
       setTestInfo((prev) => ({ ...prev, title: '', description: '' }));
-      toast.success('Đã tạo đề thi từ kho câu hỏi!');
+      toast.success(t('submit.created'));
       onSuccess?.();
     },
     onError: (error: unknown) => {
@@ -308,7 +311,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
       const data = err?.response?.data;
       // Backend có thể trả { message } hoặc chuỗi thô.
       const msg = (data as { message?: unknown } | null | undefined)?.message ?? data ?? err?.message;
-      setNotification({ type: 'danger', message: 'Lỗi: ' + (typeof msg === 'string' ? msg : JSON.stringify(msg)) });
+      setNotification({ type: 'danger', message: t('submit.errors.prefix', { message: typeof msg === 'string' ? msg : JSON.stringify(msg) }) });
     },
   });
 
@@ -316,13 +319,13 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
     if (e?.preventDefault) e.preventDefault();
 
     if (!testInfo.title?.trim() || !testInfo.examTypeId) {
-      setNotification({ type: 'warning', message: 'Vui lòng điền tiêu đề và chọn loại kỳ thi.' });
+      setNotification({ type: 'warning', message: t('submit.titleRequired') });
       return;
     }
 
     const partsToAdd = examParts.filter(hasPartWithQuestions);
     if (partsToAdd.length === 0) {
-      setNotification({ type: 'warning', message: 'Vui lòng cấu hình ít nhất một part có câu hỏi (số câu > 0 hoặc chọn thủ công).' });
+      setNotification({ type: 'warning', message: t('submit.partRequired') });
       return;
     }
 
@@ -345,63 +348,63 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
 
         <div className={cx('configCard')}>
           <div className={cx('sectionTitle')}>
-            <IoSettingsOutline /> 1. Thông tin đề thi
+            <IoSettingsOutline /> 1. {t('info.section')}
           </div>
           <Row className="g-3">
             <Col md={8}>
               <div className={cx('formGroupModern')}>
-                <label>Tiêu đề đề thi *</label>
+                <label>{t('info.title')}</label>
                 <input
                   type="text"
                   className={cx('inputModern')}
                   value={testInfo.title}
                   onChange={(e) => setTestInfo({ ...testInfo, title: e.target.value })}
-                  placeholder="Nhập tiêu đề đề thi"
-                  aria-label="Tiêu đề đề thi"
+                  placeholder={t('info.titlePlaceholder')}
+                  aria-label={t('info.titleAria')}
                 />
               </div>
             </Col>
             <Col md={4}>
               <div className={cx('formGroupModern')}>
-                <label><IoTimeOutline /> Thời gian (phút)</label>
+                <label><IoTimeOutline /> {t('info.duration')}</label>
                 <input
                   type="number"
                   min={0}
                   className={cx('inputModern')}
                   value={testInfo.durationMinutes}
                   onChange={(e) => setTestInfo({ ...testInfo, durationMinutes: e.target.value })}
-                  placeholder="VD: 60"
-                  aria-label="Thời gian làm bài"
+                  placeholder={t('info.durationPlaceholder')}
+                  aria-label={t('info.durationAria')}
                 />
               </div>
             </Col>
             <Col md={4}>
               <div className={cx('formGroupModern')}>
-                <label>Loại kỳ thi *</label>
+                <label>{t('info.examType')}</label>
                 <select
                   className={cx('inputModern')}
                   value={testInfo.examTypeId}
                   onChange={(e) => handleExamTypeChange(e.target.value)}
-                  aria-label="Loại kỳ thi"
+                  aria-label={t('info.examTypeAria')}
                 >
-                  <option value="">-- Chọn --</option>
+                  <option value="">{t('info.selectPlaceholder')}</option>
 
-                  {(examTypes || []).filter((t) => !t.childCount).map((t) => (
-                    <option key={t.examTypeId} value={t.examTypeId}>{t.name}</option>
+                  {(examTypes || []).filter((type) => !type.childCount).map((type) => (
+                    <option key={type.examTypeId} value={type.examTypeId}>{type.name}</option>
                   ))}
                 </select>
               </div>
             </Col>
             <Col md={4}>
               <div className={cx('formGroupModern')}>
-                <label><IoLibraryOutline /> Bộ đề (Collection)</label>
+                <label><IoLibraryOutline /> {t('info.collection')}</label>
                 <select
                   className={cx('inputModern')}
                   value={testInfo.collectionId || ''}
                   onChange={(e) => setTestInfo({ ...testInfo, collectionId: e.target.value })}
-                  aria-label="Bộ đề"
+                  aria-label={t('info.collectionAria')}
                 >
-                  <option value="">-- Trống --</option>
+                  <option value="">{t('info.emptyOption')}</option>
                   {buildCollectionTree(
                     (questionCollections || []).filter(
                       (c) => !testInfo.examTypeId || !c.examTypeId || String(c.examTypeId) === String(testInfo.examTypeId),
@@ -416,15 +419,15 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             </Col>
             <Col md={4}>
               <div className={cx('formGroupModern')}>
-                <label><IoRocketOutline /> Số lượt làm tối đa</label>
+                <label><IoRocketOutline /> {t('info.maxAttempts')}</label>
                 <input
                   type="number"
                   min={0}
                   className={cx('inputModern')}
                   value={testInfo.maxAttempts}
                   onChange={(e) => setTestInfo({ ...testInfo, maxAttempts: e.target.value })}
-                  placeholder="Để trống = không giới hạn"
-                  aria-label="Số lượt làm"
+                  placeholder={t('info.maxAttemptsPlaceholder')}
+                  aria-label={t('info.maxAttemptsAria')}
                 />
               </div>
             </Col>
@@ -437,14 +440,14 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             />
             <Col md={4}>
               <div className={cx('formGroupModern')}>
-                <label>Phân loại bài thi (tuỳ chọn)</label>
+                <label>{t('info.category')}</label>
                 <select
                   className={cx('inputModern')}
                   value={testInfo.examCategoryId}
                   onChange={(e) => setTestInfo({ ...testInfo, examCategoryId: e.target.value })}
-                  aria-label="Phân loại bài thi"
+                  aria-label={t('info.categoryAria')}
                 >
-                  <option value="">-- Không phân loại --</option>
+                  <option value="">{t('info.noCategory')}</option>
                   {examCategories.map((c) => (
                     <option key={c.examCategoryId} value={c.examCategoryId}>
                       {c.name}
@@ -455,14 +458,14 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             </Col>
             <Col md={12}>
               <div className={cx('formGroupModern')}>
-                <label>Mô tả</label>
+                <label>{t('info.description')}</label>
                 <textarea
                   className={cx('inputModern')}
                   rows={2}
                   value={testInfo.description}
                   onChange={(e) => setTestInfo({ ...testInfo, description: e.target.value })}
-                  placeholder="Mô tả ngắn (tùy chọn)"
-                  aria-label="Mô tả đề thi"
+                  placeholder={t('info.descriptionPlaceholder')}
+                  aria-label={t('info.descriptionAria')}
                 />
               </div>
             </Col>
@@ -471,15 +474,15 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
 
         <div className={cx('configCard')}>
           <div className={cx('sectionTitle')}>
-            <IoServerOutline /> 2. Chọn nguồn kho câu hỏi
+            <IoServerOutline /> 2. {t('source.section')}
           </div>
           <p className={cx('bankHint')}>
-            Chọn kho lấy câu hỏi để tạo đề. <strong>Kho cá nhân</strong> chứa các câu hỏi do chính bạn lưu.
+            {t.rich('source.hint', { strong: (chunks) => <strong>{chunks}</strong> })}
             {isClassMode && (
-              <> <strong>Kho lớp học</strong> là kho câu hỏi của lớp hiện tại  có thể lọc theo chapter.</>
+              <> {t.rich('source.classHint', { strong: (chunks) => <strong>{chunks}</strong> })}</>
             )}
             {canAccessAdminBank && (
-              <> <strong>Kho quản trị</strong> là kho do admin cung cấp, dùng làm nguồn tạo đề.</>
+              <> {t.rich('source.adminHint', { strong: (chunks) => <strong>{chunks}</strong> })}</>
             )}
           </p>
           <div
@@ -495,7 +498,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
               onClick={() => setBankSource(BANK_SOURCES.PERSONAL)}
               aria-pressed={bankSource === BANK_SOURCES.PERSONAL}
             >
-              <IoLibraryOutline size={18} /> Kho cá nhân
+              <IoLibraryOutline size={18} /> {t('source.personal')}
             </button>
             {isClassMode && (
               <button
@@ -504,7 +507,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 onClick={() => setBankSource(BANK_SOURCES.CLASS)}
                 aria-pressed={bankSource === BANK_SOURCES.CLASS}
               >
-                <IoSchoolOutline size={18} /> Kho lớp học
+                <IoSchoolOutline size={18} /> {t('source.class')}
               </button>
             )}
             {canAccessAdminBank && (
@@ -514,14 +517,14 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 onClick={() => setBankSource(BANK_SOURCES.ADMIN)}
                 aria-pressed={bankSource === BANK_SOURCES.ADMIN}
               >
-                <IoServerOutline size={18} /> Kho quản trị
+                <IoServerOutline size={18} /> {t('source.admin')}
               </button>
             )}
           </div>
 
           <div className={cx('bankScopeRow')} style={{ marginTop: 16 }}>
             <div className={cx('bankScopeLabel')}>
-              <IoFilterOutline size={16} /> Phạm vi câu hỏi
+              <IoFilterOutline size={16} /> {t('scope.label')}
             </div>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {BANK_SCOPE_OPTIONS.map((opt) => (
@@ -531,30 +534,30 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   className={cx('bankModeTab', { active: bankScope === opt.value })}
                   onClick={() => setBankScope(opt.value)}
                   aria-pressed={bankScope === opt.value}
-                  title={opt.hint}
+                  title={t(opt.hint)}
                 >
-                  {opt.label}
+                  {t(opt.label)}
                 </button>
               ))}
             </div>
             <p className={cx('bankHint')} style={{ marginTop: 8, marginBottom: 0 }}>
-              {BANK_SCOPE_OPTIONS.find((o) => o.value === bankScope)?.hint}
+              {t(BANK_SCOPE_OPTIONS.find((o) => o.value === bankScope)?.hint ?? 'scope.exam.hint')}
             </p>
           </div>
 
           {isClassMode && bankSource === BANK_SOURCES.CLASS && (
             <div className={cx('formGroupModern')} style={{ marginTop: 14, maxWidth: 480 }}>
-              <label><IoBookOutline /> Lọc theo chapter</label>
+              <label><IoBookOutline /> {t('source.chapterFilter')}</label>
               <select
                 className={cx('inputModern')}
                 value={selectedChapterId}
                 onChange={(e) => setSelectedChapterId(e.target.value)}
-                aria-label="Chọn chapter trong lớp"
+                aria-label={t('source.chapterAria')}
               >
-                <option value={ALL_CHAPTERS}>Tất cả chapter của lớp</option>
+                <option value={ALL_CHAPTERS}>{t('source.allChaptersOption')}</option>
                 {chapters.map((c) => (
                   <option key={c.chapterId} value={c.chapterId}>
-                    {c.title || `Chapter ${c.chapterId}`}
+                    {c.title || t('source.chapterFallback', { chapterId: c.chapterId })}
                   </option>
                 ))}
               </select>
@@ -565,7 +568,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         {testInfo.examTypeId && (examParts || []).length > 0 && (
           <div className={cx('configCard')}>
             <div className={cx('sectionTitle')}>
-              <IoLibraryOutline /> 3. Cấu hình từng Part
+              <IoLibraryOutline /> 3. {t('parts.section')}
               <span
                 style={{
                   marginLeft: 10,
@@ -582,12 +585,12 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 }}
               >
                 {bankSource === BANK_SOURCES.ADMIN
-                  ? 'Kho quản trị'
+                  ? t('source.admin')
                   : bankSource === BANK_SOURCES.CLASS
-                    ? `Kho lớp học${selectedChapterId && selectedChapterId !== ALL_CHAPTERS
-                      ? ` · ${chapters.find((c) => c.chapterId === selectedChapterId)?.title || 'Chapter'}`
-                      : ' · Tất cả chapter'}`
-                    : 'Kho cá nhân'}
+                    ? `${t('source.class')} · ${selectedChapterId && selectedChapterId !== ALL_CHAPTERS
+                      ? chapters.find((c) => c.chapterId === selectedChapterId)?.title || t('source.chapter')
+                      : t('source.allChapters')}`
+                    : t('source.personal')}
               </span>
               <span
                 style={{
@@ -600,16 +603,13 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   borderRadius: 999,
                 }}
               >
-                {BANK_SCOPE_OPTIONS.find((o) => o.value === bankScope)?.label}
+                {t(BANK_SCOPE_OPTIONS.find((o) => o.value === bankScope)?.label ?? 'scope.exam.label')}
               </span>
             </div>
             <p className={cx('bankHint')}>
-              Mỗi part: <strong>Random theo số lượng</strong> (lấy ngẫu nhiên toàn kho), <strong>Random theo bộ đề</strong>,{' '}
-              <strong>Lấy tuần tự</strong> hoặc <strong>Chọn thủ công</strong>.
-              {testInfo.collectionId
-                ? ' Đã chọn Bộ đề → Random theo bộ đề / Tuần tự / Thủ công chỉ lấy câu trong bộ đề đó.'
-                : ' Chọn Bộ đề ở mục 1 để giới hạn nguồn câu theo bộ đề.'}
-              {' '}Với part có passage (vd. Part 3, 4, 6, 7): chọn theo <strong>nhóm (cùng passage)</strong> để giữ tính tương đồng, không chọn lẻ từng câu.
+              {t.rich('parts.modesHint', { strong: (chunks) => <strong>{chunks}</strong> })}
+              {' '}{testInfo.collectionId ? t('parts.collectionSelectedHint') : t('parts.collectionNotSelectedHint')}
+              {' '}{t.rich('parts.passageHint', { strong: (chunks) => <strong>{chunks}</strong> })}
             </p>
 
             <div className={cx('bankModeTabs')}>
@@ -618,18 +618,18 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 className={cx('bankModeTab', 'active')}
                 onClick={() => applyModeToAllParts(SELECTION_MODES.RANDOM_BY_COLLECTION)}
                 title={testInfo.collectionId
-                  ? 'Lấy toàn bộ câu trong bộ đề cho tất cả Part'
-                  : 'Chưa chọn Bộ đề → sẽ lấy toàn bộ kho cho tất cả Part'}
+                  ? t('parts.applyByCollectionTitle')
+                  : t('parts.applyByCollectionNoCollectionTitle')}
               >
-                <IoLibraryOutline size={18} /> Random theo bộ đề · tất cả Part
+                <IoLibraryOutline size={18} /> {t('parts.applyByCollection')}
               </button>
               <button
                 type="button"
                 className={cx('bankModeTab')}
                 onClick={() => applyModeToAllParts(SELECTION_MODES.RANDOM)}
-                title="Đặt tất cả Part về Random theo số lượng"
+                title={t('parts.applyRandomTitle')}
               >
-                <IoShuffleOutline size={18} /> Random số lượng · tất cả Part
+                <IoShuffleOutline size={18} /> {t('parts.applyRandom')}
               </button>
             </div>
 
@@ -639,7 +639,6 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
               const maxInBank = scopedQuestions.length;
 
               const collectionScoped = !!collectionScopeIds && COLLECTION_SCOPED_MODES.includes(cfg.mode);
-              const scopeLabel = collectionScoped ? 'bộ đề' : 'kho';
               const allSelected = maxInBank > 0 && getPartEffectiveCount(part.examPartId) === maxInBank;
 
               return (
@@ -653,7 +652,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                     <span className={cx('bankPartName')}>
                       <IoBookOutline size={20} /> {part.name}
                     </span>
-                    <span className={cx('bankPartBadge')}>{maxInBank} câu</span>
+                    <span className={cx('bankPartBadge')}>{t('parts.questionCount', { count: maxInBank })}</span>
                     {cfg.expanded ? <IoChevronUpOutline size={22} /> : <IoChevronDownOutline size={22} />}
                   </button>
 
@@ -667,16 +666,16 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.RANDOM)}
                           aria-pressed={cfg.mode === SELECTION_MODES.RANDOM}
                         >
-                          <IoShuffleOutline size={18} /> Random theo số lượng
+                          <IoShuffleOutline size={18} /> {t('modes.random')}
                         </button>
                         <button
                           type="button"
                           className={cx('bankModeTab', { active: cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION })}
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.RANDOM_BY_COLLECTION)}
                           aria-pressed={cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION}
-                          title={testInfo.collectionId ? undefined : 'Chưa chọn Bộ đề ở mục 1 → sẽ lấy toàn kho'}
+                          title={testInfo.collectionId ? undefined : t('modes.byCollectionNoCollectionTitle')}
                         >
-                          <IoLibraryOutline size={18} /> Random theo bộ đề
+                          <IoLibraryOutline size={18} /> {t('modes.byCollection')}
                         </button>
                         <button
                           type="button"
@@ -684,7 +683,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.SEQUENTIAL)}
                           aria-pressed={cfg.mode === SELECTION_MODES.SEQUENTIAL}
                         >
-                          <IoRocketOutline size={18} /> Lấy tuần tự
+                          <IoRocketOutline size={18} /> {t('modes.sequential')}
                         </button>
                         <button
                           type="button"
@@ -692,13 +691,13 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.MANUAL)}
                           aria-pressed={cfg.mode === SELECTION_MODES.MANUAL}
                         >
-                          <IoCheckboxOutline size={18} /> Chọn thủ công
+                          <IoCheckboxOutline size={18} /> {t('modes.manual')}
                         </button>
                       </div>
 
                       {cfg.mode === SELECTION_MODES.RANDOM && (
                         <div className={cx('bankRandomRow')}>
-                          <label className={cx('bankRandomLabel')}>Số câu lấy ngẫu nhiên:</label>
+                          <label className={cx('bankRandomLabel')}>{t('parts.randomCount')}</label>
                           <input
                             type="number"
                             min={0}
@@ -706,9 +705,9 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                             className={cx('inputModern', 'bankRandomInput')}
                             value={cfg.randomCount}
                             onChange={(e) => updatePartConfig(part.examPartId, 'randomCount', e.target.value)}
-                            aria-label={`Số câu random ${part.name}`}
+                            aria-label={t('parts.randomAria', { part: part.name ?? '' })}
                           />
-                          <span className={cx('bankRandomHint')}>Tối đa {maxInBank} câu trong {scopeLabel}</span>
+                          <span className={cx('bankRandomHint')}>{collectionScoped ? t('parts.maxInCollection', { count: maxInBank }) : t('parts.maxInBank', { count: maxInBank })}</span>
                         </div>
                       )}
 
@@ -716,15 +715,15 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                         <div className={cx('bankRandomRow')}>
                           <span className={cx('bankRandomHint')}>
                             {testInfo.collectionId
-                              ? `Lấy toàn bộ ${maxInBank} câu trong bộ đề (xáo trộn thứ tự, giữ trọn cụm passage).`
-                              : `Chưa chọn Bộ đề ở mục 1 → sẽ lấy toàn bộ ${maxInBank} câu trong kho.`}
+                              ? t('parts.byCollectionHint', { count: maxInBank })
+                              : t('parts.byCollectionNoCollectionHint', { count: maxInBank })}
                           </span>
                         </div>
                       )}
 
                       {cfg.mode === SELECTION_MODES.SEQUENTIAL && (
                         <div className={cx('bankRandomRow')} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                          <label className={cx('bankRandomLabel')}>Từ câu:</label>
+                          <label className={cx('bankRandomLabel')}>{t('parts.fromIndex')}</label>
                           <input
                             type="number"
                             min={1}
@@ -732,9 +731,9 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                             className={cx('inputModern', 'bankRandomInput')}
                             value={cfg.fromIndex}
                             onChange={(e) => updatePartConfig(part.examPartId, 'fromIndex', e.target.value)}
-                            aria-label={`Từ câu ${part.name}`}
+                            aria-label={t('parts.fromAria', { part: part.name ?? '' })}
                           />
-                          <label className={cx('bankRandomLabel')}>Đến câu:</label>
+                          <label className={cx('bankRandomLabel')}>{t('parts.toIndex')}</label>
                           <input
                             type="number"
                             min={1}
@@ -742,31 +741,31 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                             className={cx('inputModern', 'bankRandomInput')}
                             value={cfg.toIndex}
                             onChange={(e) => updatePartConfig(part.examPartId, 'toIndex', e.target.value)}
-                            aria-label={`Đến câu ${part.name}`}
+                            aria-label={t('parts.toAria', { part: part.name ?? '' })}
                           />
-                          <span className={cx('bankRandomHint')}>Tối đa {maxInBank} câu trong {scopeLabel}</span>
+                          <span className={cx('bankRandomHint')}>{collectionScoped ? t('parts.maxInCollection', { count: maxInBank }) : t('parts.maxInBank', { count: maxInBank })}</span>
                         </div>
                       )}
 
                       {cfg.loading && (
                         <div className={cx('bankLoadingWrap')}>
-                          <Spinner animation="border" size="sm" /> <span>Đang tải câu hỏi...</span>
+                          <Spinner animation="border" size="sm" /> <span>{t('parts.loading')}</span>
                         </div>
                       )}
 
                       {!cfg.loading && maxInBank === 0 && (
                         <Alert variant="info" className="mb-0 mt-2">
                           {collectionScoped
-                            ? 'Bộ đề đã chọn chưa có câu hỏi cho part này.'
+                            ? t('parts.empty.collection')
                             : bankSource === BANK_SOURCES.ADMIN
-                              ? 'Kho quản trị chưa có câu hỏi cho part này.'
+                              ? t('parts.empty.admin')
                               : bankSource === BANK_SOURCES.CLASS
                                 ? (selectedChapterId && selectedChapterId !== ALL_CHAPTERS
-                                    ? 'Kho lớp học (chapter đã chọn) chưa có câu hỏi cho part này.'
-                                    : 'Kho lớp học chưa có câu hỏi cho part này.')
-                                : 'Chưa có câu hỏi trong kho cá nhân cho part này.'}
+                                    ? t('parts.empty.classChapter')
+                                    : t('parts.empty.class'))
+                                : t('parts.empty.personal')}
                           {bankScope !== QuestionBankScope.ALL && (
-                            <> Đang lọc theo <strong>{BANK_SCOPE_OPTIONS.find((o) => o.value === bankScope)?.label}</strong> — thử đổi phạm vi ở mục 2.</>
+                            <> {t.rich('parts.filteringBy', { scope: t(BANK_SCOPE_OPTIONS.find((o) => o.value === bankScope)?.label ?? 'scope.exam.label'), strong: (chunks) => <strong>{chunks}</strong> })}</>
                           )}
                         </Alert>
                       )}
@@ -779,10 +778,10 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                               <Form.Check
                                 type="checkbox"
                                 id={`select-all-${part.examPartId}`}
-                                label={`Chọn tất cả (${maxInBank} câu)`}
+                                label={t('parts.selectAll', { count: maxInBank })}
                                 checked={allSelected}
                                 onChange={(e) => toggleSelectAll(part.examPartId, e.target.checked)}
-                                aria-label={`Chọn tất cả ${part.name}`}
+                                aria-label={t('parts.selectAllAria', { part: part.name ?? '' })}
                               />
                             </div>
                             <div className={cx('bankGroupList')}>
@@ -791,8 +790,8 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                                 return groups.map((gr) => {
                                 const grSelected = isGroupSelected(part.examPartId, gr.groupKey);
                                 const grLabel = gr.passageId != null
-                                  ? `Nhóm passage (${gr.questions.length} câu)`
-                                  : `Câu độc lập (${gr.questions.length} câu)`;
+                                  ? t('parts.passageGroup', { count: gr.questions.length })
+                                  : t('parts.standalone', { count: gr.questions.length });
                                 const groupStartOffset = listOffset;
                                 listOffset += gr.questions.length;
                                 return (
@@ -816,10 +815,10 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                                         return (
                                           <li key={id} className={cx('bankQuestionItem', { selected: checked })}>
                                             <span className={cx('bankQuestionIndex')}>{displayNo}.</span>
-                                            <span className={cx('bankQuestionText')}>{q.questionText || '(Không có nội dung)'}</span>
+                                            <span className={cx('bankQuestionText')}>{q.questionText || t('parts.noContent')}</span>
                                             {q.usageScope === QuestionUsageScope.PRACTICE && (
-                                              <span className={cx('bankScopeBadge')} title="Câu ôn tập — vẫn giữ nguyên trạng thái ôn tập sau khi đưa vào đề">
-                                                Ôn tập
+                                              <span className={cx('bankScopeBadge')} title={t('parts.practiceBadgeTitle')}>
+                                                {t('parts.practiceBadge')}
                                               </span>
                                             )}
                                             {bankSource === BANK_SOURCES.PERSONAL && (
@@ -830,7 +829,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                                                   setEditingPartId(part.examPartId);
                                                   setEditingQuestionId(id);
                                                 }}
-                                                title="Sửa câu hỏi này"
+                                                title={t('parts.editQuestion')}
                                               >
                                                 <IoCreateOutline size={18} />
                                               </button>
@@ -854,7 +853,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             })}
 
             <p className={cx('bankTotalCount')}>
-              Tổng số câu sẽ đưa vào đề: <strong>{totalSelected}</strong>
+              {t.rich('parts.total', { count: totalSelected, strong: (chunks) => <strong>{chunks}</strong> })}
             </p>
           </div>
         )}
@@ -862,7 +861,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         <div className={cx('footer')}>
           {onCancel && (
             <ButtonPrime type="button" variant="ghost" size="md" onClick={onCancel}>
-              Để sau
+              {t('submit.later')}
             </ButtonPrime>
           )}
           <ButtonPrime
@@ -871,7 +870,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             size="md"
             disabled={createTestMutation.isPending || !hasAnyPartWithQuestions || !testInfo.examTypeId}
           >
-            {createTestMutation.isPending ? <><Spinner animation="border" size="sm" /> Đang tạo đề...</> : <><IoRocketOutline /> Tạo đề thi từ kho</>}
+            {createTestMutation.isPending ? <><Spinner animation="border" size="sm" /> {t('submit.creating')}</> : <><IoRocketOutline /> {t('submit.submit')}</>}
           </ButtonPrime>
         </div>
       </Form>

@@ -1,0 +1,329 @@
+{
+  "certificateBanner": {
+    "notPassedTitle": "Chưa đạt chứng chỉ lần này",
+    "notPassedDesc": "Bạn còn thiếu <strong>{pointsToPass} điểm</strong> nữa để nhận chứng chỉ (cần {passScore} điểm, bạn đạt {score} điểm).",
+    "buildPlan": "Lập lộ trình ôn tập",
+    "justIssuedTitle": "Chúc mừng! Bạn vừa nhận được chứng chỉ",
+    "alreadyHaveTitle": "Bạn đã có chứng chỉ cho loại đề này",
+    "fallbackTitle": "Chứng chỉ",
+    "issuedOn": "cấp ngày {date}",
+    "noReissue": "thi lại không cấp thêm chứng chỉ mới",
+    "view": "Xem chứng chỉ"
+  },
+  "dashboard": {
+    "title": "Danh sách câu hỏi",
+    "questionLabel": "Câu {number}",
+    "ariaAnswered": ", đã làm",
+    "ariaFlagged": ", đã đánh dấu",
+    "ariaLocked": ", đang khoá",
+    "answered": "Đã làm",
+    "unanswered": "Chưa làm",
+    "flagged": "Đánh dấu ({count})"
+  },
+  "evaluation": {
+    "ratingLabels": {
+      "veryBad": "Rất tệ",
+      "notGood": "Chưa tốt",
+      "okay": "Bình thường",
+      "good": "Tốt",
+      "veryGood": "Rất tốt"
+    },
+    "ratingRequired": "Vui lòng chọn số sao",
+    "thanks": "Cảm ơn bạn đã đánh giá đề!",
+    "submitFailed": "Gửi đánh giá thất bại. Vui lòng thử lại sau!",
+    "later": "Để sau",
+    "submit": "Gửi đánh giá",
+    "submitting": "Đang gửi...",
+    "title": "Bạn thấy đề này thế nào?",
+    "testLabel": "Đề: <strong>{title}</strong>",
+    "satisfaction": "Mức độ hài lòng",
+    "stars": "{count} sao",
+    "feedbackLabel": "Góp ý thêm (không bắt buộc)",
+    "feedbackPlaceholder": "Đề khó/dễ thế nào, có câu nào sai đáp án hay giải thích chưa rõ không?",
+    "privacyTip": "Đánh giá chỉ được gửi tới đội ngũ quản trị để cải thiện đề, không hiển thị công khai."
+  },
+  "examLayout": {
+    "bannerPlaceholder": "Banner (chưa có ảnh)",
+    "bannerAlt": "Banner bài thi",
+    "questions": "Câu hỏi",
+    "hide": "Ẩn",
+    "hideQuestionList": "Ẩn danh sách câu hỏi",
+    "showQuestionList": "Xem danh sách câu hỏi",
+    "questionList": "Danh sách câu hỏi",
+    "submit": "Nộp bài thi",
+    "submitting": "Đang nộp bài...",
+    "audioBlockedHint": "Trình duyệt tạm dừng audio sau khi tải lại trang. Nhấn để nghe, hoặc chuyển sang câu tiếp.",
+    "playAudio": "Phát audio",
+    "next": "Câu tiếp",
+    "prev": "Câu trước",
+    "questionNumber": "Câu {number}:",
+    "unflag": "Bỏ đánh dấu",
+    "flagForReview": "Đánh dấu để xem lại",
+    "flagged": "Đã đánh dấu",
+    "flag": "Đánh dấu",
+    "fillPlaceholder": "Nhập câu trả lời của bạn...",
+    "essayPlaceholder": "Viết câu trả lời chi tiết tại đây...",
+    "readingMaterial": "Đọc tài liệu",
+    "materialAudio": "Tài liệu / audio",
+    "loadingQuestions": "Đang tải câu hỏi…",
+    "practiceTitle": "Luyện theo phần"
+  },
+  "guestSave": {
+    "loginFlash": "Đăng nhập để lưu kết quả và xây lộ trình cá nhân hóa.",
+    "discarded": "Đã xóa kết quả bài làm của bạn.",
+    "title": "Bạn đã có kết quả!",
+    "lead": "Bạn có muốn lưu kết quả này và xây lộ trình cá nhân hóa không?",
+    "saveTitle": "Đăng nhập & lưu kết quả",
+    "saveHint": "Bài vừa làm được lưu vào tài khoản và dùng để lập lộ trình ôn tập.",
+    "exitTitle": "Thoát",
+    "exitHint": "Kết quả của bạn sẽ bị xóa vĩnh viễn.",
+    "confirmTitle": "Xóa kết quả và thoát?",
+    "confirmMessage": "Kết quả bài làm này sẽ bị xóa vĩnh viễn, bạn không thể xem lại hay lưu vào tài khoản sau này.",
+    "confirmText": "Xóa & thoát",
+    "cancelText": "Giữ lại"
+  },
+  "history": {
+    "empty": {
+      "title": "Chưa có lần làm bài nào",
+      "desc": "Bấm \"Bắt đầu làm bài\" ở trên. Mỗi lần nộp bài sẽ được lưu lại ở đây để bạn so sánh."
+    },
+    "stats": {
+      "label": "Tổng quan",
+      "attempts": "Lượt đã làm",
+      "completed": "{count} lượt hoàn thành",
+      "best": "Điểm cao nhất",
+      "latest": "Lần gần nhất",
+      "delta": "{delta} so với lần trước",
+      "avgDuration": "Thời gian TB"
+    },
+    "attemptsTitle": "Các lần làm bài",
+    "columns": {
+      "attempt": "Lần",
+      "started": "Bắt đầu",
+      "submitted": "Nộp bài",
+      "duration": "Thời gian làm",
+      "score": "Điểm",
+      "status": "Trạng thái"
+    },
+    "status": {
+      "completed": "Hoàn thành",
+      "inProgress": "Đang làm",
+      "expired": "Hết hạn"
+    },
+    "practice": "Luyện theo phần",
+    "bestPill": "Cao nhất",
+    "viewResult": "Xem kết quả"
+  },
+  "leaderboard": {
+    "forbidden": "Bạn không có quyền xem bảng xếp hạng của đề này (đề thuộc lớp riêng).",
+    "loadError": "Không tải được bảng xếp hạng từ hệ thống.",
+    "you": "Bạn",
+    "userFallback": "User {id}",
+    "anonymous": "Người dùng",
+    "empty": {
+      "title": "Chưa có ai trên bảng xếp hạng",
+      "desc": "Làm bài và nộp bài để trở thành người đầu tiên."
+    },
+    "myRank": "Hạng của bạn",
+    "score": "Điểm",
+    "time": "Thời gian",
+    "rankingHint": "Mỗi người tính lần điểm cao nhất; bằng điểm thì ai làm nhanh hơn xếp trên.",
+    "notRanked": "Bạn chưa có kết quả trên bảng này. Làm bài và nộp bài để được xếp hạng.",
+    "rankLabel": "Hạng {rank}",
+    "title": "Bảng xếp hạng",
+    "showingTop": "Hiển thị top {shown} / {total}",
+    "columns": {
+      "rank": "Hạng",
+      "user": "Người dùng",
+      "duration": "Thời gian làm"
+    }
+  },
+  "managementTable": {
+    "name": "Tên bài test",
+    "duration": "Thời gian",
+    "status": "Trạng thái",
+    "totalAttempts": "Tổng lượt làm",
+    "actions": "Hành động",
+    "edit": "Sửa bài test",
+    "delete": "Xóa bài test",
+    "viewScores": "Xem chi tiết điểm"
+  },
+  "notes": {
+    "myNotes": "Ghi chú của tôi",
+    "titleRequired": "Vui lòng nhập tiêu đề ghi chú!",
+    "updated": "Đã cập nhật ghi chú!",
+    "saved": "Đã lưu ghi chú!",
+    "saveError": "Có lỗi xảy ra khi lưu ghi chú!",
+    "deleted": "Đã xóa ghi chú!",
+    "deleteError": "Có lỗi xảy ra khi xóa ghi chú!",
+    "saving": "Đang lưu...",
+    "saveChanges": "Lưu thay đổi",
+    "saveNote": "Lưu ghi chú",
+    "editNote": "Sửa ghi chú",
+    "newNote": "Ghi chú mới",
+    "backToList": "Về danh sách",
+    "titlePlaceholder": "Tiêu đề ghi chú",
+    "contentPlaceholder": "Viết lại điều bạn cần nhớ...",
+    "writeNew": "Viết ghi chú mới",
+    "loading": "Đang mở sổ tay...",
+    "empty": "Sổ tay còn trống - ghi lại điều bạn hay quên nhé.",
+    "noContent": "Chưa có nội dung",
+    "confirmDelete": "Xóa?",
+    "delete": "Xóa",
+    "deleteNote": "Xóa ghi chú"
+  },
+  "pageHeader": {
+    "tabs": {
+      "history": "Lịch sử làm bài",
+      "leaderboard": "Bảng xếp hạng"
+    },
+    "retake": "Làm lại",
+    "start": "Bắt đầu làm bài",
+    "fallbackTitle": "Đề thi",
+    "meta": {
+      "questions": "{count} câu",
+      "minutes": "{count} phút",
+      "unlimited": "Không giới hạn giờ",
+      "attemptsLeft": "Còn {remaining}/{max} lượt"
+    },
+    "breadcrumbLabel": "Đường dẫn",
+    "examLibrary": "Kho đề thi",
+    "tabsLabel": "Trang của đề"
+  },
+  "passageMedia": {
+    "audio": "Audio",
+    "image": "Ảnh",
+    "document": "Tài liệu",
+    "openFile": "Mở file"
+  },
+  "readinessGauge": {
+    "correctStat": "Trả lời đúng <strong>{correct}/{total}</strong> câu",
+    "beginnerCta": "Xem cấu trúc kỳ thi để bắt đầu từ nền tảng",
+    "fullTestCta": "Làm một đề thi thử đầy đủ để biết chính xác trình độ của bạn"
+  },
+  "recoveryPlan": {
+    "practiceNotCounted": "Bài luyện theo phần không tính vào mục tiêu điểm.",
+    "title": "Việc cần làm ngay",
+    "setTarget": "Đặt mục tiêu",
+    "signUpForPlan": "Đăng ký để nhận lộ trình học",
+    "createPlan": "Lập lộ trình học"
+  },
+  "result": {
+    "loadError": "Không thể tải kết quả bài thi này",
+    "reviewLocked": "Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc.",
+    "loading": "Đang tổng hợp điểm số của bạn...",
+    "backHome": "Quay lại trang chủ",
+    "titleBeginner": "Đây là điểm xuất phát",
+    "title": "Hoàn thành bài thi!",
+    "startingScore": "Điểm xuất phát",
+    "accuracy": "Độ chính xác",
+    "score": "Điểm số",
+    "scale": "thang {min}–{max}",
+    "stats": {
+      "correct": "Câu đúng",
+      "wrong": "Câu sai",
+      "total": "Tổng số câu",
+      "time": "Thời gian"
+    },
+    "answersLocked": "Đáp án sẽ hiển thị sau khi thời gian làm bài kết thúc.",
+    "viewAnswers": "Xem đáp án & giải thích",
+    "history": "Lịch sử bài thi",
+    "home": "Trang chủ",
+    "planFromTest": "Lập lộ trình từ bài này",
+    "percentile": "Bạn làm tốt hơn <strong>{percentile}%</strong> người đã từng làm bài này"
+  },
+  "review": {
+    "questionList": "Danh sách câu hỏi",
+    "questionLabel": "Câu {number}",
+    "legend": {
+      "correct": "Đúng",
+      "incorrect": "Sai",
+      "unanswered": "Chưa làm"
+    },
+    "hide": "Ẩn",
+    "showList": "Danh sách câu",
+    "correctCount": "{correct}/{total} câu đúng",
+    "questionNumber": "Câu {number}:",
+    "questionPrefix": "Câu hỏi:",
+    "yourAnswer": "Bạn trả lời:",
+    "noAnswer": "(Chưa trả lời)",
+    "correctAnswer": "Đáp án đúng:",
+    "yourChoice": "(Bạn chọn)",
+    "explanation": "Giải thích:"
+  },
+  "start": {
+    "loginRequiredFlash": "Bạn cần đăng nhập để làm bài thi này!",
+    "autoSubmitRetry": "Mất kết nối khi nộp bài. Đang tự thử nộp lại, đừng đóng trang...",
+    "submitFailed": "Nộp bài thất bại! Vui lòng thử lại.",
+    "unlockSuccess": "Đã mở khoá bài kiểm tra!",
+    "unlockFailed": "Mở khoá thất bại. Vui lòng thử lại.",
+    "confirmSubmit": {
+      "title": "Nộp bài?",
+      "continue": "Làm tiếp",
+      "submit": "Nộp bài",
+      "unanswered": "Bạn còn <strong>{unanswered}/{total} câu</strong> chưa trả lời. Nộp rồi thì không sửa được nữa.",
+      "allAnswered": "Bạn đã trả lời hết {total} câu. Nộp rồi thì không sửa được nữa.",
+      "flagged": "Còn <strong>{count} câu</strong> bạn đã đánh dấu để xem lại."
+    },
+    "loading": "Đang tải đề thi...",
+    "back": "Quay lại",
+    "ready": {
+      "fallbackTitle": "Sẵn sàng làm bài",
+      "questionCount": "<strong>{count}</strong> câu hỏi",
+      "partCount": ", chia thành {count} phần",
+      "timed": "Thời gian: <strong>{minutes} phút</strong>, tính từ lúc bấm bắt đầu",
+      "untimed": "Không giới hạn thời gian",
+      "autosave": "Câu trả lời được lưu tự động, lỡ tải lại trang vẫn làm tiếp được.",
+      "submitHint": "Làm xong bấm <strong>Nộp bài</strong> để xem điểm và đáp án.",
+      "autoSubmit": "Hết giờ bài sẽ tự nộp.",
+      "start": "Bắt đầu làm bài"
+    },
+    "payment": {
+      "title": "Bài kiểm tra trả phí",
+      "desc": "Đầu tư một lần, sử dụng mãi mãi.",
+      "unlocking": "Đang mở khoá...",
+      "unlock": "Mở khoá ({cost} xu)",
+      "notEnough": "Không đủ xu"
+    },
+    "noAttempts": {
+      "title": "Hết lượt làm bài",
+      "desc": "Bạn đã hoàn thành số lượt làm bài cho phép cho bài thi này."
+    },
+    "locked": {
+      "title": "Phòng thi chưa mở",
+      "desc": "Vui lòng đợi trong giây lát..."
+    },
+    "closed": {
+      "title": "Phòng thi đã đóng",
+      "desc": "Rất tiếc, thời gian tham gia bài thi này đã kết thúc."
+    },
+    "error": {
+      "title": "Không tải được đề thi",
+      "desc": "Có thể mạng đang chập chờn. Bạn thử tải lại, bài đã làm (nếu có) vẫn được giữ."
+    }
+  },
+  "tagAnalysis": {
+    "fallbackPart": "Phần",
+    "title": "Phân tích chi tiết",
+    "columns": {
+      "category": "Phân loại câu hỏi",
+      "correct": "Số câu đúng",
+      "wrong": "Số câu sai",
+      "skipped": "Số câu bỏ qua",
+      "accuracy": "Độ chính xác",
+      "questions": "Danh sách câu hỏi"
+    },
+    "questionTitle": "Câu {number}  xem giải thích",
+    "total": "Tổng"
+  },
+  "testReview": {
+    "loadError": "Không thể tải chi tiết câu hỏi. Vui lòng thử lại.",
+    "notReviewable": "Bạn chỉ có thể xem đáp án sau khi thời gian làm bài kết thúc.",
+    "translation": "Bản dịch",
+    "loading": "Đang tải chi tiết bài làm...",
+    "backToResult": "Quay lại kết quả",
+    "home": "Trang chủ",
+    "title": "Chi tiết bài làm",
+    "passageLabel": "Tài liệu / Đoạn nghe"
+  }
+}

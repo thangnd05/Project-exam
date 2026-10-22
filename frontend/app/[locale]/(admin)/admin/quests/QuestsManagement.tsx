@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import {useLocale, useTranslations} from 'next-intl';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 import {toast} from 'react-toastify';
@@ -15,21 +16,21 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/(admin)/_components/common';
-import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
+} from '@/app/[locale]/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import {QuestConditionType} from '@/app/enums';
 import type {QuestRequest, QuestResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
 
 const CONDITION_TYPES = [
-  {value: QuestConditionType.NONE, label: 'Không cần điều kiện (tặng xu)'},
-  {value: QuestConditionType.COMPLETE_TEST, label: 'Hoàn thành bài thi'},
-  {value: QuestConditionType.STREAK_DAYS, label: 'Đạt chuỗi ngày học'},
-  {value: QuestConditionType.CREATE_LEARNING_PLAN, label: 'Tạo lộ trình học'},
-  {value: QuestConditionType.COMPLETE_LEARNING_PLAN, label: 'Hoàn thành lộ trình học'},
-  {value: QuestConditionType.SET_TARGET, label: 'Đặt mục tiêu'},
-  {value: QuestConditionType.COMPLETE_PLAN_TASK, label: 'Hoàn thành nhiệm vụ trong lộ trình'},
-];
+  {value: QuestConditionType.NONE, labelKey: 'none'},
+  {value: QuestConditionType.COMPLETE_TEST, labelKey: 'completeTest'},
+  {value: QuestConditionType.STREAK_DAYS, labelKey: 'streakDays'},
+  {value: QuestConditionType.CREATE_LEARNING_PLAN, labelKey: 'createLearningPlan'},
+  {value: QuestConditionType.COMPLETE_LEARNING_PLAN, labelKey: 'completeLearningPlan'},
+  {value: QuestConditionType.SET_TARGET, labelKey: 'setTarget'},
+  {value: QuestConditionType.COMPLETE_PLAN_TASK, labelKey: 'completePlanTask'},
+] as const;
 
 interface QuestFormState {
   title: string;
@@ -56,6 +57,9 @@ const defaultFormState: QuestFormState = {
 const toInputDateTime = (value?: string) => toDateTimeLocalInput(value);
 
 function QuestsManagement() {
+  const t = useTranslations('AdminUsers');
+  const tCommon = useTranslations('Common');
+  const locale = useLocale();
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingQuestId, setEditingQuestId] = useState<string | null>(null);
@@ -112,12 +116,12 @@ function QuestsManagement() {
 
   const handleSubmit = async () => {
     if (!formState.title.trim()) {
-      setErrorMessage('Tiêu đề không được để trống.');
+      setErrorMessage(t('quests.errors.titleRequired'));
       return;
     }
     const reward = Number(formState.rewardCoins);
     if (Number.isNaN(reward) || reward < 0) {
-      setErrorMessage('Số xu thưởng phải là số không âm.');
+      setErrorMessage(t('quests.errors.rewardInvalid'));
       return;
     }
 
@@ -145,7 +149,7 @@ function QuestsManagement() {
       resetForm();
     } catch (error) {
       setErrorMessage(
-        getApiErrorMessage(error, 'Không thể lưu nhiệm vụ. Vui lòng thử lại.'),
+        getApiErrorMessage(error, t('quests.errors.save')),
       );
     } finally {
       setSubmitting(false);
@@ -159,22 +163,31 @@ function QuestsManagement() {
     setSubmitting(true);
     try {
       await removeQuest(deletingQuest.questId);
-      toast.success('Đã xóa nhiệm vụ.');
+      toast.success(t('quests.deleted'));
     } catch (error) {
-      toast.error(getApiErrorMessage(error, 'Không thể xóa nhiệm vụ.'));
+      toast.error(getApiErrorMessage(error, t('quests.errors.delete')));
     } finally {
       setDeletingQuest(null);
       setSubmitting(false);
     }
   };
 
+  // conditionLabel của backend là tiếng Việt cố định nên dịch theo conditionType khi biết
+  const conditionLabelOf = (quest: QuestResponse) => {
+    if (quest.conditionType === QuestConditionType.NONE) {
+      return t('quests.conditionNone');
+    }
+    const type = CONDITION_TYPES.find((item) => item.value === quest.conditionType);
+    return type ? t(`quests.conditions.${type.labelKey}`) : quest.conditionLabel;
+  };
+
   const formatDate = (value?: string) =>
-    value ? new Date(value).toLocaleString('vi-VN') : '-';
+    value ? new Date(value).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN') : '-';
 
   const columns: AdminTableColumn[] = [
     {
       key: 'title',
-      header: 'Tiêu đề',
+      header: t('quests.columns.title'),
       render: (quest: QuestResponse) => (
         <div className="d-flex flex-column">
           <span className="fw-semibold">{quest.title}</span>
@@ -186,70 +199,70 @@ function QuestsManagement() {
     },
     {
       key: 'condition',
-      header: 'Điều kiện',
+      header: t('quests.columns.condition'),
       render: (quest: QuestResponse) => (
         <>
-          {quest.conditionLabel}
+          {conditionLabelOf(quest)}
           {quest.conditionType !== QuestConditionType.NONE && ` (x${quest.conditionTarget})`}
         </>
       ),
     },
-    {key: 'rewardCoins', header: 'Xu', render: (quest: QuestResponse) => quest.rewardCoins},
+    {key: 'rewardCoins', header: t('quests.columns.coins'), render: (quest: QuestResponse) => quest.rewardCoins},
     {
       key: 'time',
-      header: 'Thời gian',
+      header: t('quests.columns.time'),
       render: (quest: QuestResponse) => (
         <div className="d-flex flex-column">
-          <span>Từ: {formatDate(quest.startAt)}</span>
-          <span>Đến: {formatDate(quest.endAt)}</span>
+          <span>{t('quests.from', {date: formatDate(quest.startAt)})}</span>
+          <span>{t('quests.to', {date: formatDate(quest.endAt)})}</span>
         </div>
       ),
     },
-    {key: 'claimCount', header: 'Đã nhận', render: (quest: QuestResponse) => quest.claimCount ?? 0},
+    {key: 'claimCount', header: t('quests.columns.claimed'), render: (quest: QuestResponse) => quest.claimCount ?? 0},
     {
       key: 'active',
-      header: 'Trạng thái',
-      render: (quest: QuestResponse) => (quest.active ? 'Đang bật' : 'Tắt'),
+      header: t('quests.columns.status'),
+      render: (quest: QuestResponse) => (quest.active ? t('quests.active') : t('quests.inactive')),
     },
   ];
 
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Quản lý nhiệm vụ"
-        description="Tạo nhiệm vụ thưởng xu theo sự kiện hoặc theo thời gian."
+        title={t('quests.title')}
+        description={t('quests.description')}
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
-          Thêm nhiệm vụ
+          {t('quests.add')}
         </Button>
       </AdminPageHeader>
 
       <AdminToolbar
         searchValue={keyword}
         onSearchChange={setKeyword}
-        searchPlaceholder="Tìm theo tiêu đề..."
+        searchPlaceholder={t('quests.searchPlaceholder')}
       />
       {!showModal && (
-        <AdminFieldError message={errorMessage || (isError ? 'Không thể tải danh sách nhiệm vụ.' : '')} />
+        <AdminFieldError message={errorMessage || (isError ? t('quests.errors.load') : '')} />
       )}
 
       <AdminTable
         showIndex
         paginated
-        itemLabel="nhiệm vụ"
+        itemLabel={t('quests.itemLabel')}
         columns={columns}
         data={filteredQuests}
         loading={loading}
         getRowKey={(quest: QuestResponse) => quest.questId}
         rowActions={(quest: QuestResponse) => (
           <>
-            <button title="Sửa" onClick={() => openEditModal(quest)}>
+            <button title={t('shared.edit')} onClick={() => openEditModal(quest)}>
               <Edit size={14} />
             </button>
             <button
               className="danger"
-              title="Xóa"
+              title={t('shared.delete')}
               onClick={() => setDeletingQuest(quest)}
             >
               <Trash2 size={14} />
@@ -267,7 +280,7 @@ function QuestsManagement() {
           setShowModal(false);
           resetForm();
         }}
-        title={editingQuestId ? 'Cập nhật nhiệm vụ' : 'Tạo nhiệm vụ'}
+        title={editingQuestId ? t('quests.modal.editTitle') : t('quests.modal.createTitle')}
         maxWidth={550}
         footer={
           <ModalActionFooter
@@ -279,14 +292,14 @@ function QuestsManagement() {
               resetForm();
             }}
             onSubmit={handleSubmit}
-            cancelLabel="Hủy"
-            submitLabel={editingQuestId ? 'Lưu' : 'Tạo mới'}
+            cancelLabel={tCommon('cancelShort')}
+            submitLabel={editingQuestId ? tCommon('save') : t('shared.createNew')}
             loading={submitting}
           />
         }
       >
         <Form.Group className="mb-3">
-          <Form.Label>Tiêu đề</Form.Label>
+          <Form.Label>{t('quests.form.title')}</Form.Label>
           <Form.Control
             value={formState.title}
             onChange={(event) =>
@@ -295,7 +308,7 @@ function QuestsManagement() {
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Mô tả</Form.Label>
+          <Form.Label>{t('quests.form.description')}</Form.Label>
           <Form.Control
             as="textarea"
             rows={2}
@@ -309,7 +322,7 @@ function QuestsManagement() {
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Số xu thưởng</Form.Label>
+          <Form.Label>{t('quests.form.rewardCoins')}</Form.Label>
           <Form.Control
             type="number"
             min={0}
@@ -320,7 +333,7 @@ function QuestsManagement() {
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Điều kiện</Form.Label>
+          <Form.Label>{t('quests.form.condition')}</Form.Label>
           <Form.Select
             value={formState.conditionType}
             onChange={(event) =>
@@ -332,14 +345,14 @@ function QuestsManagement() {
           >
             {CONDITION_TYPES.map((type) => (
               <option key={type.value} value={type.value}>
-                {type.label}
+                {t(`quests.conditions.${type.labelKey}`)}
               </option>
             ))}
           </Form.Select>
         </Form.Group>
         {formState.conditionType !== QuestConditionType.NONE && (
           <Form.Group className="mb-3">
-            <Form.Label>Số lần cần đạt</Form.Label>
+            <Form.Label>{t('quests.form.conditionTarget')}</Form.Label>
             <Form.Control
               type="number"
               min={1}
@@ -355,7 +368,7 @@ function QuestsManagement() {
         )}
         <div className="d-flex gap-2 mb-3">
           <Form.Group className="flex-fill">
-            <Form.Label>Bắt đầu</Form.Label>
+            <Form.Label>{t('quests.form.startAt')}</Form.Label>
             <Form.Control
               type="datetime-local"
               value={formState.startAt}
@@ -365,7 +378,7 @@ function QuestsManagement() {
             />
           </Form.Group>
           <Form.Group className="flex-fill">
-            <Form.Label>Kết thúc</Form.Label>
+            <Form.Label>{t('quests.form.endAt')}</Form.Label>
             <Form.Control
               type="datetime-local"
               value={formState.endAt}
@@ -377,7 +390,7 @@ function QuestsManagement() {
         </div>
         <Form.Check
           type="switch"
-          label="Đang bật"
+          label={t('quests.form.active')}
           checked={formState.active}
           onChange={(event) =>
             setFormState((previous) => ({...previous, active: event.target.checked}))
@@ -395,8 +408,8 @@ function QuestsManagement() {
           setDeletingQuest(null);
         }}
         onConfirm={handleDelete}
-        title="Xác nhận xóa nhiệm vụ"
-        message={`Bạn có chắc muốn xóa "${deletingQuest?.title || ''}" không?`}
+        title={t('quests.confirmDelete.title')}
+        message={t('quests.confirmDelete.message', {title: deletingQuest?.title || ''})}
       />
     </div>
   );

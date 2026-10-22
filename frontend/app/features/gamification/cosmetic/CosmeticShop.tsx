@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { CircleDollarSign, Check } from 'lucide-react';
 
 import { getCosmeticShop } from '@/app/apis/cosmeticApi';
@@ -66,6 +67,7 @@ export function CosmeticPreview({ item, size = 60 }: CosmeticPreviewProps) {
 }
 
 function CosmeticShop() {
+  const t = useTranslations('Gamification.shop');
   const { balance } = useCoins();
   const { user } = useAuth();
   const buyMutation = useBuyCosmetic();
@@ -84,7 +86,7 @@ function CosmeticShop() {
       try {
         return await getCosmeticShop();
       } catch (error) {
-        toast.error('Không thể tải cửa hàng.');
+        toast.error(t('loadError'));
         throw error;
       }
     },
@@ -96,10 +98,10 @@ function CosmeticShop() {
   const handleBuy = (item: CosmeticResponse) => {
     buyMutation.mutate(item.cosmeticId, {
       onSuccess: () => {
-        toast.success(`Đã mua "${item.name}"!`);
+        toast.success(t('buySuccess', { name: item.name ?? '' }));
       },
       onError: (error) => {
-        toast.error(error?.response?.data?.message || 'Mua thất bại. Vui lòng thử lại.');
+        toast.error(error?.response?.data?.message || t('buyError'));
       },
     });
   };
@@ -107,7 +109,7 @@ function CosmeticShop() {
   const handleEquip = (item: CosmeticResponse) => {
     equipMutation.mutate(item.cosmeticId, {
       onError: (error) => {
-        toast.error(error?.response?.data?.message || 'Không thể đeo vật phẩm.');
+        toast.error(error?.response?.data?.message || t('equipError'));
       },
     });
   };
@@ -115,7 +117,7 @@ function CosmeticShop() {
   const handleUnequip = (item: CosmeticResponse) => {
     unequipMutation.mutate(item.cosmeticId, {
       onError: () => {
-        toast.error('Không thể tháo vật phẩm.');
+        toast.error(t('unequipError'));
       },
     });
   };
@@ -124,13 +126,13 @@ function CosmeticShop() {
     return (
       <div className={cx('placeholder')}>
         <Spinner size="sm" className="me-2" />
-        Đang tải cửa hàng...
+        {t('loading')}
       </div>
     );
   }
 
   if (items.length === 0) {
-    return <div className={cx('placeholder')}>Cửa hàng chưa có vật phẩm nào.</div>;
+    return <div className={cx('placeholder')}>{t('empty')}</div>;
   }
 
   const renderCard = (item: CosmeticResponse) => {
@@ -155,14 +157,14 @@ function CosmeticShop() {
               disabled={busy || !canAfford}
               onClick={() => handleBuy(item)}
             >
-              {busy ? 'Đang mua...' : canAfford ? 'Mua' : 'Không đủ xu'}
+              {busy ? t('buying') : canAfford ? t('buy') : t('notEnough')}
             </button>
           </>
         ) : item.equipped ? (
           <>
             <div className={cx('ownedTag')}>
               <Check size={14} />
-              Đang đeo
+              {t('equipped')}
             </div>
             <button
               type="button"
@@ -170,19 +172,19 @@ function CosmeticShop() {
               disabled={busy}
               onClick={() => handleUnequip(item)}
             >
-              Tháo
+              {t('unequip')}
             </button>
           </>
         ) : (
           <>
-            <div className={cx('ownedTag')}>Đã sở hữu</div>
+            <div className={cx('ownedTag')}>{t('owned')}</div>
             <button
               type="button"
               className={cx('equipBtn')}
               disabled={busy}
               onClick={() => handleEquip(item)}
             >
-              {busy ? '...' : 'Đeo'}
+              {busy ? '...' : t('equip')}
             </button>
           </>
         )}

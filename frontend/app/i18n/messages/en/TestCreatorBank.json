@@ -1,0 +1,186 @@
+{
+  "page": {
+    "label": "Create test",
+    "title": "Create a test from the question bank",
+    "badge": "Configure each part (random or manual selection), then build the test from your personal bank.",
+    "hint": "For each part: <strong>Random by count</strong> (the backend picks randomly from your personal bank) or <strong>Manual selection</strong>. For parts with passages (e.g. Part 3, 4, 6, 7): select by <strong>group (same passage)</strong> to keep them consistent, not individual questions.",
+    "noQuestions": "No questions in the (personal) bank for this part yet."
+  },
+  "info": {
+    "section": "Test information",
+    "title": "Test title *",
+    "titlePlaceholder": "Enter test title",
+    "titleAria": "Test title",
+    "duration": "Duration (minutes)",
+    "durationPlaceholder": "e.g. 60",
+    "durationAria": "Test duration",
+    "examType": "Exam type *",
+    "examTypeAria": "Exam type",
+    "selectPlaceholder": "-- Select --",
+    "collection": "Test set (Collection)",
+    "collectionAria": "Test set",
+    "emptyOption": "-- None --",
+    "maxAttempts": "Max attempts",
+    "maxAttemptsPlaceholder": "Leave blank = unlimited",
+    "maxAttemptsAria": "Attempts",
+    "category": "Test category (optional)",
+    "categoryAria": "Test category",
+    "noCategory": "-- Uncategorized --",
+    "description": "Description",
+    "descriptionPlaceholder": "Short description (optional)",
+    "descriptionAria": "Test description"
+  },
+  "source": {
+    "section": "Choose question bank source",
+    "hint": "Choose the bank to draw questions from. <strong>Personal bank</strong> holds the questions you saved yourself.",
+    "classHint": "<strong>Class bank</strong> is the question bank of the current class and can be filtered by chapter.",
+    "adminHint": "<strong>Admin bank</strong> is provided by admins as a source for building tests.",
+    "personal": "Personal bank",
+    "class": "Class bank",
+    "admin": "Admin bank",
+    "chapterFilter": "Filter by chapter",
+    "chapterAria": "Choose a chapter in the class",
+    "allChaptersOption": "All chapters of the class",
+    "chapterFallback": "Chapter {chapterId}",
+    "chapter": "Chapter",
+    "allChapters": "All chapters"
+  },
+  "scope": {
+    "label": "Question scope",
+    "exam": {
+      "label": "Exam questions",
+      "hint": "Only take questions meant for exams — this is the default."
+    },
+    "practice": {
+      "label": "Practice questions",
+      "hint": "Only take practice (learning path) questions. They keep their practice status after being added to the test."
+    },
+    "all": {
+      "label": "Both",
+      "hint": "Take both exam and practice questions from the same bank."
+    }
+  },
+  "modes": {
+    "random": "Random by count",
+    "byCollection": "Random by test set",
+    "byCollectionNoCollectionTitle": "No test set chosen in section 1 → the whole bank will be used",
+    "sequential": "Sequential",
+    "manual": "Manual selection"
+  },
+  "parts": {
+    "section": "Configure each part",
+    "modesHint": "For each part: <strong>Random by count</strong> (random from the whole bank), <strong>Random by test set</strong>, <strong>Sequential</strong> or <strong>Manual selection</strong>.",
+    "collectionSelectedHint": "Test set chosen → Random by test set / Sequential / Manual only take questions from that test set.",
+    "collectionNotSelectedHint": "Choose a test set in section 1 to limit questions to that set.",
+    "passageHint": "For parts with passages (e.g. Part 3, 4, 6, 7): select by <strong>group (same passage)</strong> to keep them consistent, not individual questions.",
+    "applyByCollectionTitle": "Take all questions in the test set for every part",
+    "applyByCollectionNoCollectionTitle": "No test set chosen → the whole bank will be used for every part",
+    "applyByCollection": "Random by test set · all parts",
+    "applyRandomTitle": "Set every part to Random by count",
+    "applyRandom": "Random by count · all parts",
+    "questionCount": "{count, plural, one {# question} other {# questions}}",
+    "randomCount": "Number of random questions:",
+    "randomAria": "Random question count for {part}",
+    "maxInBank": "Max {count, plural, one {# question} other {# questions}} in the bank",
+    "maxInCollection": "Max {count, plural, one {# question} other {# questions}} in the test set",
+    "byCollectionHint": "Takes all {count, plural, one {# question} other {# questions}} in the test set (shuffled, passage groups kept intact).",
+    "byCollectionNoCollectionHint": "No test set chosen in section 1 → all {count, plural, one {# question} other {# questions}} in the bank will be used.",
+    "fromIndex": "From question:",
+    "fromAria": "From question for {part}",
+    "toIndex": "To question:",
+    "toAria": "To question for {part}",
+    "loading": "Loading questions...",
+    "empty": {
+      "collection": "The selected test set has no questions for this part yet.",
+      "admin": "The admin bank has no questions for this part yet.",
+      "classChapter": "The class bank (selected chapter) has no questions for this part yet.",
+      "class": "The class bank has no questions for this part yet.",
+      "personal": "No questions in your personal bank for this part yet."
+    },
+    "filteringBy": "Filtering by <strong>{scope}</strong> — try changing the scope in section 2.",
+    "selectAll": "Select all ({count, plural, one {# question} other {# questions}})",
+    "selectAllAria": "Select all in {part}",
+    "passageGroup": "Passage group ({count, plural, one {# question} other {# questions}})",
+    "standalone": "Standalone questions ({count})",
+    "noContent": "(No content)",
+    "practiceBadgeTitle": "Practice question — keeps its practice status after being added to the test",
+    "practiceBadge": "Practice",
+    "editQuestion": "Edit this question",
+    "total": "Total questions in the test: <strong>{count}</strong>"
+  },
+  "submit": {
+    "later": "Later",
+    "creating": "Creating test...",
+    "submit": "Create test from bank",
+    "created": "Test created from the question bank!",
+    "titleRequired": "Please enter a title and choose an exam type.",
+    "partRequired": "Please configure at least one part with questions (count > 0 or manual selection).",
+    "errors": {
+      "noTestId": "No testId received from the server.",
+      "noPartId": "No testPartId received for part {part}.",
+      "prefix": "Error: {message}"
+    }
+  },
+  "bank": {
+    "unnamed": "(Unnamed)",
+    "unknown": "(Unknown)",
+    "errors": {
+      "chapterQuestions": "Could not load this chapter’s questions.",
+      "chapters": "Could not load the chapter list.",
+      "questions": "Could not load the question list."
+    },
+    "deleted": "Question deleted successfully.",
+    "deleteError": "Could not delete the question. Please try again.",
+    "label": "Question bank",
+    "title": {
+      "class": "Class question bank",
+      "admin": "Admin question bank",
+      "personal": "Personal question bank"
+    },
+    "badge": {
+      "class": "Manage questions by chapter. Click the pencil to edit quickly.",
+      "admin": "Question bank provided by admins, used as a source for building tests.",
+      "personal": "Manage questions by part. Click the pencil to edit quickly."
+    },
+    "filters": "Question bank filters",
+    "selectClassAria": "Choose a class",
+    "selectClass": "-- Choose a class --",
+    "classFallback": "Class {classId}",
+    "selectExamType": "-- Choose an exam type --",
+    "collectionFilterAria": "Filter by group (Collection)",
+    "allCollections": "-- All groups (Collection) --",
+    "noCollectionOption": "(No group)",
+    "includeChildrenTitle": "Include questions from child groups",
+    "includeChildren": "Include child groups",
+    "byChapter": "Questions by chapter",
+    "loadingChapters": "Loading chapters...",
+    "noChapters": "This class has no chapters yet.",
+    "questionCountRaw": "{count} questions",
+    "noQuestionsInCollection": "No questions in the selected group.",
+    "chapterEmpty": "This chapter has no questions yet.",
+    "collectionBadgeTitle": "Group (Collection)",
+    "noCollection": "No group",
+    "viewQuestion": "View question {number}",
+    "editQuestion": "Edit question {number}",
+    "deleteQuestion": "Delete question {number}",
+    "adminByPart": "Admin questions by part",
+    "byPart": "Questions by part",
+    "partEmpty": "This part has no questions yet.",
+    "confirmDeleteTitle": "Delete question",
+    "confirmDeleteMessage": "Are you sure you want to delete this question? This action cannot be undone."
+  },
+  "view": {
+    "loadError": "Could not load question data",
+    "title": "Question details",
+    "loading": "Loading data...",
+    "empty": "No data to display.",
+    "questionText": "Question text",
+    "passage": "Passage / Media",
+    "translation": "Translation",
+    "answers": "Answers",
+    "noAnswers": "This question has no answers yet.",
+    "blank": "(Blank)",
+    "correct": "Correct answer",
+    "explanation": "Answer explanation"
+  }
+}

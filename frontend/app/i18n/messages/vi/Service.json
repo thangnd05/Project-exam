@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "title": "Điều khoản dịch vụ",
+    "description": "Điều khoản sử dụng nền tảng WinDe Exam."
+  },
+  "title": "Điều Khoản Dịch Vụ",
+  "updated": "Cập nhật lần cuối: 18/10/2026 • Phiên bản 2.0 • Kênh tiếp nhận giải quyết tranh chấp:",
+  "intro": "Chào mừng bạn đến với FrostScope. Khi bạn truy cập website frostscope.com, thực hiện bài kiểm tra nhanh (Quick Scope), tham gia lộ trình cá nhân hóa (My Path), sử dụng ngân hàng đề thi hoặc tham gia bảng thành tích (ScopeRank), bạn đồng ý tuân thủ toàn bộ các điều khoản và điều kiện được nêu tại văn bản này. Nếu bạn không đồng ý với bất kỳ phần nào của điều khoản, vui lòng ngừng sử dụng dịch vụ của chúng tôi.",
+  "nature": {
+    "title": "1. Bản chất dịch vụ & Tuyên bố miễn trừ trách nhiệm kết quả thi",
+    "body": "FrostScope là nền tảng học tập công nghệ độc lập, hỗ trợ kỹ sư và người học đánh giá năng lực hiện tại, nhận diện lỗ hổng kiến thức theo từng Domain và cá nhân hóa lộ trình ôn thi chứng chỉ Cloud, DevOps và Kubernetes.",
+    "simulation": "<strong>Tính chất mô phỏng nội bộ:</strong> Các bài kiểm tra nhanh (Quick Scope) và bài thi đầy đủ (Full Mock) do đội ngũ FrostScope xây dựng bám sát cấu trúc đề cương Blueprint công khai của các hãng. Kết quả bài thi, điểm số chuẩn hóa và chỉ số sẵn sàng (Readiness) là công cụ đo lường sư phạm nội bộ, <strong>không cấu thành cam kết hay bảo đảm chắc chắn</strong> rằng bạn sẽ đạt số điểm tương đương hoặc thi đỗ trong kỳ thi chính thức của bên thứ ba.",
+    "noRepresentation": "Chúng tôi không đại diện hoặc thay mặt cho bất kỳ tổ chức cấp chứng chỉ nào và không chịu trách nhiệm pháp lý đối với kết quả thi thực tế của bạn tại các trung tâm khảo thí chính thức."
+  },
+  "ip": {
+    "title": "2. Quyền sở hữu trí tuệ & Tuyên bố nhãn hiệu bên thứ ba",
+    "trademarks": "<strong>Nhãn hiệu bên thứ ba:</strong> Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), The Linux Foundation (Kubernetes, CKA, CKAD), HashiCorp, Oracle và các biểu trưng, huy hiệu liên quan là nhãn hiệu hoặc nhãn hiệu đã đăng ký của các chủ sở hữu tương ứng.",
+    "usage": "Việc nhắc đến tên các chứng chỉ và hiển thị biểu trưng trên FrostScope chỉ nhằm mục đích định danh kỳ thi, hỗ trợ người học tra cứu đề cương và định hướng lộ trình học tập phù hợp. FrostScope không có mối quan hệ bảo trợ, liên doanh hoặc ủy quyền chính thức từ các chủ sở hữu nhãn hiệu này.",
+    "ownership": "<strong>Quyền sở hữu của FrostScope:</strong> Toàn bộ giao diện người dùng, mã nguồn, cấu trúc thuật toán sinh lộ trình, hệ thống câu hỏi, giải thích chi tiết và tài liệu học tập trên nền tảng thuộc quyền sở hữu trí tuệ độc quyền của FrostScope. Nghiêm cấm mọi hành vi sao chép, trích xuất dữ liệu tự động (scraping), phân phối lại hoặc bán lại tài liệu của FrostScope dưới bất kỳ hình thức nào khi chưa có sự đồng ý bằng văn bản."
+  },
+  "account": {
+    "title": "3. Tài khoản người học & Trách nhiệm bảo mật",
+    "intro": "Khi tạo tài khoản trên FrostScope (bao gồm đăng ký trực tiếp hoặc xác thực qua Google/GitHub SSO):",
+    "items": [
+      "Bạn cam kết cung cấp thông tin trung thực, chính xác và chịu trách nhiệm duy trì tính bảo mật của mật khẩu và phiên đăng nhập cá nhân.",
+      "Mỗi tài khoản được cấp riêng cho một cá nhân kỹ sư sử dụng nhằm đảm bảo tính chính xác của thuật toán cá nhân hóa lộ trình. Nghiêm cấm việc chia sẻ chung tài khoản cho nhiều người, cho thuê hoặc chuyển nhượng tài khoản cho người khác.",
+      "Bạn có nghĩa vụ thông báo ngay cho FrostScope qua email hỗ trợ nếu phát hiện bất kỳ dấu hiệu truy cập trái phép nào vào tài khoản của mình."
+    ]
+  },
+  "credits": {
+    "title": "4. Cơ chế điểm thưởng nội bộ (Credits) & Gamification",
+    "intro": "Hệ thống điểm thưởng Credits được tích lũy khi người học hoàn thành các mục tiêu học tập hằng ngày (Daily Focus), ôn tập kiến thức đã sai (Smart Review) hoặc đóng góp báo lỗi câu hỏi:",
+    "internal": "Credits là công cụ kỹ thuật số nội bộ dùng để mở khóa đề thi mô phỏng đầy đủ (Full Mock) hoặc quyền lợi học tập trên website.",
+    "noCash": "<strong>Tuyệt đối không quy đổi tiền mặt:</strong> Credits không phải là tiền pháp định, tiền kỹ thuật số hay tài sản tài chính. Credits không có giá trị quy đổi thành tiền mặt, không phát sinh lãi suất và không thể chuyển nhượng hay giao dịch giữa các tài khoản.",
+    "enforcement": "FrostScope có toàn quyền khấu trừ điểm hoặc vô hiệu hóa tài khoản nếu phát hiện hành vi sử dụng công cụ tự động, gian lận làm bài để cày điểm Credits trái phép."
+  },
+  "conduct": {
+    "title": "5. Quy tắc ứng xử & Bảng xếp hạng ScopeRank",
+    "intro": "Bảng xếp hạng ScopeRank vinh danh những kỹ sư có thành tích xuất sắc và tiến độ cải thiện bền bỉ. Người dùng tham gia cam kết tuân thủ các quy định ứng xử:",
+    "integrity": "<strong>Tính trung thực trong làm bài:</strong> Không sử dụng phần mềm can thiệp thời gian làm bài, script tự động chọn đáp án, can thiệp vào mã nguồn máy khách hoặc chia sẻ đề thi gian lận. Mọi kết quả phát hiện có dấu hiệu gian lận sẽ bị hủy bỏ ngay lập tức.",
+    "displayName": "<strong>Văn hóa Tên hiển thị (Display Name):</strong> Tên hiển thị và hình ảnh đại diện không được chứa nội dung đồi trụy, thô tục, phân biệt đối xử, vi phạm thuần phong mỹ tục hoặc giả danh cá nhân, tổ chức, nhà cung cấp công nghệ khác.",
+    "anonymous": "<strong>Chế độ ẩn danh:</strong> Nếu không muốn hiển thị tên và điểm số trên ScopeRank, bạn có thể chủ động kích hoạt chế độ <em>\"Ẩn danh\"</em> trong trang cài đặt cá nhân mà không bị giới hạn bất kỳ tính năng ôn luyện nào."
+  },
+  "paid": {
+    "title": "6. Dịch vụ trả phí & Chính sách hỗ trợ",
+    "intro": "Một số gói bài thi chuyên sâu hoặc tài liệu mở rộng có thể yêu cầu trả phí theo từng gói:",
+    "items": [
+      "Mọi mức phí dịch vụ đều được công bố rõ ràng, minh bạch trước khi bạn xác nhận đăng ký hoặc thanh toán.",
+      "Do tính chất đặc thù của nội dung số (bài thi và tài liệu học tập được cấp quyền truy cập ngay lập tức sau thanh toán), chúng tôi áp dụng chính sách không hoàn phí sau khi gói học đã được kích hoạt và sử dụng, trừ trường hợp lỗi kỹ thuật kéo dài xuất phát từ hệ thống của FrostScope mà đội ngũ kỹ thuật không thể khắc phục trong thời gian hợp lý.",
+      "Khi phát hiện sai sót trong câu hỏi hoặc đề thi, bạn có thể nhấn nút báo lỗi câu hỏi. Đội ngũ học thuật sẽ xác minh và điều chỉnh trong vòng 48 giờ làm việc, đồng thời tặng Credits cảm ơn đóng góp của bạn."
+    ]
+  },
+  "liability": {
+    "title": "7. Giới hạn trách nhiệm pháp lý",
+    "intro": "Trong phạm vi tối đa được pháp luật cho phép:",
+    "items": [
+      "FrostScope nỗ lực duy trì hệ thống hoạt động liên tục 24/7 với hiệu năng tối ưu, nhưng không chịu trách nhiệm đối với sự gián đoạn dịch vụ do sự cố đường truyền mạng internet của bạn, sự cố bất khả kháng từ hạ tầng viễn thông công cộng hoặc lịch bảo trì máy chủ đã được thông báo trước.",
+      "FrostScope không chịu trách nhiệm bồi thường đối với các thiệt hại gián tiếp, mất cơ hội việc làm, chi phí thi lại chứng chỉ của bên thứ ba hoặc bất kỳ tổn thất tài chính nào phát sinh từ việc sử dụng hoặc không thể sử dụng nền tảng."
+    ]
+  },
+  "termination": {
+    "title": "8. Tạm ngừng & Chấm dứt dịch vụ",
+    "intro": "FrostScope có quyền tạm khóa hoặc chấm dứt vĩnh viễn quyền truy cập tài khoản của người học mà không cần thông báo trước nếu:",
+    "items": [
+      "Bạn vi phạm nghiêm trọng bất kỳ điều khoản nào trong văn bản này.",
+      "Bạn có hành vi tấn công mạng, quét lỗ hổng, đảo ngược mã nguồn hoặc cố tình gây tổn hại đến hệ thống cơ sở hạ tầng của nền tảng.",
+      "Bạn thực hiện hành vi thương mại hóa, phát tán trái phép dữ liệu đề thi của FrostScope cho bên thứ ba."
+    ]
+  },
+  "disputes": {
+    "title": "9. Cơ chế tiếp nhận khiếu nại & Giải quyết tranh chấp",
+    "intro": "Chúng tôi coi trọng sự hài lòng của người học và cam kết xử lý tranh chấp một cách công bằng, minh bạch:",
+    "channel": "Mọi khiếu nại liên quan đến quyền sở hữu trí tuệ, bản quyền câu hỏi, tranh chấp tài khoản hoặc điều khoản sử dụng vui lòng gửi trực tiếp tới kênh tiếp nhận chính thức:",
+    "inbox": "Hộp thư tiếp nhận tranh chấp:",
+    "responseTime": "Thời gian phản hồi cam kết: trong vòng 3 – 5 ngày làm việc.",
+    "resolution": "Hai bên thống nhất ưu tiên giải quyết mọi bất đồng thông qua thương lượng, hòa giải thiện chí. Trường hợp không đạt được thỏa thuận chung, tranh chấp sẽ được đưa ra cơ quan tài phán có thẩm quyền tại Việt Nam theo quy định pháp luật."
+  },
+  "changes": {
+    "title": "10. Hiệu lực & Điều chỉnh điều khoản",
+    "body": "FrostScope có quyền cập nhật, sửa đổi điều khoản này theo từng giai đoạn phát triển của sản phẩm. Các thay đổi quan trọng sẽ được thông báo nổi bật trên trang chủ hoặc gửi tới email đăng ký của bạn ít nhất 7 ngày trước ngày chính thức có hiệu lực. Việc bạn tiếp tục sử dụng dịch vụ sau khi điều khoản cập nhật có hiệu lực đồng nghĩa với việc bạn chấp thuận các điều khoản sửa đổi đó."
+  }
+}

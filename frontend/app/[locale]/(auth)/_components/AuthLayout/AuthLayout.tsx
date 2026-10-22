@@ -1,9 +1,9 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import Link, { usePathname } from '@/app/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
-import styles from '@/app/(auth)/_components/AuthLayout/AuthLayout.module.scss';
+import styles from '@/app/[locale]/(auth)/_components/AuthLayout/AuthLayout.module.scss';
 import { name } from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
 
@@ -11,6 +11,7 @@ const cx = classNames.bind(styles);
 
 function AuthLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const t = useTranslations('Auth');
 
   if (pathname === routes.login) return <>{children}</>;
 
@@ -22,10 +23,10 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
       <main className={cx('content')}>{children}</main>
 
       <footer className={cx('bottom')}>
-        <nav className={cx('legal')} aria-label="Thông tin pháp lý">
-          <Link href={routes.service}>Điều khoản</Link>
+        <nav className={cx('legal')} aria-label={t('common.legalNav')}>
+          <Link href={routes.service}>{t('common.terms')}</Link>
           <span className={cx('divider')} aria-hidden="true">|</span>
-          <Link href={routes.policy}>Quyền riêng tư</Link>
+          <Link href={routes.policy}>{t('common.privacy')}</Link>
         </nav>
         <p className={cx('copyright')}>© {name} Exam. All rights reserved.</p>
       </footer>

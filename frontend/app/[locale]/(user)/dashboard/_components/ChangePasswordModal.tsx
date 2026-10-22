@@ -1,8 +1,9 @@
 'use client';
 
 import {useState} from 'react';
+import {useTranslations} from 'next-intl';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
-import { useChangePassword } from '@/app/(user)/dashboard/_hooks/useChangePassword';
+import { useChangePassword } from '@/app/[locale]/(user)/dashboard/_hooks/useChangePassword';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
 import {isAxiosError} from 'axios';
@@ -19,6 +20,8 @@ type ChangePasswordModalProps = {
 };
 
 function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
+  const t = useTranslations('Dashboard');
+  const tCommon = useTranslations('Common');
   const changePasswordMutation = useChangePassword();
   const [visibleFields, setVisibleFields] = useState({
     oldPassword: false,
@@ -65,12 +68,12 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
     const {oldPassword, newPassword, confirmNewPassword} = formValues;
 
     if (!oldPassword || !newPassword || !confirmNewPassword) {
-      toast.warning('Vui lòng nhập đầy đủ thông tin đổi mật khẩu.');
+      toast.warning(t('changePassword.toast.missingFields'));
       return;
     }
 
     if (newPassword !== confirmNewPassword) {
-      toast.warning('Xác nhận mật khẩu mới không khớp.');
+      toast.warning(t('changePassword.toast.mismatch'));
       return;
     }
 
@@ -82,7 +85,7 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
       },
       {
         onSuccess: (data) => {
-          const successMessage = data?.message || 'Đổi mật khẩu thành công.';
+          const successMessage = data?.message || t('changePassword.toast.success');
           toast.success(successMessage);
           onHide();
           resetForm();
@@ -93,7 +96,7 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
           const apiMessage =
             getApiErrorMessage(error, '') ||
             (typeof data === 'string' && data) ||
-            'Đổi mật khẩu thất bại. Vui lòng thử lại.';
+            t('changePassword.toast.failed');
           toast.error(apiMessage);
         },
       },
@@ -104,12 +107,12 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
     <CommonFormModal
       show={show}
       onHide={closeModal}
-      title="Đổi mật khẩu"
+      title={t('changePassword.title')}
       footer={
         <ModalActionFooter
-          cancelLabel="Hủy"
-          submitLabel="Cập nhật mật khẩu"
-          loadingLabel="Đang lưu..."
+          cancelLabel={tCommon('cancelShort')}
+          submitLabel={t('changePassword.submit')}
+          loadingLabel={t('saving')}
           loading={submitting}
           onCancel={closeModal}
           onSubmit={submitChangePassword}
@@ -118,7 +121,7 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
     >
       <div className={cmx('formGroup')}>
         <label className={cmx('label')} htmlFor="oldPasswordInput">
-          Mật khẩu cũ
+          {t('changePassword.oldPassword')}
         </label>
         <div className={cmx('passwordField')}>
           <input
@@ -129,13 +132,13 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
             onChange={(event) => updateField('oldPassword', event.target.value)}
             disabled={submitting}
             autoFocus
-            placeholder="Nhập mật khẩu hiện tại"
+            placeholder={t('changePassword.oldPasswordPlaceholder')}
           />
           <button
             type="button"
             className={cmx('passwordToggle')}
             onClick={() => toggleVisibility('oldPassword')}
-            aria-label={visibleFields.oldPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+            aria-label={visibleFields.oldPassword ? t('changePassword.hidePassword') : t('changePassword.showPassword')}
           >
             {visibleFields.oldPassword ? <FiEyeOff /> : <FiEye />}
           </button>
@@ -144,7 +147,7 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
 
       <div className={cmx('formGroup')}>
         <label className={cmx('label')} htmlFor="newPasswordInput">
-          Mật khẩu mới
+          {t('changePassword.newPassword')}
         </label>
         <div className={cmx('passwordField')}>
           <input
@@ -154,13 +157,13 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
             value={formValues.newPassword}
             onChange={(event) => updateField('newPassword', event.target.value)}
             disabled={submitting}
-            placeholder="Nhập mật khẩu mới"
+            placeholder={t('changePassword.newPasswordPlaceholder')}
           />
           <button
             type="button"
             className={cmx('passwordToggle')}
             onClick={() => toggleVisibility('newPassword')}
-            aria-label={visibleFields.newPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+            aria-label={visibleFields.newPassword ? t('changePassword.hidePassword') : t('changePassword.showPassword')}
           >
             {visibleFields.newPassword ? <FiEyeOff /> : <FiEye />}
           </button>
@@ -169,7 +172,7 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
 
       <div className={cmx('formGroup')}>
         <label className={cmx('label')} htmlFor="confirmNewPasswordInput">
-          Xác nhận mật khẩu mới
+          {t('changePassword.confirmPassword')}
         </label>
         <div className={cmx('passwordField')}>
           <input
@@ -181,13 +184,13 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
               updateField('confirmNewPassword', event.target.value)
             }
             disabled={submitting}
-            placeholder="Nhập lại mật khẩu mới"
+            placeholder={t('changePassword.confirmPasswordPlaceholder')}
           />
           <button
             type="button"
             className={cmx('passwordToggle')}
             onClick={() => toggleVisibility('confirmNewPassword')}
-            aria-label={visibleFields.confirmNewPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+            aria-label={visibleFields.confirmNewPassword ? t('changePassword.hidePassword') : t('changePassword.showPassword')}
           >
             {visibleFields.confirmNewPassword ? <FiEyeOff /> : <FiEye />}
           </button>

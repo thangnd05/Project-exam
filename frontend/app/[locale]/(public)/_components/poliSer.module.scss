@@ -1,81 +1,173 @@
-.d-flex {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
-  padding: 40px 0;
-  color: var(--text-color);
-  font-family: var(--font-inter), Arial, sans-serif;
-  line-height: 1.6;
-}
+// Trang văn bản (Chính sách, Điều khoản, Giới thiệu) theo mẫu FrostScope: một cột đọc liên tục, không đóng khung.
+$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
-.policy-wapper,
-.service-wapper {
-  max-width: 850px;
-  padding: 40px 50px;
-  background-color: var(--white);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  text-align: left;
-  line-height: 1.8;
-  transition: all 0.3s ease;
-  border: 1px solid var(--border-color);
+.page {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 40px 32px 96px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: 1.625;
+  color: var(--slate-700);
 
-  &:hover {
-    box-shadow: var(--shadow-lg);
-  }
-
-  h1 {
-    text-align: center;
-    color: var(--primary-text);
+  strong {
     font-weight: var(--font-weight-bold);
-    font-size: 2.6rem;
-    margin-bottom: 25px;
+    color: var(--slate-900);
   }
 
-  h2 {
-    color: var(--primary-text);
+  a {
     font-weight: var(--font-weight-semibold);
-    font-size: var(--font-size-xl);
-    margin-top: 30px;
-    margin-bottom: 10px;
+    color: var(--frost-link);
+    text-decoration: underline;
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--brand-700);
+    }
   }
 
   ul {
-    padding-left: 25px;
-    margin-bottom: 20px;
+    padding-left: 20px;
+    list-style: disc;
+
+    li + li {
+      margin-top: 8px;
+    }
+  }
+}
+
+.header {
+  padding-bottom: 24px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid rgb(var(--slate-300-rgb) / 0.8);
+}
+
+.title {
+  margin: 0 0 12px;
+  font-size: var(--font-size-4xl);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  color: var(--slate-900);
+}
+
+.meta {
+  margin: 0;
+  font-family: $mono;
+  font-size: var(--font-size-ssm);
+  color: var(--slate-500);
+}
+
+.body,
+.section {
+  > * {
+    margin: 0;
+  }
+}
+
+.body > * + * {
+  margin-top: 40px;
+}
+
+.section {
+  > * + * {
+    margin-top: 12px;
   }
 
-  li {
-    margin-bottom: 10px;
-    list-style: disc;
+  h2 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.4;
+    letter-spacing: -0.025em;
+    color: var(--slate-900);
+  }
+}
+
+.mono {
+  font-family: $mono;
+}
+
+// Dòng hộp thư tranh chấp: chữ mono đậm như mẫu.
+.contactLine {
+  font-family: $mono;
+  font-size: var(--font-size-ssm);
+  color: var(--slate-900);
+
+  a {
+    font-weight: var(--font-weight-bold);
+  }
+}
+
+.note {
+  font-size: var(--font-size-sm);
+  color: var(--slate-500);
+}
+
+// Nội dung phẳng (h1/h2/p/ul liền nhau, không chia section) như trang Giới thiệu.
+.prose {
+  h1 {
+    padding-bottom: 24px;
+    margin: 0 0 40px;
+    border-bottom: 1px solid rgb(var(--slate-300-rgb) / 0.8);
+    font-size: var(--font-size-4xl);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -0.025em;
+    color: var(--slate-900);
+  }
+
+  h2 {
+    margin: 40px 0 12px;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.4;
+    letter-spacing: -0.025em;
+    color: var(--slate-900);
+  }
+
+  p,
+  ul {
+    margin: 0 0 12px;
+  }
+
+  .thankyou {
+    margin-top: 40px;
   }
 }
 
 .thankyou {
-  margin-top: 40px;
-  text-align: center;
+  padding: 16px 20px;
+  border: 1px solid var(--brand-200);
+  border-radius: var(--radius-md);
+  background: var(--brand-50);
   font-weight: var(--font-weight-semibold);
   color: var(--brand-700);
-  background: var(--brand-50);
-  padding: 15px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--brand-200);
+  text-align: center;
 }
 
-@media (max-width: 768px) {
-  .policy-wapper,
-  .service-wapper {
-    padding: 25px 20px;
-    margin: 20px;
-    line-height: 1.5;
+@media (min-width: 1280px) {
+  .page {
+    max-width: 896px;
+  }
+}
 
-    h1 {
-      font-size: var(--font-size-xxl);
-    }
+@media (max-width: 639.98px) {
+  .page {
+    padding: 24px 20px 64px;
+    font-size: var(--font-size-ssm);
+  }
 
-    h2 {
-      font-size: var(--font-size-lg);
-    }
+  .title,
+  .prose h1 {
+    font-size: var(--font-size-3xl);
+  }
+
+  .meta {
+    font-size: var(--font-size-sm);
+  }
+
+  .section h2,
+  .prose h2 {
+    font-size: var(--font-size-lg);
   }
 }

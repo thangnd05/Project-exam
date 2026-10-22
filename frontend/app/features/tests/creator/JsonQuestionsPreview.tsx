@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { Alert } from 'react-bootstrap';
 import { IoBookOutline, IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import type { NormalQuestionRequest, PassageQuestionGroupRequest, TagResponse } from '@/app/types';
 import type { DraftQuestion } from '@/app/features/tests/creator/hooks/useCreateTest';
@@ -58,14 +59,15 @@ type EditableQuestionProps = {
 
 /** Khung soạn thảo như khi nhập tay: sửa trực tiếp trên ô, thùng rác ở góc để xoá câu. */
 const EditableQuestion = ({ item, partKey, partTags, canRemove, onChange }: EditableQuestionProps) => {
+  const t = useTranslations('TestCreator');
   const draft = toDraftQuestion(item.question, partTags);
   const commit = (patch: Partial<DraftQuestion>) => onChange(fromDraftQuestion({ ...draft, ...patch }, item.question));
   const { unmatched } = resolveQuestionTags(item.question, partTags);
   const warning = item.status === 'ok'
     ? null
     : item.status === 'unmatched'
-      ? `${TAG_STATUS_LABEL.unmatched}: ${unmatched.map(shortTag).join(', ')}`
-      : TAG_STATUS_LABEL.missing;
+      ? `${t(TAG_STATUS_LABEL.unmatched)}: ${unmatched.map(shortTag).join(', ')}`
+      : t(TAG_STATUS_LABEL.missing);
 
   return (
     <div className={cx('jsonEditableQuestion', { hasTagIssue: item.status !== 'ok' })}>
@@ -144,6 +146,7 @@ const JsonQuestionsPreview = ({
   clearLabel,
   onEditQuestion,
 }: JsonQuestionsPreviewProps) => {
+  const t = useTranslations('TestCreator');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [pages, setPages] = useState<Record<string, number>>({});
   const [issuesOnly, setIssuesOnly] = useState(false);
@@ -185,11 +188,11 @@ const JsonQuestionsPreview = ({
   if (!valid) {
     return (
       <Alert variant="danger">
-        <strong>File có {errors.length} lỗi, chưa thể lưu:</strong>
+        <strong>{t('jsonPreview.fileErrors', { count: errors.length })}</strong>
         <ul className="mb-0">
           {errors.slice(0, 30).map((err, i) => <li key={i}>{err}</li>)}
         </ul>
-        {errors.length > 30 && <small>... và {errors.length - 30} lỗi khác.</small>}
+        {errors.length > 30 && <small>{t('jsonPreview.moreErrors', { count: errors.length - 30 })}</small>}
       </Alert>
     );
   }
@@ -207,12 +210,12 @@ const JsonQuestionsPreview = ({
       </div>
 
       <div className={cx('tagSummaryBar', { hasIssue: issueCount > 0 })}>
-        <span className={cx('tagSummaryItem', 'ok')}>✓ {counts.ok}/{counts.total} câu có tag</span>
+        <span className={cx('tagSummaryItem', 'ok')}>{t('jsonPreview.tagged', { ok: counts.ok, total: counts.total })}</span>
         {counts.missing > 0 && (
-          <span className={cx('tagSummaryItem', 'warn')}>⚠ {counts.missing} câu chưa có tag</span>
+          <span className={cx('tagSummaryItem', 'warn')}>{t('jsonPreview.missing', { count: counts.missing })}</span>
         )}
         {counts.unmatched > 0 && (
-          <span className={cx('tagSummaryItem', 'danger')}>⚠ {counts.unmatched} câu có tag không khớp hệ thống</span>
+          <span className={cx('tagSummaryItem', 'danger')}>{t('jsonPreview.unmatched', { count: counts.unmatched })}</span>
         )}
         {(issueCount > 0 || issuesOnly) && (
           <button
@@ -223,24 +226,23 @@ const JsonQuestionsPreview = ({
               setPages({});
             }}
           >
-            {issuesOnly ? 'Hiện tất cả câu' : `Chỉ hiện ${issueCount} câu cần sửa tag`}
+            {issuesOnly ? t('form.editor.showAll') : t('jsonPreview.showIssuesOnly', { count: issueCount })}
           </button>
         )}
       </div>
       {issueCount > 0 && (
         <small className="text-muted d-block mb-3">
-          Câu thiếu tag vẫn lưu được nhưng không tính vào điểm theo tag và không sinh ải học trong lộ trình.
-          Chọn tag ngay trên câu bên dưới.
+          {t('jsonPreview.issueHint')}
         </small>
       )}
 
       {warnings.length > 0 && (
         <Alert variant="warning" className="mb-3">
-          <strong>Cảnh báo ({warnings.length}):</strong>
+          <strong>{t('jsonPreview.warnings', { count: warnings.length })}</strong>
           <ul className="mb-0">
             {warnings.slice(0, 20).map((w, i) => <li key={i}>{w}</li>)}
           </ul>
-          {warnings.length > 20 && <small>... và {warnings.length - 20} cảnh báo khác.</small>}
+          {warnings.length > 20 && <small>{t('jsonPreview.moreWarnings', { count: warnings.length - 20 })}</small>}
         </Alert>
       )}
 
@@ -278,8 +280,8 @@ const JsonQuestionsPreview = ({
                 <IoBookOutline size={20} /> {part.name}
               </span>
               <span className="d-flex align-items-center gap-2">
-                {partIssues > 0 && <span className={cx('tagWarningBadge')}>⚠ {partIssues} câu thiếu/sai tag</span>}
-                <span className={cx('bankPartBadge')}>{partQuestionCount} câu</span>
+                {partIssues > 0 && <span className={cx('tagWarningBadge')}>{t('jsonPreview.partIssues', { count: partIssues })}</span>}
+                <span className={cx('bankPartBadge')}>{t('jsonPreview.questionCount', { count: partQuestionCount })}</span>
               </span>
               {isOpen ? <IoChevronUpOutline size={22} /> : <IoChevronDownOutline size={22} />}
             </button>
@@ -288,7 +290,7 @@ const JsonQuestionsPreview = ({
                 <Pager page={page} pageCount={pageCount} onChange={setPage} />
                 {pageBlocks.map((block) => (block.kind === 'question' ? renderQuestion(block.item) : (
                   <div key={`g-${block.items[0]?.loc.groupIndex}`} className={cx('jsonPassageGroup')}>
-                    <div className={cx('bankGroupLabel')}>Nhóm đoạn văn ({block.items.length} câu)</div>
+                    <div className={cx('bankGroupLabel')}>{t('jsonPreview.passageGroup', { count: block.items.length })}</div>
                     {block.group.passage?.content && (
                       <div className={cx('jsonPassageContent')}>{block.group.passage.content}</div>
                     )}

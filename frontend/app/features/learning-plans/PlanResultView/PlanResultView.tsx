@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import ReviewQuestionCard from '@/app/features/tests/Review/ReviewQuestionCard';
@@ -29,6 +30,7 @@ type PlanResultViewProps = {
 };
 
 function PlanResultView({ result, onRetry, onPickAnother, onNext }: PlanResultViewProps) {
+  const t = useTranslations('LearningPlans');
   const items = useMemo(
     () =>
       (result?.reviewItems || []).map((item, idx) => ({
@@ -58,7 +60,7 @@ function PlanResultView({ result, onRetry, onPickAnother, onNext }: PlanResultVi
     <div className={cx('planReviewWithFooter')}>
       <div className={cx('planReviewTop')}>
         <div>
-          <h2 className={cx('reviewTitle')}>Chi tiết bài làm</h2>
+          <h2 className={cx('reviewTitle')}>{t('resultView.title')}</h2>
           <p className={cx('planReviewMeta')}>
             <span
               className={cx('planReviewStatus', {
@@ -66,10 +68,10 @@ function PlanResultView({ result, onRetry, onPickAnother, onNext }: PlanResultVi
                 failed: !result.passed,
               })}
             >
-              {result.passed ? 'Đã qua ải' : 'Chưa qua ải'}
+              {result.passed ? t('resultView.passed') : t('resultView.failed')}
             </span>
             <span>
-              {correctCount}/{items.length} câu đúng
+              {t('resultView.correct', { correct: correctCount, total: items.length })}
               {result.accuracy != null ? ` · ${result.accuracy}%` : ''}
             </span>
           </p>
@@ -77,7 +79,7 @@ function PlanResultView({ result, onRetry, onPickAnother, onNext }: PlanResultVi
         <div className={cx('resultActions')}>
           {result.passed && onNext && (
             <button type="button" className={cx('btn', 'btnPrimary', 'btnSm')} onClick={onNext}>
-              Ải tiếp theo →
+              {t('resultView.next')}
             </button>
           )}
           <button
@@ -85,14 +87,14 @@ function PlanResultView({ result, onRetry, onPickAnother, onNext }: PlanResultVi
             className={cx('btn', result.passed && onNext ? 'btnOutline' : 'btnPrimary', 'btnSm')}
             onClick={onRetry}
           >
-            {result.passed ? 'Làm lại ải này' : 'Thử lại'}
+            {result.passed ? t('resultView.redo') : t('common.retry')}
           </button>
           <button
             type="button"
             className={cx('btn', 'btnOutline', 'btnSm')}
             onClick={onPickAnother}
           >
-            Chọn ải khác
+            {t('resultView.pickAnother')}
           </button>
         </div>
       </div>

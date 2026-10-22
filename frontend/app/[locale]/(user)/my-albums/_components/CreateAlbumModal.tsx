@@ -1,13 +1,14 @@
 'use client';
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from 'react-toastify';
 import classNames from "classnames/bind";
 import { FaEdit, FaInfoCircle } from "react-icons/fa";
 import CommonFormModal from "@/app/components/modal/CommonFormModal";
 import ModalActionFooter from "@/app/components/modal/ModalActionFooter";
 import styles from "@/app/components/modal/CommonFormModal.module.scss";
-import { useCreateAlbum } from '@/app/(user)/my-albums/_hooks/useAlbums';
+import { useCreateAlbum } from '@/app/[locale]/(user)/my-albums/_hooks/useAlbums';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 
 const cx = classNames.bind(styles);
@@ -19,6 +20,7 @@ type CreateAlbumModalProps = {
 };
 
 function CreateAlbumModal({ show, onClose, onSuccess }: CreateAlbumModalProps) {
+    const t = useTranslations('Vocabulary');
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
 
@@ -27,7 +29,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }: CreateAlbumModalProps) {
 
     const handleCreate = () => {
         if (!name.trim()) {
-            toast.warning(" Vui lòng nhập tên Album!");
+            toast.warning(t('albumForm.toast.nameRequired'));
             return;
         }
 
@@ -38,7 +40,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }: CreateAlbumModalProps) {
 
         createMutation.mutate(payload, {
             onSuccess: () => {
-                toast.success("Tạo Album thành công!");
+                toast.success(t('albumForm.toast.created'));
 
                 setName("");
                 setDescription("");
@@ -48,7 +50,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }: CreateAlbumModalProps) {
             },
             onError: (err) => {
                 console.error(err);
-                toast.error(getApiErrorMessage(err, "Có lỗi xảy ra khi tạo Album!"));
+                toast.error(getApiErrorMessage(err, t('albumForm.toast.createError')));
             },
         });
     };
@@ -57,12 +59,12 @@ function CreateAlbumModal({ show, onClose, onSuccess }: CreateAlbumModalProps) {
         <CommonFormModal
             show={show}
             onHide={onClose}
-            title="Tạo Album Mới"
+            title={t('albumForm.createTitle')}
             footer={(
                 <ModalActionFooter
-                    cancelLabel="Để sau"
-                    submitLabel="Tạo Album ngay"
-                    loadingLabel="Đang tạo..."
+                    cancelLabel={t('albumForm.later')}
+                    submitLabel={t('albumForm.createSubmit')}
+                    loadingLabel={t('albumForm.creating')}
                     loading={loading}
                     onCancel={onClose}
                     onSubmit={handleCreate}
@@ -70,7 +72,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }: CreateAlbumModalProps) {
             )}
         >
             <div className={cx("formGroup")}>
-                <label className={cx("label")}>Tên Album</label>
+                <label className={cx("label")}>{t('albumForm.name')}</label>
                 <div className={cx("inputWrapper")}>
                     <span className={cx("inputIcon")}>
                         <FaEdit />
@@ -78,7 +80,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }: CreateAlbumModalProps) {
                     <input
                         type="text"
                         className={cx("inputControl")}
-                        placeholder="Ví dụ: Từ vựng IELTS, Giao tiếp..."
+                        placeholder={t('albumForm.namePlaceholder')}
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         disabled={loading}
@@ -88,11 +90,11 @@ function CreateAlbumModal({ show, onClose, onSuccess }: CreateAlbumModalProps) {
             </div>
 
             <div className={cx("formGroup")}>
-                <label className={cx("label")}>Mô tả</label>
+                <label className={cx("label")}>{t('albumForm.description')}</label>
                 <div className={cx("inputWrapper")}>
                     <textarea
                         className={cx("inputControl", "textarea")}
-                        placeholder="Nhập mô tả về mục tiêu của album này..."
+                        placeholder={t('albumForm.descriptionPlaceholder')}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         disabled={loading}
@@ -101,7 +103,7 @@ function CreateAlbumModal({ show, onClose, onSuccess }: CreateAlbumModalProps) {
                 </div>
                 <div className={cx("tip")}>
                     <FaInfoCircle />
-                    <span>Mô tả giúp bạn ghi nhớ mục đích học tập của album.</span>
+                    <span>{t('albumForm.descriptionTip')}</span>
                 </div>
             </div>
         </CommonFormModal>

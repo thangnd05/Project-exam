@@ -2,6 +2,7 @@
 
 import {classKeys} from '@/app/configs/queryKeys';
 import { useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-toastify';
 import { getClassById } from '@/app/apis/classApi';
@@ -29,6 +30,7 @@ const normalizeList = (data: unknown): ClassMemberResponse[] => {
 };
 
 export function useClassMembers(classId: string) {
+  const t = useTranslations('Classes');
   const qc = useQueryClient();
 
   const infoQuery = useQuery({
@@ -54,16 +56,16 @@ export function useClassMembers(classId: string) {
   useEffect(() => {
     if (infoQuery.isError) {
       console.error('Lỗi khi lấy thông tin lớp học:', infoQuery.error);
-      toast.error('Không thể tải thông tin lớp học');
+      toast.error(t('members.loadClassFailed'));
     }
-  }, [infoQuery.isError, infoQuery.error]);
+  }, [infoQuery.isError, infoQuery.error, t]);
 
   useEffect(() => {
     if (membersQuery.isError) {
       console.error('Lỗi khi lấy danh sách thành viên:', membersQuery.error);
-      toast.error('Không thể tải danh sách thành viên');
+      toast.error(t('members.loadMembersFailed'));
     }
-  }, [membersQuery.isError, membersQuery.error]);
+  }, [membersQuery.isError, membersQuery.error, t]);
 
   useEffect(() => {
     if (pendingQuery.isError) {

@@ -1,8 +1,9 @@
 'use client';
 
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { useCreateClass } from '@/app/features/classes/hooks/useMyClasses';
@@ -22,6 +23,8 @@ type CreateClassModalProps = {
 };
 
 function CreateClassModal({ show, onClose }: CreateClassModalProps) {
+  const t = useTranslations('Classes');
+  const tCommon = useTranslations('Common');
   const [className, setClassName] = useState('');
   const [description, setDescription] = useState('');
 
@@ -38,7 +41,7 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
 
     if (!user) {
       setType('warning');
-      setMessage(' Bạn cần đăng nhập trước khi tạo lớp!');
+      setMessage(t('createClass.loginRequired'));
 
       setTimeout(() => {
         onClose();
@@ -50,7 +53,7 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
 
     if (!className.trim()) {
       setType('danger');
-      setMessage(' Vui lòng nhập tên lớp học!');
+      setMessage(t('createClass.nameRequired'));
       return;
     }
 
@@ -58,7 +61,7 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
       { className, description },
       {
         onSuccess: () => {
-          toast.success('Tạo lớp học thành công!');
+          toast.success(t('createClass.success'));
 
           setClassName('');
           setDescription('');
@@ -69,7 +72,7 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
         onError: (err) => {
           setType('danger');
           setMessage(
-            err.response?.data?.message || ' Có lỗi xảy ra khi tạo lớp học!',
+            err.response?.data?.message || t('createClass.error'),
           );
         },
       },
@@ -80,12 +83,12 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
     <CommonFormModal
       show={show}
       onHide={onClose}
-      title="Tạo lớp học mới"
+      title={t('createClass.title')}
       footer={
         <ModalActionFooter
-          cancelLabel="Để sau"
-          submitLabel="Tạo lớp ngay"
-          loadingLabel="Đang xử lý..."
+          cancelLabel={t('common.later')}
+          submitLabel={t('createClass.submit')}
+          loadingLabel={tCommon('processing')}
           loading={loading}
           onCancel={onClose}
           onSubmit={handleCreate}
@@ -100,7 +103,7 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
       )}
 
       <div className={cx('formGroup')}>
-        <label className={cx('label')}>Tên lớp học</label>
+        <label className={cx('label')}>{t('common.className')}</label>
         <div className={cx('inputWrapper')}>
           <span className={cx('inputIcon')}>
             <FaEdit />
@@ -108,7 +111,7 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
           <input
             type="text"
             className={cx('inputControl')}
-            placeholder="Nhập tên lớp học (ví dụ: Lớp Tiếng Anh 10A1)"
+            placeholder={t('createClass.namePlaceholder')}
             value={className}
             onChange={(e) => setClassName(e.target.value)}
             disabled={loading}
@@ -117,11 +120,11 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
       </div>
 
       <div className={cx('formGroup', 'mt-4')}>
-        <label className={cx('label')}>Mô tả lớp học</label>
+        <label className={cx('label')}>{t('common.classDescription')}</label>
         <div className={cx('inputWrapper')}>
           <textarea
             className={cx('inputControl', 'textarea')}
-            placeholder="Nhập mô tả về lớp học (không bắt buộc)"
+            placeholder={t('common.classDescriptionPlaceholder')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             disabled={loading}
@@ -130,7 +133,7 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
         </div>
         <div className={cx('tip')}>
           <FaInfoCircle />
-          <span>Mô tả giúp học sinh hiểu rõ hơn về nội dung lớp học.</span>
+          <span>{t('common.classDescriptionTip')}</span>
         </div>
       </div>
     </CommonFormModal>

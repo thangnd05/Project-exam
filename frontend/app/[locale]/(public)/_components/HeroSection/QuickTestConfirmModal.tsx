@@ -7,6 +7,7 @@ import {
   IoTimeOutline,
   IoTrendingUpOutline,
 } from 'react-icons/io5';
+import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 
 import BaseModal from '@/app/components/modal/BaseModal';
@@ -16,8 +17,8 @@ import styles from './QuickTestConfirmModal.module.scss';
 
 const cx = classNames.bind(styles);
 
-function shortExamName(name?: string): string {
-  if (!name) return 'Kiểm tra nhanh';
+function shortExamName(name: string | undefined, fallback: string): string {
+  if (!name) return fallback;
   return name.length > 64 ? `${name.slice(0, 61)}…` : name;
 }
 
@@ -38,19 +39,21 @@ function QuickTestConfirmModal({
   onStartSyllabusPlan,
   isGuest = false,
 }: QuickTestConfirmModalProps) {
+  const t = useTranslations('Home.quickTest');
+
   if (!test) return null;
 
   const durationLabel =
     test.durationMinutes != null && test.durationMinutes > 0
-      ? `${test.durationMinutes} phút`
-      : 'Không giới hạn';
+      ? t('minutes', {minutes: test.durationMinutes})
+      : t('unlimited');
 
   const questionLabel =
     test.totalQuestions != null
-      ? `${test.totalQuestions} câu hỏi`
-      : '- câu hỏi';
+      ? t('questions', {count: test.totalQuestions})
+      : t('questionsUnknown');
 
-  const examName = shortExamName(test.examTypeName || test.title);
+  const examName = shortExamName(test.examTypeName || test.title, t('fallbackName'));
 
   const chooseStudied = () => {
     setLearnerLevel(test.examTypeId, 'STUDIED');
@@ -66,7 +69,7 @@ function QuickTestConfirmModal({
     <BaseModal
       show={show}
       onClose={onClose}
-      title={`Bắt đầu với ${examName}`}
+      title={t('confirm.title', {name: examName})}
       maxWidth={560}
     >
       <div className={cx('body')}>
@@ -92,11 +95,11 @@ function QuickTestConfirmModal({
               <IoTrendingUpOutline aria-hidden="true" />
             </span>
             <span className={cx('optionText')}>
-              <span className={cx('optionTitle')}>Làm bài thi thử ngay</span>
+              <span className={cx('optionTitle')}>{t('confirm.practiceTitle')}</span>
               <span className={cx('optionHint')}>
                 {isGuest
-                  ? 'Không cần đăng nhập, làm xong biết ngay đang yếu phần nào.'
-                  : 'Làm xong biết ngay đang yếu phần nào.'}
+                  ? t('confirm.practiceHintGuest')
+                  : t('confirm.practiceHint')}
               </span>
             </span>
             <IoPlayOutline className={cx('optionArrow')} aria-hidden="true" />
@@ -113,11 +116,11 @@ function QuickTestConfirmModal({
             <span className={cx('optionText')}>
               <span className={cx('optionTitle')}>
                 {isGuest
-                  ? 'Đăng nhập để xây lộ trình cá nhân hóa'
-                  : 'Xây lộ trình cá nhân hóa'}
+                  ? t('confirm.planTitleGuest')
+                  : t('confirm.planTitle')}
               </span>
               <span className={cx('optionHint')}>
-                Đặt mục tiêu và nhận lộ trình ôn tập riêng, tiến độ lưu vào tài khoản.
+                {t('confirm.planHint')}
               </span>
             </span>
             <IoArrowForward

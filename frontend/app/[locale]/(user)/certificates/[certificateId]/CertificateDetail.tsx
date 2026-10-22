@@ -1,6 +1,8 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { Container, Spinner, Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -16,19 +18,21 @@ const cx = classNames.bind(styles);
 
 function CertificateDetail() {
   const { certificateId } = useParams<{ certificateId: string }>();
+  const t = useTranslations('Account');
   const router = useRouter();
+  const localizeHref = useLocalizeHref();
   const { data: certificate, isLoading, isError } = useCertificateDetail(certificateId);
 
   const verifyUrl = certificate
-    ? `${window.location.origin}/certificates/verify/${certificate.certificateCode}`
+    ? `${window.location.origin}${localizeHref(`/certificates/verify/${certificate.certificateCode}`)}`
     : '';
 
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(verifyUrl);
-      toast.success('Đã sao chép link tra cứu chứng chỉ!');
+      toast.success(t('certificateDetail.copied'));
     } catch {
-      toast.error('Trình duyệt không cho sao chép. Bạn hãy copy thủ công link phía dưới.');
+      toast.error(t('certificateDetail.copyFailed'));
     }
   };
 
@@ -36,7 +40,7 @@ function CertificateDetail() {
     return (
       <div className={cx('state')}>
         <Spinner animation="border" />
-        <p>Đang tải chứng chỉ...</p>
+        <p>{t('certificates.loading')}</p>
       </div>
     );
   }
@@ -44,9 +48,9 @@ function CertificateDetail() {
   if (isError || !certificate) {
     return (
       <Container className={cx('state')}>
-        <Alert variant="danger">Không tìm thấy chứng chỉ này hoặc bạn không có quyền xem.</Alert>
+        <Alert variant="danger">{t('certificateDetail.notFound')}</Alert>
         <ButtonPrime variant="primary" onClick={() => router.push('/my-certificates')}>
-          Về danh sách chứng chỉ
+          {t('certificateDetail.backToList')}
         </ButtonPrime>
       </Container>
     );
@@ -60,28 +64,29 @@ function CertificateDetail() {
       <Container>
         <div className={cx('topBar')}>
           <ButtonPrime variant="ghost" size="sm" onClick={() => router.push('/my-certificates')}>
-            <ArrowLeft size={16} /> Chứng chỉ của tôi
+            <ArrowLeft size={16} /> {t('certificates.myCertificates')}
           </ButtonPrime>
 
           <div className={cx('actions')}>
             <ButtonPrime variant="outline" size="sm" onClick={handleCopyLink}>
-              <Copy size={16} /> Copy link tra cứu
+              <Copy size={16} /> {t('certificateDetail.copyLink')}
             </ButtonPrime>
             <ButtonPrime variant="primary" size="sm" onClick={() => window.print()}>
-              <Printer size={16} /> In / Lưu PDF
+              <Printer size={16} /> {t('certificateDetail.print')}
             </ButtonPrime>
           </div>
         </div>
 
         {revoked && (
           <Alert variant="danger">
-            Chứng chỉ này đã bị thu hồi
-            {certificate.revokedReason ? `: ${certificate.revokedReason}` : '.'}
+            {certificate.revokedReason
+              ? t('certificateDetail.revokedWithReason', { reason: certificate.revokedReason })
+              : t('certificateDetail.revoked')}
           </Alert>
         )}
         {!revoked && expired && (
           <Alert variant="warning">
-            Chứng chỉ đã hết hiệu lực. Bạn có thể thi lại bài thi thử để được cấp chứng chỉ mới.
+            {t('certificateDetail.expired')}
           </Alert>
         )}
 

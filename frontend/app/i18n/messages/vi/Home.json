@@ -1,0 +1,94 @@
+{
+  "hero": {
+    "eyebrow": "Nền tảng luyện thi chứng chỉ Cloud <accent>cá nhân hóa</accent>",
+    "headline": {
+      "line1": "Đừng chỉ luyện đề.",
+      "line2": "Hãy hiểu",
+      "glow": "mình đang thiếu gì"
+    },
+    "startQuick": "Làm bài kiểm tra nhanh",
+    "exploreExams": "Khám phá kỳ thi",
+    "highlights": {
+      "shortTests": "Đề rút gọn 25% độ dài thật",
+      "domainAnalysis": "Phân tích theo từng Domain",
+      "personalPlan": "Lộ trình cá nhân hóa"
+    },
+    "providersLabel": "Hệ thống kho đề bám sát Blueprint"
+  },
+  "quickTest": {
+    "fallbackName": "Kiểm tra nhanh",
+    "minutes": "{minutes} phút",
+    "unlimited": "Không giới hạn",
+    "questions": "{count} câu hỏi",
+    "questionsUnknown": "- câu hỏi",
+    "loginFlash": "Đăng nhập để xây lộ trình cá nhân hóa cho kỳ thi này.",
+    "confirm": {
+      "title": "Bắt đầu với {name}",
+      "practiceTitle": "Làm bài thi thử ngay",
+      "practiceHintGuest": "Không cần đăng nhập, làm xong biết ngay đang yếu phần nào.",
+      "practiceHint": "Làm xong biết ngay đang yếu phần nào.",
+      "planTitleGuest": "Đăng nhập để xây lộ trình cá nhân hóa",
+      "planTitle": "Xây lộ trình cá nhân hóa",
+      "planHint": "Đặt mục tiêu và nhận lộ trình ôn tập riêng, tiến độ lưu vào tài khoản."
+    },
+    "picker": {
+      "title": "Chọn đề kiểm tra nhanh",
+      "loadingAria": "Đang tải đề kiểm tra nhanh",
+      "empty": "Chưa có đề kiểm tra nhanh trên website.",
+      "intro": "<strong>{count} đề</strong> sẵn sàng, làm ngay để biết bạn đang ở đâu.",
+      "startAria": "Bắt đầu {name}",
+      "start": "Bắt đầu"
+    }
+  },
+  "rankScope": {
+    "subtitle": "TOP {count} kỹ sư đạt điểm cao nhất từ bài thi Full Mock chuẩn Blueprint",
+    "syncing": "Đang đồng bộ...",
+    "refresh": "Làm mới dữ liệu",
+    "tabsAria": "Lọc theo hãng",
+    "tabs": {
+      "all": "Tất cả",
+      "aws": "AWS",
+      "azure": "Azure",
+      "gcp": "Google Cloud",
+      "other": "Linux / Khác"
+    },
+    "columns": {
+      "rank": "Hạng",
+      "engineer": "Kỹ sư",
+      "certification": "Chứng chỉ",
+      "totalScore": "Tổng điểm"
+    },
+    "emptyTitle": "Chưa có ai lên bảng xếp hạng",
+    "emptyText": "Hoàn thành một đề Full Mock để trở thành người đầu tiên góp mặt.",
+    "emptyLink": "Vào kho đề thi",
+    "viewAll": "Xem toàn bộ bảng xếp hạng",
+    "anonymous": "Ẩn danh",
+    "modal": {
+      "title": "Bảng xếp hạng RankScope toàn hệ thống",
+      "subtitle": "Vinh danh các thí sinh đạt điểm cao nhất từ đề thi Full Mock Test",
+      "close": "Đóng",
+      "tabs": {
+        "all": "Tất cả",
+        "aws": "AWS",
+        "azure": "Azure",
+        "gcp": "GCP",
+        "other": "LPIC / Khác"
+      },
+      "emptyText": "Hoàn thành một đề Full Mock để trở thành người đầu tiên được ghi danh.",
+      "note": "Cập nhật liên tục từ kết quả thi Full Mock đạt chuẩn",
+      "join": "Thi ngay để ghi danh"
+    }
+  },
+  "orbit": {
+    "title": "Các chứng chỉ hiện hành",
+    "lede": "Hệ thống đề thi thử bám sát 100% cấu trúc chính thức từ các nhà cung cấp cloud hàng đầu.",
+    "practiceNow": "Thi thử ngay",
+    "buildPlan": "Lên lộ trình",
+    "badgeAria": "Thi thử {name}"
+  },
+  "fullSpec": {
+    "minutes": "{minutes}p",
+    "byExam": "theo đề",
+    "spec": "{questions} câu / {duration}"
+  }
+}

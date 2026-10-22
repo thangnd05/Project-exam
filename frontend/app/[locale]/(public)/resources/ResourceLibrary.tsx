@@ -5,6 +5,7 @@ import { FiArrowRight } from 'react-icons/fi';
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {Container} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 
 import {getExamTypes} from '@/app/apis/examTypeApi';
 import {getAllResources} from '@/app/apis/recoveryResourceApi';
@@ -12,7 +13,7 @@ import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/
 import {examTypeKeys} from '@/app/configs/queryKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
 import type {RecoveryResourceResponse} from '@/app/types/resource';
-import {VENDORS, badgeUrl, parseCode, parseVendor, type Vendor} from '@/app/(public)/_lib/certificationMeta';
+import {VENDORS, badgeUrl, parseCode, parseVendor, type Vendor} from '@/app/[locale]/(public)/_lib/certificationMeta';
 
 import styles from './ResourceLibrary.module.scss';
 
@@ -43,19 +44,24 @@ const examKeyOf = (resource: RecoveryResourceResponse) => {
   return fromTag || UNASSIGNED_EXAM;
 };
 
-const examNameOf = (resource: RecoveryResourceResponse, id: string, exams: Map<string, ExamTypeResponse>) =>
-  resource.examTypeName?.trim() || exams.get(id)?.name?.trim() || 'Chưa gắn kỳ thi';
+const examNameOf = (
+  resource: RecoveryResourceResponse,
+  id: string,
+  exams: Map<string, ExamTypeResponse>,
+  unassignedLabel: string,
+) => resource.examTypeName?.trim() || exams.get(id)?.name?.trim() || unassignedLabel;
 
 const matchesKeyword = (
   resource: RecoveryResourceResponse,
   keyword: string,
   exams: Map<string, ExamTypeResponse>,
+  unassignedLabel: string,
 ) => {
   if (!keyword) return true;
   const haystack = [
     resource.title,
     resource.description,
-    examNameOf(resource, examKeyOf(resource), exams),
+    examNameOf(resource, examKeyOf(resource), exams, unassignedLabel),
     ...(resource.examPartNames ?? []),
     resource.originalFileName,
     ...(resource.tags ?? []).map((tag) => tag.name),
@@ -69,6 +75,7 @@ const matchesKeyword = (
 const groupByExam = (
   resources: RecoveryResourceResponse[],
   exams: Map<string, ExamTypeResponse>,
+  unassignedLabel: string,
 ): ExamGroup[] => {
   const groups = new Map<string, ExamGroup>();
 
@@ -76,7 +83,7 @@ const groupByExam = (
     const id = examKeyOf(resource);
     let group = groups.get(id);
     if (!group) {
-      const name = examNameOf(resource, id, exams);
+      const name = examNameOf(resource, id, exams, unassignedLabel);
       const code = parseCode(name);
       const exam = exams.get(id) ?? {examTypeId: id, name};
       group = {
@@ -112,8 +119,8 @@ const fileTypeOf = (resource: RecoveryResourceResponse) => {
   return ext && ext !== resource.originalFileName ? ext.toUpperCase() : '';
 };
 
-const vendorTag = (group: ExamGroup) => {
-  if (!group.vendor) return {label: 'Khác', tone: 'other'};
+const vendorTag = (group: ExamGroup, otherLabel: string) => {
+  if (!group.vendor) return {label: otherLabel, tone: 'other'};
   if (group.vendor !== 'other') {
     return {label: VENDORS.find((v) => v.id === group.vendor)?.tag ?? '', tone: group.vendor};
   }
@@ -121,6 +128,7 @@ const vendorTag = (group: ExamGroup) => {
 };
 
 function ResourceLibrary() {
+  const t = useTranslations('Resources');
   const [selectedExamId, setSelectedExamId] = useState('');
   const [selectedPart, setSelectedPart] = useState(ALL_PARTS);
   const [keyword, setKeyword] = useState('');
@@ -155,14 +163,18 @@ function ResourceLibrary() {
   }, [examTypes]);
 
   const normalizedKeyword = keyword.trim().toLowerCase();
+  const unassignedLabel = t('library.unassignedExam');
 
   const groups = useMemo(
     () =>
       groupByExam(
-        resources.filter((resource) => matchesKeyword(resource, normalizedKeyword, examsById)),
+        resources.filter((resource) =>
+          matchesKeyword(resource, normalizedKeyword, examsById, unassignedLabel),
+        ),
         examsById,
+        unassignedLabel,
       ),
-    [resources, normalizedKeyword, examsById],
+    [resources, normalizedKeyword, examsById, unassignedLabel],
   );
 
   const activeGroup = groups.find((group) => group.id === selectedExamId) ?? groups[0];
@@ -198,8 +210,8 @@ function ResourceLibrary() {
       return (
         <div className={cx('empty')}>
           <IoAlertCircleOutline className={cx('icon')} />
-          <h2>Không tải được tài liệu</h2>
-          <p>Thử tải lại trang.</p>
+          <h2>{t('library.loadError.title')}</h2>
+          <p>{t('library.loadError.message')}</p>
         </div>
       );
     }
@@ -208,8 +220,8 @@ function ResourceLibrary() {
       return (
         <div className={cx('empty')}>
           <IoDocumentTextOutline className={cx('icon')} />
-          <h2>Chưa có tài liệu</h2>
-          <p>Tài liệu sẽ xuất hiện ở đây khi được gắn vào kỳ thi.</p>
+          <h2>{t('library.empty.title')}</h2>
+          <p>{t('library.empty.message')}</p>
         </div>
       );
     }
@@ -218,15 +230,15 @@ function ResourceLibrary() {
       return (
         <div className={cx('empty')}>
           <IoSearchOutline className={cx('icon')} />
-          <h2>Không có tài liệu khớp</h2>
+          <h2>{t('library.noMatch.title')}</h2>
           <button type="button" className={cx('textBtn')} onClick={resetFilters}>
-            Đặt lại bộ lọc
+            {t('library.resetFilters')}
           </button>
         </div>
       );
     }
 
-    const tag = vendorTag(activeGroup);
+    const tag = vendorTag(activeGroup, t('library.otherVendor'));
 
     return (
       <section aria-labelledby="resource-exam-title">
@@ -247,7 +259,7 @@ function ResourceLibrary() {
             const fileType = fileTypeOf(resource);
             // Tag trùng tên tài liệu thì bỏ, tránh lặp chữ.
             const extraTags = (resource.tags ?? [])
-              .filter((t) => t.name && t.name !== resource.title)
+              .filter((item) => item.name && item.name !== resource.title)
               .slice(0, 3);
 
             return (
@@ -271,15 +283,15 @@ function ResourceLibrary() {
 
                   {extraTags.length > 0 && (
                     <div className={cx('tags')}>
-                      {extraTags.map((t) => (
-                        <span key={t.tagId} className={cx('tag')}>{t.name}</span>
+                      {extraTags.map((item) => (
+                        <span key={item.tagId} className={cx('tag')}>{item.name}</span>
                       ))}
                     </div>
                   )}
                 </div>
 
                 <span className={cx('readBtn')}>
-                  Đọc tài liệu
+                  {t('library.readResource')}
                   <FiArrowRight aria-hidden="true" />
                 </span>
               </RecoveryResourceLink>
@@ -293,34 +305,37 @@ function ResourceLibrary() {
   return (
     <div className={cx('wrapper')}>
       <Container>
-        <h1 className="visually-hidden">Kho tài liệu</h1>
+        <h1 className="visually-hidden">{t('library.pageTitle')}</h1>
 
         <div className={cx('controls')}>
           <div className={cx('searchRow')}>
             <label className={cx('search')}>
               <IoSearchOutline className={cx('searchIcon')} aria-hidden="true" />
-              <span className="visually-hidden">Tìm tài liệu</span>
+              <span className="visually-hidden">{t('library.searchLabel')}</span>
               <input
                 type="search"
                 value={keyword}
-                placeholder="Tìm theo tên tài liệu, phần thi, dịch vụ (CodePipeline, VPC...)"
+                placeholder={t('library.searchPlaceholder')}
                 onChange={(event) => setKeyword(event.target.value)}
               />
             </label>
             <div className={cx('counter')}>
               <span>
-                Hiển thị: <strong>{isLoading ? 0 : visible.length}</strong> tài liệu
+                {t.rich('library.showing', {
+                  count: isLoading ? 0 : visible.length,
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
               </span>
               <button type="button" className={cx('textBtn')} onClick={resetFilters}>
-                Đặt lại bộ lọc
+                {t('library.resetFilters')}
               </button>
             </div>
           </div>
 
           {!isLoading && !isError && groups.length > 0 && (
             <>
-              <div className={cx('filterRow')} role="group" aria-label="Lọc theo kỳ thi">
-                <span className={cx('filterLabel')}>Kỳ thi:</span>
+              <div className={cx('filterRow')} role="group" aria-label={t('library.examFilterLabel')}>
+                <span className={cx('filterLabel')}>{t('library.examLabel')}</span>
                 {groups.map((group) => (
                   <button
                     key={group.id}
@@ -337,8 +352,8 @@ function ResourceLibrary() {
               </div>
 
               {parts.length > 0 && (
-                <div className={cx('filterRow')} role="group" aria-label="Lọc theo phần thi">
-                  <span className={cx('filterLabel')}>Phần thi:</span>
+                <div className={cx('filterRow')} role="group" aria-label={t('library.partFilterLabel')}>
+                  <span className={cx('filterLabel')}>{t('library.partLabel')}</span>
                   {[ALL_PARTS, ...parts].map((part) => (
                     <button
                       key={part}
@@ -347,7 +362,7 @@ function ResourceLibrary() {
                       className={cx('partTab', {active: activePart === part})}
                       onClick={() => setSelectedPart(part)}
                     >
-                      {part === ALL_PARTS ? 'Tất cả' : part}
+                      {part === ALL_PARTS ? t('library.allParts') : part}
                     </button>
                   ))}
                 </div>

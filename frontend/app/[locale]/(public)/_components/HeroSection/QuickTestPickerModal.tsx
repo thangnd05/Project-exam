@@ -7,6 +7,7 @@ import {
   IoTimeOutline,
 } from 'react-icons/io5';
 
+import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 
 import BaseModal from '@/app/components/modal/BaseModal';
@@ -23,14 +24,8 @@ const getInitials = (name?: string) => {
   return (words[0][0] + words[1][0]).toUpperCase();
 };
 
-const durationLabel = (minutes?: number) =>
-  minutes != null && minutes > 0 ? `${minutes} phút` : 'Không giới hạn';
-
-const questionLabel = (total?: number) =>
-  total != null && total > 0 ? `${total} câu hỏi` : '- câu hỏi';
-
-const displayTitle = (test: QuickChallengeCardResponse) =>
-  test.examTypeName || test.title || 'Kiểm tra nhanh';
+const displayTitle = (test: QuickChallengeCardResponse, fallback: string) =>
+  test.examTypeName || test.title || fallback;
 
 const displaySubtitle = (test: QuickChallengeCardResponse) => {
   const title = test.title?.trim();
@@ -83,6 +78,14 @@ function QuickTestPickerModal({
   onClose,
   onSelect,
 }: QuickTestPickerModalProps) {
+  const t = useTranslations('Home.quickTest');
+
+  const durationLabel = (minutes?: number) =>
+    minutes != null && minutes > 0 ? t('minutes', {minutes}) : t('unlimited');
+
+  const questionLabel = (total?: number) =>
+    total != null && total > 0 ? t('questions', {count: total}) : t('questionsUnknown');
+
   const sortedTests = useMemo(
     () =>
       [...tests].sort((a, b) => {
@@ -94,31 +97,34 @@ function QuickTestPickerModal({
   );
 
   return (
-    <BaseModal show={show} onClose={onClose} title="Chọn đề kiểm tra nhanh" maxWidth={660}>
+    <BaseModal show={show} onClose={onClose} title={t('picker.title')} maxWidth={660}>
       {loading ? (
-        <ul className={cx('list')} aria-busy="true" aria-label="Đang tải đề kiểm tra nhanh">
+        <ul className={cx('list')} aria-busy="true" aria-label={t('picker.loadingAria')}>
           {[0, 1].map((i) => (
             <li key={i} className={cx('skeleton')} />
           ))}
         </ul>
       ) : sortedTests.length === 0 ? (
-        <p className={cx('status')}>Chưa có đề kiểm tra nhanh trên website.</p>
+        <p className={cx('status')}>{t('picker.empty')}</p>
       ) : (
         <>
           <p className={cx('intro')}>
-            <strong>{sortedTests.length} đề</strong> sẵn sàng, làm ngay để biết bạn đang ở đâu.
+            {t.rich('picker.intro', {
+              count: sortedTests.length,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
           <ul className={cx('list')}>
             {sortedTests.map((test) => {
               const subtitle = displaySubtitle(test);
-              const name = displayTitle(test);
+              const name = displayTitle(test, t('fallbackName'));
               return (
                 <li key={test.testId}>
                   <button
                     type="button"
                     className={cx('item')}
                     onClick={() => onSelect?.(test)}
-                    aria-label={`Bắt đầu ${name}`}
+                    aria-label={t('picker.startAria', {name})}
                   >
                     <span className={cx('logoFrame')}>
                       <Logo url={test.examTypeImageUrl || test.bannerUrl} name={name} />
@@ -138,7 +144,7 @@ function QuickTestPickerModal({
                       </span>
                     </span>
                     <span className={cx('start')}>
-                      Bắt đầu
+                      {t('picker.start')}
                       <IoArrowForward className={cx('startArrow')} aria-hidden="true" />
                     </span>
                   </button>

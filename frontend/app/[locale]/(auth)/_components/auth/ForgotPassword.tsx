@@ -1,12 +1,13 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import {isAxiosError} from 'axios';
 import {useCallback, useEffect, useRef, useState} from 'react';
+import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 import routes from '@/app/configs/Routes';
 import {useForgotPasswordMutation} from '@/app/features/auth/hooks/useAuthActions';
-import style from '@/app/(auth)/_components/auth/AuthRecovery.module.scss';
+import style from '@/app/[locale]/(auth)/_components/auth/AuthRecovery.module.scss';
 
 const cx = classNames.bind(style);
 
@@ -23,6 +24,7 @@ type ForgotPasswordProps = {
 };
 
 function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
+  const t = useTranslations('Auth');
   const [email, setEmail] = useState('');
   const [formError, setFormError] = useState('');
   const [sentTo, setSentTo] = useState('');
@@ -71,15 +73,15 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
             : RESEND_COOLDOWN_SECONDS;
         startCooldown(waitFor);
         setFormError(
-          `Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau ${waitFor} giây.`,
+          t('forgot.tooManyRequests', { seconds: waitFor }),
         );
         return;
       }
       setFormError(
         response?.data?.message ||
           (response
-            ? 'Không gửi được yêu cầu. Vui lòng thử lại.'
-            : 'Không thể kết nối đến máy chủ. Kiểm tra kết nối mạng của bạn.'),
+            ? t('forgot.requestFailed')
+            : t('common.networkError')),
       );
     }
   };
@@ -92,11 +94,11 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
 
   const backToLogin = onBack ? (
     <button type="button" className={cx('back-link', 'back-button')} onClick={onBack}>
-      Quay lại đăng nhập
+      {t('common.backToLogin')}
     </button>
   ) : (
     <Link href={routes.login} className={cx('back-link')}>
-      Quay lại đăng nhập
+      {t('common.backToLogin')}
     </Link>
   );
 
@@ -109,11 +111,12 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
     return (
       <div className={cx('page', { embedded })}>
         <div className={cx('card', { embedded })}>
-          <h1 className={cx('title')}>Kiểm tra hộp thư của bạn</h1>
+          <h1 className={cx('title')}>{t('forgot.checkInbox')}</h1>
           <p className={cx('subtitle')}>
-            Nếu <strong>{sentTo}</strong> đang được dùng cho một tài khoản,
-            chúng tôi đã gửi một liên kết đặt lại mật khẩu đến email đó. Liên
-            kết có hiệu lực trong 30 phút và chỉ dùng được một lần.
+            {t.rich('forgot.sentDescription', {
+              email: sentTo,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
 
           {formError && (
@@ -128,10 +131,10 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
               disabled={cooldown > 0 || isSubmitting}
             >
               {isSubmitting
-                ? 'Đang gửi lại...'
+                ? t('forgot.resending')
                 : cooldown > 0
-                  ? `Gửi lại sau ${cooldown}s`
-                  : 'Gửi lại email'}
+                  ? t('forgot.resendIn', { seconds: cooldown })
+                  : t('forgot.resend')}
             </button>
             <button
               type="button"
@@ -141,12 +144,12 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
                 setFormError('');
               }}
             >
-              Dùng email khác
+              {t('forgot.useAnotherEmail')}
             </button>
           </div>
 
           <p className={cx('footer')}>
-            Không thấy email? Hãy kiểm tra cả mục Spam / Quảng cáo.
+            {t('forgot.spamHint')}
             {backToLogin}
           </p>
         </div>
@@ -157,10 +160,9 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
   return (
     <div className={cx('page', { embedded })}>
       <div className={cx('card', { embedded })}>
-        <h1 className={cx('title')}>Quên mật khẩu</h1>
+        <h1 className={cx('title')}>{t('forgot.title')}</h1>
         <p className={cx('subtitle')}>
-          Nhập email bạn đã đăng ký. Chúng tôi sẽ gửi cho bạn một liên kết để
-          đặt lại mật khẩu.
+          {t('forgot.subtitle')}
         </p>
 
         <form className={cx('form')} onSubmit={handleSubmit} noValidate>
@@ -171,9 +173,9 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
                 type="email"
                 autoComplete="email"
                 autoFocus
-                aria-label="Email"
+                aria-label={t('forgot.email')}
                 className={cx('input')}
-                placeholder="Email"
+                placeholder={t('forgot.email')}
                 value={email}
                 disabled={isSubmitting}
                 onChange={(e) => {
@@ -197,10 +199,10 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
           >
             {isSubmitting && <span className={cx('spinner')} />}
             {isSubmitting
-              ? 'Đang gửi...'
+              ? t('forgot.sending')
               : cooldown > 0
-                ? `Thử lại sau ${cooldown}s`
-                : 'Gửi liên kết đặt lại'}
+                ? t('forgot.retryIn', { seconds: cooldown })
+                : t('forgot.submit')}
           </button>
         </form>
       </div>

@@ -2,6 +2,7 @@
 
 import { Container } from 'react-bootstrap';
 import classNamesBind from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { IoPodiumOutline, IoTrophyOutline } from 'react-icons/io5';
 
 import type { TestRef } from '@/app/features/tests/testRef';
@@ -38,19 +39,21 @@ type Row = {
 };
 
 function UserCell({ row }: { row: Row }) {
+  const t = useTranslations('TestTaking.leaderboard');
   return (
     <span className={cx('user')}>
       <span className={cx('avatar')} aria-hidden="true">
         {initialOf(row.displayName)}
       </span>
       <span className={cx('userName')}>{row.displayName}</span>
-      {row.isMe && <span className={ui('pill', 'pillBrand')}>Bạn</span>}
+      {row.isMe && <span className={ui('pill', 'pillBrand')}>{t('you')}</span>}
     </span>
   );
 }
 
 // testRef do page server tra từ slug trên URL (/tests/aws-dop-c02-test-1/leaderboard) rồi truyền xuống.
 function TestLeaderboard({ testRef }: { testRef: TestRef }) {
+  const t = useTranslations('TestTaking.leaderboard');
   const { test } = useTestInfo(testRef.testId);
   const { rawRows, me, totalParticipants, errorMessage, isLoading: loading } = useTestLeaderboard(
     testRef.testId,
@@ -64,7 +67,7 @@ function TestLeaderboard({ testRef }: { testRef: TestRef }) {
       entry.userName ||
       entry.username ||
       entry.displayName ||
-      (entry.userId ? `User ${entry.userId}` : 'Người dùng'),
+      (entry.userId ? t('userFallback', { id: entry.userId }) : t('anonymous')),
     score: Number(entry.totalScore ?? entry.score ?? 0),
     durationTaken: typeof entry.durationTaken === 'number' ? entry.durationTaken : null,
     isMe: me != null && entry.userTestId === me.userTestId,
@@ -94,8 +97,8 @@ function TestLeaderboard({ testRef }: { testRef: TestRef }) {
       return (
         <div className={ui('empty')}>
           <IoPodiumOutline className={ui('emptyIcon')} aria-hidden="true" />
-          <h2>Chưa có ai trên bảng xếp hạng</h2>
-          <p>Làm bài và nộp bài để trở thành người đầu tiên.</p>
+          <h2>{t('empty.title')}</h2>
+          <p>{t('empty.desc')}</p>
         </div>
       );
     }
@@ -103,9 +106,9 @@ function TestLeaderboard({ testRef }: { testRef: TestRef }) {
     return (
       <>
         {me ? (
-          <section className={cx('myRank')} aria-label="Hạng của bạn">
+          <section className={cx('myRank')} aria-label={t('myRank')}>
             <div className={cx('myRankMain')}>
-              <span className={ui('eyebrow')}>Hạng của bạn</span>
+              <span className={ui('eyebrow')}>{t('myRank')}</span>
               <span className={cx('myRankValue')}>
                 #{me.rank}
                 <small>/ {totalParticipants}</small>
@@ -113,19 +116,19 @@ function TestLeaderboard({ testRef }: { testRef: TestRef }) {
             </div>
             <div className={cx('myRankStats')}>
               <div className={cx('myRankStat')}>
-                <span className={ui('eyebrow')}>Điểm</span>
+                <span className={ui('eyebrow')}>{t('score')}</span>
                 <strong>{formatScore(Number(me.totalScore ?? 0))}</strong>
               </div>
               <div className={cx('myRankStat')}>
-                <span className={ui('eyebrow')}>Thời gian</span>
+                <span className={ui('eyebrow')}>{t('time')}</span>
                 <strong>{formatDuration(me.durationTaken ?? null)}</strong>
               </div>
             </div>
-            <span className={cx('myRankHint')}>Mỗi người tính lần điểm cao nhất; bằng điểm thì ai làm nhanh hơn xếp trên.</span>
+            <span className={cx('myRankHint')}>{t('rankingHint')}</span>
           </section>
         ) : (
           <div className={ui('notice', 'noticeInfo')}>
-            <span>Bạn chưa có kết quả trên bảng này. Làm bài và nộp bài để được xếp hạng.</span>
+            <span>{t('notRanked')}</span>
           </div>
         )}
 
@@ -135,7 +138,7 @@ function TestLeaderboard({ testRef }: { testRef: TestRef }) {
               <div className={cx('podiumTop')}>
                 <span className={cx('podiumRank')}>
                   <IoTrophyOutline aria-hidden="true" />
-                  Hạng {row.rank}
+                  {t('rankLabel', { rank: row.rank })}
                 </span>
               </div>
               <UserCell row={row} />
@@ -151,12 +154,12 @@ function TestLeaderboard({ testRef }: { testRef: TestRef }) {
           <section aria-labelledby="leaderboard-title">
             <div className={cx('sectionHead')}>
               <h2 id="leaderboard-title" className={cx('sectionTitle')}>
-                Bảng xếp hạng
+                {t('title')}
               </h2>
               <span className={cx('sectionCount')}>{totalParticipants}</span>
               {totalParticipants > rows.length && (
                 <span className={cx('sectionNote')}>
-                  Hiển thị top {rows.length} / {totalParticipants}
+                  {t('showingTop', { shown: rows.length, total: totalParticipants })}
                 </span>
               )}
             </div>
@@ -165,10 +168,10 @@ function TestLeaderboard({ testRef }: { testRef: TestRef }) {
               <table className={cx('table')}>
                 <thead>
                   <tr>
-                    <th>Hạng</th>
-                    <th>Người dùng</th>
-                    <th className={cx('right')}>Điểm</th>
-                    <th className={cx('right')}>Thời gian làm</th>
+                    <th>{t('columns.rank')}</th>
+                    <th>{t('columns.user')}</th>
+                    <th className={cx('right')}>{t('score')}</th>
+                    <th className={cx('right')}>{t('columns.duration')}</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import {useTranslations} from 'next-intl';
 import {Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Check, Pencil, Plus, Trash2, X} from 'lucide-react';
@@ -12,7 +13,7 @@ import {
   AdminFieldError,
   AdminPageHeader,
   AdminToolbar,
-} from '@/app/(admin)/_components/common';
+} from '@/app/[locale]/(admin)/_components/common';
 import type {ExamPartResponse, MilestoneResponse, PartRequirementResponse} from '@/app/types';
 import {useMilestones} from './_hooks/useMilestones';
 import styles from './MilestonesManagement.module.scss';
@@ -37,6 +38,8 @@ const sortPartsByNameOrder = (parts: ExamPartResponse[]) => {
 };
 
 function MilestonesManagement() {
+  const t = useTranslations('AdminUsers');
+  const tCommon = useTranslations('Common');
   const [examTypeFilter, setExamTypeFilter] = useState('');
   const [keyword, setKeyword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -109,7 +112,7 @@ function MilestonesManagement() {
 
   const handleCreate = async () => {
     if (!examTypeFilter || !newScore) {
-      setErrorMessage('Vui lòng chọn loại kỳ thi và nhập mốc điểm.');
+      setErrorMessage(t('milestones.errors.required'));
       return;
     }
 
@@ -131,7 +134,7 @@ function MilestonesManagement() {
       setNewScore('');
       setNewDescription('');
     } catch {
-      setErrorMessage('Không thể tạo mốc điểm. Có thể mốc này đã tồn tại.');
+      setErrorMessage(t('milestones.errors.create'));
     } finally {
       setSubmitting(false);
     }
@@ -173,7 +176,7 @@ function MilestonesManagement() {
       setEditingId(null);
       setEditParts({});
     } catch {
-      setErrorMessage('Không thể cập nhật cấu hình.');
+      setErrorMessage(t('milestones.errors.update'));
     } finally {
       setSubmitting(false);
     }
@@ -187,7 +190,7 @@ function MilestonesManagement() {
       await deleteMilestone(deletingMilestone.examTargetMilestoneId);
       setDeletingMilestone(null);
     } catch {
-      setErrorMessage('Không thể xóa mốc điểm.');
+      setErrorMessage(t('milestones.errors.delete'));
     } finally {
       setSubmitting(false);
     }
@@ -214,10 +217,10 @@ function MilestonesManagement() {
       <div className={cx('scoreEstimate', {
         over: diff > 0, under: diff < 0, match: diff === 0,
       })}>
-        <span className={cx('scoreEstimateLabel')}>Điểm ước tính:</span>
+        <span className={cx('scoreEstimateLabel')}>{t('milestones.estimateLabel')}</span>
         <span className={cx('scoreEstimateValue')}>{est.totalScore}</span>
         <span className={cx('scoreEstimateDiff')}>
-          ({diff > 0 ? '+' : ''}{diff} so với mốc {milestoneScore})
+          {t('milestones.estimateDiff', {diff: `${diff > 0 ? '+' : ''}${diff}`, score: milestoneScore})}
         </span>
         <span className={cx('scoreEstimateDetail')}>{formatEstimateDetail(est)}</span>
       </div>
@@ -227,20 +230,20 @@ function MilestonesManagement() {
   return (
     <div className={cx('milestonePage')}>
       <AdminPageHeader
-        title="Cấu hình mốc điểm mục tiêu"
-        description="Thiết lập các mốc điểm và % yêu cầu từng phần thi để đánh giá độ sẵn sàng của người dùng."
+        title={t('milestones.title')}
+        description={t('milestones.description')}
       />
 
       <AdminToolbar
         searchValue={keyword}
         onSearchChange={setKeyword}
-        searchPlaceholder="Tìm theo mốc điểm hoặc mô tả..."
+        searchPlaceholder={t('milestones.searchPlaceholder')}
       >
         <Form.Select
           value={examTypeFilter}
           onChange={(e) => setExamTypeFilter(e.target.value)}
         >
-          <option value="">Chọn loại kỳ thi</option>
+          <option value="">{t('milestones.selectExamType')}</option>
           {examTypes.map((et) => (
             <option key={et.examTypeId} value={et.examTypeId}>
               {et.name}
@@ -251,28 +254,27 @@ function MilestonesManagement() {
 
       {examTypeFilter && (
         <div className={cx('createBox')}>
-          <h5>Thêm mốc điểm mới</h5>
+          <h5>{t('milestones.createHeading')}</h5>
           <div className={cx('createGrid')}>
             <Form.Control
               type="number"
               min={0}
               max={maxScore}
-              placeholder={isScaled ? 'Mốc điểm (VD: 700)' : 'Mốc điểm (VD: 450)'}
+              placeholder={isScaled ? t('milestones.scorePlaceholderScaled') : t('milestones.scorePlaceholder')}
               value={newScore}
               onChange={(e) => setNewScore(e.target.value)}
             />
             <span style={{alignSelf: 'center', color: '#6b7280', fontSize: '0.85rem'}}>
-              ≈ {newScore ? evenPctForScore(newScore) : 0}%
-              mỗi part
+              {t('milestones.perPart', {percent: newScore ? evenPctForScore(newScore) : 0})}
             </span>
             <Form.Control
-              placeholder="Mô tả (VD: Mức cơ bản)"
+              placeholder={t('milestones.descriptionPlaceholder')}
               value={newDescription}
               onChange={(e) => setNewDescription(e.target.value)}
             />
             <ButtonPrime onClick={handleCreate} disabled={submitting}>
               <Plus size={16} />
-              Thêm
+              {t('milestones.add')}
             </ButtonPrime>
           </div>
           <AdminFieldError message={displayedError} />
@@ -282,13 +284,13 @@ function MilestonesManagement() {
       {isLoading && (
         <div className="text-center py-4">
           <Spinner size="sm" className="me-2" />
-          Đang tải...
+          {tCommon('loading')}
         </div>
       )}
 
       {!isLoading && filteredMilestones.length === 0 && examTypeFilter && (
         <div className={cx('emptyState')}>
-          Chưa có mốc điểm nào cho loại kỳ thi này.
+          {t('milestones.empty')}
         </div>
       )}
 
@@ -298,7 +300,7 @@ function MilestonesManagement() {
             <div className={cx('milestoneHeader')}>
               <div>
                 <h5>
-                  {m.milestoneScore} điểm
+                  {t('milestones.points', {score: m.milestoneScore as number})}
                   {m.description && (
                     <span style={{marginLeft: 8}}>- {m.description}</span>
                   )}
@@ -309,14 +311,14 @@ function MilestonesManagement() {
                   <>
                     <button
                       className={cx('iconButton')}
-                      title="Chỉnh sửa % từng part"
+                      title={t('milestones.editPartsTitle')}
                       onClick={() => handleStartEdit(m)}
                     >
                       <Pencil size={14} />
                     </button>
                     <button
                       className={cx('iconButton', 'danger')}
-                      title="Xóa"
+                      title={t('shared.delete')}
                       onClick={() => setDeletingMilestone(m)}
                     >
                       <Trash2 size={14} />
@@ -335,7 +337,7 @@ function MilestonesManagement() {
                     const numCorrect = percentToNum(pct, total);
                     return (
                       <div key={p.examPartId} className={cx('editPartItem')}>
-                        <label>{p.name} ({total} câu)</label>
+                        <label>{t('milestones.partQuestionCount', {name: p.name ?? '', total})}</label>
                         <Form.Control
                           type="number"
                           min={0}
@@ -346,7 +348,7 @@ function MilestonesManagement() {
                             setEditParts((prev) => ({...prev, [p.examPartId]: newPct}));
                           }}
                         />
-                        <span>câu</span>
+                        <span>{t('milestones.questionUnit')}</span>
                         <Form.Control
                           type="number"
                           min={0}
@@ -371,14 +373,14 @@ function MilestonesManagement() {
                       setEditParts({});
                     }}
                   >
-                    <X size={14} /> Hủy
+                    <X size={14} /> {tCommon('cancelShort')}
                   </ButtonPrime>
                   <ButtonPrime
                     size="sm"
                     onClick={() => handleSaveEdit(m)}
                     disabled={submitting}
                   >
-                    <Check size={14} /> Lưu
+                    <Check size={14} /> {tCommon('save')}
                   </ButtonPrime>
                 </div>
               </>
@@ -394,14 +396,14 @@ function MilestonesManagement() {
                         {getPartName(pr.examPartId as string)}
                       </span>
                       <span className={cx('partPercent')}>
-                        {numCorrect}/{total} câu ({pr.requiredPercentage}%)
+                        {t('milestones.partProgress', {correct: numCorrect, total, percent: pr.requiredPercentage as number})}
                       </span>
                     </div>
                   );
                 })}
                 {(!m.partRequirements || m.partRequirements.length === 0) && (
                   <span style={{color: '#9ca3af', fontSize: '0.85rem', padding: 16}}>
-                    Chưa cấu hình % từng part
+                    {t('milestones.noPartConfig')}
                   </span>
                 )}
               </div>
@@ -424,8 +426,8 @@ function MilestonesManagement() {
           setDeletingMilestone(null);
         }}
         onConfirm={handleDelete}
-        title="Xác nhận xóa mốc điểm"
-        message={`Bạn có chắc muốn xóa mốc ${deletingMilestone?.milestoneScore} điểm không? Tất cả cấu hình part sẽ bị xóa theo.`}
+        title={t('milestones.confirmDelete.title')}
+        message={t('milestones.confirmDelete.message', {score: deletingMilestone?.milestoneScore ?? ''})}
       />
     </div>
   );

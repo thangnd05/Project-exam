@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 
 import {
   getScoreScale,
@@ -50,6 +51,7 @@ export default function useMilestoneScoring<TExamType extends ExamTypeLike = Exa
   scoringConversions?: ConversionLike[];
   selectedExamTypeId?: string | number;
 }) {
+  const t = useTranslations('MyTarget');
 
   const selectedExamType = useMemo(
     () => examTypes.find((t) => String(t.examTypeId) === String(selectedExamTypeId)),
@@ -141,12 +143,22 @@ export default function useMilestoneScoring<TExamType extends ExamTypeLike = Exa
     (est: ScoreEstimate | null | undefined): string => {
       if (!est) return '';
       return est.scaled
-        ? `Tổng ${est.totalCorrect}/${est.totalQuestions} câu đúng → ${est.totalScore} điểm (thang ${SCALE_MIN}–${SCALE_MAX})`
+        ? t('scoring.scaledDetail', {
+            correct: est.totalCorrect ?? 0,
+            total: est.totalQuestions ?? 0,
+            score: est.totalScore,
+            min: SCALE_MIN,
+            max: SCALE_MAX,
+          })
         : (est.skillDetails || [])
-            .map((s) => `${s.skillName}: ${s.numCorrect} câu → ${s.convertedScore} điểm`)
+            .map((s) => t('scoring.skillDetail', {
+              skill: s.skillName,
+              count: s.numCorrect,
+              score: s.convertedScore,
+            }))
             .join(' | ');
     },
-    [SCALE_MIN, SCALE_MAX],
+    [SCALE_MIN, SCALE_MAX, t],
   );
 
   return {

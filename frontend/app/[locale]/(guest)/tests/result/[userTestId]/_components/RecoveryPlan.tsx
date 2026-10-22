@@ -1,11 +1,12 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { IoCalendarOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { buildPracticeRecoveryMessage, buildRecoveryMessage } from '@/app/features/my-target/readiness-label';
 import type { PartBreakdownResponse } from '@/app/types';
-import { buildPlanFromTestUrl, buildGeneratePlanUrl } from '@/app/(guest)/tests/result/[userTestId]/_lib/planFromTest';
+import { buildPlanFromTestUrl, buildGeneratePlanUrl } from '@/app/[locale]/(guest)/tests/result/[userTestId]/_lib/planFromTest';
 import styles from './Result.module.scss';
 
 const cx = classNames.bind(styles);
@@ -33,12 +34,15 @@ function RecoveryPlan({
   practiceParts,
 }: RecoveryPlanProps) {
   const router = useRouter();
+  const t = useTranslations('TestTaking.recoveryPlan');
+  // readiness-label dịch theo namespace MyTarget; truyền translator để thông điệp theo ngôn ngữ đang xem.
+  const tTarget = useTranslations('MyTarget');
 
   const practiceWithTarget = hasTarget && practiceParts ? practiceParts : null;
-  const practiceResult = practiceWithTarget ? buildPracticeRecoveryMessage(practiceWithTarget) : null;
+  const practiceResult = practiceWithTarget ? buildPracticeRecoveryMessage(practiceWithTarget, tTarget) : null;
   const recoveryMessage = practiceWithTarget
-    ? practiceResult?.message ?? 'Bài luyện theo phần không tính vào mục tiêu điểm.'
-    : buildRecoveryMessage({ hasTarget, isTargetMet, readinessScore, readinessLevel });
+    ? practiceResult?.message ?? t('practiceNotCounted')
+    : buildRecoveryMessage({ hasTarget, isTargetMet, readinessScore, readinessLevel, t: tTarget });
 
   const canCreateTarget = !isGuest && !hasTarget && Boolean(examTypeId);
   const canCreatePlan = !isGuest && hasTarget && (practiceWithTarget
@@ -60,7 +64,7 @@ function RecoveryPlan({
   return (
     <div className={cx('sectionContainer')}>
       <h3 className={cx('sectionTitle')} style={{ marginBottom: 4 }}>
-        Việc cần làm ngay
+        {t('title')}
       </h3>
       {recoveryMessage && (
         <p className={cx('recoveryMessage')}>{recoveryMessage}</p>
@@ -71,7 +75,7 @@ function RecoveryPlan({
           className={cx('recoveryPlanCta', 'recoveryTargetCta')}
           onClick={handleGoToTarget}
         >
-          Đặt mục tiêu
+          {t('setTarget')}
         </button>
       )}
       {canSignUp && (
@@ -81,7 +85,7 @@ function RecoveryPlan({
           onClick={() => router.push(buildPlanFromTestUrl({ userTestId, examTypeId, isGuest: true }))}
         >
           <IoCalendarOutline size={20} aria-hidden />
-          Đăng ký để nhận lộ trình học
+          {t('signUpForPlan')}
         </button>
       )}
       {canCreatePlan && (
@@ -91,7 +95,7 @@ function RecoveryPlan({
           onClick={handleGoToPlan}
         >
           <IoCalendarOutline size={20} aria-hidden />
-          Lập lộ trình học
+          {t('createPlan')}
         </button>
       )}
     </div>

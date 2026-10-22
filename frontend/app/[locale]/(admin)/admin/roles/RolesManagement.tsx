@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import {useTranslations} from 'next-intl';
 import {Badge, Button, Form, Spinner} from 'react-bootstrap';
 import {Edit, Plus, ShieldCheck, Trash2} from 'lucide-react';
 
@@ -13,8 +14,8 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/(admin)/_components/common';
-import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
+} from '@/app/[locale]/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import type {PermissionResponse} from '@/app/types';
 
 type RoleFormState = {
@@ -28,6 +29,8 @@ const emptyForm: RoleFormState = {
 };
 
 function RolesManagement() {
+  const t = useTranslations('AdminUsers');
+  const tCommon = useTranslations('Common');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
   const [editingRoleId, setEditingRoleId] = useState<string | null>(null);
@@ -53,14 +56,14 @@ function RolesManagement() {
   const permissionGroups = useMemo(() => {
     const groups = new Map<string, PermissionResponse[]>();
     permissionCatalog.forEach((permission) => {
-      const groupName = permission.groupName || 'Khác';
+      const groupName = permission.groupName || t('shared.other');
       if (!groups.has(groupName)) {
         groups.set(groupName, []);
       }
       groups.get(groupName)!.push(permission);
     });
     return Array.from(groups.entries());
-  }, [permissionCatalog]);
+  }, [permissionCatalog, t]);
 
   const openPermissionModal = (role: AdminRoleRow) => {
     setPermRole(role);
@@ -101,7 +104,7 @@ function RolesManagement() {
       });
       setPermRole(null);
     } catch {
-      setErrorMessage('Không thể lưu phân quyền.');
+      setErrorMessage(t('roles.errors.savePermissions'));
     } finally {
       setPermSaving(false);
     }
@@ -143,7 +146,7 @@ function RolesManagement() {
     const normalizedRoleName = formState.role_name.trim().toUpperCase();
     const normalizedDescription = formState.description.trim();
     if (!normalizedRoleName) {
-      setErrorMessage('Tên vai trò không được để trống.');
+      setErrorMessage(t('roles.errors.nameRequired'));
       return;
     }
 
@@ -164,7 +167,7 @@ function RolesManagement() {
       setShowFormModal(false);
       resetForm();
     } catch {
-      setErrorMessage('Không thể lưu vai trò.');
+      setErrorMessage(t('roles.errors.save'));
     } finally {
       setSubmitting(false);
     }
@@ -180,7 +183,7 @@ function RolesManagement() {
       await deleteRoleMutation.mutateAsync(deletingRole.role_id);
       setDeletingRole(null);
     } catch {
-      setErrorMessage('Không thể xóa vai trò.');
+      setErrorMessage(t('roles.errors.delete'));
     } finally {
       setSubmitting(false);
     }
@@ -189,13 +192,13 @@ function RolesManagement() {
   const columns: AdminTableColumn[] = [
     {
       key: 'role_name',
-      header: 'Tên vai trò',
+      header: t('roles.columns.name'),
       render: (role: AdminRoleRow) => <Badge bg="primary">{role.role_name}</Badge>,
     },
-    {key: 'description', header: 'Mô tả', render: (role: AdminRoleRow) => role.description || '-'},
+    {key: 'description', header: t('roles.columns.description'), render: (role: AdminRoleRow) => role.description || '-'},
     {
       key: 'permissions',
-      header: 'Số quyền',
+      header: t('roles.columns.permissionCount'),
       render: (role: AdminRoleRow) => (
         <Badge bg={role.permissions?.length ? 'success' : 'secondary'}>
           {role.permissions?.length || 0}
@@ -207,26 +210,26 @@ function RolesManagement() {
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Quản lý vai trò"
-        description="Quản lý quyền hệ thống cho tài khoản người dùng."
+        title={t('roles.title')}
+        description={t('roles.description')}
       >
         <Button onClick={openCreateModal}>
           <Plus size={16} className="me-1" />
-          Thêm vai trò
+          {t('roles.add')}
         </Button>
       </AdminPageHeader>
 
       <AdminToolbar
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
-        searchPlaceholder="Tìm theo tên vai trò hoặc mô tả..."
+        searchPlaceholder={t('roles.searchPlaceholder')}
       />
       <AdminFieldError message={errorMessage} />
 
       <AdminTable
         showIndex
         paginated
-        itemLabel="vai trò"
+        itemLabel={t('roles.itemLabel')}
         columns={columns}
         data={filteredRoles}
         loading={loading}
@@ -235,17 +238,17 @@ function RolesManagement() {
           <>
             <button
               onClick={() => openPermissionModal(role)}
-              title="Phân quyền"
+              title={t('roles.actions.permissions')}
             >
               <ShieldCheck size={14} />
             </button>
-            <button onClick={() => openEditModal(role)} title="Sửa vai trò">
+            <button onClick={() => openEditModal(role)} title={t('roles.actions.edit')}>
               <Edit size={14} />
             </button>
             <button
               className="danger"
               onClick={() => setDeletingRole(role)}
-              title="Xóa vai trò"
+              title={t('roles.actions.delete')}
             >
               <Trash2 size={14} />
             </button>
@@ -259,7 +262,7 @@ function RolesManagement() {
           setShowFormModal(false);
           resetForm();
         }}
-        title={editingRoleId ? 'Cập nhật vai trò' : 'Tạo vai trò'}
+        title={editingRoleId ? t('roles.modal.editTitle') : t('roles.modal.createTitle')}
         maxWidth={550}
         footer={
           <ModalActionFooter
@@ -271,14 +274,14 @@ function RolesManagement() {
               resetForm();
             }}
             onSubmit={handleSubmit}
-            cancelLabel="Hủy"
-            submitLabel={editingRoleId ? 'Lưu' : 'Tạo mới'}
+            cancelLabel={tCommon('cancelShort')}
+            submitLabel={editingRoleId ? tCommon('save') : t('shared.createNew')}
             loading={submitting}
           />
         }
       >
         <Form.Group className="mb-3">
-          <Form.Label>Tên vai trò</Form.Label>
+          <Form.Label>{t('roles.modal.name')}</Form.Label>
           <Form.Control
             value={formState.role_name}
             onChange={(event) =>
@@ -287,11 +290,11 @@ function RolesManagement() {
                 role_name: event.target.value,
               }))
             }
-            placeholder="Ví dụ: ADMIN, TEACHER"
+            placeholder={t('roles.modal.namePlaceholder')}
           />
         </Form.Group>
         <Form.Group>
-          <Form.Label>Mô tả</Form.Label>
+          <Form.Label>{t('roles.modal.description')}</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
@@ -313,7 +316,7 @@ function RolesManagement() {
           }
           setPermRole(null);
         }}
-        title={`Phân quyền cho vai trò: ${permRole?.role_name || ''}`}
+        title={t('roles.permissionModal.title', {role: permRole?.role_name || ''})}
         maxWidth={680}
         footer={
           <ModalActionFooter
@@ -324,20 +327,20 @@ function RolesManagement() {
               setPermRole(null);
             }}
             onSubmit={handleSavePermissions}
-            cancelLabel="Hủy"
-            submitLabel="Lưu phân quyền"
+            cancelLabel={tCommon('cancelShort')}
+            submitLabel={t('roles.permissionModal.save')}
             loading={permSaving}
           />
         }
       >
         {permissionCatalog.length === 0 ? (
           <div className="d-flex align-items-center gap-2 text-muted">
-            <Spinner animation="border" size="sm" /> Đang tải danh mục quyền...
+            <Spinner animation="border" size="sm" /> {t('roles.permissionModal.loading')}
           </div>
         ) : (
           <div className="d-flex flex-column gap-3">
             <p className="text-muted mb-0">
-              Tích vào hành động mà vai trò này được phép thực hiện.
+              {t('roles.permissionModal.hint')}
             </p>
             {permissionGroups.map(([groupName, items]) => {
               const codes = items.map((item) => item.code!);
@@ -349,7 +352,7 @@ function RolesManagement() {
                     <Form.Check
                       type="checkbox"
                       id={`group-${groupName}`}
-                      label="Chọn tất cả"
+                      label={t('roles.permissionModal.selectAll')}
                       checked={allChecked}
                       onChange={() => toggleGroup(codes, allChecked)}
                     />
@@ -387,8 +390,8 @@ function RolesManagement() {
           setDeletingRole(null);
         }}
         onConfirm={handleDelete}
-        title="Xác nhận xóa vai trò"
-        message={`Bạn có chắc muốn xóa "${deletingRole?.role_name || ''}" không?`}
+        title={t('roles.confirmDelete.title')}
+        message={t('roles.confirmDelete.message', {name: deletingRole?.role_name || ''})}
       />
     </div>
   );

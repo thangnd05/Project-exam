@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Spinner, Button } from 'react-bootstrap';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { IoLockClosedOutline, IoAlertCircleOutline, IoPlayCircleOutline } from 'react-icons/io5';
 import { useExamTypeById } from '@/app/features/exam-types/hooks/useExamTypes';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
@@ -61,11 +62,13 @@ export default function TestStateScreens({
   partCount = 0,
   onStart,
 }: TestStateScreensProps) {
+  const t = useTranslations('TestTaking.start');
+  const tCommon = useTranslations('Common');
   if (status === 'loading')
     return (
       <div className={cx('state-box')}>
         <Spinner animation="grow" variant="primary" />
-        <h3>Đang tải đề thi...</h3>
+        <h3>{t('loading')}</h3>
       </div>
     );
 
@@ -74,27 +77,36 @@ export default function TestStateScreens({
     return (
       <div className={cx('state-box')}>
         <ExamTypeLogo examTypeId={test.examTypeId} />
-        <h3>{test.title || 'Sẵn sàng làm bài'}</h3>
+        <h3>{test.title || t('ready.fallbackTitle')}</h3>
         <ul className={cx('ready-facts')}>
           <li>
-            <span><strong>{questionCount}</strong> câu hỏi{partCount > 1 ? `, chia thành ${partCount} phần` : ''}</span>
+            <span>
+              {t.rich('ready.questionCount', {
+                count: questionCount,
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
+              {partCount > 1 ? t('ready.partCount', { count: partCount }) : ''}
+            </span>
           </li>
           <li>
             <span>
               {timed ? (
-                <>Thời gian: <strong>{test.durationMinutes} phút</strong>, tính từ lúc bấm bắt đầu</>
+                t.rich('ready.timed', {
+                  minutes: test.durationMinutes ?? 0,
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })
               ) : (
-                <>Không giới hạn thời gian</>
+                t('ready.untimed')
               )}
             </span>
           </li>
           <li>
-            <span>Câu trả lời được lưu tự động, lỡ tải lại trang vẫn làm tiếp được.</span>
+            <span>{t('ready.autosave')}</span>
           </li>
           <li>
             <span>
-              Làm xong bấm <strong>Nộp bài</strong> để xem điểm và đáp án.
-              {timed && ' Hết giờ bài sẽ tự nộp.'}
+              {t.rich('ready.submitHint', { strong: (chunks) => <strong>{chunks}</strong> })}
+              {timed && ` ${t('ready.autoSubmit')}`}
             </span>
           </li>
         </ul>
@@ -104,14 +116,14 @@ export default function TestStateScreens({
             className={cx('state-btn', 'state-btn-secondary')}
             onClick={onBack}
           >
-            Quay lại
+            {t('back')}
           </button>
           <button
             type="button"
             className={cx('state-btn', 'state-btn-primary')}
             onClick={onStart}
           >
-            Bắt đầu làm bài
+            {t('ready.start')}
           </button>
         </div>
       </div>
@@ -124,9 +136,9 @@ export default function TestStateScreens({
     return (
       <div className={cx('state-box')}>
         <IoLockClosedOutline size={80} color="var(--warning)" />
-        <h3>Bài kiểm tra trả phí</h3>
+        <h3>{t('payment.title')}</h3>
         <p>
-           Đầu tư một lần, sử dụng mãi mãi.
+           {t('payment.desc')}
         </p>
         <div className={cx('state-actions')}>
           <button
@@ -134,7 +146,7 @@ export default function TestStateScreens({
             className={cx('state-btn', 'state-btn-secondary')}
             onClick={onBack}
           >
-            Quay lại
+            {t('back')}
           </button>
           <button
             type="button"
@@ -142,7 +154,11 @@ export default function TestStateScreens({
             disabled={purchasing || !enough}
             onClick={onPurchase}
           >
-            {purchasing ? 'Đang mở khoá...' : enough ? `Mở khoá (${cost} xu)` : 'Không đủ xu'}
+            {purchasing
+              ? t('payment.unlocking')
+              : enough
+                ? t('payment.unlock', { cost })
+                : t('payment.notEnough')}
           </button>
         </div>
       </div>
@@ -153,14 +169,14 @@ export default function TestStateScreens({
     return (
       <div className={cx('state-box')}>
         <IoAlertCircleOutline size={80} color="var(--danger-text)" />
-        <h3>Hết lượt làm bài</h3>
-        <p>Bạn đã hoàn thành số lượt làm bài cho phép cho bài thi này.</p>
+        <h3>{t('noAttempts.title')}</h3>
+        <p>{t('noAttempts.desc')}</p>
         <Button
           variant="primary"
           className="mt-4 rounded-pill"
           onClick={onBack}
         >
-          Quay lại
+          {t('back')}
         </Button>
       </div>
     );
@@ -169,8 +185,8 @@ export default function TestStateScreens({
     return (
       <div className={cx('state-box')}>
         <IoLockClosedOutline size={80} color="var(--text-secondary)" />
-        <h3>Phòng thi chưa mở</h3>
-        <p>Vui lòng đợi trong giây lát...</p>
+        <h3>{t('locked.title')}</h3>
+        <p>{t('locked.desc')}</p>
         <div className={cx('timer-box', 'mt-4')}>
           <span className={cx('time')}>{formatTime(preCountdown)}</span>
         </div>
@@ -181,14 +197,14 @@ export default function TestStateScreens({
     return (
       <div className={cx('state-box')}>
         <IoAlertCircleOutline size={80} color="var(--danger-text)" />
-        <h3>Phòng thi đã đóng</h3>
-        <p>Rất tiếc, thời gian tham gia bài thi này đã kết thúc.</p>
+        <h3>{t('closed.title')}</h3>
+        <p>{t('closed.desc')}</p>
         <Button
           variant="secondary"
           className="mt-4 rounded-pill"
           onClick={onBack}
         >
-          Quay lại
+          {t('back')}
         </Button>
       </div>
     );
@@ -197,15 +213,15 @@ export default function TestStateScreens({
     return (
       <div className={cx('state-box')}>
         <IoAlertCircleOutline size={80} color="var(--danger-text)" />
-        <h3>Không tải được đề thi</h3>
-        <p>Có thể mạng đang chập chờn. Bạn thử tải lại, bài đã làm (nếu có) vẫn được giữ.</p>
+        <h3>{t('error.title')}</h3>
+        <p>{t('error.desc')}</p>
         <div className={cx('state-actions')}>
           <button
             type="button"
             className={cx('state-btn', 'state-btn-secondary')}
             onClick={onBack}
           >
-            Quay lại
+            {t('back')}
           </button>
           {onRetry && (
             <button
@@ -213,7 +229,7 @@ export default function TestStateScreens({
               className={cx('state-btn', 'state-btn-primary')}
               onClick={onRetry}
             >
-              Thử lại
+              {tCommon('error.retry')}
             </button>
           )}
         </div>

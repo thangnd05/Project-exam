@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import styles from '@/app/assets/styles/ReviewQuestions.module.scss';
 
 const cx = classNames.bind(styles);
@@ -42,20 +43,21 @@ function ReviewQuestionCard({
   explanation,
   canReview = true,
 }: ReviewQuestionCardProps) {
+  const t = useTranslations('TestTaking.review');
   return (
     <div id={id} className={cx('questionItem', status)}>
       <span className={cx('qText')}>
-        <strong>{number ? `Câu ${number}:` : 'Câu hỏi:'}</strong> {questionText}
+        <strong>{number ? t('questionNumber', { number }) : t('questionPrefix')}</strong> {questionText}
       </span>
 
       {mode === 'fill' ? (
         <div>
           <p className={cx('fillRow')}>
-            <strong>Bạn trả lời:</strong> {userAnswerText || '(Chưa trả lời)'}
+            <strong>{t('yourAnswer')}</strong> {userAnswerText || t('noAnswer')}
           </p>
           {canReview && correctAnswerText && (
             <p className={cx('fillRow')}>
-              <strong>Đáp án đúng:</strong> {correctAnswerText}
+              <strong>{t('correctAnswer')}</strong> {correctAnswerText}
             </p>
           )}
         </div>
@@ -79,7 +81,7 @@ function ReviewQuestionCard({
                 {a.answerText?.trim()
                   ? `${a.answerLabel ? `${a.answerLabel}. ` : ''}${a.answerText}`
                   : a.answerLabel}
-                {isUserChoice && <span className={cx('userPill')}>(Bạn chọn)</span>}
+                {isUserChoice && <span className={cx('userPill')}>{t('yourChoice')}</span>}
               </div>
             );
           })}
@@ -88,7 +90,7 @@ function ReviewQuestionCard({
 
       {canReview && explanation?.trim() && (
         <div className={cx('explanationBox')}>
-          <strong>Giải thích:</strong> {explanation}
+          <strong>{t('explanation')}</strong> {explanation}
         </div>
       )}
     </div>

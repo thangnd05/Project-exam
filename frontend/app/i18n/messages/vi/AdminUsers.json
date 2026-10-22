@@ -1,0 +1,309 @@
+{
+  "shared": {
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "createNew": "Tạo mới",
+    "saving": "Đang lưu...",
+    "other": "Khác"
+  },
+  "milestones": {
+    "title": "Cấu hình mốc điểm mục tiêu",
+    "description": "Thiết lập các mốc điểm và % yêu cầu từng phần thi để đánh giá độ sẵn sàng của người dùng.",
+    "searchPlaceholder": "Tìm theo mốc điểm hoặc mô tả...",
+    "selectExamType": "Chọn loại kỳ thi",
+    "createHeading": "Thêm mốc điểm mới",
+    "scorePlaceholderScaled": "Mốc điểm (VD: 700)",
+    "scorePlaceholder": "Mốc điểm (VD: 450)",
+    "perPart": "≈ {percent}% mỗi part",
+    "descriptionPlaceholder": "Mô tả (VD: Mức cơ bản)",
+    "add": "Thêm",
+    "empty": "Chưa có mốc điểm nào cho loại kỳ thi này.",
+    "points": "{score} điểm",
+    "editPartsTitle": "Chỉnh sửa % từng part",
+    "partQuestionCount": "{name} ({total} câu)",
+    "questionUnit": "câu",
+    "partProgress": "{correct}/{total} câu ({percent}%)",
+    "noPartConfig": "Chưa cấu hình % từng part",
+    "estimateLabel": "Điểm ước tính:",
+    "estimateDiff": "({diff} so với mốc {score})",
+    "errors": {
+      "required": "Vui lòng chọn loại kỳ thi và nhập mốc điểm.",
+      "create": "Không thể tạo mốc điểm. Có thể mốc này đã tồn tại.",
+      "update": "Không thể cập nhật cấu hình.",
+      "delete": "Không thể xóa mốc điểm.",
+      "loadExamTypes": "Không thể tải danh sách loại kỳ thi.",
+      "loadExamParts": "Không thể tải danh sách phần thi.",
+      "loadMilestones": "Không thể tải danh sách mốc điểm."
+    },
+    "confirmDelete": {
+      "title": "Xác nhận xóa mốc điểm",
+      "message": "Bạn có chắc muốn xóa mốc {score} điểm không? Tất cả cấu hình part sẽ bị xóa theo."
+    }
+  },
+  "permissions": {
+    "title": "Phân quyền (RBAC)",
+    "description": "Tích vào hành động mà mỗi vai trò được phép thực hiện. Đổi quyền có hiệu lực ngay cho người dùng.",
+    "loading": "Đang tải ma trận phân quyền...",
+    "saveChanges": "Lưu thay đổi",
+    "actionColumn": "Hành động",
+    "fullAccess": "Toàn quyền",
+    "selectGroup": "Chọn cả nhóm “{group}”",
+    "selectGroupAria": "{role} - chọn nhóm {group}",
+    "saved": "Đã lưu phân quyền cho {count} vai trò.",
+    "errors": {
+      "load": "Không thể tải dữ liệu phân quyền.",
+      "save": "Không thể lưu phân quyền."
+    }
+  },
+  "posts": {
+    "title": "Duyệt bài viết",
+    "description": "Duyệt bài chờ duyệt hoặc xóa bài không phù hợp. Bài bị xóa sẽ biến mất khỏi danh sách của tác giả.",
+    "searchPlaceholder": "Tìm kiếm bài viết...",
+    "filters": {
+      "pending": "Chờ duyệt",
+      "approved": "Đã duyệt",
+      "all": "Tất cả"
+    },
+    "columns": {
+      "title": "Tiêu đề",
+      "author": "Tác giả",
+      "createdAt": "Ngày tạo",
+      "status": "Trạng thái"
+    },
+    "noCategory": "Không có danh mục",
+    "empty": "Không có dữ liệu bài viết",
+    "itemLabel": "bài viết",
+    "viewDetail": "Xem chi tiết",
+    "approve": "Duyệt",
+    "deletePost": "Xóa bài viết",
+    "approveModal": {
+      "title": "Duyệt bài viết",
+      "message": "Duyệt bài viết \"{title}\"?"
+    },
+    "confirmDelete": {
+      "title": "Xác nhận xóa bài viết",
+      "message": "Xóa bài viết \"{title}\"? Hành động này không thể hoàn tác."
+    },
+    "toast": {
+      "loadError": "Lỗi khi tải danh sách bài viết",
+      "approved": "Đã duyệt bài viết",
+      "approveError": "Lỗi khi duyệt bài viết",
+      "deleted": "Đã xóa bài viết",
+      "deleteError": "Lỗi khi xóa bài viết"
+    }
+  },
+  "quests": {
+    "title": "Quản lý nhiệm vụ",
+    "description": "Tạo nhiệm vụ thưởng xu theo sự kiện hoặc theo thời gian.",
+    "add": "Thêm nhiệm vụ",
+    "searchPlaceholder": "Tìm theo tiêu đề...",
+    "itemLabel": "nhiệm vụ",
+    "conditions": {
+      "none": "Không cần điều kiện (tặng xu)",
+      "completeTest": "Hoàn thành bài thi",
+      "streakDays": "Đạt chuỗi ngày học",
+      "createLearningPlan": "Tạo lộ trình học",
+      "completeLearningPlan": "Hoàn thành lộ trình học",
+      "setTarget": "Đặt mục tiêu",
+      "completePlanTask": "Hoàn thành nhiệm vụ trong lộ trình"
+    },
+    "conditionNone": "Không cần điều kiện",
+    "columns": {
+      "title": "Tiêu đề",
+      "condition": "Điều kiện",
+      "coins": "Xu",
+      "time": "Thời gian",
+      "claimed": "Đã nhận",
+      "status": "Trạng thái"
+    },
+    "from": "Từ: {date}",
+    "to": "Đến: {date}",
+    "active": "Đang bật",
+    "inactive": "Tắt",
+    "modal": {
+      "editTitle": "Cập nhật nhiệm vụ",
+      "createTitle": "Tạo nhiệm vụ"
+    },
+    "form": {
+      "title": "Tiêu đề",
+      "description": "Mô tả",
+      "rewardCoins": "Số xu thưởng",
+      "condition": "Điều kiện",
+      "conditionTarget": "Số lần cần đạt",
+      "startAt": "Bắt đầu",
+      "endAt": "Kết thúc",
+      "active": "Đang bật"
+    },
+    "errors": {
+      "titleRequired": "Tiêu đề không được để trống.",
+      "rewardInvalid": "Số xu thưởng phải là số không âm.",
+      "save": "Không thể lưu nhiệm vụ. Vui lòng thử lại.",
+      "delete": "Không thể xóa nhiệm vụ.",
+      "load": "Không thể tải danh sách nhiệm vụ."
+    },
+    "deleted": "Đã xóa nhiệm vụ.",
+    "confirmDelete": {
+      "title": "Xác nhận xóa nhiệm vụ",
+      "message": "Bạn có chắc muốn xóa \"{title}\" không?"
+    }
+  },
+  "recoveryResources": {
+    "title": "Kho tài liệu ôn tập",
+    "description": "Quản lý bài giảng, video, tài liệu gắn với các Tag kiến thức.",
+    "add": "Thêm tài liệu",
+    "searchPlaceholder": "Tìm theo tiêu đề, mô tả, tag...",
+    "allExamTypes": "Tất cả loại kỳ thi",
+    "empty": "Không có tài liệu nào.",
+    "sharedGroup": "Dùng chung",
+    "partFallback": "Phần thi",
+    "ungrouped": "Chưa gán tag",
+    "emptyGroup": "Chưa có tài liệu trong nhóm \"{group}\".",
+    "view": "Xem",
+    "download": "Tải về",
+    "downloadOriginal": "Tải file gốc",
+    "downloadOriginalTitle": "Tải file markdown gốc (dành cho quản trị)",
+    "errors": {
+      "load": "Không thể tải danh sách tài liệu.",
+      "titleRequired": "Tiêu đề không được để trống.",
+      "fileOrUrlRequired": "Vui lòng upload file hoặc cung cấp URL.",
+      "save": "Không thể lưu tài liệu. Vui lòng thử lại.",
+      "delete": "Không thể xóa tài liệu."
+    },
+    "confirmDelete": {
+      "title": "Xác nhận xóa tài liệu",
+      "message": "Bạn có chắc muốn xóa \"{title}\" không? File trên Cloudinary cũng sẽ bị xóa."
+    },
+    "form": {
+      "editTitle": "Cập nhật tài liệu",
+      "createTitle": "Thêm tài liệu mới",
+      "title": "Tiêu đề",
+      "titlePlaceholder": "VD: Mẹo giải dạng bài hay sai...",
+      "description": "Mô tả",
+      "descriptionPlaceholder": "Mô tả chi tiết nội dung tài liệu...",
+      "uploadFile": "Upload file",
+      "supportedFormats": "Hỗ trợ Markdown (.md), PDF, Word, ảnh, audio, video.",
+      "currentFile": "File hiện tại: <link>Xem file</link>",
+      "orUrl": "Hoặc nhập URL",
+      "examType": "Loại kỳ thi",
+      "selectExamType": "- Chọn loại kỳ thi ",
+      "selectExamTypeFirst": "Chọn loại kỳ thi ở trên để gắn hoặc thay đổi tag cho tài liệu.",
+      "tagLabel": "Gắn Tag (liên kết kiến thức)",
+      "tagHint": "Phần thi của tài liệu được lấy theo tag. Một tài liệu có thể gắn tag của nhiều phần thi.",
+      "noTags": "Loại kỳ thi này chưa có tag. Tạo tag tại mục Quản lý Tag trước."
+    }
+  },
+  "roles": {
+    "title": "Quản lý vai trò",
+    "description": "Quản lý quyền hệ thống cho tài khoản người dùng.",
+    "add": "Thêm vai trò",
+    "searchPlaceholder": "Tìm theo tên vai trò hoặc mô tả...",
+    "itemLabel": "vai trò",
+    "columns": {
+      "name": "Tên vai trò",
+      "description": "Mô tả",
+      "permissionCount": "Số quyền"
+    },
+    "actions": {
+      "permissions": "Phân quyền",
+      "edit": "Sửa vai trò",
+      "delete": "Xóa vai trò"
+    },
+    "modal": {
+      "editTitle": "Cập nhật vai trò",
+      "createTitle": "Tạo vai trò",
+      "name": "Tên vai trò",
+      "namePlaceholder": "Ví dụ: ADMIN, TEACHER",
+      "description": "Mô tả"
+    },
+    "permissionModal": {
+      "title": "Phân quyền cho vai trò: {role}",
+      "save": "Lưu phân quyền",
+      "loading": "Đang tải danh mục quyền...",
+      "hint": "Tích vào hành động mà vai trò này được phép thực hiện.",
+      "selectAll": "Chọn tất cả"
+    },
+    "errors": {
+      "savePermissions": "Không thể lưu phân quyền.",
+      "nameRequired": "Tên vai trò không được để trống.",
+      "save": "Không thể lưu vai trò.",
+      "delete": "Không thể xóa vai trò."
+    },
+    "confirmDelete": {
+      "title": "Xác nhận xóa vai trò",
+      "message": "Bạn có chắc muốn xóa \"{name}\" không?"
+    }
+  },
+  "streakRecover": {
+    "title": "Khôi phục chuỗi ngày",
+    "description": "Giá xu user phải trả để nối lại chuỗi đã đứt (khi chưa học lại).",
+    "loading": "Đang tải cấu hình...",
+    "cardTitle": "Cấu hình tính năng khôi phục",
+    "costLabel": "Giá khôi phục (xu)",
+    "costHint": "Đặt 0 nếu muốn cho khôi phục miễn phí.",
+    "activeLabel": "Cho phép khôi phục chuỗi",
+    "save": "Lưu cấu hình",
+    "saved": "Đã lưu cấu hình khôi phục chuỗi.",
+    "errors": {
+      "load": "Không thể tải cấu hình.",
+      "costInvalid": "Giá xu phải là số không âm.",
+      "save": "Không thể lưu cấu hình."
+    }
+  },
+  "users": {
+    "title": "Quản lý Users",
+    "description": "Quản lý tài khoản người dùng trong hệ thống",
+    "add": "Thêm người dùng",
+    "stats": {
+      "users": "Người dùng",
+      "teachers": "Giáo viên",
+      "verified": "Đã xác thực",
+      "unverified": "Chưa xác thực"
+    },
+    "searchPlaceholder": "Tìm kiếm theo tên, email, username...",
+    "allRoles": "Tất cả vai trò",
+    "allStatuses": "Tất cả trạng thái",
+    "itemLabel": "người dùng",
+    "columns": {
+      "user": "Người dùng",
+      "role": "Vai trò",
+      "email": "Email",
+      "status": "Trạng thái",
+      "premium": "Premium",
+      "createdAt": "Ngày tạo"
+    },
+    "status": {
+      "verified": "Đã xác thực",
+      "unverified": "Chưa xác thực",
+      "unknown": "Không có dữ liệu"
+    },
+    "form": {
+      "createTitle": "Thêm người dùng",
+      "editTitle": "Sửa người dùng",
+      "fullName": "Họ và tên",
+      "fullNamePlaceholder": "Nguyễn Văn A",
+      "userName": "Username",
+      "userNamePlaceholder": "nguyenvana",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "passwordPlaceholder": "Tối thiểu 6 ký tự",
+      "role": "Vai trò",
+      "defaultRole": "-- Mặc định (USER) --",
+      "markVerified": "Đánh dấu đã xác thực",
+      "verified": "Đã xác thực",
+      "premium": "Tài khoản Premium"
+    },
+    "errors": {
+      "loadUsers": "Không thể tải danh sách người dùng.",
+      "loadRoles": "Không thể tải danh sách vai trò.",
+      "createRequired": "Vui lòng nhập đủ họ tên, username, email và mật khẩu.",
+      "create": "Không thể tạo người dùng.",
+      "editRequired": "Vui lòng nhập đủ họ tên, username và email.",
+      "update": "Không thể cập nhật người dùng.",
+      "delete": "Không thể xóa người dùng."
+    },
+    "confirmDelete": {
+      "title": "Xác nhận xóa người dùng",
+      "message": "Bạn có chắc muốn xóa \"{name}\" không?"
+    }
+  }
+}

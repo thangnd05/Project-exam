@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState } from 'react';
 import {Button, Form} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 import {Braces, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
 
@@ -15,8 +16,8 @@ import {
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
-} from '@/app/(admin)/_components/common';
-import styles from '@/app/(admin)/_components/common/adminKit.module.scss';
+} from '@/app/[locale]/(admin)/_components/common';
+import styles from '@/app/[locale]/(admin)/_components/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);
 import {useScoringConversion, type ScoringRuleItem} from './_hooks/useScoringConversion';
@@ -29,6 +30,8 @@ const defaultFormState = {
 };
 
 function ScoringConversionManagement() {
+  const t = useTranslations('AdminContent.scoringConversion');
+  const tc = useTranslations('Common');
   const [keyword, setKeyword] = useState('');
   const [examTypeFilter, setExamTypeFilter] = useState('all');
   const [activeSkillId, setActiveSkillId] = useState('all');
@@ -115,12 +118,12 @@ function ScoringConversionManagement() {
     const convertedScore = Number(formState.converted_score);
 
     if (!examTypeId || !skillId || Number.isNaN(numCorrect) || Number.isNaN(convertedScore)) {
-      setErrorMessage('Vui lòng nhập đầy đủ dữ liệu quy đổi.');
+      setErrorMessage(t('errors.required'));
       return;
     }
 
     if (isDuplicateRule(examTypeId, skillId, numCorrect)) {
-      setErrorMessage('Bộ quy đổi đã tồn tại với exam type, skill và số câu đúng này.');
+      setErrorMessage(t('errors.duplicate'));
       return;
     }
 
@@ -134,7 +137,7 @@ function ScoringConversionManagement() {
       });
       resetForm();
     } catch {
-      setErrorMessage('Không thể thêm cấu hình quy đổi.');
+      setErrorMessage(t('errors.createFailed'));
     }
   };
 
@@ -148,19 +151,19 @@ function ScoringConversionManagement() {
       await deleteMutation.mutateAsync(deletingRule.conversion_id);
       setDeletingRule(null);
     } catch {
-      setErrorMessage('Không thể xóa cấu hình quy đổi.');
+      setErrorMessage(t('errors.deleteFailed'));
     }
   };
 
   const handleCreateByJson = async () => {
     if (!jsonCreateValue.trim()) {
-      setErrorMessage('Vui lòng nhập JSON trước khi tạo.');
+      setErrorMessage(t('errors.jsonEmpty'));
       return;
     }
     try {
       const parsedData = JSON.parse(jsonCreateValue);
       if (!Array.isArray(parsedData)) {
-        setErrorMessage('JSON không hợp lệ. Dữ liệu phải là mảng.');
+        setErrorMessage(t('errors.jsonNotArray'));
         return;
       }
 
@@ -179,9 +182,7 @@ function ScoringConversionManagement() {
           Number.isNaN(item.convertedScore),
       );
       if (hasInvalidItem) {
-        setErrorMessage(
-          'JSON có phần tử thiếu dữ liệu. Cần đủ examTypeId, skillId, numCorrect, convertedScore.',
-        );
+        setErrorMessage(t('errors.jsonMissingFields'));
         return;
       }
 
@@ -190,21 +191,21 @@ function ScoringConversionManagement() {
       setShowJsonCreateForm(false);
       setErrorMessage('');
     } catch {
-      setErrorMessage('Không thể tạo từ JSON. Vui lòng kiểm tra định dạng và dữ liệu.');
+      setErrorMessage(t('errors.jsonCreateFailed'));
     }
   };
 
   const columns = [
     {
       key: 'exam_type',
-      header: 'Loại kỳ thi',
+      header: t('columns.examType'),
       render: (rule: ScoringRuleItem) => getExamTypeName(rule.exam_type_id),
     },
-    {key: 'skill', header: 'Kỹ năng', render: (rule: ScoringRuleItem) => getSkillName(rule.skill_id)},
-    {key: 'num_correct', header: 'Số câu đúng', render: (rule: ScoringRuleItem) => rule.num_correct},
+    {key: 'skill', header: t('columns.skill'), render: (rule: ScoringRuleItem) => getSkillName(rule.skill_id)},
+    {key: 'num_correct', header: t('columns.numCorrect'), render: (rule: ScoringRuleItem) => rule.num_correct},
     {
       key: 'converted_score',
-      header: 'Điểm quy đổi',
+      header: t('columns.convertedScore'),
       render: (rule: ScoringRuleItem) => rule.converted_score,
     },
   ];
@@ -212,8 +213,8 @@ function ScoringConversionManagement() {
   return (
     <div className="d-flex flex-column gap-3">
       <AdminPageHeader
-        title="Quản lý quy đổi điểm"
-        description="Thiết lập score theo exam type, kỹ năng và số câu trả lời đúng."
+        title={t('title')}
+        description={t('description')}
       >
         <Button
           onClick={() => {
@@ -223,7 +224,7 @@ function ScoringConversionManagement() {
           }}
         >
           <Braces size={16} />
-          Tạo bằng JSON
+          {t('createByJson')}
         </Button>
       </AdminPageHeader>
 
@@ -237,7 +238,7 @@ function ScoringConversionManagement() {
           setJsonCreateValue('');
           setErrorMessage('');
         }}
-        title="Tạo quy đổi điểm bằng JSON"
+        title={t('jsonModalTitle')}
         maxWidth={600}
         footer={
           <ModalActionFooter
@@ -247,15 +248,15 @@ function ScoringConversionManagement() {
               setErrorMessage('');
             }}
             onSubmit={handleCreateByJson}
-            cancelLabel="Hủy"
-            submitLabel="Tạo dữ liệu"
+            cancelLabel={tc('cancelShort')}
+            submitLabel={t('jsonSubmit')}
             loading={submitting}
           />
         }
       >
         <AdminFieldError message={errorMessage} />
         <p className="text-secondary mb-3">
-          Dán mảng JSON theo format: <code>[{'{'}"examTypeId","skillId","numCorrect","convertedScore"{'}'}]</code>
+          {t('jsonHelp')} <code>[{'{'}"examTypeId","skillId","numCorrect","convertedScore"{'}'}]</code>
         </p>
         <Form.Control
           as="textarea"
@@ -271,13 +272,13 @@ function ScoringConversionManagement() {
       <AdminToolbar
         searchValue={keyword}
         onSearchChange={setKeyword}
-        searchPlaceholder="Tìm theo exam type, skill hoặc điểm..."
+        searchPlaceholder={t('searchPlaceholder')}
       >
         <Form.Select
           value={examTypeFilter}
           onChange={(event) => setExamTypeFilter(event.target.value)}
         >
-          <option value="all">Tất cả loại kỳ thi</option>
+          <option value="all">{t('allExamTypes')}</option>
           {examTypes.map((examType) => (
             <option key={examType.exam_type_id} value={examType.exam_type_id}>
               {examType.name}
@@ -292,7 +293,7 @@ function ScoringConversionManagement() {
           className={cx('pillBtn', {active: activeSkillId === 'all'})}
           onClick={() => selectSkill('all')}
         >
-          Tất cả kỹ năng
+          {t('allSkills')}
         </Button>
         {skills.map((skill) => (
           <Button
@@ -308,7 +309,7 @@ function ScoringConversionManagement() {
       </div>
 
       <AdminCard>
-        <h5>Thêm cấu hình quy đổi</h5>
+        <h5>{t('addTitle')}</h5>
         <div
           style={{
             display: 'grid',
@@ -323,7 +324,7 @@ function ScoringConversionManagement() {
               setFormState((previous) => ({...previous, exam_type_id: event.target.value}))
             }
           >
-            <option value="">Chọn loại kỳ thi</option>
+            <option value="">{t('selectExamType')}</option>
             {examTypes.map((examType) => (
               <option key={examType.exam_type_id} value={examType.exam_type_id}>
                 {examType.name}
@@ -336,7 +337,7 @@ function ScoringConversionManagement() {
               setFormState((previous) => ({...previous, skill_id: event.target.value}))
             }
           >
-            <option value="">Chọn kỹ năng</option>
+            <option value="">{t('selectSkill')}</option>
             {skills.map((skill) => (
               <option key={skill.skill_id} value={skill.skill_id}>
                 {skill.name}
@@ -345,7 +346,7 @@ function ScoringConversionManagement() {
           </Form.Select>
           <Form.Control
             type="number"
-            placeholder="Số câu đúng"
+            placeholder={t('columns.numCorrect')}
             value={formState.num_correct}
             onChange={(event) =>
               setFormState((previous) => ({...previous, num_correct: event.target.value}))
@@ -353,7 +354,7 @@ function ScoringConversionManagement() {
           />
           <Form.Control
             type="number"
-            placeholder="Điểm quy đổi"
+            placeholder={t('columns.convertedScore')}
             value={formState.converted_score}
             onChange={(event) =>
               setFormState((previous) => ({
@@ -364,7 +365,7 @@ function ScoringConversionManagement() {
           />
           <ButtonPrime onClick={handleAddRule}>
             <Plus size={16} />
-            Thêm
+            {t('add')}
           </ButtonPrime>
         </div>
         <AdminFieldError message={errorMessage} />
@@ -373,13 +374,13 @@ function ScoringConversionManagement() {
       <AdminTable
         showIndex
         paginated
-        itemLabel="mốc quy đổi"
+        itemLabel={t('itemLabel')}
         columns={columns}
         data={filteredRules}
         loading={loading}
         getRowKey={(rule: ScoringRuleItem) => rule.conversion_id}
         rowActions={(rule: ScoringRuleItem) => (
-          <button className="danger" title="Xóa" onClick={() => setDeletingRule(rule)}>
+          <button className="danger" title={t('delete')} onClick={() => setDeletingRule(rule)}>
             <Trash2 size={14} />
           </button>
         )}
@@ -393,8 +394,8 @@ function ScoringConversionManagement() {
           setDeletingRule(null);
         }}
         onConfirm={handleDeleteRule}
-        title="Xác nhận xóa quy đổi"
-        message="Bạn có chắc muốn xóa cấu hình quy đổi này không?"
+        title={t('deleteTitle')}
+        message={t('deleteMessage')}
       />
     </div>
   );

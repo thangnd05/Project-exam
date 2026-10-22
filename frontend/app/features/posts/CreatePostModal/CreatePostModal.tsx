@@ -1,8 +1,9 @@
 'use client';
 
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useState, useRef, useMemo, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -26,6 +27,7 @@ type CreatePostModalProps = {
 };
 
 function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPost = null }: CreatePostModalProps) {
+  const t = useTranslations('Posts.editor');
   const isEditing = !!editingPost;
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -119,7 +121,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
 
   const handleSubmit = () => {
     if (!user) {
-      toast.warning(' Bạn cần đăng nhập trước khi đăng bài viết!');
+      toast.warning(t('loginRequired'));
       setTimeout(() => {
         onClose();
         router.push(buildLoginUrlFromHere());
@@ -128,7 +130,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
     }
 
     if (!title.trim() || !content.trim() || !categoryId) {
-      toast.warning(' Vui lòng điền đầy đủ tiêu đề, nội dung và chọn danh mục!');
+      toast.warning(t('missingFields'));
       return;
     }
 
@@ -149,12 +151,12 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
       show={show}
       onHide={onClose}
       size="xl"
-      title={isEditing ? 'Chỉnh sửa bài viết' : 'Tạo bài viết mới'}
+      title={isEditing ? t('editTitle') : t('createTitle')}
       footer={
         <ModalActionFooter
-          cancelLabel="Hủy bỏ"
-          submitLabel={isEditing ? 'Lưu thay đổi' : 'Đăng bài ngay'}
-          loadingLabel="Đang xử lý..."
+          cancelLabel={t('cancel')}
+          submitLabel={isEditing ? t('submitEdit') : t('submitCreate')}
+          loadingLabel={t('processing')}
           loading={loading}
           onCancel={onClose}
           onSubmit={handleSubmit}
@@ -163,7 +165,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
     >
 
       <div className={cx('formGroup')}>
-        <label className={cx('label')}>Tiêu đề bài viết</label>
+        <label className={cx('label')}>{t('titleLabel')}</label>
         <div className={cx('inputWrapper')}>
           <span className={cx('inputIcon')}>
             <FaEdit />
@@ -171,7 +173,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
           <input
             type="text"
             className={cx('inputControl')}
-            placeholder="Nhập tiêu đề hấp dẫn cho bài viết..."
+            placeholder={t('titlePlaceholder')}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             disabled={loading}
@@ -181,7 +183,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
 
       <div className={cx('row', 'mt-4')}>
         <div className={cx('col', 'formGroup')}>
-          <label className={cx('label')}>Danh mục</label>
+          <label className={cx('label')}>{t('categoryLabel')}</label>
           <div className={cx('inputWrapper')}>
             <span className={cx('inputIcon')}>
               <FaTag />
@@ -192,7 +194,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
               onChange={(e) => setCategoryId(e.target.value)}
               disabled={loading}
             >
-              <option value="">Chọn danh mục...</option>
+              <option value="">{t('categoryPlaceholder')}</option>
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -205,7 +207,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
 
       <div className={cx('row', 'mt-4')}>
         <div className={cx('col', 'formGroup')}>
-          <label className={cx('label')}>Ảnh bìa (Upload từ máy tính)</label>
+          <label className={cx('label')}>{t('thumbnailUploadLabel')}</label>
           <input
             type="file"
             accept="image/*"
@@ -215,11 +217,11 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
             style={{ padding: '1rem', fontSize: 'var(--font-size-ssm)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)' }}
           />
           {thumbnailFile && (
-            <small className="text-muted d-block mt-2">Đã chọn: {thumbnailFile.name}</small>
+            <small className="text-muted d-block mt-2">{t('thumbnailSelected', { name: thumbnailFile.name })}</small>
           )}
         </div>
         <div className={cx('col', 'formGroup')}>
-          <label className={cx('label')}>Hoặc dán Link (URL) ảnh bìa</label>
+          <label className={cx('label')}>{t('thumbnailUrlLabel')}</label>
           <div className={cx('inputWrapper')}>
             <span className={cx('inputIcon')}>
               <FaImage />
@@ -227,7 +229,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
             <input
               type="text"
               className={cx('inputControl')}
-              placeholder="Dán link ảnh bìa tại đây..."
+              placeholder={t('thumbnailUrlPlaceholder')}
               value={thumbnailUrl}
               onChange={(e) => setThumbnailUrl(e.target.value)}
               disabled={loading}
@@ -238,13 +240,13 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
       <div className={cx('row', 'mt-1')}>
         <div className={cx('col')}>
           <small className="text-primary" style={{ fontStyle: 'italic' }}>
-            * Lưu ý: Nếu bạn chọn cả Upload ảnh và dán Link URL, hệ thống sẽ ưu tiên sử dụng ảnh Upload.
+            {t('thumbnailNote')}
           </small>
         </div>
       </div>
 
       <div className={cx('formGroup', 'mt-4')}>
-        <label className={cx('label')}>Nội dung chi tiết</label>
+        <label className={cx('label')}>{t('contentLabel')}</label>
         <div className={cx('quillWrapper')}>
           <RichTextEditor
             ref={quillRef}
@@ -253,7 +255,7 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
             onChange={setContent}
             modules={quillModules}
             formats={quillFormats}
-            placeholder="Viết nội dung bài viết tại đây..."
+            placeholder={t('contentPlaceholder')}
             style={{ height: '30rem', marginBottom: '5rem' }}
           />
         </div>

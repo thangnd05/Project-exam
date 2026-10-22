@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import {
   Bar,
   CartesianGrid,
@@ -14,7 +15,7 @@ import {
   YAxis,
 } from 'recharts';
 import { planStageLabel, planStatusLabel } from '@/app/features/learning-plans/planLabels';
-import styles from '@/app/(user)/learning-plans/compare/PlanComparison.module.scss';
+import styles from '@/app/[locale]/(user)/learning-plans/compare/PlanComparison.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
 
 export type PlanComparisonChartRow = {
@@ -50,6 +51,7 @@ function PlanComparisonTooltip({
   active?: boolean;
   payload?: { payload?: PlanComparisonChartRow }[];
 }) {
+  const t = useTranslations('LearningPlans');
   if (!active || !payload?.length) {
     return null;
   }
@@ -62,26 +64,26 @@ function PlanComparisonTooltip({
     <div className={cx('chartTooltip')}>
       <p className={cx('chartTooltipTitle')}>{row.label}</p>
       <p>
-        <strong>Độ sẵn sàng ban đầu:</strong> {row.readiness}%
+        <strong>{t('common.baselineReadiness')}</strong> {row.readiness}%
       </p>
       <p>
-        <strong>Trạng thái:</strong> {planStatusLabel(row.status)}
+        <strong>{t('compareCharts.status')}</strong> {planStatusLabel(t, row.status)}
       </p>
       {row.planStage && (
         <p>
-          <strong>Giai đoạn:</strong> {planStageLabel(row.planStage)}
+          <strong>{t('common.stage')}</strong> {planStageLabel(t, row.planStage)}
         </p>
       )}
       {row.diffVsPrev != null && (
         <p>
-          <strong>So với lộ trình trước:</strong>{' '}
+          <strong>{t('compareCharts.vsPrev')}</strong>{' '}
           {row.diffVsPrev > 0 ? '+' : ''}
           {row.diffVsPrev}%
         </p>
       )}
       {row.createdAt && (
         <p>
-          <strong>Tạo:</strong> {row.createdAt}
+          <strong>{t('common.created')}</strong> {row.createdAt}
         </p>
       )}
     </div>
@@ -94,6 +96,7 @@ type PlanComparisonChartsProps = {
 };
 
 function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsProps) {
+  const t = useTranslations('LearningPlans');
   if (!chartData.length) {
     return null;
   }
@@ -109,20 +112,20 @@ function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsP
     <div className={cx('chartsSection')}>
       <div className={cx('statsRow')}>
         <div className={cx('statTile')}>
-          <span className={cx('statTileLabel')}>Số plan</span>
+          <span className={cx('statTileLabel')}>{t('compareCharts.planCount')}</span>
           <strong className={cx('statTileValue')}>{chartData.length}</strong>
         </div>
         <div className={cx('statTile')}>
-          <span className={cx('statTileLabel')}>Sẵn sàng ban đầu</span>
+          <span className={cx('statTileLabel')}>{t('compareCharts.baseline')}</span>
           <strong className={cx('statTileValue')}>{first}%</strong>
         </div>
         <div className={cx('statTile', 'statTileHighlight')}>
-          <span className={cx('statTileLabel')}>Sẵn sàng mới nhất</span>
+          <span className={cx('statTileLabel')}>{t('compareCharts.latest')}</span>
           <strong className={cx('statTileValue')}>{last}%</strong>
         </div>
         {totalDelta != null && chartData.length > 1 && (
           <div className={cx('statTile')}>
-            <span className={cx('statTileLabel')}>Tăng từ plan đầu</span>
+            <span className={cx('statTileLabel')}>{t('compareCharts.growth')}</span>
             <strong
               className={cx('statTileValue', {
                 statTileDeltaUp: totalDelta > 0,
@@ -136,7 +139,7 @@ function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsP
         )}
         {activePlan && (
           <div className={cx('statTile')}>
-            <span className={cx('statTileLabel')}>Đang học</span>
+            <span className={cx('statTileLabel')}>{t('compareCharts.active')}</span>
             <strong className={cx('statTileValue')}>{activePlan.label}</strong>
           </div>
         )}
@@ -145,12 +148,12 @@ function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsP
       <div className={cx('chartCard')}>
         <div className={cx('chartCardHeader')}>
           <h3 className={cx('chartCardTitle')}>
-            Tiến triển độ sẵn sàng qua các lộ trình
+            {t('compareCharts.chartTitle')}
             {examTypeName ? ` · ${examTypeName}` : ''}
           </h3>
         </div>
         <p className={cx('chartCardDesc')}>
-          Trục ngang: thứ tự lộ trình (1 → mới nhất). Cột = độ sẵn sàng ban đầu khi tạo lộ trình từ bài thi thử.
+          {t('compareCharts.chartDesc')}
         </p>
 
         <div className={cx('chartContainer')}>
@@ -176,8 +179,8 @@ function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsP
               <Legend
                 wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
                 formatter={(value) => {
-                  if (value === 'readiness') return 'Độ sẵn sàng ban đầu';
-                  if (value === 'diffVsPrev') return 'Chênh so với lộ trình trước';
+                  if (value === 'readiness') return t('compareCharts.legendReadiness');
+                  if (value === 'diffVsPrev') return t('compareCharts.legendDiffVsPrev');
                   return value;
                 }}
               />
@@ -209,8 +212,7 @@ function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsP
         </div>
 
         <p className={cx('chartLegendNote')}>
-          Xanh dương = đang học · xanh lá = hoàn thành · xám = đã thay · đỏ = đã bỏ.
-          Mốc ban đầu không đổi khi qua ải  chỉ bài thi thử mới + lộ trình mới mới tăng độ sẵn sàng.
+          {t('compareCharts.note')}
         </p>
       </div>
     </div>

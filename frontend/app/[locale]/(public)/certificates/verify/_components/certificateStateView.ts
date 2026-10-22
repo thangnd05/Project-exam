@@ -2,11 +2,16 @@ import { BadgeCheck, Clock, ShieldAlert, ShieldX, type LucideIcon } from 'lucide
 
 import { CertificateVerifyState } from '@/app/enums';
 
+// heading/message là key trong namespace Certificates, component tự dịch bằng t().
+export type CertificateStateMessageKey =
+  | `state.${CertificateVerifyState}.heading`
+  | `state.${CertificateVerifyState}.message`;
+
 export type CertificateStateView = {
   icon: LucideIcon;
   tone: string;
-  heading: string;
-  message: string;
+  heading: CertificateStateMessageKey;
+  message: CertificateStateMessageKey;
   watermark?: string;
 };
 
@@ -14,28 +19,28 @@ export const CERTIFICATE_STATE_VIEW: Record<CertificateVerifyState, CertificateS
   VALID: {
     icon: BadgeCheck,
     tone: 'valid',
-    heading: 'Chứng chỉ hợp lệ',
-    message: 'Chứng chỉ này do hệ thống cấp và đang còn hiệu lực.',
+    heading: 'state.VALID.heading',
+    message: 'state.VALID.message',
   },
   REVOKED: {
     icon: ShieldX,
     tone: 'invalid',
-    heading: 'Chứng chỉ đã bị thu hồi',
-    message: 'Chứng chỉ từng được cấp nhưng đã bị thu hồi, không còn giá trị sử dụng.',
+    heading: 'state.REVOKED.heading',
+    message: 'state.REVOKED.message',
     watermark: 'REVOKED',
   },
   EXPIRED: {
     icon: Clock,
     tone: 'warning',
-    heading: 'Chứng chỉ đã hết hạn',
-    message: 'Chứng chỉ này đã quá thời hạn hiệu lực.',
+    heading: 'state.EXPIRED.heading',
+    message: 'state.EXPIRED.message',
     watermark: 'EXPIRED',
   },
   NOT_FOUND: {
     icon: ShieldAlert,
     tone: 'invalid',
-    heading: 'Không tìm thấy chứng chỉ',
-    message: 'Không có chứng chỉ nào mang mã này. Hãy kiểm tra lại mã tra cứu.',
+    heading: 'state.NOT_FOUND.heading',
+    message: 'state.NOT_FOUND.message',
   },
 };
 

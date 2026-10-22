@@ -1,6 +1,7 @@
 import { queryClient } from '@/app/configs/queryClient';
 import { claimGuestTests } from '@/app/apis/userTestApi';
 import { getGuestSessionId, clearGuestSessionId, setGuestClaimIntent, takeGuestClaimIntent } from '@/app/utils/guestSession';
+import { localizeHref, splitLocale } from '@/app/i18n/routing';
 
 const OAUTH_REDIRECT_KEY = 'postLoginRedirect';
 
@@ -22,7 +23,10 @@ const isInternalPath = (target: string): boolean => {
 const isSafeRedirect = (target: string | null | undefined): target is string =>
   typeof target === 'string'
   && isInternalPath(target)
-  && !AUTH_PAGES.some((p) => target === p || target.startsWith(`${p}?`) || target.startsWith(`${p}/`));
+  && !AUTH_PAGES.some((p) => {
+    const bare = splitLocale(target.split('?')[0]).pathname;
+    return bare === p || bare.startsWith(`${p}/`);
+  });
 
 export const getRedirectTarget = (searchParams: SearchParamsLike | null | undefined, fallback = '/'): string => {
   const from = searchParams?.get?.('from');
@@ -44,12 +48,13 @@ export const buildLoginUrl = (
 export const buildGuestSignupUrl = (from: string): string =>
   buildLoginUrl(from, { mode: 'signup' });
 
-// Đăng nhập xong quay lại đúng trang đang đứng thay vì rơi về trang chủ.
-export const buildLoginUrlFromHere = (flash?: string): string =>
-  buildLoginUrl(
-    typeof window === 'undefined' ? null : window.location.pathname + window.location.search,
-    { flash },
-  );
+// Đăng nhập xong quay lại đúng trang đang đứng thay vì rơi về trang chủ. Kết quả dùng cho
+// window.location (không qua router của app/i18n) nên tự gắn ngôn ngữ của trang hiện tại.
+export const buildLoginUrlFromHere = (flash?: string): string => {
+  if (typeof window === 'undefined') return buildLoginUrl(null, { flash });
+  const { locale, pathname } = splitLocale(window.location.pathname);
+  return localizeHref(buildLoginUrl(pathname + window.location.search, { flash }), locale);
+};
 
 export const saveOAuthRedirect = (target: string | null | undefined): void => {
   if (typeof window === 'undefined' || !target || target === '/') return;

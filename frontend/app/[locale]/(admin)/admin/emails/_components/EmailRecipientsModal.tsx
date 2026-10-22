@@ -3,15 +3,16 @@
 import {useState} from 'react';
 import {RefreshCw} from 'lucide-react';
 import {toast} from 'react-toastify';
+import {useLocale, useTranslations} from 'next-intl';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import {AdminFieldError, AdminTable, StatCard, StatCardGroup} from '@/app/(admin)/_components/common';
-import type {AdminTableColumn} from '@/app/(admin)/_components/common/AdminTable';
+import {AdminFieldError, AdminTable, StatCard, StatCardGroup} from '@/app/[locale]/(admin)/_components/common';
+import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import {EmailStatus, EmailType} from '@/app/enums';
 import type {EmailRecipientResponse, EmailResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
-import {useEmailMutations, useEmailRecipients} from '@/app/(admin)/admin/emails/_hooks/useAdminEmails';
+import {useEmailMutations, useEmailRecipients} from '@/app/[locale]/(admin)/admin/emails/_hooks/useAdminEmails';
 
 const PAGE_SIZE = 20;
 
@@ -28,6 +29,8 @@ type EmailRecipientsModalProps = {
 };
 
 function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps) {
+  const t = useTranslations('AdminSystem.emails.recipients');
+  const locale = useLocale();
   const [page, setPage] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
   const [retrying, setRetrying] = useState(false);
@@ -52,45 +55,45 @@ function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps)
     setRetrying(true);
     try {
       await retryFailed(email!.emailId);
-      toast.info('Đã đưa các email lỗi vào hàng gửi lại.');
+      toast.info(t('retryQueued'));
     } catch (error) {
-      setErrorMessage(getApiErrorMessage(error, 'Không gửi lại được.'));
+      setErrorMessage(getApiErrorMessage(error, t('retryFailed')));
     } finally {
       setRetrying(false);
     }
   };
 
-  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString('vi-VN') : '-');
+  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN') : '-');
 
   const columns: AdminTableColumn[] = [
     {
       key: 'recipient',
-      header: 'Người nhận',
+      header: t('recipient'),
       render: (row: EmailRecipientResponse) => (
         <div className="d-flex flex-column">
-          <span className="fw-semibold">{row.fullName || '(tài khoản đã xóa)'}</span>
+          <span className="fw-semibold">{row.fullName || t('deletedAccount')}</span>
           <span className="text-muted small">{row.toEmail}</span>
         </div>
       ),
     },
     {
       key: 'status',
-      header: 'Trạng thái',
+      header: t('status'),
       render: (row: EmailRecipientResponse) => (
         <span className={`badge ${STATUS_VARIANTS[row.status as EmailStatus] || 'bg-secondary'}`}>
-          {row.statusLabel}
+          {row.status && row.status in STATUS_VARIANTS ? t(`statuses.${row.status as EmailStatus}`) : row.statusLabel}
         </span>
       ),
     },
     {
       key: 'error',
-      header: 'Lỗi',
+      header: t('error'),
       render: (row: EmailRecipientResponse) => (
         <span className="small text-danger">{row.errorMessage || '-'}</span>
       ),
     },
-    {key: 'sentAt', header: 'Gửi lúc', render: (row: EmailRecipientResponse) => formatDate(row.sentAt)},
-    {key: 'createdAt', header: 'Xếp hàng lúc', render: (row: EmailRecipientResponse) => formatDate(row.createdAt)},
+    {key: 'sentAt', header: t('sentAt'), render: (row: EmailRecipientResponse) => formatDate(row.sentAt)},
+    {key: 'createdAt', header: t('queuedAt'), render: (row: EmailRecipientResponse) => formatDate(row.createdAt)},
   ];
 
   const canRetry = email?.type === EmailType.MANUAL && (email?.failedCount ?? 0) > 0;
@@ -99,26 +102,26 @@ function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps)
     <BaseModal
       show={show}
       onClose={onClose}
-      title={`Nhật ký gửi: ${email?.name || email?.subject || ''}`}
+      title={t('title', {name: email?.name || email?.subject || ''})}
       maxWidth={900}
     >
       <StatCardGroup>
-        <StatCard label="Tổng lượt gửi" value={email?.totalCount ?? 0} />
-        <StatCard label="Thành công" value={email?.sentCount ?? 0} />
-        <StatCard label="Lỗi" value={email?.failedCount ?? 0} />
-        <StatCard label="Đang chờ" value={email?.pendingCount ?? 0} />
+        <StatCard label={t('stats.total')} value={email?.totalCount ?? 0} />
+        <StatCard label={t('stats.sent')} value={email?.sentCount ?? 0} />
+        <StatCard label={t('stats.failed')} value={email?.failedCount ?? 0} />
+        <StatCard label={t('stats.pending')} value={email?.pendingCount ?? 0} />
       </StatCardGroup>
 
       <div className="d-flex justify-content-end my-3">
         {canRetry && (
           <ButtonPrime variant="outline" onClick={handleRetry} disabled={retrying}>
             <RefreshCw size={16} className="me-1" />
-            Gửi lại {email!.failedCount} email lỗi
+            {t('retry', {count: email!.failedCount})}
           </ButtonPrime>
         )}
         {email?.type === EmailType.AUTO && (
           <span className="small text-muted">
-            Email tự động không gửi lại được  nội dung phụ thuộc dữ liệu của lần gửi đó.
+            {t('autoNoRetry')}
           </span>
         )}
       </div>
@@ -128,12 +131,12 @@ function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps)
         data={recipientPage.content}
         loading={isLoading}
         getRowKey={(row: EmailRecipientResponse) => row.recipientId}
-        emptyText="Email này chưa gửi cho ai."
+        emptyText={t('empty')}
         page={recipientPage.currentPage}
         totalPages={recipientPage.totalPages}
         totalElements={recipientPage.totalElements}
         onPageChange={setPage}
-        itemLabel="lượt gửi"
+        itemLabel={t('itemLabel')}
       />
 
       <AdminFieldError message={errorMessage} />

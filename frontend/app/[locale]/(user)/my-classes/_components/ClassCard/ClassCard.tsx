@@ -1,6 +1,7 @@
 'use client';
 
 import { IoPeopleOutline, IoKeyOutline, IoPersonOutline } from 'react-icons/io5';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import styles from './ClassCard.module.scss';
@@ -32,6 +33,7 @@ type ClassCardProps = {
 };
 
 const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }: ClassCardProps) => {
+  const t = useTranslations('Classes');
   const classQr = classData.classQr ;
 
   const handleCopyCode = async (e: React.MouseEvent) => {
@@ -39,9 +41,9 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
     if (!classQr) return;
     try {
       await copyToClipboard(classQr);
-      toast.success('Đã copy mã lớp!');
+      toast.success(t('classCard.copied'));
     } catch {
-      toast.error('Copy mã lớp thất bại');
+      toast.error(t('classCard.copyFailed'));
     }
   };
 
@@ -55,20 +57,20 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
       <div className={cx('info-item')}>
         <IoPersonOutline />
         {role === 'teacher' ? (
-          <span>Vai trò: <strong>Giáo viên</strong></span>
+          <span>{t.rich('classCard.role', { strong: (chunks) => <strong>{chunks}</strong> })}</span>
         ) : (
-          <span>Giáo viên: <strong>{classData.teacherName || 'N/A'}</strong></span>
+          <span>{t.rich('classCard.teacherName', { name: classData.teacherName || 'N/A', strong: (chunks) => <strong>{chunks}</strong> })}</span>
         )}
       </div>
 
       <div className={cx('info-item')}>
         <IoPeopleOutline />
-        <span>Mã lớp:</span>
+        <span>{t('classCard.classCode')}</span>
         <button
           type="button"
           className={cx('class-id')}
           onClick={handleCopyCode}
-          title="Nhấn để copy mã lớp"
+          title={t('classCard.copyTitle')}
         >
           <IoKeyOutline size={14} />
           {classQr}
@@ -76,7 +78,7 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
       </div>
 
       <button className={cx('btn-view')}>
-        {role === 'teacher' ? 'Xem các bài test' : 'Làm bài kiểm tra'}
+        {role === 'teacher' ? t('classCard.viewTests') : t('classCard.takeTests')}
       </button>
 
       {role === 'teacher' && (
@@ -87,7 +89,7 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
             onManageMembers?.(e, classData.classId);
           }}
         >
-          Quản lý học sinh
+          {t('common.manageStudents')}
         </button>
       )}
     </div>

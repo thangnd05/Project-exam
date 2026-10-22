@@ -1,7 +1,9 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useCallback, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import { Spinner } from 'react-bootstrap';
 import {
@@ -17,7 +19,7 @@ import {
 import classNames from 'classnames/bind';
 
 import {useExamTypeById} from '@/app/features/exam-types/hooks/useExamTypes';
-import {useOwnExamTypeLayout, useUpdateExamTypeLayout} from '@/app/(admin)/admin/exam-types/_hooks/useAdminExamTypes';
+import {useOwnExamTypeLayout, useUpdateExamTypeLayout} from '@/app/[locale]/(admin)/admin/exam-types/_hooks/useAdminExamTypes';
 import { resolveLayoutConfig } from '@/app/features/exam-layout/resolveLayoutConfig';
 import {
   defaultLayoutConfig,
@@ -29,11 +31,7 @@ import {
 } from '@/app/features/exam-layout/layoutSchema';
 import type { LayoutBlock, LayoutConfig } from '@/app/features/exam-layout/layoutSchema';
 import ExamLayoutRenderer from '@/app/features/exam-layout/ExamLayoutRenderer';
-import {
-  sampleExamData,
-  sampleAllQuestions,
-  sampleQuestionIndexMap,
-} from '@/app/(admin)/admin/exam-types/[examTypeId]/layout/_lib/sampleExamData';
+import { buildSampleExam } from '@/app/[locale]/(admin)/admin/exam-types/[examTypeId]/layout/_lib/sampleExamData';
 import styles from './ExamTypeLayoutEditor.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
 import { getApiErrorMessage } from '@/app/utils/apiError';
@@ -49,20 +47,30 @@ const formatTime = (seconds: number | null | undefined) => {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 };
 
-function alignOptionsFor(zone: string) {
+type AlignLabelKey = 'top' | 'middle' | 'bottom' | 'left' | 'center' | 'right';
+
+function alignOptionsFor(zone: string): Array<{ value: string; labelKey: AlignLabelKey }> {
   if (zone === ZONES.LEFT || zone === ZONES.RIGHT) {
     return [
-      { value: 'start', label: 'Trên' },
-      { value: 'center', label: 'Giữa' },
-      { value: 'end', label: 'Dưới' },
+      { value: 'start', labelKey: 'top' },
+      { value: 'center', labelKey: 'middle' },
+      { value: 'end', labelKey: 'bottom' },
     ];
   }
   return [
-    { value: 'left', label: 'Trái' },
-    { value: 'center', label: 'Giữa' },
-    { value: 'right', label: 'Phải' },
+    { value: 'left', labelKey: 'left' },
+    { value: 'center', labelKey: 'center' },
+    { value: 'right', labelKey: 'right' },
   ];
 }
+
+// Nhãn dịch cho các vùng/yếu tố đã biết; loại lạ thì giữ nhãn từ BLOCK_META/ZONE_META.
+const ZONE_LABEL_KEYS = ['TOP', 'LEFT', 'RIGHT', 'BOTTOM', 'FLOAT'] as const;
+const BLOCK_LABEL_KEYS = ['timer', 'progress', 'submit', 'questionNav', 'banner', 'title'] as const;
+const isZoneLabelKey = (key: string): key is (typeof ZONE_LABEL_KEYS)[number] =>
+  (ZONE_LABEL_KEYS as readonly string[]).includes(key);
+const isBlockLabelKey = (key: string): key is (typeof BLOCK_LABEL_KEYS)[number] =>
+  (BLOCK_LABEL_KEYS as readonly string[]).includes(key);
 function alignDefaultFor(zone: string) {
   if (zone === ZONES.LEFT || zone === ZONES.RIGHT) return 'start';
   if (zone === ZONES.BOTTOM) return 'right';
@@ -80,6 +88,22 @@ function normalizeOrders(blocks: LayoutBlock[]) {
 function ExamTypeLayoutEditor() {
   const { examTypeId } = useParams<{examTypeId: string}>();
   const router = useRouter();
+  const t = useTranslations('AdminContent.layoutEditor');
+
+  const zoneLabel = (key: string, fallback: string) => (isZoneLabelKey(key) ? t(`zones.${key}`) : fallback);
+  const blockLabel = (type: string) =>
+    isBlockLabelKey(type) ? t(`blocks.${type}`) : BLOCK_META[type]?.label || type;
+
+  const { sampleExamData, sampleAllQuestions, sampleQuestionIndexMap } = useMemo(
+    () =>
+      buildSampleExam({
+        passage: t('sample.passage'),
+        questionWithPassage: t('sample.questionWithPassage'),
+        questionWithoutPassage: t('sample.questionWithoutPassage'),
+        answer: (label) => t('sample.answer', { label }),
+      }),
+    [t],
+  );
 
   const [config, setConfig] = useState<LayoutConfig>(defaultLayoutConfig);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -115,8 +139,8 @@ function ExamTypeLayoutEditor() {
         const rest = blocks.filter((b) => b.id !== blockId);
         const relocated = { ...moving, zone: targetZone };
         if (targetBlockId && targetBlockId !== blockId) {
-          const t = rest.findIndex((b) => b.id === targetBlockId);
-          rest.splice(t < 0 ? rest.length : t, 0, relocated);
+          const targetIndex = rest.findIndex((b) => b.id === targetBlockId);
+          rest.splice(targetIndex < 0 ? rest.length : targetIndex, 0, relocated);
           return rest;
         }
 
@@ -190,12 +214,12 @@ function ExamTypeLayoutEditor() {
     saveLayout.mutate(
       {examTypeId, config: JSON.stringify(config)},
       {
-        onSuccess: () => toast.success('Đã lưu giao diện làm bài cho loại đề này.'),
+        onSuccess: () => toast.success(t('saveSuccess')),
         onError: (err: unknown) =>
-          toast.error(getApiErrorMessage(err, 'Lưu thất bại. Vui lòng thử lại.')),
+          toast.error(getApiErrorMessage(err, t('saveFailed'))),
       },
     );
-  }, [config, examTypeId, saveLayout]);
+  }, [config, examTypeId, saveLayout, t]);
 
   const handleDropOnZone = (zone: string) => {
     if (dragId) moveBlock(dragId, zone);
@@ -223,7 +247,7 @@ function ExamTypeLayoutEditor() {
   if (loading) {
     return (
       <div className="text-center py-5">
-        <Spinner /> <span className="ms-2">Đang tải giao diện...</span>
+        <Spinner /> <span className="ms-2">{t('loading')}</span>
       </div>
     );
   }
@@ -233,22 +257,24 @@ function ExamTypeLayoutEditor() {
       <div className={cx('header')}>
         <div className={cx('headerLeft')}>
           <button className={cx('backBtn')} onClick={() => router.back()}>
-            <ArrowLeft size={16} /> Quay lại
+            <ArrowLeft size={16} /> {t('back')}
           </button>
           <div>
-            <h2>Giao diện làm bài</h2>
+            <h2>{t('title')}</h2>
             <div className={cx('subtitle')}>
-              Loại đề: <strong>{examTypeName || examTypeId}</strong>  kéo các yếu tố vào vùng
-              bất kỳ.
+              {t.rich('subtitle', {
+                name: examTypeName || examTypeId,
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
             </div>
           </div>
         </div>
         <div className={cx('headerActions')}>
           <button className={cx('dangerBtn')} onClick={resetDefault}>
-            <RotateCcw size={16} /> Về mặc định
+            <RotateCcw size={16} /> {t('resetDefault')}
           </button>
           <button className="btn btn-primary d-inline-flex align-items-center gap-2" onClick={handleSave} disabled={saving}>
-            {saving ? <Spinner size="sm" /> : <Save size={16} />} Lưu
+            {saving ? <Spinner size="sm" /> : <Save size={16} />} {t('save')}
           </button>
         </div>
       </div>
@@ -257,8 +283,8 @@ function ExamTypeLayoutEditor() {
 
         <div className={cx('panel')}>
           <div className={cx('section')}>
-            <h3>Bố cục theo vùng</h3>
-            <div className={cx('hint')}>Kéo một yếu tố rồi thả vào vùng khác để đổi vị trí.</div>
+            <h3>{t('zonesSection')}</h3>
+            <div className={cx('hint')}>{t('zonesHint')}</div>
             {ZONE_META.map((zone) => (
               <div
                 key={zone.key}
@@ -270,12 +296,11 @@ function ExamTypeLayoutEditor() {
                 onDragLeave={() => setDropZone((z) => (z === zone.key ? null : z))}
                 onDrop={() => handleDropOnZone(zone.key)}
               >
-                <span className={cx('zoneTitle')}>{zone.label}</span>
+                <span className={cx('zoneTitle')}>{zoneLabel(zone.key, zone.label)}</span>
                 {blocksByZone[zone.key].length === 0 && (
-                  <span className={cx('zoneEmpty')}>- thả yếu tố vào đây </span>
+                  <span className={cx('zoneEmpty')}>{t('zoneEmpty')}</span>
                 )}
                 {blocksByZone[zone.key].map((block) => {
-                  const meta = BLOCK_META[block.type] || { label: block.type };
                   const addable = ADDABLE_BLOCK_TYPES.includes(block.type);
                   return (
                     <div
@@ -298,12 +323,12 @@ function ExamTypeLayoutEditor() {
                         <GripVertical size={16} />
                       </span>
                       <span className={cx('blockLabel')}>
-                        {meta.label}
+                        {blockLabel(block.type)}
                       </span>
                       <button
                         type="button"
                         className={cx('iconBtn')}
-                        title={block.visible === false ? 'Hiện' : 'Ẩn'}
+                        title={block.visible === false ? t('show') : t('hide')}
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleVisible(block.id);
@@ -315,7 +340,7 @@ function ExamTypeLayoutEditor() {
                         <button
                           type="button"
                           className={cx('iconBtn')}
-                          title="Xoá"
+                          title={t('remove')}
                           onClick={(e) => {
                             e.stopPropagation();
                             removeBlock(block.id);
@@ -332,13 +357,12 @@ function ExamTypeLayoutEditor() {
           </div>
 
           <div className={cx('section')}>
-            <h3>Thêm yếu tố</h3>
+            <h3>{t('addSection')}</h3>
             <div className={cx('paletteRow')}>
               {ADDABLE_BLOCK_TYPES.map((type) => {
-                const meta = BLOCK_META[type];
                 return (
                   <button key={type} className={cx('paletteBtn')} onClick={() => addBlock(type)}>
-                    <Plus size={14} /> {meta.label}
+                    <Plus size={14} /> {blockLabel(type)}
                   </button>
                 );
               })}
@@ -348,8 +372,8 @@ function ExamTypeLayoutEditor() {
 
         <div className={cx('previewWrap')}>
           <div className={cx('previewBar')}>
-            <span>Xem trước (dữ liệu mẫu)</span>
-            <span>Nhấp vào yếu tố để chỉnh</span>
+            <span>{t('preview')}</span>
+            <span>{t('previewHint')}</span>
           </div>
           <div className={cx('previewCanvas')} onClick={() => setSelectedId(null)}>
             <ExamLayoutRenderer
@@ -374,9 +398,9 @@ function ExamTypeLayoutEditor() {
 
         <div className={cx('panel')}>
           <div className={cx('section')}>
-            <h3>Chủ đề (theme)</h3>
+            <h3>{t('themeSection')}</h3>
             <div className={cx('field')}>
-              <label>Màu chủ đạo</label>
+              <label>{t('primaryColor')}</label>
               <input
                 type="color"
                 value={config.theme.primary || brandColors.primary}
@@ -384,12 +408,12 @@ function ExamTypeLayoutEditor() {
               />
             </div>
             <div className={cx('field')}>
-              <label>Font chữ</label>
+              <label>{t('font')}</label>
               <select
                 value={config.theme.font || ''}
                 onChange={(e) => patchTheme({ font: e.target.value || null })}
               >
-                <option value="">Mặc định</option>
+                <option value="">{t('fontDefault')}</option>
                 {FONT_OPTIONS.map((f) => (
                   <option key={f} value={f}>
                     {f}
@@ -398,7 +422,7 @@ function ExamTypeLayoutEditor() {
               </select>
             </div>
             <div className={cx('field')}>
-              <label>Bo góc (px)</label>
+              <label>{t('radius')}</label>
               <input
                 type="number"
                 min="0"
@@ -411,51 +435,51 @@ function ExamTypeLayoutEditor() {
           </div>
 
           <div className={cx('section')}>
-            <h3>Khối câu hỏi</h3>
+            <h3>{t('questionAreaSection')}</h3>
             <div className={cx('field')}>
-              <label>Kiểu làm bài</label>
+              <label>{t('navigationMode')}</label>
               <select
                 value={config.questionArea.navigationMode || 'scroll'}
                 onChange={(e) => patchQuestionArea({ navigationMode: e.target.value })}
               >
-                <option value="scroll">Cuộn tất cả (mặc định)</option>
-                <option value="paged">Từng câu/nhóm một (nghe tự chuyển, đọc bấm)</option>
+                <option value="scroll">{t('navigationModes.scroll')}</option>
+                <option value="paged">{t('navigationModes.paged')}</option>
               </select>
             </div>
             <div className={cx('field')}>
-              <label>Vị trí đoạn văn</label>
+              <label>{t('passagePosition')}</label>
               <select
                 value={config.questionArea.passagePosition || 'side'}
                 onChange={(e) => patchQuestionArea({ passagePosition: e.target.value })}
               >
-                <option value="side">Bên cạnh câu hỏi (2 cột)</option>
-                <option value="stacked">Trên câu hỏi (xếp dọc)</option>
+                <option value="side">{t('passagePositions.side')}</option>
+                <option value="stacked">{t('passagePositions.stacked')}</option>
               </select>
             </div>
           </div>
 
           <div className={cx('section')}>
-            <h3>Thuộc tính yếu tố</h3>
+            <h3>{t('propertiesSection')}</h3>
             {!selectedBlock && (
-              <div className={cx('emptyRight')}>Chọn một yếu tố ở cột trái hoặc trong preview.</div>
+              <div className={cx('emptyRight')}>{t('propertiesEmpty')}</div>
             )}
             {selectedBlock && (
               <>
                 <div className={cx('field')}>
-                  <label>Loại</label>
+                  <label>{t('blockType')}</label>
                   <div>
-                    {BLOCK_META[selectedBlock.type]?.label}
+                    {blockLabel(selectedBlock.type)}
                   </div>
                 </div>
                 <div className={cx('field')}>
-                  <label>Vùng</label>
+                  <label>{t('zone')}</label>
                   <select
                     value={selectedBlock.zone}
                     onChange={(e) => moveBlock(selectedBlock.id, e.target.value)}
                   >
                     {ZONE_META.map((z) => (
                       <option key={z.key} value={z.key}>
-                        {z.label}
+                        {zoneLabel(z.key, z.label)}
                       </option>
                     ))}
                   </select>
@@ -463,14 +487,14 @@ function ExamTypeLayoutEditor() {
 
                 {selectedBlock.zone !== ZONES.FLOAT && (
                   <div className={cx('field')}>
-                    <label>Canh vị trí</label>
+                    <label>{t('align')}</label>
                     <select
                       value={selectedBlock.align || alignDefaultFor(selectedBlock.zone)}
                       onChange={(e) => patchBlockField(selectedBlock.id, { align: e.target.value })}
                     >
                       {alignOptionsFor(selectedBlock.zone).map((o) => (
                         <option key={o.value} value={o.value}>
-                          {o.label}
+                          {t(`alignOptions.${o.labelKey}`)}
                         </option>
                       ))}
                     </select>
@@ -478,7 +502,7 @@ function ExamTypeLayoutEditor() {
                 )}
 
                 <div className={cx('field')}>
-                  <label>Khoảng cách quanh (px)</label>
+                  <label>{t('spacing')}</label>
                   <input
                     type="number"
                     min="0"
@@ -494,10 +518,10 @@ function ExamTypeLayoutEditor() {
 
                 {selectedBlock.type === BLOCK_TYPES.SUBMIT && (
                   <div className={cx('field')}>
-                    <label>Nhãn nút</label>
+                    <label>{t('submitLabel')}</label>
                     <input
                       value={selectedBlock.props?.label || ''}
-                      placeholder="Nộp bài thi"
+                      placeholder={t('submitLabelPlaceholder')}
                       onChange={(e) => patchBlockProps(selectedBlock.id, { label: e.target.value })}
                     />
                   </div>
@@ -506,27 +530,27 @@ function ExamTypeLayoutEditor() {
                 {selectedBlock.type === BLOCK_TYPES.QUESTION_NAV && (
                   <>
                     <div className={cx('field')}>
-                      <label>Nhãn nút mở</label>
+                      <label>{t('toggleLabel')}</label>
                       <input
                         value={selectedBlock.props?.toggleLabel || ''}
-                        placeholder="Câu hỏi"
+                        placeholder={t('toggleLabelPlaceholder')}
                         onChange={(e) =>
                           patchBlockProps(selectedBlock.id, { toggleLabel: e.target.value })
                         }
                       />
                     </div>
                     <div className={cx('field')}>
-                      <label>Nhãn nút ẩn</label>
+                      <label>{t('hideLabel')}</label>
                       <input
                         value={selectedBlock.props?.hideLabel || ''}
-                        placeholder="Ẩn"
+                        placeholder={t('hideLabelPlaceholder')}
                         onChange={(e) =>
                           patchBlockProps(selectedBlock.id, { hideLabel: e.target.value })
                         }
                       />
                     </div>
                     <div className={cx('field')}>
-                      <label>Số cột (khi ở cột bên / trên / nổi)</label>
+                      <label>{t('navColumns')}</label>
                       <input
                         type="number"
                         min="1"
@@ -544,30 +568,30 @@ function ExamTypeLayoutEditor() {
 
                 {selectedBlock.type === BLOCK_TYPES.BANNER && (
                   <div className={cx('field')}>
-                    <label>URL ảnh banner</label>
+                    <label>{t('bannerUrl')}</label>
                     <input
                       value={selectedBlock.props?.url || ''}
-                      placeholder="https://... hoặc /uploads/..."
+                      placeholder={t('bannerUrlPlaceholder')}
                       onChange={(e) => patchBlockProps(selectedBlock.id, { url: e.target.value })}
                     />
                   </div>
                 )}
 
                 <div className={cx('field')}>
-                  <label>Hiển thị</label>
+                  <label>{t('visibility')}</label>
                   <button
                     type="button"
                     className={cx('paletteBtn')}
                     onClick={() => toggleVisible(selectedBlock.id)}
                   >
                     {selectedBlock.visible === false ? <EyeOff size={14} /> : <Eye size={14} />}
-                    {selectedBlock.visible === false ? 'Đang ẩn' : 'Đang hiện'}
+                    {selectedBlock.visible === false ? t('hidden') : t('visible')}
                   </button>
                 </div>
 
                 {ADDABLE_BLOCK_TYPES.includes(selectedBlock.type) && (
                   <button className={cx('dangerBtn')} onClick={() => removeBlock(selectedBlock.id)}>
-                    <Trash2 size={14} /> Xoá yếu tố
+                    <Trash2 size={14} /> {t('removeBlock')}
                   </button>
                 )}
               </>

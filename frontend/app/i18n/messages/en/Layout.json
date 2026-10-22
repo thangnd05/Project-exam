@@ -1,0 +1,54 @@
+{
+  "nav": {
+    "mainNavigation": "Main navigation",
+    "home": "Home",
+    "examTypes": "Exam library",
+    "resources": "Resources",
+    "learningPlans": "Study plans",
+    "login": "Log in",
+    "signup": "Sign up",
+    "logout": "Log out",
+    "profile": "Profile",
+    "myCertificates": "My certificates",
+    "createTest": "Create a test",
+    "account": "Account {name}",
+    "menu": "Menu",
+    "close": "Close"
+  },
+  "streakHint": {
+    "title": "Study streak and coins",
+    "streak": "🔥 Your streak grows every day you take a test or complete a task in your study plan. Miss a day and it resets to 0.",
+    "coins": "🪙 Complete quests to earn coins, then spend them on avatar frames and badges. Tap your coin count to see quests; a red dot means a reward is waiting."
+  },
+  "appearance": {
+    "title": "Appearance",
+    "mode": "Mode",
+    "light": "Light",
+    "dark": "Dark",
+    "palette": "Color palette",
+    "paletteFrost": "Frost",
+    "paletteGold": "Gold",
+    "language": "Language"
+  },
+  "footer": {
+    "homeAria": "FrostScope - Home",
+    "tagline": "Personalized Cloud certification prep",
+    "description": "Assess your Cloud & DevOps skills, find your weak spots and prepare for certifications by focusing on exactly what you need to improve.",
+    "practice": "Practice",
+    "examTypes": "Exam library",
+    "certifications": "Certifications",
+    "leaderboard": "Leaderboard",
+    "quickTest": "Quick test",
+    "generatePlan": "Create a study plan",
+    "aboutUs": "About us",
+    "about": "About us",
+    "contact": "Contact",
+    "legal": "Legal",
+    "policy": "Policy",
+    "terms": "Terms and conditions",
+    "trademarkNote": "All related logos are trademarks of their respective owners.",
+    "copyright": "Copyright {year} FrostScope. Personalized Cloud certification prep.",
+    "language": "Language"
+  },
+  "scrollToTop": "Back to top"
+}

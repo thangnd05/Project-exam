@@ -1,6 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { Container, Spinner, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { Award, ExternalLink } from 'lucide-react';
@@ -14,10 +15,13 @@ import styles from './MyCertificates.module.scss';
 
 const cx = classNames.bind(styles);
 
-const formatDate = (value?: string) =>
-  value ? new Date(value).toLocaleDateString('vi-VN') : '--';
+const formatDate = (value: string | undefined, locale: string) =>
+  value ? new Date(value).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN') : '--';
 
 function MyCertificates() {
+  const t = useTranslations('Account');
+  const locale = useLocale();
+  const localizeHref = useLocalizeHref();
   const router = useRouter();
   const { data: certificates = [], isLoading, isError } = useMyCertificates();
 
@@ -29,12 +33,12 @@ function MyCertificates() {
     <div className={cx('wrapper')}>
       <Container>
         <PageHeader
-          title="Chứng chỉ của tôi"
-          label="Thành tích"
-          description="Chứng chỉ được cấp khi bạn đạt điểm yêu cầu ở bài thi thử toàn phần. Mỗi loại đề chỉ cấp một chứng chỉ."
+          title={t('certificates.myCertificates')}
+          label={t('myCertificates.label')}
+          description={t('myCertificates.description')}
           meta={
             <span className={cx('countBadge')}>
-              <Award size={18} /> {activeCount} chứng chỉ còn hiệu lực
+              <Award size={18} /> {t('myCertificates.activeCount', { count: activeCount })}
             </span>
           }
         />
@@ -42,23 +46,23 @@ function MyCertificates() {
         {isLoading && (
           <div className={cx('state')}>
             <Spinner animation="border" />
-            <p>Đang tải chứng chỉ...</p>
+            <p>{t('certificates.loading')}</p>
           </div>
         )}
 
         {isError && (
-          <Alert variant="danger">Không tải được danh sách chứng chỉ. Vui lòng thử lại.</Alert>
+          <Alert variant="danger">{t('myCertificates.loadFailed')}</Alert>
         )}
 
         {!isLoading && !isError && certificates.length === 0 && (
           <div className={cx('empty')}>
             <Award size={48} />
-            <h3>Bạn chưa có chứng chỉ nào</h3>
+            <h3>{t('myCertificates.emptyTitle')}</h3>
             <p>
-              Hoàn thành một bài thi thử toàn phần và đạt điểm yêu cầu để nhận chứng chỉ đầu tiên.
+              {t('myCertificates.emptyDescription')}
             </p>
             <ButtonPrime variant="primary" onClick={() => router.push('/')}>
-              Tìm bài thi thử
+              {t('myCertificates.findMockTest')}
             </ButtonPrime>
           </div>
         )}
@@ -74,7 +78,7 @@ function MyCertificates() {
                     type="button"
                     className={cx('preview', { dimmed: revoked || expired })}
                     onClick={() => router.push(`/certificates/${certificate.certificateId}`)}
-                    aria-label={`Xem chứng chỉ ${certificate.design?.title || ''}`}
+                    aria-label={t('myCertificates.viewAria', { title: certificate.design?.title || '' })}
                   >
                     <CertificateCanvas
                       design={certificate.design}
@@ -88,11 +92,11 @@ function MyCertificates() {
 
                   <div className={cx('cardBody')}>
                     <h3 className={cx('cardTitle')}>
-                      {certificate.design?.title || 'Chứng chỉ'}
+                      {certificate.design?.title || t('myCertificates.fallbackTitle')}
                     </h3>
                     <p className={cx('cardMeta')}>
-                      Cấp ngày {formatDate(certificate.issuedAt)}
-                      {certificate.expiresAt && ` · Hết hạn ${formatDate(certificate.expiresAt)}`}
+                      {t('myCertificates.issuedOn', { date: formatDate(certificate.issuedAt, locale) })}
+                      {certificate.expiresAt && ` · ${t('myCertificates.expiresOn', { date: formatDate(certificate.expiresAt, locale) })}`}
                     </p>
                     <div className={cx('cardActions')}>
                       <ButtonPrime
@@ -100,17 +104,17 @@ function MyCertificates() {
                         size="sm"
                         onClick={() => router.push(`/certificates/${certificate.certificateId}`)}
                       >
-                        Xem & tải về
+                        {t('myCertificates.viewDownload')}
                       </ButtonPrime>
                       <ButtonPrime
                         as="a"
                         variant="ghost"
                         size="sm"
-                        href={`/certificates/verify/${certificate.certificateCode}`}
+                        href={localizeHref(`/certificates/verify/${certificate.certificateCode}`)}
                         target="_blank"
                         rel="noreferrer"
                       >
-                        <ExternalLink size={14} /> Trang tra cứu
+                        <ExternalLink size={14} /> {t('myCertificates.verifyPage')}
                       </ButtonPrime>
                     </div>
                   </div>

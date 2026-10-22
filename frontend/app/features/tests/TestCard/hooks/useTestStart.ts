@@ -1,8 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { getTestStatus } from '@/app/features/tests/testStatusHelper';
+import { getTestStatus, splitCountdown } from '@/app/features/tests/testStatusHelper';
 import type { TestModeSelection } from '@/app/features/tests/TestModeModal/TestModeModal';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useGuestAllowedCategories } from '@/app/features/tests/TestCard/hooks/useGuestAllowedCategories';
@@ -13,10 +14,17 @@ import { buildTestPath } from '@/app/configs/Routes';
 // Trạng thái đề + luồng bấm "Bắt đầu" (khách cần đăng nhập, chọn chế độ thi) dùng chung cho thẻ và hàng đề.
 export function useTestStart(test: TestResponse, countdowns?: Record<string, number>) {
   const router = useRouter();
+  const t = useTranslations('Tests');
   const now = new Date();
   const [showModeModal, setShowModeModal] = useState(false);
 
-  const { status, statusLabel, buttonText, canStart } = getTestStatus(test, now, countdowns);
+  // testStatusHelper trả key dịch (Tests.status.*, Tests.action.*), ở đây dịch theo ngôn ngữ đang dùng.
+  const { status, statusLabelKey, buttonKey, remainingMs, canStart } = getTestStatus(test, now, countdowns);
+  const statusLabel = t(`status.${statusLabelKey}`);
+  const buttonText =
+    buttonKey === 'opensIn'
+      ? t('action.opensIn', { time: t('action.countdown', splitCountdown(remainingMs ?? 0)) })
+      : t(`action.${buttonKey}`);
 
   // Lịch sử và bảng xếp hạng cần đăng nhập, khách bấm vào sẽ bị đẩy sang trang đăng nhập.
   const { isAuthenticated, loading: authLoading } = useAuth();
@@ -34,7 +42,7 @@ export function useTestStart(test: TestResponse, countdowns?: Record<string, num
     if (needsLogin) {
       router.push(
         buildLoginUrl(window.location.pathname + window.location.search, {
-          flash: 'Đề này cần tài khoản. Đăng nhập hoặc đăng ký miễn phí để làm bài.',
+          flash: t('loginFlash'),
         }),
       );
       return;

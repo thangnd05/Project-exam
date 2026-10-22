@@ -4,6 +4,7 @@ import { Spinner } from 'react-bootstrap';
 import { PlusCircle } from 'lucide-react';
 import { IoRocketOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import styles from '@/app/features/tests/CreateTestModal.module.scss';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
@@ -23,19 +24,20 @@ const FormFooter = ({
     onAddQuestion,
     onCancel,
     onSubmit,
-    submitLabel = 'Lưu & Xuất bản',
+    submitLabel,
     showAddBtn = true,
 }: FormFooterProps) => {
+    const t = useTranslations('TestCreator');
     return (
         <div className={cx('footer')}>
             {showAddBtn && (
                 <ButtonPrime type="button" variant="outline" size="md" onClick={onAddQuestion}>
-                    <PlusCircle size={18} /> Thêm câu hỏi
+                    <PlusCircle size={18} /> {t('formFooter.addQuestion')}
                 </ButtonPrime>
             )}
             {onCancel && (
                 <ButtonPrime type="button" variant="ghost" size="md" onClick={onCancel}>
-                    Để sau
+                    {t('formFooter.later')}
                 </ButtonPrime>
             )}
             <ButtonPrime type="button" variant="primary" size="md" onClick={onSubmit} disabled={loading}>
@@ -43,7 +45,7 @@ const FormFooter = ({
                     <Spinner size="sm" />
                 ) : (
                     <>
-                        <IoRocketOutline /> {submitLabel}
+                        <IoRocketOutline /> {submitLabel ?? t('formFooter.saveAndPublish')}
                     </>
                 )}
             </ButtonPrime>

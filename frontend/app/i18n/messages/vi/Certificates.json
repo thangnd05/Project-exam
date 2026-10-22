@@ -1,0 +1,52 @@
+{
+  "meta": {
+    "title": "Tra cứu chứng chỉ",
+    "description": "Xác thực chứng chỉ do WinDe Exam cấp bằng mã tra cứu, xem danh mục chứng chỉ đang cấp và các chứng chỉ vừa được cấp."
+  },
+  "codeMeta": {
+    "title": "Xác thực chứng chỉ",
+    "description": "Kiểm tra tính hợp lệ của chứng chỉ do WinDe Exam cấp bằng mã chứng chỉ in trên bản chứng chỉ."
+  },
+  "verify": {
+    "title": "Tra cứu chứng chỉ",
+    "subtitle": "Nhập mã in trên chứng chỉ để kiểm tra tính xác thực.",
+    "codePlaceholder": "VD: EXAM-2026-8F3K9Q",
+    "codeLabel": "Mã chứng chỉ",
+    "submit": "Tra cứu",
+    "hint": "Mã tra cứu nằm ở cạnh dưới tấm chứng chỉ, dạng <code>EXAM-2026-XXXXXX</code>.",
+    "checking": "Đang kiểm tra mã {code}..."
+  },
+  "state": {
+    "VALID": {
+      "heading": "Chứng chỉ hợp lệ",
+      "message": "Chứng chỉ này do hệ thống cấp và đang còn hiệu lực."
+    },
+    "REVOKED": {
+      "heading": "Chứng chỉ đã bị thu hồi",
+      "message": "Chứng chỉ từng được cấp nhưng đã bị thu hồi, không còn giá trị sử dụng."
+    },
+    "EXPIRED": {
+      "heading": "Chứng chỉ đã hết hạn",
+      "message": "Chứng chỉ này đã quá thời hạn hiệu lực."
+    },
+    "NOT_FOUND": {
+      "heading": "Không tìm thấy chứng chỉ",
+      "message": "Không có chứng chỉ nào mang mã này. Hãy kiểm tra lại mã tra cứu."
+    }
+  },
+  "wall": {
+    "title": "Chứng chỉ đã cấp",
+    "summary": "{total} chứng chỉ còn hiệu lực do WinDe Exam cấp, mới nhất trước.",
+    "summaryEmpty": "Các chứng chỉ còn hiệu lực do WinDe Exam cấp.",
+    "loadError": "Không tải được danh sách chứng chỉ.",
+    "empty": "Chưa có chứng chỉ nào được cấp.",
+    "cardLabel": "Xem chứng chỉ {code} của {name}",
+    "newBadge": "Mới",
+    "viewCertificate": "Xem chứng chỉ",
+    "loadMore": "Xem thêm"
+  },
+  "preview": {
+    "fallbackTitle": "Chứng chỉ",
+    "loading": "Đang tải chứng chỉ {code}..."
+  }
+}

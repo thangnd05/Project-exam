@@ -4,6 +4,7 @@ import {useEffect, useRef, useState} from 'react';
 import type {ReactNode} from 'react';
 import {Overlay, Popover} from 'react-bootstrap';
 import classNames from 'classnames/bind';
+import {useTranslations} from 'next-intl';
 import styles from '@/app/features/gamification/onboarding/FirstTimeHint.module.scss';
 
 const cx = classNames.bind(styles);
@@ -38,6 +39,7 @@ const markSeen = (hintKey: string) => {
 };
 
 function FirstTimeHint({hintKey, title, body, placement = 'bottom', enabled = true, children}: FirstTimeHintProps) {
+  const t = useTranslations('Gamification.hint');
   const targetRef = useRef<HTMLSpanElement>(null);
   const [show, setShow] = useState(false);
 
@@ -66,7 +68,7 @@ function FirstTimeHint({hintKey, title, body, placement = 'bottom', enabled = tr
             <p className={cx('title')}>{title}</p>
             <div className={cx('body')}>{body}</div>
             <button type="button" className={cx('okBtn')} onClick={dismiss}>
-              Đã hiểu
+              {t('ok')}
             </button>
           </Popover.Body>
         </Popover>

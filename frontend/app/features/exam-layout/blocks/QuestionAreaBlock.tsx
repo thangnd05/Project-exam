@@ -4,6 +4,7 @@ import { useLayoutEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
 import { IoFlag, IoFlagOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -75,6 +76,7 @@ function QuestionAreaBlock({
   goNext,
   goPrev,
 }: QuestionAreaBlockProps) {
+  const t = useTranslations('TestTaking.examLayout');
 
   const pagedRootRef = useRef<HTMLDivElement | null>(null);
   useLayoutEffect(() => {
@@ -178,7 +180,7 @@ function QuestionAreaBlock({
       <div key={q.questionId} id={`q-${q.questionId}`} className={cx('question-card')}>
         <div className={cx('q-head')}>
           <span className={cx('q-text')}>
-            <span className={cx('q-number')}>Câu {absoluteIndex}:</span>
+            <span className={cx('q-number')}>{t('questionNumber', { number: absoluteIndex })}</span>
             {q.questionText}
           </span>
           {onToggleFlag && (
@@ -187,10 +189,10 @@ function QuestionAreaBlock({
               className={cx('q-flag-btn', { active: flagged })}
               onClick={() => onToggleFlag(q.questionId)}
               aria-pressed={flagged}
-              title={flagged ? 'Bỏ đánh dấu' : 'Đánh dấu để xem lại'}
+              title={flagged ? t('unflag') : t('flagForReview')}
             >
               {flagged ? <IoFlag size={16} /> : <IoFlagOutline size={16} />}
-              <span>{flagged ? 'Đã đánh dấu' : 'Đánh dấu'}</span>
+              <span>{flagged ? t('flagged') : t('flag')}</span>
             </button>
           )}
         </div>
@@ -249,7 +251,7 @@ function QuestionAreaBlock({
             className={cx('fill-input')}
             value={userAnswers[q.questionId]?.answerText || ''}
             onChange={(e) => handleAnswerChange(q.questionId, 'FILL_BLANK', e.target.value)}
-            placeholder="Nhập câu trả lời của bạn..."
+            placeholder={t('fillPlaceholder')}
           />
         )}
 
@@ -258,7 +260,7 @@ function QuestionAreaBlock({
             className={cx('essay-input')}
             value={userAnswers[q.questionId]?.answerText || ''}
             onChange={(e) => handleAnswerChange(q.questionId, 'ESSAY', e.target.value)}
-            placeholder="Viết câu trả lời chi tiết tại đây..."
+            placeholder={t('essayPlaceholder')}
           />
         )}
       </div>
@@ -280,7 +282,7 @@ function QuestionAreaBlock({
       >
         {split ? (
           <>
-            <div className={cx('passage-column')} aria-label="Đọc tài liệu">
+            <div className={cx('passage-column')} aria-label={t('readingMaterial')}>
               {renderPassage(q.passage)}
             </div>
             <div className={cx('question-column')}>{questionCard}</div>
@@ -298,7 +300,7 @@ function QuestionAreaBlock({
   if (isPaged) {
     const step = flowSteps[currentStepIndex];
     if (!step) {
-      return <div className={cx('paged-empty')}>Đang tải câu hỏi…</div>;
+      return <div className={cx('paged-empty')}>{t('loadingQuestions')}</div>;
     }
 
     const passage = step.passage;
@@ -327,7 +329,7 @@ function QuestionAreaBlock({
         <div key={currentStepIndex} className={cx('paged-body', { 'split-layout': split })}>
           {split ? (
             <>
-              <div className={cx('passage-column')} aria-label="Tài liệu / audio">
+              <div className={cx('passage-column')} aria-label={t('materialAudio')}>
                 {renderPassage(passage, { suppressAudio: gated })}
               </div>
               <div className={cx('question-column')}>
@@ -347,14 +349,14 @@ function QuestionAreaBlock({
             <div className={cx('paged-nav-left')}>
               {canGoPrev && (
                 <ButtonPrime variant="outline" onClick={goPrev}>
-                  Câu trước
+                  {t('prev')}
                 </ButtonPrime>
               )}
             </div>
             <div className={cx('paged-nav-right')}>
               {showManualNext && (
                 <ButtonPrime variant="primary" onClick={goNext}>
-                  Câu tiếp
+                  {t('next')}
                 </ButtonPrime>
               )}
             </div>
@@ -366,7 +368,7 @@ function QuestionAreaBlock({
 
   return (
     <>
-      {isPractice && <h1 className={cx('exam-title')}>Luyện theo phần</h1>}
+      {isPractice && <h1 className={cx('exam-title')}>{t('practiceTitle')}</h1>}
 
       {visibleParts.map((part) => (
         <div key={part.testPartId} className={cx('part-section')}>
@@ -381,7 +383,7 @@ function QuestionAreaBlock({
                 >
                   {split ? (
                     <>
-                      <div className={cx('passage-column')} aria-label="Đọc tài liệu">
+                      <div className={cx('passage-column')} aria-label={t('readingMaterial')}>
                         {renderPassage(group.passage)}
                       </div>
                       <div className={cx('question-column')}>

@@ -1,7 +1,8 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import classNames from 'classnames/bind';
+import { useLocale, useTranslations } from 'next-intl';
 import { Award, Target } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -11,8 +12,8 @@ import styles from './CertificateBanner.module.scss';
 
 const cx = classNames.bind(styles);
 
-const formatDate = (value?: string | null) =>
-  value ? new Date(value).toLocaleDateString('vi-VN') : '';
+const formatDate = (value: string | null | undefined, locale: string) =>
+  value ? new Date(value).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN') : '';
 
 type CertificateBannerProps = {
   userTestId?: string;
@@ -21,6 +22,8 @@ type CertificateBannerProps = {
 
 function CertificateBanner({ userTestId, enabled }: CertificateBannerProps) {
   const router = useRouter();
+  const t = useTranslations('TestTaking.certificateBanner');
+  const locale = useLocale();
   const { data } = useAttemptCertificate(userTestId, enabled);
 
   if (!data || data.state === AttemptCertificateState.NOT_APPLICABLE) {
@@ -32,14 +35,18 @@ function CertificateBanner({ userTestId, enabled }: CertificateBannerProps) {
       <div className={cx('banner', 'pending')}>
         <Target size={28} className={cx('icon')} />
         <div className={cx('content')}>
-          <h3 className={cx('title')}>Chưa đạt chứng chỉ lần này</h3>
+          <h3 className={cx('title')}>{t('notPassedTitle')}</h3>
           <p className={cx('desc')}>
-            Bạn còn thiếu <strong>{data.pointsToPass} điểm</strong> nữa để nhận chứng chỉ
-            (cần {data.passScore} điểm, bạn đạt {data.score} điểm).
+            {t.rich('notPassedDesc', {
+              pointsToPass: data.pointsToPass ?? 0,
+              passScore: data.passScore ?? 0,
+              score: data.score ?? 0,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
         </div>
         <ButtonPrime variant="outline" onClick={() => router.push('/learning-plans/generate')}>
-          Lập lộ trình ôn tập
+          {t('buildPlan')}
         </ButtonPrime>
       </div>
     );
@@ -53,21 +60,19 @@ function CertificateBanner({ userTestId, enabled }: CertificateBannerProps) {
       <Award size={28} className={cx('icon')} />
       <div className={cx('content')}>
         <h3 className={cx('title')}>
-          {justIssued
-            ? 'Chúc mừng! Bạn vừa nhận được chứng chỉ'
-            : 'Bạn đã có chứng chỉ cho loại đề này'}
+          {justIssued ? t('justIssuedTitle') : t('alreadyHaveTitle')}
         </h3>
         <p className={cx('desc')}>
-          {certificate?.design?.title || 'Chứng chỉ'}
-          {!justIssued && certificate?.issuedAt && ` · cấp ngày ${formatDate(certificate.issuedAt)}`}
-          {!justIssued && ' · thi lại không cấp thêm chứng chỉ mới'}
+          {certificate?.design?.title || t('fallbackTitle')}
+          {!justIssued && certificate?.issuedAt && ` · ${t('issuedOn', { date: formatDate(certificate.issuedAt, locale) })}`}
+          {!justIssued && ` · ${t('noReissue')}`}
         </p>
       </div>
       <ButtonPrime
         variant="primary"
         onClick={() => router.push(`/certificates/${certificate?.certificateId}`)}
       >
-        Xem chứng chỉ
+        {t('view')}
       </ButtonPrime>
     </div>
   );

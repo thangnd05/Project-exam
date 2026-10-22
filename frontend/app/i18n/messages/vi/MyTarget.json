@@ -1,0 +1,226 @@
+{
+  "tabs": {
+    "ariaLabel": "Mục tiêu và lộ trình học",
+    "target": "Mục tiêu",
+    "plan": "Lập lộ trình",
+    "compare": "So sánh lộ trình",
+    "overview": "Tổng quan"
+  },
+  "examPicker": {
+    "label": "Kỳ thi",
+    "ariaLabel": "Chọn {label}"
+  },
+  "scoring": {
+    "scaledDetail": "Tổng {correct}/{total} câu đúng → {score} điểm (thang {min}–{max})",
+    "skillDetail": "{skill}: {count} câu → {score} điểm"
+  },
+  "readiness": {
+    "levels": {
+      "READY": {
+        "label": "Sẵn sàng",
+        "message": "Bạn có thể cân nhắc đăng ký thi nếu duy trì kết quả ổn định."
+      },
+      "ALMOST_READY": {
+        "label": "Gần sẵn sàng",
+        "message": "Tập trung sửa các lỗi hay sai và làm thêm một đề thi thử để chắc chắn."
+      },
+      "NEEDS_IMPROVEMENT": {
+        "label": "Cần cải thiện",
+        "message": "Bạn gần đạt nhưng còn lĩnh vực yếu có thể kéo tụt điểm."
+      },
+      "NOT_READY": {
+        "label": "Chưa sẵn sàng",
+        "message": "Bạn cần củng cố nền tảng trước khi làm đề thi thử tiếp."
+      }
+    },
+    "quickTiers": {
+      "EXCELLENT": "Xuất sắc",
+      "GOOD": "Khá tốt",
+      "FAIR": "Tạm ổn",
+      "WEAK": "Cần luyện thêm"
+    },
+    "gauge": {
+      "startLabel": "Điểm xuất phát",
+      "startTitle": "Mốc bắt đầu của bạn",
+      "startMessage": "Bạn chưa học kỳ này nên điểm thấp là bình thường. Con số này dùng để xếp bước bắt đầu, không phải kết quả thi.",
+      "accuracy": "Độ chính xác",
+      "target": "Mục tiêu",
+      "targetMet": "Đạt mục tiêu!",
+      "targetNotMet": "Chưa đạt mục tiêu",
+      "targetMetMessage": "Chúc mừng! Bạn đã đạt mức điểm mục tiêu {score} đề ra.",
+      "targetGapMessage": "Bạn còn thiếu {gap} điểm nữa để đạt mục tiêu.",
+      "readiness": "Độ sẵn sàng"
+    },
+    "recovery": {
+      "targetNotMet": "Bạn chưa đạt điểm mục tiêu. Hãy lập lộ trình học để luyện đúng những phần thi còn yếu.",
+      "nextStep": "Bước tiếp theo: nâng mức sẵn sàng từ {score}% lên {next}%. Hãy đặt điểm mục tiêu để WinDe lập lộ trình học phù hợp với bạn.",
+      "practiceAllMet": "Các phần đã luyện đều đạt mục tiêu. Làm bài thi thử trọn đề để kiểm tra điểm tổng.",
+      "practicePart": "{part} ({pct}% / cần {target}%)",
+      "practiceMissed": "{detail} chưa đạt mục tiêu. Hãy lập lộ trình để luyện đúng phần này."
+    }
+  },
+  "setTarget": {
+    "title": "Mục tiêu của tôi",
+    "subtitle": "Chọn kỳ thi và mức điểm bạn muốn đạt. WinDe dựa vào đó để biết mỗi phần cần luyện tới đâu rồi lập lộ trình cho bạn.",
+    "toast": {
+      "enterScoreFirst": "Nhập điểm mục tiêu trước.",
+      "loginRequired": "Bạn cần đăng nhập để lưu mục tiêu!",
+      "updated": "Đã cập nhật mục tiêu. Lộ trình đang chạy sẽ hiện nút \"Cập nhật theo mục tiêu mới\"  bấm là xong, không cần thi lại.",
+      "saved": "Đã lưu mục tiêu! Giờ cùng sinh lộ trình học nhé.",
+      "saveError": "Lỗi khi lưu mục tiêu.",
+      "deleted": "Đã xóa mục tiêu.",
+      "deleteError": "Lỗi khi xóa mục tiêu."
+    },
+    "summary": {
+      "ariaLabel": "Tóm tắt mục tiêu",
+      "eyebrow": "Tóm tắt",
+      "saved": "Đã lưu · {score} điểm",
+      "notSaved": "Chưa lưu",
+      "target": "Mục tiêu",
+      "estimate": "Ước tính",
+      "estimateNeed": "{detail}, cần đạt ≥ {score}",
+      "overwriteNote": "Lưu lại sẽ ghi đè mục tiêu hiện tại.",
+      "saving": "Đang lưu...",
+      "update": "Cập nhật mục tiêu",
+      "save": "Lưu mục tiêu",
+      "generatePlan": "Sinh lộ trình vượt ải",
+      "delete": "Xóa mục tiêu"
+    },
+    "empty": {
+      "title": "Chọn kỳ thi để đặt mục tiêu",
+      "description": "Bấm vào một kỳ thi ở trên để xem mức điểm gợi ý."
+    },
+    "scoreLabel": "Điểm mục tiêu",
+    "milestonesAriaLabel": "Mức điểm gợi ý",
+    "placeholderScaled": "VD: 700",
+    "placeholder": "VD: 450",
+    "milestoneHint": "Mức {score}",
+    "customHint": "Điểm tự chọn: mỗi phần thi cần đúng khoảng {pct}%",
+    "suggestedHint": "Chưa biết đặt bao nhiêu? WinDe đã chọn sẵn một mức vừa sức, sau này đổi lúc nào cũng được.",
+    "advanced": {
+      "title": "Nâng cao: số câu cần đúng ở từng phần thi",
+      "optional": "không bắt buộc",
+      "milestoneHint": "Đã điền sẵn theo mức điểm bạn chọn. Chỉ sửa nếu bạn muốn dồn sức vào phần nào đó.",
+      "evenHint": "Đã điền sẵn: mỗi phần cần đúng khoảng {pct}%. Chỉ sửa nếu bạn muốn dồn sức vào phần nào đó.",
+      "questionCount": "{count} câu",
+      "questionUnit": "câu",
+      "reset": "Đặt lại"
+    }
+  },
+  "achieved": {
+    "back": "← Tổng quan mục tiêu",
+    "examType": "Loại kỳ thi",
+    "noTarget": "Bạn chưa đặt mục tiêu cho kỳ thi này.",
+    "setTarget": "Đặt mục tiêu",
+    "notMet": "Bài thi thử gần nhất chưa đạt mục tiêu {score} điểm.",
+    "latestScore": "Điểm gần nhất: <strong>{score}</strong>.",
+    "viewProgress": "Xem tiến độ",
+    "heroTitle": "Bạn đã đạt mục tiêu!",
+    "heroTarget": "Mục tiêu: <strong>{score}</strong>",
+    "heroScore": "Điểm đạt được: <strong>{score}</strong> (+{diff})",
+    "achievedAt": "Đạt mục tiêu lúc: {date}",
+    "mockAchieved": "Bài thi thử đạt mục tiêu: {date}",
+    "nextTarget": {
+      "title": "Mục tiêu tiếp theo",
+      "description": "Bạn vừa hoàn thành chặng <strong>{score}</strong>. Muốn đặt mức mới, hãy vào trang Mục tiêu và tự nhập điểm.",
+      "cta": "Vào trang mục tiêu"
+    },
+    "next": {
+      "title": "Tiếp theo có thể làm",
+      "newTarget": "Đặt mục tiêu mới",
+      "newTargetDesc": "chỉnh điểm và mục tiêu từng phần.",
+      "journey": "Xem hành trình các lộ trình",
+      "journeyDesc": "độ sẵn sàng #1 → #N qua từng bài thi thử.",
+      "overview": "Tổng quan mục tiêu",
+      "overviewDesc": "biểu đồ độ sẵn sàng theo thời gian và các bài đã làm.",
+      "practice": "Làm thêm bài",
+      "practiceDesc": "duy trì phong độ, chờ thi thật."
+    }
+  },
+  "dashboard": {
+    "title": "Tổng quan mục tiêu",
+    "subtitle": "Bài thi thử gần nhất so với mục tiêu, lộ trình đang học và % đúng từng phần thi.",
+    "noTarget": {
+      "title": "Chưa đặt mục tiêu cho kỳ thi này",
+      "description": "Đặt mức điểm muốn đạt để xem tiến độ từng phần và sinh lộ trình phù hợp.",
+      "cta": "Đặt mục tiêu"
+    },
+    "achievedTitle": "Bạn đã đạt mục tiêu {score}!",
+    "achievedAt": "Đạt lúc {date}.",
+    "latestMockScore": "Bài thi thử gần nhất: {score} điểm.",
+    "newTarget": "Đặt mục tiêu mới",
+    "targetScore": "Mục tiêu điểm",
+    "latest": "Gần nhất <strong>{score}</strong>",
+    "reached": "đã đạt",
+    "gap": "còn {gap}đ",
+    "noMock": "Chưa có bài thi thử nào, làm bài để xem tiến độ.",
+    "readiness": "Độ sẵn sàng",
+    "noMockForExam": "Chưa có bài thi thử cho kỳ thi này.",
+    "activePlan": "Lộ trình đang học",
+    "planName": "Lộ trình {seq}",
+    "baseline": "Ban đầu {pct}%",
+    "byCurriculum": "Theo chương trình học",
+    "stages": "<strong>{passed}/{total}</strong> ải",
+    "openPlan": "Mở lộ trình",
+    "none": "Chưa có",
+    "noActivePlan": "Chưa có lộ trình đang học.",
+    "generatePlan": "Sinh lộ trình",
+    "parts": {
+      "title": "% đúng từng phần",
+      "meta": "hiện tại so với mục tiêu"
+    }
+  },
+  "partChart": {
+    "empty": "Chưa có mục tiêu cho từng phần. Hãy cập nhật ở trang Mục tiêu.",
+    "noData": "Chưa có dữ liệu",
+    "reached": "Đạt",
+    "remaining": "Còn {pct}%",
+    "ariaLabel": "{name}: hiện tại {current}, mục tiêu {aim}%",
+    "ariaNone": "chưa có",
+    "legend": {
+      "reached": "Đạt mục tiêu",
+      "notReached": "Chưa đạt",
+      "aim": "Vạch mục tiêu"
+    }
+  },
+  "mockHistory": {
+    "title": "Tiến triển qua các bài đã làm",
+    "count": "<strong>{count}</strong> bài thi đầy đủ",
+    "empty": "Chưa có bài thi đầy đủ nào để thống kê.",
+    "firstTest": "Làm bài đầu tiên",
+    "hideTable": "Ẩn bảng chi tiết",
+    "showTable": "Xem bảng chi tiết ({count} bài)",
+    "table": {
+      "finished": "Hoàn thành",
+      "testName": "Tên bài kiểm tra",
+      "score": "Điểm",
+      "readiness": "Độ sẵn sàng",
+      "target": "Mục tiêu",
+      "duration": "Thời gian",
+      "load": "Tải",
+      "met": "Đạt",
+      "notMet": "Chưa đạt",
+      "notSet": "Chưa đặt",
+      "diagnose": "Chẩn đoán"
+    }
+  },
+  "mockCharts": {
+    "tooltip": {
+      "score": "Điểm:",
+      "readiness": "Độ sẵn sàng:",
+      "met": "Đạt mục tiêu",
+      "notMet": "Chưa đạt mục tiêu"
+    },
+    "loading": "Đang tải dữ liệu biểu đồ...",
+    "title": "Tiến triển theo thời gian",
+    "description": "Trục ngang: thứ tự bài thi từ cũ → mới. Cột = điểm tổng · đường = độ sẵn sàng %.",
+    "loadingReadiness": "Đang bổ sung độ sẵn sàng cho các bài cũ...",
+    "axisScore": "Điểm",
+    "axisReadiness": "Độ sẵn sàng %",
+    "legendTotal": "Điểm tổng",
+    "legendReadiness": "Độ sẵn sàng",
+    "targetLine": "Mục tiêu {score}",
+    "legendNote": "Cột xanh lá = đạt mục tiêu · xanh dương = chưa xác định · vàng = chưa đạt.",
+    "legendNoteTarget": "Đường đỏ đứt nét = điểm mục tiêu."
+  }
+}

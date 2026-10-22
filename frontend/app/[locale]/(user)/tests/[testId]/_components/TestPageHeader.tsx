@@ -1,10 +1,11 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import classNamesBind from 'classnames/bind';
+import { useTranslations } from 'next-intl';
 import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
-import ExamBadge from '@/app/(public)/_components/ExamBadge/ExamBadge';
-import { badgeUrl, parseCode } from '@/app/(public)/_lib/certificationMeta';
+import ExamBadge from '@/app/[locale]/(public)/_components/ExamBadge/ExamBadge';
+import { badgeUrl, parseCode } from '@/app/[locale]/(public)/_lib/certificationMeta';
 import routes, { buildExamTypeDetailPath, buildTestPath } from '@/app/configs/Routes';
 import { useExamTypeById } from '@/app/features/exam-types/hooks/useExamTypes';
 import TestModeModal from '@/app/features/tests/TestModeModal/TestModeModal';
@@ -19,9 +20,9 @@ const ui = classNamesBind.bind(uiStyles);
 
 type TestPageTab = 'history' | 'leaderboard';
 
-const TABS: { key: TestPageTab; label: string }[] = [
-  { key: 'history', label: 'Lịch sử làm bài' },
-  { key: 'leaderboard', label: 'Bảng xếp hạng' },
+const TABS: { key: TestPageTab; labelKey: 'tabs.history' | 'tabs.leaderboard' }[] = [
+  { key: 'history', labelKey: 'tabs.history' },
+  { key: 'leaderboard', labelKey: 'tabs.leaderboard' },
 ];
 
 const countQuestions = (test: TestResponse) =>
@@ -32,11 +33,12 @@ const countQuestions = (test: TestResponse) =>
   );
 
 function StartButton({ test }: { test: TestResponse }) {
+  const t = useTranslations('TestTaking.pageHeader');
   const { canStart, buttonText, handleStart, modeModal } = useTestStart(test);
   return (
     <>
       <button type="button" className={ui('btnPrimary')} onClick={handleStart} disabled={!canStart}>
-        {canStart ? ((test.attemptsUsed ?? 0) > 0 ? 'Làm lại' : 'Bắt đầu làm bài') : buttonText}
+        {canStart ? ((test.attemptsUsed ?? 0) > 0 ? t('retake') : t('start')) : buttonText}
         {canStart && <FiArrowRight aria-hidden="true" />}
       </button>
       <TestModeModal
@@ -57,10 +59,11 @@ type TestPageHeaderProps = {
 
 // Đầu trang chung của lịch sử và bảng xếp hạng một đề: đường dẫn, kỳ thi, tên đề, nút làm bài, tab.
 function TestPageHeader({ testRef, test, active }: TestPageHeaderProps) {
+  const t = useTranslations('TestTaking.pageHeader');
   const { examType } = useExamTypeById(test?.examTypeId);
   const examName = examType?.name?.trim() ?? '';
   const code = parseCode(examName);
-  const title = test?.title || 'Đề thi';
+  const title = test?.title || t('fallbackTitle');
   const questions = test ? countQuestions(test) : 0;
 
   // Bảng xếp hạng chỉ mở khi đề không giới hạn hạn nộp hoặc đã hết hạn (cùng điều kiện ở thẻ đề).
@@ -69,18 +72,20 @@ function TestPageHeader({ testRef, test, active }: TestPageHeaderProps) {
 
   const meta = test
     ? [
-        questions > 0 ? `${questions} câu` : null,
-        test.durationMinutes != null ? `${test.durationMinutes} phút` : 'Không giới hạn giờ',
+        questions > 0 ? t('meta.questions', { count: questions }) : null,
+        test.durationMinutes != null
+          ? t('meta.minutes', { count: test.durationMinutes })
+          : t('meta.unlimited'),
         test.maxAttempts != null && test.remainingAttempts != null
-          ? `Còn ${test.remainingAttempts}/${test.maxAttempts} lượt`
+          ? t('meta.attemptsLeft', { remaining: test.remainingAttempts, max: test.maxAttempts })
           : null,
       ].filter(Boolean)
     : [];
 
   return (
     <>
-      <nav className={cx('breadcrumb')} aria-label="Đường dẫn">
-        <Link href={routes.examTypes}>Kho đề thi</Link>
+      <nav className={cx('breadcrumb')} aria-label={t('breadcrumbLabel')}>
+        <Link href={routes.examTypes}>{t('examLibrary')}</Link>
         {examType && (
           <>
             <FiChevronRight aria-hidden="true" />
@@ -117,7 +122,7 @@ function TestPageHeader({ testRef, test, active }: TestPageHeaderProps) {
           )}
         </div>
 
-        <nav className={cx('tabs')} aria-label="Trang của đề">
+        <nav className={cx('tabs')} aria-label={t('tabsLabel')}>
           {TABS.filter((tab) => tab.key !== 'leaderboard' || leaderboardOpen).map((tab) => (
             <Link
               key={tab.key}
@@ -125,7 +130,7 @@ function TestPageHeader({ testRef, test, active }: TestPageHeaderProps) {
               className={cx('tab', { active: tab.key === active })}
               aria-current={tab.key === active ? 'page' : undefined}
             >
-              {tab.label}
+              {t(tab.labelKey)}
             </Link>
           ))}
         </nav>

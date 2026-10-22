@@ -1,7 +1,8 @@
 'use client';
 
-import Link from 'next/link';
+import Link from '@/app/i18n/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import {
   ArrowUpRight,
@@ -16,7 +17,6 @@ import {
 } from 'lucide-react';
 import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
 import InfoTip from '@/app/components/InfoTip/InfoTip';
-import { TERM_TIPS } from '@/app/features/learning-plans/termTips';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { taskCurrentAccuracy, taskGapToPass, taskUnpassedAttempts } from '@/app/features/learning-plans/PlanPartTaskList/taskProgress';
 import { TaskStatus } from '@/app/enums';
@@ -61,8 +61,8 @@ function shortMapLabel(name?: string, max = 48) {
   return `${cut || readable.slice(0, max - 1)}…`;
 }
 
-function resourceTitle(name?: string) {
-  if (!name) return 'Mở tài liệu';
+function resourceTitle(fallback: string, name?: string) {
+  if (!name) return fallback;
   // "VPC-Traffic-Control.md" -> "VPC Traffic Control"
   return name.replace(/\.(md|pdf|docx?|txt)$/i, '').replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
 }
@@ -131,9 +131,10 @@ function PlanPartTaskList({
 
   const [openOverride, setOpenOverride] = useState<Set<string> | null>(null);
   const openIds = openOverride ?? fallbackOpen;
+  const t = useTranslations('LearningPlans');
 
   if (!orderedGroups.length) {
-    return <p className={cx('muted')}>Chưa có ải trong lộ trình.</p>;
+    return <p className={cx('muted')}>{t('taskList.empty')}</p>;
   }
 
   const togglePart = (partId: string) => {
@@ -172,17 +173,18 @@ function PlanPartTaskList({
               aria-expanded={open}
             >
               <span className={cx('partCrest', { partCrestDone: done })}>
-                <span className={cx('partCrestLabel')}>Chặng</span>
+                <span className={cx('partCrestLabel')}>{t('taskList.stage')}</span>
                 <span className={cx('partCrestNo')}>{index + 1}</span>
               </span>
               <span className={cx('partHeaderMain')}>
                 <span className={cx('partGroupName')}>{group.examPartName}</span>
                 <span className={cx('partHeaderMeta')}>
-                  <strong>
-                    {passed}/{total}
-                  </strong>{' '}
-                  ải đã xong
-                  {group.passAccuracy != null && ` · ngưỡng đạt ≥${group.passAccuracy}%`}
+                  {t.rich('taskList.partMeta', {
+                    passed,
+                    total,
+                    strong: (chunks) => <strong>{chunks}</strong>,
+                  })}
+                  {group.passAccuracy != null && ` · ${t('taskList.threshold', { pass: group.passAccuracy })}`}
                 </span>
                 <span className={cx('partDots')}>
                   {(group.tasks || []).map((t) => (
@@ -197,7 +199,7 @@ function PlanPartTaskList({
               </span>
               {done && (
                 <span className={cx('partDoneBadge')}>
-                  <Trophy size={13} /> Hoàn thành
+                  <Trophy size={13} /> {t('taskList.completed')}
                 </span>
               )}
               <ChevronDown className={cx('partChevron', { partChevronOpen: open })} size={20} />
@@ -244,6 +246,7 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
   const selected = tasks.find((t) => t.taskId === selectedId) || null;
   const mapShellRef = useRef<HTMLDivElement>(null);
   const selectedNodeRef = useRef<HTMLButtonElement>(null);
+  const t = useTranslations('LearningPlans');
 
   useEffect(() => {
     const shell = mapShellRef.current;
@@ -259,7 +262,7 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
   if (!tasks.length) {
     return (
       <div className={cx('partBody')}>
-        <p className={cx('muted')}>Chặng này chưa có ải nào.</p>
+        <p className={cx('muted')}>{t('taskList.stageEmpty')}</p>
       </div>
     );
   }
@@ -271,12 +274,12 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
   return (
     <div className={cx('partBody')}>
       <p className={cx('partGroupHint')}>
-        Bấm ải trên bản đồ để xem chi tiết
+        {t('taskList.hint')}
         {group.passAccuracy != null && (
           <>
             {' '}
-            · cần ≥{group.passAccuracy}% để vượt
-            <InfoTip text={TERM_TIPS.passThreshold} />
+            · {t('taskList.needToPass', { pass: group.passAccuracy })}
+            <InfoTip text={t('termTips.passThreshold')} />
           </>
         )}
         .
@@ -286,8 +289,10 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
         <div className={cx('resourceBox')}>
           <div className={cx('resourceInfo')}>
             <div className={cx('resourceLabel')}>
-              <BookOpen size={14} /> Giới thiệu chặng (đọc trước)
-              <span className={cx('resourceCount')}>{group.partResources!.length} tài liệu</span>
+              <BookOpen size={14} /> {t('taskList.resourceIntro')}
+              <span className={cx('resourceCount')}>
+                {t('taskList.resourceCount', { count: group.partResources!.length })}
+              </span>
             </div>
             <div className={cx('resourceGrid')}>
               {group.partResources!.map((r, i) => (
@@ -295,7 +300,7 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
                   <span className={cx('resourceTileNo')}>{i + 1}</span>
                   <span className={cx('resourceTileBody')}>
                     <span className={cx('resourceTileTitle')}>
-                      {resourceTitle(r.title || r.originalFileName)}
+                      {resourceTitle(t('common.openResource'), r.title || r.originalFileName)}
                     </span>
                     {r.description && <span className={cx('resourceTileDesc')}>{r.description}</span>}
                   </span>
@@ -310,7 +315,7 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
       <div className={cx('stageLayout')}>
         <div ref={mapShellRef} className={cx('stageMapShell')}>
           <div className={cx('stageMap')} style={{ height: `${height}px` }}>
-            <span className={cx('stageFlag', 'stageFlagStart')}>Xuất phát</span>
+            <span className={cx('stageFlag', 'stageFlagStart')}>{t('taskList.start')}</span>
 
             <svg
               className={cx('stagePath')}
@@ -348,7 +353,7 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
                 top: `${nodeY(tasks.length - 1) + 42}px`,
               }}
             >
-              <Flag size={14} /> Hết chặng
+              <Flag size={14} /> {t('taskList.end')}
             </span>
           </div>
         </div>
@@ -379,6 +384,7 @@ type StageNodeProps = {
 };
 
 function StageNode({ task, index, isSelected, isRecommended, onSelect, nodeRef }: StageNodeProps) {
+  const t = useTranslations('LearningPlans');
   const isCapstone = isCapstoneTask(task);
   const isPassed = task.status === TaskStatus.PASSED;
   const isLocked = task.status === TaskStatus.LOCKED;
@@ -398,9 +404,9 @@ function StageNode({ task, index, isSelected, isRecommended, onSelect, nodeRef }
       style={{ left: `${nodeX(index)}%`, top: `${nodeY(index)}px` }}
       onClick={onSelect}
       aria-pressed={isSelected}
-      aria-label={`Ải ${task.taskOrder}: ${taskDisplayName(task)}`}
+      aria-label={t('taskList.nodeAria', { order: task.taskOrder ?? '', name: taskDisplayName(t, task) })}
     >
-      {isRecommended && <span className={cx('stagePin')}>Bạn ở đây</span>}
+      {isRecommended && <span className={cx('stagePin')}>{t('taskList.youAreHere')}</span>}
       <span
         className={cx('stageNode', state, {
           stageNodeCapstone: isCapstone,
@@ -422,7 +428,7 @@ function StageNode({ task, index, isSelected, isRecommended, onSelect, nodeRef }
           stageNodeLabelActive: isSelected || isRecommended,
         })}
       >
-        {isCapstone ? 'Tổng hợp' : shortMapLabel(taskDisplayName(task))}
+        {isCapstone ? t('taskList.capstoneShort') : shortMapLabel(taskDisplayName(t, task))}
       </span>
     </button>
   );
@@ -437,6 +443,7 @@ type TaskDetailCardProps = {
 };
 
 function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onStudyTask }: TaskDetailCardProps) {
+  const t = useTranslations('LearningPlans');
   const status = TASK_STATUS[task.status as string] || TASK_STATUS.ACTIVE;
   const isCapstone = isCapstoneTask(task);
   const isPassed = task.status === TaskStatus.PASSED;
@@ -449,7 +456,11 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
   const nearPass = !isPassed && gap != null && gap > 0 && gap <= NEAR_PASS_GAP;
 
   const hasAttempted = (task.attemptCount ?? 0) > 0;
-  const studyLabel = isPassed ? 'Luyện lại' : hasAttempted ? 'Thử lại' : 'Bắt đầu';
+  const studyLabel = isPassed
+    ? t('taskList.retake')
+    : hasAttempted
+      ? t('common.retry')
+      : t('taskList.begin');
 
   const studyButton =
     studyAction === 'button' ? (
@@ -478,23 +489,23 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
     <div className={cx('stagePanelCard', { stagePanelCardCapstone: isCapstone })}>
       <div className={cx('stagePanelHead')}>
         <span className={cx('stagePanelKicker')}>
-          {isCapstone ? 'Tổng hợp cuối chặng' : `Ải ${task.taskOrder}`}
+          {isCapstone ? t('taskList.capstoneKicker') : t('taskList.taskKicker', { order: task.taskOrder ?? '' })}
         </span>
-        <span className={cx('badge', status.variant)}>{status.text}</span>
+        <span className={cx('badge', status.variant)}>{t(status.labelKey)}</span>
       </div>
 
-      <h5 className={cx('stagePanelTitle')}>{taskDisplayName(task)}</h5>
+      <h5 className={cx('stagePanelTitle')}>{taskDisplayName(t, task)}</h5>
 
       <div className={cx('taskBadges')}>
         {isRecommended && (
           <span className={cx('chip', 'chipPrimary')}>
-            <Sparkles size={12} /> Nên làm tiếp
+            <Sparkles size={12} /> {t('taskList.recommended')}
           </span>
         )}
-        {nearPass && <span className={cx('chip', 'chipWarning')}>Sắp vượt · còn {gap}%</span>}
+        {nearPass && <span className={cx('chip', 'chipWarning')}>{t('taskList.nearPass', { gap })}</span>}
         {unpassedAttempts > 0 && (
           <span className={cx('chip', 'chipMuted')}>
-            Đã làm {unpassedAttempts} lượt · chưa qua
+            {t('taskList.unpassedAttempts', { count: unpassedAttempts })}
           </span>
         )}
       </div>
@@ -502,10 +513,10 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
       {!isLocked && !isCapstone && (resource?.url || resource?.resourceId) && (
         <div className={cx('stagePanelResource')}>
           <div className={cx('resourceLabel')}>
-            <BookOpen size={14} /> Tài liệu nên đọc trước
+            <BookOpen size={14} /> {t('taskList.readFirst')}
           </div>
           <RecoveryResourceLink resource={resource} className={cx('resourceLink')}>
-            {resource.title || resource.originalFileName || 'Mở tài liệu'}
+            {resource.title || resource.originalFileName || t('common.openResource')}
           </RecoveryResourceLink>
         </div>
       )}
@@ -521,15 +532,19 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
           </div>
           <div className={cx('meterLabel')}>
             {current == null ? (
-              <span>Chưa luyện · cần ≥{task.passAccuracy}%</span>
+              <span>{t('taskList.meterNotPracticed', { pass: task.passAccuracy })}</span>
             ) : gap === 0 ? (
               <span className={cx('successText')}>
-                <strong>{current}%</strong> · đã đạt ngưỡng
+                {t.rich('taskList.meterReached', { current, strong: (chunks) => <strong>{chunks}</strong> })}
               </span>
             ) : (
               <span>
-                <strong>{current}%</strong> · cần ≥{task.passAccuracy}%
-                {gap != null ? ` · còn ${gap}%` : ''}
+                {t.rich('taskList.meterNeed', {
+                  current,
+                  pass: task.passAccuracy,
+                  strong: (chunks) => <strong>{chunks}</strong>,
+                })}
+                {gap != null ? ` · ${t('taskList.meterGap', { gap })}` : ''}
               </span>
             )}
           </div>
@@ -539,10 +554,14 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
       {(task.wrongCountAtDiagnosis != null || task.targetQuestionCount != null) && (
         <div className={cx('taskStats')}>
           {task.wrongCountAtDiagnosis != null && (
-            <span className={cx('metaChip')}>Sai {task.wrongCountAtDiagnosis} lúc chẩn đoán</span>
+            <span className={cx('metaChip')}>
+              {t('taskList.wrongAtDiagnosis', { count: task.wrongCountAtDiagnosis })}
+            </span>
           )}
           {task.targetQuestionCount != null && (
-            <span className={cx('metaChip')}>{task.targetQuestionCount} câu / lượt</span>
+            <span className={cx('metaChip')}>
+              {t('taskList.perAttempt', { count: task.targetQuestionCount })}
+            </span>
           )}
         </div>
       )}
@@ -550,8 +569,8 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
       {isLocked ? (
         <p className={cx('muted', 'small', 'lockHint')}>
           {isCapstone
-            ? 'Vượt hết ải phía trên để mở tổng hợp.'
-            : 'Hoàn thành các ải trước để mở ải này.'}
+            ? t('taskList.lockedCapstone')
+            : t('taskList.locked')}
         </p>
       ) : (
         <div className={cx('taskActions')}>
@@ -561,7 +580,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
               href={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/history`}
               className={cx('btn', 'btnOutline', 'btnSm')}
             >
-              <History size={14} /> Lịch sử
+              <History size={14} /> {t('taskList.history')}
             </Link>
           )}
           {isPassed && (
@@ -569,7 +588,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
               href={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/result`}
               className={cx('btn', 'btnOutline', 'btnSm')}
             >
-              Xem giải thích
+              {t('taskList.explain')}
             </Link>
           )}
         </div>

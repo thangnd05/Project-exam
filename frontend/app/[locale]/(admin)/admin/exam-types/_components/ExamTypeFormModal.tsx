@@ -1,13 +1,11 @@
 'use client';
 
 import {Form} from 'react-bootstrap';
+import {useTranslations} from 'next-intl';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 
-const scoringMethodOptions = [
-  {value: 'DEFAULT', label: 'Tuyến tính theo thang tối thiểu–tối đa'},
-  {value: 'TOEIC_SCALE', label: 'Quy đổi theo bảng (TOEIC)'},
-];
+const scoringMethodOptions = ['DEFAULT', 'TOEIC_SCALE'] as const;
 
 export type ExamTypeFormState = {
   name: string;
@@ -46,42 +44,44 @@ function ExamTypeFormModal({
   onClose,
   onSubmit,
 }: ExamTypeFormModalProps) {
+  const t = useTranslations('AdminContent.examTypes.form');
+  const tc = useTranslations('Common');
   return (
     <BaseModal
       show={show}
       onClose={onClose}
-      title={isEditing ? 'Cập nhật loại kỳ thi' : 'Tạo loại kỳ thi'}
+      title={isEditing ? t('editTitle') : t('createTitle')}
       maxWidth={640}
       footer={
         <ModalActionFooter
           onCancel={onClose}
           onSubmit={onSubmit}
-          cancelLabel="Hủy"
-          submitLabel={isEditing ? 'Lưu' : 'Tạo mới'}
+          cancelLabel={tc('cancelShort')}
+          submitLabel={isEditing ? tc('save') : t('create')}
         />
       }
     >
       <Form.Group className="mb-3">
-        <Form.Label>Tên</Form.Label>
+        <Form.Label>{t('name')}</Form.Label>
         <Form.Control
           value={formState.name}
           onChange={(event) => onChangeField('name', event.target.value)}
         />
       </Form.Group>
       <Form.Group className="mb-3">
-        <Form.Label>Slug (đường dẫn)</Form.Label>
+        <Form.Label>{t('slug')}</Form.Label>
         <Form.Control
           value={formState.slug}
-          placeholder="vd: saa-c03"
+          placeholder={t('slugPlaceholder')}
           onChange={(event) => onChangeField('slug', event.target.value)}
         />
         <Form.Text muted>
-          Dùng trong URL, vd /exam-types/aws/saa-c03. Chỉ gồm chữ thường không dấu, số và gạch ngang.
-          {isEditing ? ' Đổi slug thì link dạng slug cũ sẽ không mở được nữa.' : ''}
+          {t('slugHelp')}
+          {isEditing ? ` ${t('slugChangeWarning')}` : ''}
         </Form.Text>
       </Form.Group>
       <Form.Group className="mb-3">
-        <Form.Label>Mô tả</Form.Label>
+        <Form.Label>{t('description')}</Form.Label>
         <Form.Control
           as="textarea"
           rows={3}
@@ -90,7 +90,7 @@ function ExamTypeFormModal({
         />
       </Form.Group>
       <Form.Group className="mb-3">
-        <Form.Label>URL ảnh đại diện (tùy chọn)</Form.Label>
+        <Form.Label>{t('imageUrl')}</Form.Label>
         <Form.Control
           type="url"
           placeholder="https://..."
@@ -102,7 +102,7 @@ function ExamTypeFormModal({
             {/* eslint-disable-next-line @next/next/no-img-element -- xem trước URL admin dán vào, host bất kỳ, có onError ẩn ảnh lỗi */}
             <img
               src={formState.image_url}
-              alt="Xem trước ảnh"
+              alt={t('imagePreview')}
               style={{
                 maxHeight: 80,
                 maxWidth: '100%',
@@ -117,7 +117,7 @@ function ExamTypeFormModal({
         ) : null}
       </Form.Group>
       <Form.Group className="mb-3">
-        <Form.Label>Thời lượng (phút)</Form.Label>
+        <Form.Label>{t('duration')}</Form.Label>
         <Form.Control
           type="number"
           min={1}
@@ -128,50 +128,50 @@ function ExamTypeFormModal({
         />
       </Form.Group>
       <Form.Group className="mb-3">
-        <Form.Label>Thuộc nhóm cha (tùy chọn)</Form.Label>
+        <Form.Label>{t('parent')}</Form.Label>
         {editingHasChildren ? (
           <Form.Control
             plaintext
             readOnly
-            value="Đang là nhóm cha (chứa loại con)"
+            value={t('isParent')}
           />
         ) : (
           <Form.Select
             value={formState.parent_id || ''}
             onChange={(event) => onChangeField('parent_id', event.target.value)}
           >
-            <option value="">-- Không có (loại độc lập / gốc) --</option>
-            {parentOptions.map((t) => (
-              <option key={t.exam_type_id} value={t.exam_type_id}>
-                {t.name}
+            <option value="">{t('noParent')}</option>
+            {parentOptions.map((option) => (
+              <option key={option.exam_type_id} value={option.exam_type_id}>
+                {option.name}
               </option>
             ))}
           </Form.Select>
         )}
       </Form.Group>
       <Form.Group className="mb-3">
-        <Form.Label>Phương thức chấm điểm</Form.Label>
+        <Form.Label>{t('scoringMethod')}</Form.Label>
         <Form.Select
           value={formState.scoring_method}
           onChange={(event) =>
             onChangeField('scoring_method', event.target.value)
           }
         >
-          {scoringMethodOptions.map((item) => (
-            <option key={item.value} value={item.value}>
-              {item.label}
+          {scoringMethodOptions.map((value) => (
+            <option key={value} value={value}>
+              {t(`scoringMethods.${value}`)}
             </option>
           ))}
         </Form.Select>
         <Form.Text muted>
           {formState.scoring_method === 'TOEIC_SCALE'
-            ? 'Điểm quy đổi theo bảng; thang dưới đây chỉ dùng để hiển thị.'
-            : 'Điểm = tối thiểu + (số câu đúng / tổng số câu) × (tối đa − tối thiểu).'}
+            ? t('scoringHelp.TOEIC_SCALE')
+            : t('scoringHelp.DEFAULT')}
         </Form.Text>
       </Form.Group>
       <div className="d-flex gap-3 mb-3">
         <Form.Group className="flex-fill">
-          <Form.Label>Điểm tối thiểu</Form.Label>
+          <Form.Label>{t('scoreMin')}</Form.Label>
           <Form.Control
             type="number"
             min={0}
@@ -180,7 +180,7 @@ function ExamTypeFormModal({
           />
         </Form.Group>
         <Form.Group className="flex-fill">
-          <Form.Label>Điểm tối đa</Form.Label>
+          <Form.Label>{t('scoreMax')}</Form.Label>
           <Form.Control
             type="number"
             min={1}
@@ -193,7 +193,7 @@ function ExamTypeFormModal({
         <Form.Check
           type="switch"
           id="exam-type-flexible"
-          label="Loại linh hoạt (cho user tự tạo bài  ẩn khỏi dropdown loại kỳ thi chuẩn)"
+          label={t('flexible')}
           checked={Boolean(formState.flexible)}
           onChange={(event) => onChangeField('flexible', event.target.checked)}
         />

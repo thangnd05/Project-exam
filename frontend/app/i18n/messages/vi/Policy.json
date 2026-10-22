@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "title": "Chính sách bảo mật",
+    "description": "Cách WinDe Exam thu thập và sử dụng dữ liệu của bạn."
+  },
+  "title": "Chính Sách Bảo Mật",
+  "updated": "Cập nhật lần cuối: 18/10/2026 • Phiên bản 2.0 • Kênh giải quyết tranh chấp:",
+  "intro": "FrostScope cam kết bảo vệ quyền riêng tư và dữ liệu cá nhân của mọi người học khi truy cập nền tảng, thực hiện các bài kiểm tra nhanh (Quick Scope), tham gia lộ trình cá nhân hóa (My Path) hoặc xuất hiện trên bảng xếp hạng (ScopeRank). Chính sách này quy định rõ ràng cách thức chúng tôi thu thập, sử dụng, lưu trữ và bảo vệ thông tin của bạn.",
+  "collect": {
+    "title": "1. Thông tin chúng tôi thu thập",
+    "intro": "Chúng tôi chỉ thu thập những dữ liệu cần thiết phục vụ cho việc vận hành trải nghiệm học tập và đánh giá năng lực:",
+    "account": "<strong>1.1. Thông tin tài khoản:</strong> Họ tên hoặc tên hiển thị (Display Name), địa chỉ email, mật khẩu đã mã hóa. Trong trường hợp bạn đăng nhập thông qua Google SSO hoặc GitHub SSO, chúng tôi tiếp nhận mã định danh người dùng và email được ủy quyền từ dịch vụ tương ứng.",
+    "assessment": "<strong>1.2. Dữ liệu đánh giá năng lực & học tập:</strong> Mục tiêu chứng chỉ bạn hướng tới, ngày thi dự kiến, lịch sử làm bài thi thử (Quick Mock, Full Mock), thời gian trả lời từng câu hỏi, mức độ tự tin khi chọn đáp án và phân bố tỷ lệ nắm vững theo từng Domain Blueprint chính thức.",
+    "technical": "<strong>1.3. Dữ liệu kỹ thuật tự động:</strong> Địa chỉ IP, loại trình duyệt, hệ điều hành và thông tin phiên làm việc nhằm đảm bảo bảo mật và duy trì trạng thái đăng nhập."
+  },
+  "purpose": {
+    "title": "2. Mục đích xử lý dữ liệu học tập",
+    "intro": "Mọi dữ liệu thu thập được sử dụng duy nhất cho các mục đích:",
+    "items": [
+      "Phân tích lỗ hổng kiến thức (Gap Report): Nhận diện chính xác phần kiến thức bạn còn yếu trong từng Domain để bạn không phải ôn lại toàn bộ những gì đã nắm vững.",
+      "Tự động thích ứng lộ trình học (My Path): Phân phối bài tập trọng tâm hằng ngày (Daily Focus) và kích hoạt thuật toán ôn tập ngắt quãng (Smart Review) đúng thời điểm kiến thức sắp phai mờ.",
+      "Đo lường mức sẵn sàng (Readiness): Ước lượng mức độ tự tin thực tế trước ngày thi chính thức và đề xuất thời điểm làm bài Full Mock Test.",
+      "Đảm bảo tính trung thực của nền tảng: Phòng ngừa các hành vi gian lận kết quả, spam hoặc khai thác lỗ hổng tích lũy điểm thưởng."
+    ]
+  },
+  "scopeRank": {
+    "title": "3. Bảng xếp hạng ScopeRank và Quyền riêng tư",
+    "intro": "Bảng thành tích ScopeRank được thiết kế nhằm thúc đẩy tinh thần học tập và thi đua lành mạnh trong cộng đồng kỹ sư:",
+    "public": "<strong>Thông tin hiển thị công khai:</strong> Hệ thống chỉ hiển thị Tên hiển thị, avatar, chứng chỉ đang luyện, tổng điểm chuẩn hóa và tiến độ cải thiện. Tuyệt đối không bao giờ hiển thị địa chỉ email, số điện thoại hay thông tin cá nhân riêng tư.",
+    "private": "<strong>Quyền ẩn danh (Private Mode):</strong> Bạn có toàn quyền kích hoạt chế độ ẩn danh trong cài đặt tài khoản để ẩn điểm số và hồ sơ khỏi bảng xếp hạng công khai bất kỳ lúc nào mà không làm ảnh hưởng đến tiến trình học tập cá nhân."
+  },
+  "credits": {
+    "title": "4. Điểm thưởng nội bộ (Credits) & Giao dịch học tập",
+    "intro": "Hệ thống điểm thưởng Credits là cơ chế gamification nội bộ phục vụ việc học:",
+    "items": [
+      "Credits được dùng để mở khóa các bộ đề thi mô phỏng đầy đủ (Full Mock) hoặc bài tập nâng cao.",
+      "Credits không phải là tiền mặt, không phải tài sản tài chính, không có giá trị quy đổi ra tiền mặt và không được phép mua bán, chuyển nhượng giữa các tài khoản.",
+      "Lịch sử cộng và trừ Credits được lưu vết minh bạch trong tài khoản của bạn."
+    ]
+  },
+  "ip": {
+    "title": "5. Quyền sở hữu trí tuệ & Tuyên bố nhãn hiệu bên thứ ba",
+    "trademarks": "Amazon Web Services (AWS), Microsoft Azure, Google Cloud Platform (GCP), The Linux Foundation (Kubernetes, CKA, CKAD), HashiCorp, Oracle và các biểu trưng, huy hiệu liên quan là thương hiệu đã đăng ký của các chủ sở hữu tương ứng.",
+    "independent": "FrostScope là nền tảng đào tạo độc lập, không được tài trợ, ủy quyền hay liên kết chính thức với các tổ chức nêu trên. Các đề thi, câu hỏi và lộ trình được xây dựng độc lập bám sát cấu trúc đề cương kiểm tra (Exam Blueprint) công khai.",
+    "copyright": "Mọi thắc mắc hoặc thông báo liên quan đến bản quyền nội dung vui lòng gửi tới email: <link>{email}</link>."
+  },
+  "noSale": {
+    "title": "6. Cam kết không bán dữ liệu người dùng",
+    "commitment": "FrostScope cam kết tuyệt đối <strong>không bán, cho thuê, trao đổi hoặc thương mại hóa</strong> dữ liệu cá nhân hay lịch sử làm bài thi của bạn cho bất kỳ bên thứ ba nào vì mục đích quảng cáo hay tiếp thị.",
+    "processing": "Dữ liệu chỉ được xử lý kỹ thuật bởi các nhà cung cấp hạ tầng máy chủ đám mây đạt tiêu chuẩn bảo mật quốc tế (SOC 2, ISO 27001) chịu ràng buộc bảo mật khắt khe, hoặc theo yêu cầu bằng văn bản từ cơ quan tư pháp có thẩm quyền theo luật định."
+  },
+  "security": {
+    "title": "7. Lưu trữ và Tiêu chuẩn an toàn bảo mật",
+    "intro": "Chúng tôi áp dụng các tiêu chuẩn an ninh thông tin hiện đại:",
+    "items": [
+      "Mã hóa toàn bộ đường truyền dữ liệu bằng giao thức HTTPS với chuẩn TLS 1.3.",
+      "Mật khẩu người dùng được băm một chiều (salted hash) an toàn, tuyệt đối không lưu trữ dưới dạng văn bản thuần.",
+      "Áp dụng nguyên tắc đặc quyền tối thiểu (Least Privilege) đối với nhân sự kỹ thuật tiếp cận hệ thống cơ sở dữ liệu."
+    ]
+  },
+  "rights": {
+    "title": "8. Quyền lợi của người học đối với dữ liệu cá nhân",
+    "intro": "Bạn có toàn quyền kiểm soát dữ liệu của chính mình:",
+    "items": [
+      "Quyền truy cập và kiểm tra toàn bộ lịch sử bài thi, tỷ lệ nắm vững các domain trong phần tổng quan tài khoản.",
+      "Quyền cập nhật, chỉnh sửa tên hiển thị, mật khẩu và mục tiêu kỳ thi bất kỳ lúc nào.",
+      "Quyền yêu cầu xóa vĩnh viễn tài khoản cùng toàn bộ dữ liệu đi kèm khỏi hệ thống bằng cách gửi yêu cầu về email hỗ trợ. Yêu cầu sẽ được xử lý hoàn tất trong vòng 14 ngày làm việc."
+    ]
+  },
+  "disputes": {
+    "title": "9. Giải quyết khiếu nại & Tranh chấp",
+    "intro": "Mọi khiếu nại, tranh chấp liên quan đến quyền riêng tư, rò rỉ dữ liệu hoặc bản quyền nội dung thi xin vui lòng gửi trực tiếp tới kênh tiếp nhận chuyên trách:",
+    "inbox": "Hộp thư tiếp nhận tranh chấp:",
+    "responseTime": "Thời gian phản hồi cam kết: trong vòng 3 – 5 ngày làm việc.",
+    "general": "Các câu hỏi liên quan đến tài khoản, hỗ trợ kỹ thuật và sử dụng dịch vụ thông thường vui lòng gửi về: <link>{email}</link>."
+  },
+  "changes": {
+    "title": "10. Hiệu lực và Điều chỉnh chính sách",
+    "body": "Chính sách này có hiệu lực kể từ ngày ban hành. FrostScope có thể điều chỉnh nội dung để phù hợp với quy định pháp luật và các tính năng mới của nền tảng. Khi có thay đổi trọng yếu ảnh hưởng đến quyền lợi người học, chúng tôi sẽ thông báo trước qua email hoặc hiển thị thông báo rõ ràng trên website trước ngày áp dụng."
+  }
+}

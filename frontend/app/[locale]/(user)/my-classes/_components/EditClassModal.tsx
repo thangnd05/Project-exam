@@ -1,6 +1,7 @@
 'use client';
 
 import {useState} from 'react';
+import {useTranslations} from 'next-intl';
 import {useQuery} from '@tanstack/react-query';
 import {classKeys} from '@/app/configs/queryKeys';
 import {Alert} from 'react-bootstrap';
@@ -24,6 +25,8 @@ type EditClassModalProps = {
 };
 
 function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalProps) {
+  const t = useTranslations('Classes');
+  const tCommon = useTranslations('Common');
   const [className, setClassName] = useState('');
   const [description, setDescription] = useState('');
   const [message, setMessage] = useState('');
@@ -69,7 +72,7 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
 
     if (!className.trim()) {
       setType('danger');
-      setMessage('Vui lòng nhập tên lớp học!');
+      setMessage(t('editClass.nameRequired'));
       return;
     }
 
@@ -80,14 +83,14 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
       },
       {
         onSuccess: (data) => {
-          toast.success('Cập nhật lớp học thành công!');
+          toast.success(t('editClass.success'));
           onSuccess?.(data);
           onClose();
         },
         onError: (err) => {
           setType('danger');
           setMessage(
-            err.response?.data?.error || 'Có lỗi xảy ra khi cập nhật lớp học!',
+            err.response?.data?.error || t('editClass.error'),
           );
         },
       },
@@ -98,12 +101,12 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
     <CommonFormModal
       show={show}
       onHide={onClose}
-      title="Chỉnh sửa lớp học"
+      title={t('editClass.title')}
       footer={
         <ModalActionFooter
-          cancelLabel="Để sau"
-          submitLabel="Lưu thay đổi"
-          loadingLabel="Đang xử lý..."
+          cancelLabel={t('common.later')}
+          submitLabel={t('common.saveChanges')}
+          loadingLabel={tCommon('processing')}
           loading={loading}
           onCancel={onClose}
           onSubmit={handleUpdate}
@@ -117,7 +120,7 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
       )}
 
       <div className={cx('formGroup')}>
-        <label className={cx('label')}>Tên lớp học</label>
+        <label className={cx('label')}>{t('common.className')}</label>
         <div className={cx('inputWrapper')}>
           <span className={cx('inputIcon')}>
             <FaEdit />
@@ -125,7 +128,7 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
           <input
             type="text"
             className={cx('inputControl')}
-            placeholder="Nhập tên lớp học"
+            placeholder={t('editClass.namePlaceholder')}
             value={className}
             onChange={(e) => { setTouched(true); setClassName(e.target.value); }}
             disabled={loading}
@@ -134,11 +137,11 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
       </div>
 
       <div className={cx('formGroup', 'mt-4')}>
-        <label className={cx('label')}>Mô tả lớp học</label>
+        <label className={cx('label')}>{t('common.classDescription')}</label>
         <div className={cx('inputWrapper')}>
           <textarea
             className={cx('inputControl', 'textarea')}
-            placeholder="Nhập mô tả về lớp học (không bắt buộc)"
+            placeholder={t('common.classDescriptionPlaceholder')}
             value={description}
             onChange={(e) => { setTouched(true); setDescription(e.target.value); }}
             disabled={loading}
@@ -147,7 +150,7 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
         </div>
         <div className={cx('tip')}>
           <FaInfoCircle />
-          <span>Mô tả giúp học sinh hiểu rõ hơn về nội dung lớp học.</span>
+          <span>{t('common.classDescriptionTip')}</span>
         </div>
       </div>
     </CommonFormModal>

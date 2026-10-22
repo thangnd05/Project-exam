@@ -1,6 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslations } from 'next-intl';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { getUserTarget } from '@/app/apis/userTargetApi';
@@ -50,6 +51,7 @@ export function useCompletedUserTests(enabled = true) {
 }
 
 export function useUserTarget(examTypeId?: string, enabled = true) {
+  const t = useTranslations('LearningPlans');
   const query = useQuery({
     queryKey: generatePlanKeys.target(examTypeId),
     queryFn: () => getUserTarget(examTypeId),
@@ -61,7 +63,7 @@ export function useUserTarget(examTypeId?: string, enabled = true) {
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.isError
-      ? getApiErrorMessage(query.error, 'Không tải được mục tiêu')
+      ? getApiErrorMessage(query.error, t('generate.targetLoadError'))
       : null,
     refetch: query.refetch,
   };
