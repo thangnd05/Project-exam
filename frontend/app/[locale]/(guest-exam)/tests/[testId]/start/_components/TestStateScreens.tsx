@@ -7,9 +7,17 @@ import { useTranslations } from 'next-intl';
 import { IoLockClosedOutline, IoAlertCircleOutline, IoPlayCircleOutline } from 'react-icons/io5';
 import { useExamTypeById } from '@/app/features/exam-types/hooks/useExamTypes';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
+import { QuestionType } from '@/app/enums';
 import styles from '@/app/features/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);
+
+const QUESTION_TYPE_ORDER = [
+  QuestionType.MCQ,
+  QuestionType.MSQ,
+  QuestionType.FILL_BLANK,
+  QuestionType.ESSAY,
+];
 
 function ExamTypeLogo({ examTypeId }: { examTypeId?: string }) {
   const { examType } = useExamTypeById(examTypeId);
@@ -35,6 +43,8 @@ type TestStateScreensProps = {
     examTypeId?: string;
     durationMinutes?: number | null;
     costCoins?: number | null;
+    maxAttempts?: number | null;
+    remainingAttempts?: number | null;
   };
   balance: number;
   purchasing: boolean;
@@ -45,6 +55,7 @@ type TestStateScreensProps = {
   onRetry?: () => void;
   questionCount?: number;
   partCount?: number;
+  questionTypes?: QuestionType[];
   onStart?: () => void;
 };
 
@@ -60,10 +71,12 @@ export default function TestStateScreens({
   onRetry,
   questionCount = 0,
   partCount = 0,
+  questionTypes = [],
   onStart,
 }: TestStateScreensProps) {
   const t = useTranslations('TestTaking.start');
   const tCommon = useTranslations('Common');
+  const { examType } = useExamTypeById(test.examTypeId);
   if (status === 'loading')
     return (
       <div className={cx('state-box')}>
@@ -73,58 +86,79 @@ export default function TestStateScreens({
     );
 
   if (status === 'ready') {
-    const timed = (test.durationMinutes ?? 0) > 0;
+    const minutes = test.durationMinutes ?? 0;
+    const timed = minutes > 0;
+    const maxAttempts = test.maxAttempts ?? 0;
+    const typeLabels = QUESTION_TYPE_ORDER.filter((qt) => questionTypes.includes(qt)).map((qt) =>
+      t(`ready.questionTypes.${qt}`),
+    );
+    // Chỉ hiện các dòng đã có dữ liệu; điểm chuẩn và quy tắc tính điểm bổ sung khi backend trả về.
+    const rows: { label: string; value: string }[] = [
+      { label: t('ready.rows.questions'), value: t('ready.questionCountValue', { count: questionCount }) },
+      ...(partCount > 1
+        ? [{ label: t('ready.rows.parts'), value: t('ready.partCountValue', { count: partCount }) }]
+        : []),
+      {
+        label: t('ready.rows.duration'),
+        value: timed
+          ? t('ready.durationValue', { minutes }) +
+            (minutes >= 60
+              ? ` ${t('ready.durationHours', { hours: Math.floor(minutes / 60), mins: minutes % 60 })}`
+              : '')
+          : t('ready.untimed'),
+      },
+      ...(typeLabels.length > 0
+        ? [{ label: t('ready.rows.questionTypes'), value: typeLabels.join(' & ') }]
+        : []),
+      ...(maxAttempts > 0 && test.remainingAttempts != null
+        ? [
+            {
+              label: t('ready.rows.attempts'),
+              value: t('ready.attemptsValue', { remaining: test.remainingAttempts, max: maxAttempts }),
+            },
+          ]
+        : []),
+    ];
+
     return (
-      <div className={cx('state-box')}>
-        <ExamTypeLogo examTypeId={test.examTypeId} />
-        <h3>{test.title || t('ready.fallbackTitle')}</h3>
-        <ul className={cx('ready-facts')}>
-          <li>
-            <span>
-              {t.rich('ready.questionCount', {
-                count: questionCount,
-                strong: (chunks) => <strong>{chunks}</strong>,
-              })}
-              {partCount > 1 ? t('ready.partCount', { count: partCount }) : ''}
-            </span>
-          </li>
-          <li>
-            <span>
-              {timed ? (
-                t.rich('ready.timed', {
-                  minutes: test.durationMinutes ?? 0,
-                  strong: (chunks) => <strong>{chunks}</strong>,
-                })
-              ) : (
-                t('ready.untimed')
-              )}
-            </span>
-          </li>
-          <li>
-            <span>{t('ready.autosave')}</span>
-          </li>
-          <li>
-            <span>
-              {t.rich('ready.submitHint', { strong: (chunks) => <strong>{chunks}</strong> })}
-              {timed && ` ${t('ready.autoSubmit')}`}
-            </span>
-          </li>
-        </ul>
-        <div className={cx('state-actions')}>
-          <button
-            type="button"
-            className={cx('state-btn', 'state-btn-secondary')}
-            onClick={onBack}
-          >
-            {t('back')}
-          </button>
-          <button
-            type="button"
-            className={cx('state-btn', 'state-btn-primary')}
-            onClick={onStart}
-          >
-            {t('ready.start')}
-          </button>
+      <div className={cx('ready-wrap')}>
+        <div className={cx('ready-card')}>
+          <header className={cx('ready-header')}>
+            <ExamTypeLogo examTypeId={test.examTypeId} />
+            <div>
+              <h1 className={cx('ready-title')}>
+                {t('ready.guideTitle', { title: test.title || t('ready.fallbackTitle') })}
+              </h1>
+              {examType?.name && <p className={cx('ready-subtitle')}>{examType.name}</p>}
+            </div>
+          </header>
+
+          <h2 className={cx('ready-section-title')}>{t('ready.readCarefully')}</h2>
+          <dl className={cx('ready-table')}>
+            {rows.map((row) => (
+              <div key={row.label} className={cx('ready-row')}>
+                <dt>{row.label}</dt>
+                <dd>{row.value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <h2 className={cx('ready-section-title')}>{t('ready.rulesTitle')}</h2>
+          <ul className={cx('ready-rules')}>
+            <li>{t('ready.autosave')}</li>
+            <li>{t.rich('ready.submitHint', { strong: (chunks) => <strong>{chunks}</strong> })}</li>
+            {timed && <li>{t('ready.autoSubmit')}</li>}
+            <li>{t('ready.noChangeAfterSubmit')}</li>
+          </ul>
+
+          <footer className={cx('ready-footer')}>
+            <button type="button" className={cx('ready-cancel-btn')} onClick={onBack}>
+              {t('ready.cancel')}
+            </button>
+            <button type="button" className={cx('ready-start-btn')} onClick={onStart}>
+              {t('ready.start')}
+            </button>
+          </footer>
         </div>
       </div>
     );

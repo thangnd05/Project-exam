@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
-import { IoFlag, IoFlagOutline } from 'react-icons/io5';
+import { IoArrowBack, IoArrowForward, IoFlag, IoFlagOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 
@@ -10,7 +10,7 @@ import { getFullMediaUrl } from '@/app/utils/mediaUrl';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import GatedAudioPlayer from '@/app/features/exam-layout/blocks/GatedAudioPlayer';
 import { MediaType, PassageType, QuestionType } from '@/app/enums';
-import type { PassageMediaResponse } from '@/app/types';
+import type { AnswerResponse, PassageMediaResponse } from '@/app/types';
 import type {
   AnswerChangeHandler,
   ExamFlowStep,
@@ -174,6 +174,20 @@ function QuestionAreaBlock({
     );
   };
 
+  const renderOptionContent = (a: AnswerResponse) =>
+    a.answerText?.trim() ? (
+      <>
+        <span className={cx('opt-label')}>{a.answerLabel}.</span>
+        <span className={cx('opt-text')}>{a.answerText}</span>
+      </>
+    ) : (
+      <span className={cx('opt-label')}>{a.answerLabel}</span>
+    );
+
+  // Đáp án chỉ có nhãn (A/B/C/D, kiểu nghe TOEIC) thì xếp ngang cho gọn; có nội dung thì xếp 1 cột.
+  const isLabelOnly = (q: ExamQuestion) =>
+    (q.answers?.length ?? 0) > 0 && q.answers!.every((a) => !a.answerText?.trim());
+
   const renderQuestionOnly = (q: ExamQuestion, absoluteIndex: number) => {
     const flagged = flaggedQuestionIds?.includes(q.questionId) ?? false;
     return (
@@ -198,7 +212,7 @@ function QuestionAreaBlock({
         </div>
 
         {q.questionType === QuestionType.MCQ && (
-          <div className={cx('mcq-group')}>
+          <div className={cx('mcq-group', { 'label-only': isLabelOnly(q) })}>
             {q.answers?.map((a) => (
               <div
                 key={a.answerId}
@@ -213,18 +227,14 @@ function QuestionAreaBlock({
                   checked={userAnswers[q.questionId]?.selectedAnswerId === a.answerId}
                   readOnly
                 />
-                <span>
-                  {a.answerText?.trim()
-                    ? `${a.answerLabel}. ${a.answerText}`
-                    : a.answerLabel}
-                </span>
+                {renderOptionContent(a)}
               </div>
             ))}
           </div>
         )}
 
         {q.questionType === QuestionType.MSQ && (
-          <div className={cx('mcq-group')}>
+          <div className={cx('mcq-group', { 'label-only': isLabelOnly(q) })}>
             {q.answers?.map((a) => {
               const chosen = (userAnswers[q.questionId]?.selectedAnswerIds || []).includes(
                 a.answerId,
@@ -236,9 +246,7 @@ function QuestionAreaBlock({
                   onClick={() => handleAnswerChange(q.questionId, 'MSQ', a.answerId)}
                 >
                   <Form.Check type="checkbox" checked={chosen} readOnly />
-                  <span>
-                    {a.answerText?.trim() ? `${a.answerLabel}. ${a.answerText}` : a.answerLabel}
-                  </span>
+                  {renderOptionContent(a)}
                 </div>
               );
             })}
@@ -344,19 +352,19 @@ function QuestionAreaBlock({
           )}
         </div>
 
-        {!gated && (canGoPrev || !isLast) && (
+        {!gated && flowSteps.length > 1 && (
           <div className={cx('paged-nav')}>
             <div className={cx('paged-nav-left')}>
-              {canGoPrev && (
-                <ButtonPrime variant="outline" onClick={goPrev}>
-                  {t('prev')}
-                </ButtonPrime>
-              )}
+              <ButtonPrime variant="outline" onClick={goPrev} disabled={!canGoPrev}>
+                <IoArrowBack aria-hidden />
+                {t('prev')}
+              </ButtonPrime>
             </div>
             <div className={cx('paged-nav-right')}>
               {showManualNext && (
                 <ButtonPrime variant="primary" onClick={goNext}>
                   {t('next')}
+                  <IoArrowForward aria-hidden />
                 </ButtonPrime>
               )}
             </div>

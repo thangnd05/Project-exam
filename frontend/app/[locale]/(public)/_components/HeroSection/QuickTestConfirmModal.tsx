@@ -19,6 +19,9 @@ function shortExamName(name: string | undefined, fallback: string): string {
 type QuickTestConfirmModalProps = {
   show: boolean;
   test: QuickChallengeCardResponse | null;
+  // Có từ 2 đề trở lên thì hiện ô chọn kỳ thi, đổi lựa chọn qua onChangeTest.
+  tests?: QuickChallengeCardResponse[];
+  onChangeTest?: (test: QuickChallengeCardResponse) => void;
   onClose?: () => void;
   onConfirm?: (test: QuickChallengeCardResponse) => void;
   onStartSyllabusPlan?: (test: QuickChallengeCardResponse) => void;
@@ -28,6 +31,8 @@ type QuickTestConfirmModalProps = {
 function QuickTestConfirmModal({
   show,
   test,
+  tests,
+  onChangeTest,
   onClose,
   onConfirm,
   onStartSyllabusPlan,
@@ -106,21 +111,41 @@ function QuickTestConfirmModal({
           </p>
         </div>
 
-        <div className={cx('field')}>
-          <span className={cx('fieldLabel')}>{t('confirm.examLabel')}</span>
-          <div className={cx('exam')}>
-            {test.examTypeImageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- logo do admin dán (URL ngoài tuỳ ý), không qua next/image
-              <img
-                className={cx('logo')}
-                src={test.examTypeImageUrl}
-                alt=""
-                aria-hidden="true"
-              />
-            ) : null}
-            <span className={cx('examName')}>{examName}</span>
+        {tests && tests.length > 1 ? (
+          <label className={cx('field')}>
+            <span className={cx('fieldLabel')}>{t('confirm.examLabel')}</span>
+            <select
+              className="form-select"
+              value={test.testId}
+              onChange={(event) => {
+                const next = tests.find((item) => item.testId === event.target.value);
+                if (next) onChangeTest?.(next);
+              }}
+            >
+              {tests.map((item) => (
+                <option key={item.testId} value={item.testId}>
+                  {item.examTypeName || item.title || t('fallbackName')}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <div className={cx('field')}>
+            <span className={cx('fieldLabel')}>{t('confirm.examLabel')}</span>
+            <div className={cx('exam')}>
+              {test.examTypeImageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- logo do admin dán (URL ngoài tuỳ ý), không qua next/image
+                <img
+                  className={cx('logo')}
+                  src={test.examTypeImageUrl}
+                  alt=""
+                  aria-hidden="true"
+                />
+              ) : null}
+              <span className={cx('examName')}>{examName}</span>
+            </div>
           </div>
-        </div>
+        )}
 
         <button
           type="button"

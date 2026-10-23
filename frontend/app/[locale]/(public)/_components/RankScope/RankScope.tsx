@@ -1,19 +1,16 @@
 'use client';
 
 import {useState} from 'react';
-import Link, { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
+import Link from '@/app/i18n/navigation';
 import {useTranslations} from 'next-intl';
 import {useQueryClient} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {FiArrowRight, FiRefreshCw} from 'react-icons/fi';
 
 import routes from '@/app/configs/Routes';
-import type {QuickChallengeCardResponse} from '@/app/types/test';
 import type {Vendor} from '@/app/[locale]/(public)/_lib/certificationMeta';
 import QuickTestConfirmModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestConfirmModal';
-import QuickTestPickerModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestPickerModal';
-import {useQuickChallengeTests} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickChallengeTests';
-import {useQuickTestLauncher} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickTestLauncher';
+import {useQuickTestEntry} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickTestEntry';
 import RankScopeModal from './RankScopeModal';
 import {RANK_BOARD_KEY, displayName, initials, useRankBoard} from './useRankBoard';
 import styles from './RankScope.module.scss';
@@ -27,18 +24,13 @@ const TABS: (Vendor | 'all')[] = ['all', 'aws', 'azure', 'gcp', 'other'];
 
 function RankScope() {
   const t = useTranslations('Home.rankScope');
-  const router = useRouter();
-  const localizeHref = useLocalizeHref();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Vendor | 'all'>('all');
   const [spinKey, setSpinKey] = useState(0);
   const [fullOpen, setFullOpen] = useState(false);
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   const {vendors, rowsFor, isLoading, isFetching} = useRankBoard(TOP);
-  const {quickTests, isLoading: quickLoading} = useQuickChallengeTests();
-  const {pendingTest, requestStart, closeConfirm, confirmStart, startSyllabusPlan, isGuest} =
-    useQuickTestLauncher();
+  const {openQuick, confirmProps} = useQuickTestEntry();
 
   const tabs = TABS.filter((id) => id === 'all' || vendors.includes(id));
   const rows = rowsFor(tab);
@@ -48,19 +40,10 @@ function RankScope() {
     queryClient.invalidateQueries({queryKey: [RANK_BOARD_KEY]});
   };
 
-  // "Thi ngay để ghi danh": đóng bảng xếp hạng rồi mở hộp chọn đề nhanh; chưa có đề thì sang kho đề.
+  // "Thi ngay để ghi danh": đóng bảng xếp hạng rồi mở hộp đề nhanh; chưa có đề thì sang kho đề.
   const joinFromModal = () => {
     setFullOpen(false);
-    if (quickLoading || quickTests.length > 0) {
-      setPickerOpen(true);
-      return;
-    }
-    router.push(localizeHref(routes.examTypes));
-  };
-
-  const pickTest = (test: QuickChallengeCardResponse) => {
-    setPickerOpen(false);
-    requestStart(test);
+    openQuick();
   };
 
   const renderRows = () => {
@@ -169,21 +152,7 @@ function RankScope() {
       </div>
 
       <RankScopeModal show={fullOpen} onClose={() => setFullOpen(false)} onJoin={joinFromModal} />
-      <QuickTestPickerModal
-        show={pickerOpen}
-        tests={quickTests}
-        loading={quickLoading}
-        onClose={() => setPickerOpen(false)}
-        onSelect={pickTest}
-      />
-      <QuickTestConfirmModal
-        show={Boolean(pendingTest)}
-        test={pendingTest}
-        onClose={closeConfirm}
-        onConfirm={confirmStart}
-        onStartSyllabusPlan={startSyllabusPlan}
-        isGuest={isGuest}
-      />
+      <QuickTestConfirmModal {...confirmProps} />
     </section>
   );
 }

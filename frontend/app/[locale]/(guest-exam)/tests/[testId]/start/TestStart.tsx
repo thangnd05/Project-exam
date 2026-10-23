@@ -94,6 +94,7 @@ function TestStart({ testRef }: { testRef: TestRef }) {
         onRetry={retryLoad}
         questionCount={allQuestions.length}
         partCount={visibleParts.length}
+        questionTypes={allQuestions.flatMap((q) => (q.questionType ? [q.questionType] : []))}
         onStart={confirmReady}
       />
     );

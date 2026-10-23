@@ -1,17 +1,13 @@
 'use client';
 
-import {useState} from 'react';
 import Image from 'next/image';
 import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 
 import routes from '@/app/configs/Routes';
-import type {QuickChallengeCardResponse} from '@/app/types/test';
 import QuickTestConfirmModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestConfirmModal';
-import QuickTestPickerModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestPickerModal';
-import {useQuickChallengeTests} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickChallengeTests';
-import {useQuickTestLauncher} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickTestLauncher';
+import {useQuickTestEntry} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickTestEntry';
 import styles from './CertificationOrbit.module.scss';
 
 const cx = classNames.bind(styles);
@@ -77,24 +73,7 @@ function CertificationOrbit() {
   const t = useTranslations('Home.orbit');
   const router = useRouter();
   const localizeHref = useLocalizeHref();
-  const {quickTests, isLoading} = useQuickChallengeTests();
-  const {pendingTest, requestStart, closeConfirm, confirmStart, startSyllabusPlan, isGuest} =
-    useQuickTestLauncher();
-  const [pickerOpen, setPickerOpen] = useState(false);
-
-  // Chưa có đề nhanh nào thì đưa sang kho kỳ thi thay vì mở hộp chọn rỗng.
-  const openPicker = () => {
-    if (isLoading || quickTests.length > 0) {
-      setPickerOpen(true);
-      return;
-    }
-    router.push(localizeHref(routes.examTypes));
-  };
-
-  const pickTest = (test: QuickChallengeCardResponse) => {
-    setPickerOpen(false);
-    requestStart(test);
-  };
+  const {openQuick, confirmProps} = useQuickTestEntry();
 
   return (
     <section id="certifications" className={cx('section', 'theme-locked')}>
@@ -109,7 +88,7 @@ function CertificationOrbit() {
               {t('lede')}
             </p>
             <div className={cx('actions')}>
-              <button type="button" className={cx('btnPrimary')} onClick={openPicker}>
+              <button type="button" className={cx('btnPrimary')} onClick={openQuick}>
                 {t('practiceNow')}
               </button>
               <button type="button" className={cx('btnGhost')} onClick={() => router.push(localizeHref(routes.learningPlans))}>
@@ -134,7 +113,7 @@ function CertificationOrbit() {
                     <button
                       type="button"
                       className={cx('badge')}
-                      onClick={openPicker}
+                      onClick={openQuick}
                       aria-label={t('badgeAria', {name: badge.label})}
                     >
                       <Image
@@ -155,21 +134,7 @@ function CertificationOrbit() {
         </div>
       </div>
 
-      <QuickTestPickerModal
-        show={pickerOpen}
-        tests={quickTests}
-        loading={isLoading}
-        onClose={() => setPickerOpen(false)}
-        onSelect={pickTest}
-      />
-      <QuickTestConfirmModal
-        show={Boolean(pendingTest)}
-        test={pendingTest}
-        onClose={closeConfirm}
-        onConfirm={confirmStart}
-        onStartSyllabusPlan={startSyllabusPlan}
-        isGuest={isGuest}
-      />
+      <QuickTestConfirmModal {...confirmProps} />
     </section>
   );
 }

@@ -25,6 +25,7 @@
     "confirm": {
       "title": "Quick test (Quick Scope)",
       "intro": "A short test of <strong>{questions}</strong> in <strong>{duration}</strong>, aligned with the Blueprint, that instantly pinpoints your knowledge gaps.",
+      "introNoLimit": "A short, untimed test of <strong>{questions}</strong>, aligned with the Blueprint, that instantly pinpoints your knowledge gaps.",
       "perkTitle": "What you get:",
       "perkText": "A per-domain analysis report right after you submit.",
       "perkTextGuest": "No sign-in needed. Get a per-domain analysis report right after you submit.",
@@ -34,14 +35,6 @@
       "planTitleGuest": "Sign in to build a personalized study plan",
       "planTitle": "Build a personalized study plan",
       "planHint": "Set a goal and get your own study plan, with progress saved to your account."
-    },
-    "picker": {
-      "title": "Choose a quick test",
-      "loadingAria": "Loading quick tests",
-      "empty": "No quick tests are available yet.",
-      "intro": "<strong>{count, plural, one {# test} other {# tests}}</strong> ready. Take one now to see where you stand.",
-      "startAria": "Start {name}",
-      "start": "Start"
     }
   },
   "rankScope": {

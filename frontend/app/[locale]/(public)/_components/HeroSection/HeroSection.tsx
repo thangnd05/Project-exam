@@ -1,17 +1,11 @@
 'use client';
-import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
-import { useCallback, useState } from 'react';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { FiCheck } from 'react-icons/fi';
-import routes from '@/app/configs/Routes';
-import type { QuickChallengeCardResponse } from '@/app/types/test';
 import styles from './HeroSection.module.scss';
-import { useQuickChallengeTests } from './hooks/useQuickChallengeTests';
-import { useQuickTestLauncher } from './hooks/useQuickTestLauncher';
+import { useQuickTestEntry } from './hooks/useQuickTestEntry';
 import QuickTestConfirmModal from './QuickTestConfirmModal';
-import QuickTestPickerModal from './QuickTestPickerModal';
 
 const cx = classNames.bind(styles);
 
@@ -34,29 +28,7 @@ const rise = (delay = 0) => ({
 
 function HeroSection() {
   const t = useTranslations('Home.hero');
-  const router = useRouter();
-  const localizeHref = useLocalizeHref();
-  const { quickTests, isLoading: loading } = useQuickChallengeTests();
-  const { pendingTest, requestStart, closeConfirm, confirmStart, startSyllabusPlan, isGuest } =
-    useQuickTestLauncher();
-  const [pickerOpen, setPickerOpen] = useState(false);
-
-  // Chưa có đề nhanh nào thì đưa sang kho đề thi thay vì mở hộp chọn rỗng.
-  const handleStartQuick = useCallback(() => {
-    if (loading || quickTests.length > 0) {
-      setPickerOpen(true);
-      return;
-    }
-    router.push(localizeHref(routes.examTypes));
-  }, [loading, quickTests.length, router, localizeHref]);
-
-  const handlePickTest = useCallback(
-    (test: QuickChallengeCardResponse) => {
-      setPickerOpen(false);
-      requestStart(test);
-    },
-    [requestStart],
-  );
+  const { openQuick, confirmProps } = useQuickTestEntry();
 
   return (
     <section id="hero" className={cx('hero', 'theme-locked')}>
@@ -77,7 +49,7 @@ function HeroSection() {
             </motion.h1>
 
             <motion.div className={cx('actions')} {...rise(0.16)}>
-              <button type="button" className={cx('btnPrimary')} onClick={handleStartQuick}>
+              <button type="button" className={cx('btnPrimary')} onClick={openQuick}>
                 {t('startQuick')}
               </button>
               <a href="#certifications" className={cx('btnGhost')}>
@@ -127,22 +99,7 @@ function HeroSection() {
         </ul>
       </div>
 
-      <QuickTestPickerModal
-        show={pickerOpen}
-        tests={quickTests}
-        loading={loading}
-        onClose={() => setPickerOpen(false)}
-        onSelect={handlePickTest}
-      />
-
-      <QuickTestConfirmModal
-        show={Boolean(pendingTest)}
-        test={pendingTest}
-        onClose={closeConfirm}
-        onConfirm={confirmStart}
-        onStartSyllabusPlan={startSyllabusPlan}
-        isGuest={isGuest}
-      />
+      <QuickTestConfirmModal {...confirmProps} />
     </section>
   );
 }

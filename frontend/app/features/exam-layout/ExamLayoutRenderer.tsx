@@ -108,10 +108,22 @@ function ExamLayoutRenderer({
     ? new Set((flowSteps[currentStepIndex]?.questions || []).map((q) => q.questionId))
     : null;
 
+  // Danh sách câu dạng cột bên đã hiện "đã làm / tổng" ở đầu thẻ, nên khối Tiến độ khi đó bị trùng -> ẩn đi.
+  const hasSideNav = (config.blocks || []).some(
+    (b) =>
+      b.visible !== false &&
+      b.type === BLOCK_TYPES.QUESTION_NAV &&
+      (b.zone === ZONES.LEFT || b.zone === ZONES.RIGHT),
+  );
+
   const byZone = (zone: string) =>
     (config.blocks || [])
       .filter(
-        (b) => b.visible !== false && b.type !== BLOCK_TYPES.QUESTION_AREA && b.zone === zone,
+        (b) =>
+          b.visible !== false &&
+          b.type !== BLOCK_TYPES.QUESTION_AREA &&
+          !(hasSideNav && b.type === BLOCK_TYPES.PROGRESS) &&
+          b.zone === zone,
       )
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 

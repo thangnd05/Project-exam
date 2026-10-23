@@ -126,29 +126,78 @@
   width: 100%;
 }
 
+// Danh sách câu hỏi theo mẫu phòng thi: đầu thẻ có tiến độ + chú thích kèm số đếm, lưới ô vuông bên dưới.
 .dashboard-card {
   background: var(--bg-white);
-  border-radius: var(--radius-lg);
-  padding: 18px 16px;
-  border: 2px solid var(--slate-200);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-  background-clip: padding-box;
+  border-radius: var(--exam-radius, 12px);
+  border: 1px solid var(--slate-200);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
+  overflow: hidden;
+}
+
+.dashboard-top {
+  padding: 14px 16px 12px;
+  background: var(--slate-50);
+  border-bottom: 1px solid var(--slate-200);
 }
 
 .dashboard-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
-  font-size: 1.6rem;
-  font-weight: 800;
+  font-size: 1.4rem;
+  font-weight: 700;
   color: var(--dark-color);
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--slate-100);
+}
 
-  svg {
-    color: var(--primary-text);
-    font-size: 2rem;
+.dashboard-progress {
+  font-weight: 700;
+  color: var(--primary-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 10px;
+
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 1.2rem;
+    color: var(--slate-600);
+
+    b {
+      color: var(--slate-900);
+    }
+  }
+
+  .swatch {
+    position: relative;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid var(--slate-300);
+    background: var(--bg-white);
+    overflow: hidden;
+    flex-shrink: 0;
+
+    &.answered {
+      background: var(--surface-inverse);
+      border-color: var(--surface-inverse);
+    }
+
+    &.flagged::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      border-top: 8px solid var(--warning);
+      border-left: 8px solid transparent;
+    }
   }
 }
 
@@ -156,54 +205,55 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
   gap: 8px;
-  margin-bottom: 20px;
+  padding: 14px 16px 16px;
 }
 
 .q-nav-item {
+  position: relative;
   aspect-ratio: 1;
-  min-height: 44px;
-  border-radius: 8px;
-  border: 1px solid var(--slate-200);
-  background: var(--slate-50);
-  font-size: var(--font-size-md);
+  min-height: 40px;
+  border-radius: 6px;
+  border: 1px solid var(--slate-300);
+  background: var(--bg-white);
+  font-size: 1.3rem;
   font-weight: 700;
-  color: var(--slate-500);
+  color: var(--slate-700);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  overflow: hidden;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
   cursor: pointer;
 
   &:hover {
-    border-color: var(--primary);
-    color: var(--primary-text);
+    background: var(--slate-100);
   }
 
   &.answered {
-    background: var(--primary);
-    border-color: transparent;
-    color: white;
-    box-shadow: 0 4px 10px var(--primary-alpha-20);
+    background: var(--surface-inverse);
+    border-color: var(--surface-inverse);
+    color: #fff;
   }
 
+  // Câu đang xem: vòng viền tách khỏi ô bằng một khe trắng, giữ nguyên màu nền đã làm/chưa làm.
   &.current {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px var(--primary);
+    z-index: 1;
+    box-shadow:
+      0 0 0 2px var(--bg-white),
+      0 0 0 4px var(--primary-text);
   }
 
   // Góc gấp màu cam, giữ nguyên màu nền để vẫn biết câu đã làm hay chưa.
-  &.flagged {
-    position: relative;
-    overflow: hidden;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      border-top: 16px solid var(--warning);
-      border-left: 16px solid transparent;
-    }
+  &.flagged::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-top: 13px solid var(--warning);
+    border-left: 13px solid transparent;
+    pointer-events: none;
   }
 
   &.locked {
@@ -211,52 +261,11 @@
     cursor: not-allowed;
 
     &:hover {
-      border-color: var(--slate-200);
-      color: var(--slate-500);
-      transform: none;
-    }
-  }
-}
-
-.dashboard-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding-top: 15px;
-  border-top: 1px solid var(--slate-100);
-
-  .status-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--slate-500);
-
-    .dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: var(--slate-200);
-      flex-shrink: 0;
-
-      &.answered {
-        background: var(--primary);
-      }
-
-      &.flagged {
-        width: 0;
-        height: 0;
-        border-radius: 0;
-        background: none;
-        border-top: 12px solid var(--warning);
-        border-left: 12px solid transparent;
-      }
+      background: var(--bg-white);
     }
 
-    span {
-      display: inline-block;
-      line-height: 1;
+    &.answered:hover {
+      background: var(--surface-inverse);
     }
   }
 }
@@ -708,31 +717,52 @@
   }
 }
 
+// Đáp án xếp 1 cột như mẫu: dòng dài vẫn đọc liền mạch, chiều cao mỗi dòng không phụ thuộc dòng bên cạnh.
 .mcq-group {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 
-  @include down(md) {
-    grid-template-columns: 1fr;
+  // Đáp án chỉ có nhãn (A/B/C/D) thì xếp ngang cho gọn.
+  &.label-only {
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    .mcq-option {
+      flex: 0 1 12rem;
+    }
   }
-}
-
-.mcq-group:has(> :nth-child(3):last-child) {
-  grid-template-columns: 1fr;
 }
 
 .mcq-option {
   display: flex;
 
   align-items: flex-start;
-  gap: 14px;
-  padding: 14px 20px;
-  border-radius: 12px;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 8px;
   background: var(--bg-white);
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
   border: 1px solid var(--slate-200);
+
+  &:hover {
+    background: var(--slate-50);
+  }
+
+  .opt-label {
+    flex-shrink: 0;
+    min-width: 2rem;
+    font-weight: 700;
+    color: var(--slate-700);
+  }
+
+  .opt-text {
+    flex: 1;
+    min-width: 0;
+  }
 
   input[type='radio'],
   input[type='checkbox'] {
@@ -753,19 +783,22 @@
 
   span {
     font-size: 1.6rem;
-    font-weight: 500;
-    color: var(--slate-600);
-    line-height: 1.4;
+    font-weight: 400;
+    color: var(--slate-700);
+    line-height: 1.6;
   }
 
   &.selected {
-    background: rgb(var(--primary-rgb) / 0.04);
-    border-color: var(--primary);
-    box-shadow: 0 4px 12px rgb(var(--primary-rgb) / 0.06);
+    background: rgb(var(--primary-rgb) / 0.08);
+    border-color: var(--primary-text);
 
     span {
-      color: var(--primary-text);
+      color: var(--slate-900);
       font-weight: 500;
+    }
+
+    .opt-label {
+      font-weight: 700;
     }
   }
 
@@ -1051,43 +1084,175 @@
   }
 }
 
-.ready-facts {
-  list-style: none;
-  margin: 20px 0 0;
-  padding: 0;
+// Màn hướng dẫn trước khi bắt đầu làm bài.
+.ready-wrap {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 460px;
-  text-align: left;
-  font-size: 1.6rem;
+  justify-content: center;
+  padding: 40px 16px 60px;
+
+  @include down(sm) {
+    padding: 16px 0 40px;
+  }
+}
+
+.ready-card {
+  width: 100%;
+  max-width: 880px;
+  padding: 40px 48px 32px;
+  background: var(--bg-white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+
+  @include down(sm) {
+    padding: 24px 16px;
+  }
+}
+
+.ready-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--slate-200);
+}
+
+.ready-logo {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.ready-title {
+  margin: 0;
+  font-size: var(--font-size-2xxl);
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--dark-color);
+
+  @include down(sm) {
+    font-size: var(--font-size-xl);
+  }
+}
+
+.ready-subtitle {
+  margin: 6px 0 0;
+  font-size: var(--font-size-md);
   color: var(--text-secondary);
+}
 
-  li {
-    position: relative;
-    padding-left: 18px;
+.ready-section-title {
+  margin: 28px 0 14px;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--dark-color);
+}
 
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 0.6em;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--primary);
+.ready-table {
+  margin: 0;
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  font-size: var(--font-size-md);
+}
+
+.ready-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 35%) 1fr;
+
+  & + & {
+    border-top: 1px solid var(--slate-200);
+  }
+
+  dt,
+  dd {
+    margin: 0;
+    padding: 14px 16px;
+  }
+
+  dt {
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--slate-50);
+  }
+
+  dd {
+    font-weight: 700;
+    color: var(--dark-color);
+  }
+
+  @include down(sm) {
+    grid-template-columns: 1fr;
+
+    dt {
+      padding-bottom: 6px;
+    }
+
+    dd {
+      padding-top: 6px;
     }
   }
+}
+
+.ready-rules {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: var(--font-size-md);
+  color: var(--text-color);
 
   strong {
     color: var(--dark-color);
   }
 }
 
-.ready-logo {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
+.ready-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--slate-200);
+
+  @include down(sm) {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+}
+
+.ready-cancel-btn,
+.ready-start-btn {
+  padding: 12px 22px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.ready-cancel-btn {
+  background: transparent;
+  color: var(--slate-600);
+
+  &:hover {
+    background: var(--slate-100);
+  }
+}
+
+.ready-start-btn {
+  padding: 14px 32px;
+  font-size: var(--font-size-lg);
+  background: var(--surface-inverse);
+  color: var(--white);
+
+  &:hover {
+    filter: brightness(1.15);
+    box-shadow: var(--shadow-md);
+  }
 }
 
 // Dùng chung cho màn trạng thái và hộp xác nhận nộp bài.
@@ -1150,6 +1315,12 @@
   flex-direction: column;
   gap: 1.6rem;
   width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+
+  @include down(lg) {
+    flex: none;
+  }
 }
 
 .paged-empty {
@@ -1202,15 +1373,39 @@
 
 .paged-body {
   display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  // Giữ chỗ thanh cuộn để bề ngang card không đổi giữa câu ngắn và câu dài.
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+
+  // Card câu hỏi đơn lấp đầy khung -> khung trắng giữ nguyên kích thước khi chuyển câu.
+  > .question-card:only-child {
+    min-height: 100%;
+  }
 
   &.split-layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 2rem;
     align-items: start;
+    overflow: hidden;
+    scrollbar-gutter: auto;
 
     @include down(lg) {
       grid-template-columns: 1fr;
+      overflow: visible;
+    }
+  }
+
+  @include down(lg) {
+    flex: none;
+    overflow: visible;
+    scrollbar-gutter: auto;
+
+    > .question-card:only-child {
+      min-height: 0;
     }
   }
 }
@@ -1285,14 +1480,17 @@
   }
 }
 
+// Thanh điều hướng chân trang như mẫu: nền trắng, viền mảnh, ghim ở đáy khung làm bài.
 .paged-nav {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.2rem;
-  margin-top: 0;
-  padding-top: 0.6rem;
-  border-top: none;
+  padding: 1.2rem 1.6rem;
+  background: var(--bg-white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--exam-radius, 12px);
 }
 
 .paged-nav-left,

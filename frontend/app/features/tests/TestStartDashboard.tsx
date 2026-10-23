@@ -38,6 +38,17 @@ function TestStartDashboard({
 }: TestStartDashboardProps) {
   const t = useTranslations('TestTaking.dashboard');
   const flaggedSet = new Set(flaggedQuestionIds ?? []);
+  const isAnsweredQuestion = (questionId: string) => {
+    const ans = userAnswers[questionId];
+    return (
+      !!ans?.selectedAnswerId ||
+      (Array.isArray(ans?.selectedAnswerIds) && ans.selectedAnswerIds.length > 0) ||
+      !!ans?.answerText
+    );
+  };
+  const total = allQuestions.length;
+  const answeredCount = allQuestions.filter((q) => isAnsweredQuestion(q.questionId)).length;
+  const bold = (chunks: React.ReactNode) => <b>{chunks}</b>;
   const gridStyle: React.CSSProperties | undefined =
     columns || gridMaxHeight
       ? {
@@ -48,16 +59,33 @@ function TestStartDashboard({
   return (
     <div className={cx('dashboard')}>
       <div className={cx('dashboard-card')}>
-        <div className={cx('dashboard-header')}>
-          <span>{t('title')}</span>
+        <div className={cx('dashboard-top')}>
+          <div className={cx('dashboard-header')}>
+            <span>{t('title')}</span>
+            <span className={cx('dashboard-progress')}>
+              {answeredCount} / {total}
+            </span>
+          </div>
+          <div className={cx('dashboard-legend')}>
+            <div className={cx('status-item')}>
+              <span className={cx('swatch', 'answered')} />
+              <span>{t.rich('legendAnswered', { count: answeredCount, b: bold })}</span>
+            </div>
+            <div className={cx('status-item')}>
+              <span className={cx('swatch')} />
+              <span>{t.rich('legendUnanswered', { count: total - answeredCount, b: bold })}</span>
+            </div>
+            {flaggedQuestionIds && (
+              <div className={cx('status-item')}>
+                <span className={cx('swatch', 'flagged')} />
+                <span>{t.rich('legendFlagged', { count: flaggedQuestionIds.length, b: bold })}</span>
+              </div>
+            )}
+          </div>
         </div>
         <div className={cx('question-grid')} style={gridStyle}>
           {allQuestions.map((q, idx) => {
-            const isAnswered =
-              !!userAnswers[q.questionId]?.selectedAnswerId ||
-              (Array.isArray(userAnswers[q.questionId]?.selectedAnswerIds) &&
-                userAnswers[q.questionId]!.selectedAnswerIds!.length > 0) ||
-              !!userAnswers[q.questionId]?.answerText;
+            const isAnswered = isAnsweredQuestion(q.questionId);
 
             const locked =
               isPaged && typeof canNavigateToQuestion === 'function'
@@ -84,22 +112,6 @@ function TestStartDashboard({
               </button>
             );
           })}
-        </div>
-        <div className={cx('dashboard-footer')}>
-          <div className={cx('status-item')}>
-            <span className={cx('dot', 'answered')} />
-            <span>{t('answered')}</span>
-          </div>
-          <div className={cx('status-item')}>
-            <span className={cx('dot')} />
-            <span>{t('unanswered')}</span>
-          </div>
-          {flaggedQuestionIds && (
-            <div className={cx('status-item')}>
-              <span className={cx('dot', 'flagged')} />
-              <span>{t('flagged', { count: flaggedQuestionIds.length })}</span>
-            </div>
-          )}
         </div>
       </div>
     </div>

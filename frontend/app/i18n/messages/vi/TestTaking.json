@@ -16,9 +16,9 @@
     "ariaAnswered": ", đã làm",
     "ariaFlagged": ", đã đánh dấu",
     "ariaLocked": ", đang khoá",
-    "answered": "Đã làm",
-    "unanswered": "Chưa làm",
-    "flagged": "Đánh dấu ({count})"
+    "legendAnswered": "Đã làm: <b>{count}</b>",
+    "legendUnanswered": "Chưa làm: <b>{count}</b>",
+    "legendFlagged": "Đánh dấu: <b>{count}</b>"
   },
   "evaluation": {
     "ratingLabels": {
@@ -268,15 +268,35 @@
     "loading": "Đang tải đề thi...",
     "back": "Quay lại",
     "ready": {
-      "fallbackTitle": "Sẵn sàng làm bài",
-      "questionCount": "<strong>{count}</strong> câu hỏi",
-      "partCount": ", chia thành {count} phần",
-      "timed": "Thời gian: <strong>{minutes} phút</strong>, tính từ lúc bấm bắt đầu",
+      "fallbackTitle": "Đề thi",
+      "guideTitle": "Hướng dẫn làm bài thi: {title}",
+      "readCarefully": "Vui lòng đọc kỹ các hướng dẫn sau đây trước khi bắt đầu bài thi:",
+      "rows": {
+        "questions": "Số lượng câu hỏi:",
+        "parts": "Số phần thi:",
+        "duration": "Thời gian làm bài:",
+        "questionTypes": "Dạng câu hỏi:",
+        "attempts": "Lượt làm bài:"
+      },
+      "questionCountValue": "{count} câu hỏi",
+      "partCountValue": "{count} phần",
+      "durationValue": "{minutes} phút",
+      "durationHours": "({hours} giờ{mins, plural, =0 {} other { # phút}})",
       "untimed": "Không giới hạn thời gian",
+      "attemptsValue": "Còn {remaining}/{max} lượt",
+      "questionTypes": {
+        "MCQ": "Trắc nghiệm chọn 1 đáp án đúng",
+        "MSQ": "Trắc nghiệm chọn nhiều đáp án đúng",
+        "FILL_BLANK": "Điền vào chỗ trống",
+        "ESSAY": "Tự luận"
+      },
+      "rulesTitle": "Quy chế phòng thi:",
       "autosave": "Câu trả lời được lưu tự động, lỡ tải lại trang vẫn làm tiếp được.",
       "submitHint": "Làm xong bấm <strong>Nộp bài</strong> để xem điểm và đáp án.",
-      "autoSubmit": "Hết giờ bài sẽ tự nộp.",
-      "start": "Bắt đầu làm bài"
+      "autoSubmit": "Thời gian tính từ lúc bấm bắt đầu; hết giờ bài sẽ tự nộp.",
+      "noChangeAfterSubmit": "Sau khi nộp bài, bạn không thể thay đổi đáp án.",
+      "cancel": "Hủy và quay lại",
+      "start": "Bắt đầu làm bài thi"
     },
     "payment": {
       "title": "Bài kiểm tra trả phí",

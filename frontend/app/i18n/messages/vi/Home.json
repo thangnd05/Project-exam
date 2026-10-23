@@ -35,14 +35,6 @@
       "planTitleGuest": "Đăng nhập để xây lộ trình cá nhân hóa",
       "planTitle": "Xây lộ trình cá nhân hóa",
       "planHint": "Đặt mục tiêu và nhận lộ trình ôn tập riêng, tiến độ lưu vào tài khoản."
-    },
-    "picker": {
-      "title": "Chọn đề kiểm tra nhanh",
-      "loadingAria": "Đang tải đề kiểm tra nhanh",
-      "empty": "Chưa có đề kiểm tra nhanh trên website.",
-      "intro": "<strong>{count} đề</strong> sẵn sàng, làm ngay để biết bạn đang ở đâu.",
-      "startAria": "Bắt đầu {name}",
-      "start": "Bắt đầu"
     }
   },
   "rankScope": {

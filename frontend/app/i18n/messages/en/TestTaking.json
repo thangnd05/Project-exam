@@ -16,9 +16,9 @@
     "ariaAnswered": ", answered",
     "ariaFlagged": ", flagged",
     "ariaLocked": ", locked",
-    "answered": "Answered",
-    "unanswered": "Unanswered",
-    "flagged": "Flagged ({count})"
+    "legendAnswered": "Answered: <b>{count}</b>",
+    "legendUnanswered": "Unanswered: <b>{count}</b>",
+    "legendFlagged": "Flagged: <b>{count}</b>"
   },
   "evaluation": {
     "ratingLabels": {
@@ -268,14 +268,34 @@
     "loading": "Loading test...",
     "back": "Back",
     "ready": {
-      "fallbackTitle": "Ready to start",
-      "questionCount": "<strong>{count}</strong> {count, plural, one {question} other {questions}}",
-      "partCount": ", split into {count} sections",
-      "timed": "Time limit: <strong>{minutes, plural, one {# minute} other {# minutes}}</strong>, starting when you press Start",
+      "fallbackTitle": "Test",
+      "guideTitle": "Test instructions: {title}",
+      "readCarefully": "Please read the following instructions carefully before you start:",
+      "rows": {
+        "questions": "Number of questions:",
+        "parts": "Number of sections:",
+        "duration": "Time limit:",
+        "questionTypes": "Question types:",
+        "attempts": "Attempts:"
+      },
+      "questionCountValue": "{count, plural, one {# question} other {# questions}}",
+      "partCountValue": "{count, plural, one {# section} other {# sections}}",
+      "durationValue": "{minutes, plural, one {# minute} other {# minutes}}",
+      "durationHours": "({hours, plural, one {# hour} other {# hours}}{mins, plural, =0 {} one { # minute} other { # minutes}})",
       "untimed": "No time limit",
+      "attemptsValue": "{remaining}/{max} remaining",
+      "questionTypes": {
+        "MCQ": "Single choice",
+        "MSQ": "Multiple choice",
+        "FILL_BLANK": "Fill in the blank",
+        "ESSAY": "Essay"
+      },
+      "rulesTitle": "Exam rules:",
       "autosave": "Your answers are saved automatically, so you can pick up where you left off if the page reloads.",
       "submitHint": "When you’re done, press <strong>Submit</strong> to see your score and the answers.",
-      "autoSubmit": "Your test is submitted automatically when time runs out.",
+      "autoSubmit": "The timer starts when you press Start; your test is submitted automatically when time runs out.",
+      "noChangeAfterSubmit": "Once submitted, your answers can’t be changed.",
+      "cancel": "Cancel and go back",
       "start": "Start test"
     },
     "payment": {
