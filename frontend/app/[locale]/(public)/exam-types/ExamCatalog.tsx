@@ -20,6 +20,8 @@ import {
   LEVELS,
   VENDORS,
   badgeUrl,
+  isLeafExam,
+  normalizeExamTypes,
   parseCode,
   parseLevel,
   parseVendor,
@@ -41,19 +43,6 @@ type CatalogExam = {
   badge?: string;
   keywords: string;
 };
-
-const normalizeExamTypes = (payload: unknown): ExamTypeResponse[] => {
-  if (Array.isArray(payload)) return payload;
-  if (payload && typeof payload === 'object' && Array.isArray((payload as {data?: unknown}).data)) {
-    return (payload as {data: ExamTypeResponse[]}).data;
-  }
-  if (payload && typeof payload === 'object' && Array.isArray((payload as {content?: unknown}).content)) {
-    return (payload as {content: ExamTypeResponse[]}).content;
-  }
-  return [];
-};
-
-const isLeafExam = (exam: ExamTypeResponse) => Number(exam.childCount ?? 0) === 0;
 
 const VENDOR_ORDER = VENDORS.map((v) => v.id);
 

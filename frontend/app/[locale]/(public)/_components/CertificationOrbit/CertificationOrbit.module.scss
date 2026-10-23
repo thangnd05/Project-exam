@@ -259,6 +259,54 @@ $directions: (1: 1, 2: -1, 3: 1);
   }
 }
 
+// Chứng chỉ đã có đề: lớn hơn, viền brand đặc và vầng sáng nhịp chậm để nổi giữa các huy hiệu mờ.
+.ready {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-color: var(--primary);
+  box-shadow:
+    0 0 0 4px rgb(var(--primary-rgb) / 0.18),
+    0 0 28px rgb(var(--primary-rgb) / 0.55);
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border: 1px solid rgb(var(--primary-rgb) / 0.6);
+    border-radius: 50%;
+    animation: ready-pulse 2.8s ease-out infinite;
+    pointer-events: none;
+  }
+}
+
+// Chứng chỉ sắp có: mờ và ngả xám, rê chuột thì hiện rõ.
+.upcoming {
+  border-color: rgb(var(--primary-rgb) / 0.2);
+  box-shadow: none;
+  opacity: 0.4;
+  filter: grayscale(0.7);
+  transition: transform 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+    filter: none;
+  }
+}
+
+@keyframes ready-pulse {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
 .tooltip {
   position: absolute;
   bottom: 100%;
@@ -281,6 +329,17 @@ $directions: (1: 1, 2: -1, 3: 1);
 .spin:hover .tooltip,
 .badge:focus-visible + .tooltip {
   display: block;
+}
+
+.tooltipSoon {
+  margin-left: 6px;
+  font-weight: 700;
+  color: var(--primary);
+
+  &::before {
+    content: '· ';
+    color: var(--text-on-dark-muted);
+  }
 }
 
 /* ---------- Thu nhỏ cụm quỹ đạo cho vừa một màn hình ---------- */
@@ -343,7 +402,8 @@ $directions: (1: 1, 2: -1, 3: 1);
 // Giảm chuyển động: đứng yên hoàn toàn.
 @media (prefers-reduced-motion: reduce) {
   .track,
-  .spin {
+  .spin,
+  .ready::after {
     animation: none;
   }
 }

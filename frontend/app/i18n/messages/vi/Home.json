@@ -81,7 +81,9 @@
     "lede": "Hệ thống đề thi thử bám sát 100% cấu trúc chính thức từ các nhà cung cấp cloud hàng đầu.",
     "practiceNow": "Thi thử ngay",
     "buildPlan": "Lên lộ trình",
-    "badgeAria": "Thi thử {name}"
+    "badgeAria": "Xem đề {name}",
+    "comingSoon": "Sắp ra mắt",
+    "comingSoonAria": "{name}: sắp ra mắt"
   },
   "fullSpec": {
     "minutes": "{minutes}p",

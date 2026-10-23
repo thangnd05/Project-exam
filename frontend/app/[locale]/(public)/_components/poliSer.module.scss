@@ -45,19 +45,12 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .title {
-  margin: 0 0 12px;
+  margin: 0;
   font-size: var(--font-size-4xl);
   font-weight: 800;
   line-height: 1.2;
   letter-spacing: -0.025em;
   color: var(--slate-900);
-}
-
-.meta {
-  margin: 0;
-  font-family: $mono;
-  font-size: var(--font-size-ssm);
-  color: var(--slate-500);
 }
 
 .body,
@@ -162,10 +155,6 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   .title,
   .prose h1 {
     font-size: var(--font-size-3xl);
-  }
-
-  .meta {
-    font-size: var(--font-size-sm);
   }
 
   .section h2,

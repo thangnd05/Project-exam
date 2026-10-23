@@ -70,6 +70,21 @@ const AZURE_LEVEL_BY_CODE: Record<string, Level> = {
   'AZ-400': 'professional',
 };
 
+// API danh sách kỳ thi có thể trả mảng trần hoặc bọc trong data/content.
+export const normalizeExamTypes = (payload: unknown): ExamTypeResponse[] => {
+  if (Array.isArray(payload)) return payload;
+  if (payload && typeof payload === 'object' && Array.isArray((payload as {data?: unknown}).data)) {
+    return (payload as {data: ExamTypeResponse[]}).data;
+  }
+  if (payload && typeof payload === 'object' && Array.isArray((payload as {content?: unknown}).content)) {
+    return (payload as {content: ExamTypeResponse[]}).content;
+  }
+  return [];
+};
+
+// Kỳ thi lá (không phải nhóm hãng như "AWS") mới có đề.
+export const isLeafExam = (exam: ExamTypeResponse) => Number(exam.childCount ?? 0) === 0;
+
 export const parseCode = (name?: string) => {
   const match = name?.match(/\(([A-Z]{2,5}-[A-Z]?\d{2,3})\)/i);
   return match?.[1]?.toUpperCase() ?? '';

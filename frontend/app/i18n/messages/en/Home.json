@@ -81,7 +81,9 @@
     "lede": "Practice exams that follow 100% of the official structure from leading cloud providers.",
     "practiceNow": "Practice now",
     "buildPlan": "Build a study plan",
-    "badgeAria": "Practice {name}"
+    "badgeAria": "View {name} exams",
+    "comingSoon": "Coming soon",
+    "comingSoonAria": "{name}: coming soon"
   },
   "fullSpec": {
     "minutes": "{minutes} min",

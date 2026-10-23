@@ -21,10 +21,6 @@ function Service() {
     <article className={cx("page")}>
       <header className={cx("header")}>
         <h1 className={cx("title")}>{t("title")}</h1>
-        <p className={cx("meta")}>
-          {t("updated")}{" "}
-          <a href={`mailto:${DISPUTE_EMAIL}`}>{DISPUTE_EMAIL}</a>
-        </p>
       </header>
 
       <div className={cx("body")}>

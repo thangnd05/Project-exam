@@ -8,7 +8,6 @@ import style from "@/app/[locale]/(public)/_components/poliSer.module.scss";
 const cx = classNames.bind(style);
 
 const CONTACT_EMAIL = 'contact@frostscope.com';
-const DISPUTE_EMAIL = 'dispute@frostscope.com';
 
 const strong = (chunks: ReactNode) => <strong>{chunks}</strong>;
 
@@ -21,10 +20,6 @@ function Policy() {
     <article className={cx("page")}>
       <header className={cx("header")}>
         <h1 className={cx("title")}>{t("title")}</h1>
-        <p className={cx("meta")}>
-          {t("updated")}{" "}
-          <a href={`mailto:${DISPUTE_EMAIL}`}>{DISPUTE_EMAIL}</a>
-        </p>
       </header>
 
       <div className={cx("body")}>
@@ -63,8 +58,8 @@ function Policy() {
           <p>{t("ip.independent")}</p>
           <p>
             {t.rich("ip.copyright", {
-              email: DISPUTE_EMAIL,
-              link: (chunks) => <a href={`mailto:${DISPUTE_EMAIL}`} className={cx("mono")}>{chunks}</a>,
+              email: CONTACT_EMAIL,
+              link: (chunks) => <a href={`mailto:${CONTACT_EMAIL}`} className={cx("mono")}>{chunks}</a>,
             })}
           </p>
         </section>
@@ -91,7 +86,7 @@ function Policy() {
           <h2>{t("disputes.title")}</h2>
           <p>{t("disputes.intro")}</p>
           <p className={cx("contactLine")}>
-            {t("disputes.inbox")} <a href={`mailto:${DISPUTE_EMAIL}`}>{DISPUTE_EMAIL}</a>
+            {t("disputes.inbox")} <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
           </p>
           <p className={cx("note")}>{t("disputes.responseTime")}</p>
           <p>
