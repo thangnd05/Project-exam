@@ -49,7 +49,16 @@
     margin-bottom: 24px;
 
     .heroContent h1 {
+      margin-bottom: 6px;
       font-size: var(--font-size-2xl);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .heroContent .description {
+      font-size: var(--font-size-ssm);
     }
 
     @include down(md) {

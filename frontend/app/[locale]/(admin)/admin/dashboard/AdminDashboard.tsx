@@ -4,11 +4,10 @@ import { useState } from 'react';
 import { Row, Col, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
-import { Calendar } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import TrafficHeatmap from '@/app/[locale]/(admin)/_components/TrafficHeatmap';
 import OverviewCard from '@/app/[locale]/(admin)/_components/OverviewCard';
-import PageHeader from '@/app/components/PageHeader/PageHeader';
+import { AdminPageHeader } from '@/app/[locale]/(admin)/_components/common';
 import { useDashboardStats, useTrafficHeatmap } from '@/app/[locale]/(admin)/_hooks/useDashboardStats';
 
 const localISODate = (d: Date = new Date()) => {
@@ -55,12 +54,11 @@ const AdminDashboard = () => {
 
     return (
         <div className={cx('dashboard')}>
-            <PageHeader
-                label={t('dashboard.description')}
+            <AdminPageHeader
                 title={t('dashboard.title')}
+                description={t('dashboard.description')}
             >
                 <span className={cx('dateBadge')}>
-                    <Calendar size={16} />
                     {new Date().toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN', {
                         weekday: 'long',
                         year: 'numeric',
@@ -68,7 +66,7 @@ const AdminDashboard = () => {
                         day: 'numeric'
                     })}
                 </span>
-            </PageHeader>
+            </AdminPageHeader>
 
             {isLoading ? (
                 <div className={cx('loadingState')}>

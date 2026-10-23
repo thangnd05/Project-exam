@@ -5,7 +5,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "description": "Tổng quan hệ thống WinDe Exam",
+    "description": "Người dùng, bài thi và lượt truy cập của toàn hệ thống.",
     "heatmapTitle": "Lượt truy cập theo ngày & giờ",
     "visitsToday": "Lượt truy cập hôm nay",
     "today": "Hôm nay",
@@ -17,7 +17,7 @@
   },
   "analytics": {
     "title": "Thống kê & Phân tích",
-    "description": "Phân tích chi tiết về hệ thống WinDe Exam",
+    "description": "Phân tích xu hướng người dùng, bài thi và nội dung theo thời gian.",
     "monthLabel": "Tháng {month}/{year}",
     "yearOption": "Năm {year}",
     "totalUsers": "Tổng người dùng",
@@ -41,7 +41,7 @@
   },
   "auditLogin": {
     "title": "Audit đăng nhập",
-    "description": "Lịch sử đăng nhập thành công / thất bại (bảng login_audit  dữ liệu demo).",
+    "description": "Lịch sử đăng nhập thành công và thất bại của người dùng.",
     "time": "Thời gian",
     "status": "Trạng thái",
     "success": "Thành công",
@@ -53,7 +53,7 @@
     "itemLabel": "bản ghi"
   },
   "auditLogs": {
-    "description": "Theo doi thao tac quan tri va su kien nhay cam trong he thong.",
+    "description": "Theo dõi thao tác quản trị và sự kiện nhạy cảm trong hệ thống.",
     "time": "Thời gian",
     "action": "Hành động",
     "details": "Nội dung thay đổi",
