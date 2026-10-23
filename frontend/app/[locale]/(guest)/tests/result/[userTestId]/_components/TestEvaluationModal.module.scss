@@ -68,7 +68,8 @@
 }
 
 .closeBtn:hover {
-  transform: rotate(90deg);
+  background: var(--slate-200);
+  color: var(--slate-800);
 }
 
 .body {

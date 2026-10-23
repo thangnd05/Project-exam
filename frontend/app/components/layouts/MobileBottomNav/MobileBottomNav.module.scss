@@ -16,7 +16,6 @@
   border-top: 1px solid rgb(var(--slate-900-rgb) / 0.08);
   box-shadow: 0 -4px 20px rgb(var(--slate-900-rgb) / 0.08);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 
   @include down(lg) {
     display: flex;
@@ -231,6 +230,16 @@
     color: var(--primary-text);
     text-decoration: none;
   }
+}
+
+// Mục menu dạng nút (mở modal), trông giống các link bên cạnh.
+.menuItemButton {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--slate-50);
+  background: none;
+  text-align: left;
+  cursor: pointer;
 }
 
 .menuItemIcon {

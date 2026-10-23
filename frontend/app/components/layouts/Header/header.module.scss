@@ -18,23 +18,30 @@
   width: 100%;
   padding: 10px clamp(18px, 2.4vw, 32px);
   border-radius: 999px;
-  background-color: rgb(var(--brand-900-rgb) / 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  // Kính mờ: nền bán trong suốt + blur vừa phải để vẫn thấy nhòe nội dung phía sau.
+  background-color: rgb(var(--brand-900-rgb) / 0.55);
+  backdrop-filter: blur(10px) saturate(1.4);
   box-shadow: 0 10px 30px rgb(var(--brand-900-rgb) / 0.18);
   pointer-events: auto;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
 
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  @supports not (backdrop-filter: blur(1px)) {
     background-color: rgb(var(--brand-900-rgb) / 0.98);
   }
 }
 
-// Khi nội dung bên dưới có nền sáng (giống .nav-light của mẫu): nền trùng 100% màu nền trang,
-// không viền, không bóng; chữ slate, nút graphite.
+// Khi nội dung bên dưới có nền sáng (giống .nav-light của mẫu): nền kính mờ cùng tông nền trang,
+// viền và bóng nhẹ để header vẫn nổi rõ khi nội dung cuộn bên dưới; chữ slate, nút graphite.
 .pill.onLight {
-  background-color: var(--bg-body);
-  box-shadow: none;
+  background-color: rgb(var(--body-rgb) / 0.45);
+  backdrop-filter: blur(10px) saturate(1.4);
+  box-shadow:
+    0 0 0 1px rgb(var(--slate-900-rgb) / 0.06),
+    0 8px 24px rgb(var(--slate-900-rgb) / 0.08);
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: rgb(var(--body-rgb) / 0.97);
+  }
 
   .home {
     color: var(--slate-600);

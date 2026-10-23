@@ -17,7 +17,9 @@ import images from '@/app/assets/images';
 // import CreateClassModal from '@/app/features/classes/CreateClassModal/CreateClassModal';
 import CreateTestModal from '@/app/features/tests/CreateTestModal';
 import StreakBadge from '@/app/features/gamification/streak/StreakBadge';
-import CoinQuestMenu from '@/app/features/gamification/coin/CoinQuestMenu';
+// Tạm ẩn số xu, giống header.
+// import CoinQuestMenu from '@/app/features/gamification/coin/CoinQuestMenu';
+import SettingsModal from '@/app/components/layouts/Header/ThemeToggle/SettingsModal';
 import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import {useStreak} from '@/app/features/gamification/streak/hooks/useStreak';
 import { FaGraduationCap, FaHouse, FaPlus, FaRoute, FaUser, FaXmark } from 'react-icons/fa6';
@@ -50,6 +52,7 @@ function MobileBottomNav() {
   // const [showJoinModal, setShowJoinModal] = useState(false);
   // const [showCreateClassModal, setShowCreateClassModal] = useState(false);
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const {streakReady} = useStreak();
   const showStats = streakReady;
 
@@ -238,7 +241,7 @@ function MobileBottomNav() {
                         {showStats && (
                           <div className={cx('statsRow')}>
                             <StreakBadge />
-                            <CoinQuestMenu />
+                            {/* <CoinQuestMenu /> */}
                           </div>
                         )}
                       </div>
@@ -269,6 +272,16 @@ function MobileBottomNav() {
                         >
                           {t('myCertificates')}
                         </Link>
+                        <button
+                          type="button"
+                          className={cx('menuItem', 'menuItemButton')}
+                          onClick={() => {
+                            closeSheet();
+                            setShowSettings(true);
+                          }}
+                        >
+                          {t('settings')}
+                        </button>
                       </>
                     ) : (
                       <>
@@ -317,6 +330,7 @@ function MobileBottomNav() {
         mode="personal"
         onSuccess={() => setShowCreateTestModal(false)}
       />
+      <SettingsModal show={showSettings} onClose={() => setShowSettings(false)} />
     </>
   );
 }

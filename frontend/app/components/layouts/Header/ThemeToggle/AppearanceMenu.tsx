@@ -1,29 +1,20 @@
 'use client';
 
-import { Check, Languages, Moon, Palette as PaletteIcon, Sun, type LucideIcon } from 'lucide-react';
+import { Check, Languages, Palette as PaletteIcon } from 'lucide-react';
 // Router gốc của Next: href đổi ngôn ngữ đã là URL đích, router của app/i18n sẽ gắn lại tiền tố đang xem.
 import { useRouter } from 'next/navigation';
 import { useLanguageSwitch } from '@/app/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { Dropdown } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import { PALETTES, type Palette } from '@/app/constants/theme';
+import { PALETTES } from '@/app/constants/theme';
 import { LOCALE_LABELS } from '@/app/i18n/routing';
-import { useTheme, type Theme } from '@/app/components/layouts/Header/ThemeToggle/hooks/useTheme';
+import { useTheme } from '@/app/components/layouts/Header/ThemeToggle/hooks/useTheme';
 import { usePalette } from '@/app/components/layouts/Header/ThemeToggle/hooks/usePalette';
+import { PALETTE_LABEL_KEYS, THEME_OPTIONS } from '@/app/components/layouts/Header/ThemeToggle/appearanceOptions';
 import styles from '@/app/components/layouts/Header/ThemeToggle/ThemeToggle.module.scss';
 
 const cx = classNames.bind(styles);
-
-const THEME_OPTIONS: { value: Theme; labelKey: 'light' | 'dark'; Icon: LucideIcon }[] = [
-  { value: 'light', labelKey: 'light', Icon: Sun },
-  { value: 'dark', labelKey: 'dark', Icon: Moon },
-];
-
-const PALETTE_LABEL_KEYS: Record<Palette, 'paletteFrost' | 'paletteGold'> = {
-  frost: 'paletteFrost',
-  gold: 'paletteGold',
-};
 
 // Màu nền/chữ của menu đổi theo nền phía sau header nên do Header truyền class vào.
 interface AppearanceMenuProps {

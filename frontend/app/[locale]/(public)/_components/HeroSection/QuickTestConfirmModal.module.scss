@@ -100,12 +100,6 @@
   }
 }
 
-.planIcon {
-  flex-shrink: 0;
-  font-size: 1.6rem;
-  color: var(--primary-text);
-}
-
 .planTitle {
   font-weight: 700;
   color: var(--primary-text);
@@ -121,4 +115,17 @@
 .footerBtn {
   flex: 1;
   justify-content: center;
+}
+
+// Nút hành động chính của popup dùng nền brand đặc (giống nút chính ở hero), không dùng nền trắng mặc định.
+.footerBtn.startBtn {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--text-on-brand);
+
+  &:hover {
+    background: var(--brand-400);
+    border-color: var(--brand-400);
+    color: var(--text-on-brand);
+  }
 }

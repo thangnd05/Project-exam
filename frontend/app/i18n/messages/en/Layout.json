@@ -8,6 +8,7 @@
     "login": "Log in",
     "signup": "Sign up",
     "logout": "Log out",
+    "settings": "Settings",
     "profile": "Profile",
     "myCertificates": "My certificates",
     "createTest": "Create a test",
@@ -47,8 +48,7 @@
     "policy": "Policy",
     "terms": "Terms and conditions",
     "trademarkNote": "All related logos are trademarks of their respective owners.",
-    "copyright": "Copyright {year} FrostScope. Personalized Cloud certification prep.",
-    "language": "Language"
+    "copyright": "Copyright {year} FrostScope. Personalized Cloud certification prep."
   },
   "scrollToTop": "Back to top"
 }

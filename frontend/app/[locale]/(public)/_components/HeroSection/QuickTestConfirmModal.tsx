@@ -1,5 +1,5 @@
 'use client';
-import {IoArrowForward, IoLeafOutline} from 'react-icons/io5';
+import {IoArrowForward} from 'react-icons/io5';
 import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 
@@ -82,7 +82,7 @@ function QuickTestConfirmModal({
           <ButtonPrime
             variant="primary"
             size="lg"
-            className={cx('footerBtn')}
+            className={cx('footerBtn', 'startBtn')}
             onClick={chooseStudied}
           >
             {t('confirm.start')}
@@ -153,7 +153,6 @@ function QuickTestConfirmModal({
           onClick={chooseBeginner}
           title={t('confirm.planHint')}
         >
-          <IoLeafOutline className={cx('planIcon')} aria-hidden="true" />
           <span>
             <span className={cx('planPrompt')}>{t('confirm.planPrompt')}</span>{' '}
             <span className={cx('planTitle')}>

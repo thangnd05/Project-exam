@@ -174,20 +174,3 @@
     color: var(--primary);
   }
 }
-
-// Chọn ngôn ngữ: "Tiếng Việt | English", bản đang xem sáng hơn.
-.languageLinks {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-
-  a + a {
-    padding-left: 12px;
-    border-left: 1px solid rgb(var(--text-on-dark-rgb) / 0.25);
-  }
-
-  .languageActive {
-    color: var(--text-on-dark);
-    font-weight: 600;
-  }
-}

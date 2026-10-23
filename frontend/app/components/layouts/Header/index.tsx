@@ -18,8 +18,10 @@ import {buildLoginUrl} from '@/app/features/auth/authRedirect';
 // import CreateClassModal from '@/app/features/classes/CreateClassModal/CreateClassModal';
 import CreateTestModal from '@/app/features/tests/CreateTestModal';
 import AppearanceMenu from '@/app/components/layouts/Header/ThemeToggle/AppearanceMenu';
+import SettingsModal from '@/app/components/layouts/Header/ThemeToggle/SettingsModal';
 import StreakBadge from '@/app/features/gamification/streak/StreakBadge';
-import CoinQuestMenu from '@/app/features/gamification/coin/CoinQuestMenu';
+// Tạm ẩn số xu trên header.
+// import CoinQuestMenu from '@/app/features/gamification/coin/CoinQuestMenu';
 import FirstTimeHint from '@/app/features/gamification/onboarding/FirstTimeHint';
 import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import {useCosmetics} from '@/app/features/gamification/cosmetic/hooks/useCosmetics';
@@ -120,6 +122,7 @@ function Header() {
   // const [showJoinModal, setShowJoinModal] = useState(false);
   // const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCreateTestModal, setShowCreateTestModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   // const [showClassMenu, setShowClassMenu] = useState(false);
   // const classMenuTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
@@ -171,12 +174,12 @@ function Header() {
       body={
         <>
           <p>{t('streakHint.streak')}</p>
-          <p>{t('streakHint.coins')}</p>
+          {/* <p>{t('streakHint.coins')}</p> */}
         </>
       }
     >
       <StreakBadge variant={statVariant} />
-      <CoinQuestMenu variant={statVariant} />
+      {/* <CoinQuestMenu variant={statVariant} /> */}
     </FirstTimeHint>
   );
 
@@ -321,14 +324,17 @@ function Header() {
           </nav>
 
           <div className={cx('zoneRight')}>
-            <AppearanceMenu
-              classes={{
-                toggle: cx('themeToggle'),
-                menu: cx('custom-dropdown'),
-                label: cx('dropdownLabel'),
-                divider: cx('dropdownDivider'),
-              }}
-            />
+            {/* Đã đăng nhập thì chỉnh giao diện ở mục "Cài đặt" trong menu tài khoản. */}
+            {!user && (
+              <AppearanceMenu
+                classes={{
+                  toggle: cx('themeToggle'),
+                  menu: cx('custom-dropdown'),
+                  label: cx('dropdownLabel'),
+                  divider: cx('dropdownDivider'),
+                }}
+              />
+            )}
             {showStats && (
               <div className={cx('mobileHeaderActions')}>
                 <div className={cx('statsCluster')}>
@@ -399,6 +405,9 @@ function Header() {
                       <Dropdown.Item as={Link} href={routes.myCertificates}>
                         {t('nav.myCertificates')}
                       </Dropdown.Item>
+                      <Dropdown.Item as="button" type="button" onClick={() => setShowSettings(true)}>
+                        {t('nav.settings')}
+                      </Dropdown.Item>
                       <Dropdown.Divider className={cx('dropdownDivider')} />
                       <Dropdown.Item onClick={handleLogout} className={cx('logoutItem')}>
                         {t('nav.logout')}
@@ -420,6 +429,7 @@ function Header() {
         mode="personal"
         onSuccess={() => setShowCreateTestModal(false)}
       />
+      <SettingsModal show={showSettings} onClose={() => setShowSettings(false)} />
     </header>
   );
 }

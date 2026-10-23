@@ -23,7 +23,10 @@
     "myClasses": "Lớp học của tôi",
     "questionBank": "Ngân hàng câu hỏi",
     "myPosts": "Bài viết của tôi",
-    "savedPosts": "Bài đã lưu"
+    "savedPosts": "Bài đã lưu",
+    "learningPlans": "Lộ trình học",
+    "resources": "Tài liệu",
+    "myCertificates": "Chứng chỉ của tôi"
   },
   "stats": {
     "totalAttempts": "Tổng bài làm",

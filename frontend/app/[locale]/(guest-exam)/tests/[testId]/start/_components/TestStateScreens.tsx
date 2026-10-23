@@ -24,7 +24,7 @@ function ExamTypeLogo({ examTypeId }: { examTypeId?: string }) {
   const [failed, setFailed] = useState(false);
   const src = getFullMediaUrl(examType?.imageUrl);
 
-  if (!src || failed) return <IoPlayCircleOutline size={80} color="var(--primary)" />;
+  if (!src || failed) return <IoPlayCircleOutline size={52} color="var(--primary)" />;
   return (
     // eslint-disable-next-line @next/next/no-img-element -- logo do admin tải lên, host tuỳ ý và cần onError để hiện icon thay thế
     <img

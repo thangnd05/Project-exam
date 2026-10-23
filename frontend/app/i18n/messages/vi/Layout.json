@@ -8,6 +8,7 @@
     "login": "Đăng nhập",
     "signup": "Đăng ký",
     "logout": "Đăng xuất",
+    "settings": "Cài đặt",
     "profile": "Hồ sơ",
     "myCertificates": "Chứng chỉ của tôi",
     "createTest": "Tạo bài kiểm tra",
@@ -32,7 +33,7 @@
   },
   "footer": {
     "homeAria": "FrostScope - Trang chủ",
-    "tagline": "Nền tảng ôn thi chứng chỉ Cloud cá nhân hóa",
+    "tagline": "Nền tảng luyện thi chứng chỉ Cloud cá nhân hóa",
     "description": "Đánh giá năng lực Cloud & DevOps, nhận diện điểm yếu và luyện thi chứng chỉ theo đúng phần kiến thức bạn cần cải thiện.",
     "practice": "Luyện thi",
     "examTypes": "Kho đề thi",
@@ -41,14 +42,13 @@
     "quickTest": "Kiểm tra nhanh",
     "generatePlan": "Tạo lộ trình học",
     "aboutUs": "Về chúng tôi",
-    "about": "About us",
-    "contact": "Contact",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ",
     "legal": "Pháp lý",
     "policy": "Chính sách",
     "terms": "Điều khoản và điều kiện",
-    "trademarkNote": "All related logos are trademarks of their respective owners.",
-    "copyright": "Bản quyền {year} FrostScope. Nền tảng ôn thi chứng chỉ Cloud cá nhân hóa.",
-    "language": "Ngôn ngữ"
+    "trademarkNote": "Các logo liên quan là nhãn hiệu thuộc sở hữu của chủ sở hữu tương ứng.",
+    "copyright": "Bản quyền {year} FrostScope. Nền tảng luyện thi chứng chỉ Cloud cá nhân hóa."
   },
   "scrollToTop": "Lên đầu trang"
 }

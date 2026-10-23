@@ -88,11 +88,6 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
     border-color: var(--brand-700);
     background: rgb(var(--brand-700-rgb) / 0.06);
 
-    .sourceIcon {
-      background: var(--brand-800);
-      color: var(--brand-50);
-    }
-
     .sourceTitle {
       color: var(--brand-700);
     }
@@ -102,20 +97,6 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
     opacity: 0.55;
     cursor: not-allowed;
   }
-}
-
-.sourceIcon {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgb(var(--brand-700-rgb) / 0.08);
-  font-size: 1.7rem;
-  color: var(--brand-700);
-  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .sourceText {

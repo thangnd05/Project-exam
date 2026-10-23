@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
-import { FiAlertTriangle, FiBookOpen, FiTarget } from 'react-icons/fi';
+import { FiAlertTriangle } from 'react-icons/fi';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import LearningPlanList from './_components/LearningPlanList';
 import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
@@ -42,17 +42,14 @@ const planCx = classNamesBind.bind(planStyles);
 const PLAN_SOURCES: {
   value: PlanSource;
   labelKey: 'syllabus' | 'diagnosis';
-  icon: React.ElementType;
 }[] = [
   {
     value: 'SYLLABUS',
     labelKey: 'syllabus',
-    icon: FiBookOpen,
   },
   {
     value: 'DIAGNOSIS',
     labelKey: 'diagnosis',
-    icon: FiTarget,
   },
 ];
 
@@ -383,7 +380,6 @@ function GeneratePlan() {
             <span className={classNames(ui('eyebrow'), cx('blockLabel'))}>{t('generate.form.basedOn')}</span>
             <div className={cx('sourceGrid')} role="radiogroup" aria-label={t('generate.form.basedOn')}>
               {PLAN_SOURCES.map((option) => {
-                const Icon = option.icon;
                 const selected = planSource === option.value;
                 return (
                   <label
@@ -398,9 +394,6 @@ function GeneratePlan() {
                       onChange={() => handlePlanSourceChange(option.value)}
                       disabled={!examTypeReady}
                     />
-                    <span className={cx('sourceIcon')} aria-hidden="true">
-                      <Icon />
-                    </span>
                     <span className={cx('sourceText')}>
                       <span className={cx('sourceTitle')}>{t(`generate.sources.${option.labelKey}.title`)}</span>
                       <span className={cx('sourceSubtitle')}>{t(`generate.sources.${option.labelKey}.subtitle`)}</span>

@@ -854,7 +854,6 @@
   right: 0;
   background: rgb(var(--surface-rgb) / 0.94);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.05);
   border-top: 1px solid rgb(var(--slate-200-rgb) / 0.8);
   z-index: 1100;
@@ -863,6 +862,8 @@
   pointer-events: auto;
 }
 
+// Màn nhỏ/vừa: nút mở danh sách câu hỏi nằm thành một hàng riêng phía trên thẻ câu hỏi
+// (vẫn bám theo khi cuộn) để không đè lên nội dung câu và nút "Đánh dấu".
 .mobile-nav-bar {
   display: none;
 
@@ -870,10 +871,9 @@
     display: flex;
     justify-content: flex-end;
     position: sticky;
-    top: 6px;
+    top: 8px;
     z-index: 20;
-    height: 0;
-    overflow: visible;
+    margin-bottom: 12px;
     pointer-events: none;
   }
 }
@@ -886,13 +886,15 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 46px;
-    height: 46px;
-    padding: 0;
-    border-radius: 14px;
+    gap: 8px;
+    height: 40px;
+    padding: 0 16px;
+    border-radius: 999px;
     border: none;
     background: var(--primary-gradient);
     color: var(--on-primary-gradient);
+    font-size: 1.4rem;
+    font-weight: 700;
     box-shadow: 0 6px 16px var(--primary-alpha-35);
     cursor: pointer;
     transition: transform 0.15s ease, box-shadow 0.2s ease;
@@ -907,12 +909,19 @@
   }
 }
 
+.mobile-nav-count {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.35);
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .mobile-nav-backdrop {
   position: fixed;
   inset: 0;
   z-index: 1140;
   background: rgb(var(--slate-900-rgb) / 0.45);
-  -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
   display: flex;
   align-items: flex-end;
@@ -1088,17 +1097,17 @@
 .ready-wrap {
   display: flex;
   justify-content: center;
-  padding: 40px 16px 60px;
+  padding: 24px 16px 40px;
 
   @include down(sm) {
-    padding: 16px 0 40px;
+    padding: 16px 12px 32px;
   }
 }
 
 .ready-card {
   width: 100%;
-  max-width: 880px;
-  padding: 40px 48px 32px;
+  max-width: 760px;
+  padding: 28px 32px 24px;
   background: var(--bg-white);
   border: 1px solid var(--slate-200);
   border-radius: var(--radius-lg);
@@ -1111,39 +1120,48 @@
 .ready-header {
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding-bottom: 20px;
+  gap: 16px;
+  padding-bottom: 16px;
   border-bottom: 1px solid var(--slate-200);
+
+  @include down(sm) {
+    gap: 14px;
+  }
 }
 
 .ready-logo {
-  width: 64px;
-  height: 64px;
+  width: 52px;
+  height: 52px;
   flex-shrink: 0;
   object-fit: contain;
+
+  @include down(sm) {
+    width: 48px;
+    height: 48px;
+  }
 }
 
 .ready-title {
   margin: 0;
-  font-size: var(--font-size-2xxl);
+  font-size: var(--font-size-xxl);
   font-weight: 800;
   line-height: 1.3;
   color: var(--dark-color);
 
   @include down(sm) {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
   }
 }
 
 .ready-subtitle {
-  margin: 6px 0 0;
-  font-size: var(--font-size-md);
+  margin: 4px 0 0;
+  font-size: var(--font-size-ssm);
   color: var(--text-secondary);
 }
 
 .ready-section-title {
-  margin: 28px 0 14px;
-  font-size: var(--font-size-lg);
+  margin: 20px 0 10px;
+  font-size: var(--font-size-base);
   font-weight: 700;
   color: var(--dark-color);
 }
@@ -1153,7 +1171,7 @@
   border: 1px solid var(--slate-200);
   border-radius: var(--radius-md);
   overflow: hidden;
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-ssm);
 }
 
 .ready-row {
@@ -1167,7 +1185,7 @@
   dt,
   dd {
     margin: 0;
-    padding: 14px 16px;
+    padding: 10px 14px;
   }
 
   dt {
@@ -1199,8 +1217,8 @@
   padding-left: 22px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  font-size: var(--font-size-md);
+  gap: 6px;
+  font-size: var(--font-size-ssm);
   color: var(--text-color);
 
   strong {
@@ -1213,8 +1231,8 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-top: 32px;
-  padding-top: 24px;
+  margin-top: 20px;
+  padding-top: 16px;
   border-top: 1px solid var(--slate-200);
 
   @include down(sm) {
@@ -1225,10 +1243,10 @@
 
 .ready-cancel-btn,
 .ready-start-btn {
-  padding: 12px 22px;
+  padding: 10px 20px;
   border: none;
   border-radius: var(--radius-md);
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-ssm);
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
@@ -1244,8 +1262,8 @@
 }
 
 .ready-start-btn {
-  padding: 14px 32px;
-  font-size: var(--font-size-lg);
+  padding: 12px 28px;
+  font-size: var(--font-size-md);
   background: var(--surface-inverse);
   color: var(--white);
 

@@ -1,14 +1,12 @@
 'use client';
 
-import NextLink from 'next/link';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { FiMail } from 'react-icons/fi';
 
 import { imageAssets } from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
-import Link, { useLanguageSwitch } from '@/app/i18n/navigation';
-import { LOCALE_LABELS } from '@/app/i18n/routing';
+import Link from '@/app/i18n/navigation';
 
 import styles from './footer.module.scss';
 
@@ -59,7 +57,6 @@ const COLUMNS: { titleKey: 'practice' | 'aboutUs' | 'legal'; links: FooterLink[]
 
 function Footer() {
   const t = useTranslations('Layout.footer');
-  const language = useLanguageSwitch();
   const year = new Date().getFullYear();
 
   return (
@@ -103,21 +100,6 @@ function Footer() {
             <a href={`mailto:${DISPUTE_EMAIL}`} className={styles.accentLink}>
               {DISPUTE_EMAIL}
             </a>
-            <nav aria-label={t('language')} className={styles.languageLinks}>
-              {language.locales.map((value) => (
-                // NextLink trực tiếp vì href đã là đường dẫn đích của từng ngôn ngữ.
-                <NextLink
-                  key={value}
-                  href={language.hrefFor(value)}
-                  hrefLang={value}
-                  lang={value}
-                  aria-current={language.locale === value ? 'true' : undefined}
-                  className={language.locale === value ? styles.languageActive : undefined}
-                >
-                  {LOCALE_LABELS[value]}
-                </NextLink>
-              ))}
-            </nav>
           </div>
         </div>
       </div>

@@ -23,7 +23,10 @@
     "myClasses": "My classes",
     "questionBank": "Question bank",
     "myPosts": "My posts",
-    "savedPosts": "Saved posts"
+    "savedPosts": "Saved posts",
+    "learningPlans": "Study plans",
+    "resources": "Resources",
+    "myCertificates": "My certificates"
   },
   "stats": {
     "totalAttempts": "Total attempts",

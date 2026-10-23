@@ -337,7 +337,11 @@ function ExamLayoutRenderer({
           aria-label={t('showQuestionList')}
           title={t('questionList')}
         >
-          <IoGridOutline size={24} />
+          <IoGridOutline size={18} aria-hidden="true" />
+          <span>{t('questions')}</span>
+          <span className={cx('mobile-nav-count')}>
+            {answered}/{total}
+          </span>
         </button>
       </div>
     ) : null;

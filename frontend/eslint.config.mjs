@@ -26,6 +26,7 @@ const eslintConfig = [
       'app/not-found.tsx',
       'app/components/layouts/Footer/**',
       'app/components/layouts/Header/ThemeToggle/AppearanceMenu.tsx',
+      'app/components/layouts/Header/ThemeToggle/SettingsModal.tsx',
     ],
     rules: {
       'no-restricted-imports': [
