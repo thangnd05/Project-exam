@@ -16,7 +16,7 @@ type NativeProps = Omit<ButtonHTMLAttributes<HTMLElement>, 'type'> &
 
 type ButtonPrimeProps = NativeProps & {
   as?: 'button' | 'link' | 'a';
-  variant?: 'primary' | 'outline' | 'ghost' | 'danger' | 'dangerGhost' | 'success';
+  variant?: 'primary' | 'brand' | 'outline' | 'ghost' | 'danger' | 'dangerGhost' | 'success';
   size?: 'sm' | 'md' | 'lg' | 'icon';
   fullWidth?: boolean;
   loading?: boolean;

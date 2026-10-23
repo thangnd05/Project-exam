@@ -1,0 +1,271 @@
+@import 'app/assets/styles/mixins.scss';
+
+// Nền Frost Black như hero/CertificationOrbit ở trang chủ: logo hãng nằm giữa 2 vòng quỹ đạo,
+// tràn lên dưới header nổi (DefaultLayout bật flushTop cho trang này).
+.wrapper {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: calc(var(--header-h, 72px) + 32px) 16px 64px;
+  overflow: hidden;
+  background: var(--hero-bg);
+  text-align: center;
+  color: var(--text-on-dark);
+}
+
+.ambient {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  z-index: -1;
+  width: 720px;
+  height: 720px;
+  border-radius: 50%;
+  background: linear-gradient(
+    to top right,
+    rgb(var(--primary-rgb) / 0.08),
+    rgb(var(--surface-dark-border-rgb) / 0.12),
+    transparent
+  );
+  filter: blur(64px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* ---------- Logo trong quỹ đạo ---------- */
+
+.emblem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 280px;
+  height: 280px;
+  margin-bottom: 12px;
+
+  @include down(sm) {
+    width: 220px;
+    height: 220px;
+  }
+}
+
+.track {
+  position: absolute;
+  border: 1px dashed rgb(var(--primary-rgb) / 0.25);
+  border-radius: 50%;
+  pointer-events: none;
+
+  // Một "vệ tinh" sáng trên mỗi vòng để thấy rõ vòng đang quay.
+  &::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    box-shadow: 0 0 12px rgb(var(--primary-rgb) / 0.8);
+    transform: translateX(-50%);
+  }
+}
+
+.trackOuter {
+  inset: 0;
+  animation: cs-orbit 40s linear infinite;
+}
+
+.trackInner {
+  inset: 17%;
+  border-color: rgb(var(--primary-rgb) / 0.4);
+  animation: cs-orbit 28s linear infinite reverse;
+
+  &::after {
+    top: auto;
+    bottom: -4px;
+  }
+}
+
+// Khối tâm giống coreHalo của CertificationOrbit.
+.core {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52%;
+  aspect-ratio: 1;
+  border: 1px solid rgb(var(--primary-rgb) / 0.25);
+  border-radius: 50%;
+  background: rgb(var(--brand-900-rgb) / 0.95);
+  box-shadow:
+    0 0 40px rgb(var(--primary-rgb) / 0.15),
+    0 25px 50px -12px rgb(0 0 0 / 0.8);
+}
+
+// Trắng đơn sắc như dải logo ở hero.
+.logo {
+  display: block;
+  width: auto;
+  max-width: 78%;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.logo-sm {
+  height: 22px;
+}
+
+.logo-md {
+  height: 42px;
+}
+
+.logo-lg {
+  height: 54px;
+}
+
+.fallbackIcon {
+  font-size: 4.4rem;
+  color: var(--primary);
+}
+
+/* ---------- Chữ (cùng kiểu hero) ---------- */
+
+.eyebrow {
+  margin: 0 0 12px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.title {
+  max-width: 720px;
+  margin: 0 0 16px;
+  font-size: var(--font-size-4xl);
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1.18;
+  text-wrap: balance;
+  color: rgb(215 215 215);
+}
+
+.glow {
+  color: var(--white);
+  text-shadow: 0 2px 14px rgb(255 255 255 / 0.35);
+}
+
+.desc {
+  max-width: 540px;
+  margin: 0 0 32px;
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  text-wrap: pretty;
+  color: var(--text-on-dark-muted);
+}
+
+/* ---------- Nút (cùng kiểu nút ở hero) ---------- */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+
+  @include down(sm) {
+    flex-direction: column;
+    align-self: stretch;
+  }
+}
+
+.btnPrimary,
+.btnGhost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 28px;
+  border-radius: 999px;
+  font-size: var(--font-size-md);
+  text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+  }
+}
+
+.btnPrimary {
+  border: none;
+  background: var(--primary);
+  font-weight: 700;
+  color: var(--text-on-brand);
+  box-shadow: 0 10px 15px -3px rgb(var(--primary-rgb) / 0.2);
+
+  &:hover,
+  &:visited {
+    color: var(--text-on-brand);
+  }
+
+  &:hover {
+    background: var(--brand-400);
+  }
+
+  svg {
+    transition: transform 0.2s ease;
+  }
+
+  &:hover svg {
+    transform: translateX(3px);
+  }
+}
+
+.btnGhost {
+  border: 1px solid rgb(var(--text-on-dark-rgb) / 0.2);
+  background: rgb(var(--surface-dark-border-rgb) / 0.5);
+  font-weight: 600;
+  color: var(--text-on-dark);
+
+  &:hover,
+  &:visited {
+    color: var(--text-on-dark);
+  }
+
+  &:hover {
+    background: var(--surface-dark-border);
+  }
+}
+
+@keyframes cs-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+
+  .btnPrimary,
+  .btnGhost,
+  .btnPrimary svg {
+    transition: none;
+  }
+
+  .btnPrimary:hover,
+  .btnGhost:hover,
+  .btnPrimary:hover svg {
+    transform: none;
+  }
+}

@@ -47,13 +47,15 @@ export function useLocalizeHref() {
 }
 
 // Đường dẫn của trang hiện tại ở từng ngôn ngữ, cho nút đổi ngôn ngữ.
+// Giữ nguyên query/hash (vd. /coming-soon?provider=oracle); đọc lúc bấm nên không cần useSearchParams + Suspense.
 export function useLanguageSwitch() {
   const locale = useLocale();
   const pathname = usePathname();
   const hrefFor = useCallback(
     (target: Locale) => {
-      if (target === routing.defaultLocale) return pathname;
-      return pathname === '/' ? `/${target}` : `/${target}${pathname}`;
+      const suffix = typeof window === 'undefined' ? '' : `${window.location.search}${window.location.hash}`;
+      if (target === routing.defaultLocale) return `${pathname}${suffix}`;
+      return pathname === '/' ? `/${target}${suffix}` : `/${target}${pathname}${suffix}`;
     },
     [pathname],
   );

@@ -4,18 +4,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
-import {
-  IoBookOutline,
-  IoDocumentTextOutline,
-  IoPlayOutline,
-  IoTimeOutline,
-  IoRadioButtonOnOutline,
-  IoTrophyOutline,
-  IoStatsChartOutline,
-} from 'react-icons/io5';
+import { IoChevronDown } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 
 import BaseModal from '@/app/components/modal/BaseModal';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
 import { getTestPartsSummary } from '@/app/apis/testApi';
 import { getResourcesByParts } from '@/app/apis/recoveryResourceApi';
@@ -48,6 +41,7 @@ const normalizeParts = <T,>(data: T[] | null | undefined): T[] => (Array.isArray
 
 function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
   const t = useTranslations('Tests');
+  const tCommon = useTranslations('Common');
   const [tab, setTab] = useState<'exam' | 'practice'>('exam');
   const [selected, setSelected] = useState<Set<string>>(() => new Set());
 
@@ -140,127 +134,122 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
     onStart?.({ mode: 'practice', examPartIds });
   };
 
+  // Nút hành động nằm ở footer chung của BaseModal để luôn hiện, không bị nội dung dài đẩy mất.
+  const footer =
+    tab === 'exam' ? (
+      <>
+        <ButtonPrime variant="outline" size="lg" className={cx('footerBtn')} onClick={onClose}>
+          {tCommon('cancelShort')}
+        </ButtonPrime>
+        <ButtonPrime variant="brand" size="lg" className={cx('footerBtn')} onClick={handleStartFull}>
+          {t('mode.startExam')}
+        </ButtonPrime>
+      </>
+    ) : (
+      <>
+        <span className={cx('summary')}>
+          {t.rich('mode.selected', {
+            count: selectedCount,
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
+        </span>
+        <ButtonPrime
+          variant="brand"
+          size="lg"
+          onClick={handleStartPractice}
+          disabled={selected.size === 0}
+        >
+          {t('mode.start')}
+        </ButtonPrime>
+      </>
+    );
+
   return (
     <BaseModal
       show={show}
       onClose={onClose}
       title={t('mode.title')}
       maxWidth={640}
+      variant="plain"
+      footer={footer}
     >
-      <div className={cx('tabs')}>
+      <div className={cx('tabs')} role="tablist">
         <button
           type="button"
+          role="tab"
+          aria-selected={tab === 'exam'}
           className={cx('tab', { active: tab === 'exam' })}
           onClick={() => setTab('exam')}
         >
-          <IoDocumentTextOutline />
           {t('mode.examTab')}
         </button>
         <button
           type="button"
+          role="tab"
+          aria-selected={tab === 'practice'}
           className={cx('tab', { active: tab === 'practice' })}
           onClick={() => setTab('practice')}
         >
-          <IoRadioButtonOnOutline />
           {t('mode.practiceTab')}
         </button>
       </div>
 
       <div className={cx('panel')}>
-      {tab === 'exam' ? (
-        <div className={cx('exam-card')}>
-          <div className={cx('exam-head')}>
-            <span className={cx('exam-icon')}>
-              <IoDocumentTextOutline />
-            </span>
-            <div className={cx('exam-info')}>
-              <h4> {test?.title}</h4>
-              <p>{t('mode.examDesc')}</p>
-            </div>
-          </div>
+        {tab === 'exam' ? (
+          <div className={cx('exam-card')}>
+            <h4 className={cx('exam-title')}>{test?.title}</h4>
+            <p className={cx('exam-desc')}>{t('mode.examDesc')}</p>
 
-          <div className={cx('pills')}>
-            <span className={cx('pill')}>
-              <IoTimeOutline /> {durationLabel}
-            </span>
-            {totalQuestions > 0 && (
+            <div className={cx('pills')}>
               <span className={cx('pill')}>
-                <IoDocumentTextOutline /> {t('questions', { count: totalQuestions })}
+                {durationLabel}
               </span>
-            )}
-          </div>
-
-          <ul className={cx('features')}>
-            <li>
-              <IoTimeOutline />
-              <span>{t('mode.features.timed')}</span>
-            </li>
-            <li>
-              <IoStatsChartOutline />
-              <span>{t('mode.features.scoring')}</span>
-            </li>
-            <li>
-              <IoTrophyOutline />
-              <span>{t('mode.features.leaderboard')}</span>
-            </li>
-          </ul>
-
-          <button
-            type="button"
-            className={cx('exam-start')}
-            onClick={handleStartFull}
-          >
-            {t('mode.startExam')}
-          </button>
-        </div>
-      ) : (
-        <div className={cx('practice')}>
-          <p className={cx('practice-hint')}>
-            {t.rich('mode.practiceHint', { strong: (chunks) => <strong>{chunks}</strong> })}
-          </p>
-
-          {partResources.length > 0 && (
-            <div className={cx('guide-box')}>
-              <div className={cx('guide-title')}>
-                <IoBookOutline /> {t('mode.guideTitle')}
-              </div>
-              <ul className={cx('guide-list')}>
-                {partResources.map((r) => (
-                  <li key={r.resourceId}>
-                    <RecoveryResourceLink resource={r} className={cx('guide-link')}>
-                      {r.title}
-                    </RecoveryResourceLink>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {loading ? (
-            <div className={cx('loading')}>{t('mode.loadingParts')}</div>
-          ) : parts.length === 0 ? (
-            <div className={cx('loading')}>{t('mode.noParts')}</div>
-          ) : (
-            <>
-              <button
-                type="button"
-                className={cx('part-row', 'select-all', { checked: allSelected })}
-                onClick={toggleAll}
-              >
-                <span className={cx('checkbox', { checked: allSelected })} />
-                <span className={cx('part-name')}>
-                  {t('mode.selectAll', { count: parts.length })}
+              {totalQuestions > 0 && (
+                <span className={cx('pill')}>
+                  {t('questions', { count: totalQuestions })}
                 </span>
-                <span className={cx('part-count')}>{t('questions', { count: totalQuestions })}</span>
-              </button>
+              )}
+            </div>
 
+            <ul className={cx('features')}>
+              <li>
+                <span>{t('mode.features.timed')}</span>
+              </li>
+              <li>
+                <span>{t('mode.features.scoring')}</span>
+              </li>
+              <li>
+                <span>{t('mode.features.leaderboard')}</span>
+              </li>
+            </ul>
+          </div>
+        ) : (
+          <div className={cx('practice')}>
+            <p className={cx('practice-hint')}>
+              {t.rich('mode.practiceHint', { strong: (chunks) => <strong>{chunks}</strong> })}
+            </p>
+
+            {loading ? (
+              <div className={cx('loading')}>{t('mode.loadingParts')}</div>
+            ) : parts.length === 0 ? (
+              <div className={cx('loading')}>{t('mode.noParts')}</div>
+            ) : (
               <div className={cx('part-scroll')}>
+                <button
+                  type="button"
+                  className={cx('part-row', 'select-all', { checked: allSelected })}
+                  onClick={toggleAll}
+                >
+                  <span className={cx('checkbox', { checked: allSelected })} />
+                  <span className={cx('part-name')}>
+                    {t('mode.selectAll', { count: parts.length })}
+                  </span>
+                  <span className={cx('part-count')}>{t('questions', { count: totalQuestions })}</span>
+                </button>
+
                 {grouped.map(([section, list]) => (
                   <div key={section} className={cx('section')}>
-
-                    {grouped.length > 1 && (
-                      <div className={cx('section-title')}>{section}</div>
-                    )}
+                    {grouped.length > 1 && <div className={cx('section-title')}>{section}</div>}
                     <div className={cx('part-grid')}>
                       {list.map((p) => {
                         const checked = selected.has(p.examPartId);
@@ -282,29 +271,30 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
                     </div>
                   </div>
                 ))}
-              </div>
 
-              <div className={cx('practice-footer')}>
-                <span className={cx('summary')}>
-                  {t.rich('mode.selected', {
-                    count: selectedCount,
-                    strong: (chunks) => <strong>{chunks}</strong>,
-                  })}
-                </span>
-                <button
-                  type="button"
-                  className={cx('start-btn')}
-                  onClick={handleStartPractice}
-                  disabled={selected.size === 0}
-                >
-                  <IoPlayOutline />
-                  {t('mode.start')}
-                </button>
+                {/* Tài liệu có thể rất nhiều: thu gọn mặc định, mở ra thì hiện dạng chip. */}
+                {partResources.length > 0 && (
+                  <details className={cx('guide')}>
+                    <summary className={cx('guide-summary')}>
+                      <span>{t('mode.guideTitle')}</span>
+                      <span className={cx('guide-count')}>{partResources.length}</span>
+                      <IoChevronDown className={cx('guide-chevron')} aria-hidden="true" />
+                    </summary>
+                    <ul className={cx('guide-list')}>
+                      {partResources.map((r) => (
+                        <li key={r.resourceId}>
+                          <RecoveryResourceLink resource={r} className={cx('guide-link')}>
+                            {r.title}
+                          </RecoveryResourceLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                )}
               </div>
-            </>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        )}
       </div>
     </BaseModal>
   );

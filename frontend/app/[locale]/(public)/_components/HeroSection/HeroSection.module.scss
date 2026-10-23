@@ -253,6 +253,20 @@
   list-style: none;
 }
 
+.providerLink {
+  display: block;
+  border-radius: 6px;
+
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 6px;
+  }
+
+  &:focus-visible .providerLogo {
+    opacity: 1;
+  }
+}
+
 .providerLogo {
   display: block;
   width: auto;

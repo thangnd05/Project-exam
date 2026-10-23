@@ -7,10 +7,8 @@ import { Container } from 'react-bootstrap';
 import classNamesBind from 'classnames/bind';
 import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
 import {
-  IoBookOutline,
   IoChevronDown,
   IoDocumentTextOutline,
-  IoFlagOutline,
   IoRibbonOutline,
 } from 'react-icons/io5';
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
@@ -224,11 +222,9 @@ function TestByExamType({ examTypeId, examSlug }: { examTypeId: string; examSlug
                     {t('quickStart')}
                   </button>
                   <button type="button" className={ui('btnSecondary')} onClick={handleOpenTarget}>
-                    <IoFlagOutline aria-hidden="true" />
                     {t('detail.myTarget')}
                   </button>
                   <Link href={routes.resources} className={ui('btnSecondary')}>
-                    <IoBookOutline aria-hidden="true" />
                     {t('detail.resources')}
                   </Link>
                 </div>

@@ -23,5 +23,15 @@
     "title": "Oops, where did this page go?",
     "description": "The link you followed doesn't exist or has been removed. Use the button below to head back.",
     "backHome": "Back to homepage"
+  },
+  "comingSoon": {
+    "pageTitle": "Coming soon",
+    "badge": "Coming soon",
+    "title": "This exam is on the way",
+    "titleProvider": "<glow>{name}</glow> practice exams are on the way",
+    "description": "We're building a question bank aligned with the official exam blueprint. In the meantime, you can practice with the exams already available.",
+    "descriptionProvider": "We're building a {name} question bank aligned with the official exam blueprints. In the meantime, you can practice with the exams already available.",
+    "exploreExams": "Explore available exams",
+    "backHome": "Back to homepage"
   }
 }

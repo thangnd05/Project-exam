@@ -3,6 +3,9 @@ import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import { FiCheck } from 'react-icons/fi';
+import routes from '@/app/configs/Routes';
+import Link from '@/app/i18n/navigation';
+import { PROVIDERS } from '../../_lib/providers';
 import styles from './HeroSection.module.scss';
 import { useQuickTestEntry } from './hooks/useQuickTestEntry';
 import QuickTestConfirmModal from './QuickTestConfirmModal';
@@ -10,15 +13,6 @@ import QuickTestConfirmModal from './QuickTestConfirmModal';
 const cx = classNames.bind(styles);
 
 const HIGHLIGHTS = ['shortTests', 'domainAnalysis', 'personalPlan'] as const;
-
-// Logo hãng trong public/images/providers, hiển thị trắng đơn sắc trên nền tối.
-const PROVIDERS = [
-  { file: 'Amazon_Web_Services_Logo', name: 'Amazon Web Services', size: 'md' },
-  { file: 'Microsoft_Azure_Logo', name: 'Microsoft Azure', size: 'md' },
-  { file: 'GCP_Logo', name: 'Google Cloud Platform', size: 'lg' },
-  { file: 'Oracle_Logo', name: 'Oracle Cloud', size: 'sm' },
-  { file: 'LPI_Logo', name: 'Linux Professional Institute', size: 'md' },
-];
 
 const rise = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
@@ -86,14 +80,21 @@ function HeroSection() {
       <div className={cx('providers')}>
         <p className={cx('providersLabel')}>{t('providersLabel')}</p>
         <ul className={cx('providerList')}>
+          {/* Logo hãng hiển thị trắng đơn sắc; hãng chưa có đề dẫn sang trang Coming soon. */}
           {PROVIDERS.map((p) => (
-            <li key={p.file} title={p.name}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`/images/providers/${p.file}.webp`}
-                alt={p.name}
-                className={cx('providerLogo', `logo-${p.size}`)}
-              />
+            <li key={p.slug}>
+              <Link
+                href={p.available ? routes.examTypes : `${routes.comingSoon}?provider=${p.slug}`}
+                title={p.name}
+                className={cx('providerLink')}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/images/providers/${p.file}.webp`}
+                  alt={p.name}
+                  className={cx('providerLogo', `logo-${p.size}`)}
+                />
+              </Link>
             </li>
           ))}
         </ul>

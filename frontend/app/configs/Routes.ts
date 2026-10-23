@@ -43,6 +43,7 @@ const routes = {
   testHistory: '/tests/:testId/history',
   examTypes: '/exam-types',
   resources: '/resources',
+  comingSoon: '/coming-soon',
 
   myCertificates: '/my-certificates',
   certificateVerifyHome: '/certificates/verify',

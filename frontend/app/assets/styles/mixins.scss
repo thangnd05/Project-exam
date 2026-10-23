@@ -76,6 +76,33 @@ $breakpoints: (
   }
 }
 
+// Nút hành động chính nền brand đặc (cùng kiểu nút chính ở hero), dùng cho CTA trong popup/trang.
+@mixin buttonBrand {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--text-on-brand);
+  box-shadow: 0 8px 18px rgb(var(--primary-rgb) / 0.22);
+
+  &:hover:not(:disabled),
+  &:visited {
+    color: var(--text-on-brand);
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--brand-400);
+    border-color: var(--brand-400);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    background: var(--slate-200);
+    border-color: var(--slate-200);
+    color: var(--slate-500);
+    box-shadow: none;
+    opacity: 1;
+  }
+}
+
 @mixin buttonOutline {
   background: var(--bg-white);
   border-color: var(--border-color);

@@ -80,9 +80,9 @@ function QuickTestConfirmModal({
             {tCommon('cancelShort')}
           </ButtonPrime>
           <ButtonPrime
-            variant="primary"
+            variant="brand"
             size="lg"
-            className={cx('footerBtn', 'startBtn')}
+            className={cx('footerBtn')}
             onClick={chooseStudied}
           >
             {t('confirm.start')}

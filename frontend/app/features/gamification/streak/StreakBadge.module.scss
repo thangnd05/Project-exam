@@ -1,10 +1,10 @@
 @import 'app/assets/styles/mixins.scss';
 
 // Huy hiệu chuỗi ngày học theo mẫu FrostScope: viên thuốc trong suốt có viền,
-// ngọn lửa + số màu cam #FFA116, chữ "ngày liên tiếp".
+// ngọn lửa + số màu brand (xanh băng), chữ "ngày liên tiếp".
 
 .streakBadge {
-  --flame-rgb: 255 161 22;
+  --flame-rgb: var(--primary-rgb);
 
   display: inline-flex;
   align-items: center;
@@ -49,6 +49,11 @@
       filter: drop-shadow(0 0 6px rgb(var(--flame-rgb) / 0.4));
     }
 
+    // Chữ số trên nền sáng dùng sắc brand đậm hơn cho dễ đọc; nền tối giữ xanh nhạt (xem .onDark).
+    .count {
+      color: var(--primary-text);
+    }
+
     &:hover {
       border-color: rgb(var(--flame-rgb) / 0.5);
     }
@@ -86,6 +91,10 @@
 
     &.active {
       color: rgb(var(--flame-rgb));
+
+      .count {
+        color: rgb(var(--flame-rgb));
+      }
     }
 
     &.recoverable {
@@ -110,7 +119,7 @@
 /* ---------- Ô giải thích khi rê chuột (theo mẫu FrostScope) ---------- */
 
 .wrapper {
-  --flame-rgb: 255 161 22;
+  --flame-rgb: var(--primary-rgb);
 
   position: relative;
   display: inline-flex;
@@ -161,7 +170,7 @@
 }
 
 .activeTip .tooltipHeading {
-  color: rgb(var(--flame-rgb));
+  color: var(--primary-text);
 }
 
 .wrapper.onDark .tooltip {

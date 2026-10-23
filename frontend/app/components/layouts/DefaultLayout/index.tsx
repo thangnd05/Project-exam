@@ -9,8 +9,12 @@ import Header from '@/app/components/layouts/Header';
 import Footer from '@/app/components/layouts/Footer';
 import ScrollToTop from '@/app/components/layouts/ScrollToTop';
 import MobileBottomNav from '@/app/components/layouts/MobileBottomNav';
+import routes from '@/app/configs/Routes';
 
 const cx = classNames.bind(styles);
+
+// Trang có nền tối tràn lên dưới header nổi (header tự chuyển kiểu tối).
+const FLUSH_TOP_PATHS: string[] = [routes.home, routes.comingSoon];
 
 type DefaultLayoutProps = {
   children?: React.ReactNode;
@@ -29,7 +33,7 @@ function DefaultLayout({
 }: DefaultLayoutProps) {
   const pathname = usePathname();
   const showMobileNav = !hideFooter;
-  const flushTop = !examMode && pathname === '/';
+  const flushTop = !examMode && FLUSH_TOP_PATHS.includes(pathname);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {

@@ -8,6 +8,10 @@
   @include globalStyles.primaryGradientButton;
 }
 
+.brand {
+  @include globalStyles.buttonBrand;
+}
+
 .outline {
   @include globalStyles.buttonOutline;
 }
