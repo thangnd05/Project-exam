@@ -12,6 +12,8 @@ type AdminToolbarProps = {
   onSearchChange?: (value: string) => void;
   searchPlaceholder?: string;
   children?: React.ReactNode;
+  /** Hàng lọc phụ trải hết bề ngang dưới ô tìm kiếm, vd. bộ chọn kỳ thi. */
+  filters?: React.ReactNode;
 };
 
 function AdminToolbar({
@@ -19,6 +21,7 @@ function AdminToolbar({
   onSearchChange,
   searchPlaceholder,
   children,
+  filters,
 }: AdminToolbarProps) {
   const t = useTranslations('AdminCommon');
   return (
@@ -31,6 +34,7 @@ function AdminToolbar({
         />
       )}
       {children && <div className={cx('toolbarActions')}>{children}</div>}
+      {filters && <div className={cx('toolbarFilters')}>{filters}</div>}
     </div>
   );
 }

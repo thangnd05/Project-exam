@@ -5,10 +5,10 @@ $danger: var(--red-500);
 $purple: var(--chart-2);
 $text-primary: var(--slate-800);
 $text-secondary: var(--slate-500);
-$bg-white: #ffffff;
-$border-color: var(--slate-200);
-$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$bg-white: var(--bg-white);
+$border-color: var(--border-color);
+$shadow-sm: var(--shadow-sm);
+$shadow-md: var(--shadow-md);
 $radius-md: 12px;
 $radius-lg: 16px;
 
@@ -117,8 +117,8 @@ $radius-lg: 16px;
     cursor: pointer;
     transition: border-color 0.2s ease;
 
-    &:hover { border-color: var(--accent-act-color); }
-    &:focus { outline: none; border-color: var(--accent-act-color); box-shadow: 0 0 0 3px rgb(var(--primary-rgb) / 0.15); }
+    &:hover { border-color: var(--primary); }
+    &:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgb(var(--primary-rgb) / 0.15); }
 }
 
 .monthSummary {
@@ -146,7 +146,7 @@ $radius-lg: 16px;
     padding: 4px 10px;
     border-radius: 999px;
     background: rgb(var(--primary-rgb) / 0.1);
-    color: var(--accent-act-color);
+    color: var(--primary-text);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     white-space: nowrap;

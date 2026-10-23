@@ -12,6 +12,12 @@
   },
   "layout": {
     "backHome": "Về trang chủ",
+    "badge": "Quản trị",
+    "collapse": "Thu gọn",
+    "expand": "Mở rộng",
+    "openMenu": "Mở menu",
+    "closeMenu": "Đóng menu",
+    "navigation": "Điều hướng quản trị",
     "groups": {
       "overview": "Tổng quan",
       "users": "Người dùng",
@@ -93,5 +99,10 @@
     "delete": "Xóa",
     "create": "Tạo mới"
   },
-  "saving": "Đang lưu..."
+  "saving": "Đang lưu...",
+  "examPicker": {
+    "clearHint": "{name} - bấm lần nữa để bỏ lọc",
+    "ariaLabel": "Chọn kỳ thi",
+    "otherVendor": "Khác"
+  }
 }

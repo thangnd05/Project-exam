@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import {useLocale, useTranslations} from 'next-intl';
-import {Badge, Button, Form, Spinner} from 'react-bootstrap';
+import {Badge, Button, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Download, Edit, ExternalLink, Plus, Trash2} from 'lucide-react';
 
@@ -11,7 +11,12 @@ import RecoveryResourceFormModal, {
   type RecoveryResourceFormState,
 } from './_components/RecoveryResourceFormModal';
 import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/[locale]/(admin)/_components/common';
+import {
+  AdminExamTypePicker,
+  AdminFieldError,
+  AdminPageHeader,
+  AdminToolbar,
+} from '@/app/[locale]/(admin)/_components/common';
 import {isMarkdownResource} from '@/app/features/resources/recoveryResource';
 import type {RecoveryResourceRequest, RecoveryResourceResponse, TagResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
@@ -428,18 +433,14 @@ function RecoveryResourcesManagement() {
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder={t('recoveryResources.searchPlaceholder')}
-      >
-        <Form.Select
-          style={{maxWidth: 200}}
-          value={selectedExamTypeId}
-          onChange={(e) => setSelectedExamTypeId(e.target.value)}
-        >
-          <option value="">{t('recoveryResources.allExamTypes')}</option>
-          {examTypes.map((et) => (
-            <option key={et.id} value={et.id}>{et.name}</option>
-          ))}
-        </Form.Select>
-      </AdminToolbar>
+        filters={
+          <AdminExamTypePicker
+            value={selectedExamTypeId}
+            onChange={setSelectedExamTypeId}
+            clearable
+          />
+        }
+      />
 
       <AdminFieldError message={errorMessage || fetchError} />
 

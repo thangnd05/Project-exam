@@ -1,0 +1,100 @@
+@import 'app/assets/styles/mixins.scss';
+
+// Cùng màu hãng với bộ lọc Kho đề thi (ExamCatalog) / ExamPillPicker.
+$vendor-colors: (
+  "aws": #f79400,
+  "azure": #0089d6,
+  "gcp": #4cb050,
+  "other": #64748b,
+);
+
+.picker {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  column-gap: 16px;
+  row-gap: 10px;
+  align-items: start;
+}
+
+.row {
+  display: contents;
+}
+
+.vendor {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--slate-500);
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 5px 14px;
+  border: 1px solid var(--slate-300);
+  border-radius: 999px;
+  background: var(--bg-white);
+  font-size: 1.25rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--slate-600);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--primary);
+    color: var(--text-color);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 2px rgb(var(--primary-rgb) / 0.45);
+  }
+
+  &.active {
+    border-color: var(--brand-700);
+    background: rgb(var(--brand-700-rgb) / 0.1);
+    color: var(--brand-700);
+    font-weight: 700;
+  }
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  border-radius: 50%;
+}
+
+@each $name, $color in $vendor-colors {
+  .dot-#{$name} {
+    background-color: $color;
+  }
+}
+
+@include down(sm) {
+  .picker {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 6px;
+  }
+
+  .pills {
+    margin-bottom: 6px;
+  }
+}

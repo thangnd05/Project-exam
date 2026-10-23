@@ -6,3 +6,4 @@ export {default as AdminCard} from './AdminCard';
 export {default as AdminFieldError} from './AdminFieldError';
 export {default as StatCard, StatCard as StatCardItem, StatCardGroup} from './StatCard';
 export {default as AdminSearchInput} from './AdminSearchInput';
+export {default as AdminExamTypePicker} from './AdminExamTypePicker';

@@ -36,31 +36,25 @@ function MyCertificates() {
           title={t('certificates.myCertificates')}
           label={t('myCertificates.label')}
           description={t('myCertificates.description')}
-          meta={
-            <span className={cx('countBadge')}>
-              <Award size={18} /> {t('myCertificates.activeCount', { count: activeCount })}
-            </span>
-          }
+          badgeLabel={isLoading ? undefined : t('myCertificates.activeCount', { count: activeCount })}
         />
 
         {isLoading && (
           <div className={cx('state')}>
-            <Spinner animation="border" />
+            <Spinner animation="grow" variant="primary" />
             <p>{t('certificates.loading')}</p>
           </div>
         )}
 
         {isError && (
-          <Alert variant="danger">{t('myCertificates.loadFailed')}</Alert>
+          <Alert variant="danger" className={cx('alert')}>{t('myCertificates.loadFailed')}</Alert>
         )}
 
         {!isLoading && !isError && certificates.length === 0 && (
           <div className={cx('empty')}>
-            <Award size={48} />
-            <h3>{t('myCertificates.emptyTitle')}</h3>
-            <p>
-              {t('myCertificates.emptyDescription')}
-            </p>
+            <Award className={cx('emptyIcon')} strokeWidth={1.5} />
+            <h4>{t('myCertificates.emptyTitle')}</h4>
+            <p>{t('myCertificates.emptyDescription')}</p>
             <ButtonPrime variant="primary" onClick={() => router.push('/')}>
               {t('myCertificates.findMockTest')}
             </ButtonPrime>

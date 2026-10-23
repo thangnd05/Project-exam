@@ -2,13 +2,19 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import {useTranslations} from 'next-intl';
-import {Button, Form, Spinner} from 'react-bootstrap';
+import {Button, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {ChevronDown, ChevronRight, Edit, FileText, Plus, Trash2} from 'lucide-react';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import TagFormModal, {type TagFormState} from './_components/TagFormModal';
-import {AdminFieldError, AdminPageHeader, AdminToolbar} from '@/app/[locale]/(admin)/_components/common';
+import {
+  AdminExamTypePicker,
+  AdminFieldError,
+  AdminPageHeader,
+  AdminToolbar,
+} from '@/app/[locale]/(admin)/_components/common';
+import {useExamTypeGroups} from '@/app/[locale]/(admin)/_hooks/useExamTypeGroups';
 import {useAdminExamTypesForTags, useExamPartsForTags, useTagList, useTags, type AdminTag} from './_hooks/useTags';
 import type {TagRequest, TagResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
@@ -131,7 +137,9 @@ function TagsManagement() {
 
   const { examTypes = [] } = useAdminExamTypesForTags();
   // Chưa chọn thì mặc định loại kỳ thi đầu tiên
-  const selectedExamTypeId = chosenExamTypeId || examTypes[0]?.id || '';
+  // Mặc định kỳ thi lá đầu tiên: loại cha (AWS, Azure...) không có phần thi và tag.
+  const {firstExamId} = useExamTypeGroups();
+  const selectedExamTypeId = chosenExamTypeId || firstExamId;
   const {tags, isLoading: loading, isError: tagLoadError} = useTagList(selectedExamTypeId);
   const {examParts} = useExamPartsForTags(selectedExamTypeId);
 
@@ -278,19 +286,10 @@ function TagsManagement() {
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder={t('searchPlaceholder')}
-      >
-        <Form.Select
-          style={{maxWidth: 260}}
-          value={selectedExamTypeId}
-          onChange={(e) => setSelectedExamTypeId(e.target.value)}
-        >
-          {examTypes.map((et) => (
-            <option key={et.id} value={et.id}>
-              {et.name}
-            </option>
-          ))}
-        </Form.Select>
-      </AdminToolbar>
+        filters={
+          <AdminExamTypePicker value={selectedExamTypeId} onChange={setSelectedExamTypeId} />
+        }
+      />
 
       <AdminFieldError message={errorMessage || (tagLoadError ? t('errors.loadFailed') : '')} />
 

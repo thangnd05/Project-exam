@@ -1,9 +1,11 @@
 'use client';
 
-import Link, { usePathname } from '@/app/i18n/navigation';
+import Link, { usePathname, useRouter } from '@/app/i18n/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import classNames from 'classnames/bind';
-import {motion, AnimatePresence} from 'framer-motion';
+import {motion} from 'framer-motion';
+import {Dropdown} from 'react-bootstrap';
 import {
   LayoutDashboard,
   Users,
@@ -19,7 +21,9 @@ import {
   FileStack,
   ChevronLeft,
   ChevronRight,
-  LogOut,
+  House,
+  Menu,
+  X,
   Folder,
   FileText,
   FileQuestion,
@@ -37,8 +41,12 @@ import {
 import routes from '@/app/configs/Routes';
 import { adminPermissionByPath } from '@/app/configs/adminPermissions';
 import { mediaDown } from '@/app/assets/styles/breakpoints';
+import images, {imageAssets} from '@/app/assets/images';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useTranslations } from 'next-intl';
+import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
+import {useCosmetics} from '@/app/features/gamification/cosmetic/hooks/useCosmetics';
+import SettingsModal from '@/app/components/layouts/Header/ThemeToggle/SettingsModal';
 import styles from '@/app/[locale]/(admin)/_components/AdminLayout/AdminLayout.module.scss';
 
 const cx = classNames.bind(styles);
@@ -161,12 +169,20 @@ type AdminLayoutProps = {
   children?: React.ReactNode;
 };
 
+// Trang con (vd. /admin/exam-types/12/layout) vẫn sáng mục cha trên sidebar.
+const matchesPath = (pathname: string, path: string) =>
+  pathname === path || pathname.startsWith(`${path}/`);
+
 function AdminLayout({children}: AdminLayoutProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const pathname = usePathname();
-  const {permissions} = useAuth();
+  const router = useRouter();
+  const {user, permissions, logout} = useAuth();
+  const {frame: cosmeticFrame, badge: cosmeticBadge} = useCosmetics();
   const t = useTranslations('AdminCommon.layout');
+  const tNav = useTranslations('Layout.nav');
 
   const visibleGroups = useMemo(() => {
     const allowed = Array.isArray(permissions) ? permissions : [];
@@ -181,11 +197,18 @@ function AdminLayout({children}: AdminLayoutProps) {
       .filter((group) => group.items.length > 0);
   }, [permissions]);
 
+  const activeGroup = adminRouteGroups.find((group) =>
+    group.items.some((route) => matchesPath(pathname, route.path)),
+  );
+  const activeItem = activeGroup?.items.find((route) => matchesPath(pathname, route.path));
+
   useEffect(() => {
     const mql = window.matchMedia(mediaDown('lg'));
     const sync = () => {
       if (mql.matches) {
         setCollapsed(false);
+      } else {
+        setMobileOpen(false);
       }
     };
     sync();
@@ -193,98 +216,197 @@ function AdminLayout({children}: AdminLayoutProps) {
     return () => mql.removeEventListener('change', sync);
   }, []);
 
-  const isActive = (path: string) => pathname === path;
+  useEffect(() => {
+    if (!mobileOpen) return undefined;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileOpen(false);
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [mobileOpen]);
+
+  const handleLogout = async () => {
+    await logout();
+    router.push(routes.home);
+  };
 
   return (
     <div className={cx('adminWrapper')}>
+      <div
+        className={cx('mobileOverlay', {show: mobileOpen})}
+        onClick={() => setMobileOpen(false)}
+        aria-hidden="true"
+      />
 
-      <>
-
-        <div
-          className={cx('mobileOverlay', {show: mobileOpen})}
-          onClick={() => setMobileOpen(false)}
-        />
-
-        <aside
-          className={cx('sidebar', {collapsed, 'mobile-open': mobileOpen})}
-        >
-
-          <div className={cx('logo')}>
-            <div className={cx('logoIcon')}>
-              <span>E</span>
-            </div>
-            {!collapsed && <span className={cx('logoText')}>WinDe Manager</span>}
-          </div>
-
+      <aside className={cx('sidebar', {collapsed, 'mobile-open': mobileOpen})}>
+        <div className={cx('logo')}>
+          <Link href={routes.adminDashboard} className={cx('brand')} onClick={() => setMobileOpen(false)}>
+            {collapsed ? (
+              <span className={cx('brandMark')}>
+                <Image src={imageAssets.frostscopeFavicon} alt="FrostScope" width={28} height={28} />
+              </span>
+            ) : (
+              <>
+                <Image
+                  src={imageAssets.frostscopeLogoWhite}
+                  alt="FrostScope"
+                  width={133}
+                  height={28}
+                  priority
+                  className={cx('brandLogo')}
+                />
+                <span className={cx('brandBadge')}>{t('badge')}</span>
+              </>
+            )}
+          </Link>
           <button
-            className={cx('collapseBtn')}
-            onClick={() => setCollapsed(!collapsed)}
+            type="button"
+            className={cx('closeBtn')}
+            onClick={() => setMobileOpen(false)}
+            aria-label={t('closeMenu')}
           >
-            {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+            <X size={20} />
           </button>
+        </div>
 
-          <nav className={cx('nav')}>
-            {visibleGroups.map((group) => (
-              <div key={group.label} className={cx('navSection')}>
-                {!collapsed && <span className={cx('navLabel')}>{t(`groups.${group.label}`)}</span>}
-                {group.items.map((route) => (
+        <nav className={cx('nav')} aria-label={t('navigation')}>
+          {visibleGroups.map((group) => (
+            <div key={group.label} className={cx('navSection')}>
+              {!collapsed && <span className={cx('navLabel')}>{t(`groups.${group.label}`)}</span>}
+              {group.items.map((route) => {
+                const active = matchesPath(pathname, route.path);
+                return (
                   <Link
                     key={route.path}
                     href={route.path}
-                    className={cx('navItem', {active: isActive(route.path)})}
+                    className={cx('navItem', {active})}
+                    aria-current={active ? 'page' : undefined}
                     onClick={() => setMobileOpen(false)}
-                    title={collapsed ? t(`items.${route.label}`) : ''}
+                    title={collapsed ? t(`items.${route.label}`) : undefined}
                   >
+                    {active && (
+                      <motion.span
+                        layoutId="adminActiveNav"
+                        className={cx('activeIndicator')}
+                        transition={{type: 'spring', stiffness: 500, damping: 36}}
+                      />
+                    )}
                     <span className={cx('navIcon')}>{route.icon}</span>
                     {!collapsed && (
                       <span className={cx('navText')}>{t(`items.${route.label}`)}</span>
                     )}
-                    {isActive(route.path) && (
-                      <motion.div
-                        layoutId="activeNav"
-                        className={cx('activeIndicator')}
-                        transition={{type: 'spring', stiffness: 500, damping: 30}}
-                      />
-                    )}
                   </Link>
-                ))}
-              </div>
-            ))}
-          </nav>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
 
-          <div className={cx('bottomSection')}>
-            <Link
-              href={routes.home}
-              className={cx('navItem')}
-              title={collapsed ? t('backHome') : ''}
-            >
-              <span className={cx('navIcon')}>
-                <LogOut size={20} />
-              </span>
-              {!collapsed && (
-                <span className={cx('navText')}>{t('backHome')}</span>
-              )}
-            </Link>
-          </div>
-        </aside>
-      </>
+        <div className={cx('bottomSection')}>
+          <Link
+            href={routes.home}
+            className={cx('navItem')}
+            title={collapsed ? t('backHome') : undefined}
+          >
+            <span className={cx('navIcon')}>
+              <House size={20} />
+            </span>
+            {!collapsed && <span className={cx('navText')}>{t('backHome')}</span>}
+          </Link>
+        </div>
+
+        <button
+          type="button"
+          className={cx('collapseBtn')}
+          onClick={() => setCollapsed(!collapsed)}
+          aria-expanded={!collapsed}
+          aria-label={collapsed ? t('expand') : t('collapse')}
+          title={collapsed ? t('expand') : t('collapse')}
+        >
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </button>
+      </aside>
 
       <div className={cx('mainArea', {collapsed})}>
+        <header className={cx('topbar')}>
+          <div className={cx('topbarPill')}>
+            <div className={cx('topbarLeft')}>
+              <button
+                type="button"
+                className={cx('menuBtn')}
+                onClick={() => setMobileOpen(true)}
+                aria-label={t('openMenu')}
+                aria-expanded={mobileOpen}
+              >
+                <Menu size={20} />
+              </button>
+              {activeGroup && activeItem && (
+                <div className={cx('crumbs')}>
+                  <span className={cx('crumbGroup')}>{t(`groups.${activeGroup.label}`)}</span>
+                  <span className={cx('crumbSep')} aria-hidden="true">/</span>
+                  <span className={cx('crumbCurrent')}>{t(`items.${activeItem.label}`)}</span>
+                </div>
+              )}
+            </div>
+
+            <div className={cx('topbarRight')}>
+              <Link href={routes.home} className={cx('siteLink')}>
+                {t('backHome')}
+              </Link>
+              {user && (
+                <Dropdown>
+                  <Dropdown.Toggle
+                    as="div"
+                    className={cx('userInfo')}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={tNav('account', {name: user.userName || ''})}
+                  >
+                    <AvatarWithCosmetic
+                      src={user.avatarUrl}
+                      fallbackSrc={images.avtImage}
+                      name={user.userName || user.fullName}
+                      size={32}
+                      frame={cosmeticFrame}
+                      badge={cosmeticBadge}
+                    />
+                    <span className={cx('username')}>{user.userName}</span>
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu align="end" className={cx('userDropdown')}>
+                    <div className={cx('dropdownHead')}>
+                      <p className={cx('dropdownName')}>{user.fullName || user.userName}</p>
+                      {user.email && <p className={cx('dropdownEmail')}>{user.email}</p>}
+                    </div>
+                    <Dropdown.Item as={Link} href={routes.dashboard}>
+                      {tNav('profile')}
+                    </Dropdown.Item>
+                    <Dropdown.Item as="button" type="button" onClick={() => setShowSettings(true)}>
+                      {tNav('settings')}
+                    </Dropdown.Item>
+                    <Dropdown.Divider className={cx('dropdownDivider')} />
+                    <Dropdown.Item onClick={handleLogout} className={cx('logoutItem')}>
+                      {tNav('logout')}
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              )}
+            </div>
+          </div>
+        </header>
 
         <main className={cx('content')}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={pathname}
-              initial={{opacity: 0, y: 20}}
-              animate={{opacity: 1, y: 0}}
-              exit={{opacity: 0, y: -20}}
-              transition={{duration: 0.2}}
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            key={pathname}
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            transition={{duration: 0.2, ease: 'easeOut'}}
+          >
+            {children}
+          </motion.div>
         </main>
       </div>
+
+      <SettingsModal show={showSettings} onClose={() => setShowSettings(false)} />
     </div>
   );
 }

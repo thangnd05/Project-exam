@@ -1,426 +1,608 @@
 @import 'app/assets/styles/mixins.scss';
 
-$sidebar-bg: var(--brand-800);
-$sidebar-dark: var(--brand-900);
-$sidebar-hover: var(--brand-700);
-$sidebar-text: rgba(255, 255, 255, 0.62);
-$sidebar-text-light: rgba(255, 255, 255, 0.92);
-$header-bg: #ffffff;
-$content-bg: var(--slate-100);
-$page-bg: #ffffff;
-$primary: var(--accent-act-color);
-$success: var(--success);
-$danger: var(--red-500);
-$text-primary: var(--slate-800);
-$text-secondary: var(--slate-500);
-$border-color: var(--slate-200);
-$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-$transition: all 0.3s ease;
+// Khung quản trị cùng ngôn ngữ với header web (FrostScope): sidebar là thanh nổi bo tròn nền
+// than chì giống pill header tối, topbar là pill kính mờ giống header khi nằm trên nền sáng.
+$sidebar-width: 264px;
+$sidebar-collapsed: 76px;
+$gap: 12px;
+$on-dark-faint: rgb(var(--text-on-dark-rgb) / 0.08);
+$neutral-border: rgb(var(--slate-500-rgb) / 0.25);
 
 .adminWrapper {
-    display: flex;
-    min-height: 100vh;
-    background: $page-bg;
+  min-height: 100vh;
+  background: var(--bg-body);
 }
 
+/* ---------- Sidebar ---------- */
+
 .sidebar {
-    width: 260px;
-    background: linear-gradient(180deg, $sidebar-bg 0%, $sidebar-dark 100%);
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    transition: $transition;
+  position: fixed;
+  top: $gap;
+  bottom: $gap;
+  left: $gap;
+  z-index: 1000;
+  width: $sidebar-width;
+  display: flex;
+  flex-direction: column;
+  background: rgb(var(--brand-900-rgb));
+  border: 1px solid rgb(var(--surface-dark-border-rgb) / 0.8);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgb(var(--brand-900-rgb) / 0.18);
+  // Không cắt nội dung để nút thu gọn nhô ra ngoài mép; danh sách menu tự cuộn trong .nav.
+  overflow: visible;
+  transition: width 0.25s ease, transform 0.25s ease;
 
-    overflow: visible;
+  &.collapsed {
+    width: $sidebar-collapsed;
 
-    &.collapsed {
-        width: 80px;
-
-        .logoText,
-        .navLabel,
-        .navText {
-            display: none;
-        }
-
-        .logo {
-            justify-content: center;
-            padding: 16px;
-        }
-
-        .navItem {
-            justify-content: center;
-            padding: 12px;
-        }
+    .logo {
+      justify-content: center;
+      padding: 16px 0 14px;
     }
 
-    &.mobile-open {
-        transform: translateX(0);
+    .nav {
+      padding: 8px 10px;
     }
+
+    .navSection + .navSection {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid $on-dark-faint;
+    }
+
+    .navItem {
+      justify-content: center;
+      padding: 10px;
+    }
+
+    .bottomSection {
+      padding: 10px;
+    }
+  }
 }
 
 .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 64px;
+  padding: 16px 16px 14px 20px;
+  border-bottom: 1px solid $on-dark-faint;
 }
 
-.logoIcon {
-    width: 44px;
-    height: 44px;
-    background: linear-gradient(135deg, $primary 0%, var(--brand-400) 100%);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-size-xl);
-    font-weight: 700;
-    color: white;
-    flex-shrink: 0;
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.02);
+  }
 }
 
-.logoText {
-    font-size: var(--font-size-lg);
-    font-weight: 700;
-    color: white;
-    white-space: nowrap;
+.brandLogo {
+  height: 26px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
-.collapseBtn {
-    position: absolute;
-    right: -14px;
-    top: 64px;
-    width: 28px;
-    height: 28px;
-    background: $sidebar-hover;
-    border: 2px solid $sidebar-bg;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: $sidebar-text-light;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-    transition: $transition;
-    z-index: 1100;
+.brandBadge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgb(var(--primary-rgb) / 0.14);
+  color: var(--primary);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
 
-    &:hover {
-        background: $primary;
-        border-color: white;
-        color: white;
-        transform: scale(1.08);
-    }
+// Logo thu gọn đặt trên nền sáng vì phần chữ "S" của mark màu xanh đậm, chìm trên nền tối.
+.brandMark {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgb(var(--text-on-dark-rgb));
+
+  img {
+    object-fit: contain;
+  }
+}
+
+.closeBtn {
+  display: none;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgb(var(--surface-dark-border-rgb));
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-on-dark-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text-on-dark);
+    background: $on-dark-faint;
+  }
 }
 
 .nav {
-    flex: 1;
-    padding: 16px 12px;
-    overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 12px 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--text-on-dark-rgb) / 0.16) transparent;
 
-    &::-webkit-scrollbar {
-        width: 4px;
-    }
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
 
-    &::-webkit-scrollbar-track {
-        background: transparent;
-    }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
 
-    &::-webkit-scrollbar-thumb {
-        background: $sidebar-hover;
-        border-radius: 4px;
-    }
+  &::-webkit-scrollbar-thumb {
+    background: rgb(var(--text-on-dark-rgb) / 0.16);
+    border-radius: 4px;
+  }
 }
 
 .navSection {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .navLabel {
-    font-size: var(--font-size-xs2);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: $sidebar-text;
-    padding: 8px 12px;
-    margin-top: 8px;
+  padding: 14px 14px 6px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--text-on-dark-rgb) / 0.42);
+  white-space: nowrap;
 }
 
+// Cùng kiểu link điều hướng của header web: pill, chữ bạc, mục đang mở chữ xanh băng nền mờ.
 .navItem {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    color: $sidebar-text;
-    text-decoration: none;
-    border-radius: 10px;
-    transition: $transition;
-    cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-on-dark-muted);
+  font-size: 1.35rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease;
 
-    &:hover {
-        background: $sidebar-hover;
-        color: $sidebar-text-light;
-    }
+  &:visited {
+    color: var(--text-on-dark-muted);
+  }
 
-    &.active {
-        background: rgba(255, 255, 255, 0.1);
-        color: $sidebar-text-light;
+  &:hover {
+    color: var(--text-on-dark);
+    background-color: $on-dark-faint;
+  }
 
-        .navIcon {
-            color: var(--brand-300);
-        }
-    }
-}
+  &:focus {
+    outline: none;
+  }
 
-.navIcon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
+  &:focus-visible {
+    color: var(--text-on-dark);
+    box-shadow: 0 0 0 2px rgb(var(--primary-rgb) / 0.55);
+  }
 
-.navText {
-    font-size: var(--font-size-ssm);
-    font-weight: 500;
-    white-space: nowrap;
+  &.active,
+  &.active:visited {
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  &.active:hover {
+    background-color: transparent;
+  }
 }
 
 .activeIndicator {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 24px;
-    background: $primary;
-    border-radius: 0 4px 4px 0;
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background-color: rgb(var(--primary-rgb) / 0.12);
+}
+
+.navIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.navText {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .bottomSection {
-    padding: 16px 12px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid $on-dark-faint;
+}
+
+// Nút mũi tên tròn nằm vắt trên mép phải sidebar, ngang hàng logo.
+.collapseBtn {
+  position: absolute;
+  top: 18px;
+  right: -14px;
+  z-index: 1;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+  background: var(--bg-white);
+  color: var(--text-color);
+  box-shadow: 0 2px 8px rgb(var(--slate-900-rgb) / 0.18);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
+
+  // Mở rộng vùng bấm ra quanh nút cho dễ trúng.
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+  }
+
+  &:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--text-on-brand);
+    transform: scale(1.08);
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgb(var(--primary-rgb) / 0.45);
+  }
 }
 
 .mobileOverlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: rgb(var(--brand-900-rgb) / 0.5);
+  backdrop-filter: blur(2px);
 
-    &.show {
-        display: block;
-    }
+  &.show {
+    display: block;
+  }
 }
+
+/* ---------- Vùng nội dung ---------- */
 
 .mainArea {
-    flex: 1;
-    margin-left: 260px;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    transition: $transition;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-left: calc(#{$sidebar-width} + #{$gap});
+  transition: margin-left 0.25s ease;
 
-    &.collapsed {
-        margin-left: 80px;
-    }
+  &.collapsed {
+    margin-left: calc(#{$sidebar-collapsed} + #{$gap});
+  }
 }
 
-.header {
-    height: 70px;
-    background: $header-bg;
-    border-bottom: 1px solid $border-color;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: $shadow-sm;
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  padding: $gap clamp(12px, 2vw, 24px) 0;
+  pointer-events: none;
 }
 
-.headerLeft {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+.topbarPill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 56px;
+  padding: 6px 8px 6px 24px;
+  border-radius: 999px;
+  background-color: rgb(var(--body-rgb) / 0.72);
+  backdrop-filter: blur(10px) saturate(1.4);
+  box-shadow:
+    0 0 0 1px rgb(var(--slate-500-rgb) / 0.14),
+    0 8px 24px rgb(var(--slate-900-rgb) / 0.08);
+  pointer-events: auto;
+
+  @supports not (backdrop-filter: blur(1px)) {
+    background-color: rgb(var(--body-rgb) / 0.97);
+  }
 }
 
-.mobileMenuBtn {
-    display: none;
-    background: none;
-    border: none;
-    color: $text-primary;
-    cursor: pointer;
-    padding: 8px;
-
-    @include down(lg) {
-        display: flex;
-    }
+.topbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 
-.searchBox {
-    position: relative;
-    display: flex;
-    align-items: center;
+.menuBtn {
+  display: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid $neutral-border;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 
-    @include down(md) {
-        display: none;
-    }
+  &:hover,
+  &:focus-visible {
+    border-color: var(--primary);
+    background: rgb(var(--slate-500-rgb) / 0.1);
+    outline: none;
+  }
 }
 
-.searchIcon {
-    position: absolute;
-    left: 12px;
-    color: $text-secondary;
+.crumbs {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  white-space: nowrap;
 }
 
-.searchInput {
-    width: 300px;
-    height: 42px;
-    padding: 10px 12px 10px 42px;
-    border: 1px solid $border-color;
-    border-radius: 10px;
-    font-size: var(--font-size-ssm);
-    background: $content-bg;
-    transition: $transition;
-
-    &:focus {
-        outline: none;
-        border-color: $primary;
-        background: var(--bg-white);
-        box-shadow: 0 0 0 3px rgb(var(--primary-rgb) / 0.1);
-    }
-
-    &::placeholder {
-        color: $text-secondary;
-    }
+.crumbGroup,
+.crumbSep {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
-.headerRight {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+.crumbCurrent {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
 }
 
-.headerBtn {
-    position: relative;
-    width: 42px;
-    height: 42px;
-    background: $content-bg;
-    border: none;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: $text-secondary;
-    cursor: pointer;
-    transition: $transition;
-
-    &:hover {
-        background: var(--slate-200);
-        color: $text-primary;
-    }
+.topbarRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.notificationBadge {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 18px;
-    height: 18px;
-    background: $danger;
-    color: white;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.siteLink {
+  padding: 7px 14px;
+  border-radius: 999px;
+  color: var(--slate-600);
+  font-size: 1.35rem;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.2s ease, background-color 0.2s ease;
+
+  &:visited {
+    color: var(--slate-600);
+  }
+
+  &:hover,
+  &:focus-visible {
+    color: var(--text-color);
+    background-color: rgb(var(--slate-500-rgb) / 0.1);
+    text-decoration: none;
+    outline: none;
+  }
 }
 
 .userInfo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 6px 12px 6px 6px;
-    background: $content-bg;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: $transition;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 3px 12px 3px 4px;
+  border: 1px solid $neutral-border;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 
-    &:hover {
-        background: var(--slate-200);
-    }
+  &:hover,
+  &:focus-visible {
+    border-color: var(--primary);
+    background: rgb(var(--slate-500-rgb) / 0.08);
+    outline: none;
+  }
+
+  &:global(.dropdown-toggle)::after {
+    margin-left: 2px;
+    border-top-color: var(--slate-500);
+  }
 }
 
-.userAvatar {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, $primary 0%, var(--brand-400) 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-size-ssm);
+.username {
+  display: block;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.userDropdown {
+  min-width: 240px;
+  margin-top: 10px !important;
+  padding: 8px;
+  font-size: 1.35rem;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: 0 20px 35px -5px rgb(var(--slate-900-rgb) / 0.18);
+
+  :global(.dropdown-item) {
+    padding: 9px 12px;
+    border-radius: 12px;
     font-weight: 600;
-    color: white;
-}
+    white-space: nowrap;
+    color: var(--text-color);
 
-.userDetails {
-    display: flex;
-    flex-direction: column;
-
-    @include down(md) {
-        display: none;
+    &:hover,
+    &:focus {
+      background: var(--slate-100);
+      color: var(--text-color);
     }
+  }
+
+  :global(.dropdown-item).logoutItem {
+    color: var(--red-600);
+
+    &:hover,
+    &:focus {
+      background: var(--red-50);
+      color: var(--red-700);
+    }
+  }
 }
 
-.userName {
-    font-size: var(--font-size-smd);
-    font-weight: 600;
-    color: $text-primary;
+.dropdownHead {
+  margin-bottom: 4px;
+  padding: 8px 12px 10px;
+  border-bottom: 1px solid var(--border-color);
+
+  p {
+    margin: 0;
+  }
 }
 
-.userRole {
-    font-size: var(--font-size-xs2);
-    color: $text-secondary;
+.dropdownName {
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.dropdownEmail {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+}
+
+.dropdownDivider {
+  margin: 4px 0;
+  border-color: var(--border-color);
+  opacity: 1;
 }
 
 .content {
-    flex: 1;
-    padding: 24px;
-
-    @include down(md) {
-        padding: 16px;
-    }
+  flex: 1;
+  padding: 24px clamp(12px, 2vw, 24px) 40px;
 }
 
+/* ---------- Tablet / mobile: sidebar thành ngăn kéo ---------- */
+
 @include down(lg) {
-    .sidebar {
-        transform: translateX(-100%);
+  .sidebar {
+    top: 8px;
+    bottom: 8px;
+    left: 8px;
+    width: min(#{$sidebar-width}, calc(100vw - 32px));
+    transform: translateX(calc(-100% - 16px));
 
-        &.mobile-open {
-            transform: translateX(0);
-        }
+    &.mobile-open {
+      transform: translateX(0);
     }
+  }
 
-    .collapseBtn {
-        display: none;
-    }
+  .closeBtn,
+  .menuBtn {
+    display: inline-flex;
+  }
 
-    .mainArea {
-        margin-left: 0;
-    }
+  .collapseBtn {
+    display: none;
+  }
+
+  .mainArea,
+  .mainArea.collapsed {
+    margin-left: 0;
+  }
+
+  .topbar {
+    padding: 8px 12px 0;
+  }
+
+  .topbarPill {
+    min-height: 52px;
+    padding: 6px 6px 6px 8px;
+  }
+
+  .content {
+    padding: 16px 12px 24px;
+  }
+}
+
+@include down(md) {
+  .siteLink,
+  .crumbGroup,
+  .crumbSep,
+  .username {
+    display: none;
+  }
+
+  .userInfo {
+    padding-right: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .mainArea,
+  .brand,
+  .navItem {
+    transition: none;
+  }
 }

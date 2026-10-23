@@ -11,6 +11,7 @@ import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import {
+  AdminExamTypePicker,
   AdminFieldError,
   AdminPageHeader,
   AdminTable,
@@ -234,21 +235,14 @@ function ExamPartsManagement() {
         searchValue={searchTerm}
         onSearchChange={setSearchTerm}
         searchPlaceholder={t('searchPlaceholder')}
-      >
-        <Form.Select
-          style={{maxWidth: 280}}
-          value={examTypeFilter}
-          onChange={(event) => setExamTypeFilter(event.target.value)}
-          aria-label={t('filterByExamType')}
-        >
-          <option value="">{t('allExamTypes')}</option>
-          {examTypes.map((item) => (
-            <option key={item.exam_type_id} value={item.exam_type_id}>
-              {item.name}
-            </option>
-          ))}
-        </Form.Select>
-      </AdminToolbar>
+        filters={
+          <AdminExamTypePicker
+            value={examTypeFilter}
+            onChange={setExamTypeFilter}
+            clearable
+          />
+        }
+      />
       <AdminFieldError
         message={
           errorMessage || (isError ? t('errors.loadFailed') : '')

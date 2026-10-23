@@ -10,11 +10,13 @@ import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import useMilestoneScoring from '@/app/features/my-target/hooks/useMilestoneScoring';
 import {
+  AdminExamTypePicker,
   AdminFieldError,
   AdminPageHeader,
   AdminToolbar,
 } from '@/app/[locale]/(admin)/_components/common';
 import type {ExamPartResponse, MilestoneResponse, PartRequirementResponse} from '@/app/types';
+import {useExamTypeGroups} from '@/app/[locale]/(admin)/_hooks/useExamTypeGroups';
 import {useMilestones} from './_hooks/useMilestones';
 import styles from './MilestonesManagement.module.scss';
 
@@ -64,9 +66,10 @@ function MilestonesManagement() {
     deleteMilestone,
   } = useMilestones(examTypeFilter);
 
-  // Mặc định chọn loại kỳ thi đầu tiên khi danh sách đã tải
-  if (examTypes.length > 0 && !examTypeFilter) {
-    setExamTypeFilter(examTypes[0].examTypeId);
+  // Mặc định chọn kỳ thi lá đầu tiên (đúng thứ tự bộ chọn) khi danh sách đã tải
+  const {firstExamId} = useExamTypeGroups('standard');
+  if (firstExamId && !examTypeFilter) {
+    setExamTypeFilter(firstExamId);
   }
 
   // Đổi loại kỳ thi thì xoá lỗi cũ
@@ -238,19 +241,14 @@ function MilestonesManagement() {
         searchValue={keyword}
         onSearchChange={setKeyword}
         searchPlaceholder={t('milestones.searchPlaceholder')}
-      >
-        <Form.Select
-          value={examTypeFilter}
-          onChange={(e) => setExamTypeFilter(e.target.value)}
-        >
-          <option value="">{t('milestones.selectExamType')}</option>
-          {examTypes.map((et) => (
-            <option key={et.examTypeId} value={et.examTypeId}>
-              {et.name}
-            </option>
-          ))}
-        </Form.Select>
-      </AdminToolbar>
+        filters={
+          <AdminExamTypePicker
+            value={examTypeFilter}
+            onChange={setExamTypeFilter}
+            source="standard"
+          />
+        }
+      />
 
       {examTypeFilter && (
         <div className={cx('createBox')}>

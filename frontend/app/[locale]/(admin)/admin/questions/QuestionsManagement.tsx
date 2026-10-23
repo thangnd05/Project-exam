@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import { Edit, Trash2 } from 'lucide-react';
 
 import {
+  AdminExamTypePicker,
   AdminPageHeader,
   AdminTable,
   AdminToolbar,
@@ -69,7 +70,7 @@ function QuestionsManagement() {
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
   const [deletingQuestion, setDeletingQuestion] = useState<AdminQuestionListItem | null>(null);
 
-  const { examTypes, examParts, tags } = useQuestionFilterOptions(examTypeId);
+  const { examParts, tags } = useQuestionFilterOptions(examTypeId);
   const visibleTags = tags.filter(
     (tag) => !examPartId || !tag.examPartId || tag.examPartId === examPartId,
   );
@@ -280,6 +281,18 @@ function QuestionsManagement() {
           resetToFirstPage();
         }}
         searchPlaceholder={t('searchPlaceholder')}
+        filters={
+          <AdminExamTypePicker
+            value={examTypeId}
+            onChange={(nextExamTypeId) => {
+              setExamTypeId(nextExamTypeId);
+              setExamPartId('');
+              setTagId('');
+              resetToFirstPage();
+            }}
+            clearable
+          />
+        }
       >
         <ButtonPrime
           variant="primary"
@@ -294,24 +307,6 @@ function QuestionsManagement() {
       </AdminToolbar>
 
       <div className={cx('filterRow')}>
-        <select
-          className={cx('filterInput')}
-          value={examTypeId}
-          onChange={(e) => {
-            setExamTypeId(e.target.value);
-            setExamPartId('');
-            setTagId('');
-            resetToFirstPage();
-          }}
-        >
-          <option value="">{t('filters.allExamTypes')}</option>
-          {examTypes.map((type) => (
-            <option key={type.examTypeId} value={type.examTypeId}>
-              {type.name}
-            </option>
-          ))}
-        </select>
-
         <select
           className={cx('filterInput')}
           value={examPartId}

@@ -12,6 +12,12 @@
   },
   "layout": {
     "backHome": "Back to home",
+    "badge": "Admin",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "navigation": "Admin navigation",
     "groups": {
       "overview": "Overview",
       "users": "Users",
@@ -93,5 +99,10 @@
     "delete": "Delete",
     "create": "Create"
   },
-  "saving": "Saving..."
+  "saving": "Saving...",
+  "examPicker": {
+    "clearHint": "{name} - click again to clear the filter",
+    "ariaLabel": "Choose exam",
+    "otherVendor": "Other"
+  }
 }

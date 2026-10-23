@@ -190,9 +190,9 @@
   }
 
   &.active {
-    border-color: var(--accent-act-color);
+    border-color: var(--primary);
     background: var(--brand-50);
-    box-shadow: 0 0 0 1px var(--accent-act-color);
+    box-shadow: 0 0 0 1px var(--primary);
   }
 }
 
@@ -218,8 +218,8 @@
 }
 
 .parentTab.active .parentTabCount {
-  background: var(--accent-act-color);
-  color: #fff;
+  background: var(--primary);
+  color: var(--text-on-brand);
 }
 
 .parentTabPanel {

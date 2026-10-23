@@ -11,6 +11,7 @@ import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import {
+  AdminExamTypePicker,
   AdminCard,
   AdminFieldError,
   AdminPageHeader,
@@ -273,19 +274,15 @@ function ScoringConversionManagement() {
         searchValue={keyword}
         onSearchChange={setKeyword}
         searchPlaceholder={t('searchPlaceholder')}
-      >
-        <Form.Select
-          value={examTypeFilter}
-          onChange={(event) => setExamTypeFilter(event.target.value)}
-        >
-          <option value="all">{t('allExamTypes')}</option>
-          {examTypes.map((examType) => (
-            <option key={examType.exam_type_id} value={examType.exam_type_id}>
-              {examType.name}
-            </option>
-          ))}
-        </Form.Select>
-      </AdminToolbar>
+        filters={
+          <AdminExamTypePicker
+            value={examTypeFilter}
+            onChange={setExamTypeFilter}
+            clearable
+            clearValue="all"
+          />
+        }
+      />
       <div className="d-flex flex-wrap gap-2">
         <Button
           type="button"
