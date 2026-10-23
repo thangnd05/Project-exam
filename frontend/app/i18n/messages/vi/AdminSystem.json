@@ -5,7 +5,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "description": "Người dùng, bài thi và lượt truy cập của toàn hệ thống.",
+    "description": "Tổng quan hệ thống {siteName}",
     "heatmapTitle": "Lượt truy cập theo ngày & giờ",
     "visitsToday": "Lượt truy cập hôm nay",
     "today": "Hôm nay",
@@ -17,7 +17,7 @@
   },
   "analytics": {
     "title": "Thống kê & Phân tích",
-    "description": "Phân tích xu hướng người dùng, bài thi và nội dung theo thời gian.",
+    "description": "Phân tích chi tiết về hệ thống {siteName}",
     "monthLabel": "Tháng {month}/{year}",
     "yearOption": "Năm {year}",
     "totalUsers": "Tổng người dùng",

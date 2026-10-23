@@ -11,6 +11,7 @@ import ThemeInitScript from '@/app/components/layouts/ThemeInitScript';
 import { routing } from '@/app/i18n/routing';
 import { OG_LOCALES } from '@/app/i18n/metadata';
 import { DEFAULT_PALETTE } from '@/app/constants/theme';
+import { SITE_NAME } from '@/app/constants/site';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -26,7 +27,6 @@ const playfair = Playfair_Display({
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-const SITE_NAME = 'WinDe Exam';
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: LayoutProps<'/[locale]'>) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: 'Metadata' });
-  const title = t('title', { siteName: SITE_NAME });
+  const title = t('title');
   const description = t('description');
 
   return {

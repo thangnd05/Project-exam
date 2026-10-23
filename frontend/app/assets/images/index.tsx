@@ -48,6 +48,5 @@ export const SearchIcon = ({ width = '2.4rem', height = '2.4rem', className }: S
         ></path>
     </svg>
 );
-export const name = "WinDe";
 
 export default images;

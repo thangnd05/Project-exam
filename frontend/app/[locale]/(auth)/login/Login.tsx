@@ -24,7 +24,8 @@ import style from './login.module.scss';
 import { FcGoogle } from "react-icons/fc";
 import { FaFacebook } from "react-icons/fa";
 import { FiArrowLeft, FiArrowRight, FiAtSign, FiEye, FiEyeOff, FiLock, FiMail, FiUser } from 'react-icons/fi';
-import { imageAssets, name } from '@/app/assets/images';
+import { imageAssets } from '@/app/assets/images';
+import { SITE_NAME } from '@/app/constants/site';
 import ForgotPassword from '@/app/[locale]/(auth)/_components/auth/ForgotPassword';
 import RecaptchaCheckbox, { type RecaptchaCheckboxHandle } from '@/app/[locale]/(auth)/login/_components/Recaptcha/RecaptchaCheckbox';
 
@@ -473,7 +474,7 @@ function Login() {
           <span className={cx('legalDivider')} aria-hidden="true" />
           <Link href={routes.policy}>{t('common.privacy')}</Link>
         </nav>
-        <p className={cx('copyright')}>© {name} Exam. All rights reserved.</p>
+        <p className={cx('copyright')}>© {SITE_NAME}. All rights reserved.</p>
       </footer>
     </div>
   );

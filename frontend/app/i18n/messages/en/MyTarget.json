@@ -53,7 +53,7 @@
     },
     "recovery": {
       "targetNotMet": "You haven’t reached your target score yet. Create a study plan to practice exactly the sections you’re weak in.",
-      "nextStep": "Next step: raise your readiness from {score}% to {next}%. Set a target score so WinDe can build a study plan that fits you.",
+      "nextStep": "Next step: raise your readiness from {score}% to {next}%. Set a target score so {siteShortName} can build a study plan that fits you.",
       "practiceAllMet": "All practiced sections met their targets. Take a full mock test to check your overall score.",
       "practicePart": "{part} ({pct}% / need {target}%)",
       "practiceMissed": "{detail} below target. Create a study plan to practice these sections."
@@ -61,7 +61,7 @@
   },
   "setTarget": {
     "title": "My target",
-    "subtitle": "Pick an exam and the score you want to reach. WinDe uses it to work out how far each section needs to go, then builds your study plan.",
+    "subtitle": "Pick an exam and the score you want to reach. {siteShortName} uses it to work out how far each section needs to go, then builds your study plan.",
     "toast": {
       "enterScoreFirst": "Enter a target score first.",
       "loginRequired": "Please sign in to save your target!",
@@ -96,7 +96,7 @@
     "placeholder": "e.g. 450",
     "milestoneHint": "Level {score}",
     "customHint": "Custom score: each section needs about {pct}% correct",
-    "suggestedHint": "Not sure what to aim for? WinDe has preselected a realistic level — you can change it any time.",
+    "suggestedHint": "Not sure what to aim for? {siteShortName} has preselected a realistic level — you can change it any time.",
     "advanced": {
       "title": "Advanced: correct answers needed per section",
       "optional": "optional",

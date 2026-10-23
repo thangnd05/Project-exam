@@ -53,7 +53,7 @@
     },
     "recovery": {
       "targetNotMet": "Bạn chưa đạt điểm mục tiêu. Hãy lập lộ trình học để luyện đúng những phần thi còn yếu.",
-      "nextStep": "Bước tiếp theo: nâng mức sẵn sàng từ {score}% lên {next}%. Hãy đặt điểm mục tiêu để WinDe lập lộ trình học phù hợp với bạn.",
+      "nextStep": "Bước tiếp theo: nâng mức sẵn sàng từ {score}% lên {next}%. Hãy đặt điểm mục tiêu để {siteShortName} lập lộ trình học phù hợp với bạn.",
       "practiceAllMet": "Các phần đã luyện đều đạt mục tiêu. Làm bài thi thử trọn đề để kiểm tra điểm tổng.",
       "practicePart": "{part} ({pct}% / cần {target}%)",
       "practiceMissed": "{detail} chưa đạt mục tiêu. Hãy lập lộ trình để luyện đúng phần này."
@@ -61,7 +61,7 @@
   },
   "setTarget": {
     "title": "Mục tiêu của tôi",
-    "subtitle": "Chọn kỳ thi và mức điểm bạn muốn đạt. WinDe dựa vào đó để biết mỗi phần cần luyện tới đâu rồi lập lộ trình cho bạn.",
+    "subtitle": "Chọn kỳ thi và mức điểm bạn muốn đạt. {siteShortName} dựa vào đó để biết mỗi phần cần luyện tới đâu rồi lập lộ trình cho bạn.",
     "toast": {
       "enterScoreFirst": "Nhập điểm mục tiêu trước.",
       "loginRequired": "Bạn cần đăng nhập để lưu mục tiêu!",
@@ -96,7 +96,7 @@
     "placeholder": "VD: 450",
     "milestoneHint": "Mức {score}",
     "customHint": "Điểm tự chọn: mỗi phần thi cần đúng khoảng {pct}%",
-    "suggestedHint": "Chưa biết đặt bao nhiêu? WinDe đã chọn sẵn một mức vừa sức, sau này đổi lúc nào cũng được.",
+    "suggestedHint": "Chưa biết đặt bao nhiêu? {siteShortName} đã chọn sẵn một mức vừa sức, sau này đổi lúc nào cũng được.",
     "advanced": {
       "title": "Nâng cao: số câu cần đúng ở từng phần thi",
       "optional": "không bắt buộc",

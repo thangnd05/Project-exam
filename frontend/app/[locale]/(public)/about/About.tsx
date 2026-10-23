@@ -4,7 +4,6 @@ import styles from '@/app/[locale]/(public)/_components/poliSer.module.scss';
 import classNames from 'classnames/bind';
 import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
-import {name} from '@/app/assets/images';
 
 const cx = classNames.bind(styles);
 
@@ -17,9 +16,9 @@ function About() {
   return (
     <div className={cx('page')}>
       <section className={cx('prose')}>
-        <h1>{t('title', { name })}</h1>
+        <h1>{t('title')}</h1>
 
-        <p>{t.rich('intro', { name, strong })}</p>
+        <p>{t.rich('intro', { strong })}</p>
 
         <h2>{t('goals.title')}</h2>
         <p>{t('goals.intro')}</p>
@@ -39,10 +38,10 @@ function About() {
         </ul>
 
         <h2>{t('community.title')}</h2>
-        <p>{t.rich('community.body', { name, strong })}</p>
+        <p>{t.rich('community.body', { strong })}</p>
 
         <h2>{t('contact.title')}</h2>
-        <p>{t.rich('contact.body', { name, strong })}</p>
+        <p>{t.rich('contact.body', { strong })}</p>
 
         <p className={cx('thankyou')}>{t('thankYou')}</p>
       </section>

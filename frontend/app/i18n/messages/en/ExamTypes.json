@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Exam Library",
-    "description": "Cloud certification practice exams on WinDe: filter by vendor and level, take a quick test or a full-length mock that mirrors the real exam."
+    "description": "Cloud certification practice exams on {siteShortName}: filter by vendor and level, take a quick test or a full-length mock that mirrors the real exam."
   },
   "detailMeta": {
     "title": "{name} Practice Exams",

@@ -1,10 +1,10 @@
 {
   "meta": {
     "title": "About",
-    "description": "The story and mission of WinDe Exam."
+    "description": "The story and mission of {siteName}."
   },
-  "title": "About the {name} system",
-  "intro": "Hello! Welcome to <strong>{name}</strong>, a modern online learning and testing platform built to help teachers and students create, take, and manage exams quickly, conveniently, and effectively.",
+  "title": "About the {siteShortName} system",
+  "intro": "Hello! Welcome to <strong>{siteShortName}</strong>, a modern online learning and testing platform built to help teachers and students create, take, and manage exams quickly, conveniently, and effectively.",
   "goals": {
     "title": "Our goals",
     "intro": "The application is designed to help schools, learning centers, and individuals easily:",
@@ -27,11 +27,11 @@
   },
   "community": {
     "title": "Community focus",
-    "body": "<strong>{name}</strong> is not just a place to test your knowledge but also an interactive learning environment where teachers can share materials and students can learn from one another through online classes."
+    "body": "<strong>{siteShortName}</strong> is not just a place to test your knowledge but also an interactive learning environment where teachers can share materials and students can learn from one another through online classes."
   },
   "contact": {
     "title": "Contact & Feedback",
-    "body": "If you have feedback or would like to see a feature improved, please get in touch. Every piece of feedback helps <strong>{name}</strong> serve you better."
+    "body": "If you have feedback or would like to see a feature improved, please get in touch. Every piece of feedback helps <strong>{siteShortName}</strong> serve you better."
   },
   "thankYou": "Thank you for trusting and using our system. We wish you effective learning and teaching!"
 }

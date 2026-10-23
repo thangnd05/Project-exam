@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Kho đề thi",
-    "description": "Kho đề thi chứng chỉ Cloud trên WinDe: lọc theo hãng và cấp độ, thi nhanh hoặc làm đề full sát format thật."
+    "description": "Kho đề thi chứng chỉ Cloud trên {siteShortName}: lọc theo hãng và cấp độ, thi nhanh hoặc làm đề full sát format thật."
   },
   "detailMeta": {
     "title": "Đề thi {name}",

@@ -5,6 +5,7 @@ import com.project_exam.backend.shared.exception.BadRequestException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -18,27 +19,39 @@ public class EmailUtil {
 
     private final JavaMailSender javaMailSender;
 
+    @Value("${app.mail.from-address}")
+    private String fromAddress;
+
+    @Value("${app.mail.from-name}")
+    private String fromName;
+
+    @Value("${app.mail.site-name}")
+    private String siteName;
+
+    @Value("${app.frontend.origin}")
+    private String frontendOrigin;
+
     public void sendVerificationEmail(String email, String token) throws MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
         try {
-            helper.setFrom("Thang10072005@gmail.com", "WinDe Exam");
+            helper.setFrom(fromAddress, fromName);
         } catch (UnsupportedEncodingException e) {
-            helper.setFrom("Thang10072005@gmail.com");
+            helper.setFrom(fromAddress);
         }
         helper.setTo(email);
-        helper.setSubject("Xác thực tài khoản WinDe Exam");
+        helper.setSubject("Xác thực tài khoản " + siteName);
 
         String content = """
             <div style="font-family:Arial, sans-serif; background:#f9f9f9; padding:20px; border-radius:10px;">
                 <h2 style="color:#2c3e50;">Xin chào!</h2>
                 <p style="font-size:16px; color:#333;">
-                    Cảm ơn bạn đã đăng ký tài khoản tại <b>WinDe Exam</b>.<br>
+                    Cảm ơn bạn đã đăng ký tài khoản tại <b>%s</b>.<br>
                     Vui lòng ấn vào nút bên dưới để xác thực tài khoản của bạn:
                 </p>
                 <div style="margin:25px 0;">
-                    <a href="http:
+                    <a href="%s/verify?token=%s"
                        style="background-color:#00c6ff; color:white; text-decoration:none;
                               padding:12px 20px; border-radius:8px; font-weight:bold;">
                         Xác thực ngay
@@ -47,10 +60,10 @@ public class EmailUtil {
                 <p style="color:#666; font-size:13px;">
                     Nếu bạn không tạo tài khoản này, vui lòng bỏ qua email này.<br><br>
                     Trân trọng,<br>
-                    <b>Đội ngũ WinDe Exam</b>
+                    <b>Đội ngũ %s</b>
                 </p>
             </div>
-        """.formatted(token);
+        """.formatted(siteName, frontendOrigin, token, siteName);
 
         helper.setText(content, true);
 
@@ -67,12 +80,12 @@ public class EmailUtil {
         try {
             helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             try {
-                helper.setFrom("Thang10072005@gmail.com", "WinDe Exam");
+                helper.setFrom(fromAddress, fromName);
             } catch (UnsupportedEncodingException e) {
-                helper.setFrom("Thang10072005@gmail.com");
+                helper.setFrom(fromAddress);
             }
             helper.setTo(email);
-            helper.setSubject("Đặt lại mật khẩu WinDe Exam");
+            helper.setSubject("Đặt lại mật khẩu " + siteName);
 
             String content = """
                 <div style="font-family:Arial, sans-serif; background:#f9f9f9; padding:20px; border-radius:10px;">
@@ -82,7 +95,7 @@ public class EmailUtil {
                         Vui lòng nhấn nút bên dưới để tiếp tục:
                     </p>
                     <div style="margin:25px 0;">
-                        <a href="http://localhost:3000/reset-password?token=%s"
+                        <a href="%s/reset?token=%s"
                            style="background-color:#ff7a18; color:white; text-decoration:none;
                                   padding:12px 20px; border-radius:8px; font-weight:bold;">
                             Đặt lại mật khẩu
@@ -92,10 +105,10 @@ public class EmailUtil {
                         Liên kết có hiệu lực trong 30 phút.<br>
                         Nếu bạn không yêu cầu thao tác này, hãy bỏ qua email.<br><br>
                         Trân trọng,<br>
-                        <b>Đội ngũ WinDe Exam</b>
+                        <b>Đội ngũ %s</b>
                     </p>
                 </div>
-            """.formatted(token);
+            """.formatted(frontendOrigin, token, siteName);
 
             helper.setText(content, true);
             javaMailSender.send(mimeMessage);

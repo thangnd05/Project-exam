@@ -179,7 +179,7 @@
     "mockCtaHint": "Chấm lại độ sẵn sàng thật",
     "enterTask": "Vào ải ngay",
     "practiceSource": "Lộ trình này chẩn đoán từ một <strong>bài luyện theo phần</strong> nên chỉ phủ các phần đã luyện. Làm bài thi thử trọn đề rồi sinh lại để có lộ trình đầy đủ.",
-    "partsWithoutTasks": "Các phần thi sau chưa đạt mục tiêu nhưng tạm thời chưa có bài luyện, WinDe đang bổ sung:",
+    "partsWithoutTasks": "Các phần thi sau chưa đạt mục tiêu nhưng tạm thời chưa có bài luyện, {siteShortName} đang bổ sung:",
     "roadmapTitle": "Bản đồ ải của bạn",
     "roadmapDesc": "{parts} chặng · {tasks} ải. Mỗi chặng là một phần thi, mỗi ải là một lượt luyện ngắn về một chủ đề  đạt đủ % câu đúng là vượt ải."
   },

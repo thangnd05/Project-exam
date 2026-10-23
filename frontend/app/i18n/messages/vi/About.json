@@ -1,10 +1,10 @@
 {
   "meta": {
     "title": "Giới thiệu",
-    "description": "Câu chuyện và sứ mệnh của WinDe Exam."
+    "description": "Câu chuyện và sứ mệnh của {siteName}."
   },
-  "title": "Giới thiệu về hệ thống {name}",
-  "intro": "Xin chào! Chào mừng bạn đến với <strong>{name}</strong>  nền tảng học tập và kiểm tra trực tuyến hiện đại, được xây dựng để hỗ trợ giáo viên và học sinh trong việc tạo, tham gia và quản lý bài thi một cách nhanh chóng, thuận tiện và hiệu quả.",
+  "title": "Giới thiệu về hệ thống {siteShortName}",
+  "intro": "Xin chào! Chào mừng bạn đến với <strong>{siteShortName}</strong>  nền tảng học tập và kiểm tra trực tuyến hiện đại, được xây dựng để hỗ trợ giáo viên và học sinh trong việc tạo, tham gia và quản lý bài thi một cách nhanh chóng, thuận tiện và hiệu quả.",
   "goals": {
     "title": "Mục tiêu phát triển",
     "intro": "Ứng dụng được thiết kế nhằm giúp các trường học, trung tâm hoặc cá nhân có thể dễ dàng:",
@@ -27,11 +27,11 @@
   },
   "community": {
     "title": "Định hướng cộng đồng",
-    "body": "<strong>{name}</strong> không chỉ là nơi kiểm tra kiến thức, mà còn là môi trường học tập tương tác, nơi giáo viên có thể chia sẻ tài liệu, và học viên có thể học hỏi lẫn nhau thông qua các lớp học trực tuyến."
+    "body": "<strong>{siteShortName}</strong> không chỉ là nơi kiểm tra kiến thức, mà còn là môi trường học tập tương tác, nơi giáo viên có thể chia sẻ tài liệu, và học viên có thể học hỏi lẫn nhau thông qua các lớp học trực tuyến."
   },
   "contact": {
     "title": "Liên hệ & Góp ý",
-    "body": "Nếu bạn có góp ý hoặc mong muốn cải thiện tính năng nào, hãy liên hệ với chúng tôi. Mỗi phản hồi đều giúp <strong>{name}</strong> phục vụ bạn tốt hơn."
+    "body": "Nếu bạn có góp ý hoặc mong muốn cải thiện tính năng nào, hãy liên hệ với chúng tôi. Mỗi phản hồi đều giúp <strong>{siteShortName}</strong> phục vụ bạn tốt hơn."
   },
   "thankYou": "Cảm ơn bạn đã tin tưởng và sử dụng hệ thống. Chúc bạn học tập và giảng dạy hiệu quả!"
 }

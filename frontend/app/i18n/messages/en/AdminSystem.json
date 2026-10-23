@@ -5,7 +5,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "description": "Users, exams and traffic across the whole system.",
+    "description": "{siteName} system overview",
     "heatmapTitle": "Visits by day & hour",
     "visitsToday": "Visits today",
     "today": "Today",
@@ -17,7 +17,7 @@
   },
   "analytics": {
     "title": "Statistics & Analytics",
-    "description": "Trends in users, exams and content over time.",
+    "description": "Detailed analytics for the {siteName} system",
     "monthLabel": "{month, select, 1 {January} 2 {February} 3 {March} 4 {April} 5 {May} 6 {June} 7 {July} 8 {August} 9 {September} 10 {October} 11 {November} 12 {December} other {{month}}} {year}",
     "yearOption": "{year}",
     "totalUsers": "Total users",

@@ -4,7 +4,7 @@ import Link, { usePathname } from '@/app/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import styles from '@/app/[locale]/(auth)/_components/AuthLayout/AuthLayout.module.scss';
-import { name } from '@/app/assets/images';
+import { SITE_NAME } from '@/app/constants/site';
 import routes from '@/app/configs/Routes';
 
 const cx = classNames.bind(styles);
@@ -28,7 +28,7 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
           <span className={cx('divider')} aria-hidden="true">|</span>
           <Link href={routes.policy}>{t('common.privacy')}</Link>
         </nav>
-        <p className={cx('copyright')}>© {name} Exam. All rights reserved.</p>
+        <p className={cx('copyright')}>© {SITE_NAME}. All rights reserved.</p>
       </footer>
     </div>
   );

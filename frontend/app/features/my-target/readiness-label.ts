@@ -1,6 +1,7 @@
 import { createTranslator, type useTranslations } from 'next-intl';
 import type { EnhancedResultResponse, PartBreakdownResponse } from '@/app/types';
 import viMyTarget from '@/app/i18n/messages/vi/MyTarget.json';
+import { withBrandNames } from '@/app/i18n/brandNames';
 
 export type MyTargetTranslator = ReturnType<typeof useTranslations<'MyTarget'>>;
 
@@ -36,7 +37,7 @@ function fallbackT(): MyTargetTranslator {
   if (!viTranslator) {
     viTranslator = createTranslator({
       locale: 'vi',
-      messages: { MyTarget: viMyTarget },
+      messages: { MyTarget: withBrandNames(viMyTarget) },
       namespace: 'MyTarget',
     }) as unknown as MyTargetTranslator;
   }

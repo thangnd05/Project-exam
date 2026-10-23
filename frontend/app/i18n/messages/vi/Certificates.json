@@ -1,11 +1,11 @@
 {
   "meta": {
     "title": "Tra cứu chứng chỉ",
-    "description": "Xác thực chứng chỉ do WinDe Exam cấp bằng mã tra cứu, xem danh mục chứng chỉ đang cấp và các chứng chỉ vừa được cấp."
+    "description": "Xác thực chứng chỉ do {siteName} cấp bằng mã tra cứu, xem danh mục chứng chỉ đang cấp và các chứng chỉ vừa được cấp."
   },
   "codeMeta": {
     "title": "Xác thực chứng chỉ",
-    "description": "Kiểm tra tính hợp lệ của chứng chỉ do WinDe Exam cấp bằng mã chứng chỉ in trên bản chứng chỉ."
+    "description": "Kiểm tra tính hợp lệ của chứng chỉ do {siteName} cấp bằng mã chứng chỉ in trên bản chứng chỉ."
   },
   "verify": {
     "title": "Tra cứu chứng chỉ",
@@ -36,8 +36,8 @@
   },
   "wall": {
     "title": "Chứng chỉ đã cấp",
-    "summary": "{total} chứng chỉ còn hiệu lực do WinDe Exam cấp, mới nhất trước.",
-    "summaryEmpty": "Các chứng chỉ còn hiệu lực do WinDe Exam cấp.",
+    "summary": "{total} chứng chỉ còn hiệu lực do {siteName} cấp, mới nhất trước.",
+    "summaryEmpty": "Các chứng chỉ còn hiệu lực do {siteName} cấp.",
     "loadError": "Không tải được danh sách chứng chỉ.",
     "empty": "Chưa có chứng chỉ nào được cấp.",
     "cardLabel": "Xem chứng chỉ {code} của {name}",

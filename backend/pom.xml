@@ -12,7 +12,7 @@
 	<artifactId>english_exam</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>english-exam-backend</name>
-	<description>Backend for WinDe Exam - English Exam Platform</description>
+	<description>Backend for FrostScope - English Exam Platform</description>
 	<url/>
 	<licenses>
 		<license/>
