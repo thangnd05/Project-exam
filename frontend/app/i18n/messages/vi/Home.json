@@ -25,6 +25,7 @@
     "confirm": {
       "title": "Bài kiểm tra nhanh (Quick Scope)",
       "intro": "Bài thi ngắn gồm <strong>{questions}</strong> trong <strong>{duration}</strong> bám sát Blueprint, giúp phân tích tức thì khoảng trống kiến thức của bạn.",
+      "introNoLimit": "Bài thi ngắn gồm <strong>{questions}</strong>, không giới hạn thời gian, bám sát Blueprint, giúp phân tích tức thì khoảng trống kiến thức của bạn.",
       "perkTitle": "Đặc quyền bài thi:",
       "perkText": "Nhận báo cáo phân tích theo từng Domain kiến thức ngay sau khi nộp bài.",
       "perkTextGuest": "Không cần đăng nhập, nhận báo cáo phân tích theo từng Domain kiến thức ngay sau khi nộp bài.",
