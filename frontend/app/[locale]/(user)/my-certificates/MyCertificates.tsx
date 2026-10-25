@@ -36,7 +36,7 @@ function MyCertificates() {
           title={t('certificates.myCertificates')}
           label={t('myCertificates.label')}
           description={t('myCertificates.description')}
-          badgeLabel={isLoading ? undefined : t('myCertificates.activeCount', { count: activeCount })}
+          badgeLabel={activeCount > 0 ? t('myCertificates.activeCount', { count: activeCount }) : undefined}
         />
 
         {isLoading && (

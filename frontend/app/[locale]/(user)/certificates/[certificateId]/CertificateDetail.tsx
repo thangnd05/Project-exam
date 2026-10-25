@@ -70,6 +70,7 @@ function CertificateDetail() {
     <div className={cx('wrapper')}>
       <Container>
         <PageHeader
+          compact
           title={certificate.design?.title || t('myCertificates.fallbackTitle')}
           label={t('myCertificates.label')}
           description={
