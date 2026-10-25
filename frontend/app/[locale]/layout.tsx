@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import '@/app/assets/styles/GlobalStyles/GlobalStyles.scss';
 import '@/app/assets/styles/global-overrides.scss';
 import Providers from '@/app/providers';
+import BrowserSupportScript from '@/app/components/layouts/BrowserSupportScript';
 import ThemeInitScript from '@/app/components/layouts/ThemeInitScript';
 import { routing } from '@/app/i18n/routing';
 import { OG_LOCALES } from '@/app/i18n/metadata';
@@ -98,6 +99,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
       suppressHydrationWarning
     >
       <head>
+        <BrowserSupportScript />
         <ThemeInitScript />
       </head>
       <body>
