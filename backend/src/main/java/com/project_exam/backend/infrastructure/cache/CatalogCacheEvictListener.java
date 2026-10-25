@@ -3,6 +3,7 @@ package com.project_exam.backend.infrastructure.cache;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamCategory;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamPart;
 import com.project_exam.backend.modules.assessment.exam.domain.ExamType;
+import com.project_exam.backend.modules.gamification.quest.domain.Quest;
 import jakarta.persistence.PostPersist;
 import jakarta.persistence.PostRemove;
 import jakarta.persistence.PostUpdate;
@@ -20,7 +21,8 @@ public class CatalogCacheEvictListener {
     private static final Map<Class<?>, String[]> CACHES_BY_ENTITY = Map.of(
             ExamType.class, new String[]{CacheNames.EXAM_TYPES, CacheNames.EXAM_TYPE},
             ExamCategory.class, new String[]{CacheNames.EXAM_CATEGORIES},
-            ExamPart.class, new String[]{CacheNames.EXAM_PARTS}
+            ExamPart.class, new String[]{CacheNames.EXAM_PARTS},
+            Quest.class, new String[]{CacheNames.ACTIVE_QUESTS}
     );
 
     private final CacheEvictor cacheEvictor;

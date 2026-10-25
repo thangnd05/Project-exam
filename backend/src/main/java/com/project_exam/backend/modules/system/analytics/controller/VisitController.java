@@ -7,7 +7,6 @@ import com.project_exam.backend.shared.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,9 +24,12 @@ public class VisitController {
             @RequestHeader(value = "X-Guest-Session", required = false) String sessionKey,
             HttpServletRequest request) {
 
-        String ip = clientIp(request);
+        // IP thật đã được Tomcat lấy từ X-Forwarded-* của proxy tin cậy (forward-headers-strategy=native).
+        String ip = request.getRemoteAddr();
 
-        if (!rateLimiter.allow(StringUtils.hasText(sessionKey) ? sessionKey : ip)) {
+        // Đếm theo IP, không theo X-Guest-Session: header do client tự đặt, đổi mỗi request là vượt giới hạn
+        // và mỗi session mới thành một dòng page_visit mới.
+        if (!rateLimiter.allow(ip)) {
             return ResponseEntity.noContent().build();
         }
 
@@ -40,13 +42,5 @@ public class VisitController {
 
         visitTrackingService.record(body.getPath(), sessionKey, userId, ip);
         return ResponseEntity.noContent().build();
-    }
-
-    private String clientIp(HttpServletRequest request) {
-        String forwarded = request.getHeader("X-Forwarded-For");
-        if (StringUtils.hasText(forwarded)) {
-            return forwarded.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
     }
 }

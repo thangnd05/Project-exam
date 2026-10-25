@@ -7,6 +7,7 @@ import com.project_exam.backend.modules.assessment.exam.dto.ExamCategoryResponse
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamTypeResponse;
 import com.project_exam.backend.modules.assessment.test.dto.TestPartResponse;
+import com.project_exam.backend.modules.gamification.quest.domain.Quest;
 import com.project_exam.backend.modules.gamification.streak.dto.StreakLeaderboardResponse;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurer;
@@ -59,6 +60,8 @@ public class CacheConfig implements CachingConfigurer {
                         types.listOf(ExamCategoryResponse.class, CATALOG_TTL))
                 .withCacheConfiguration(CacheNames.EXAM_PARTS,
                         types.listOf(ExamPartResponse.class, CATALOG_TTL))
+                .withCacheConfiguration(CacheNames.ACTIVE_QUESTS,
+                        types.listOf(Quest.class, CATALOG_TTL))
                 .withCacheConfiguration(CacheNames.HALL_OF_FAME,
                         types.single(QuickLeaderboardResponse.class, LEADERBOARD_TTL))
                 .withCacheConfiguration(CacheNames.STREAK_LEADERBOARD,

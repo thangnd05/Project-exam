@@ -101,6 +101,19 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.CONFLICT, "Dữ liệu bị trùng hoặc vi phạm ràng buộc", request);
     }
 
+    // FE đọc Retry-After để đếm ngược nút gửi lại, giống 429 của AuthRateLimitFilter.
+    @ExceptionHandler(TooManyRequestsException.class)
+    public ResponseEntity<ApiErrorResponse> handleTooManyRequestsException(
+            TooManyRequestsException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("TooManyRequestsException at {}: {}", request.getRequestURI(), ex.getMessage());
+        ResponseEntity<ApiErrorResponse> response = buildErrorResponse(ex.getStatus(), ex.getMessage(), request);
+        return ResponseEntity.status(response.getStatusCode())
+                .header("Retry-After", String.valueOf(ex.getRetryAfterSeconds()))
+                .body(response.getBody());
+    }
+
     @ExceptionHandler(AppException.class)
     public ResponseEntity<ApiErrorResponse> handleAppException(AppException ex, HttpServletRequest request) {
         log.warn("AppException: {}", ex.getMessage());

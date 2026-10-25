@@ -9,6 +9,8 @@ public final class CacheNames {
     public static final String EXAM_TYPE = "examType";
     public static final String EXAM_CATEGORIES = "examCategories";
     public static final String EXAM_PARTS = "examParts";
+    // Chỉ danh sách nhiệm vụ đang bật; tiến độ/đã nhận của từng người vẫn tính mỗi lần gọi.
+    public static final String ACTIVE_QUESTS = "activeQuests";
 
     // Bảng xếp hạng công khai: truy vấn nặng, chấp nhận chậm vài chục giây nên không xoá theo lượt ghi.
     public static final String HALL_OF_FAME = "hallOfFame";

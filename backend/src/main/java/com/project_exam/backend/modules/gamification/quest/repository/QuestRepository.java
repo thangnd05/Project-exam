@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface QuestRepository extends JpaRepository<Quest, String> {
     List<Quest> findAllByOrderByCreatedAtDesc();
+
+    List<Quest> findByActiveTrueOrderByCreatedAtDesc();
 }

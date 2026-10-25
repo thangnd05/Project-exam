@@ -4,6 +4,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 import jakarta.persistence.*;
+import com.project_exam.backend.infrastructure.cache.CatalogCacheEvictListener;
 import com.project_exam.backend.infrastructure.persistence.UuidV7;
 import lombok.*;
 
@@ -17,6 +18,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @SQLDelete(sql = "UPDATE gamification.quests SET deleted_at = now() WHERE quest_id = ?")
 @SQLRestriction("deleted_at IS NULL")
+@EntityListeners(CatalogCacheEvictListener.class)
 public class Quest {
     @Id
     @UuidV7

@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.gamification.quest.service;
 
 import com.project_exam.backend.modules.gamification.coin.service.CoinService;
+import com.project_exam.backend.modules.gamification.quest.cache.ActiveQuestCache;
 import com.project_exam.backend.modules.gamification.quest.domain.Quest;
 import com.project_exam.backend.modules.gamification.quest.domain.UserQuestClaim;
 import com.project_exam.backend.modules.gamification.quest.dto.QuestClaimResponse;
@@ -31,6 +32,7 @@ public class QuestService {
     private final QuestConditionEvaluator evaluator;
     private final CoinService coinService;
     private final QuestMapper questMapper;
+    private final ActiveQuestCache activeQuestCache;
 
     @Transactional(readOnly = true)
     public List<UserQuestResponse> getAvailableForUser(String userId) {
@@ -39,7 +41,7 @@ public class QuestService {
                 .map(UserQuestClaim::getQuestId)
                 .collect(Collectors.toSet());
 
-        return questRepository.findAllByOrderByCreatedAtDesc().stream()
+        return activeQuestCache.getActive().stream()
                 .filter(quest -> isVisible(quest, now))
                 .map(quest -> toUserResponse(quest, userId, claimedQuestIds.contains(quest.getQuestId())))
                 .toList();

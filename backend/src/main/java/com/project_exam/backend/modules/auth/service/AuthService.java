@@ -22,6 +22,7 @@ import com.project_exam.backend.modules.users.user.domain.User;
 import com.project_exam.backend.modules.users.rbac.repository.RolePermissionRepository;
 import com.project_exam.backend.modules.users.rbac.repository.RoleRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
+import com.project_exam.backend.infrastructure.security.AuthAttemptLimiter;
 import com.project_exam.backend.infrastructure.security.AuthCookieWriter;
 import com.project_exam.backend.infrastructure.security.CustomUserDetailsService;
 import com.project_exam.backend.infrastructure.security.JwtService;
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -77,14 +79,22 @@ public class AuthService {
     private final RecaptchaService recaptchaService;
     private final RefreshTokenStore refreshTokenStore;
     private final AuthCookieWriter authCookieWriter;
+    private final AuthAttemptLimiter authAttemptLimiter;
 
     @Value("${app.frontend.origin}")
     private String frontendOrigin;
 
     public UserResponse login(String identifier, String password, HttpServletResponse response) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(identifier, password)
-        );
+        authAttemptLimiter.checkLoginAllowed(identifier);
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(identifier, password)
+            );
+        } catch (BadCredentialsException e) {
+            authAttemptLimiter.recordLoginFailure(identifier);
+            throw e;
+        }
+        authAttemptLimiter.resetLoginFailures(identifier);
 
         User user = userRepository.findByUserName(identifier)
                 .or(() -> userRepository.findByEmail(identifier))
@@ -276,6 +286,7 @@ public class AuthService {
     @Transactional
     public AuthMessageResponse forgotPassword(ForgotPasswordRequest request) {
         String email = request.getEmail() == null ? "" : request.getEmail().trim();
+        authAttemptLimiter.acquireResetMailSlot(email);
         Optional<User> userOptional = userRepository.findByEmail(email)
                 .or(() -> userRepository.findByEmail(email.toLowerCase()));
         if (userOptional.isPresent()) {
