@@ -14,6 +14,7 @@ import type {
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import {examTypeKeys} from '@/app/configs/queryKeys';
+import { toList } from '@/app/utils/toList';
 
 const PAGE_SIZE = 12;
 
@@ -23,9 +24,6 @@ export const examTypeTestsKeys = {
   children: (id?: string) => ['examtype-children', id],
   certificateExams: (id?: string) => ['examtype-certificate-exams', id],
 };
-
-const normalizeArray = <T,>(data: T[] | null | undefined): T[] =>
-  Array.isArray(data) ? data : [];
 
 export function useTestsByExamType(examTypeId?: string, page = 0) {
   const testsQuery = useQuery({
@@ -45,7 +43,7 @@ export function useTestsByExamType(examTypeId?: string, page = 0) {
     queryKey: examTypeTestsKeys.children(examTypeId),
     queryFn: () => getExamTypeChildren(examTypeId as string),
     enabled: !!examTypeId,
-    select: normalizeArray<ExamTypeResponse>,
+    select: toList<ExamTypeResponse>,
   });
 
   const certificateExamsQuery = useQuery({

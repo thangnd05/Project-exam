@@ -14,6 +14,7 @@ import { getSkills } from '@/app/apis/skillApi';
 import type { ExamPartRequest, ExamPartResponse, ExamTypeResponse, SkillResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import {examPartKeys, examTypeKeys, skillKeys} from '@/app/configs/queryKeys';
+import { toList } from '@/app/utils/toList';
 
 export const examPartsKeys = {
   examParts: examPartKeys.all,
@@ -40,9 +41,6 @@ export type ExamPartSkillOption = {
   skill_id: string;
   name: string;
 };
-
-const toArray = <T,>(data: T[] | { content?: T[] } | null | undefined): T[] =>
-  Array.isArray(data) ? data : data?.content ?? [];
 
 const mapExamPartFromApi = (item: ExamPartResponse): ExamPartItem => ({
   exam_part_id: String(item.examPartId),
@@ -77,13 +75,13 @@ export function useExamParts() {
   const examTypesQuery = useQuery({
     queryKey: examPartsKeys.examTypes,
     queryFn: getExamTypes,
-    select: (data) => toArray(data).map(mapExamTypeFromApi),
+    select: (data) => toList(data).map(mapExamTypeFromApi),
   });
 
   const skillsQuery = useQuery({
     queryKey: examPartsKeys.skills,
     queryFn: getSkills,
-    select: (data) => toArray(data).map(mapSkillFromApi),
+    select: (data) => toList(data).map(mapSkillFromApi),
   });
 
   return {

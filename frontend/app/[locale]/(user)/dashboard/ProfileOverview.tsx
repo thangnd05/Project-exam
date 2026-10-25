@@ -19,6 +19,7 @@ import {
   useMyTargets,
   useMyActivity,
 } from './_hooks/useProfileDashboard';
+import { formatDuration, type DashboardT } from './_lib/formatDuration';
 
 const cx = classNames.bind(styles);
 
@@ -32,8 +33,6 @@ const MonthlyTimeLine = dynamic(
 );
 
 const TARGET_VISIBLE_COUNT = 2;
-
-type DashboardT = ReturnType<typeof useTranslations<'Dashboard'>>;
 
 const formatDateTime = (value: string | null | undefined, intlLocale: string) => {
   if (!value) return '--';
@@ -57,14 +56,6 @@ const formatMonthShort = (value: string | undefined, t: DashboardT) => {
   if (!value) return '';
   const [, month] = value.split('-');
   return t('activity.monthShort', { month: String(Number(month)) });
-};
-
-const formatDuration = (minutes: unknown, t: DashboardT) => {
-  const total = Math.max(0, Math.round(Number(minutes) || 0));
-  const h = Math.floor(total / 60);
-  const m = total % 60;
-  if (h > 0) return m > 0 ? t('duration.hoursMinutes', { h, m }) : t('duration.hours', { h });
-  return t('duration.minutes', { m });
 };
 
 function ProfileOverview() {

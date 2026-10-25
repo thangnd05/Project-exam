@@ -20,6 +20,7 @@ import type {
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import {examTypeKeys} from '@/app/configs/queryKeys';
+import { toList } from '@/app/utils/toList';
 
 export interface IssuedCertificateParams {
   examTypeId?: string;
@@ -35,9 +36,6 @@ export const certificateAdminKeys = {
   issued: (params: IssuedCertificateParams) => ['admin-certificates', 'issued', params] as const,
 };
 
-const normalizeArray = <T,>(data: T[] | { content?: T[] } | null | undefined): T[] =>
-  Array.isArray(data) ? data : data?.content ?? [];
-
 export function useCertificateTemplates() {
   const crud = useAdminCrud({
     queryKey: certificateAdminKeys.templates,
@@ -51,7 +49,7 @@ export function useCertificateTemplates() {
   const examTypesQuery = useQuery({
     queryKey: certificateAdminKeys.examTypes,
     queryFn: getStandardExamTypes,
-    select: normalizeArray,
+    select: toList,
   });
 
   return {

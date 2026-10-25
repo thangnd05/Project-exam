@@ -19,6 +19,7 @@ import type {
   TagResponse,
 } from '@/app/types';
 import {examTypeKeys, tagKeys} from '@/app/configs/queryKeys';
+import {toList} from '@/app/utils/toList';
 
 export interface RecoveryExamTypeOption {
   id?: string;
@@ -32,15 +33,14 @@ export const recoveryResourceKeys = {
 };
 
 const EMPTY: never[] = [];
-const asArray = <T,>(data: T[] | null | undefined): T[] => (Array.isArray(data) ? data : EMPTY);
 const mapExamTypes = (list: ExamTypeResponse[]): RecoveryExamTypeOption[] =>
-  asArray(list).map((item) => ({id: item.examTypeId, name: item.name}));
+  toList(list).map((item) => ({id: item.examTypeId, name: item.name}));
 
 export function useRecoveryResources() {
   const crud = useAdminCrud({
     queryKey: recoveryResourceKeys.resources,
     list: getAllResources,
-    select: asArray,
+    select: toList,
     create: ({payload, file}: {payload: RecoveryResourceRequest; file?: File | null}) =>
       createResource(payload, file),
     update: ({id, payload, file}: {id: string; payload: RecoveryResourceRequest; file?: File | null}) =>
@@ -71,7 +71,7 @@ export function useTagsByExamType(examTypeId: string): TagResponse[] {
     queryFn: () => getTagsFlatByExamType(examTypeId),
     enabled: !!examTypeId,
     placeholderData: keepPreviousData,
-    select: asArray,
+    select: toList,
   });
 
   return query.data ?? EMPTY;

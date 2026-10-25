@@ -15,6 +15,7 @@ import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import TestPageHeader from '../_components/TestPageHeader';
 import styles from '../_components/TestPage.module.scss';
 import { useTestHistory } from './_hooks/useTestHistory';
+import { formatDuration, formatScore } from '../_lib/formatAttempt';
 
 const cx = classNamesBind.bind(styles);
 const ui = classNamesBind.bind(uiStyles);
@@ -29,21 +30,6 @@ const formatDateTime = (dateStr: string | undefined, locale: string) => {
     hour: '2-digit',
     minute: '2-digit',
   });
-};
-
-const formatDuration = (seconds?: number | null) => {
-  if (seconds == null) return '—';
-  const sec = Math.max(0, Math.floor(seconds));
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = sec % 60;
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
-};
-
-const formatScore = (score?: number | null) => {
-  if (score == null) return '—';
-  return Number.isInteger(score) ? String(score) : score.toFixed(1);
 };
 
 type StatusLabelKey = 'completed' | 'inProgress' | 'expired';

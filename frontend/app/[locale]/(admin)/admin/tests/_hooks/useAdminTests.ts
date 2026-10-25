@@ -13,6 +13,7 @@ import type {
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import {examTypeKeys} from '@/app/configs/queryKeys';
+import { toList } from '@/app/utils/toList';
 
 const USERS_PARAMS = { page: 0, size: 200 };
 
@@ -22,7 +23,6 @@ export const adminTestsKeys = {
   users: (params: typeof USERS_PARAMS) => ['admin-users', params],
 };
 
-const toArray = <T,>(data: T[]): T[] => (Array.isArray(data) ? data : []);
 const toUsers = (data: PageResponse<UserResponse>): UserResponse[] =>
   Array.isArray(data?.content) ? data.content : [];
 
@@ -32,12 +32,12 @@ export function useAdminTests() {
   const testsQuery = useQuery({
     queryKey: adminTestsKeys.tests,
     queryFn: getAdminTests,
-    select: toArray<TestAdminResponse>,
+    select: toList<TestAdminResponse>,
   });
   const examTypesQuery = useQuery({
     queryKey: adminTestsKeys.examTypes,
     queryFn: getExamTypes,
-    select: toArray<ExamTypeResponse>,
+    select: toList<ExamTypeResponse>,
   });
   const usersQuery = useQuery({
     queryKey: adminTestsKeys.users(USERS_PARAMS),

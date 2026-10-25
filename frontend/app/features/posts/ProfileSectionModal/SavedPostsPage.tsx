@@ -14,6 +14,7 @@ import { useSavedPosts, useUnsavePost } from '@/app/features/posts/hooks/useSave
 import type { PostSummaryResponse } from '@/app/types';
 import styles from '@/app/features/posts/ProfileSectionModal/PostsListPage.module.scss';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
+import { formatCount, formatDate } from './postFormat';
 
 const cx = classNames.bind(styles);
 
@@ -26,19 +27,6 @@ const cardVariants: Variants = {
     y: 0,
     transition: { duration: 0.45, delay: i * 0.07, ease: [0.22, 1, 0.36, 1] },
   }),
-};
-
-const formatDate = (value: string | null | undefined, locale: string) => {
-  if (!value) return '--';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '--';
-  return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
-};
-
-const formatCount = (n: unknown) => {
-  const v = Number(n) || 0;
-  if (v >= 1000) return `${(v / 1000).toFixed(1).replace(/\.0$/, '')}k`;
-  return String(v);
 };
 
 type SavedPostsPageProps = {

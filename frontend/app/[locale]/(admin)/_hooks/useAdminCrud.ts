@@ -3,13 +3,11 @@
 import {useMutation, useQuery, useQueryClient, type QueryKey} from '@tanstack/react-query';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import type { PageResponse } from '@/app/types';
+import { toList } from '@/app/utils/toList';
 
 type CrudFn<TVariables, TData> = (variables: TVariables) => Promise<TData>;
 
 type ListData<TRaw> = TRaw[] | PageResponse<TRaw>;
-
-const asList = <TRaw,>(data: ListData<TRaw> | null | undefined): TRaw[] =>
-  Array.isArray(data) ? data : data?.content ?? [];
 
 type CrudMutationsOptions<TCreateVars, TCreateData, TUpdateVars, TUpdateData, TRemoveVars, TRemoveData> = {
   queryKey: QueryKey;
@@ -73,7 +71,7 @@ export function useAdminCrud<
     queryKey,
     queryFn: list,
     select: (data: ListData<TRaw>): TItem[] => {
-      const rows = asList(data);
+      const rows = toList(data);
       if (select) return select(rows);
       // Không có mapItem thì TItem mặc định là TRaw
       return mapItem ? rows.map(mapItem) : (rows as unknown as TItem[]);

@@ -13,18 +13,9 @@ import {
 } from 'recharts';
 import { useTranslations } from 'next-intl';
 import { brandColors } from '@/app/assets/styles/brandColors';
+import { formatDuration } from '../_lib/formatDuration';
 
 const chartColors = brandColors;
-
-type DashboardT = ReturnType<typeof useTranslations<'Dashboard'>>;
-
-const formatDuration = (minutes: unknown, t: DashboardT) => {
-  const total = Math.max(0, Math.round(Number(minutes) || 0));
-  const h = Math.floor(total / 60);
-  const m = total % 60;
-  if (h > 0) return m > 0 ? t('duration.hoursMinutes', { h, m }) : t('duration.hours', { h });
-  return t('duration.minutes', { m });
-};
 
 type DailyPoint = { day: number | string; minutes: number };
 

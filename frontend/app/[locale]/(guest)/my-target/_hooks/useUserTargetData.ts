@@ -10,6 +10,7 @@ import { getUserTarget } from '@/app/apis/userTargetApi';
 import { sortByPartOrder } from '@/app/features/exam-types/partOrder';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import {examTypeKeys, examPartKeys, skillKeys, scoringConversionKeys, milestoneKeys, userTargetKeys as targetKeys} from '@/app/configs/queryKeys';
+import { toList } from '@/app/utils/toList';
 
 export const userTargetKeys = {
   examTypes: examTypeKeys.standard,
@@ -20,35 +21,32 @@ export const userTargetKeys = {
   current: targetKeys.byExamType,
 };
 
-const asArray = <T>(data: T[] | { content?: T[] } | null | undefined): T[] =>
-  Array.isArray(data) ? data : Array.isArray(data?.content) ? data.content : [];
-
 export function useUserTargetData(selectedExamTypeId?: string) {
   const examTypesQuery = useQuery({
     queryKey: userTargetKeys.examTypes,
     queryFn: getStandardExamTypes,
-    select: asArray,
+    select: toList,
   });
   const examPartsQuery = useQuery({
     queryKey: userTargetKeys.examParts,
     queryFn: getExamParts,
-    select: (data) => sortByPartOrder(asArray(data)),
+    select: (data) => sortByPartOrder(toList(data)),
   });
   const skillsQuery = useQuery({
     queryKey: userTargetKeys.skills,
     queryFn: getSkills,
-    select: asArray,
+    select: toList,
   });
   const scoringConversionsQuery = useQuery({
     queryKey: userTargetKeys.scoringConversions,
     queryFn: getScoringConversions,
-    select: asArray,
+    select: toList,
   });
   const milestonesQuery = useQuery({
     queryKey: userTargetKeys.milestones(selectedExamTypeId),
     queryFn: () => getMilestones(selectedExamTypeId),
     enabled: !!selectedExamTypeId,
-    select: asArray,
+    select: toList,
   });
 
   return {

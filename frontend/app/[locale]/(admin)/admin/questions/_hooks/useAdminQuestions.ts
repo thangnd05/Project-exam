@@ -20,6 +20,7 @@ import type {
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import {examTypeKeys, examPartKeys, tagKeys} from '@/app/configs/queryKeys';
+import { toList } from '@/app/utils/toList';
 
 export const adminQuestionKeys = {
   root: ['admin-questions'] as const,
@@ -28,9 +29,6 @@ export const adminQuestionKeys = {
   parts: examPartKeys.byExamType,
   tags: tagKeys.flat,
 };
-
-const normalizeArray = <T,>(data: T[] | { content?: T[] } | null | undefined): T[] =>
-  Array.isArray(data) ? data : data?.content ?? [];
 
 export function useAdminQuestionList(params: AdminQuestionSearchParams) {
   const queryClient = useQueryClient();
@@ -71,21 +69,21 @@ export function useQuestionFilterOptions(examTypeId: string) {
   const examTypesQuery = useQuery({
     queryKey: adminQuestionKeys.examTypes,
     queryFn: getExamTypes,
-    select: normalizeArray,
+    select: toList,
   });
 
   const partsQuery = useQuery({
     queryKey: adminQuestionKeys.parts(examTypeId),
     queryFn: () => getExamPartsByExamType(examTypeId),
     enabled: !!examTypeId,
-    select: normalizeArray,
+    select: toList,
   });
 
   const tagsQuery = useQuery({
     queryKey: adminQuestionKeys.tags(examTypeId),
     queryFn: () => getTagsFlatByExamType(examTypeId),
     enabled: !!examTypeId,
-    select: normalizeArray,
+    select: toList,
   });
 
   return {

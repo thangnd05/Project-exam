@@ -16,6 +16,7 @@ import { useMyPosts } from '@/app/features/posts/ProfileSectionModal/useMyPosts'
 import type { PostResponse, PostSummaryResponse } from '@/app/types';
 import styles from '@/app/features/posts/ProfileSectionModal/PostsListPage.module.scss';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
+import { formatCount, formatDate } from './postFormat';
 
 const cx = classNames.bind(styles);
 
@@ -42,19 +43,6 @@ const FILTER_OPTIONS: Array<{ value: string; labelKey: StatusKey }> = [
   { value: 'APPROVED', labelKey: 'approved' },
   { value: 'PENDING', labelKey: 'pending' },
 ];
-
-const formatDate = (value: string | null | undefined, locale: string) => {
-  if (!value) return '--';
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return '--';
-  return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
-};
-
-const formatCount = (n: unknown) => {
-  const v = Number(n) || 0;
-  if (v >= 1000) return `${(v / 1000).toFixed(1).replace(/\.0$/, '')}k`;
-  return String(v);
-};
 
 type MyPostsPageProps = {
   embedded?: boolean;

@@ -6,6 +6,7 @@ import {getRoles, updateRolePermissions} from '@/app/apis/roleApi';
 import {getPermissions} from '@/app/apis/permissionApi';
 import {CURRENT_USER_QUERY_KEY} from '@/app/contexts/AuthContext';
 import {EMPTY_LIST} from '@/app/utils/stableEmpty';
+import {toList} from '@/app/utils/toList';
 
 export type PermissionMatrix = Record<string, Set<string>>;
 
@@ -14,21 +15,19 @@ export const permissionsKeys = {
   permissions: () => ['admin-permissions'],
 };
 
-const asArray = <T,>(data: T[]): T[] => (Array.isArray(data) ? data : []);
-
 export function usePermissionsMatrix() {
   const qc = useQueryClient();
 
   const rolesQuery = useQuery({
     queryKey: permissionsKeys.roles(),
     queryFn: getRoles,
-    select: asArray,
+    select: toList,
   });
 
   const permissionsQuery = useQuery({
     queryKey: permissionsKeys.permissions(),
     queryFn: getPermissions,
-    select: asArray,
+    select: toList,
   });
 
   const saveMutation = useMutation({

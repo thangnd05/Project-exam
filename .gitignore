@@ -2,9 +2,6 @@
 # BACKEND (Java Spring Boot)
 # ==========================================
 backend/target/
-backend/!.mvn/wrapper/maven-wrapper.jar
-backend/!**/src/main/**/target/
-backend/!**/src/test/**/target/
 
 # STS, IntelliJ, NetBeans, VS Code (Specific to backend folder)
 backend/.apt_generated

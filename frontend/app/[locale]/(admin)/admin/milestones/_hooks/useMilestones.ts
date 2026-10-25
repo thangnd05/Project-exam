@@ -17,6 +17,7 @@ import {
 import type { MilestoneRequest } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import {examTypeKeys, examPartKeys, skillKeys, scoringConversionKeys, milestoneKeys} from '@/app/configs/queryKeys';
+import { toList } from '@/app/utils/toList';
 
 export const milestonesKeys = {
   examTypes: examTypeKeys.standard,
@@ -26,41 +27,38 @@ export const milestonesKeys = {
   list: milestoneKeys.list,
 };
 
-const normalizeArray = <T,>(data: T[] | { content?: T[] } | null | undefined): T[] =>
-  Array.isArray(data) ? data : data?.content ?? [];
-
 export function useMilestones(examTypeFilter: string) {
   const t = useTranslations('AdminUsers');
 
   const examTypesQuery = useQuery({
     queryKey: milestonesKeys.examTypes,
     queryFn: getStandardExamTypes,
-    select: normalizeArray,
+    select: toList,
   });
 
   const examPartsQuery = useQuery({
     queryKey: milestonesKeys.examParts,
     queryFn: getExamParts,
-    select: normalizeArray,
+    select: toList,
   });
 
   const skillsQuery = useQuery({
     queryKey: milestonesKeys.skills,
     queryFn: getSkills,
-    select: normalizeArray,
+    select: toList,
   });
 
   const scoringQuery = useQuery({
     queryKey: milestonesKeys.scoring,
     queryFn: getScoringConversions,
-    select: normalizeArray,
+    select: toList,
   });
 
   const milestonesQuery = useQuery({
     queryKey: milestonesKeys.list(examTypeFilter),
     queryFn: () => getMilestones(examTypeFilter),
     enabled: !!examTypeFilter,
-    select: normalizeArray,
+    select: toList,
   });
 
   const { createMutation, updateMutation, deleteMutation } = useCrudMutations({

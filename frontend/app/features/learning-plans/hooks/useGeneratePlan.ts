@@ -11,6 +11,7 @@ import { LearningPlanStatus } from '@/app/enums';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import {examTypeKeys, completedUserTestKeys, userTargetKeys} from '@/app/configs/queryKeys';
+import { toList } from '@/app/utils/toList';
 
 export const generatePlanKeys = {
   examTypes: examTypeKeys.standard,
@@ -18,13 +19,11 @@ export const generatePlanKeys = {
   target: userTargetKeys.byExamType,
 };
 
-const asArray = <T>(data: T[]): T[] => (Array.isArray(data) ? data : []);
-
 export function useExamTypes() {
   const query = useQuery({
     queryKey: generatePlanKeys.examTypes,
     queryFn: getStandardExamTypes,
-    select: asArray,
+    select: toList,
   });
 
   return {

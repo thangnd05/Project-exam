@@ -11,21 +11,10 @@ import TestPageHeader from '../_components/TestPageHeader';
 import { useTestInfo } from '../_hooks/useTestInfo';
 import styles from '../_components/TestPage.module.scss';
 import { useTestLeaderboard } from './_hooks/useTestLeaderboard';
+import { formatDuration, formatScore } from '../_lib/formatAttempt';
 
 const cx = classNamesBind.bind(styles);
 const ui = classNamesBind.bind(uiStyles);
-
-const formatDuration = (totalSeconds: number | null) => {
-  if (totalSeconds == null) return '—';
-  const sec = Math.max(0, Math.floor(Number(totalSeconds)));
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = sec % 60;
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
-};
-
-const formatScore = (score: number) => (Number.isInteger(score) ? String(score) : score.toFixed(1));
 
 const initialOf = (name: string) => name.trim().charAt(0).toUpperCase() || '?';
 
