@@ -94,7 +94,6 @@ public class Question {
         public static final List<UsageScope> FOR_PRACTICE = List.of(PRACTICE);
         public static final List<UsageScope> FOR_ALL = List.of(EXAM, PRACTICE);
 
-        public static final List<String> FOR_EXAM_NAMES = List.of(EXAM.name());
         public static final List<String> FOR_PRACTICE_NAMES = List.of(PRACTICE.name());
 
         /**

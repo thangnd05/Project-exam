@@ -299,11 +299,6 @@ public class UserTestService {
                 .count();
     }
 
-    public List<UserTest> findAll() { return userTestRepository.findAll(); }
-
-    public List<UserTestResponse> findAllResponses() {
-        return toResponseListBatched(findAll());
-    }
     public Optional<UserTest> findById(String id) { return userTestRepository.findById(id); }
     public List<UserTest> findByUserId(String userId) { return userTestRepository.findByUserId(userId); }
     public List<UserTestResponse> findResponsesByUserId(String userId) {
@@ -363,8 +358,6 @@ public class UserTestService {
         requireTestOwnerOrAdmin(testId, currentUserId);
         return toResponseListBatched(findByTestId(testId));
     }
-    public UserTest save(UserTest userTest) { return userTestRepository.save(userTest); }
-    public UserTestResponse saveResponse(UserTest userTest) { return toResponse(save(userTest)); }
 
     private void requireTestOwnerOrAdmin(String testId, String currentUserId) {
         if (authUtils.hasPermission(PermissionCatalog.ATTEMPT_MANAGE)) return;

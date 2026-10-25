@@ -140,25 +140,6 @@ public class TagService {
         }
     }
 
-    /** Bỏ các tag không thuộc phần thi của câu hỏi (dùng cho import, không báo lỗi). */
-    public List<String> filterTagIdsForExamPart(Collection<String> tagIds, String examPartId) {
-        if (tagIds == null || tagIds.isEmpty()) return List.of();
-        Map<String, Tag> byId = tagRepository.findAllById(tagIds).stream()
-                .collect(Collectors.toMap(Tag::getTagId, t -> t));
-        List<String> kept = new ArrayList<>();
-        List<String> dropped = new ArrayList<>();
-        for (String id : tagIds) {
-            Tag t = byId.get(id);
-            if (t == null) continue;
-            if (isAllowedForPart(t, examPartId)) kept.add(id);
-            else dropped.add(t.getName());
-        }
-        if (!dropped.isEmpty()) {
-            log.warn("Import tags: bỏ qua {} tag không thuộc phần thi {}: {}", dropped.size(), examPartId, dropped);
-        }
-        return kept;
-    }
-
     /** Kết quả resolve tag theo tên, kèm các spec không khớp hoặc trùng tên để báo cho người dùng. */
     public record TagNameResolution(List<String> ids, List<String> unmatched, List<String> ambiguous) {
     }
@@ -193,7 +174,7 @@ public class TagService {
             tags.forEach(t -> byId.put(t.getTagId(), t));
         }
 
-        /** Tag hợp lệ cho một câu thuộc {@code examPartId}; tag của phần thi khác bị bỏ, như filterTagIdsForExamPart. */
+        /** Tag hợp lệ cho một câu thuộc {@code examPartId}; tag của phần thi khác bị bỏ. */
         public List<Tag> resolve(String examPartId, Collection<String> tagIds, Collection<String> tagNames) {
             List<String> ids = new ArrayList<>();
             if (tagIds != null) {

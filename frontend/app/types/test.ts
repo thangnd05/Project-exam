@@ -86,19 +86,6 @@ export interface TestPartRequest {
   numQuestions?: number;
 }
 
-export interface TestQuestionRequest {
-  testPartId?: string;
-  questionId?: string;
-  displayOrder?: number;
-}
-
-export interface TestQuestionResponse {
-  testQuestionId: string;
-  testPartId?: string;
-  questionId?: string;
-  displayOrder?: number;
-}
-
 export interface TestResponse {
   testId: string;
   slug?: string;
@@ -211,14 +198,6 @@ export interface QuickChallengeCardResponse {
   status?: TestStatus;
   totalQuestions: number;
   parts?: QuickChallengePartSummary[];
-}
-
-export interface CanStartTestResponse {
-  canStart: boolean;
-  message?: string;
-  costCoins?: number;
-  owned?: boolean;
-  requiresPayment?: boolean;
 }
 
 export interface CertificateExamListResponse {

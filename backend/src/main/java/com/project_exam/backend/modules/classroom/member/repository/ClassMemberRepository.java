@@ -18,8 +18,6 @@ public interface ClassMemberRepository extends JpaRepository<ClassMember, String
     List<ClassMember> findByUserIdAndStatus(String studentId, MemberStatus status);
     long countByUserIdAndStatus(String userId, MemberStatus status);
 
-    long countByStatus(MemberStatus status);
-
     boolean existsByClassIdAndUserId(String classId, String userId);
 
     boolean existsByClassIdAndUserIdAndStatus(String classId, String userId, MemberStatus status);

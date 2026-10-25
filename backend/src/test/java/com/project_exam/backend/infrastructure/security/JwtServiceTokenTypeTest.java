@@ -1,7 +1,6 @@
 package com.project_exam.backend.infrastructure.security;
 
 import com.project_exam.backend.shared.exception.UnauthorizedException;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
@@ -14,8 +13,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.crypto.SecretKey;
-import java.util.Date;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,9 +42,9 @@ class JwtServiceTokenTypeTest {
     @Test
     @DisplayName("Access token được nhận là access token, không phải refresh token")
     void accessTokenIsAccessToken() {
-        String token = jwtService.generateToken(user, Map.of("userId", "u1"));
+        String token = jwtService.generateToken(user, Map.of("userId", "u1", "fid", "f1"));
 
-        assertTrue(jwtService.isAccessToken(token));
+        assertTrue(jwtService.isActiveAccessToken(jwtService.extractAllClaims(token)));
         assertFalse(jwtService.isRefreshToken(token));
     }
 
@@ -57,20 +54,7 @@ class JwtServiceTokenTypeTest {
         String token = jwtService.generateRefreshToken(user, "fid", "jti");
 
         assertTrue(jwtService.isRefreshToken(token));
-        assertFalse(jwtService.isAccessToken(token));
-    }
-
-    @Test
-    @DisplayName("Access token cũ chưa có claim type vẫn hợp lệ")
-    void legacyAccessTokenWithoutTypeIsAccepted() {
-        SecretKey key = (SecretKey) ReflectionTestUtils.getField(jwtService, "cachedSigningKey");
-        String legacy = Jwts.builder()
-                .setSubject(user.getUsername())
-                .setExpiration(new Date(System.currentTimeMillis() + 60_000))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        assertTrue(jwtService.isAccessToken(legacy));
+        assertFalse(jwtService.isActiveAccessToken(jwtService.extractAllClaims(token)));
     }
 
     @Test

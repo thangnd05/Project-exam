@@ -1,5 +1,3 @@
-import { UserVocabularyStatus } from '@/app/enums';
-
 export interface VocabularyAlbumRequest {
   name?: string;
   description?: string;
@@ -38,20 +36,6 @@ export interface VocabularyResponse {
   albumDesc?: string;
   voiceUrl?: string;
   createdAt?: string;
-}
-
-export interface UserVocabularyRequest {
-  vocabId?: string;
-  status?: UserVocabularyStatus;
-}
-
-export interface UserVocabularyResponse {
-  id: string;
-  userId?: string;
-  vocabId?: string;
-  status?: UserVocabularyStatus;
-  lastReviewed?: string;
-  correctCount?: number;
 }
 
 export interface PracticeQuestionResponse {

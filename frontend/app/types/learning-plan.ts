@@ -124,10 +124,6 @@ export interface SubmitSessionAnswerItem {
   selectedAnswerIds?: string[];
 }
 
-export interface SubmitSessionRequest {
-  answers: SubmitSessionAnswerItem[];
-}
-
 export interface SubmitSessionResponse {
   sessionId: string;
   correctCount: number;

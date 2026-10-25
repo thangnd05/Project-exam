@@ -109,7 +109,3 @@ export interface PublicCertificateResponse {
 
   design?: CertificateDesign;
 }
-
-export interface RevokeCertificateRequest {
-  reason?: string;
-}

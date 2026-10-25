@@ -8,11 +8,6 @@ export interface DashboardStats {
   totalExamTypes: number;
 }
 
-export interface NameValue {
-  name?: string;
-  value: number;
-}
-
 export interface DayHours {
   day?: string;
   hours?: number[];
@@ -79,8 +74,4 @@ export interface AuditLogResponse {
   success?: boolean;
   details?: string;
   createdAt?: string;
-}
-
-export interface VisitRequest {
-  path?: string;
 }

@@ -12,18 +12,6 @@ export interface CategoryResponse {
   slug?: string;
 }
 
-export interface PostUpsertRequest {
-  title?: string;
-  content?: string;
-  thumbnailUrl?: string;
-  status?: PostStatus;
-  categoryIds?: string[];
-}
-
-export interface UpdatePostStatusRequest {
-  status?: PostStatus;
-}
-
 export interface PostResponse {
   id: string;
   userId?: string;

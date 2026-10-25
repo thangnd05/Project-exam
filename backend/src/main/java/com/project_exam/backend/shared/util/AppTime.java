@@ -29,10 +29,6 @@ public final class AppTime {
         return local == null ? null : local.atZone(ZONE).toInstant();
     }
 
-    public static Instant startOfDay(LocalDate date) {
-        return date == null ? null : date.atStartOfDay(ZONE).toInstant();
-    }
-
     public static LocalDate today() {
         return LocalDate.now(ZONE);
     }

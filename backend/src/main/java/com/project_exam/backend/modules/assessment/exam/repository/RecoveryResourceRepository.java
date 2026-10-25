@@ -8,8 +8,6 @@ import java.util.List;
 
 public interface RecoveryResourceRepository extends JpaRepository<RecoveryResource, String> {
 
-    List<RecoveryResource> findByCreatedBy(String createdBy);
-
     List<RecoveryResource> findByResourceIdInOrderByCreatedAtAscTitleAsc(Collection<String> resourceIds);
 
 }

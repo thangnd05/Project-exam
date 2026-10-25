@@ -24,8 +24,6 @@ public interface UserCertificateRepository extends JpaRepository<UserCertificate
 
     boolean existsByCertificateCode(String certificateCode);
 
-    long countByStatus(UserCertificate.Status status);
-
     @Query("""
             SELECT c.templateId, COUNT(c) FROM UserCertificate c
             WHERE c.status = com.project_exam.backend.modules.assessment.certificate.domain.UserCertificate.Status.ACTIVE

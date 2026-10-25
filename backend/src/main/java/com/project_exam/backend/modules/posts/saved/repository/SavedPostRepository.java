@@ -20,7 +20,6 @@ public interface SavedPostRepository extends JpaRepository<SavedPost, String> {
 
     @Query("SELECT sp.postId, COUNT(sp) FROM SavedPost sp WHERE sp.postId IN :postIds GROUP BY sp.postId")
     List<Object[]> countGroupedByPostIdIn(@Param("postIds") java.util.Collection<String> postIds);
-    List<SavedPost> findByUserIdOrderByCreatedAtDesc(String userId);
 
     @Query(value = "SELECT p FROM SavedPost sp, Post p "
             + "WHERE p.id = sp.postId AND sp.userId = :userId "
@@ -35,5 +34,4 @@ public interface SavedPostRepository extends JpaRepository<SavedPost, String> {
                                       @Param("status") Post.PostStatus status,
                                       @Param("keyword") String keyword,
                                       Pageable pageable);
-    void deleteByUserId(String userId);
 }

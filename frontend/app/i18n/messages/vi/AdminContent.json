@@ -372,7 +372,6 @@
       "exam": "Thi"
     },
     "filters": {
-      "allExamTypes": "Tất cả loại đề",
       "allExamParts": "Tất cả phần thi",
       "selectExamTypeFirst": "Chọn loại đề trước",
       "allTags": "Tất cả tag",

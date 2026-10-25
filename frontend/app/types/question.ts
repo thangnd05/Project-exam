@@ -93,41 +93,9 @@ export interface NormalQuestionRequest {
   questionNumber?: number;
 }
 
-export interface CreateQuestionAndAttachRequest {
-  testPartId?: string;
-  classId?: string;
-  chapterId?: string;
-  passage?: PassageRequest;
-  questionText?: string;
-  questionType?: QuestionType;
-  answers?: AnswerRequest[];
-  collectionId?: string;
-  explanation?: string;
-  tagIds?: string[];
-  tagNames?: string[];
-}
-
-export interface BulkCreateQuestionsToBankRequest {
-  examPartId?: string;
-  classId?: string;
-  chapterId?: string;
-  questions?: NormalQuestionRequest[];
-
-  usageScope?: QuestionUsageScope;
-}
-
 export interface PassageQuestionGroupRequest {
   passage?: PassageRequest;
   questions?: NormalQuestionRequest[];
-}
-
-export interface BulkPassageGroupRequest {
-  examPartId?: string;
-  classId?: string;
-  chapterId?: string;
-  groups?: PassageQuestionGroupRequest[];
-
-  usageScope?: QuestionUsageScope;
 }
 
 export interface QuestionJsonImportRequest {
@@ -154,16 +122,6 @@ export interface QuestionJsonImportPreviewResponse {
   warnings: string[];
   questions: NormalQuestionRequest[];
   groups: PassageQuestionGroupRequest[];
-}
-
-export interface BulkQuestionWithPassageRequest {
-  examPartId?: string;
-  classId?: string;
-  chapterId?: string;
-  passage?: PassageRequest;
-  questions?: NormalQuestionRequest[];
-
-  usageScope?: QuestionUsageScope;
 }
 
 export interface QuestionAdminResponse {

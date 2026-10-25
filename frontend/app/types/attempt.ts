@@ -38,10 +38,6 @@ export interface UserTestResponse {
   durationTaken?: number;
 }
 
-export interface UserTestUpdateRequest {
-  status?: UserTestStatus;
-}
-
 export interface UserAnswerRequest {
   userTestId?: string;
   questionId?: string;

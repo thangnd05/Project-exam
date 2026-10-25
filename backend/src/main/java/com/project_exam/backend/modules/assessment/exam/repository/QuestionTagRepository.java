@@ -13,8 +13,6 @@ public interface QuestionTagRepository extends JpaRepository<QuestionTag, String
 
     List<QuestionTag> findByQuestionId(String questionId);
 
-    List<QuestionTag> findByTagId(String tagId);
-
     @Modifying
     @Query("DELETE FROM QuestionTag qt WHERE qt.questionId = :questionId")
     void deleteByQuestionId(@Param("questionId") String questionId);

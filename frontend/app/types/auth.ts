@@ -1,9 +1,3 @@
-export interface AuthResponse {
-  accessToken?: string;
-  refreshToken?: string;
-  message?: string;
-}
-
 export interface AuthMessageResponse {
   message?: string;
 }
@@ -25,10 +19,6 @@ export interface ChangePasswordRequest {
   oldPassword: string;
   newPassword: string;
   confirmNewPassword: string;
-}
-
-export interface ForgotPasswordRequest {
-  email: string;
 }
 
 export interface ResetPasswordRequest {

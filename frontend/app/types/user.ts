@@ -96,7 +96,3 @@ export interface RoleRequest {
   roleName?: string;
   description?: string;
 }
-
-export interface RolePermissionsRequest {
-  codes?: string[];
-}

@@ -372,7 +372,6 @@
       "exam": "Exam"
     },
     "filters": {
-      "allExamTypes": "All exam types",
       "allExamParts": "All exam parts",
       "selectExamTypeFirst": "Select an exam type first",
       "allTags": "All tags",

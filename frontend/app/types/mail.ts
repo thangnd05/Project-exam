@@ -39,10 +39,6 @@ export interface EmailSaveRequest {
   active?: boolean;
 }
 
-export interface EmailSendRequest {
-  userIds: string[];
-}
-
 export interface EmailPreviewRequest {
   subject: string;
   bodyHtml: string;

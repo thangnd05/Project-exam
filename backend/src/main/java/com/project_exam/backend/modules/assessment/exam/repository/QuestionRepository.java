@@ -13,8 +13,6 @@ import java.util.List;
 @Repository
 public interface QuestionRepository extends JpaRepository<Question, String>, JpaSpecificationExecutor<Question> {
 
-    List<Question> findByExamPartId(String examPartId);
-    List<Question> findByPassageId(String passageId);
     List<Question> findByChapterId(String chapterId);
     List<Question> findByClassId(String classId);
 

@@ -30,10 +30,6 @@ export interface ExamTypeResponse {
   childCount?: number;
 }
 
-export interface ExamTypeLayoutRequest {
-  config?: string;
-}
-
 export interface ExamTypeLayoutResponse {
   examTypeId: string;
   config?: string;
@@ -103,10 +99,4 @@ export interface ScoringConversionResponse {
   skillId?: string;
   numCorrect?: number;
   convertedScore?: number;
-}
-
-export interface PartResponse {
-  examPartId: string;
-  numQuestions?: number;
-  questionIds?: string[];
 }

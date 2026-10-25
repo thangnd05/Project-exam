@@ -52,10 +52,6 @@ public class RoleAuthorityCache {
         });
     }
 
-    public void invalidate(String roleId) {
-        cache.remove(roleId);
-    }
-
     public void invalidateAfterCommit(String roleId) {
         cache.remove(roleId);
         if (TransactionSynchronizationManager.isSynchronizationActive()) {

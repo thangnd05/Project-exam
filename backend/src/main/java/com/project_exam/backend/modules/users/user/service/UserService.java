@@ -95,16 +95,6 @@ public class UserService {
         return user;
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    public List<UserResponse> findAllResponses() {
-        return findAll().stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
     public PageResponse<UserResponse> findAllPaged(Integer page, Integer size, String keyword, String roleId, Boolean verified) {
         int safePage = page == null || page < 0 ? 0 : page;
         int safeSize = size == null || size <= 0 ? 20 : Math.min(size, 100);

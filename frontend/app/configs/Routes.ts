@@ -67,8 +67,6 @@ const routes = {
   notFoundPage: '/not-found',
 } as const;
 
-export type RouteKey = keyof typeof routes;
-
 type ExamTypeRef =
   | string
   | number

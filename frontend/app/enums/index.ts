@@ -140,11 +140,6 @@ export enum EmailType {
   MANUAL = 'MANUAL',
 }
 
-export enum UserVocabularyStatus {
-  LEARNING = 'learning',
-  MASTERED = 'mastered',
-}
-
 export enum PermissionCode {
   USER_MANAGE = 'USER:MANAGE',
   ROLE_MANAGE = 'ROLE:MANAGE',
