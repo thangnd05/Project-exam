@@ -112,12 +112,13 @@ export const defaultLayoutConfig: LayoutConfig = {
     cardShadow: true,
   },
 
-  // Bố cục phòng thi chuẩn: đồng hồ đối diện số câu, danh sách câu ở cột trái, nút nộp bài ghim chân cột trái.
+  // Bố cục phòng thi chuẩn (kiểu Pearson VUE): đồng hồ trên thanh đầu cạnh nút Thoát, danh sách câu ở cột trái,
+  // nút nộp bài ghim chân cột trái; bên phải thanh câu dành cho nút Đánh dấu.
   blocks: [
     {
       id: 'timer',
       type: BLOCK_TYPES.TIMER,
-      zone: ZONES.TOOLBAR,
+      zone: ZONES.TOP,
       align: 'right',
       order: 1,
       visible: true,

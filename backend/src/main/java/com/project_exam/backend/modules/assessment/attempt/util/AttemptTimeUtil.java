@@ -13,9 +13,15 @@ public final class AttemptTimeUtil {
     private AttemptTimeUtil() {
     }
 
-    // Hạn nộp = mốc sớm hơn giữa (bắt đầu + thời lượng) và giờ đóng đề, cộng thời gian ân hạn.
-    // Khớp với cách frontend tính đồng hồ, để bắt đầu sát giờ đóng đề không làm quá availableTo được.
+    // Hạn nộp = giờ hết giờ trên đồng hồ cộng thời gian ân hạn (để kịp gửi request lúc tự nộp).
     public static Instant deadline(UserTest userTest, Test test) {
+        Instant end = scheduledEnd(userTest, test);
+        return end == null ? null : end.plusSeconds(GRACE_SECONDS);
+    }
+
+    // Giờ hết giờ = mốc sớm hơn giữa (bắt đầu + thời lượng) và giờ đóng đề, chưa cộng ân hạn.
+    // Khớp với cách frontend tính đồng hồ, để bắt đầu sát giờ đóng đề không làm quá availableTo được.
+    public static Instant scheduledEnd(UserTest userTest, Test test) {
         if (userTest == null || userTest.isPractice() || test == null) {
             return null;
         }
@@ -33,7 +39,7 @@ public final class AttemptTimeUtil {
         } else {
             deadline = byDuration.isBefore(availableTo) ? byDuration : availableTo;
         }
-        return deadline == null ? null : deadline.plusSeconds(GRACE_SECONDS);
+        return deadline;
     }
 
     public static boolean isExpired(UserTest userTest, Test test, Instant now) {

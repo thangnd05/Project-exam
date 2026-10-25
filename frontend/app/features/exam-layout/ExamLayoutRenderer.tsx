@@ -13,6 +13,7 @@ import ProgressBlock from '@/app/features/exam-layout/blocks/ProgressBlock';
 import SubmitBlock from '@/app/features/exam-layout/blocks/SubmitBlock';
 import QuestionNavBlock from '@/app/features/exam-layout/blocks/QuestionNavBlock';
 import BannerBlock from '@/app/features/exam-layout/blocks/BannerBlock';
+import FlagButton from '@/app/features/exam-layout/blocks/FlagButton';
 import { BLOCK_TYPES, ZONES } from '@/app/features/exam-layout/layoutSchema';
 import type { LayoutBlock, LayoutConfig, LayoutTheme } from '@/app/features/exam-layout/layoutSchema';
 import type {
@@ -45,6 +46,8 @@ type ExamLayoutRendererProps = {
   config: LayoutConfig;
   isPractice?: boolean;
   title?: string;
+  // Tên loại đề/chứng chỉ, hiện mờ trước tên đề trên thanh đầu.
+  subtitle?: string;
   onExit?: () => void;
   visibleParts: ExamPart[];
   questionIndexMap: QuestionIndexMap;
@@ -78,6 +81,7 @@ function ExamLayoutRenderer({
   config,
   isPractice,
   title,
+  subtitle,
   onExit,
   visibleParts,
   questionIndexMap,
@@ -268,7 +272,7 @@ function ExamLayoutRenderer({
   const sideBlocksWithNav = [leftBlocks, rightBlocks].filter((blocks) => blocks.some(isNav));
   const sheetExtras = sideBlocksWithNav.flat().filter((b) => !isNav(b));
 
-  // Bước hiện tại chỉ có một câu: số câu chuyển lên thanh câu hiện tại như mẫu.
+  // Bước hiện tại chỉ có một câu: số câu và nút Đánh dấu chuyển lên thanh câu hiện tại như mẫu.
   const singleQuestion = currentStep?.questions.length === 1 ? currentStep.questions[0] : null;
   const stepNumbers = (currentStep?.questions || [])
     .map((q) => questionIndexMap[q.questionId])
@@ -314,6 +318,12 @@ function ExamLayoutRenderer({
     title || topBlocks.length > 0 || onExit ? (
       <header className={cx('exam-header')}>
         <div className={cx('exam-header-group')}>
+          {subtitle && (
+            <>
+              <span className={cx('exam-header-subtitle')}>{subtitle}</span>
+              {title && <span className={cx('exam-header-sep')} aria-hidden />}
+            </>
+          )}
           {title && <span className={cx('exam-header-title')}>{title}</span>}
           {renderBlocks(topGroups.left, ZONES.TOP)}
         </div>
@@ -380,12 +390,24 @@ function ExamLayoutRenderer({
             })}
           </span>
         )}
+        {isPaged && currentStep?.partName && (
+          <>
+            <span className={cx('exam-toolbar-sep')} aria-hidden />
+            <span className={cx('exam-toolbar-part')}>{currentStep.partName}</span>
+          </>
+        )}
         {renderBlocks(toolbarGroups.left, ZONES.TOOLBAR)}
       </div>
       <div className={cx('exam-toolbar-actions', 'center')}>
         {renderBlocks(toolbarGroups.center, ZONES.TOOLBAR)}
       </div>
       <div className={cx('exam-toolbar-actions')}>
+        {singleQuestion && onToggleFlag && (
+          <FlagButton
+            flagged={flaggedQuestionIds?.includes(singleQuestion.questionId) ?? false}
+            onToggle={() => onToggleFlag(singleQuestion.questionId)}
+          />
+        )}
         {renderBlocks(toolbarGroups.right, ZONES.TOOLBAR)}
         {mobileNavTrigger}
       </div>

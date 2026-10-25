@@ -76,6 +76,7 @@ export default function TestStateScreens({
 }: TestStateScreensProps) {
   const t = useTranslations('TestTaking.start');
   const tCommon = useTranslations('Common');
+  const tLayout = useTranslations('TestTaking.examLayout');
   const { examType } = useExamTypeById(test.examTypeId);
   if (status === 'loading')
     return (
@@ -121,44 +122,70 @@ export default function TestStateScreens({
     ];
 
     return (
-      <div className={cx('ready-wrap')}>
-        <div className={cx('ready-card')}>
-          <header className={cx('ready-header')}>
-            <ExamTypeLogo examTypeId={test.examTypeId} />
-            <div>
-              <h1 className={cx('ready-title')}>
-                {t('ready.guideTitle', { title: test.title || t('ready.fallbackTitle') })}
-              </h1>
-              {examType?.name && <p className={cx('ready-subtitle')}>{examType.name}</p>}
-            </div>
-          </header>
-
-          <h2 className={cx('ready-section-title')}>{t('ready.readCarefully')}</h2>
-          <dl className={cx('ready-table')}>
-            {rows.map((row) => (
-              <div key={row.label} className={cx('ready-row')}>
-                <dt>{row.label}</dt>
-                <dd>{row.value}</dd>
+      <div className={cx('ready-screen')}>
+        <header className={cx('exam-header')}>
+          <div className={cx('exam-header-group')}>
+            {examType?.name && (
+              <>
+                <span className={cx('exam-header-subtitle')}>{examType.name}</span>
+                <span className={cx('exam-header-sep')} aria-hidden />
+              </>
+            )}
+            <span className={cx('exam-header-title')}>{test.title || t('ready.fallbackTitle')}</span>
+          </div>
+          <div className={cx('exam-header-group', 'center')} />
+          <div className={cx('exam-header-group', 'right')}>
+            {timed && (
+              <div className={cx('exam-stat', 'exam-stat-time')}>
+                <span className={cx('exam-stat-label')}>{tLayout('timeLabel')}</span>
+                <span className={cx('exam-stat-value')}>{formatTime(minutes * 60)}</span>
               </div>
-            ))}
-          </dl>
-
-          <h2 className={cx('ready-section-title')}>{t('ready.rulesTitle')}</h2>
-          <ul className={cx('ready-rules')}>
-            <li>{t('ready.autosave')}</li>
-            <li>{t.rich('ready.submitHint', { strong: (chunks) => <strong>{chunks}</strong> })}</li>
-            {timed && <li>{t('ready.autoSubmit')}</li>}
-            <li>{t('ready.noChangeAfterSubmit')}</li>
-          </ul>
-
-          <footer className={cx('ready-footer')}>
-            <button type="button" className={cx('ready-cancel-btn')} onClick={onBack}>
-              {t('ready.cancel')}
+            )}
+            <button type="button" className={cx('exam-header-exit')} onClick={onBack}>
+              {tLayout('exit')}
             </button>
-            <button type="button" className={cx('ready-start-btn')} onClick={onStart}>
-              {t('ready.start')}
-            </button>
-          </footer>
+          </div>
+        </header>
+
+        <div className={cx('ready-wrap')}>
+          <div className={cx('ready-card')}>
+            <header className={cx('ready-header')}>
+              <ExamTypeLogo examTypeId={test.examTypeId} />
+              <div>
+                <h1 className={cx('ready-title')}>
+                  {t('ready.guideTitle', { title: test.title || t('ready.fallbackTitle') })}
+                </h1>
+                {examType?.name && <p className={cx('ready-subtitle')}>{examType.name}</p>}
+              </div>
+            </header>
+
+            <h2 className={cx('ready-section-title')}>{t('ready.readCarefully')}</h2>
+            <dl className={cx('ready-table')}>
+              {rows.map((row) => (
+                <div key={row.label} className={cx('ready-row')}>
+                  <dt>{row.label}</dt>
+                  <dd>{row.value}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <h2 className={cx('ready-section-title')}>{t('ready.rulesTitle')}</h2>
+            <ul className={cx('ready-rules')}>
+              <li>{t('ready.autosave')}</li>
+              <li>{t.rich('ready.submitHint', { strong: (chunks) => <strong>{chunks}</strong> })}</li>
+              {timed && <li>{t('ready.autoSubmit')}</li>}
+              <li>{t('ready.noChangeAfterSubmit')}</li>
+            </ul>
+
+            <footer className={cx('ready-footer')}>
+              <button type="button" className={cx('ready-cancel-btn')} onClick={onBack}>
+                {t('ready.cancel')}
+              </button>
+              <button type="button" className={cx('ready-start-btn')} onClick={onStart}>
+                {t('ready.start')}
+              </button>
+            </footer>
+          </div>
         </div>
       </div>
     );

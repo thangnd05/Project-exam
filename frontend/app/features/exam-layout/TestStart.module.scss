@@ -49,7 +49,7 @@
   gap: 16px;
   min-height: 56px;
   padding: 10px 24px;
-  background: var(--surface-inverse);
+  background: var(--exam-ink);
   color: #fff;
   z-index: 30;
 
@@ -86,6 +86,32 @@
 
   @include down(sm) {
     font-size: 1.3rem;
+  }
+}
+
+.exam-header-subtitle {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: rgb(255 255 255 / 0.65);
+}
+
+.exam-header-sep {
+  flex: none;
+  width: 1px;
+  height: 16px;
+  background: rgb(255 255 255 / 0.3);
+}
+
+// Màn nhỏ chỉ còn tên đề.
+.exam-header-subtitle,
+.exam-header-sep {
+  @include down(md) {
+    display: none;
   }
 }
 
@@ -236,6 +262,27 @@
   }
 }
 
+.exam-toolbar-sep {
+  flex: none;
+  width: 1px;
+  height: 14px;
+  background: var(--slate-300);
+}
+
+.exam-toolbar-part {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.exam-toolbar-sep,
+.exam-toolbar-part {
+  @include down(sm) {
+    display: none;
+  }
+}
+
 .exam-toolbar-actions {
   flex-shrink: 0;
   display: flex;
@@ -343,12 +390,13 @@
 }
 
 .step-btn-next {
-  border: 1px solid var(--surface-inverse);
-  background: var(--surface-inverse);
+  border: 1px solid var(--exam-ink);
+  background: var(--exam-ink);
   color: #fff;
 
   &:hover:not(:disabled) {
-    filter: brightness(1.2);
+    border-color: var(--exam-ink-deep);
+    background: var(--exam-ink-deep);
   }
 }
 
@@ -452,7 +500,7 @@
 .exam-header {
   .exam-stat {
     border-color: rgb(255 255 255 / 0.16);
-    background: rgb(0 0 0 / 0.22);
+    background: var(--exam-ink-deep);
   }
 
   .exam-stat-label {
@@ -560,7 +608,7 @@
 .dashboard-progress {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-weight: 700;
-  color: var(--surface-inverse);
+  color: var(--exam-ink);
   font-variant-numeric: tabular-nums;
 }
 
@@ -598,8 +646,8 @@
     flex-shrink: 0;
 
     &.answered {
-      background: var(--surface-inverse);
-      border-color: var(--surface-inverse);
+      background: var(--exam-ink);
+      border-color: var(--exam-ink);
     }
 
     &.flagged::after {
@@ -644,8 +692,8 @@
   }
 
   &.answered {
-    background: var(--surface-inverse);
-    border-color: var(--surface-inverse);
+    background: var(--exam-ink);
+    border-color: var(--exam-ink);
     color: #fff;
   }
 
@@ -677,7 +725,7 @@
     }
 
     &.answered:hover {
-      background: var(--surface-inverse);
+      background: var(--exam-ink);
     }
   }
 }
@@ -1277,8 +1325,8 @@
     gap: 8px;
     padding: 6px 12px;
     border-radius: 4px;
-    border: 1px solid var(--surface-inverse);
-    background: var(--surface-inverse);
+    border: 1px solid var(--exam-ink);
+    background: var(--exam-ink);
     color: #fff;
     font-size: 1.3rem;
     font-weight: 700;
@@ -1422,17 +1470,18 @@
   gap: 8px;
   padding: 9px 20px;
   border-radius: 4px;
-  border: 1px solid var(--surface-inverse);
-  background: var(--surface-inverse);
+  border: 1px solid var(--exam-ink);
+  background: var(--exam-ink);
   color: #fff;
   font-size: 1.3rem;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
-  transition: filter 0.15s;
+  transition: background-color 0.15s;
 
   &:hover:not(:disabled) {
-    filter: brightness(1.2);
+    border-color: var(--exam-ink-deep);
+    background: var(--exam-ink-deep);
   }
 
   &:disabled {
@@ -1450,7 +1499,7 @@
 .exam-header .btn-submit {
   border-color: #fff;
   background: #fff;
-  color: var(--surface-inverse);
+  color: var(--exam-ink);
 
   &:hover:not(:disabled) {
     filter: brightness(0.94);
@@ -1521,11 +1570,23 @@
   }
 }
 
-// Màn hướng dẫn trước khi bắt đầu làm bài.
-.ready-wrap {
+// Màn hướng dẫn trước khi bắt đầu làm bài: thanh đầu giống phòng thi, thẻ hướng dẫn nằm giữa vùng còn lại.
+.ready-screen {
+  flex: 1;
+  min-height: 0;
   display: flex;
-  justify-content: center;
-  padding: 24px 16px 40px;
+  flex-direction: column;
+  background: var(--slate-50);
+  font-family: var(--font-family);
+}
+
+.ready-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  padding: 32px 16px;
+  @include auto-hide-scrollbar;
 
   @include down(sm) {
     padding: 16px 12px 32px;
@@ -1534,11 +1595,14 @@
 
 .ready-card {
   width: 100%;
-  max-width: 760px;
-  padding: 28px 32px 24px;
+  max-width: 768px;
+  // margin auto thay cho align-items: center để thẻ dài hơn màn hình vẫn cuộn được từ đầu.
+  margin: auto;
+  padding: 36px 40px 28px;
   background: var(--bg-white);
-  border: 1px solid var(--slate-200);
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--slate-300);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
 
   @include down(sm) {
     padding: 24px 16px;
@@ -1597,7 +1661,7 @@
 .ready-table {
   margin: 0;
   border: 1px solid var(--slate-200);
-  border-radius: var(--radius-md);
+  border-radius: 4px;
   overflow: hidden;
   font-size: var(--font-size-ssm);
 }
@@ -1610,6 +1674,11 @@
     border-top: 1px solid var(--slate-200);
   }
 
+  // Tô xen kẽ cả dòng như bảng hướng dẫn của phòng thi mẫu.
+  &:nth-child(odd) {
+    background: var(--slate-50);
+  }
+
   dt,
   dd {
     margin: 0;
@@ -1619,7 +1688,6 @@
   dt {
     font-weight: 600;
     color: var(--text-secondary);
-    background: var(--slate-50);
   }
 
   dd {
@@ -1643,6 +1711,11 @@
 .ready-rules {
   margin: 0;
   padding-left: 22px;
+
+  // Reset toàn cục bỏ dấu đầu dòng ở cả ul lẫn li, nên đặt lại trên li.
+  li {
+    list-style: disc;
+  }
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -1692,12 +1765,11 @@
 .ready-start-btn {
   padding: 12px 28px;
   font-size: var(--font-size-md);
-  background: var(--surface-inverse);
+  background: var(--exam-ink);
   color: var(--white);
 
   &:hover {
-    filter: brightness(1.15);
-    box-shadow: var(--shadow-md);
+    background: var(--exam-ink-deep);
   }
 }
 
@@ -1790,29 +1862,14 @@
   padding: 32px;
   @include auto-hide-scrollbar;
 
-  // Câu không kèm bài đọc bên cạnh: không khung thẻ, nội dung trải hết vùng làm bài trên nền trắng.
-  // Admin đặt "Bề rộng tối đa" thì nội dung thu vào giữa.
-  &:not(.split-layout) {
-    padding: 0;
-    background: var(--bg-white);
+  // Câu không kèm bài đọc bên cạnh: thẻ câu trắng nằm giữa nền xám như phòng thi mẫu.
+  // Admin đặt "Bề rộng tối đa" thì dùng bề rộng đó thay cho mặc định.
+  &:not(.split-layout) > * {
+    max-width: var(--exam-content-width, 896px);
+    margin-inline: auto;
 
-    > * {
-      max-width: var(--exam-content-width, none);
-      margin-inline: auto;
-    }
-
-    > .question-card {
-      border: 0;
-      border-radius: 0;
-      box-shadow: none;
-    }
-
-    > .passage-box {
-      margin: 32px 32px 0;
-
-      @include down(md) {
-        margin: 16px 16px 0;
-      }
+    & + * {
+      margin-top: 16px;
     }
   }
 

@@ -147,8 +147,9 @@ public class UserTestService {
         Test test = testRepository.findById(userTest.getTestId())
                 .orElseThrow(() -> new NotFoundException("Test not found"));
 
-        Instant deadline = AttemptTimeUtil.deadline(userTest, test);
-        userTest.setFinishedAt(deadline != null && now.isAfter(deadline) ? deadline : now);
+        // Nộp trong thời gian ân hạn (tự nộp lúc hết giờ, mạng chậm) vẫn tính là làm hết đúng thời lượng đề.
+        Instant end = AttemptTimeUtil.scheduledEnd(userTest, test);
+        userTest.setFinishedAt(end != null && now.isAfter(end) ? end : now);
         userTest.setStatus(UserTest.Status.COMPLETED);
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTest.getUserTestId());

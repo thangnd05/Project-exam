@@ -650,7 +650,8 @@ export function useTestSession(testId: string) {
 
     const tick = () => {
       // So với giờ server, không phải giờ máy người dùng (có thể chạy nhanh/chậm).
-      const remaining = Math.max(0, Math.round((deadline - serverNowMs()) / 1000));
+      // Làm tròn lên: chỉ về 0 khi đã thật sự hết giờ, tránh tự nộp sớm nửa giây.
+      const remaining = Math.max(0, Math.ceil((deadline - serverNowMs()) / 1000));
       setTimeLeft(remaining);
       if (remaining <= 0) {
         clearInterval(timer);

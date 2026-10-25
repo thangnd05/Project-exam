@@ -213,6 +213,11 @@
   --frost-ice-white: rgb(var(--frost-ice-white-rgb));
   --frost-silver: rgb(var(--frost-silver-rgb));
   --frost-link: rgb(var(--frost-link-rgb));
+
+  // Phòng thi mô phỏng Pearson VUE: navy riêng cho thanh đầu, nút chính và ô câu đã làm, không đổi theo theme.
+  --exam-ink-rgb: 10 37 64;
+  --exam-ink: rgb(var(--exam-ink-rgb));
+  --exam-ink-deep: rgb(0 24 46);
 }
 
 @mixin palette-frost-light {

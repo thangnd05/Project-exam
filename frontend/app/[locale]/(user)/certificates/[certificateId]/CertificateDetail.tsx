@@ -2,12 +2,13 @@
 
 import { useParams } from 'next/navigation';
 import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Container, Spinner, Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
-import { ArrowLeft, Copy, Printer } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
+import PageHeader from '@/app/components/PageHeader/PageHeader';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import CertificateCanvas from '@/app/features/certificates/CertificateCanvas/CertificateCanvas';
 import { useCertificateDetail } from '@/app/features/certificates/hooks/useCertificates';
@@ -16,9 +17,13 @@ import styles from './CertificateDetail.module.scss';
 
 const cx = classNames.bind(styles);
 
+const formatDate = (value: string | undefined, locale: string) =>
+  value ? new Date(value).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN') : '--';
+
 function CertificateDetail() {
   const { certificateId } = useParams<{ certificateId: string }>();
   const t = useTranslations('Account');
+  const locale = useLocale();
   const router = useRouter();
   const localizeHref = useLocalizeHref();
   const { data: certificate, isLoading, isError } = useCertificateDetail(certificateId);
@@ -39,7 +44,7 @@ function CertificateDetail() {
   if (isLoading) {
     return (
       <div className={cx('state')}>
-        <Spinner animation="border" />
+        <Spinner animation="grow" variant="primary" />
         <p>{t('certificates.loading')}</p>
       </div>
     );
@@ -47,12 +52,14 @@ function CertificateDetail() {
 
   if (isError || !certificate) {
     return (
-      <Container className={cx('state')}>
-        <Alert variant="danger">{t('certificateDetail.notFound')}</Alert>
-        <ButtonPrime variant="primary" onClick={() => router.push('/my-certificates')}>
-          {t('certificateDetail.backToList')}
-        </ButtonPrime>
-      </Container>
+      <div className={cx('wrapper')}>
+        <Container>
+          <Alert variant="danger" className={cx('alert')}>{t('certificateDetail.notFound')}</Alert>
+          <ButtonPrime variant="primary" onClick={() => router.push('/my-certificates')}>
+            {t('certificateDetail.backToList')}
+          </ButtonPrime>
+        </Container>
+      </div>
     );
   }
 
@@ -62,43 +69,51 @@ function CertificateDetail() {
   return (
     <div className={cx('wrapper')}>
       <Container>
-        <div className={cx('topBar')}>
+        <PageHeader
+          title={certificate.design?.title || t('myCertificates.fallbackTitle')}
+          label={t('myCertificates.label')}
+          description={
+            <>
+              {t('myCertificates.issuedOn', { date: formatDate(certificate.issuedAt, locale) })}
+              {certificate.expiresAt && ` · ${t('myCertificates.expiresOn', { date: formatDate(certificate.expiresAt, locale) })}`}
+            </>
+          }
+          onAction={() => window.print()}
+          actionText={t('certificateDetail.print')}
+          onSecondaryAction={handleCopyLink}
+          secondaryActionText={t('certificateDetail.copyLink')}
+        />
+
+        <div className={cx('toolbar')}>
           <ButtonPrime variant="ghost" size="sm" onClick={() => router.push('/my-certificates')}>
             <ArrowLeft size={16} /> {t('certificates.myCertificates')}
           </ButtonPrime>
-
-          <div className={cx('actions')}>
-            <ButtonPrime variant="outline" size="sm" onClick={handleCopyLink}>
-              <Copy size={16} /> {t('certificateDetail.copyLink')}
-            </ButtonPrime>
-            <ButtonPrime variant="primary" size="sm" onClick={() => window.print()}>
-              <Printer size={16} /> {t('certificateDetail.print')}
-            </ButtonPrime>
-          </div>
         </div>
 
         {revoked && (
-          <Alert variant="danger">
+          <Alert variant="danger" className={cx('alert')}>
             {certificate.revokedReason
               ? t('certificateDetail.revokedWithReason', { reason: certificate.revokedReason })
               : t('certificateDetail.revoked')}
           </Alert>
         )}
         {!revoked && expired && (
-          <Alert variant="warning">
+          <Alert variant="warning" className={cx('alert')}>
             {t('certificateDetail.expired')}
           </Alert>
         )}
 
-        <div className={cx('printArea')}>
-          <CertificateCanvas
-            design={certificate.design}
-            recipientName={certificate.recipientName}
-            certificateCode={certificate.certificateCode}
-            issuedAt={certificate.issuedAt}
-            expiresAt={certificate.expiresAt}
-            watermark={revoked ? 'REVOKED' : expired ? 'EXPIRED' : undefined}
-          />
+        <div className={cx('sheet')}>
+          <div className={cx('printArea')}>
+            <CertificateCanvas
+              design={certificate.design}
+              recipientName={certificate.recipientName}
+              certificateCode={certificate.certificateCode}
+              issuedAt={certificate.issuedAt}
+              expiresAt={certificate.expiresAt}
+              watermark={revoked ? 'REVOKED' : expired ? 'EXPIRED' : undefined}
+            />
+          </div>
         </div>
       </Container>
     </div>

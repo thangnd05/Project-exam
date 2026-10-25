@@ -8,6 +8,7 @@ import TestStateScreens from './_components/TestStateScreens';
 import { useTestSession } from './_hooks/useTestSession';
 import type { TestRef } from '@/app/features/tests/testRef';
 import ExamLayoutRenderer from '@/app/features/exam-layout/ExamLayoutRenderer';
+import { useExamTypeById } from '@/app/features/exam-types/hooks/useExamTypes';
 import StreakRestoreModal from '@/app/features/gamification/streak/StreakRestoreModal';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
@@ -56,6 +57,7 @@ function TestStart({ testRef }: { testRef: TestRef }) {
     allowStreakRestore,
     holdStart,
   } = useTestSession(testRef.testId);
+  const { examType } = useExamTypeById(test?.examTypeId);
 
   const formatTime = (seconds: number | null) => {
     if (seconds === null) return '--:--';
@@ -123,6 +125,7 @@ function TestStart({ testRef }: { testRef: TestRef }) {
         config={layoutConfig}
         isPractice={isPractice}
         title={test?.title}
+        subtitle={examType?.name}
         onExit={() => setExitOpen(true)}
         visibleParts={visibleParts}
         questionIndexMap={questionIndexMap}
