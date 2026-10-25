@@ -44,8 +44,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -110,8 +108,9 @@ public class TestPaperQueryService {
                 ? null
                 : userTestRepository.findTopByUserIdAndTestIdOrderByStartedAtDesc(currentUserId, testId).orElse(null);
 
+        // Mở lại đề khi lượt trước đã quá hạn (kể cả ân hạn) mà chưa nộp: hệ thống nộp hộ, không ghi streak.
         if (!isGuest) {
-            handleAutoSubmit(test, latest);
+            userTestService.finalizeIfExpired(latest);
         }
 
         int attemptsUsed = isGuest
@@ -291,27 +290,6 @@ public class TestPaperQueryService {
         return testMapper.toEmptyResponse(
                 test, maxAttempts, attemptsUsed, remaining, totalAttempts,
                 true, true, false, test.calculateStatus().name(), Collections.emptyList());
-    }
-
-    private void handleAutoSubmit(Test test, UserTest latest) {
-        Integer duration = test.getDurationMinutes();
-        // Luyện tập không giới hạn giờ nên không tự nộp theo thời lượng đề.
-        if (latest != null && latest.getStatus() == UserTest.Status.IN_PROGRESS && !latest.isPractice()
-                && duration != null && duration > 0) {
-            Instant endTime = latest.getStartedAt().plus(Duration.ofMinutes(duration));
-            if (test.getAvailableTo() != null && test.getAvailableTo().isBefore(endTime)) endTime = test.getAvailableTo();
-
-            if (!Instant.now().isBefore(endTime)) {
-                try {
-                    // Hệ thống nộp hộ: không ghi streak vì người làm không tự nộp.
-                    userTestService.finalizeAttempt(latest, Instant.now());
-                } catch (Exception e) {
-                    latest.setStatus(UserTest.Status.COMPLETED);
-                    latest.setFinishedAt(endTime);
-                    userTestRepository.save(latest);
-                }
-            }
-        }
     }
 
     private TestResponse buildLimitExceededResponse(Test test, int used, Integer rem, long total) {

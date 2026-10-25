@@ -21,8 +21,6 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     long countByUserId(String userId);
     long countByUserIdAndStatus(String userId, UserTest.Status status);
 
-    int countByUserIdAndTestIdAndStatus(String userId, String testId, UserTest.Status status);
-
     @Query("SELECT COUNT(ut) FROM UserTest ut WHERE ut.userId = :userId AND ut.testId = :testId "
             + "AND ut.status = :status AND (ut.mode IS NULL OR ut.mode <> :practiceMode)")
     int countCompletedExcludingMode(@Param("userId") String userId,
@@ -186,8 +184,6 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     Optional<UserTest> findTopByUserIdOrderByStartedAtDesc(String userId);
     Optional<UserTest> findTopByUserIdAndStatusOrderByTotalScoreDesc(String userId, UserTest.Status status);
 
-    long countByTestIdAndUserId(String testId, String userId);
-
     @Query("SELECT AVG(ut.totalScore) FROM UserTest ut WHERE ut.userId = :userId AND ut.status = :status")
     Double findAverageScoreByUserIdAndStatus(@Param("userId") String userId, @Param("status") UserTest.Status status);
 
@@ -218,10 +214,14 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
             """)
     List<Object[]> findDiagnosisSourcesByUserTestIdIn(@Param("userTestIds") Collection<String> userTestIds);
 
+    // Số lượt đã dùng theo từng đề, cùng luật với countCompletedExcludingMode (chặn khi bắt đầu làm bài).
     @Query("SELECT ut.testId, COUNT(ut) FROM UserTest ut "
-            + "WHERE ut.testId IN :testIds AND ut.userId = :userId GROUP BY ut.testId")
-    List<Object[]> countGroupedByTestIdInAndUserId(
-            @Param("testIds") List<String> testIds, @Param("userId") String userId);
+            + "WHERE ut.testId IN :testIds AND ut.userId = :userId "
+            + "AND ut.status = :status AND (ut.mode IS NULL OR ut.mode <> :practiceMode) "
+            + "GROUP BY ut.testId")
+    List<Object[]> countCompletedExcludingModeGroupedByTestIdIn(
+            @Param("testIds") List<String> testIds, @Param("userId") String userId,
+            @Param("status") UserTest.Status status, @Param("practiceMode") UserTest.Mode practiceMode);
 
     long countByStatus(UserTest.Status status);
 

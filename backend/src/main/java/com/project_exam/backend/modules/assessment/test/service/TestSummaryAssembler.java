@@ -1,5 +1,6 @@
 package com.project_exam.backend.modules.assessment.test.service;
 
+import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.dto.TestAdminResponse;
@@ -36,7 +37,8 @@ public class TestSummaryAssembler {
                 .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]));
 
         Map<String, Long> attemptsUsedByTest = userId != null
-                ? userTestRepository.countGroupedByTestIdInAndUserId(testIds, userId).stream()
+                ? userTestRepository.countCompletedExcludingModeGroupedByTestIdIn(
+                                testIds, userId, UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE).stream()
                         .collect(Collectors.toMap(row -> (String) row[0], row -> (Long) row[1]))
                 : Map.of();
 
@@ -54,7 +56,8 @@ public class TestSummaryAssembler {
     public TestResponse buildUserTestSummary(Test test, String userId) {
         long attemptsUsed = 0;
         if (userId != null) {
-            attemptsUsed = userTestRepository.countByTestIdAndUserId(test.getTestId(), userId);
+            attemptsUsed = userTestRepository.countCompletedExcludingMode(
+                    userId, test.getTestId(), UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE);
         }
         long totalAttempts = userTestRepository.countByTestId(test.getTestId());
 

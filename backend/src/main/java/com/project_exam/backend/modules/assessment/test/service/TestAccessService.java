@@ -51,11 +51,8 @@ public class TestAccessService {
                     .build();
         }
 
-        int attemptsUsed = userTestRepository.countByUserIdAndTestIdAndStatus(
-                userId,
-                test.getTestId(),
-                UserTest.Status.COMPLETED
-        );
+        int attemptsUsed = userTestRepository.countCompletedExcludingMode(
+                userId, test.getTestId(), UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE);
         Integer maxAttempts = test.getMaxAttempts();
 
         if (maxAttempts != null && attemptsUsed >= maxAttempts) {
