@@ -158,8 +158,7 @@ public class DashboardService {
                 questionRepository.count(),
                 classRepository.count(),
                 userTestRepository.count(),
-                // Khớp biểu đồ: không tính lượt hệ thống nộp hộ.
-                userTestRepository.countByStatusAndAutoSubmitted(UserTest.Status.COMPLETED, false),
+                userTestRepository.countByStatus(UserTest.Status.COMPLETED),
                 examTypeRepository.countRootStandard()
         );
     }

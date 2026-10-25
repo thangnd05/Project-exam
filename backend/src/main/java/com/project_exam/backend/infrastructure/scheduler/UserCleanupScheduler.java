@@ -12,9 +12,6 @@ public class UserCleanupScheduler {
 
     private static final long ABANDONED_UNTIMED_THRESHOLD_HOURS = 24;
 
-    // Lượt đề không giới hạn giờ đã làm dở: quá số ngày này chưa nộp thì chuyển sang Hết hạn.
-    private static final long STALE_UNTIMED_DAYS = 7;
-
     private static final int ABANDONED_BATCH_SIZE = 500;
 
     private static final int ABANDONED_MAX_BATCHES_PER_RUN = 20;
@@ -43,11 +40,6 @@ public class UserCleanupScheduler {
             int deleted = userTestService.purgeAbandonedUntimed(
                     ABANDONED_UNTIMED_THRESHOLD_HOURS, ABANDONED_BATCH_SIZE);
             if (deleted < ABANDONED_BATCH_SIZE) break;
-        }
-
-        for (int i = 0; i < ABANDONED_MAX_BATCHES_PER_RUN; i++) {
-            int expired = userTestService.expireStaleUntimed(STALE_UNTIMED_DAYS, ABANDONED_BATCH_SIZE);
-            if (expired < ABANDONED_BATCH_SIZE) break;
         }
     }
 }

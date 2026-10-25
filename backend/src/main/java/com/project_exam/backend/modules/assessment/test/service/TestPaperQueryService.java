@@ -303,10 +303,10 @@ public class TestPaperQueryService {
 
             if (!Instant.now().isBefore(endTime)) {
                 try {
-                    userTestService.submitTimedOut(latest);
+                    // Hệ thống nộp hộ: không ghi streak vì người làm không tự nộp.
+                    userTestService.finalizeAttempt(latest, Instant.now());
                 } catch (Exception e) {
                     latest.setStatus(UserTest.Status.COMPLETED);
-                    latest.setAutoSubmitted(true);
                     latest.setFinishedAt(endTime);
                     userTestRepository.save(latest);
                 }

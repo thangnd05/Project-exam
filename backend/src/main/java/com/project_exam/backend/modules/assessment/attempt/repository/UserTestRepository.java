@@ -94,17 +94,6 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
                                             @Param("closedBefore") java.time.Instant closedBefore,
                                             @Param("limit") int limit);
 
-    // Lượt đề không giới hạn giờ (không thời lượng, không giờ đóng) đã trả lời dở rồi bỏ quá lâu.
-    @Query("SELECT ut FROM UserTest ut WHERE ut.status = :status AND ut.startedAt < :cutoff "
-            + "AND (ut.mode IS NULL OR ut.mode <> :practiceMode) "
-            + "AND EXISTS (SELECT t FROM Test t WHERE t.testId = ut.testId "
-            + "AND (t.durationMinutes IS NULL OR t.durationMinutes = 0) AND t.availableTo IS NULL) "
-            + "ORDER BY ut.startedAt ASC")
-    List<UserTest> findStaleUntimedAttempts(@Param("status") UserTest.Status status,
-                                            @Param("practiceMode") UserTest.Mode practiceMode,
-                                            @Param("cutoff") java.time.Instant cutoff,
-                                            org.springframework.data.domain.Pageable pageable);
-
     List<UserTest> findByUserIdAndTestId(String userId, String testId);
     List<UserTest> findByUserIdAndTestIdOrderByStartedAtDesc(String userId, String testId);
     List<UserTest> findByTestIdAndStatus(String testId, UserTest.Status status);
@@ -234,7 +223,7 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     List<Object[]> countGroupedByTestIdInAndUserId(
             @Param("testIds") List<String> testIds, @Param("userId") String userId);
 
-    long countByStatusAndAutoSubmitted(UserTest.Status status, boolean autoSubmitted);
+    long countByStatus(UserTest.Status status);
 
     @Query("SELECT ut.startedAt FROM UserTest ut WHERE ut.startedAt >= :from")
     List<java.time.Instant> findStartedAtSince(@Param("from") java.time.Instant from);
