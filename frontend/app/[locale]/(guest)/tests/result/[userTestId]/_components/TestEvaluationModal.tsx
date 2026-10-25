@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaStar, FaInfoCircle } from 'react-icons/fa';
+import { FaStar } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
@@ -33,8 +33,10 @@ const TestEvaluationModal = ({
 }: TestEvaluationModalProps) => {
     const t = useTranslations('TestTaking.evaluation');
     const [rating, setRating] = useState(0);
+    const [hovered, setHovered] = useState(0);
     const [content, setContent] = useState('');
     const submitting = submitMutation.isPending;
+    const shownRating = hovered || rating;
 
     const handleSubmit = (e?: React.SyntheticEvent) => {
         e?.preventDefault();
@@ -79,46 +81,55 @@ const TestEvaluationModal = ({
             footer={footer}
         >
             <form onSubmit={handleSubmit}>
-                {testTitle && (
-                    <p className="mb-3">
-                        {t.rich('testLabel', {
-                            title: testTitle,
-                            strong: (chunks) => <strong>{chunks}</strong>,
-                        })}
-                    </p>
-                )}
+                {testTitle && <p className={cx('testName')}>{testTitle}</p>}
 
-                <div className={cx('formGroup')}>
-                    <label className={cx('label')}>{t('satisfaction')}</label>
-                    <div className={cx('ratingSelect')}>
-                        {[...Array(5)].map((_, i) => (
-                            <FaStar
-                                key={i}
-                                className={i < rating ? cx('starActive') : cx('starInactive')}
-                                onClick={() => setRating(i + 1)}
-                                aria-label={t('stars', { count: i + 1 })}
-                            />
-                        ))}
-                        {rating > 0 && <span className={cx('ratingText')}>{t(`ratingLabels.${RATING_LABEL_KEYS[rating - 1]}`)}</span>}
+                <div className={cx('ratingBlock')}>
+                    <span className={cx('ratingPrompt')}>{t('ratingPrompt')}</span>
+                    <div
+                        className={cx('stars')}
+                        role="radiogroup"
+                        aria-label={t('ratingPrompt')}
+                        onMouseLeave={() => setHovered(0)}
+                    >
+                        {RATING_LABEL_KEYS.map((key, i) => {
+                            const value = i + 1;
+                            return (
+                                <button
+                                    key={key}
+                                    type="button"
+                                    role="radio"
+                                    aria-checked={rating === value}
+                                    aria-label={t('stars', { count: value })}
+                                    className={cx('star', { active: value <= shownRating })}
+                                    onClick={() => setRating(value)}
+                                    onMouseEnter={() => setHovered(value)}
+                                    disabled={submitting}
+                                >
+                                    <FaStar />
+                                </button>
+                            );
+                        })}
                     </div>
+                    <span className={cx('ratingText', { chosen: shownRating > 0 })}>
+                        {shownRating > 0 ? t(`ratingLabels.${RATING_LABEL_KEYS[shownRating - 1]}`) : t('ratingHint')}
+                    </span>
                 </div>
 
                 <div className={cx('formGroup')}>
-                    <label className={cx('label')}>{t('feedbackLabel')}</label>
-                    <div className={cx('inputWrapper')}>
-                        <textarea
-                            className={cx('inputControl')}
-                            rows={4}
-                            maxLength={2000}
-                            placeholder={t('feedbackPlaceholder')}
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                        ></textarea>
-                    </div>
-                    <div className={cx('tip')}>
-                        <FaInfoCircle />
-                        <span>{t('privacyTip')}</span>
-                    </div>
+                    <label htmlFor="evaluation-feedback" className={cx('label')}>
+                        {t('feedbackLabel')} <span className={cx('optional')}>{t('optional')}</span>
+                    </label>
+                    <textarea
+                        id="evaluation-feedback"
+                        className={cx('textarea')}
+                        rows={4}
+                        maxLength={2000}
+                        placeholder={t('feedbackPlaceholder')}
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        disabled={submitting}
+                    ></textarea>
+                    <p className={cx('tip')}>{t('privacyTip')}</p>
                 </div>
             </form>
         </BaseModal>

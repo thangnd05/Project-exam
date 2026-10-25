@@ -108,7 +108,7 @@ $breakpoints: (
   border-color: var(--border-color);
   color: var(--text-color);
 
-  &:hover {
+  &:hover:not(:disabled) {
     border-color: var(--primary);
     color: var(--primary-text);
     transform: translateY(-1px);

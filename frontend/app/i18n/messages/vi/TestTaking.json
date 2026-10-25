@@ -34,12 +34,13 @@
     "later": "Để sau",
     "submit": "Gửi đánh giá",
     "submitting": "Đang gửi...",
-    "title": "Bạn thấy đề này thế nào?",
-    "testLabel": "Đề: <strong>{title}</strong>",
-    "satisfaction": "Mức độ hài lòng",
+    "title": "Đánh giá đề thi",
+    "ratingPrompt": "Chất lượng đề",
+    "ratingHint": "Chọn từ 1 đến 5 sao",
     "stars": "{count} sao",
-    "feedbackLabel": "Góp ý thêm (không bắt buộc)",
-    "feedbackPlaceholder": "Đề khó/dễ thế nào, có câu nào sai đáp án hay giải thích chưa rõ không?",
+    "feedbackLabel": "Góp ý thêm",
+    "optional": "(không bắt buộc)",
+    "feedbackPlaceholder": "Câu hỏi có sát đề thi thật không? Có câu nào sai đáp án hoặc giải thích chưa rõ?",
     "privacyTip": "Đánh giá chỉ được gửi tới đội ngũ quản trị để cải thiện đề, không hiển thị công khai."
   },
   "examLayout": {

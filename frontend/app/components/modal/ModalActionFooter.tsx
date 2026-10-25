@@ -33,7 +33,7 @@ function ModalActionFooter({
     <>
       <ButtonPrime
         type="button"
-        variant="ghost"
+        variant="outline"
         size="lg"
         className={cx('btnCancel')}
         onClick={onCancel}
