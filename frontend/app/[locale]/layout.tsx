@@ -93,6 +93,8 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
       lang={locale}
       className={`${inter.variable} ${playfair.variable}`}
       data-palette={DEFAULT_PALETTE}
+      // Bootstrap reboot bật scroll-behavior: smooth trên :root; thuộc tính này để Next tắt cuộn mượt khi chuyển trang.
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <head>

@@ -26,6 +26,10 @@ const VIZ = { primary: brand.accent, muted: '#94a3b8' };
 const AXIS_TICK = { fill: '#64748b', fontSize: 12 };
 const GRID_STROKE = '#e2e8f0';
 
+// Width/height đều là % nên lần render đầu (trước khi ResizeObserver đo) recharts nhận -1×-1 và cảnh báo.
+// Kích thước giả 1×1 chỉ để qua lần render đó; ngay sau đó container được đo lại kích thước thật.
+const INITIAL_DIMENSION = { width: 1, height: 1 };
+
 const TOOLTIP_STYLE = {
     contentStyle: {
         background: 'var(--bg-white)',
@@ -41,7 +45,7 @@ const TOOLTIP_STYLE = {
 export const MonthlyNewUsersLine = ({ data }: { data: MonthPerformance[] }) => {
     const t = useTranslations('AdminCommon.charts');
     return (
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" initialDimension={INITIAL_DIMENSION}>
             <AreaChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                 <defs>
                     <linearGradient id="acNewUsersLine" x1="0" y1="0" x2="0" y2="1">
@@ -89,7 +93,7 @@ const MonthlyActivityTooltip = ({ active, payload, label }: ChartTooltipProps) =
 export const MonthlyActivityCombo = ({ data }: { data: MonthPerformance[] }) => {
     const t = useTranslations('AdminCommon.charts');
     return (
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" initialDimension={INITIAL_DIMENSION}>
             <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
