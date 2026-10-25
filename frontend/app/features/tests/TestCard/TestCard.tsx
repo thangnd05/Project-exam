@@ -188,7 +188,7 @@ function TestCard({ test, countdowns }: TestCardProps) {
 
                     {showLeaderboard && (
                         <ButtonPrime
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
                             className={cx('btn-icon-modern')}
                             title={t('leaderboard')}

@@ -294,7 +294,7 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
       />
 
       <div className="d-flex flex-wrap align-items-end gap-2 mb-3">
-        <ButtonPrime type="button" variant="outline" onClick={handlePreview}>
+        <ButtonPrime type="button" variant="ghost" onClick={handlePreview}>
           <Eye size={16} className="me-1" />
           {t('preview')}
         </ButtonPrime>

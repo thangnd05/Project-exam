@@ -55,7 +55,7 @@
 }
 
 .btnPrimary {
-  @include globalStyles.primaryGradientButton;
+  @include globalStyles.buttonBrand;
 }
 
 .btnSuccess {

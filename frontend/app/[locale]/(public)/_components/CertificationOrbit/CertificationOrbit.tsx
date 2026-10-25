@@ -33,8 +33,6 @@ type Orbit = {
   radius: number;
   // Góc của huy hiệu đầu tiên; các huy hiệu còn lại cách đều 60 độ.
   startAngle: number;
-  // Hãng chưa có đề nào thì trang Coming soon hiện logo hãng; AWS đã có đề nên dùng câu chung.
-  comingSoonProvider?: string;
   badges: {file: string; label: string}[];
 };
 
@@ -58,7 +56,6 @@ const ORBITS: Orbit[] = [
     vendor: 'azure',
     radius: 295,
     startAngle: 30,
-    comingSoonProvider: 'azure',
     badges: [
       {file: 'AZ-104', label: 'Microsoft Azure Administrator (AZ-104)'},
       {file: 'AZ-305', label: 'Azure Solutions Architect (AZ-305)'},
@@ -72,7 +69,6 @@ const ORBITS: Orbit[] = [
     vendor: 'gcp',
     radius: 375,
     startAngle: 15,
-    comingSoonProvider: 'gcp',
     badges: [
       {file: 'Associate_Cloud_Engineer', label: 'Google Associate Cloud Engineer'},
       {file: 'Professional_Cloud_Architect', label: 'Google Professional Cloud Architect'},
@@ -158,9 +154,8 @@ function CertificationOrbit() {
           </div>
 
           {orbits.map((orbit, orbitIdx) => {
-            const comingSoonHref = orbit.comingSoonProvider
-              ? `${routes.comingSoon}?provider=${orbit.comingSoonProvider}`
-              : routes.comingSoon;
+            // Luôn gửi hãng để trang Coming soon hiện đúng logo (slug hãng trùng vendor).
+            const comingSoonHref = `${routes.comingSoon}?provider=${orbit.vendor}`;
             return (
               <div
                 key={orbit.radius}

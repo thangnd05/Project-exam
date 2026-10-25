@@ -10,9 +10,12 @@ import styles from './ComingSoon.module.scss';
 
 const cx = classNames.bind(styles);
 
-// Không có provider (hoặc slug lạ) thì hiện đồng hồ và câu chung cho mọi đề chưa có.
+// Có provider thì luôn hiện logo hãng; không có (hoặc slug lạ) thì hiện đồng hồ.
+// Câu "Đề luyện thi {hãng} đang được chuẩn bị" chỉ đúng với hãng chưa có đề nào; hãng đã có đề
+// (vd AWS, khi bấm một chứng chỉ sắp ra mắt) dùng câu chung cho riêng đề đó.
 export default function ComingSoon({ provider }: { provider?: Provider }) {
   const t = useTranslations('Common.comingSoon');
+  const upcomingProvider = provider && !provider.available ? provider : undefined;
 
   return (
     <section className={cx('wrapper', 'theme-locked')}>
@@ -38,16 +41,18 @@ export default function ComingSoon({ provider }: { provider?: Provider }) {
       <p className={cx('eyebrow')}>{t('badge')}</p>
 
       <h1 className={cx('title')}>
-        {provider
+        {upcomingProvider
           ? t.rich('titleProvider', {
-              name: provider.name,
+              name: upcomingProvider.name,
               glow: (chunks) => <span className={cx('glow')}>{chunks}</span>,
             })
           : t('title')}
       </h1>
 
       <p className={cx('desc')}>
-        {provider ? t('descriptionProvider', { name: provider.name }) : t('description')}
+        {upcomingProvider
+          ? t('descriptionProvider', { name: upcomingProvider.name })
+          : t('description')}
       </p>
 
       <div className={cx('actions')}>

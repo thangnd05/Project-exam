@@ -4,8 +4,10 @@
   @include globalStyles.buttonBase;
 }
 
+// Quy tắc: hai nút đứng cạnh nhau không được cùng nền trắng. Nút chính luôn nền brand đặc,
+// nút phụ cạnh nó dùng outline/ghost. (primaryGradientButton nền trắng chỉ để đặt trên nền tối/gradient.)
 .primary {
-  @include globalStyles.primaryGradientButton;
+  @include globalStyles.buttonBrand;
 }
 
 .brand {

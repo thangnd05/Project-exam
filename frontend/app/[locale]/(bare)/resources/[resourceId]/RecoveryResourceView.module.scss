@@ -150,14 +150,16 @@
     color: var(--primary-text);
   }
 
+  // Nút chính nền đặc để không lẫn với nút viền trắng đứng cạnh.
   &.primary {
-    background: var(--primary-btn-bg);
-    border-color: transparent;
-    color: var(--primary-btn-fg);
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--text-on-brand);
 
     &:hover {
-      border-color: var(--primary);
-      color: var(--primary-btn-fg-hover);
+      background: var(--brand-400);
+      border-color: var(--brand-400);
+      color: var(--text-on-brand);
     }
   }
 }
