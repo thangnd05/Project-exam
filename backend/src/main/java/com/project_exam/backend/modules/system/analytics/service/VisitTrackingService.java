@@ -45,6 +45,22 @@ public class VisitTrackingService {
                 .build());
     }
 
+    // Gắn người dùng vào lượt hiện tại của phiên khi họ đăng nhập giữa chừng (phiên bắt đầu lúc còn là khách).
+    // Không tạo lượt mới: phiên có thể đã kéo dài quá SESSION_GAP kể từ lúc bắt đầu.
+    @Async("visitExecutor")
+    public void identify(String sessionKey, String userId) {
+        String key = trim(sessionKey, 64);
+        if (!StringUtils.hasText(key) || userId == null) {
+            return;
+        }
+        pageVisitRepository.findFirstBySessionKeyOrderByCreatedAtDesc(key)
+                .filter(visit -> visit.getUserId() == null)
+                .ifPresent(visit -> {
+                    visit.setUserId(userId);
+                    pageVisitRepository.save(visit);
+                });
+    }
+
     @Transactional
     public int purgeOlderThan(int days) {
         return pageVisitRepository.deleteOlderThan(Instant.now().minus(Duration.ofDays(days)));

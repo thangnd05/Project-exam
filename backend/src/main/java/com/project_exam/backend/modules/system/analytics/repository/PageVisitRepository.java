@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Mỗi dòng page_visits = 1 lượt truy cập (phiên). FE chỉ ping khi bắt đầu phiên mới.
@@ -19,6 +20,8 @@ public interface PageVisitRepository extends JpaRepository<PageVisit, String> {
     long countByCreatedAtGreaterThanEqual(Instant from);
 
     boolean existsBySessionKeyAndCreatedAtAfter(String sessionKey, Instant after);
+
+    Optional<PageVisit> findFirstBySessionKeyOrderByCreatedAtDesc(String sessionKey);
 
     @Modifying
     @Query("DELETE FROM PageVisit v WHERE v.createdAt < :cutoff")

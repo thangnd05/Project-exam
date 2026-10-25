@@ -33,14 +33,12 @@ public class VisitController {
             return ResponseEntity.noContent().build();
         }
 
-        String userId = null;
-        try {
-            userId = authUtils.getUserId(request);
-        } catch (Exception ignored) {
-
+        String userId = authUtils.findUserIdOrNull(request);
+        if (body.isIdentify()) {
+            visitTrackingService.identify(sessionKey, userId);
+        } else {
+            visitTrackingService.record(body.getPath(), sessionKey, userId, ip);
         }
-
-        visitTrackingService.record(body.getPath(), sessionKey, userId, ip);
         return ResponseEntity.noContent().build();
     }
 }
