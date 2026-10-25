@@ -244,6 +244,7 @@
     "removeBlock": "Remove element",
     "zones": {
       "TOP": "Top (header bar)",
+      "TOOLBAR": "Question bar (next to question number)",
       "LEFT": "Left (side column)",
       "RIGHT": "Right (side column)",
       "BOTTOM": "Bottom (footer bar)",

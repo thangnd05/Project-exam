@@ -243,6 +243,18 @@
   display: flex;
   align-items: center;
   gap: 8px;
+
+  &.center {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+// Màn nhỏ: thanh câu hỏi chật nên đồng hồ/tiến độ chỉ còn con số.
+.exam-toolbar .exam-stat-label {
+  @include down(sm) {
+    display: none;
+  }
 }
 
 // Vùng nội dung: tự cuộn; thẻ câu nằm giữa với bề rộng đọc thoải mái.
@@ -1780,10 +1792,30 @@
   padding: 32px;
   @include auto-hide-scrollbar;
 
-  // Mặc định thẻ câu trải hết vùng nền; admin đặt "Bề rộng tối đa" thì thu vào giữa.
-  &:not(.split-layout) > * {
-    max-width: var(--exam-content-width, none);
-    margin-inline: auto;
+  // Câu không kèm bài đọc bên cạnh: không khung thẻ, nội dung trải hết vùng làm bài trên nền trắng.
+  // Admin đặt "Bề rộng tối đa" thì nội dung thu vào giữa.
+  &:not(.split-layout) {
+    padding: 0;
+    background: var(--bg-white);
+
+    > * {
+      max-width: var(--exam-content-width, none);
+      margin-inline: auto;
+    }
+
+    > .question-card {
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    > .passage-box {
+      margin: 32px 32px 0;
+
+      @include down(md) {
+        margin: 16px 16px 0;
+      }
+    }
   }
 
   &.split-layout {

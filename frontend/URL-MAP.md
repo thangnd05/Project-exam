@@ -14,93 +14,95 @@ Tổng hợp từ `app/[locale]/**/page.tsx`, [app/configs/Routes.ts](app/config
 
 Ký hiệu cột "Truy cập": 🌐 công khai · 👤 cần đăng nhập · 👁 khách xem được, thao tác cần đăng nhập · 🔒 admin (theo quyền trong [adminPermissions.ts](app/configs/adminPermissions.ts)).
 
+Cột "Ví dụ": slug kỳ thi/đề (`aws/saa-c03`, `aws-dop-c02-test-1`) và định dạng mã chứng chỉ (`EXAM-<năm>-<6 ký tự>`) lấy theo code thật; các UUID chỉ là giá trị minh hoạ, thay bằng id có trong database. Bản tiếng Anh thì thêm `/en` phía trước, vd `/en/exam-types/aws/saa-c03`.
+
 ---
 
 ## 1. Danh sách URL
 
 ### Công khai `(public)` — có Header/Footer
 
-| URL | Trang | Truy cập |
-|---|---|---|
-| `/` | Trang chủ (Hero, Certification Orbit, Rank Scope) | 🌐 |
-| `/about` | Giới thiệu | 🌐 |
-| `/policy` | Chính sách | 🌐 |
-| `/service` | Điều khoản dịch vụ | 🌐 |
-| `/coming-soon` | Sắp ra mắt | 🌐 |
-| `/exam-types` | Danh mục kỳ thi | 🌐 |
-| `/exam-types/:group` | Nhóm kỳ thi / kỳ thi một cấp (danh sách đề, bộ đề) | 🌐 |
-| `/exam-types/:group/:exam` | Chi tiết kỳ thi (đề thi thử, bộ đề) | 🌐 |
-| `/exam-types/:group/collections/:collectionId` | Bộ đề thuộc kỳ thi một cấp | 🌐 |
-| `/exam-types/:group/:exam/collections/:collectionId` | Bộ đề thuộc kỳ thi hai cấp | 🌐 |
-| `/posts` | Danh sách bài viết | 🌐 |
-| `/posts/:postId` | Chi tiết bài viết | 🌐 |
-| `/resources` | Tài liệu ôn tập | 🌐 |
-| `/certificates/verify` | Tra cứu chứng chỉ + tường chứng chỉ | 🌐 |
-| `/certificates/verify/:code` | Kết quả xác minh chứng chỉ theo mã | 🌐 |
+| URL | Trang | Truy cập | Ví dụ |
+|---|---|---|---|
+| `/` | Trang chủ (Hero, Certification Orbit, Rank Scope) | 🌐 | `/` |
+| `/about` | Giới thiệu | 🌐 | `/about` |
+| `/policy` | Chính sách | 🌐 | `/policy` |
+| `/service` | Điều khoản dịch vụ | 🌐 | `/service` |
+| `/coming-soon` | Sắp ra mắt | 🌐 | `/coming-soon` |
+| `/exam-types` | Danh mục kỳ thi | 🌐 | `/exam-types` |
+| `/exam-types/:group` | Nhóm kỳ thi / kỳ thi một cấp (danh sách đề, bộ đề) | 🌐 | `/exam-types/aws` · `/exam-types/toeic` |
+| `/exam-types/:group/:exam` | Chi tiết kỳ thi (đề thi thử, bộ đề) | 🌐 | `/exam-types/aws/saa-c03` |
+| `/exam-types/:group/collections/:collectionId` | Bộ đề thuộc kỳ thi một cấp | 🌐 | `/exam-types/toeic/collections/0b6d2f1e-3c4a-4e5b-8f7a-9c1d2e3f4a5b` |
+| `/exam-types/:group/:exam/collections/:collectionId` | Bộ đề thuộc kỳ thi hai cấp | 🌐 | `/exam-types/aws/saa-c03/collections/0b6d2f1e-3c4a-4e5b-8f7a-9c1d2e3f4a5b` |
+| `/posts` | Danh sách bài viết | 🌐 | `/posts` |
+| `/posts/:postId` | Chi tiết bài viết | 🌐 | `/posts/2a7e4c9d-1b3f-4d6a-8e2c-5f9b0a1c3d4e` |
+| `/resources` | Tài liệu ôn tập | 🌐 | `/resources` |
+| `/certificates/verify` | Tra cứu chứng chỉ + tường chứng chỉ | 🌐 | `/certificates/verify` |
+| `/certificates/verify/:code` | Kết quả xác minh chứng chỉ theo mã | 🌐 | `/certificates/verify/EXAM-2026-K7P3QX` |
 
 ### Xác thực `(auth)`
 
-| URL | Trang | Truy cập |
-|---|---|---|
-| `/login` | Đăng nhập / đăng ký (`?mode=signin\|signup`, `?from=`, `?flash=`, `?error=`) | 🌐 |
-| `/forgot` | Quên mật khẩu | 🌐 |
-| `/reset` | Đặt lại mật khẩu (link từ email) | 🌐 |
-| `/oauth2/redirect` | Nhận kết quả đăng nhập Google/Facebook rồi chuyển tiếp | 🌐 (nằm trong `(user)` nhưng không bị proxy chặn) |
+| URL | Trang | Truy cập | Ví dụ |
+|---|---|---|---|
+| `/login` | Đăng nhập / đăng ký (`?mode=signin\|signup`, `?from=`, `?flash=`, `?error=`) | 🌐 | `/login?mode=signup&from=/my-target` |
+| `/forgot` | Quên mật khẩu | 🌐 | `/forgot` |
+| `/reset` | Đặt lại mật khẩu (link từ email) | 🌐 | `/reset?token=<token trong email>` |
+| `/oauth2/redirect` | Nhận kết quả đăng nhập Google/Facebook rồi chuyển tiếp | 🌐 (nằm trong `(user)` nhưng không bị proxy chặn) | `/oauth2/redirect` (backend tự chuyển về) |
 
 ### Trang trần `(bare)` — không Header/Footer
 
-| URL | Trang | Truy cập |
-|---|---|---|
-| `/resources/:resourceId` | Xem tài liệu phục hồi (recovery resource) | 🌐 |
-| `/not-found` | Trang 404 (AuthGuard đẩy về đây khi thiếu quyền) | 🌐 |
+| URL | Trang | Truy cập | Ví dụ |
+|---|---|---|---|
+| `/resources/:resourceId` | Xem tài liệu phục hồi (recovery resource) | 🌐 | `/resources/6c8a1f3e-2d4b-4a7c-9e5f-0b1c2d3e4f5a` |
+| `/not-found` | Trang 404 (AuthGuard đẩy về đây khi thiếu quyền) | 🌐 | `/not-found` |
 
 ### Khách & người dùng `(guest)`, `(guest-exam)`, `(guest-focus)` — khách vẫn làm bài được
 
-| URL | Trang | Truy cập |
-|---|---|---|
-| `/tests/:testId/start` | Làm bài thi (giao diện thi) | 🌐 |
-| `/tests/result/:userTestId` | Kết quả bài thi | 🌐 |
-| `/tests/result/:userTestId/review` | Xem lại đáp án (focus mode) | 🌐 |
-| `/learning-plans` | Trang trung chuyển "Lộ trình" (chỉ redirect, xem mục 3) | 👁 |
-| `/learning-plans/generate` | Sinh lộ trình học + danh sách lộ trình | 👁 |
-| `/my-target` | Đặt mục tiêu kỳ thi (`?examTypeId=`, `?next=`) | 👁 |
+| URL | Trang | Truy cập | Ví dụ |
+|---|---|---|---|
+| `/tests/:testId/start` | Làm bài thi (giao diện thi) | 🌐 | `/tests/aws-dop-c02-test-1/start` |
+| `/tests/result/:userTestId` | Kết quả bài thi | 🌐 | `/tests/result/5e2f9c1a-7b3d-4e8a-9c6f-1d2b3a4c5e6f` |
+| `/tests/result/:userTestId/review` | Xem lại đáp án (focus mode) | 🌐 | `/tests/result/5e2f9c1a-7b3d-4e8a-9c6f-1d2b3a4c5e6f/review` |
+| `/learning-plans` | Trang trung chuyển "Lộ trình" (chỉ redirect, xem mục 3) | 👁 | `/learning-plans` |
+| `/learning-plans/generate` | Sinh lộ trình học + danh sách lộ trình | 👁 | `/learning-plans/generate?userTestId=5e2f9c1a-7b3d-4e8a-9c6f-1d2b3a4c5e6f&examTypeId=9d4b2e7a-1c3f-4a5e-8b6d-2f0a1b3c4d5e` |
+| `/my-target` | Đặt mục tiêu kỳ thi (`?examTypeId=`, `?next=`) | 👁 | `/my-target?examTypeId=9d4b2e7a-1c3f-4a5e-8b6d-2f0a1b3c4d5e` |
 
 ### Người dùng `(user)` — cần đăng nhập
 
-| URL | Trang | Truy cập |
-|---|---|---|
-| `/dashboard` | Hồ sơ / tổng quan cá nhân | 👤 |
-| `/my-target/dashboard` | Bảng mục tiêu (`?examTypeId=`) | 👤 |
-| `/my-target/achieved` | Đã đạt mục tiêu | 👤 |
-| `/my-target/mocks` | Redirect sang `/my-target/dashboard` (giữ query) | 👤 |
-| `/learning-plans/compare` | So sánh các lộ trình | 👤 |
-| `/learning-plans/:learningPlanId` | Chi tiết lộ trình | 👤 |
-| `/learning-plans/:learningPlanId/tasks/:taskId/history` | Lịch sử làm một nhiệm vụ | 👤 |
-| `/tests/:testId/history` | Lịch sử làm đề | 👤 |
-| `/tests/:testId/leaderboard` | Bảng xếp hạng đề | 👤 |
-| `/my-certificates` | Chứng chỉ của tôi | 👤 |
-| `/certificates/:certificateId` | Chi tiết chứng chỉ | 👤 |
-| `/my-albums` | Thẻ ghi nhớ của tôi *(đang ẩn khỏi menu)* | 👤 |
-| `/albums/:albumId` | Chi tiết bộ thẻ *(đang ẩn)* | 👤 |
-| `/practice/:albumId` | Luyện bộ thẻ *(đang ẩn)* | 👤 |
-| `/my-classes` | Lớp học của tôi *(đang ẩn)* | 👤 |
-| `/class/:classId/chapters` | Chương của lớp *(đang ẩn)* | 👤 |
-| `/class/:classId/members` | Thành viên lớp *(đang ẩn)* | 👤 |
-| `/classes/:classId/chapters/:chapterId/tests` | Bài thi của chương *(đang ẩn)* | 👤 |
-| `/admin/personal-question-bank` | Ngân hàng câu hỏi cá nhân *(đang ẩn)* | 👤 |
-| `/admin/create-test-from-bank` | Tạo đề từ ngân hàng *(không có link nào trỏ tới)* | 👤 |
+| URL | Trang | Truy cập | Ví dụ |
+|---|---|---|---|
+| `/dashboard` | Hồ sơ / tổng quan cá nhân | 👤 | `/dashboard` |
+| `/my-target/dashboard` | Bảng mục tiêu (`?examTypeId=`) | 👤 | `/my-target/dashboard?examTypeId=9d4b2e7a-1c3f-4a5e-8b6d-2f0a1b3c4d5e` |
+| `/my-target/achieved` | Đã đạt mục tiêu | 👤 | `/my-target/achieved` |
+| `/my-target/mocks` | Redirect sang `/my-target/dashboard` (giữ query) | 👤 | `/my-target/mocks` → `/my-target/dashboard` |
+| `/learning-plans/compare` | So sánh các lộ trình | 👤 | `/learning-plans/compare` |
+| `/learning-plans/:learningPlanId` | Chi tiết lộ trình | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e` |
+| `/learning-plans/:learningPlanId/tasks/:taskId/history` | Lịch sử làm một nhiệm vụ | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/tasks/8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c/history` |
+| `/tests/:testId/history` | Lịch sử làm đề | 👤 | `/tests/aws-dop-c02-test-1/history` |
+| `/tests/:testId/leaderboard` | Bảng xếp hạng đề | 👤 | `/tests/aws-dop-c02-test-1/leaderboard` |
+| `/my-certificates` | Chứng chỉ của tôi | 👤 | `/my-certificates` |
+| `/certificates/:certificateId` | Chi tiết chứng chỉ | 👤 | `/certificates/4d9e2a7b-1f3c-4b5d-8e6a-2c0b1a3d4e5f` |
+| `/my-albums` | Thẻ ghi nhớ của tôi *(đang ẩn khỏi menu)* | 👤 | `/my-albums` |
+| `/albums/:albumId` | Chi tiết bộ thẻ *(đang ẩn)* | 👤 | `/albums/1e3a5c7d-9b2f-4d4e-8a6c-3f5b7d9e1a2c` |
+| `/practice/:albumId` | Luyện bộ thẻ *(đang ẩn)* | 👤 | `/practice/1e3a5c7d-9b2f-4d4e-8a6c-3f5b7d9e1a2c` |
+| `/my-classes` | Lớp học của tôi *(đang ẩn)* | 👤 | `/my-classes` |
+| `/class/:classId/chapters` | Chương của lớp *(đang ẩn)* | 👤 | `/class/7f2b4d6e-8a1c-4e3f-9b5d-0c2e4a6b8d1f/chapters` |
+| `/class/:classId/members` | Thành viên lớp *(đang ẩn)* | 👤 | `/class/7f2b4d6e-8a1c-4e3f-9b5d-0c2e4a6b8d1f/members` |
+| `/classes/:classId/chapters/:chapterId/tests` | Bài thi của chương *(đang ẩn)* | 👤 | `/classes/7f2b4d6e-8a1c-4e3f-9b5d-0c2e4a6b8d1f/chapters/2c4e6a8b-1d3f-4a5c-9e7b-3d5f7a9c1e2b/tests` |
+| `/admin/personal-question-bank` | Ngân hàng câu hỏi cá nhân *(đang ẩn)* | 👤 | `/admin/personal-question-bank` |
+| `/admin/create-test-from-bank` | Tạo đề từ ngân hàng *(không có link nào trỏ tới)* | 👤 | `/admin/create-test-from-bank` |
 
 ### Người dùng – focus mode `(user-focus)` — không Header/Footer
 
-| URL | Trang | Truy cập |
-|---|---|---|
-| `/learning-plans/:learningPlanId/study` | Học nhiệm vụ (`?taskId=`) | 👤 |
-| `/learning-plans/:learningPlanId/tasks/:taskId/result` | Kết quả nhiệm vụ | 👤 |
-| `/learning-plans/:learningPlanId/sessions/:sessionId/review` | Xem lại một phiên học (`?taskId=`) | 👤 |
+| URL | Trang | Truy cập | Ví dụ |
+|---|---|---|---|
+| `/learning-plans/:learningPlanId/study` | Học nhiệm vụ (`?taskId=`) | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/study?taskId=8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c` |
+| `/learning-plans/:learningPlanId/tasks/:taskId/result` | Kết quả nhiệm vụ | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/tasks/8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c/result` |
+| `/learning-plans/:learningPlanId/sessions/:sessionId/review` | Xem lại một phiên học (`?taskId=`) | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/sessions/6b8d0f2a-3c5e-4a7b-9d1f-4e6a8c0b2d3f/review?taskId=8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c` |
 
 ### Quản trị `(admin)` — layout có sidebar riêng
 
-Tất cả 🔒, mỗi trang kiểm tra quyền riêng.
+Tất cả 🔒, mỗi trang kiểm tra quyền riêng. URL admin không có tham số nên ví dụ chính là URL ở cột đầu, trừ trang bố cục: `/admin/exam-types/9d4b2e7a-1c3f-4a5e-8b6d-2f0a1b3c4d5e/layout`.
 
 | URL | Trang |
 |---|---|

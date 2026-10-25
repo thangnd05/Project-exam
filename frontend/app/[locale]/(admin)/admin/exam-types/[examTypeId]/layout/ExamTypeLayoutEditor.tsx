@@ -65,7 +65,7 @@ function alignOptionsFor(zone: string): Array<{ value: string; labelKey: AlignLa
 }
 
 // Nhãn dịch cho các vùng/yếu tố đã biết; loại lạ thì giữ nhãn từ BLOCK_META/ZONE_META.
-const ZONE_LABEL_KEYS = ['TOP', 'LEFT', 'RIGHT', 'BOTTOM', 'FLOAT'] as const;
+const ZONE_LABEL_KEYS = ['TOP', 'TOOLBAR', 'LEFT', 'RIGHT', 'BOTTOM', 'FLOAT'] as const;
 const BLOCK_LABEL_KEYS = ['timer', 'progress', 'submit', 'questionNav', 'banner', 'title'] as const;
 const isZoneLabelKey = (key: string): key is (typeof ZONE_LABEL_KEYS)[number] =>
   (ZONE_LABEL_KEYS as readonly string[]).includes(key);
@@ -73,7 +73,7 @@ const isBlockLabelKey = (key: string): key is (typeof BLOCK_LABEL_KEYS)[number] 
   (BLOCK_LABEL_KEYS as readonly string[]).includes(key);
 function alignDefaultFor(zone: string) {
   if (zone === ZONES.LEFT || zone === ZONES.RIGHT) return 'start';
-  if (zone === ZONES.BOTTOM) return 'right';
+  if (zone === ZONES.BOTTOM || zone === ZONES.TOOLBAR) return 'right';
   return 'left';
 }
 

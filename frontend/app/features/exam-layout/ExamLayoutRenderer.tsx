@@ -255,6 +255,7 @@ function ExamLayoutRenderer({
   });
 
   const topBlocks = byZone(ZONES.TOP);
+  const toolbarBlocks = byZone(ZONES.TOOLBAR);
   const leftBlocks = byZone(ZONES.LEFT);
   const rightBlocks = byZone(ZONES.RIGHT);
   const bottomBlocks = byZone(ZONES.BOTTOM);
@@ -361,10 +362,13 @@ function ExamLayoutRenderer({
     );
   };
 
-  const toolbar = isPaged && currentStep && (
+  // Thanh câu hiện tại: số câu bên trái, các khối của vùng "Thanh câu hỏi" chia theo căn lề.
+  const toolbarGroups = splitHorizontal(toolbarBlocks, 'right');
+  const showToolbar = Boolean(isPaged && currentStep) || toolbarBlocks.length > 0;
+  const toolbar = showToolbar && (
     <div className={cx('exam-toolbar')}>
       <div className={cx('exam-toolbar-info')}>
-        {stepNumbers.length > 0 && (
+        {isPaged && stepNumbers.length > 0 && (
           <span className={cx('exam-toolbar-number')}>
             {t.rich('questionOf', {
               number:
@@ -376,8 +380,15 @@ function ExamLayoutRenderer({
             })}
           </span>
         )}
+        {renderBlocks(toolbarGroups.left, ZONES.TOOLBAR)}
       </div>
-      <div className={cx('exam-toolbar-actions')}>{mobileNavTrigger}</div>
+      <div className={cx('exam-toolbar-actions', 'center')}>
+        {renderBlocks(toolbarGroups.center, ZONES.TOOLBAR)}
+      </div>
+      <div className={cx('exam-toolbar-actions')}>
+        {renderBlocks(toolbarGroups.right, ZONES.TOOLBAR)}
+        {mobileNavTrigger}
+      </div>
     </div>
   );
 
@@ -488,7 +499,7 @@ function ExamLayoutRenderer({
         <section className={cx('exam-main')}>
           {toolbar}
           <div className={cx('exam-scroll', { 'paged-fit-scroll': isPaged })}>
-            {!isPaged && mobileNavTrigger && (
+            {!showToolbar && mobileNavTrigger && (
               <div className={cx('mobile-nav-bar')}>{mobileNavTrigger}</div>
             )}
             {questionArea}

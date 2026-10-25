@@ -1,5 +1,6 @@
 export const ZONES = {
   TOP: 'TOP',
+  TOOLBAR: 'TOOLBAR',
   LEFT: 'LEFT',
   RIGHT: 'RIGHT',
   BOTTOM: 'BOTTOM',
@@ -64,6 +65,7 @@ export interface LayoutConfig {
 
 export const ZONE_META: Array<{ key: string; label: string }> = [
   { key: ZONES.TOP, label: 'Trên (thanh đầu trang)' },
+  { key: ZONES.TOOLBAR, label: 'Thanh câu hỏi (cạnh số câu)' },
   { key: ZONES.LEFT, label: 'Trái (cột bên)' },
   { key: ZONES.RIGHT, label: 'Phải (cột bên)' },
   { key: ZONES.BOTTOM, label: 'Dưới (thanh chân trang)' },
@@ -107,12 +109,12 @@ export const defaultLayoutConfig: LayoutConfig = {
     cardShadow: true,
   },
 
-  // Bố cục phòng thi chuẩn: đồng hồ trên thanh đầu, danh sách câu ở cột trái, nút nộp bài ghim chân cột trái.
+  // Bố cục phòng thi chuẩn: đồng hồ đối diện số câu, danh sách câu ở cột trái, nút nộp bài ghim chân cột trái.
   blocks: [
     {
       id: 'timer',
       type: BLOCK_TYPES.TIMER,
-      zone: ZONES.TOP,
+      zone: ZONES.TOOLBAR,
       align: 'right',
       order: 1,
       visible: true,

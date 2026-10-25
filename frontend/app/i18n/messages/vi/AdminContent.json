@@ -244,6 +244,7 @@
     "removeBlock": "Xoá yếu tố",
     "zones": {
       "TOP": "Trên (thanh đầu trang)",
+      "TOOLBAR": "Thanh câu hỏi (cạnh số câu)",
       "LEFT": "Trái (cột bên)",
       "RIGHT": "Phải (cột bên)",
       "BOTTOM": "Dưới (thanh chân trang)",
