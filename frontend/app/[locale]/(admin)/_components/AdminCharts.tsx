@@ -37,7 +37,8 @@ type ChartTooltipProps = Partial<TooltipContentProps<number, string>>;
 
 const VIZ = { primary: brand.accent, accent: brand.unique, muted: '#94a3b8' };
 
-const STATUS_COLORS = [VIZ.primary, VIZ.accent, VIZ.muted];
+// Theo thứ tự BE trả: Hoàn thành, Tự nộp khi hết giờ, Đang làm, Hết hạn. Mỗi trạng thái một màu tách bạch.
+const STATUS_COLORS = ['#10b981', '#f59e0b', brand.primary, VIZ.muted];
 
 const AXIS_TICK = { fill: '#64748b', fontSize: 12 };
 const GRID_STROKE = '#e2e8f0';

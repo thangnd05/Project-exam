@@ -35,6 +35,7 @@
     "topPracticeTests": "Most-practiced tests",
     "status": {
       "completed": "Completed",
+      "autoSubmitted": "Auto-submitted (time up)",
       "inProgress": "In progress",
       "expired": "Expired"
     }

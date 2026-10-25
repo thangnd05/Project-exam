@@ -35,6 +35,7 @@
     "topPracticeTests": "Đề thi ôn luyện nhiều nhất",
     "status": {
       "completed": "Hoàn thành",
+      "autoSubmitted": "Tự nộp khi hết giờ",
       "inProgress": "Đang làm",
       "expired": "Hết hạn"
     }

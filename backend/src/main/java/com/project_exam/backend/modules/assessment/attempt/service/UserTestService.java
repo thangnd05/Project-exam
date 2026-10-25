@@ -144,6 +144,21 @@ public class UserTestService {
 
     @Transactional
     public UserTest finalizeAttempt(UserTest userTest, Instant now) {
+        return finalizeAttempt(userTest, now, false);
+    }
+
+    // Người làm mở lại đề sau khi đã hết giờ mà chưa nộp: hệ thống nộp hộ.
+    @Transactional
+    public UserTest submitTimedOut(UserTest userTest) {
+        if (userTest.getUserId() != null) {
+            String userId = userTest.getUserId();
+            AfterCommitTasks.runQuietly(
+                    () -> streakService.recordActivity(userId, StreakActivityType.TEST_SUBMIT));
+        }
+        return finalizeAttempt(userTest, Instant.now(), true);
+    }
+
+    private UserTest finalizeAttempt(UserTest userTest, Instant now, boolean autoSubmitted) {
         Test test = testRepository.findById(userTest.getTestId())
                 .orElseThrow(() -> new NotFoundException("Test not found"));
 
@@ -151,6 +166,7 @@ public class UserTestService {
         Instant end = AttemptTimeUtil.scheduledEnd(userTest, test);
         userTest.setFinishedAt(end != null && now.isAfter(end) ? end : now);
         userTest.setStatus(UserTest.Status.COMPLETED);
+        userTest.setAutoSubmitted(autoSubmitted);
 
         List<UserAnswer> userAnswers = userAnswerRepository.findByUserTestId(userTest.getUserTestId());
         if (userAnswers.isEmpty()) {
@@ -192,7 +208,7 @@ public class UserTestService {
         if (!AttemptTimeUtil.isExpired(userTest, test, Instant.now())) {
             return false;
         }
-        finalizeAttempt(userTest, Instant.now());
+        finalizeAttempt(userTest, Instant.now(), true);
         return true;
     }
 
@@ -647,19 +663,29 @@ public class UserTestService {
     }
 
     @Transactional
-    public int finalizeExpiredTimedAttempts(long staleAfterHours, int batchSize) {
-        Instant now = Instant.now();
-        List<UserTest> candidates = userTestRepository.findStaleTimedAttempts(
-                UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE,
-                now.minus(Duration.ofHours(staleAfterHours)),
-                now.minusSeconds(AttemptTimeUtil.GRACE_SECONDS),
-                org.springframework.data.domain.PageRequest.of(0, batchSize));
+    public int finalizeExpiredTimedAttempts(int batchSize) {
+        List<UserTest> candidates = userTestRepository.findOverdueTimedAttempts(
+                UserTest.Status.IN_PROGRESS.name(), UserTest.Mode.PRACTICE.name(),
+                Instant.now().minusSeconds(AttemptTimeUtil.GRACE_SECONDS), batchSize);
 
         int finalized = 0;
         for (UserTest attempt : candidates) {
             if (finalizeIfExpired(attempt)) finalized++;
         }
         return finalized;
+    }
+
+    // Đề không giới hạn giờ không có hạn nộp: lượt làm dở bỏ quá lâu chuyển sang EXPIRED (giữ nguyên bài làm),
+    // để không nằm mãi ở "Đang làm". Lượt EXPIRED không tính vào số lượt đã dùng.
+    @Transactional
+    public int expireStaleUntimed(long staleAfterDays, int batchSize) {
+        List<UserTest> stale = userTestRepository.findStaleUntimedAttempts(
+                UserTest.Status.IN_PROGRESS, UserTest.Mode.PRACTICE,
+                Instant.now().minus(Duration.ofDays(staleAfterDays)),
+                org.springframework.data.domain.PageRequest.of(0, batchSize));
+        stale.forEach(ut -> ut.setStatus(UserTest.Status.EXPIRED));
+        userTestRepository.saveAll(stale);
+        return stale.size();
     }
 
     @Transactional

@@ -78,16 +78,32 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     @Query(value = "DELETE FROM assessment.user_tests WHERE user_test_id IN (:ids)", nativeQuery = true)
     void hardDeleteByIdIn(@Param("ids") Collection<String> ids);
 
-    @Query("SELECT ut FROM UserTest ut WHERE ut.status = :status AND ut.mode <> :practiceMode "
+    // Lượt có giờ đã quá hạn thật (khớp AttemptTimeUtil.scheduledEnd): bắt đầu + thời lượng, hoặc giờ đóng đề,
+    // sớm hơn :closedBefore (= now - ân hạn). Cộng interval nên phải viết native.
+    @Query(value = "SELECT ut.* FROM assessment.user_tests ut "
+            + "JOIN assessment.tests t ON t.test_id = ut.test_id AND t.deleted_at IS NULL "
+            + "WHERE ut.deleted_at IS NULL AND ut.status = :status "
+            + "AND (ut.mode IS NULL OR ut.mode <> :practiceMode) "
+            + "AND ((t.duration_minutes > 0 "
+            + "AND ut.started_at + make_interval(mins => t.duration_minutes) < :closedBefore) "
+            + "OR t.available_to < :closedBefore) "
+            + "ORDER BY ut.started_at ASC LIMIT :limit",
+            nativeQuery = true)
+    List<UserTest> findOverdueTimedAttempts(@Param("status") String status,
+                                            @Param("practiceMode") String practiceMode,
+                                            @Param("closedBefore") java.time.Instant closedBefore,
+                                            @Param("limit") int limit);
+
+    // Lượt đề không giới hạn giờ (không thời lượng, không giờ đóng) đã trả lời dở rồi bỏ quá lâu.
+    @Query("SELECT ut FROM UserTest ut WHERE ut.status = :status AND ut.startedAt < :cutoff "
+            + "AND (ut.mode IS NULL OR ut.mode <> :practiceMode) "
             + "AND EXISTS (SELECT t FROM Test t WHERE t.testId = ut.testId "
-            + "AND ((t.durationMinutes IS NOT NULL AND t.durationMinutes > 0 AND ut.startedAt < :cutoff) "
-            + "OR (t.availableTo IS NOT NULL AND t.availableTo < :closedBefore))) "
+            + "AND (t.durationMinutes IS NULL OR t.durationMinutes = 0) AND t.availableTo IS NULL) "
             + "ORDER BY ut.startedAt ASC")
-    List<UserTest> findStaleTimedAttempts(@Param("status") UserTest.Status status,
-                                          @Param("practiceMode") UserTest.Mode practiceMode,
-                                          @Param("cutoff") java.time.Instant cutoff,
-                                          @Param("closedBefore") java.time.Instant closedBefore,
-                                          org.springframework.data.domain.Pageable pageable);
+    List<UserTest> findStaleUntimedAttempts(@Param("status") UserTest.Status status,
+                                            @Param("practiceMode") UserTest.Mode practiceMode,
+                                            @Param("cutoff") java.time.Instant cutoff,
+                                            org.springframework.data.domain.Pageable pageable);
 
     List<UserTest> findByUserIdAndTestId(String userId, String testId);
     List<UserTest> findByUserIdAndTestIdOrderByStartedAtDesc(String userId, String testId);
@@ -220,11 +236,14 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
 
     long countByStatus(UserTest.Status status);
 
-    @Query("SELECT ut.startedAt, ut.totalScore, ut.status FROM UserTest ut WHERE ut.startedAt >= :from")
+    long countByStatusAndAutoSubmitted(UserTest.Status status, boolean autoSubmitted);
+
+    @Query("SELECT ut.startedAt, ut.totalScore, ut.status, ut.autoSubmitted FROM UserTest ut WHERE ut.startedAt >= :from")
     List<Object[]> findAttemptsSince(@Param("from") java.time.Instant from);
 
+    // Cột thứ 3 = số lượt người làm tự nộp (không tính lượt hệ thống nộp hộ khi quá hạn).
     @Query("SELECT ut.testId, COUNT(ut), "
-            + "SUM(CASE WHEN ut.status = :completed THEN 1 ELSE 0 END) "
+            + "SUM(CASE WHEN ut.status = :completed AND ut.autoSubmitted = false THEN 1 ELSE 0 END) "
             + "FROM UserTest ut, Test t "
             + "WHERE t.testId = ut.testId AND t.classId IS NULL "
             + "AND (ut.mode IS NULL OR ut.mode = :fullMode) "

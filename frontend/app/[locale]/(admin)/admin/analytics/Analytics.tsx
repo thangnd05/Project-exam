@@ -70,8 +70,9 @@ const monthLabel = (t: AnalyticsT, month: string) => {
 };
 
 // Tên trạng thái do API trả về (tiếng Việt cố định) -> khoá dịch
-const STATUS_KEYS: Record<string, 'completed' | 'inProgress' | 'expired'> = {
+const STATUS_KEYS: Record<string, 'completed' | 'autoSubmitted' | 'inProgress' | 'expired'> = {
     'Hoàn thành': 'completed',
+    'Tự nộp khi hết giờ': 'autoSubmitted',
     'Đang làm': 'inProgress',
     'Hết hạn': 'expired',
 };

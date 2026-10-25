@@ -49,6 +49,10 @@ public class UserTest {
     @Column(length = 20)
     private Mode mode = Mode.FULL_TEST;
 
+    // Hệ thống nộp hộ khi quá hạn, người làm không tự bấm nộp.
+    @Column(name = "auto_submitted", nullable = false)
+    private boolean autoSubmitted = false;
+
     @Column(name = "practice_part_ids", length = 500)
     private String practicePartIds;
 

@@ -303,9 +303,10 @@ public class TestPaperQueryService {
 
             if (!Instant.now().isBefore(endTime)) {
                 try {
-                    userTestService.submitTest(latest.getUserTestId(), latest.getUserId());
+                    userTestService.submitTimedOut(latest);
                 } catch (Exception e) {
                     latest.setStatus(UserTest.Status.COMPLETED);
+                    latest.setAutoSubmitted(true);
                     latest.setFinishedAt(endTime);
                     userTestRepository.save(latest);
                 }

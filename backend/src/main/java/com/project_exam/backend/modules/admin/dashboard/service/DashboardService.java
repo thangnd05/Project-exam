@@ -182,9 +182,11 @@ public class DashboardService {
             LocalDateTime startedAt = AppTime.local((Instant) row[0]);
             if (startedAt.getYear() != year) continue;
             UserTest.Status status = (UserTest.Status) row[2];
+            boolean autoSubmitted = Boolean.TRUE.equals(row[3]);
             long[] b = buckets[startedAt.getMonthValue() - 1];
             b[0]++;
-            if (status == UserTest.Status.COMPLETED) b[1]++;
+            // Lượt hệ thống nộp hộ khi quá hạn không tính là hoàn thành.
+            if (status == UserTest.Status.COMPLETED && !autoSubmitted) b[1]++;
         }
 
         long[] newUsers = new long[12];
@@ -227,7 +229,10 @@ public class DashboardService {
 
     private List<NameValue> buildStatusDistribution() {
         List<NameValue> result = new ArrayList<>();
-        result.add(new NameValue("Hoàn thành", userTestRepository.countByStatus(UserTest.Status.COMPLETED)));
+        result.add(new NameValue("Hoàn thành",
+                userTestRepository.countByStatusAndAutoSubmitted(UserTest.Status.COMPLETED, false)));
+        result.add(new NameValue("Tự nộp khi hết giờ",
+                userTestRepository.countByStatusAndAutoSubmitted(UserTest.Status.COMPLETED, true)));
         result.add(new NameValue("Đang làm", userTestRepository.countByStatus(UserTest.Status.IN_PROGRESS)));
         result.add(new NameValue("Hết hạn", userTestRepository.countByStatus(UserTest.Status.EXPIRED)));
         return result;
