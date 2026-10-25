@@ -2,8 +2,7 @@
 
 import { Fragment, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Container } from 'react-bootstrap';
-import { IoGridOutline } from 'react-icons/io5';
+import { IoArrowBack, IoArrowForward } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 
@@ -30,7 +29,7 @@ import zoneStyles from '@/app/features/exam-layout/examLayout.module.scss';
 const cx = classNames.bind(pageStyles);
 const zx = classNames.bind(zoneStyles);
 
-function buildThemeStyle(theme: LayoutTheme = {}): React.CSSProperties {
+function buildThemeStyle(theme: LayoutTheme = {}, contentMaxWidth?: number | null): React.CSSProperties {
   const style: Record<string, string> = {};
   if (theme.primary) {
     style['--primary'] = theme.primary;
@@ -38,12 +37,15 @@ function buildThemeStyle(theme: LayoutTheme = {}): React.CSSProperties {
   }
   if (theme.font) style['--font-family'] = theme.font;
   if (theme.radius != null) style['--exam-radius'] = `${theme.radius}px`;
+  if (contentMaxWidth) style['--exam-content-width'] = `${contentMaxWidth}px`;
   return style as React.CSSProperties;
 }
 
 type ExamLayoutRendererProps = {
   config: LayoutConfig;
   isPractice?: boolean;
+  title?: string;
+  onExit?: () => void;
   visibleParts: ExamPart[];
   questionIndexMap: QuestionIndexMap;
   userAnswers: ExamUserAnswers;
@@ -70,9 +72,13 @@ type ExamLayoutRendererProps = {
   canNavigateToQuestion?: (questionId: string) => boolean;
 };
 
+// Khung phòng thi theo mẫu: thanh đầu (tên đề + vùng TRÊN), cột bên (vùng TRÁI/PHẢI), cột làm bài ở giữa
+// gồm thanh câu hiện tại, nội dung câu và thanh chân (Câu trước/Câu tiếp + vùng DƯỚI).
 function ExamLayoutRenderer({
   config,
   isPractice,
+  title,
+  onExit,
   visibleParts,
   questionIndexMap,
   userAnswers,
@@ -104,23 +110,24 @@ function ExamLayoutRenderer({
   const answered = Object.keys(userAnswers).length;
   const total = allQuestions.length;
 
+  const currentStep = isPaged ? flowSteps[currentStepIndex] : undefined;
   const currentStepQuestionIds = isPaged
-    ? new Set((flowSteps[currentStepIndex]?.questions || []).map((q) => q.questionId))
+    ? new Set((currentStep?.questions || []).map((q) => q.questionId))
     : null;
 
+  const visibleBlocks = (config.blocks || []).filter((b) => b.visible !== false);
+
   // Danh sách câu dạng cột bên đã hiện "đã làm / tổng" ở đầu thẻ, nên khối Tiến độ khi đó bị trùng -> ẩn đi.
-  const hasSideNav = (config.blocks || []).some(
+  const hasSideNav = visibleBlocks.some(
     (b) =>
-      b.visible !== false &&
-      b.type === BLOCK_TYPES.QUESTION_NAV &&
-      (b.zone === ZONES.LEFT || b.zone === ZONES.RIGHT),
+      b.type === BLOCK_TYPES.QUESTION_NAV && (b.zone === ZONES.LEFT || b.zone === ZONES.RIGHT),
   );
+  const hasSubmitBlock = visibleBlocks.some((b) => b.type === BLOCK_TYPES.SUBMIT);
 
   const byZone = (zone: string) =>
-    (config.blocks || [])
+    visibleBlocks
       .filter(
         (b) =>
-          b.visible !== false &&
           b.type !== BLOCK_TYPES.QUESTION_AREA &&
           !(hasSideNav && b.type === BLOCK_TYPES.PROGRESS) &&
           b.zone === zone,
@@ -166,7 +173,7 @@ function ExamLayoutRenderer({
       case BLOCK_TYPES.BANNER:
         return <BannerBlock url={block.props?.url} showPlaceholder={interactive} />;
       case BLOCK_TYPES.QUESTION_NAV:
-        if (zone === ZONES.BOTTOM) {
+        if (zone !== ZONES.LEFT && zone !== ZONES.RIGHT) {
           return (
             <QuestionNavBlock
               open={showInfoPanel}
@@ -178,45 +185,27 @@ function ExamLayoutRenderer({
         }
 
         return (
-          <div className={zx('sideNavInline')}>
-            <TestStartDashboard
-              allQuestions={allQuestions}
-              userAnswers={userAnswers}
-              onScrollToQuestion={navigateToQuestion}
-              columns={block.props?.navColumns ?? 5}
-              {...dashboardPagingProps}
-            />
-          </div>
+          <TestStartDashboard
+            allQuestions={allQuestions}
+            userAnswers={userAnswers}
+            onScrollToQuestion={navigateToQuestion}
+            columns={block.props?.navColumns ?? 5}
+            fill
+            {...dashboardPagingProps}
+          />
         );
       default:
         return null;
     }
   };
 
-  const blockWrapStyle = (block: LayoutBlock, zone: string) => {
-    const style: React.CSSProperties = {};
-    const spacing = block.props?.spacing;
-    if (spacing !== undefined && spacing !== null && spacing !== '') {
-      style.padding = `${spacing}px`;
-    }
-    const align = block.align;
-    if (zone === ZONES.LEFT || zone === ZONES.RIGHT) {
-      style.alignSelf =
-        align === 'center' ? 'center' : align === 'end' || align === 'bottom' ? 'flex-end' : 'flex-start';
-    } else if (zone === ZONES.TOP) {
-      if (align === 'center') {
-        style.marginLeft = 'auto';
-        style.marginRight = 'auto';
-      } else if (align === 'right' || align === 'end') {
-        style.marginLeft = 'auto';
-      }
-    }
-    return style;
-  };
-
   const wrap = (block: LayoutBlock, node: React.ReactNode, zone: string) => {
-    const posStyle = blockWrapStyle(block, zone);
-    if (!interactive && Object.keys(posStyle).length === 0) {
+    const spacing = block.props?.spacing;
+    const posStyle: React.CSSProperties =
+      spacing !== undefined && spacing !== null && spacing !== '' ? { padding: `${spacing}px` } : {};
+    const isSideNav =
+      block.type === BLOCK_TYPES.QUESTION_NAV && (zone === ZONES.LEFT || zone === ZONES.RIGHT);
+    if (!interactive && Object.keys(posStyle).length === 0 && !isSideNav) {
       return <Fragment key={block.id}>{node}</Fragment>;
     }
     const selected = selectedId === block.id;
@@ -225,12 +214,13 @@ function ExamLayoutRenderer({
           cursor: 'pointer',
           borderRadius: 8,
           outline: selected ? '2px solid var(--primary)' : '2px solid transparent',
-          outlineOffset: 2,
+          outlineOffset: -2,
         }
       : {};
     return (
       <div
         key={block.id}
+        className={cx({ 'side-nav-slot': isSideNav })}
         role={interactive ? 'button' : undefined}
         tabIndex={interactive ? 0 : undefined}
         onClick={
@@ -248,13 +238,21 @@ function ExamLayoutRenderer({
     );
   };
 
-  const isPill = (b: LayoutBlock) => b.type === BLOCK_TYPES.TIMER || b.type === BLOCK_TYPES.PROGRESS;
-  const footerGroupOf = (b: LayoutBlock) => {
-    const a = b.align || 'right';
-    if (a === 'left') return 'left';
+  const renderBlocks = (blocks: LayoutBlock[], zone: string) =>
+    blocks.map((b) => wrap(b, renderBlockNode(b, zone), zone));
+
+  // Vùng ngang (TRÊN/DƯỚI) chia 3 nhóm theo căn lề trái/giữa/phải.
+  const horizontalGroupOf = (b: LayoutBlock, fallback: string) => {
+    const a = b.align || fallback;
+    if (a === 'left' || a === 'start') return 'left';
     if (a === 'center') return 'center';
     return 'right';
   };
+  const splitHorizontal = (blocks: LayoutBlock[], fallback: string) => ({
+    left: blocks.filter((b) => horizontalGroupOf(b, fallback) === 'left'),
+    center: blocks.filter((b) => horizontalGroupOf(b, fallback) === 'center'),
+    right: blocks.filter((b) => horizontalGroupOf(b, fallback) === 'right'),
+  });
 
   const topBlocks = byZone(ZONES.TOP);
   const leftBlocks = byZone(ZONES.LEFT);
@@ -262,11 +260,18 @@ function ExamLayoutRenderer({
   const bottomBlocks = byZone(ZONES.BOTTOM);
   const floatBlocks = byZone(ZONES.FLOAT);
 
-  const hasNav = (config.blocks || []).some(
-    (b) => b.visible !== false && b.type === BLOCK_TYPES.QUESTION_NAV,
-  );
-  const isNavOnly = (blocks: LayoutBlock[]) =>
-    blocks.length > 0 && blocks.every((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
+  const hasNav = visibleBlocks.some((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
+  const isNav = (b: LayoutBlock) => b.type === BLOCK_TYPES.QUESTION_NAV;
+  // Màn nhỏ: cột bên chứa danh sách câu được thu vào bảng trượt "Câu hỏi"; các khối đi kèm trong cột
+  // (vd. nút nộp bài) nằm dưới danh sách trong bảng đó.
+  const sideBlocksWithNav = [leftBlocks, rightBlocks].filter((blocks) => blocks.some(isNav));
+  const sheetExtras = sideBlocksWithNav.flat().filter((b) => !isNav(b));
+
+  // Bước hiện tại chỉ có một câu: số câu chuyển lên thanh câu hiện tại như mẫu.
+  const singleQuestion = currentStep?.questions.length === 1 ? currentStep.questions[0] : null;
+  const stepNumbers = (currentStep?.questions || [])
+    .map((q) => questionIndexMap[q.questionId])
+    .filter((n): n is number => typeof n === 'number');
 
   const questionArea = (
     <QuestionAreaBlock
@@ -281,70 +286,155 @@ function ExamLayoutRenderer({
       isPaged={isPaged}
       flowSteps={flowSteps}
       currentStepIndex={currentStepIndex}
-      canGoPrev={canGoPrev}
       goNext={goNext}
-      goPrev={goPrev}
+      headInToolbar={Boolean(singleQuestion)}
     />
   );
-  const renderFooterGroup = (blocks: LayoutBlock[]) => {
-    const navs = blocks.filter((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
-    const pills = blocks.filter(isPill);
-    const others = blocks.filter((b) => !isPill(b) && b.type !== BLOCK_TYPES.QUESTION_NAV);
+
+  const mobileNavTrigger =
+    hasNav && !preview ? (
+      <button
+        type="button"
+        className={cx('mobile-nav-trigger')}
+        onClick={() => setShowInfoPanel((v) => !v)}
+        aria-expanded={showInfoPanel}
+        aria-label={t('showQuestionList')}
+        title={t('questionList')}
+      >
+        <span>{t('questions')}</span>
+        <span className={cx('mobile-nav-count')}>
+          {answered}/{total}
+        </span>
+      </button>
+    ) : null;
+
+  const topGroups = splitHorizontal(topBlocks, 'left');
+  const header =
+    title || topBlocks.length > 0 || onExit ? (
+      <header className={cx('exam-header')}>
+        <div className={cx('exam-header-group')}>
+          {title && <span className={cx('exam-header-title')}>{title}</span>}
+          {renderBlocks(topGroups.left, ZONES.TOP)}
+        </div>
+        <div className={cx('exam-header-group', 'center')}>
+          {renderBlocks(topGroups.center, ZONES.TOP)}
+        </div>
+        <div className={cx('exam-header-group', 'right')}>
+          {renderBlocks(topGroups.right, ZONES.TOP)}
+          {onExit && (
+            <button type="button" className={cx('exam-header-exit')} onClick={onExit}>
+              {t('exit')}
+            </button>
+          )}
+        </div>
+      </header>
+    ) : null;
+
+  // Cột bên: danh sách câu chiếm phần giữa; khối căn "Dưới" ghim ở chân cột, các khối khác nằm trên.
+  const renderSide = (blocks: LayoutBlock[], zone: string) => {
+    if (blocks.length === 0) return null;
+    const footerBlocks = blocks.filter(
+      (b) => b.type !== BLOCK_TYPES.QUESTION_NAV && (b.align === 'end' || b.align === 'bottom'),
+    );
+    const mainBlocks = blocks.filter((b) => !footerBlocks.includes(b));
+    const navIndex = mainBlocks.findIndex((b) => b.type === BLOCK_TYPES.QUESTION_NAV);
+    const before = navIndex < 0 ? mainBlocks : mainBlocks.slice(0, navIndex);
+    const nav = navIndex < 0 ? [] : [mainBlocks[navIndex]];
+    const after = navIndex < 0 ? [] : mainBlocks.slice(navIndex + 1);
     return (
-      <>
-        {navs.map((b) => wrap(b, renderBlockNode(b, ZONES.BOTTOM), ZONES.BOTTOM))}
-        {pills.length > 0 && (
-          <div className={cx('footer-pills')}>
-            {pills.map((b) => wrap(b, renderBlockNode(b, ZONES.BOTTOM), ZONES.BOTTOM))}
-          </div>
+      <aside
+        className={cx(zone === ZONES.LEFT ? 'exam-side-left' : 'exam-side-right', 'exam-side', {
+          'hidden-on-mobile': blocks.some(isNav),
+        })}
+      >
+        {before.length > 0 && <div className={cx('exam-side-section')}>{renderBlocks(before, zone)}</div>}
+        {nav.length > 0 ? (
+          renderBlocks(nav, zone)
+        ) : (
+          <div className={cx('exam-side-spacer')} />
         )}
-        {others.map((b) => wrap(b, renderBlockNode(b, ZONES.BOTTOM), ZONES.BOTTOM))}
-      </>
+        {after.length > 0 && <div className={cx('exam-side-section')}>{renderBlocks(after, zone)}</div>}
+        {footerBlocks.length > 0 && (
+          <div className={cx('exam-side-footer')}>{renderBlocks(footerBlocks, zone)}</div>
+        )}
+      </aside>
     );
   };
-  const footerLeft = bottomBlocks.filter((b) => footerGroupOf(b) === 'left');
-  const footerCenter = bottomBlocks.filter((b) => footerGroupOf(b) === 'center');
-  const footerRight = bottomBlocks.filter((b) => footerGroupOf(b) === 'right');
 
-  const footer =
-    bottomBlocks.length === 0 ? null : (
-      <div className={cx('footer-actions')} style={{ position: 'static' }}>
-        <div className={cx('footer-buttons')}>
-          <Container className={cx('footer-buttons-inner')}>
-            <div className={zx('footerGroup')}>{renderFooterGroup(footerLeft)}</div>
-            <div className={zx('footerGroup')}>{renderFooterGroup(footerCenter)}</div>
-            <div className={cx('footer-right-group')}>{renderFooterGroup(footerRight)}</div>
-          </Container>
-        </div>
+  const toolbar = isPaged && currentStep && (
+    <div className={cx('exam-toolbar')}>
+      <div className={cx('exam-toolbar-info')}>
+        {stepNumbers.length > 0 && (
+          <span className={cx('exam-toolbar-number')}>
+            {t.rich('questionOf', {
+              number:
+                stepNumbers.length > 1
+                  ? `${Math.min(...stepNumbers)}–${Math.max(...stepNumbers)}`
+                  : String(stepNumbers[0]),
+              total,
+              b: (chunks) => <b>{chunks}</b>,
+            })}
+          </span>
+        )}
       </div>
-    );
+      <div className={cx('exam-toolbar-actions')}>{mobileNavTrigger}</div>
+    </div>
+  );
+
+  const gated = Boolean(currentStep?.audioGated);
+  const isLastStep = currentStepIndex >= flowSteps.length - 1;
+  const showStepNav = isPaged && !gated && flowSteps.length > 1;
+  const bottomGroups = splitHorizontal(bottomBlocks, 'right');
+  const hasBottomBar = showStepNav || bottomBlocks.length > 0;
+
+  const bottomBar = hasBottomBar ? (
+    <div className={cx('exam-bottom')}>
+      <div className={cx('exam-bottom-group')}>
+        {showStepNav && (
+          <button
+            type="button"
+            className={cx('step-btn', 'step-btn-prev')}
+            onClick={goPrev}
+            disabled={!canGoPrev}
+          >
+            <IoArrowBack aria-hidden />
+            {t('prev')}
+          </button>
+        )}
+        {renderBlocks(bottomGroups.left, ZONES.BOTTOM)}
+      </div>
+      <div className={cx('exam-bottom-group', 'center')}>
+        {renderBlocks(bottomGroups.center, ZONES.BOTTOM)}
+      </div>
+      <div className={cx('exam-bottom-group', 'right')}>
+        {renderBlocks(bottomGroups.right, ZONES.BOTTOM)}
+        {showStepNav && !isLastStep && (
+          <button type="button" className={cx('step-btn', 'step-btn-next')} onClick={goNext}>
+            {t('next')}
+            <IoArrowForward aria-hidden />
+          </button>
+        )}
+        {/* Câu cuối mà bố cục không có nút nộp bài: nút "Câu tiếp" thành "Nộp bài" như mẫu. */}
+        {showStepNav && isLastStep && !hasSubmitBlock && handleSubmit && (
+          <button
+            type="button"
+            className={cx('step-btn', 'step-btn-next')}
+            onClick={preview ? undefined : handleSubmit}
+            disabled={isSubmitting}
+          >
+            {t('submit')}
+          </button>
+        )}
+      </div>
+    </div>
+  ) : null;
 
   const floatStack =
     floatBlocks.length === 0 ? null : (
       <div className={zx('zoneFloat', { previewFloat: preview })}>
-        {floatBlocks.map((b) => wrap(b, renderBlockNode(b, ZONES.FLOAT), ZONES.FLOAT))}
+        {renderBlocks(floatBlocks, ZONES.FLOAT)}
       </div>
     );
-
-  const mobileNavTrigger =
-    hasNav && !preview ? (
-      <div className={cx('mobile-nav-bar')}>
-        <button
-          type="button"
-          className={cx('mobile-nav-trigger')}
-          onClick={() => setShowInfoPanel((v) => !v)}
-          aria-expanded={showInfoPanel}
-          aria-label={t('showQuestionList')}
-          title={t('questionList')}
-        >
-          <IoGridOutline size={18} aria-hidden="true" />
-          <span>{t('questions')}</span>
-          <span className={cx('mobile-nav-count')}>
-            {answered}/{total}
-          </span>
-        </button>
-      </div>
-    ) : null;
 
   const mobileNavSheet =
     hasNav && !preview && showInfoPanel ? (
@@ -368,57 +458,46 @@ function ExamLayoutRenderer({
             }}
             {...dashboardPagingProps}
           />
+          {sheetExtras.length > 0 && (
+            <div
+              className={cx('exam-side', 'mobile-nav-extras')}
+              // Bấm nút (vd. nộp bài) thì đóng bảng trượt để hộp xác nhận không bị che.
+              onClick={(e) => {
+                if ((e.target as HTMLElement).closest('button')) setShowInfoPanel(false);
+              }}
+            >
+              {sheetExtras.map((b) => (
+                <Fragment key={b.id}>{renderBlockNode(b, b.zone)}</Fragment>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     ) : null;
 
-  const wrapperStyle: React.CSSProperties = preview
-    ? { ...buildThemeStyle(config.theme), position: 'relative' }
-    : {
-        ...buildThemeStyle(config.theme),
-        display: 'flex',
-        flexDirection: 'column',
-        flex: 1,
-        minHeight: 0,
-        overflow: 'hidden',
-        marginTop: 0,
-        paddingBottom: 0,
-      };
-
   return (
-    <div className={cx('wrapper')} style={wrapperStyle}>
-      {topBlocks.length > 0 && (
-        <div className={zx('zoneTop')}>
-          {topBlocks.map((b) => wrap(b, renderBlockNode(b, ZONES.TOP), ZONES.TOP))}
-        </div>
-      )}
+    <div
+      className={cx('exam-shell', { 'exam-shell-preview': preview })}
+      style={buildThemeStyle(config.theme, config.questionArea?.maxWidth)}
+    >
+      {header}
 
-      <div
-        className={zx('scrollBody')}
-        style={preview ? { flex: 'none', overflow: 'visible' } : undefined}
-      >
-        <div className={zx('innerRow')}>
-          {leftBlocks.length > 0 && (
-            <aside className={zx('zoneLeft', { hiddenOnMobile: isNavOnly(leftBlocks) })}>
-              {leftBlocks.map((b) => wrap(b, renderBlockNode(b, ZONES.LEFT), ZONES.LEFT))}
-            </aside>
-          )}
-          <div
-            className={zx('centerScroll', { pagedFit: isPaged })}
-            style={preview ? { overflowY: 'visible' } : undefined}
-          >
-            {mobileNavTrigger}
+      <div className={cx('exam-body')}>
+        {renderSide(leftBlocks, ZONES.LEFT)}
+
+        <section className={cx('exam-main')}>
+          {toolbar}
+          <div className={cx('exam-scroll', { 'paged-fit-scroll': isPaged })}>
+            {!isPaged && mobileNavTrigger && (
+              <div className={cx('mobile-nav-bar')}>{mobileNavTrigger}</div>
+            )}
             {questionArea}
           </div>
-          {rightBlocks.length > 0 && (
-            <aside className={zx('zoneRight', { hiddenOnMobile: isNavOnly(rightBlocks) })}>
-              {rightBlocks.map((b) => wrap(b, renderBlockNode(b, ZONES.RIGHT), ZONES.RIGHT))}
-            </aside>
-          )}
-        </div>
-      </div>
+          {bottomBar}
+        </section>
 
-      {footer}
+        {renderSide(rightBlocks, ZONES.RIGHT)}
+      </div>
 
       {preview
         ? floatStack

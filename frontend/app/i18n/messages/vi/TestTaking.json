@@ -17,7 +17,7 @@
     "ariaFlagged": ", đã đánh dấu",
     "ariaLocked": ", đang khoá",
     "legendAnswered": "Đã làm: <b>{count}</b>",
-    "legendUnanswered": "Chưa làm: <b>{count}</b>",
+    "legendUnanswered": "Chưa: <b>{count}</b>",
     "legendFlagged": "Đánh dấu: <b>{count}</b>"
   },
   "evaluation": {
@@ -66,7 +66,15 @@
     "readingMaterial": "Đọc tài liệu",
     "materialAudio": "Tài liệu / audio",
     "loadingQuestions": "Đang tải câu hỏi…",
-    "practiceTitle": "Luyện theo phần"
+    "practiceTitle": "Luyện theo phần",
+    "timeLabel": "Thời gian làm bài:",
+    "progressLabel": "Đã làm:",
+    "exit": "Thoát",
+    "questionOf": "Câu hỏi <b>{number}</b> / {total}",
+    "instructionSingle": "Chọn 1 đáp án đúng.",
+    "instructionMulti": "Chọn tất cả đáp án đúng.",
+    "instructionFill": "Điền câu trả lời vào ô trống.",
+    "instructionEssay": "Viết câu trả lời của bạn."
   },
   "guestSave": {
     "loginFlash": "Đăng nhập để lưu kết quả và xây lộ trình cá nhân hóa.",
@@ -264,6 +272,12 @@
       "unanswered": "Bạn còn <strong>{unanswered}/{total} câu</strong> chưa trả lời. Nộp rồi thì không sửa được nữa.",
       "allAnswered": "Bạn đã trả lời hết {total} câu. Nộp rồi thì không sửa được nữa.",
       "flagged": "Còn <strong>{count} câu</strong> bạn đã đánh dấu để xem lại."
+    },
+    "confirmExit": {
+      "title": "Thoát phòng thi?",
+      "message": "Câu trả lời đã được lưu, bạn có thể quay lại làm tiếp. Đồng hồ vẫn tiếp tục chạy trong lúc bạn rời đi.",
+      "confirm": "Thoát",
+      "cancel": "Làm tiếp"
     },
     "loading": "Đang tải đề thi...",
     "back": "Quay lại",

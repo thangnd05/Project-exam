@@ -2,12 +2,11 @@
 
 import { useLayoutEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
-import { IoArrowBack, IoArrowForward, IoFlag, IoFlagOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
-import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import FlagButton from '@/app/features/exam-layout/blocks/FlagButton';
 import GatedAudioPlayer from '@/app/features/exam-layout/blocks/GatedAudioPlayer';
 import { MediaType, PassageType, QuestionType } from '@/app/enums';
 import type { AnswerResponse, PassageMediaResponse } from '@/app/types';
@@ -54,9 +53,9 @@ type QuestionAreaBlockProps = {
   isPaged?: boolean;
   flowSteps?: ExamFlowStep[];
   currentStepIndex?: number;
-  canGoPrev?: boolean;
   goNext?: () => void;
-  goPrev?: () => void;
+  // Số câu đã hiện trên thanh câu hiện tại của khung phòng thi -> thẻ câu không lặp lại.
+  headInToolbar?: boolean;
 };
 
 function QuestionAreaBlock({
@@ -72,9 +71,8 @@ function QuestionAreaBlock({
   isPaged = false,
   flowSteps = [],
   currentStepIndex = 0,
-  canGoPrev = false,
   goNext,
-  goPrev,
+  headInToolbar = false,
 }: QuestionAreaBlockProps) {
   const t = useTranslations('TestTaking.examLayout');
 
@@ -188,28 +186,41 @@ function QuestionAreaBlock({
   const isLabelOnly = (q: ExamQuestion) =>
     (q.answers?.length ?? 0) > 0 && q.answers!.every((a) => !a.answerText?.trim());
 
+  const instructionOf = (q: ExamQuestion) => {
+    switch (q.questionType) {
+      case QuestionType.MCQ:
+        return t('instructionSingle');
+      case QuestionType.MSQ:
+        return t('instructionMulti');
+      case QuestionType.FILL_BLANK:
+        return t('instructionFill');
+      case QuestionType.ESSAY:
+        return t('instructionEssay');
+      default:
+        return null;
+    }
+  };
+
   const renderQuestionOnly = (q: ExamQuestion, absoluteIndex: number) => {
     const flagged = flaggedQuestionIds?.includes(q.questionId) ?? false;
+    const instruction = instructionOf(q);
     return (
       <div key={q.questionId} id={`q-${q.questionId}`} className={cx('question-card')}>
-        <div className={cx('q-head')}>
-          <span className={cx('q-text')}>
-            <span className={cx('q-number')}>{t('questionNumber', { number: absoluteIndex })}</span>
-            {q.questionText}
-          </span>
-          {onToggleFlag && (
-            <button
-              type="button"
-              className={cx('q-flag-btn', { active: flagged })}
-              onClick={() => onToggleFlag(q.questionId)}
-              aria-pressed={flagged}
-              title={flagged ? t('unflag') : t('flagForReview')}
-            >
-              {flagged ? <IoFlag size={16} /> : <IoFlagOutline size={16} />}
-              <span>{flagged ? t('flagged') : t('flag')}</span>
-            </button>
-          )}
-        </div>
+        {(!headInToolbar || instruction || onToggleFlag) && (
+          <div className={cx('q-head')}>
+            {!headInToolbar && (
+              <span className={cx('q-number')}>{t('questionNumber', { number: absoluteIndex })}</span>
+            )}
+            {instruction && <span className={cx('q-instruction')}>{instruction}</span>}
+            {onToggleFlag && (
+              <span className={cx('q-head-actions')}>
+                <FlagButton flagged={flagged} onToggle={() => onToggleFlag(q.questionId)} />
+              </span>
+            )}
+          </div>
+        )}
+
+        <div className={cx('q-text')}>{q.questionText}</div>
 
         {q.questionType === QuestionType.MCQ && (
           <div className={cx('mcq-group', { 'label-only': isLabelOnly(q) })}>
@@ -314,8 +325,6 @@ function QuestionAreaBlock({
     const passage = step.passage;
     const audioUrls = step.audioGated ? getAudioUrls(passage) : [];
     const gated = step.audioGated && audioUrls.length > 0;
-    const isLast = currentStepIndex >= flowSteps.length - 1;
-    const showManualNext = !gated && !isLast;
 
     const passageText = String(passage?.content ?? '').trim();
     const hasNonAudioMedia = mediaListOf(passage).some((m) => m?.mediaType !== MediaType.AUDIO);
@@ -351,25 +360,6 @@ function QuestionAreaBlock({
             </>
           )}
         </div>
-
-        {!gated && flowSteps.length > 1 && (
-          <div className={cx('paged-nav')}>
-            <div className={cx('paged-nav-left')}>
-              <ButtonPrime variant="outline" onClick={goPrev} disabled={!canGoPrev}>
-                <IoArrowBack aria-hidden />
-                {t('prev')}
-              </ButtonPrime>
-            </div>
-            <div className={cx('paged-nav-right')}>
-              {showManualNext && (
-                <ButtonPrime variant="primary" onClick={goNext}>
-                  {t('next')}
-                  <IoArrowForward aria-hidden />
-                </ButtonPrime>
-              )}
-            </div>
-          </div>
-        )}
       </div>
     );
   }

@@ -10,6 +10,7 @@ import type { TestRef } from '@/app/features/tests/testRef';
 import ExamLayoutRenderer from '@/app/features/exam-layout/ExamLayoutRenderer';
 import StreakRestoreModal from '@/app/features/gamification/streak/StreakRestoreModal';
 import BaseModal from '@/app/components/modal/BaseModal';
+import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import styles from '@/app/features/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);
@@ -21,6 +22,7 @@ function TestStart({ testRef }: { testRef: TestRef }) {
   const router = useRouter();
   const t = useTranslations('TestTaking.start');
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [exitOpen, setExitOpen] = useState(false);
   const {
     isPractice,
     status,
@@ -120,6 +122,8 @@ function TestStart({ testRef }: { testRef: TestRef }) {
       <ExamLayoutRenderer
         config={layoutConfig}
         isPractice={isPractice}
+        title={test?.title}
+        onExit={() => setExitOpen(true)}
         visibleParts={visibleParts}
         questionIndexMap={questionIndexMap}
         userAnswers={userAnswers}
@@ -183,6 +187,15 @@ function TestStart({ testRef }: { testRef: TestRef }) {
           )}
         </p>
       </BaseModal>
+      <ConfirmModal
+        show={exitOpen}
+        onClose={() => setExitOpen(false)}
+        onConfirm={() => router.back()}
+        title={t('confirmExit.title')}
+        message={t('confirmExit.message')}
+        confirmText={t('confirmExit.confirm')}
+        cancelText={t('confirmExit.cancel')}
+      />
     </>
   );
 }

@@ -17,7 +17,7 @@
     "ariaFlagged": ", flagged",
     "ariaLocked": ", locked",
     "legendAnswered": "Answered: <b>{count}</b>",
-    "legendUnanswered": "Unanswered: <b>{count}</b>",
+    "legendUnanswered": "Left: <b>{count}</b>",
     "legendFlagged": "Flagged: <b>{count}</b>"
   },
   "evaluation": {
@@ -66,7 +66,15 @@
     "readingMaterial": "Reading material",
     "materialAudio": "Material / audio",
     "loadingQuestions": "Loading questions…",
-    "practiceTitle": "Practice by section"
+    "practiceTitle": "Practice by section",
+    "timeLabel": "Time left:",
+    "progressLabel": "Answered:",
+    "exit": "Exit",
+    "questionOf": "Question <b>{number}</b> / {total}",
+    "instructionSingle": "Choose 1 correct answer.",
+    "instructionMulti": "Choose all correct answers.",
+    "instructionFill": "Type your answer in the blank.",
+    "instructionEssay": "Write your answer."
   },
   "guestSave": {
     "loginFlash": "Sign in to save your results and build a personalized study plan.",
@@ -264,6 +272,12 @@
       "unanswered": "You have <strong>{unanswered}/{total} questions</strong> unanswered. You can’t change your answers after submitting.",
       "allAnswered": "You’ve answered all {total, plural, one {# question} other {# questions}}. You can’t change your answers after submitting.",
       "flagged": "<strong>{count, plural, one {# question is} other {# questions are}}</strong> still flagged for review."
+    },
+    "confirmExit": {
+      "title": "Leave the exam room?",
+      "message": "Your answers are saved and you can come back to continue. The timer keeps running while you are away.",
+      "confirm": "Exit",
+      "cancel": "Keep working"
     },
     "loading": "Loading test...",
     "back": "Back",

@@ -23,6 +23,8 @@ type TestStartDashboardProps = {
   currentQuestionIds?: Set<string> | null;
   flaggedQuestionIds?: string[] | null;
   gridMaxHeight?: string | number | null;
+  // Nằm trong cột bên của phòng thi: bỏ khung thẻ, lấp đầy chiều cao cột, chỉ lưới ô câu cuộn.
+  fill?: boolean;
 };
 
 function TestStartDashboard({
@@ -35,6 +37,7 @@ function TestStartDashboard({
   currentQuestionIds = null,
   flaggedQuestionIds = null,
   gridMaxHeight = null,
+  fill = false,
 }: TestStartDashboardProps) {
   const t = useTranslations('TestTaking.dashboard');
   const flaggedSet = new Set(flaggedQuestionIds ?? []);
@@ -57,7 +60,7 @@ function TestStartDashboard({
         }
       : undefined;
   return (
-    <div className={cx('dashboard')}>
+    <div className={cx('dashboard', { 'dashboard-fill': fill })}>
       <div className={cx('dashboard-card')}>
         <div className={cx('dashboard-top')}>
           <div className={cx('dashboard-header')}>
