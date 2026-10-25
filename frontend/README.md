@@ -1,4 +1,4 @@
-# english_exam_fe
+# FrostScope - Frontend
 
 Next.js 16 (App Router) + React 19, TypeScript, pnpm. Cấu trúc thư mục: [ARCHITECTURE.md](ARCHITECTURE.md),
 bảng URL: [URL-MAP.md](URL-MAP.md).
