@@ -29,6 +29,7 @@ function ScaledPreview({ width, height, children }: ScaledPreviewProps) {
     <div ref={hostRef} style={{ width: '100%', height: height * scale, overflow: 'hidden' }}>
       <div
         style={{
+          position: 'relative',
           width,
           height,
           transform: `scale(${scale})`,

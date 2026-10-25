@@ -191,7 +191,7 @@
     "saveSuccess": "Test-taking layout saved for this exam type.",
     "saveFailed": "Save failed. Please try again.",
     "zonesSection": "Layout by zone",
-    "zonesHint": "Drag a block to another zone, or click it to open its settings right below. The small map next to each zone shows where it sits on screen.",
+    "zonesHint": "Drag a block to another zone here or drop it straight onto the preview, or use the ⇄ button to pick a zone. Click a block to open its settings right below.",
     "zoneEmpty": "Drop a block here",
     "show": "Show",
     "hide": "Hide",
@@ -286,7 +286,9 @@
       "cancel": "Stay"
     },
     "progressAutoHiddenShort": "Auto-hidden",
-    "progressAutoHidden": "Hidden automatically because the question list sits in a side column and already shows the answered count."
+    "progressAutoHidden": "Hidden automatically because the question list sits in a side column and already shows the answered count.",
+    "keyboardHint": "Keyboard: ↑/↓ pick a block · Enter opens settings · Alt+↑/↓ reorder · Alt+←/→ change zone.",
+    "moveToZone": "Move to zone"
   },
   "questionCollections": {
     "title": "Question collections",

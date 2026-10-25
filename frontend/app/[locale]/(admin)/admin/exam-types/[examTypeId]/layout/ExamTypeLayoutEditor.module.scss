@@ -335,7 +335,14 @@
   text-align: center;
 }
 
+.keyboardHint {
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.6rem;
+  background: var(--slate-50);
+}
+
 .blockItem {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -357,6 +364,11 @@
   &.selected {
     border-color: var(--primary);
     box-shadow: 0 0 0 1px var(--primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-text);
+    outline-offset: 2px;
   }
 
   &.hidden {
@@ -395,6 +407,97 @@
   }
 }
 
+// Menu "Chuyển vùng": đổi vùng không cần kéo (tiện cho touchpad, máy tính bảng).
+.moveMenuWrap {
+  position: relative;
+  display: flex;
+}
+
+.moveMenu {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: -0.4rem;
+  z-index: 20;
+  min-width: 24rem;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 0.8rem;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  cursor: default;
+}
+
+.moveMenuTitle {
+  padding: 0.4rem 0.6rem 0.6rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.moveMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--text-color);
+  font-size: 1.3rem;
+  text-align: left;
+  cursor: pointer;
+
+  svg {
+    flex: none;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: var(--slate-100);
+  }
+}
+
+// Lớp thả trên khung xem trước khi đang kéo yếu tố. Toạ độ theo màn hình giả lập nên chữ to để vẫn đọc
+// được sau khi khung bị thu nhỏ.
+.dropOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgb(15 23 42 / 0.25);
+}
+
+.dropArea {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 3px dashed rgb(255 255 255 / 0.85);
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.55);
+  color: var(--slate-800);
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+  transition:
+    background-color 0.12s,
+    border-color 0.12s;
+
+  span {
+    pointer-events: none;
+  }
+
+  &.active {
+    border-style: solid;
+    border-color: var(--primary-text);
+    background: rgb(var(--primary-rgb) / 0.35);
+    color: var(--slate-900);
+  }
+}
+
 .paletteRow {
   display: flex;
   flex-wrap: wrap;
@@ -415,10 +518,10 @@
   }
 }
 
-// Khung xem trước bám theo khi cuộn các cột chỉnh dài.
+// Khung xem trước bám theo khi cuộn các cột chỉnh dài, nằm dưới thanh trên cùng (dính) của trang admin.
 .previewWrap {
   position: sticky;
-  top: 1.6rem;
+  top: 8.4rem;
   border: 1px solid var(--border-color);
   border-radius: 1.2rem;
   background: var(--bg-body);

@@ -6,7 +6,7 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import { Spinner } from 'react-bootstrap';
-import { ArrowLeft, Eye, EyeOff, GripVertical, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowLeftRight, Eye, EyeOff, GripVertical, Trash2 } from 'lucide-react';
 import classNames from 'classnames/bind';
 
 import {useExamTypeById} from '@/app/features/exam-types/hooks/useExamTypes';
@@ -38,6 +38,17 @@ const FONT_OPTIONS = ['Inter', 'Roboto', 'Arial', 'Times New Roman', 'Georgia'];
 // Màn hình giả lập cho phần xem trước (cỡ laptop phổ biến).
 const PREVIEW_WIDTH = 1280;
 const PREVIEW_HEIGHT = 760;
+
+// Vị trí các vùng trên màn hình xem trước (toạ độ theo PREVIEW_WIDTH × PREVIEW_HEIGHT), dùng làm chỗ thả
+// khi kéo yếu tố từ cột trái sang. Khớp với khung phòng thi: thanh đầu 56px, cột bên 320px.
+const DROP_AREAS: Array<{ zone: string; left: number; top: number; width: number; height: number }> = [
+  { zone: ZONES.TOP, left: 0, top: 0, width: PREVIEW_WIDTH, height: 56 },
+  { zone: ZONES.LEFT, left: 0, top: 56, width: 320, height: PREVIEW_HEIGHT - 56 },
+  { zone: ZONES.RIGHT, left: PREVIEW_WIDTH - 320, top: 56, width: 320, height: PREVIEW_HEIGHT - 56 },
+  { zone: ZONES.TOOLBAR, left: 320, top: 56, width: PREVIEW_WIDTH - 640, height: 64 },
+  { zone: ZONES.BOTTOM, left: 320, top: PREVIEW_HEIGHT - 72, width: PREVIEW_WIDTH - 640, height: 72 },
+  { zone: ZONES.FLOAT, left: PREVIEW_WIDTH - 600, top: PREVIEW_HEIGHT - 232, width: 260, height: 140 },
+];
 
 const formatTime = (seconds: number | null | undefined) => {
   if (seconds === null || seconds === undefined) return '--:--';
@@ -119,7 +130,36 @@ function ExamTypeLayoutEditor() {
   const [previewStep, setPreviewStep] = useState(0);
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmLeave, setConfirmLeave] = useState(false);
+  // Yếu tố đang mở menu "Chuyển vùng".
+  const [moveMenuId, setMoveMenuId] = useState<string | null>(null);
+  // Sau khi đổi chỗ bằng bàn phím/menu, đưa focus về lại yếu tố vừa di chuyển (nó được dựng lại ở vị trí mới).
+  const pendingFocusRef = useRef<string | null>(null);
   const propertiesRef = useRef<HTMLDivElement | null>(null);
+  const zonesPanelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const id = pendingFocusRef.current;
+    if (!id) return;
+    pendingFocusRef.current = null;
+    zonesPanelRef.current?.querySelector<HTMLElement>(`[data-block-id="${id}"]`)?.focus();
+  });
+
+  // Menu chuyển vùng đóng khi bấm ra ngoài hoặc nhấn Esc.
+  useEffect(() => {
+    if (!moveMenuId) return;
+    const close = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('[data-move-menu]')) setMoveMenuId(null);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMoveMenuId(null);
+    };
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', close);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [moveMenuId]);
 
   // Chọn yếu tố từ khung xem trước thì cuộn danh sách vùng tới phần thuộc tính vừa mở.
   useEffect(() => {
@@ -171,7 +211,14 @@ function ExamTypeLayoutEditor() {
         const moving = blocks.find((b) => b.id === blockId);
         if (!moving) return blocks;
         const rest = blocks.filter((b) => b.id !== blockId);
-        const relocated = { ...moving, zone: targetZone };
+        // Căn lề của vùng ngang (trái/giữa/phải) và cột bên (trên/giữa/dưới) khác nhau: sang vùng mới mà giá trị
+        // cũ không hợp thì về mặc định của vùng đó.
+        const alignFits = alignOptionsFor(targetZone).some((o) => o.value === moving.align);
+        const relocated = {
+          ...moving,
+          zone: targetZone,
+          align: alignFits ? moving.align : alignDefaultFor(targetZone),
+        };
         if (targetBlockId && targetBlockId !== blockId) {
           const targetIndex = rest.findIndex((b) => b.id === targetBlockId);
           rest.splice(targetIndex < 0 ? rest.length : targetIndex, 0, relocated);
@@ -187,6 +234,26 @@ function ExamTypeLayoutEditor() {
         }
         rest.splice(insertAt, 0, relocated);
         return rest;
+      });
+    },
+    [updateBlocks],
+  );
+
+  // Đổi chỗ yếu tố với yếu tố liền trên/dưới trong cùng vùng (dir = -1 lên, 1 xuống).
+  const moveWithinZone = useCallback(
+    (blockId: string, dir: -1 | 1) => {
+      updateBlocks((blocks) => {
+        const moving = blocks.find((b) => b.id === blockId);
+        if (!moving) return blocks;
+        const zoneBlocks = blocks
+          .filter((b) => b.zone === moving.zone)
+          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        const i = zoneBlocks.findIndex((b) => b.id === blockId);
+        const j = i + dir;
+        if (j < 0 || j >= zoneBlocks.length) return blocks;
+        [zoneBlocks[i], zoneBlocks[j]] = [zoneBlocks[j], zoneBlocks[i]];
+        let k = 0;
+        return blocks.map((b) => (b.zone === moving.zone ? zoneBlocks[k++] : b));
       });
     },
     [updateBlocks],
@@ -271,6 +338,42 @@ function ExamTypeLayoutEditor() {
     if (dragId) moveBlock(dragId, targetBlock.zone, targetBlock.id);
     setDragId(null);
     setDropZone(null);
+  };
+
+  const moveToZone = (blockId: string, zone: string) => {
+    moveBlock(blockId, zone);
+    setMoveMenuId(null);
+    setSelectedId(blockId);
+    pendingFocusRef.current = blockId;
+  };
+
+  // Bàn phím trên một yếu tố: ↑/↓ chuyển giữa các yếu tố, Alt+↑/↓ đổi thứ tự trong vùng,
+  // Alt+←/→ chuyển sang vùng trước/sau, Enter mở/đóng phần chỉnh.
+  const handleItemKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, block: LayoutBlock) => {
+    if (e.target !== e.currentTarget) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      setSelectedId((id) => (id === block.id ? null : block.id));
+    } else if (e.key === 'Escape') {
+      setSelectedId(null);
+    } else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      const dir = e.key === 'ArrowUp' ? -1 : 1;
+      if (e.altKey) {
+        moveWithinZone(block.id, dir);
+        pendingFocusRef.current = block.id;
+        return;
+      }
+      const items = Array.from(
+        zonesPanelRef.current?.querySelectorAll<HTMLElement>('[data-block-id]') ?? [],
+      );
+      items[items.indexOf(e.currentTarget) + dir]?.focus();
+    } else if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+      e.preventDefault();
+      const zoneKeys = ZONE_META.map((z) => z.key);
+      const target = zoneKeys[zoneKeys.indexOf(block.zone) + (e.key === 'ArrowLeft' ? -1 : 1)];
+      if (target) moveToZone(block.id, target);
+    }
   };
 
   const blocksByZone = useMemo(() => {
@@ -484,10 +587,11 @@ function ExamTypeLayoutEditor() {
 
       <div className={cx('workspace')}>
 
-        <div className={cx('panel')}>
+        <div className={cx('panel')} ref={zonesPanelRef}>
           <div className={cx('section')}>
             <h3>{t('zonesSection')}</h3>
             <div className={cx('hint')}>{t('zonesHint')}</div>
+            <div className={cx('hint', 'keyboardHint')}>{t('keyboardHint')}</div>
             {ZONE_META.map((zone) => (
               <div
                 key={zone.key}
@@ -516,15 +620,29 @@ function ExamTypeLayoutEditor() {
                         hidden: block.visible === false || isAutoHidden(block),
                       })}
                       title={isAutoHidden(block) ? t('progressAutoHidden') : undefined}
+                      data-block-id={block.id}
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={selectedId === block.id}
+                      aria-keyshortcuts="Alt+ArrowUp Alt+ArrowDown Alt+ArrowLeft Alt+ArrowRight"
                       draggable
-                      onDragStart={() => setDragId(block.id)}
-                      onDragEnd={() => setDragId(null)}
+                      onDragStart={(e) => {
+                        e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/plain', block.id);
+                        setDragId(block.id);
+                        setMoveMenuId(null);
+                      }}
+                      onDragEnd={() => {
+                        setDragId(null);
+                        setDropZone(null);
+                      }}
                       onDragOver={(e) => e.preventDefault()}
                       onDrop={(e) => {
                         e.stopPropagation();
                         handleDropOnBlock(block);
                       }}
                       onClick={() => setSelectedId(block.id)}
+                      onKeyDown={(e) => handleItemKeyDown(e, block)}
                     >
                       <span className={cx('grip')}>
                         <GripVertical size={16} />
@@ -535,6 +653,39 @@ function ExamTypeLayoutEditor() {
                           <span className={cx('blockMeta')}>{t('progressAutoHiddenShort')}</span>
                         ) : (
                           align && <span className={cx('blockMeta')}>{align}</span>
+                        )}
+                      </span>
+                      <span className={cx('moveMenuWrap')} data-move-menu>
+                        <button
+                          type="button"
+                          className={cx('iconBtn')}
+                          title={t('moveToZone')}
+                          aria-label={t('moveToZone')}
+                          aria-haspopup="menu"
+                          aria-expanded={moveMenuId === block.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setMoveMenuId((id) => (id === block.id ? null : block.id));
+                          }}
+                        >
+                          <ArrowLeftRight size={16} />
+                        </button>
+                        {moveMenuId === block.id && (
+                          <div className={cx('moveMenu')} role="menu" onClick={(e) => e.stopPropagation()}>
+                            <div className={cx('moveMenuTitle')}>{t('moveToZone')}</div>
+                            {ZONE_META.filter((z) => z.key !== block.zone).map((z) => (
+                              <button
+                                key={z.key}
+                                type="button"
+                                role="menuitem"
+                                className={cx('moveMenuItem')}
+                                onClick={() => moveToZone(block.id, z.key)}
+                              >
+                                <ZoneGlyph zone={z.key} />
+                                {zoneLabel(z.key, z.label)}
+                              </button>
+                            ))}
+                          </div>
                         )}
                       </span>
                       <button
@@ -623,6 +774,33 @@ function ExamTypeLayoutEditor() {
                 }}
                 canNavigateToQuestion={() => true}
               />
+              {/* Đang kéo một yếu tố từ cột trái: các vùng trên khung xem trước thành chỗ thả. */}
+              {dragId && (
+                <div className={cx('dropOverlay')}>
+                  {DROP_AREAS.map((area) => (
+                    <div
+                      key={area.zone}
+                      className={cx('dropArea', { active: dropZone === area.zone })}
+                      style={{ left: area.left, top: area.top, width: area.width, height: area.height }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.dataTransfer.dropEffect = 'move';
+                        setDropZone(area.zone);
+                      }}
+                      onDragLeave={() => setDropZone((z) => (z === area.zone ? null : z))}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        const movedId = dragId;
+                        handleDropOnZone(area.zone);
+                        // Mở phần chỉnh của yếu tố vừa thả để thấy ngay nó đã sang vùng nào.
+                        setSelectedId(movedId);
+                      }}
+                    >
+                      <span>{zoneLabel(area.zone, area.zone)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </ScaledPreview>
           </div>
         </div>

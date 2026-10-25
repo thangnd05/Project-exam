@@ -191,7 +191,7 @@
     "saveSuccess": "Đã lưu giao diện làm bài cho loại đề này.",
     "saveFailed": "Lưu thất bại. Vui lòng thử lại.",
     "zonesSection": "Bố cục theo vùng",
-    "zonesHint": "Kéo yếu tố sang vùng khác, hoặc bấm vào yếu tố để mở phần chỉnh ngay bên dưới. Hình nhỏ cạnh tên vùng cho biết vùng nằm ở đâu trên màn hình.",
+    "zonesHint": "Kéo yếu tố sang vùng khác ở danh sách này hoặc thả thẳng lên khung xem trước, hay bấm nút ⇄ để chọn vùng. Bấm vào yếu tố để mở phần chỉnh ngay bên dưới.",
     "zoneEmpty": "Kéo yếu tố vào đây",
     "show": "Hiện",
     "hide": "Ẩn",
@@ -286,7 +286,9 @@
       "cancel": "Ở lại"
     },
     "progressAutoHiddenShort": "Tự ẩn",
-    "progressAutoHidden": "Đang tự ẩn vì danh sách câu hỏi nằm ở cột bên và đã hiện số câu đã làm."
+    "progressAutoHidden": "Đang tự ẩn vì danh sách câu hỏi nằm ở cột bên và đã hiện số câu đã làm.",
+    "keyboardHint": "Bàn phím: ↑/↓ chọn yếu tố · Enter mở phần chỉnh · Alt+↑/↓ đổi thứ tự · Alt+←/→ chuyển vùng.",
+    "moveToZone": "Chuyển sang vùng"
   },
   "questionCollections": {
     "title": "Quản lý bộ sưu tập câu hỏi",
