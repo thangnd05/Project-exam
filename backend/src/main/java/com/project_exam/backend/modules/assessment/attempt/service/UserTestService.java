@@ -326,7 +326,7 @@ public class UserTestService {
         int safeSize = size <= 0 ? 10 : Math.min(size, 100);
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "finishedAt"));
 
-        Specification<UserTest> spec = Specification.<UserTest>where(null)
+        Specification<UserTest> spec = Specification.<UserTest>unrestricted()
                 .and((root, q, cb) -> cb.equal(root.get("userId"), userId))
                 .and((root, q, cb) -> cb.equal(root.get("status"), UserTest.Status.COMPLETED))
 

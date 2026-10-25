@@ -1,7 +1,7 @@
 package com.project_exam.backend.infrastructure.cache;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
 import com.project_exam.backend.modules.assessment.attempt.dto.QuickLeaderboardResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamCategoryResponse;
 import com.project_exam.backend.modules.assessment.exam.dto.ExamPartResponse;
@@ -21,7 +21,7 @@ import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext.SerializationPair;
 
 import java.time.Duration;
@@ -94,7 +94,7 @@ public class CacheConfig implements CachingConfigurer {
             return defaults
                     .entryTtl(ttl)
                     .serializeValuesWith(SerializationPair.fromSerializer(
-                            new Jackson2JsonRedisSerializer<>(objectMapper, type)));
+                            new JacksonJsonRedisSerializer<>(objectMapper, type)));
         }
     }
 }

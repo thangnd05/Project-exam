@@ -1,7 +1,7 @@
 package com.project_exam.backend.modules.assessment.certificate.mapper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.project_exam.backend.modules.assessment.certificate.domain.CertificateTemplate;
 import com.project_exam.backend.modules.assessment.certificate.domain.UserCertificate;
 import com.project_exam.backend.modules.assessment.certificate.dto.CertificateDesign;
@@ -40,7 +40,7 @@ public class CertificateMapper {
     public String writeSnapshot(CertificateDesign design) {
         try {
             return objectMapper.writeValueAsString(design);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return "{}";
         }
     }
@@ -51,7 +51,7 @@ public class CertificateMapper {
         }
         try {
             return objectMapper.readValue(snapshot, CertificateDesign.class);
-        } catch (JsonProcessingException e) {
+        } catch (JacksonException e) {
             return CertificateDesign.builder().build();
         }
     }

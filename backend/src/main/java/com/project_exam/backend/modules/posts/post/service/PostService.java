@@ -248,7 +248,7 @@ public class PostService {
         int safeSize = size <= 0 ? 10 : Math.min(size, 100);
 
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Specification<Post> spec = Specification.where(null);
+        Specification<Post> spec = Specification.unrestricted();
 
         Post.PostStatus effectiveStatus = status;
         if (!authUtils.hasPermission(PermissionCatalog.POST_MODERATE)) {

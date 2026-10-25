@@ -1,11 +1,11 @@
 package com.project_exam.backend.modules.assessment.exam.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectReader;
+import tools.jackson.databind.exc.UnrecognizedPropertyException;
 import com.project_exam.backend.modules.assessment.exam.domain.Passage;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.dto.AnswerRequest;
@@ -57,9 +57,8 @@ public class QuestionJsonImportService {
     private final ObjectReader strictReader;
 
     public QuestionJsonImportService(ObjectMapper objectMapper) {
-        this.strictReader = objectMapper.copy()
-                .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-                .readerFor(QuestionJsonImportRequest.class);
+        this.strictReader = objectMapper.readerFor(QuestionJsonImportRequest.class)
+                .with(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     }
 
     public QuestionJsonImportRequest parse(MultipartFile file) throws IOException {
@@ -94,9 +93,9 @@ public class QuestionJsonImportService {
             throw new BadRequestException(
                     "Trường không hợp lệ '" + ex.getPropertyName() + "'" + atPath(ex)
                             + ". Các trường được phép: " + knownProperties(ex) + ".");
-        } catch (JsonMappingException ex) {
+        } catch (DatabindException ex) {
             throw new BadRequestException("Sai định dạng dữ liệu" + atPath(ex) + ": " + rootMessage(ex));
-        } catch (JsonProcessingException ex) {
+        } catch (JacksonException ex) {
             throw new BadRequestException("JSON không hợp lệ: " + rootMessage(ex));
         }
     }
@@ -445,10 +444,10 @@ public class QuestionJsonImportService {
                 .collect(Collectors.joining(", "));
     }
 
-    private String atPath(JsonMappingException ex) {
+    private String atPath(DatabindException ex) {
         String path = ex.getPath().stream()
-                .map(ref -> ref.getFieldName() != null
-                        ? "." + ref.getFieldName()
+                .map(ref -> ref.getPropertyName() != null
+                        ? "." + ref.getPropertyName()
                         : "[" + ref.getIndex() + "]")
                 .collect(Collectors.joining());
         if (path.startsWith(".")) {
@@ -457,7 +456,7 @@ public class QuestionJsonImportService {
         return path.isEmpty() ? "" : " tại '" + path + "'";
     }
 
-    private String rootMessage(JsonProcessingException ex) {
+    private String rootMessage(JacksonException ex) {
         String message = ex.getOriginalMessage();
         return message == null ? ex.getMessage() : message;
     }

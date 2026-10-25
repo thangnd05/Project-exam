@@ -104,7 +104,7 @@ public class AdminQuestionService {
             Boolean isBank,
             String keyword
     ) {
-        Specification<Question> spec = Specification.where(null);
+        Specification<Question> spec = Specification.unrestricted();
 
         if (partIdScope != null) {
             spec = spec.and((root, query, cb) -> root.get("examPartId").in(partIdScope));

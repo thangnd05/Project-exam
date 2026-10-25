@@ -1,9 +1,8 @@
 package com.project_exam.backend.infrastructure.security;
 
 import com.project_exam.backend.shared.exception.UnauthorizedException;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Encoders;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +31,7 @@ class JwtServiceTokenTypeTest {
     void setUp() {
         refreshTokenStore = mock(RefreshTokenStore.class);
         jwtService = new JwtService(refreshTokenStore);
-        String secret = Encoders.BASE64URL.encode(Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded());
+        String secret = Encoders.BASE64URL.encode(Jwts.SIG.HS256.key().build().getEncoded());
         ReflectionTestUtils.setField(jwtService, "secretKey", secret);
         ReflectionTestUtils.setField(jwtService, "jwtExpiration", 60_000L);
         ReflectionTestUtils.setField(jwtService, "jwtRefreshExpiration", 120_000L);

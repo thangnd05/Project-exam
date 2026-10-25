@@ -17,7 +17,7 @@ import com.project_exam.backend.modules.assessment.exam.service.QuestionJsonImpo
 import com.project_exam.backend.modules.assessment.exam.service.QuestionService;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.util.AuthUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

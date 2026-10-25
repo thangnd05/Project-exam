@@ -28,7 +28,7 @@ import com.project_exam.backend.modules.assessment.test.service.TestCommandServi
 import com.project_exam.backend.modules.assessment.test.service.TestSlugService;
 import com.project_exam.backend.shared.util.AuthUtils;
 import com.project_exam.backend.shared.util.ClassAccessGuard;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.modules.assessment.exam.dto.QuestionJsonImportRequest;
 import com.project_exam.backend.modules.assessment.exam.service.QuestionJsonImportService;

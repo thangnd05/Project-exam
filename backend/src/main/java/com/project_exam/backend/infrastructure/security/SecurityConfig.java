@@ -48,7 +48,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final CustomUserDetailsService customUserDetailsService;
     private final UserRepository userRepository;
-    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
+    private final tools.jackson.databind.ObjectMapper objectMapper;
     private final AuthRateLimitFilter authRateLimitFilter;
     private final RefreshTokenStore refreshTokenStore;
     private final AuthCookieWriter authCookieWriter;
@@ -95,7 +95,7 @@ public class SecurityConfig {
             UserDetailsService userDetailsService,
             CustomUserDetailsService customUserDetailsService,
             UserRepository userRepository,
-            com.fasterxml.jackson.databind.ObjectMapper objectMapper,
+            tools.jackson.databind.ObjectMapper objectMapper,
             AuthRateLimitFilter authRateLimitFilter,
             RefreshTokenStore refreshTokenStore,
             AuthCookieWriter authCookieWriter
@@ -255,8 +255,7 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(customUserDetailsService);
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(customUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder);
         return provider;
     }

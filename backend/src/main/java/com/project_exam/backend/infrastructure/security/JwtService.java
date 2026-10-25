@@ -51,11 +51,11 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>(extraClaims);
         claims.put(TOKEN_TYPE_CLAIM, ACCESS_TOKEN_TYPE);
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(cachedSigningKey, SignatureAlgorithm.HS256)
+                .claims(claims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(cachedSigningKey, Jwts.SIG.HS256)
                 .compact();
     }
 
@@ -68,12 +68,12 @@ public class JwtService {
         claims.put(TOKEN_TYPE_CLAIM, REFRESH_TOKEN_TYPE);
         claims.put("fid", familyId);
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(userDetails.getUsername())
-                .setId(jti)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtRefreshExpiration))
-                .signWith(cachedSigningKey, SignatureAlgorithm.HS256)
+                .claims(claims)
+                .subject(userDetails.getUsername())
+                .id(jti)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + jwtRefreshExpiration))
+                .signWith(cachedSigningKey, Jwts.SIG.HS256)
                 .compact();
     }
 
@@ -97,11 +97,11 @@ public class JwtService {
 
     public Claims extractAllClaims(String token) {
         try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(cachedSigningKey)
+            return Jwts.parser()
+                    .verifyWith(cachedSigningKey)
                     .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                    .parseSignedClaims(token)
+                    .getPayload();
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException("Token đã hết hạn");
         } catch (JwtException e) {

@@ -1,7 +1,7 @@
 package com.project_exam.backend.infrastructure.cache;
 
 import org.springframework.cache.Cache;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;

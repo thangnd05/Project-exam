@@ -77,7 +77,7 @@ public class GlobalExceptionHandler {
     ) {
         log.warn("MaxUploadSizeExceededException: {}", ex.getMessage());
         return buildErrorResponse(
-                HttpStatus.PAYLOAD_TOO_LARGE,
+                HttpStatus.CONTENT_TOO_LARGE,
                 "File tải lên quá lớn. Mỗi file tối đa 10MB và tổng dung lượng tối đa 50MB.",
                 request
         );

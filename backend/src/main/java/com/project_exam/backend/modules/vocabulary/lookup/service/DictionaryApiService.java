@@ -1,7 +1,7 @@
 package com.project_exam.backend.modules.vocabulary.lookup.service;
 
 import com.project_exam.backend.modules.vocabulary.lookup.domain.DictionaryResult;
-import com.fasterxml.jackson.databind.JsonNode;
+import tools.jackson.databind.JsonNode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -43,14 +43,14 @@ public class DictionaryApiService {
 
                     JsonNode phonetics = first.path("phonetics");
                     for (JsonNode phonetic : phonetics) {
-                        String textCandidate = phonetic.path("text").asText();
+                        String textCandidate = phonetic.path("text").asString();
                         if (text == null || text.isEmpty()) {
                             text = textCandidate;
                         }
                     }
 
                     if (text == null || text.isEmpty()) {
-                        text = first.path("phonetic").asText();
+                        text = first.path("phonetic").asString();
                     }
                 }
             }

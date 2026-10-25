@@ -1,6 +1,7 @@
 package com.project_exam.backend.modules.posts.post.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.ObjectMapper;
 import com.project_exam.backend.modules.posts.post.dto.ImageUploadResponse;
 import com.project_exam.backend.modules.posts.post.dto.PostUpsertRequest;
 import com.project_exam.backend.shared.dto.PageResponse;
@@ -110,7 +111,7 @@ public class PostController {
     private PostUpsertRequest parsePostRequest(String requestJson) {
         try {
             return objectMapper.readValue(requestJson, PostUpsertRequest.class);
-        } catch (IOException e) {
+        } catch (JacksonException e) {
             throw new BadRequestException("Request body không hợp lệ");
         }
     }

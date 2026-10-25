@@ -1,7 +1,7 @@
 package com.project_exam.backend.modules.system.analytics.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -53,8 +53,8 @@ public class GeoIpService {
                     .build();
             HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
             JsonNode node = objectMapper.readTree(response.body());
-            if ("success".equals(node.path("status").asText())) {
-                return new Country(node.path("countryCode").asText(null), node.path("country").asText(null));
+            if ("success".equals(node.path("status").asString())) {
+                return new Country(node.path("countryCode").asString(null), node.path("country").asString(null));
             }
         } catch (Exception e) {
             log.debug("Geo-IP lookup thất bại cho {}: {}", ip, e.getMessage());

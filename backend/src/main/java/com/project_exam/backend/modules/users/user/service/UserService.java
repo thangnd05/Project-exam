@@ -101,7 +101,7 @@ public class UserService {
 
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        Specification<User> specification = Specification.where(null);
+        Specification<User> specification = Specification.unrestricted();
 
         if (keyword != null && !keyword.trim().isEmpty()) {
             String normalizedKeyword = "%" + keyword.trim().toLowerCase() + "%";

@@ -92,7 +92,7 @@ public class EvaluationService {
         int safeSize = size == null || size <= 0 ? 20 : Math.min(size, 100);
 
         Pageable pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Specification<Evaluation> specification = Specification.where(null);
+        Specification<Evaluation> specification = Specification.unrestricted();
 
         if (keyword != null && !keyword.trim().isEmpty()) {
             String normalizedKeyword = "%" + keyword.trim().toLowerCase() + "%";
