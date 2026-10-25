@@ -7,6 +7,7 @@ import type {
   ExamQuestion,
   QuestionIndexMap,
 } from '@/app/features/exam-layout/examLayoutTypes';
+import { DEFAULT_NAVIGATION_MODE } from '@/app/features/exam-layout/layoutSchema';
 import type { LayoutConfig } from '@/app/features/exam-layout/layoutSchema';
 import { isListeningStep, passageHasAudio } from '@/app/[locale]/(guest-exam)/tests/[testId]/start/_lib/passageUtils';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
@@ -23,7 +24,8 @@ export function useExamFlowNavigation({
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [maxStepIndex, setMaxStepIndex] = useState(0);
 
-  const isPaged = (layoutConfig?.questionArea?.navigationMode || 'scroll') === 'paged';
+  const isPaged =
+    (layoutConfig?.questionArea?.navigationMode || DEFAULT_NAVIGATION_MODE) === 'paged';
 
   const allQuestions = useMemo<ExamQuestion[]>(
     () =>

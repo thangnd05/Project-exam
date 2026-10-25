@@ -92,6 +92,9 @@ export const customBlockLabel = (label?: string | null): string | undefined => {
 
 export const ADDABLE_BLOCK_TYPES: string[] = [BLOCK_TYPES.BANNER];
 
+// Mặc định làm từng câu (hoặc từng nhóm câu chung bài đọc) như phòng thi thật; "scroll" là hiện tất cả câu.
+export const DEFAULT_NAVIGATION_MODE = 'paged';
+
 export const defaultLayoutConfig: LayoutConfig = {
   version: 1,
   theme: {
@@ -103,7 +106,7 @@ export const defaultLayoutConfig: LayoutConfig = {
   questionArea: {
     passagePosition: 'side',
 
-    navigationMode: 'scroll',
+    navigationMode: DEFAULT_NAVIGATION_MODE,
     columns: 1,
     maxWidth: null,
     cardShadow: true,

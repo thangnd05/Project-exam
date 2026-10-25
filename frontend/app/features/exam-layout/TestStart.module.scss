@@ -12,11 +12,9 @@
   font-family: var(--font-family);
 }
 
-// Xem trước ở trang chỉnh bố cục: khung cao cố định như một màn hình thật.
+// Xem trước ở trang chỉnh bố cục: lấp đầy "màn hình" giả lập mà trang chỉnh dựng sẵn.
 .exam-shell-preview {
   position: relative;
-  flex: none;
-  height: 64rem;
   border: 1px solid var(--slate-200);
   border-radius: 8px;
 }

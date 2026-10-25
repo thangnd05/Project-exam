@@ -1,5 +1,10 @@
 import { PassageType, QuestionType } from '@/app/enums';
-import type { ExamPart, ExamQuestion, QuestionIndexMap } from '@/app/features/exam-layout/examLayoutTypes';
+import type {
+  ExamFlowStep,
+  ExamPart,
+  ExamQuestion,
+  QuestionIndexMap,
+} from '@/app/features/exam-layout/examLayoutTypes';
 
 export type SampleExamTexts = {
   passage: string;
@@ -64,5 +69,18 @@ export function buildSampleExam(texts: SampleExamTexts) {
     {},
   );
 
-  return { sampleExamData, sampleAllQuestions, sampleQuestionIndexMap };
+  // Mỗi nhóm câu là một bước, giống cách phòng thi chia bước ở chế độ "Từng câu/nhóm một".
+  const sampleFlowSteps: ExamFlowStep[] = sampleExamData.visibleParts.flatMap((part) =>
+    (part.questionGroups || []).map((group, gi) => ({
+      key: group.passage?.passageId || group.questions?.[0]?.questionId || `${part.testPartId}-${gi}`,
+      partId: part.testPartId,
+      partName: part.partName || '',
+      sectionType: null,
+      audioGated: false,
+      passage: group.passage || null,
+      questions: group.questions || [],
+    })),
+  );
+
+  return { sampleExamData, sampleAllQuestions, sampleQuestionIndexMap, sampleFlowSteps };
 }

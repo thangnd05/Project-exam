@@ -185,20 +185,20 @@
     "loading": "Đang tải giao diện...",
     "back": "Quay lại",
     "title": "Giao diện làm bài",
-    "subtitle": "Loại đề: <strong>{name}</strong>  kéo các yếu tố vào vùng bất kỳ.",
-    "resetDefault": "Về mặc định",
-    "save": "Lưu",
+    "subtitle": "Loại đề: <strong>{name}</strong>. Kéo thả yếu tố giữa các vùng, xem kết quả ngay ở khung giữa.",
+    "resetDefault": "Đặt lại mặc định",
+    "save": "Lưu thay đổi",
     "saveSuccess": "Đã lưu giao diện làm bài cho loại đề này.",
     "saveFailed": "Lưu thất bại. Vui lòng thử lại.",
     "zonesSection": "Bố cục theo vùng",
-    "zonesHint": "Kéo một yếu tố rồi thả vào vùng khác để đổi vị trí.",
-    "zoneEmpty": "- thả yếu tố vào đây ",
+    "zonesHint": "Kéo yếu tố sang vùng khác, hoặc bấm vào yếu tố để mở phần chỉnh ngay bên dưới. Hình nhỏ cạnh tên vùng cho biết vùng nằm ở đâu trên màn hình.",
+    "zoneEmpty": "Kéo yếu tố vào đây",
     "show": "Hiện",
     "hide": "Ẩn",
     "remove": "Xoá",
     "addSection": "Thêm yếu tố",
-    "preview": "Xem trước (dữ liệu mẫu)",
-    "previewHint": "Nhấp vào yếu tố để chỉnh",
+    "preview": "Xem trước · màn hình {width}px",
+    "previewHint": "Bấm vào yếu tố trong khung để chỉnh",
     "themeSection": "Chủ đề (theme)",
     "primaryColor": "Màu chủ đạo",
     "font": "Font chữ",
@@ -207,8 +207,8 @@
     "questionAreaSection": "Khối câu hỏi",
     "navigationMode": "Kiểu làm bài",
     "navigationModes": {
-      "scroll": "Cuộn tất cả (mặc định)",
-      "paged": "Từng câu/nhóm một (nghe tự chuyển, đọc bấm)"
+      "scroll": "Cuộn tất cả câu",
+      "paged": "Từng câu/nhóm một (mặc định)"
     },
     "passagePosition": "Vị trí đoạn văn",
     "passagePositions": {
@@ -216,8 +216,6 @@
       "stacked": "Trên câu hỏi (xếp dọc)"
     },
     "propertiesSection": "Thuộc tính yếu tố",
-    "propertiesEmpty": "Chọn một yếu tố ở cột trái hoặc trong preview.",
-    "blockType": "Loại",
     "zone": "Vùng",
     "align": "Canh vị trí",
     "alignOptions": {
@@ -235,12 +233,9 @@
     "toggleLabelPlaceholder": "Câu hỏi",
     "hideLabel": "Nhãn nút ẩn",
     "hideLabelPlaceholder": "Ẩn",
-    "navColumns": "Số cột (khi ở cột bên / trên / nổi)",
+    "navColumns": "Số cột ô câu hỏi",
     "bannerUrl": "URL ảnh banner",
     "bannerUrlPlaceholder": "https://... hoặc /uploads/...",
-    "visibility": "Hiển thị",
-    "hidden": "Đang ẩn",
-    "visible": "Đang hiện",
     "removeBlock": "Xoá yếu tố",
     "zones": {
       "TOP": "Trên (thanh đầu trang)",
@@ -263,7 +258,35 @@
       "questionWithPassage": "Nội dung câu hỏi mẫu (có đoạn văn).",
       "questionWithoutPassage": "Nội dung câu hỏi mẫu (không có đoạn văn).",
       "answer": "Đáp án {label}"
-    }
+    },
+    "saved": "Đã lưu",
+    "unsaved": "Có thay đổi chưa lưu",
+    "propertiesFor": "Yếu tố: {name}",
+    "done": "Xong",
+    "showBlock": "Hiện yếu tố",
+    "hideBlock": "Ẩn yếu tố",
+    "maxWidth": "Bề rộng nội dung tối đa (px)",
+    "maxWidthPlaceholder": "Không giới hạn",
+    "defaultValue": "Mặc định",
+    "useDefault": "Dùng mặc định",
+    "navigationModeHints": {
+      "scroll": "Mọi câu nằm trên một trang dài, người làm bài cuộn để làm.",
+      "paged": "Mỗi lần hiện một câu (hoặc một nhóm câu chung bài đọc), có nút Câu trước/Câu tiếp. Phần nghe tự chuyển khi hết audio."
+    },
+    "resetConfirm": {
+      "title": "Đặt lại bố cục mặc định?",
+      "message": "Bố cục đang chỉnh sẽ được thay bằng bố cục mặc định. Thay đổi chỉ được áp dụng khi bạn bấm \"Lưu thay đổi\".",
+      "confirm": "Đặt lại",
+      "cancel": "Huỷ"
+    },
+    "leaveConfirm": {
+      "title": "Rời trang khi chưa lưu?",
+      "message": "Các thay đổi bố cục chưa lưu sẽ bị mất.",
+      "confirm": "Rời trang",
+      "cancel": "Ở lại"
+    },
+    "progressAutoHiddenShort": "Tự ẩn",
+    "progressAutoHidden": "Đang tự ẩn vì danh sách câu hỏi nằm ở cột bên và đã hiện số câu đã làm."
   },
   "questionCollections": {
     "title": "Quản lý bộ sưu tập câu hỏi",

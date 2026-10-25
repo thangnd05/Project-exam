@@ -3,8 +3,7 @@
 .editor {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-  height: 100%;
+  gap: 1.6rem;
 }
 
 .header {
@@ -16,9 +15,11 @@
 }
 
 .headerLeft {
+  flex: 1 1 32rem;
   display: flex;
   align-items: center;
   gap: 1.2rem;
+  min-width: 0;
 
   h2 {
     margin: 0;
@@ -33,59 +34,190 @@
 }
 
 .headerActions {
+  flex: none;
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.backBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  background: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: 0.8rem;
-  padding: 0.7rem 1.2rem;
-  cursor: pointer;
-  color: var(--text-color);
+.saveState {
+  font-size: 1.3rem;
+  color: var(--text-secondary);
+
+  &.dirty {
+    color: var(--warning);
+    font-weight: 600;
+  }
 }
 
+.backBtn,
+.secondaryBtn,
+.primaryBtn,
+.dangerBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1.4rem;
+  border-radius: 0.8rem;
+  border: 1px solid var(--border-color);
+  font-size: 1.4rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    opacity 0.15s;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.backBtn {
+  flex: none;
+}
+
+.backBtn,
+.secondaryBtn {
+  background: var(--bg-white);
+  color: var(--text-color);
+
+  &:hover:not(:disabled) {
+    background: var(--slate-50);
+    border-color: var(--slate-300);
+  }
+}
+
+// Nút chính nền đặc màu thương hiệu, nút bên cạnh viền trắng -> không bị hai nút trắng cạnh nhau.
+.primaryBtn {
+  border-color: var(--primary-text);
+  background: var(--primary-text);
+  color: #fff;
+  padding: 0.8rem 1.8rem;
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.1);
+  }
+}
+
+.dangerBtn {
+  border-color: var(--danger-border);
+  color: var(--danger-text);
+  background: var(--danger-bg);
+}
+
+.linkBtn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--primary-text);
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// Bố cục: cột vùng | xem trước | cột thuộc tính & tuỳ chỉnh.
 .workspace {
   display: grid;
-  grid-template-columns: 30rem 1fr 30rem;
-  gap: 1.4rem;
+  grid-template-columns: 28rem minmax(0, 1fr) 28rem;
+  grid-template-areas: 'zones preview settings';
+  gap: 1.6rem;
   align-items: start;
+
+  > :nth-child(1) {
+    grid-area: zones;
+  }
+
+  > :nth-child(2) {
+    grid-area: preview;
+  }
+
+  > :nth-child(3) {
+    grid-area: settings;
+  }
+
+  // Chưa tới cỡ màn rất rộng (trang admin còn thanh menu bên trái): dồn hai cột chỉnh sang trái
+  // để khung xem trước đủ rộng mà đọc được.
+  @media (max-width: 1799.98px) {
+    grid-template-columns: 30rem minmax(0, 1fr);
+    grid-template-areas:
+      'zones preview'
+      'settings preview';
+  }
+
+  @include down(lg) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'preview'
+      'zones'
+      'settings';
+  }
 }
 
 .panel {
   background: var(--bg-white);
   border: 1px solid var(--border-color);
   border-radius: 1.2rem;
-  padding: 1.4rem;
+  padding: 1.6rem;
   display: flex;
   flex-direction: column;
-  gap: 1.4rem;
-  max-height: calc(100vh - 16rem);
-  overflow-y: auto;
+  gap: 2rem;
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
+  gap: 1rem;
 
   h3 {
     margin: 0;
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-color);
   }
 }
 
+// Thuộc tính của yếu tố đang chọn, mở ngay dưới yếu tố đó trong danh sách vùng.
+.propertiesCard {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.2rem;
+  border: 1px solid var(--primary);
+  border-radius: 0.8rem;
+  background: rgb(var(--primary-rgb) / 0.04);
+  scroll-margin: 1.6rem;
+}
+
+.propertyActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.8rem;
+
+  .secondaryBtn,
+  .dangerBtn {
+    padding: 0.6rem 1.2rem;
+    font-size: 1.3rem;
+  }
+}
+
+.doneBtn {
+  margin-left: auto;
+}
+
 .field {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.5rem;
   font-size: var(--font-size-smd);
 
   label {
@@ -95,48 +227,112 @@
 
   input,
   select {
-    padding: 0.7rem 0.9rem;
+    width: 100%;
+    padding: 0.8rem 1rem;
     border: 1px solid var(--border-color);
     border-radius: 0.7rem;
     font-size: var(--font-size-smd);
     background: var(--bg-white);
+    color: var(--text-color);
   }
+}
+
+.fieldHint {
+  font-size: 1.2rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.colorRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 
   input[type='color'] {
-    padding: 0.2rem;
+    width: 4.4rem;
     height: 3.4rem;
+    padding: 0.2rem;
+    flex: none;
     cursor: pointer;
+  }
+}
+
+.colorValue {
+  flex: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.3rem;
+  color: var(--text-color);
+}
+
+// Chọn căn lề bằng nút bấm thay cho danh sách thả xuống: thấy hết lựa chọn, một lần bấm.
+.segmented {
+  display: flex;
+  padding: 0.3rem;
+  gap: 0.3rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.8rem;
+  background: var(--slate-50);
+}
+
+.segment {
+  flex: 1;
+  padding: 0.6rem 0.8rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &.active {
+    background: var(--bg-white);
+    color: var(--text-color);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.08);
   }
 }
 
 .zoneGroup {
   border: 1px dashed var(--border-color);
-  border-radius: 0.9rem;
-  padding: 0.8rem;
+  border-radius: 1rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
-  transition: border-color 0.15s, background 0.15s;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
 
   &.dropActive {
     border-color: var(--primary);
-    background: rgb(var(--primary-rgb) / 0.05);
+    border-style: solid;
+    background: rgb(var(--primary-rgb) / 0.06);
+  }
+}
+
+.zoneHead {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  svg {
+    flex: none;
   }
 }
 
 .zoneTitle {
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--text-color);
 }
 
 .zoneEmpty {
+  padding: 0.6rem;
+  border-radius: 0.6rem;
+  background: var(--slate-50);
   font-size: 1.2rem;
   color: var(--text-secondary);
-  font-style: italic;
-  padding: 0.4rem 0.2rem;
+  text-align: center;
 }
 
 .blockItem {
@@ -149,6 +345,10 @@
   background: var(--bg-white);
   cursor: grab;
   font-size: var(--font-size-smd);
+
+  &:hover {
+    border-color: var(--slate-300);
+  }
 
   &:active {
     cursor: grabbing;
@@ -170,9 +370,15 @@
 
   .blockLabel {
     flex: 1;
+    min-width: 0;
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+
+  .blockMeta {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
   }
 
   .iconBtn {
@@ -196,10 +402,7 @@
 }
 
 .paletteBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1rem;
+  padding: 0.6rem 1.2rem;
   border: 1px dashed var(--border-color);
   border-radius: 0.7rem;
   background: transparent;
@@ -212,66 +415,38 @@
   }
 }
 
+// Khung xem trước bám theo khi cuộn các cột chỉnh dài.
 .previewWrap {
+  position: sticky;
+  top: 1.6rem;
   border: 1px solid var(--border-color);
   border-radius: 1.2rem;
   background: var(--bg-body);
   overflow: hidden;
-  max-height: calc(100vh - 16rem);
-  overflow-y: auto;
-  position: relative;
+
+  @include down(lg) {
+    position: static;
+  }
 }
 
 .previewBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.7rem 1.2rem;
+  gap: 1rem;
+  padding: 0.8rem 1.2rem;
   background: var(--bg-white);
   border-bottom: 1px solid var(--border-color);
   font-size: 1.2rem;
   color: var(--text-secondary);
-  position: sticky;
-  top: 0;
-  z-index: 2;
 }
 
 .previewCanvas {
-  padding: 1rem;
+  padding: 1.2rem;
 }
 
 .hint {
   font-size: 1.2rem;
   color: var(--text-secondary);
   line-height: 1.5;
-}
-
-.emptyRight {
-  color: var(--text-secondary);
-  font-size: var(--font-size-smd);
-  text-align: center;
-  padding: 2rem 1rem;
-}
-
-.dangerBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.7rem 1rem;
-  border: 1px solid var(--danger-border);
-  color: var(--danger-text);
-  background: var(--danger-bg);
-  border-radius: 0.7rem;
-  cursor: pointer;
-  font-size: var(--font-size-smd);
-}
-
-@include down(xl) {
-  .workspace {
-    grid-template-columns: 1fr;
-  }
-  .panel,
-  .previewWrap {
-    max-height: none;
-  }
 }
