@@ -28,11 +28,6 @@
     "resources": "Tài liệu",
     "myCertificates": "Chứng chỉ của tôi"
   },
-  "stats": {
-    "totalAttempts": "Tổng bài làm",
-    "savedFlashcards": "Thẻ ghi nhớ đã lưu",
-    "currentClasses": "Lớp học hiện tại"
-  },
   "activity": {
     "testTime": "Thời gian làm bài",
     "summary": "{duration} làm bài · {days} ngày hoạt động",

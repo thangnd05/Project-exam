@@ -28,11 +28,6 @@
     "resources": "Resources",
     "myCertificates": "My certificates"
   },
-  "stats": {
-    "totalAttempts": "Total attempts",
-    "savedFlashcards": "Saved flashcards",
-    "currentClasses": "Current classes"
-  },
   "activity": {
     "testTime": "Test time",
     "summary": "{duration} of tests · {days, plural, one {# active day} other {# active days}}",

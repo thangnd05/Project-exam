@@ -56,7 +56,6 @@
 
 .profileCard,
 .quickActionsCard,
-.statCardCompact,
 .chartCard,
 .statCard {
   background: var(--bg-white);
@@ -179,38 +178,6 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-}
-
-.statsRow {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
-  gap: 2rem;
-}
-
-.statCardCompact {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-}
-
-.statInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.statLabel {
-  font-size: 1.25rem;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.statValue {
-  font-size: var(--font-size-xxl);
-  font-weight: 800;
-  color: var(--dark-color);
-  line-height: 1;
 }
 
 .chartsRow {

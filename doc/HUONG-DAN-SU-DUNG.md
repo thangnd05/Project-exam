@@ -547,7 +547,6 @@ Vào avatar → **"Hồ sơ"**  **Dashboard Cá Nhân**.
 
 **Thống kê & biểu đồ**
 
-- **Tổng bài làm**, **Thẻ ghi nhớ đã lưu**, **Lớp học hiện tại**.
 - **Thời gian làm bài** theo ngày (biểu đồ cột).
 - **Thời gian học theo tháng** (biểu đồ đường).
 

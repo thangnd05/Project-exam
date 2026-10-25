@@ -237,29 +237,6 @@ function ProfileOverview() {
             </aside>
 
             <main className={cx('rightCol')}>
-              <section className={cx('statsRow')}>
-                <article className={cx('statCard', 'statCardCompact')}>
-                  <div className={cx('statInfo')}>
-                    <span className={cx('statLabel')}>{t('stats.totalAttempts')}</span>
-                    <strong className={cx('statValue')}>{formatNumber(profileOverview.testStats?.totalAttempts, intlLocale)}</strong>
-                  </div>
-                </article>
-
-                <article className={cx('statCard', 'statCardCompact')}>
-                  <div className={cx('statInfo')}>
-                    <span className={cx('statLabel')}>{t('stats.savedFlashcards')}</span>
-                    <strong className={cx('statValue')}>{formatNumber(profileOverview.vocabularyStats?.totalVocabulary, intlLocale)}</strong>
-                  </div>
-                </article>
-
-                <article className={cx('statCard', 'statCardCompact')}>
-                  <div className={cx('statInfo')}>
-                    <span className={cx('statLabel')}>{t('stats.currentClasses')}</span>
-                    <strong className={cx('statValue')}>{formatNumber(profileOverview.classStats?.approvedClassCount, intlLocale)}</strong>
-                  </div>
-                </article>
-              </section>
-
               <section className={cx('chartsRow')}>
                 <article className={cx('chartCard')}>
                   <div className={cx('chartHeader')}>
