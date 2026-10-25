@@ -1,9 +1,10 @@
 import axios from './axiosClient';
 import type {
-  ContentInsightsResponse,
   DashboardStatsResponse,
   DayHours,
   MonthlyPerformanceResponse,
+  PageResponse,
+  TestUsageStat,
   TrafficLocationsResponse,
 } from '@/app/types';
 
@@ -17,8 +18,10 @@ export const getMonthlyPerformance = (year?: number): Promise<MonthlyPerformance
     .get(`${BASE_DASHBOARD_URL}/monthly-performance`, {params: year ? {year} : {}})
     .then((response) => response.data);
 
-export const getContentInsights = (): Promise<ContentInsightsResponse> =>
-  axios.get(`${BASE_DASHBOARD_URL}/content-insights`).then((response) => response.data);
+export const getTestUsage = (page: number, size: number): Promise<PageResponse<TestUsageStat>> =>
+  axios
+    .get(`${BASE_DASHBOARD_URL}/test-usage`, {params: {page, size}})
+    .then((response) => response.data);
 
 export const getTrafficLocations = (month?: string): Promise<TrafficLocationsResponse> =>
   axios

@@ -62,7 +62,6 @@
     "newUsers": "Người dùng mới",
     "exams": "Bài thi",
     "testCount": "Số bài thi",
-    "completionRatePercent": "Tỉ lệ hoàn thành (%)",
     "visits": "Lượt truy cập",
     "attempts": "Lượt thi",
     "avgSkill": "Kỹ năng TB",
@@ -72,7 +71,6 @@
     "students": "Học viên",
     "tooltipVisits": "Lượt truy cập: <strong>{value}</strong>",
     "tooltipAttempts": "Lượt thi: <strong>{value}</strong>",
-    "tooltipCompletionRate": "Tỉ lệ hoàn thành: <strong>{value}%</strong>",
     "peakHour": "Giờ cao điểm: {hour}:00",
     "noVisits": "Chưa có truy cập"
   },
@@ -91,7 +89,8 @@
   "contentInsights": {
     "test": "Bài thi",
     "attempts": "Lượt làm",
-    "completionRate": "Tỉ lệ hoàn thành",
+    "users": "Người làm",
+    "itemLabel": "bài thi",
     "empty": "Chưa có lượt làm bài nào."
   },
   "actions": {

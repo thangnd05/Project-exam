@@ -14,7 +14,6 @@ import java.util.List;
 public class DashboardStatsResponse {
     private Stats stats;
     private Traffic traffic;
-    private List<NameValue> statusDistribution;
 
     @Getter
     @Builder
@@ -28,15 +27,6 @@ public class DashboardStatsResponse {
         private long totalExamsTaken;
         private long completedExams;
         private long totalExamTypes;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class NameValue {
-        private String name;
-        private long value;
     }
 
     @Getter
@@ -75,7 +65,6 @@ public class DashboardStatsResponse {
     public static class MonthPerformance {
         private String month;
         private long tests;
-        private long rate;
         private long newUsers;
         private long visits;
         private Integer peakHour;

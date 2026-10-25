@@ -7,10 +7,6 @@ import {
     BarChart,
     Bar,
     ComposedChart,
-    Line,
-    PieChart,
-    Pie,
-    Cell,
     RadarChart,
     Radar,
     PolarGrid,
@@ -36,9 +32,6 @@ type SparkDatum = Record<string, unknown>;
 type ChartTooltipProps = Partial<TooltipContentProps<number, string>>;
 
 const VIZ = { primary: brand.accent, accent: brand.unique, muted: '#94a3b8' };
-
-// Theo thứ tự BE trả: Hoàn thành, Tự nộp khi hết giờ, Đang làm, Hết hạn. Mỗi trạng thái một màu tách bạch.
-const STATUS_COLORS = ['#10b981', '#f59e0b', brand.primary, VIZ.muted];
 
 const AXIS_TICK = { fill: '#64748b', fontSize: 12 };
 const GRID_STROKE = '#e2e8f0';
@@ -113,64 +106,20 @@ export const MonthlyPerformanceCombo = ({ data }: { data: MonthPerformance[] }) 
                 </defs>
                 <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={AXIS_TICK} />
-                <YAxis
-                    yAxisId="right"
-                    orientation="right"
-                    domain={[0, 100]}
-                    axisLine={false}
-                    tickLine={false}
-                    tick={AXIS_TICK}
-                />
+                <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} />
                 <Tooltip {...TOOLTIP_STYLE} />
                 <Legend />
                 <Bar
-                    yAxisId="left"
                     dataKey="tests"
                     name={t('testCount')}
                     fill="url(#acTests)"
                     radius={[6, 6, 0, 0]}
                     barSize={28}
                 />
-                <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="rate"
-                    name={t('completionRatePercent')}
-                    stroke={VIZ.accent}
-                    strokeWidth={3}
-                    dot={{ r: 4, fill: VIZ.accent }}
-                    activeDot={{ r: 6 }}
-                />
             </ComposedChart>
         </ResponsiveContainer>
     );
 };
-
-export const ExamTypeDonut = ({ data }: { data: NameValue[] }) => (
-    <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-            <Tooltip {...TOOLTIP_STYLE} />
-            <Legend layout="vertical" align="right" verticalAlign="middle" iconType="circle" />
-            <Pie
-                data={data}
-                dataKey="value"
-                nameKey="name"
-                cx="40%"
-                cy="50%"
-                innerRadius="55%"
-                outerRadius="80%"
-                paddingAngle={2}
-                stroke="#fff"
-                strokeWidth={2}
-            >
-                {data.map((entry, index) => (
-                    <Cell key={entry.name} fill={STATUS_COLORS[index % STATUS_COLORS.length]} />
-                ))}
-            </Pie>
-        </PieChart>
-    </ResponsiveContainer>
-);
 
 export const MonthlyNewUsersBar = ({ data }: { data: MonthPerformance[] }) => {
     const t = useTranslations('AdminCommon.charts');
@@ -272,7 +221,6 @@ const MonthlyActivityTooltip = ({ active, payload, label }: ChartTooltipProps) =
             <div style={TOOLTIP_STYLE.labelStyle}>{label}</div>
             <div>{t.rich('tooltipVisits', { value: row.visits ?? 0, strong: (chunks) => <strong>{chunks}</strong> })}</div>
             <div>{t.rich('tooltipAttempts', { value: row.tests ?? 0, strong: (chunks) => <strong>{chunks}</strong> })}</div>
-            <div>{t.rich('tooltipCompletionRate', { value: row.rate ?? 0, strong: (chunks) => <strong>{chunks}</strong> })}</div>
             <div style={{ color: '#64748b', marginTop: 2 }}>
                 {hasPeak ? t('peakHour', { hour: String(peak).padStart(2, '0') }) : t('noVisits')}
             </div>
@@ -287,30 +235,11 @@ export const MonthlyActivityCombo = ({ data }: { data: MonthPerformance[] }) => 
             <ComposedChart data={data} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="4 4" vertical={false} stroke={GRID_STROKE} />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={AXIS_TICK} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
-                <YAxis
-                    yAxisId="right"
-                    orientation="right"
-                    domain={[0, 100]}
-                    axisLine={false}
-                    tickLine={false}
-                    tick={AXIS_TICK}
-                    unit="%"
-                />
+                <YAxis axisLine={false} tickLine={false} tick={AXIS_TICK} allowDecimals={false} />
                 <Tooltip {...TOOLTIP_STYLE} content={<MonthlyActivityTooltip />} />
                 <Legend />
-                <Bar yAxisId="left" dataKey="visits" name={t('visits')} fill={VIZ.muted} radius={[4, 4, 0, 0]} barSize={16} />
-                <Bar yAxisId="left" dataKey="tests" name={t('attempts')} fill={VIZ.primary} radius={[4, 4, 0, 0]} barSize={16} />
-                <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="rate"
-                    name={t('completionRatePercent')}
-                    stroke={VIZ.accent}
-                    strokeWidth={2.5}
-                    dot={{ r: 3, fill: VIZ.accent }}
-                    activeDot={{ r: 6 }}
-                />
+                <Bar dataKey="visits" name={t('visits')} fill={VIZ.muted} radius={[4, 4, 0, 0]} barSize={16} />
+                <Bar dataKey="tests" name={t('attempts')} fill={VIZ.primary} radius={[4, 4, 0, 0]} barSize={16} />
             </ComposedChart>
         </ResponsiveContainer>
     );

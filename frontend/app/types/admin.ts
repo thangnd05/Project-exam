@@ -33,7 +33,6 @@ export interface DashboardTraffic {
 export interface MonthPerformance {
   month?: string;
   tests: number;
-  rate: number;
   newUsers: number;
   visits: number;
   peakHour?: number;
@@ -42,7 +41,6 @@ export interface MonthPerformance {
 export interface DashboardStatsResponse {
   stats?: DashboardStats;
   traffic?: DashboardTraffic;
-  statusDistribution?: NameValue[];
 }
 
 export interface MonthlyPerformanceResponse {
@@ -58,17 +56,11 @@ export interface TrafficLocationsResponse {
   topCountries?: CountryTraffic[];
 }
 
-export interface ContentTestStat {
+export interface TestUsageStat {
   testId: string;
   title?: string;
   attempts: number;
-  completed: number;
-  completionRate: number;
-}
-
-export interface ContentInsightsResponse {
-  topTests?: ContentTestStat[];
-  topPracticeTests?: ContentTestStat[];
+  users: number;
 }
 
 export interface AuditLogResponse {

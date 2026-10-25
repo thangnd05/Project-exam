@@ -28,17 +28,9 @@
     "publicVisitsInMonth": "lượt truy cập từ IP công cộng trong tháng {month}/{year}",
     "publicVisits": "lượt truy cập từ IP công cộng",
     "topCountries": "Top quốc gia",
-    "monthlyActivity": "Hoạt động theo tháng (truy cập, lượt thi & tỉ lệ hoàn thành)",
+    "monthlyActivity": "Hoạt động theo tháng (truy cập & lượt thi)",
     "monthlyNewUsers": "Người dùng mới theo tháng",
-    "attemptStatus": "Tình trạng lượt thi",
-    "topTests": "Bài thi nhiều nhất",
-    "topPracticeTests": "Đề thi ôn luyện nhiều nhất",
-    "status": {
-      "completed": "Hoàn thành",
-      "autoSubmitted": "Tự nộp khi hết giờ",
-      "inProgress": "Đang làm",
-      "expired": "Hết hạn"
-    }
+    "topTests": "Bài thi được làm nhiều nhất"
   },
   "auditLogin": {
     "title": "Audit đăng nhập",

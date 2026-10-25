@@ -7,7 +7,7 @@
   "intro": "Chào mừng bạn đến với FrostScope. Khi bạn truy cập website frostscope.com, thực hiện bài kiểm tra nhanh (Quick Scope), tham gia lộ trình cá nhân hóa (My Path), sử dụng ngân hàng đề thi hoặc tham gia bảng thành tích (ScopeRank), bạn đồng ý tuân thủ toàn bộ các điều khoản và điều kiện được nêu tại văn bản này. Nếu bạn không đồng ý với bất kỳ phần nào của điều khoản, vui lòng ngừng sử dụng dịch vụ của chúng tôi.",
   "nature": {
     "title": "1. Bản chất dịch vụ & Tuyên bố miễn trừ trách nhiệm kết quả thi",
-    "body": "FrostScope là nền tảng học tập công nghệ độc lập, hỗ trợ kỹ sư và người học đánh giá năng lực hiện tại, nhận diện lỗ hổng kiến thức theo từng Domain và cá nhân hóa lộ trình ôn thi chứng chỉ Cloud, DevOps và Kubernetes.",
+    "body": "FrostScope là nền tảng học tập công nghệ độc lập, hỗ trợ kỹ sư và người học đánh giá năng lực hiện tại, nhận diện lỗ hổng kiến thức theo từng Domain và cá nhân hóa lộ trình luyện thi chứng chỉ Cloud, DevOps và Kubernetes.",
     "simulation": "<strong>Tính chất mô phỏng nội bộ:</strong> Các bài kiểm tra nhanh (Quick Scope) và bài thi đầy đủ (Full Mock) do đội ngũ FrostScope xây dựng bám sát cấu trúc đề cương Blueprint công khai của các hãng. Kết quả bài thi, điểm số chuẩn hóa và chỉ số sẵn sàng (Readiness) là công cụ đo lường sư phạm nội bộ, <strong>không cấu thành cam kết hay bảo đảm chắc chắn</strong> rằng bạn sẽ đạt số điểm tương đương hoặc thi đỗ trong kỳ thi chính thức của bên thứ ba.",
     "noRepresentation": "Chúng tôi không đại diện hoặc thay mặt cho bất kỳ tổ chức cấp chứng chỉ nào và không chịu trách nhiệm pháp lý đối với kết quả thi thực tế của bạn tại các trung tâm khảo thí chính thức."
   },

@@ -1,11 +1,12 @@
 package com.project_exam.backend.modules.admin.dashboard.controller;
 
-import com.project_exam.backend.modules.admin.dashboard.dto.ContentInsightsResponse;
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse;
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse.DayHours;
 import com.project_exam.backend.modules.admin.dashboard.dto.MonthlyPerformanceResponse;
+import com.project_exam.backend.modules.admin.dashboard.dto.TestUsageStat;
 import com.project_exam.backend.modules.admin.dashboard.dto.TrafficLocationsResponse;
 import com.project_exam.backend.modules.admin.dashboard.service.DashboardService;
+import com.project_exam.backend.shared.dto.PageResponse;
 import com.project_exam.backend.shared.security.PermissionCatalog;
 import com.project_exam.backend.shared.security.RequirePermission;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +41,11 @@ public class DashboardController {
         return ResponseEntity.ok(dashboardService.getMonthlyPerformance(year));
     }
 
-    @GetMapping("/content-insights")
-    public ResponseEntity<ContentInsightsResponse> getContentInsights() {
-        return ResponseEntity.ok(dashboardService.getContentInsights());
+    @GetMapping("/test-usage")
+    public ResponseEntity<PageResponse<TestUsageStat>> getTestUsage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(dashboardService.getTestUsage(page, size));
     }
 
     @GetMapping("/traffic-locations")

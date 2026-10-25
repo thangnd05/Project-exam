@@ -3,9 +3,9 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import {
-  getContentInsights,
   getDashboardStats,
   getMonthlyPerformance,
+  getTestUsage,
   getTrafficHeatmap,
   getTrafficLocations,
 } from '@/app/apis/dashboardApi';
@@ -14,7 +14,6 @@ import type {
   DashboardTraffic,
   DayHours,
   MonthlyPerformanceResponse,
-  NameValue,
   TrafficLocationsResponse,
 } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
@@ -24,7 +23,7 @@ export const dashboardKeys = {
   monthlyPerformance: (year?: number) => ['admin-dashboard-monthly-performance', year ?? 'current'],
   trafficHeatmap: (endDate?: string) => ['admin-dashboard-traffic-heatmap', endDate ?? 'today'],
   trafficLocations: (month?: string) => ['admin-dashboard-traffic-locations', month ?? 'current'],
-  contentInsights: ['admin-dashboard-content-insights'],
+  testUsage: (page: number, size: number) => ['admin-dashboard-test-usage', page, size],
 };
 
 export function useDashboardStats() {
@@ -42,12 +41,10 @@ export function useDashboardStats() {
     heatmap: [],
     topCountries: [],
   };
-  const statusDistribution: NameValue[] = query.data?.statusDistribution ?? [];
 
   return {
     stats,
     traffic,
-    statusDistribution,
     isLoading: query.isLoading,
     isError: query.isError,
   };
@@ -69,16 +66,18 @@ export function useMonthlyPerformance(year?: number) {
   };
 }
 
-export function useContentInsights() {
+export function useTestUsage(page: number, size: number) {
   const query = useQuery({
-    queryKey: dashboardKeys.contentInsights,
-    queryFn: getContentInsights,
+    queryKey: dashboardKeys.testUsage(page, size),
+    queryFn: () => getTestUsage(page, size),
     staleTime: 5 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   return {
-    topTests: query.data?.topTests ?? EMPTY_LIST,
-    topPracticeTests: query.data?.topPracticeTests ?? EMPTY_LIST,
+    tests: query.data?.content ?? EMPTY_LIST,
+    totalPages: query.data?.totalPages ?? 0,
+    totalElements: query.data?.totalElements ?? 0,
     isLoading: query.isLoading,
     isError: query.isError,
   };

@@ -1,21 +1,23 @@
 package com.project_exam.backend.modules.admin.dashboard.service;
 
-import com.project_exam.backend.modules.admin.dashboard.dto.ContentInsightsResponse;
-import com.project_exam.backend.modules.admin.dashboard.dto.ContentInsightsResponse.TestStat;
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse;
 import com.project_exam.backend.modules.admin.dashboard.dto.DashboardStatsResponse.*;
 import com.project_exam.backend.modules.admin.dashboard.dto.MonthlyPerformanceResponse;
+import com.project_exam.backend.modules.admin.dashboard.dto.TestUsageStat;
 import com.project_exam.backend.modules.admin.dashboard.dto.TrafficLocationsResponse;
 import com.project_exam.backend.modules.system.analytics.repository.PageVisitRepository;
 import com.project_exam.backend.modules.assessment.attempt.domain.UserTest;
 import com.project_exam.backend.modules.assessment.attempt.repository.UserTestRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.ExamTypeRepository;
 import com.project_exam.backend.modules.assessment.exam.repository.QuestionRepository;
-import com.project_exam.backend.modules.assessment.test.domain.Test;
 import com.project_exam.backend.modules.assessment.test.repository.TestRepository;
 import com.project_exam.backend.modules.classroom.clazz.repository.ClassRepository;
 import com.project_exam.backend.modules.users.user.repository.UserRepository;
+import com.project_exam.backend.shared.dto.PageResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +46,7 @@ public class DashboardService {
 
         return new DashboardStatsResponse(
                 buildStats(),
-                buildTraffic(today),
-                buildStatusDistribution()
+                buildTraffic(today)
         );
     }
 
@@ -157,7 +158,8 @@ public class DashboardService {
                 questionRepository.count(),
                 classRepository.count(),
                 userTestRepository.count(),
-                userTestRepository.countByStatus(UserTest.Status.COMPLETED),
+                // Khớp biểu đồ: không tính lượt hệ thống nộp hộ.
+                userTestRepository.countByStatusAndAutoSubmitted(UserTest.Status.COMPLETED, false),
                 examTypeRepository.countRootStandard()
         );
     }
@@ -177,16 +179,11 @@ public class DashboardService {
 
         LocalDateTime yearStart = LocalDate.of(year, 1, 1).atStartOfDay();
 
-        long[][] buckets = new long[12][2];
-        for (Object[] row : userTestRepository.findAttemptsSince(AppTime.instant(yearStart))) {
-            LocalDateTime startedAt = AppTime.local((Instant) row[0]);
+        long[] attempts = new long[12];
+        for (Instant startedAtUtc : userTestRepository.findStartedAtSince(AppTime.instant(yearStart))) {
+            LocalDateTime startedAt = AppTime.local(startedAtUtc);
             if (startedAt.getYear() != year) continue;
-            UserTest.Status status = (UserTest.Status) row[2];
-            boolean autoSubmitted = Boolean.TRUE.equals(row[3]);
-            long[] b = buckets[startedAt.getMonthValue() - 1];
-            b[0]++;
-            // Lượt hệ thống nộp hộ khi quá hạn không tính là hoàn thành.
-            if (status == UserTest.Status.COMPLETED && !autoSubmitted) b[1]++;
+            attempts[startedAt.getMonthValue() - 1]++;
         }
 
         long[] newUsers = new long[12];
@@ -207,10 +204,7 @@ public class DashboardService {
         List<MonthPerformance> months = new ArrayList<>();
         for (int m = 0; m < 12; m++) {
             String label = Month.of(m + 1).getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
-            long total = buckets[m][0];
-            long completed = buckets[m][1];
-            long rate = total == 0 ? 0 : Math.round(completed * 100.0 / total);
-            months.add(new MonthPerformance(label, total, rate, newUsers[m], visits[m], peakHour(hourHistogram[m])));
+            months.add(new MonthPerformance(label, attempts[m], newUsers[m], visits[m], peakHour(hourHistogram[m])));
         }
         return new MonthlyPerformanceResponse(year, availableYears, months);
     }
@@ -227,47 +221,16 @@ public class DashboardService {
         return best < 0 ? null : best;
     }
 
-    private List<NameValue> buildStatusDistribution() {
-        List<NameValue> result = new ArrayList<>();
-        result.add(new NameValue("Hoàn thành",
-                userTestRepository.countByStatusAndAutoSubmitted(UserTest.Status.COMPLETED, false)));
-        result.add(new NameValue("Tự nộp khi hết giờ",
-                userTestRepository.countByStatusAndAutoSubmitted(UserTest.Status.COMPLETED, true)));
-        result.add(new NameValue("Đang làm", userTestRepository.countByStatus(UserTest.Status.IN_PROGRESS)));
-        result.add(new NameValue("Hết hạn", userTestRepository.countByStatus(UserTest.Status.EXPIRED)));
-        return result;
-    }
-
-    private static final int TOP_TESTS_LIMIT = 8;
+    private static final int TEST_USAGE_MAX_SIZE = 50;
 
     @Transactional(readOnly = true)
-    public ContentInsightsResponse getContentInsights() {
-        return new ContentInsightsResponse(
-                buildTopTests(userTestRepository.aggregateFullTestStats(
-                        UserTest.Status.COMPLETED, UserTest.Mode.FULL_TEST)),
-                buildTopTests(userTestRepository.aggregatePracticeTestStats(
-                        UserTest.Status.COMPLETED, UserTest.Mode.PRACTICE))
-        );
-    }
-
-    private List<TestStat> buildTopTests(List<Object[]> aggregated) {
-        List<Object[]> rows = new ArrayList<>(aggregated);
-        rows.sort((a, b) -> Long.compare(((Number) b[1]).longValue(), ((Number) a[1]).longValue()));
-        List<Object[]> top = rows.stream().limit(TOP_TESTS_LIMIT).collect(Collectors.toList());
-
-        List<String> testIds = top.stream().map(r -> (String) r[0]).collect(Collectors.toList());
-        Map<String, String> titles = testRepository.findAllById(testIds).stream()
-                .collect(Collectors.toMap(Test::getTestId, Test::getTitle));
-
-        List<TestStat> result = new ArrayList<>();
-        for (Object[] r : top) {
-            String testId = (String) r[0];
-            long attempts = ((Number) r[1]).longValue();
-            long completed = r[2] == null ? 0 : ((Number) r[2]).longValue();
-            long rate = attempts == 0 ? 0 : Math.round(completed * 100.0 / attempts);
-            result.add(new TestStat(testId, titles.getOrDefault(testId, "(đã xoá)"),
-                    attempts, completed, rate));
-        }
-        return result;
+    public PageResponse<TestUsageStat> getTestUsage(int page, int size) {
+        Pageable pageable = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), TEST_USAGE_MAX_SIZE));
+        Page<Object[]> rows = userTestRepository.aggregateTestUsage(pageable);
+        return PageResponse.from(rows, r -> new TestUsageStat(
+                (String) r[0],
+                (String) r[1],
+                ((Number) r[2]).longValue(),
+                ((Number) r[3]).longValue()));
     }
 }

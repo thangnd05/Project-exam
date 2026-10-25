@@ -6,14 +6,13 @@ import { Row, Col, Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
-import { TopTestsTable } from '@/app/[locale]/(admin)/_components/ContentInsightsTables';
+import { TestUsageTable } from '@/app/[locale]/(admin)/_components/TestUsageTable';
 import { TopCountriesList } from '@/app/[locale]/(admin)/_components/TopCountriesList';
 import { AdminPageHeader } from '@/app/[locale]/(admin)/_components/common';
 import OverviewCard from '@/app/[locale]/(admin)/_components/OverviewCard';
 import {
     useDashboardStats,
     useMonthlyPerformance,
-    useContentInsights,
     useTrafficLocations,
 } from '@/app/[locale]/(admin)/_hooks/useDashboardStats';
 
@@ -27,10 +26,6 @@ const MonthlyActivityCombo = dynamic(
 );
 const MonthlyNewUsersLine = dynamic(
     () => import('@/app/[locale]/(admin)/_components/AdminCharts').then((m) => m.MonthlyNewUsersLine),
-    { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },
-);
-const ExamTypeDonut = dynamic(
-    () => import('@/app/[locale]/(admin)/_components/AdminCharts').then((m) => m.ExamTypeDonut),
     { ssr: false, loading: () => <Spinner animation="border" size="sm" /> },
 );
 const LocationsMap = dynamic(() => import('@/app/[locale]/(admin)/_components/LocationsMap'), {
@@ -69,28 +64,16 @@ const monthLabel = (t: AnalyticsT, month: string) => {
     return y && m ? t('monthLabel', { month: String(Number(m)), year: y }) : month;
 };
 
-// Tên trạng thái do API trả về (tiếng Việt cố định) -> khoá dịch
-const STATUS_KEYS: Record<string, 'completed' | 'autoSubmitted' | 'inProgress' | 'expired'> = {
-    'Hoàn thành': 'completed',
-    'Tự nộp khi hết giờ': 'autoSubmitted',
-    'Đang làm': 'inProgress',
-    'Hết hạn': 'expired',
-};
-
 const currentMonthKey = () => {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 };
 
 const Analytics = () => {
-    const { stats, statusDistribution, isLoading, isError } = useDashboardStats();
+    const { stats, isLoading, isError } = useDashboardStats();
     const t = useTranslations('AdminSystem.analytics');
     const tStats = useTranslations('AdminSystem.stats');
     const locale = useLocale();
-    const statusData = statusDistribution.map((item) => {
-        const key = item.name ? STATUS_KEYS[item.name] : undefined;
-        return key ? { ...item, name: t(`status.${key}`) } : item;
-    });
 
     const currentYear = new Date().getFullYear();
     const [perfYear, setPerfYear] = useState(currentYear);
@@ -102,8 +85,6 @@ const Analytics = () => {
         availableMonths: locAvailableMonths,
         topCountries: locCountries,
     } = useTrafficLocations(locMonth);
-
-    const { topTests = [], topPracticeTests = [] } = useContentInsights();
 
     const monthOptions = locAvailableMonths.includes(locMonth)
         ? locAvailableMonths
@@ -224,7 +205,7 @@ const Analytics = () => {
                     </Row>
 
                     <Row className={cx('chartsRow')}>
-                        <Col lg={8}>
+                        <Col lg={12}>
                             <ChartCard
                                 title={t('monthlyNewUsers')}
                                 height={300}
@@ -234,22 +215,12 @@ const Analytics = () => {
                                 <MonthlyNewUsersLine data={monthlyPerformance} />
                             </ChartCard>
                         </Col>
-                        <Col lg={4}>
-                            <ChartCard title={t('attemptStatus')} height={300} delay={0.55}>
-                                <ExamTypeDonut data={statusData} />
-                            </ChartCard>
-                        </Col>
                     </Row>
 
                     <Row className={cx('chartsRow')}>
-                        <Col lg={6}>
+                        <Col lg={12}>
                             <ChartCard title={t('topTests')} delay={0.6}>
-                                <TopTestsTable data={topTests} />
-                            </ChartCard>
-                        </Col>
-                        <Col lg={6}>
-                            <ChartCard title={t('topPracticeTests')} delay={0.65}>
-                                <TopTestsTable data={topPracticeTests} />
+                                <TestUsageTable />
                             </ChartCard>
                         </Col>
                     </Row>

@@ -148,13 +148,9 @@ public class UserTestService {
     }
 
     // Người làm mở lại đề sau khi đã hết giờ mà chưa nộp: hệ thống nộp hộ.
+    // Không ghi streak, giống lượt scheduler nộp hộ: người làm không thực sự nộp bài hôm nay.
     @Transactional
     public UserTest submitTimedOut(UserTest userTest) {
-        if (userTest.getUserId() != null) {
-            String userId = userTest.getUserId();
-            AfterCommitTasks.runQuietly(
-                    () -> streakService.recordActivity(userId, StreakActivityType.TEST_SUBMIT));
-        }
         return finalizeAttempt(userTest, Instant.now(), true);
     }
 

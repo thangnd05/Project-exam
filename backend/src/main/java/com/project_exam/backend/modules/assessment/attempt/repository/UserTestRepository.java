@@ -234,30 +234,21 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     List<Object[]> countGroupedByTestIdInAndUserId(
             @Param("testIds") List<String> testIds, @Param("userId") String userId);
 
-    long countByStatus(UserTest.Status status);
-
     long countByStatusAndAutoSubmitted(UserTest.Status status, boolean autoSubmitted);
 
-    @Query("SELECT ut.startedAt, ut.totalScore, ut.status, ut.autoSubmitted FROM UserTest ut WHERE ut.startedAt >= :from")
-    List<Object[]> findAttemptsSince(@Param("from") java.time.Instant from);
+    @Query("SELECT ut.startedAt FROM UserTest ut WHERE ut.startedAt >= :from")
+    List<java.time.Instant> findStartedAtSince(@Param("from") java.time.Instant from);
 
-    // Cột thứ 3 = số lượt người làm tự nộp (không tính lượt hệ thống nộp hộ khi quá hạn).
-    @Query("SELECT ut.testId, COUNT(ut), "
-            + "SUM(CASE WHEN ut.status = :completed AND ut.autoSubmitted = false THEN 1 ELSE 0 END) "
+    // Mỗi đề công khai (gộp thi thật + ôn luyện): testId, tên đề, số lượt làm, số người làm
+    // (tài khoản hoặc phiên khách khác nhau). Nhiều lượt nhất lên đầu.
+    @Query(value = "SELECT ut.testId, t.title, COUNT(ut), COUNT(DISTINCT COALESCE(ut.userId, ut.guestSessionId)) "
             + "FROM UserTest ut, Test t "
             + "WHERE t.testId = ut.testId AND t.classId IS NULL "
-            + "AND (ut.mode IS NULL OR ut.mode = :fullMode) "
-            + "GROUP BY ut.testId")
-    List<Object[]> aggregateFullTestStats(@Param("completed") UserTest.Status completed,
-                                          @Param("fullMode") UserTest.Mode fullMode);
-
-    @Query("SELECT ut.testId, COUNT(ut), "
-            + "SUM(CASE WHEN ut.status = :completed THEN 1 ELSE 0 END) "
-            + "FROM UserTest ut, Test t "
-            + "WHERE t.testId = ut.testId AND t.classId IS NULL "
-            + "AND ut.mode = :practiceMode "
-            + "GROUP BY ut.testId")
-    List<Object[]> aggregatePracticeTestStats(@Param("completed") UserTest.Status completed,
-                                              @Param("practiceMode") UserTest.Mode practiceMode);
+            + "GROUP BY ut.testId, t.title "
+            + "ORDER BY COUNT(ut) DESC, t.title ASC",
+            countQuery = "SELECT COUNT(DISTINCT ut.testId) FROM UserTest ut, Test t "
+                    + "WHERE t.testId = ut.testId AND t.classId IS NULL")
+    org.springframework.data.domain.Page<Object[]> aggregateTestUsage(
+            org.springframework.data.domain.Pageable pageable);
 
 }
