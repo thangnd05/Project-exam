@@ -5,8 +5,7 @@ import { useRouter } from '@/app/i18n/navigation';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import { BookmarkCheck } from 'lucide-react';
-import { IoArrowForward, IoExitOutline, IoTrashOutline } from 'react-icons/io5';
+import { IoArrowForward, IoTrashOutline } from 'react-icons/io5';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
@@ -89,9 +88,6 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
 
           <div className={px('options')}>
             <button type="button" className={px('option')} onClick={handleSave}>
-              <span className={px('optionIcon')}>
-                <BookmarkCheck size={20} aria-hidden="true" />
-              </span>
               <span className={px('optionText')}>
                 <span className={px('optionTitle')}>{t('saveTitle')}</span>
                 <span className={px('optionHint')}>
@@ -102,9 +98,6 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
             </button>
 
             <button type="button" className={px('option', 'optionDanger')} onClick={openExitConfirm}>
-              <span className={px('optionIcon')}>
-                <IoExitOutline aria-hidden="true" />
-              </span>
               <span className={px('optionText')}>
                 <span className={px('optionTitle')}>{t('exitTitle')}</span>
                 <span className={px('optionHint')}>

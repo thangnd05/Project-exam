@@ -5,16 +5,9 @@ import { Row, Col, Spinner, Alert, Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import {
-  BookOpen,
-  CheckSquare,
   ChevronDown,
   ChevronUp,
-  Clock,
-  Library,
   Pencil,
-  Rocket,
-  Settings,
-  Shuffle,
 } from 'lucide-react';
 import CoinPriceField from '@/app/features/tests/CoinPriceField';
 import { useBaseMetaData } from '@/app/features/tests/creator/hooks/useBaseMetaData';
@@ -142,12 +135,7 @@ const CreateTestFromBank = () => {
         <PageHeader
           label={t('page.label')}
           title={t('page.title')}
-          badgeLabel={
-            <>
-              <Library size={16} />
-              <span>{t('page.badge')}</span>
-            </>
-          }
+          badgeLabel={t('page.badge')}
         />
 
         {notification.message && (
@@ -164,7 +152,7 @@ const CreateTestFromBank = () => {
         <Form onSubmit={handleSubmit}>
           <div className={cx('configCard')}>
             <div className={cx('sectionTitle')}>
-              <Settings size={18} /> 1. {t('info.section')}
+              1. {t('info.section')}
             </div>
             <Row className="g-3">
               <Col md={8}>
@@ -183,7 +171,7 @@ const CreateTestFromBank = () => {
               <Col md={4}>
                 <div className={cx('formGroup')}>
                   <label>
-                    <Clock size={14} /> {t('info.duration')}
+                    {t('info.duration')}
                   </label>
                   <input
                     type="number"
@@ -219,7 +207,7 @@ const CreateTestFromBank = () => {
               <Col md={4}>
                 <div className={cx('formGroup')}>
                   <label>
-                    <Rocket size={14} /> {t('info.maxAttempts')}
+                    {t('info.maxAttempts')}
                   </label>
                   <input
                     type="number"
@@ -277,7 +265,7 @@ const CreateTestFromBank = () => {
           {testInfo.examTypeId && (examParts || []).length > 0 && (
             <div className={cx('configCard')}>
               <div className={cx('sectionTitle')}>
-                <Library size={18} /> 2. {t('parts.section')}
+                2. {t('parts.section')}
               </div>
               <p className={cx('hint')}>
                 {t.rich('page.hint', { strong: (chunks) => <strong>{chunks}</strong> })}
@@ -298,7 +286,7 @@ const CreateTestFromBank = () => {
                       aria-expanded={cfg.expanded}
                     >
                       <span className={cx('partName')}>
-                        <BookOpen size={20} /> {part.name}
+                        {part.name}
                       </span>
                       <span className={cx('partBadge')}>{t('parts.questionCount', { count })}</span>
                       {cfg.expanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
@@ -317,7 +305,7 @@ const CreateTestFromBank = () => {
                             }
                             aria-pressed={cfg.mode === SELECTION_MODES.RANDOM}
                           >
-                            <Shuffle size={18} /> {t('modes.random')}
+                            {t('modes.random')}
                           </button>
                           <button
                             type="button"
@@ -333,7 +321,7 @@ const CreateTestFromBank = () => {
                             }
                             aria-pressed={cfg.mode === SELECTION_MODES.SEQUENTIAL}
                           >
-                            <Rocket size={18} /> {t('modes.sequential')}
+                            {t('modes.sequential')}
                           </button>
                           <button
                             type="button"
@@ -345,7 +333,7 @@ const CreateTestFromBank = () => {
                             }
                             aria-pressed={cfg.mode === SELECTION_MODES.MANUAL}
                           >
-                            <CheckSquare size={18} /> {t('modes.manual')}
+                            {t('modes.manual')}
                           </button>
                         </div>
 
@@ -543,7 +531,7 @@ const CreateTestFromBank = () => {
                 </>
               ) : (
                 <>
-                  <Rocket size={16} /> {t('submit.submit')}
+                  {t('submit.submit')}
                 </>
               )}
             </ButtonPrime>

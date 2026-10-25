@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
-import { Save } from 'lucide-react';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
@@ -82,7 +81,6 @@ function BulkEditQuestionsModal({
           submitLabel={hasChange ? t('apply', { count: selectedCount }) : t('noChange')}
           loadingLabel={t('saving')}
           loading={saving || !hasChange}
-          submitIcon={Save}
         />
       }
     >

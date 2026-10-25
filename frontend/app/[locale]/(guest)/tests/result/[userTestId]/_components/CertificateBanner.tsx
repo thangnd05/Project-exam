@@ -3,7 +3,6 @@
 import { useRouter } from '@/app/i18n/navigation';
 import classNames from 'classnames/bind';
 import { useLocale, useTranslations } from 'next-intl';
-import { Award, Target } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { useAttemptCertificate } from '@/app/features/certificates/hooks/useCertificates';
@@ -33,7 +32,6 @@ function CertificateBanner({ userTestId, enabled }: CertificateBannerProps) {
   if (data.state === AttemptCertificateState.NOT_PASSED) {
     return (
       <div className={cx('banner', 'pending')}>
-        <Target size={28} className={cx('icon')} />
         <div className={cx('content')}>
           <h3 className={cx('title')}>{t('notPassedTitle')}</h3>
           <p className={cx('desc')}>
@@ -57,7 +55,6 @@ function CertificateBanner({ userTestId, enabled }: CertificateBannerProps) {
 
   return (
     <div className={cx('banner', 'achieved')}>
-      <Award size={28} className={cx('icon')} />
       <div className={cx('content')}>
         <h3 className={cx('title')}>
           {justIssued ? t('justIssuedTitle') : t('alreadyHaveTitle')}

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import {useTranslations} from 'next-intl';
 import {Form, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import {Check, Pencil, Plus, Trash2, X} from 'lucide-react';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -371,14 +371,14 @@ function MilestonesManagement() {
                       setEditParts({});
                     }}
                   >
-                    <X size={14} /> {tCommon('cancelShort')}
+                    {tCommon('cancelShort')}
                   </ButtonPrime>
                   <ButtonPrime
                     size="sm"
                     onClick={() => handleSaveEdit(m)}
                     disabled={submitting}
                   >
-                    <Check size={14} /> {tCommon('save')}
+                    {tCommon('save')}
                   </ButtonPrime>
                 </div>
               </>

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { IoCodeSlashOutline, IoFlashOutline } from 'react-icons/io5';
 import { standardizeVocabularies } from '@/app/apis/vocabularyApi';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -155,7 +154,6 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
                             onClick={handleStandardize}
                             disabled={aiLoading || loading}
                         >
-                            <IoFlashOutline className="me-1" />
                             {aiLoading ? tCommon('processing') : t('bulkImport.standardize')}
                         </ButtonPrime>
                         <ButtonPrime
@@ -165,7 +163,6 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
                             onClick={() => setJsonInput(exampleJson)}
                             disabled={aiLoading || loading}
                         >
-                            <IoCodeSlashOutline className="me-1" />
                             {t('bulkImport.showSample')}
                         </ButtonPrime>
                     </div>

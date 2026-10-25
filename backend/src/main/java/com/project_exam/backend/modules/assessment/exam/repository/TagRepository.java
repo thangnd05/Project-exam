@@ -11,6 +11,4 @@ public interface TagRepository extends JpaRepository<Tag, String> {
 
     List<Tag> findByExamTypeIdOrderBySortOrderAsc(String examTypeId);
 
-    boolean existsByNameAndExamTypeId(String name, String examTypeId);
-
 }

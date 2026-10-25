@@ -21,5 +21,4 @@ public interface ReactRepository extends JpaRepository<React, String> {
 
     @Query("SELECT r.type, COUNT(r) FROM React r WHERE r.postId = :postId GROUP BY r.type")
     List<Object[]> countGroupedByTypeForPost(@Param("postId") String postId);
-    void deleteByPostIdAndUserId(String postId, String userId);
 }

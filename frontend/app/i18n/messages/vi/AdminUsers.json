@@ -152,7 +152,6 @@
     "description": "Quản lý bài giảng, video, tài liệu gắn với các Tag kiến thức.",
     "add": "Thêm tài liệu",
     "searchPlaceholder": "Tìm theo tiêu đề, mô tả, tag...",
-    "allExamTypes": "Tất cả loại kỳ thi",
     "empty": "Không có tài liệu nào.",
     "sharedGroup": "Dùng chung",
     "partFallback": "Phần thi",

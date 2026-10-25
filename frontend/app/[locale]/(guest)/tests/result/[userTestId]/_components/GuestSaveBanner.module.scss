@@ -43,25 +43,7 @@
   }
 }
 
-.optionIcon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: var(--surface-tint);
-  color: var(--primary-text);
-  font-size: 2rem;
-}
-
 .optionDanger {
-  .optionIcon {
-    background: var(--danger-bg);
-    color: var(--danger-text);
-  }
-
   &:hover {
     border-color: var(--danger-border);
   }

@@ -9,7 +9,7 @@ import TagSelector from '@/app/features/tests/TagSelector/TagSelector';
 import { buildCollectionTree } from '@/app/features/tests/collectionTree';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import { CheckCircle2, Pencil, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { PassageMediaList } from '@/app/features/tests/passageMedia';
 import { useEditQuestionModal } from '@/app/features/tests/hooks/useEditQuestionModal';
 import { QuestionUsageScope } from '@/app/enums';
@@ -78,7 +78,6 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
             cancelLabel={tCommon('cancelShort')}
             submitLabel={t('editTest.submit')}
             loadingLabel={t('editTest.saving')}
-            submitIcon={CheckCircle2}
           />
         }
       >
@@ -284,7 +283,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
 
                 <Col md={12}>
                   <ButtonPrime variant="outline" size="sm" onClick={addExtraContent}>
-                    <Pencil className="me-1" size={16} /> {t('form.passage.addText')}
+                    {t('form.passage.addText')}
                   </ButtonPrime>
                 </Col>
 
@@ -374,7 +373,7 @@ const EditQuestionModal = ({ show, onHide, questionId, onSuccess }: EditQuestion
                     onClick={addAnswer}
                     disabled={formData.options.length >= 10}
                   >
-                    <Pencil className="me-1" size={16} /> {t('questionBlock.addAnswer')}
+                    {t('questionBlock.addAnswer')}
                   </ButtonPrime>
                 </Col>
 

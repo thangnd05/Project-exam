@@ -58,7 +58,6 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
     Integer lockStartOf(@Param("ownerId") String ownerId, @Param("testId") String testId);
 
     List<UserTest> findByGuestSessionId(String guestSessionId);
-    List<UserTest> findByGuestSessionIdAndTestIdOrderByStartedAtDesc(String guestSessionId, String testId);
 
     @Query("SELECT ut FROM UserTest ut WHERE ut.status = :status AND ut.startedAt < :cutoff "
             + "AND (ut.mode = :practiceMode "
@@ -92,9 +91,7 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
                                             @Param("closedBefore") java.time.Instant closedBefore,
                                             @Param("limit") int limit);
 
-    List<UserTest> findByUserIdAndTestId(String userId, String testId);
     List<UserTest> findByUserIdAndTestIdOrderByStartedAtDesc(String userId, String testId);
-    List<UserTest> findByTestIdAndStatus(String testId, UserTest.Status status);
 
     interface LeaderboardRow {
         String getUserTestId();
@@ -177,8 +174,6 @@ public interface UserTestRepository extends JpaRepository<UserTest, String>,
 
     List<UserTest> findByUserIdAndStatusAndFinishedAtIsNotNullOrderByFinishedAtDesc(
             String userId, UserTest.Status status);
-
-    List<UserTest> findByTestIdOrderByTotalScoreDesc(String testId);
 
     Optional<UserTest> findTopByUserIdAndTestIdOrderByStartedAtDesc(String userId, String testId);
     Optional<UserTest> findTopByUserIdOrderByStartedAtDesc(String userId);

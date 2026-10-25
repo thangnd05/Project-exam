@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface LearningPlanRepository extends JpaRepository<LearningPlan, String> {
@@ -17,9 +16,6 @@ public interface LearningPlanRepository extends JpaRepository<LearningPlan, Stri
     List<LearningPlan> findByUserIdOrderByCreatedAtDesc(String userId);
 
     List<LearningPlan> findBySourceUserTestIdIn(java.util.Collection<String> sourceUserTestIds);
-
-    Optional<LearningPlan> findTopByUserIdAndExamTypeIdAndStatusOrderByCreatedAtDesc(
-            String userId, String examTypeId, LearningPlan.Status status);
 
     List<LearningPlan> findByUserIdAndExamTypeIdAndStatus(
             String userId, String examTypeId, LearningPlan.Status status);

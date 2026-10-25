@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useTranslations } from 'next-intl';
-import { ClipboardCheck, Play } from 'lucide-react';
 import MockStageGuide from './_components/MockStageGuide';
 import PlanCongratsModal, {
   congratsSeenKey,
@@ -224,7 +223,7 @@ function PlanDetail() {
         {!isReplaced && isMockStage && (
           <div className={cx('planHeroCtaBox')}>
             <Link href={mockTestsTo} className={cx('planHeroCta')}>
-              <ClipboardCheck size={16} /> {t('common.takeMock')}
+              {t('common.takeMock')}
             </Link>
             <span className={cx('planHeroCtaHint')}>{t('detail.mockCtaHint')}</span>
           </div>
@@ -235,7 +234,7 @@ function PlanDetail() {
             href={`/learning-plans/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
             className={cx('planHeroCta')}
           >
-            <Play size={16} /> {t('detail.enterTask')}
+            {t('detail.enterTask')}
           </Link>
         )}
       </PageHeader>

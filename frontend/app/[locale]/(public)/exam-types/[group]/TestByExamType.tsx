@@ -9,7 +9,6 @@ import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
 import {
   IoChevronDown,
   IoDocumentTextOutline,
-  IoRibbonOutline,
 } from 'react-icons/io5';
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
 import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
@@ -240,9 +239,6 @@ function TestByExamType({ examTypeId, examSlug }: { examTypeId: string; examSlug
                   aria-expanded={certificateOpen}
                   aria-controls="certificate-exams"
                 >
-                  <span className={cx('certificateIcon')} aria-hidden="true">
-                    <IoRibbonOutline />
-                  </span>
                   <span className={cx('certificateText')}>
                     <span className={cx('certificateTitle')}>
                       {t('detail.certificate.title')}

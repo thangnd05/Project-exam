@@ -41,12 +41,6 @@
     },
     "capstone1": "Ải cuối chặng  lần 1",
     "capstone2": "Ải cuối chặng  lần 2",
-    "summary": {
-      "target": "đạt mục tiêu",
-      "targetScore": "đạt {score} điểm",
-      "syllabus": "Đi theo chương trình học, chưa có chẩn đoán. {total} ải trải đều các phần, để {target}.",
-      "diagnosis": "Độ sẵn sàng {readiness}%. {total} ải cho các phần chưa đạt mục tiêu, để {target}."
-    },
     "resync": {
       "achieved": "Bạn đã đạt mục tiêu mới  lộ trình hiện tại được đánh dấu hoàn thành, chưa cần lộ trình mới.",
       "reopened": "Đã cập nhật theo mục tiêu mới  {count} ải phải vượt lại vì ngưỡng mới cao hơn.",

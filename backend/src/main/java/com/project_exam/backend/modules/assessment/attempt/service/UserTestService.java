@@ -142,8 +142,8 @@ public class UserTestService {
         return finalizeAttempt(userTest, Instant.now());
     }
 
-    @Transactional
-    public UserTest finalizeAttempt(UserTest userTest, Instant now) {
+    // Chỉ gọi từ submitTest / finalizeIfExpired, đã nằm trong transaction của chúng.
+    private UserTest finalizeAttempt(UserTest userTest, Instant now) {
         Test test = testRepository.findById(userTest.getTestId())
                 .orElseThrow(() -> new NotFoundException("Test not found"));
 

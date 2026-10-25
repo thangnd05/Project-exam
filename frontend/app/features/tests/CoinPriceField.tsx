@@ -1,7 +1,6 @@
 'use client';
 
 import { Col } from 'react-bootstrap';
-import { IoRocketOutline } from 'react-icons/io5';
 import { useTranslations } from 'next-intl';
 import { useHasPermission } from '@/app/hooks/usePermission';
 import { PermissionCode } from '@/app/enums';
@@ -31,7 +30,7 @@ const CoinPriceField = ({
     <Col md={md}>
       <div className={groupClassName}>
         <label>
-          <IoRocketOutline /> {t('coinPrice.label')}
+          {t('coinPrice.label')}
         </label>
         <input
           type="number"

@@ -167,14 +167,16 @@
   li {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
   }
 
-  svg {
+  li::before {
+    content: '';
     flex-shrink: 0;
-    font-size: 1.4em;
-    stroke-width: 3;
-    color: var(--primary);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--primary);
   }
 }
 

@@ -7,7 +7,6 @@ import { useTranslations } from "next-intl";
 import { Alert } from "react-bootstrap";
 import { useJoinClass } from '@/app/features/classes/hooks/useMyClasses';
 import classNames from "classnames/bind";
-import { FaKey, FaInfoCircle } from "react-icons/fa";
 import { useAuth } from "@/app/hooks/useAuth";
 import routes from "@/app/configs/Routes";
 import CommonFormModal from "@/app/components/modal/CommonFormModal";
@@ -109,10 +108,6 @@ function JoinClassModal({ show, onClose }: JoinClassModalProps) {
                 <label className={cx("label")}>{t("joinClass.codeLabel")}</label>
 
                 <div className={cx("inputWrapper")}>
-                    <span className={cx("inputIcon")}>
-                        <FaKey />
-                    </span>
-
                     <input
                         type="text"
                         className={cx("inputControl")}
@@ -124,7 +119,6 @@ function JoinClassModal({ show, onClose }: JoinClassModalProps) {
                 </div>
 
                 <div className={cx("tip")}>
-                    <FaInfoCircle />
                     <span>{t("joinClass.codeTip")}</span>
                 </div>
             </div>

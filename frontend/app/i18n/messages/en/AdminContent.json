@@ -92,8 +92,6 @@
     "description": "Configure the parts of each exam type.",
     "add": "Add exam part",
     "searchPlaceholder": "Search parts by name, description, exam type...",
-    "filterByExamType": "Filter by exam type",
-    "allExamTypes": "-- All exam types --",
     "unknownExamType": "Unknown",
     "empty": "No exam parts.",
     "partCount": "{count, plural, one {# part} other {# parts}}",
@@ -215,7 +213,6 @@
       "side": "Beside the questions (2 columns)",
       "stacked": "Above the questions (stacked)"
     },
-    "propertiesSection": "Element properties",
     "zone": "Zone",
     "align": "Alignment",
     "alignOptions": {
@@ -419,7 +416,6 @@
     "jsonSubmit": "Create",
     "jsonHelp": "Paste a JSON array in this format:",
     "searchPlaceholder": "Search by exam type, skill or score...",
-    "allExamTypes": "All exam types",
     "allSkills": "All skills",
     "addTitle": "Add conversion rule",
     "selectExamType": "Select exam type",

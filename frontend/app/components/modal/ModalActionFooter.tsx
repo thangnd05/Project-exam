@@ -14,7 +14,6 @@ type ModalActionFooterProps = {
   loading?: boolean;
   onCancel?: () => void;
   onSubmit?: () => void;
-  submitIcon?: React.ElementType;
 };
 
 function ModalActionFooter({
@@ -24,7 +23,6 @@ function ModalActionFooter({
   loading = false,
   onCancel,
   onSubmit,
-  submitIcon: SubmitIcon,
 }: ModalActionFooterProps) {
   const t = useTranslations('Common');
   const submitText = submitLabel ?? t('save');
@@ -50,7 +48,6 @@ function ModalActionFooter({
         onClick={onSubmit}
         disabled={loading}
       >
-        {SubmitIcon ? <SubmitIcon className="me-2" /> : null}
         {loading ? loadingLabel || submitText : submitText}
       </ButtonPrime>
     </>

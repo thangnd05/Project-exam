@@ -241,13 +241,6 @@ public class TestCatalogService {
         return summaryAssembler.buildAdminTestSummariesBatch(result);
     }
 
-    public List<TestAdminResponse> getAdminTestsByCreatedUser(String userId) {
-        if (userId == null) {
-            return List.of();
-        }
-        return summaryAssembler.buildAdminTestSummariesBatch(testRepository.findByCreatedBy(userId));
-    }
-
     private QuickChallengeCardResponse buildQuickChallengeCard(
             Test test,
             ExamType examType,

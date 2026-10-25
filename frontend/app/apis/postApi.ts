@@ -115,10 +115,6 @@ export const updateComment = (commentId: string, data: CommentRequest): Promise<
   return axios.put(`/api/comments/${commentId}`, data).then((response) => response.data);
 };
 
-export const getReacts = (postId: string): Promise<ReactSummaryResponse> => {
-  return axios.get(`${BASE_URL}/${postId}/reacts`).then((response) => response.data);
-};
-
 export const toggleReact = (postId: string, data: ReactRequest): Promise<ReactSummaryResponse> => {
   return axios.post(`${BASE_URL}/${postId}/reacts`, data).then((response) => response.data);
 };
@@ -137,8 +133,4 @@ export const getSavedPosts = ({ page = 0, size = 10, keyword }: PostListParams =
   return axios
     .get(`${BASE_URL}/saved?${params.toString()}`)
     .then((response) => response.data);
-};
-
-export const getSaveStatus = (postId: string): Promise<SavedPostStatusResponse> => {
-  return axios.get(`${BASE_URL}/${postId}/save`).then((response) => response.data);
 };

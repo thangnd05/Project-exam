@@ -1,8 +1,5 @@
 package com.project_exam.backend.modules.vocabulary.lookup.service;
 
-import com.project_exam.backend.modules.assessment.exam.domain.Answer;
-import com.project_exam.backend.modules.assessment.exam.domain.Passage;
-import com.project_exam.backend.modules.assessment.exam.domain.Question;
 import com.project_exam.backend.shared.exception.BadRequestException;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
@@ -34,8 +31,6 @@ public class GeminiService {
     private static final int CONNECT_TIMEOUT_MS = 10_000;
     private static final int READ_TIMEOUT_MS = 30_000;
 
-    private static final double EXPLAIN_TEMPERATURE = 0.5;
-    private static final int EXPLAIN_MAX_TOKENS = 1024;
     private static final double VOCAB_TEMPERATURE = 0.2;
     private static final int VOCAB_MAX_TOKENS = 2048;
 
@@ -58,11 +53,7 @@ public class GeminiService {
     @Value("classpath:prompts/vocabulary-standardize.md")
     private Resource vocabularyPromptResource;
 
-    @Value("classpath:prompts/question-explain.md")
-    private Resource questionExplainPromptResource;
-
     private String vocabularyPromptTemplate;
-    private String questionExplainPromptTemplate;
 
     private final RestTemplate restTemplate;
 
@@ -77,24 +68,9 @@ public class GeminiService {
     void loadPromptTemplates() {
         try {
             vocabularyPromptTemplate = vocabularyPromptResource.getContentAsString(StandardCharsets.UTF_8);
-            questionExplainPromptTemplate = questionExplainPromptResource.getContentAsString(StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new IllegalStateException("Không thể load prompt template từ classpath: " + e.getMessage(), e);
         }
-    }
-
-    public String explainQuestion(Question question, List<Answer> answers, Passage passage) {
-        if (question == null) {
-            throw new BadRequestException("Câu hỏi không được để trống.");
-        }
-        if (answers == null || answers.isEmpty()) {
-            throw new BadRequestException("Danh sách đáp án không được để trống.");
-        }
-
-        logger.info("Gọi Gemini API để giải thích câu hỏi ID: {}", question.getQuestionId());
-
-        String prompt = buildExplainPrompt(question, answers, passage);
-        return callGeminiApi(prompt, EXPLAIN_TEMPERATURE, EXPLAIN_MAX_TOKENS);
     }
 
     public String standardizeVocabulary(String rawText) {
@@ -107,36 +83,6 @@ public class GeminiService {
         String prompt = buildVocabularyPrompt(rawText);
         String result = callGeminiApi(prompt, VOCAB_TEMPERATURE, VOCAB_MAX_TOKENS);
         return result.replaceAll("(?s)```json\\s*|```", "").trim();
-    }
-
-    private String buildExplainPrompt(Question question, List<Answer> answers, Passage passage) {
-        StringBuilder userData = new StringBuilder(512);
-
-        if (passage != null) {
-            String content = passage.getContent();
-            String mediaUrl = passage.getMediaUrl();
-            if (content != null && !content.isBlank()) {
-                userData.append("DỮ LIỆU NGỮ CẢNH (ĐOẠN VĂN):\n").append(content).append("\n\n");
-            } else if (mediaUrl != null && !mediaUrl.isBlank()) {
-                userData.append("DỮ LIỆU NGỮ CẢNH: Đây là một câu hỏi dựa trên một bài nghe.\n\n");
-            }
-        }
-
-        userData.append("DỮ LIỆU CÂU HỎI:\n");
-        userData.append("Câu hỏi: ").append(question.getQuestionText()).append("\n");
-
-        for (Answer a : answers) {
-            userData.append("- ")
-                    .append(a.getAnswerLabel())
-                    .append(": ")
-                    .append(a.getAnswerText());
-            if (Boolean.TRUE.equals(a.getIsCorrect())) {
-                userData.append(" (Đây là đáp án đúng)");
-            }
-            userData.append("\n");
-        }
-
-        return questionExplainPromptTemplate.replace("{{userData}}", userData.toString());
     }
 
     private String buildVocabularyPrompt(String rawText) {

@@ -7,12 +7,10 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import javax.crypto.SecretKey;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -122,15 +120,6 @@ public class JwtService {
     }
 
     /**
-     * Access token hợp lệ để xác thực request. Token cấp trước khi có claim "type"
-     * vẫn được chấp nhận để không đăng xuất người dùng khi deploy; chỉ chặn refresh token.
-     */
-    public boolean isAccessToken(String token) {
-        Claims claims = extractAllClaims(token);
-        return claims != null && !isRefreshClaims(claims);
-    }
-
-    /**
      * Access token dùng được để xác thực: không phải refresh token và gắn với một phiên (fid) chưa bị thu hồi.
      * Token không có fid (cấp từ bản cũ) bị từ chối, client tự gọi /api/auth/refresh để lấy token mới.
      */
@@ -149,23 +138,6 @@ public class JwtService {
     private boolean isTokenExpired(String token) {
         Date expiration = extractClaim(token, Claims::getExpiration);
         return expiration != null && expiration.before(new Date());
-    }
-
-public String resolveToken(HttpServletRequest request) {
-
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("accessToken".equals(cookie.getName())) {
-                    return cookie.getValue();
-                }
-            }
-        }
-
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
     }
 
     public Claims extractAllClaimsFromRequest(HttpServletRequest request) {

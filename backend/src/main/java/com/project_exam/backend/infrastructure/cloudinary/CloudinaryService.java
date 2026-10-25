@@ -51,11 +51,6 @@ public class CloudinaryService {
         return (String) uploadResult.get("secure_url");
     }
 
-    public Map updateImage(String publicId, MultipartFile file) throws IOException {
-        return cloudinary.uploader().upload(file.getBytes(),
-                ObjectUtils.asMap("public_id", publicId, "resource_type", "auto"));
-    }
-
     public void deleteFile(String publicId) throws IOException {
         cloudinary.uploader().destroy(publicId, ObjectUtils.asMap("resource_type", "auto"));
     }

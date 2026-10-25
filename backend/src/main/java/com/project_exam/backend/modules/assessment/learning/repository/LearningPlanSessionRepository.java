@@ -9,9 +9,6 @@ import java.util.Optional;
 
 public interface LearningPlanSessionRepository extends JpaRepository<LearningPlanSession, String> {
 
-    Optional<LearningPlanSession> findFirstByLearningPlanIdAndStatusOrderByStartedAtDesc(
-            String learningPlanId, SessionStatus status);
-
     Optional<LearningPlanSession> findFirstByLearningPlanIdAndTaskIdAndStatusOrderByStartedAtDesc(
             String learningPlanId, String taskId, SessionStatus status);
 

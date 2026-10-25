@@ -64,9 +64,6 @@ export const taskStatusLabel = (t: LearningPlansT, status?: string | null): stri
   return key ? t(key) : status || '-';
 };
 
-export const taskStatusVariant = (status?: string | null): string =>
-  TASK_STATUS[status as string]?.variant || 'badgeMuted';
-
 export function taskDisplayName(t: LearningPlansT, task?: PlanTaskResponse | null): string {
   if (!task) return '-';
   if (task.taskType === PlanTaskType.PART_CAPSTONE_1) return t('labels.capstone1');
@@ -76,20 +73,6 @@ export function taskDisplayName(t: LearningPlansT, task?: PlanTaskResponse | nul
 
 export function isCapstoneTask(task?: PlanTaskResponse | null): boolean {
   return CAPSTONE_TYPES.has(task?.taskType as string);
-}
-
-export function buildPlanSummary(t: LearningPlansT, plan: PlanResponse): string {
-  const target = plan.targetScore == null
-    ? t('labels.summary.target')
-    : t('labels.summary.targetScore', { score: plan.targetScore });
-  if (plan.baselineReadiness == null) {
-    return t('labels.summary.syllabus', { total: plan.totalTasks ?? 0, target });
-  }
-  return t('labels.summary.diagnosis', {
-    readiness: plan.baselineReadiness,
-    total: plan.totalTasks ?? 0,
-    target,
-  });
 }
 
 export function buildResyncMessage(t: LearningPlansT, plan?: PlanResponse | null): string {

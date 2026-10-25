@@ -25,7 +25,7 @@ interface StartTestOptions {
   examPartIds?: string[];
 }
 
-export const getMyUserTests = (params: MyUserTestsParams = {}): Promise<UserTestResponse[]> => {
+const getMyUserTests = (params: MyUserTestsParams = {}): Promise<UserTestResponse[]> => {
   return axios.get(`${BASE_URL}/my`, { params }).then((res) => res.data);
 };
 

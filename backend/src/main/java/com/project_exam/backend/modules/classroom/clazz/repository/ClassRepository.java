@@ -10,12 +10,10 @@ import java.util.Optional;
 @Repository
 public interface ClassRepository extends JpaRepository<ClassEntity, String> {
 
-    boolean existsByClassId(String classId);
     boolean existsByClassQr(String classQr);
 
     List<ClassEntity> findByTeacherId(String teacherId);
 
-    Optional<ClassEntity> findByclassId(String classId);
     Optional<ClassEntity> findByClassQr(String classQr);
 
     boolean existsByClassIdAndTeacherId(String classId, String teacherId);

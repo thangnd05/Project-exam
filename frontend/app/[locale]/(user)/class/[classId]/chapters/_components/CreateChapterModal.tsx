@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import classNames from 'classnames/bind';
 import { useCreateChapter } from '@/app/[locale]/(user)/class/[classId]/chapters/_hooks/useChaptersOfClass';
 import { toast } from 'react-toastify';
@@ -69,9 +68,6 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapter
             <div className={cx('formGroup')}>
                 <label className={cx('label')}>{t('common.chapterName')}</label>
                 <div className={cx('inputWrapper')}>
-                    <span className={cx('inputIcon')}>
-                        <FaEdit />
-                    </span>
                     <input
                         type="text"
                         className={cx('inputControl')}
@@ -97,7 +93,6 @@ const CreateChapterModal = ({ show, onClose, classId, onSuccess }: CreateChapter
                     />
                 </div>
                 <div className={cx('tip')}>
-                    <FaInfoCircle />
                     <span>{t('createChapter.descriptionTip')}</span>
                 </div>
             </div>

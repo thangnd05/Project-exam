@@ -19,12 +19,7 @@ import {
     CheckCircle,
     XCircle,
     ArrowLeft,
-    SkipForward,
-    Sparkles,
     BookOpen,
-    Target,
-    Trophy,
-    ChevronRight,
     Volume2
 } from 'lucide-react';
 import type { PracticeCheckRequest, PracticeCheckResponse, PracticeQuestionResponse } from '@/app/types';
@@ -192,9 +187,6 @@ const Practice = () => {
                         animate={{opacity: 1, y: 0}}
                         className={cx('finishedCard')}
                     >
-                        <div className={cx('finishedIcon')}>
-                            <Trophy size={64} />
-                        </div>
                         <h2 className={cx('finishedTitle')}>{t('practice.finishedTitle')}</h2>
                         <p className={cx('finishedSubtitle')}>
                             {t('practice.finishedSubtitle')}
@@ -243,7 +235,6 @@ const Practice = () => {
                             exit={{opacity: 0, y: -20}}
                             className={cx('toast', knownMessage === 'markError' ? 'error' : 'success')}
                         >
-                            <Sparkles size={18} />
                             <span>{t(`practice.${knownMessage}`)}</span>
                         </motion.div>
                     )}
@@ -256,7 +247,6 @@ const Practice = () => {
                 >
                     <div className={cx('headerLeft')}>
                         <div className={cx('typeBadge')}>
-                            {isMultiChoice ? <Target size={16} /> : <BookOpen size={16} />}
                             <span>{isMultiChoice ? t('practice.multiChoice') : t('practice.typeWord')}</span>
                         </div>
                     </div>
@@ -428,15 +418,7 @@ const Practice = () => {
                                         onClick={handleNext}
                                         disabled={loadingNext}
                                     >
-                                        {loadingNext ? (
-                                            <Spinner size="sm" animation="border" />
-                                        ) : (
-                                            <>
-                                                <SkipForward size={18} />
-                                                {t('practice.next')}
-                                                <ChevronRight size={18} />
-                                            </>
-                                        )}
+                                        {loadingNext ? <Spinner size="sm" animation="border" /> : t('practice.next')}
                                     </ButtonPrime>
                                     <ButtonPrime
                                         variant="success"
@@ -444,7 +426,6 @@ const Practice = () => {
                                         onClick={handleMarkKnown}
                                         disabled={markingKnown}
                                     >
-                                        <Sparkles size={18} />
                                         {markingKnown ? tCommon('processing') : t('practice.known')}
                                     </ButtonPrime>
                                 </>

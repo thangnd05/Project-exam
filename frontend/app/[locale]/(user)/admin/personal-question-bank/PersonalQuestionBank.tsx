@@ -3,13 +3,10 @@
 import { useState } from 'react';
 import { Alert, Spinner } from 'react-bootstrap';
 import {
-  BookOpen,
   ChevronDown,
   ChevronUp,
   Eye,
-  Library,
   Pencil,
-  School,
   Trash2,
 } from 'lucide-react';
 import classNames from 'classnames/bind';
@@ -143,16 +140,11 @@ const PersonalQuestionBank = () => {
                 : t('bank.title.personal')
           }
           badgeLabel={
-            <>
-              <Library size={16} />
-              <span>
-                {bankScope === BANK_SCOPE.CLASS
-                  ? t('bank.badge.class')
-                  : bankScope === BANK_SCOPE.ADMIN
-                    ? t('bank.badge.admin')
-                    : t('bank.badge.personal')}
-              </span>
-            </>
+            bankScope === BANK_SCOPE.CLASS
+              ? t('bank.badge.class')
+              : bankScope === BANK_SCOPE.ADMIN
+                ? t('bank.badge.admin')
+                : t('bank.badge.personal')
           }
         />
 
@@ -169,7 +161,7 @@ const PersonalQuestionBank = () => {
 
         <div className={cx('card')}>
           <div className={cx('sectionTitle')}>
-            <School size={18} /> {t('bank.filters')}
+            {t('bank.filters')}
           </div>
 
           <div className={cx('scopeSwitch')}>
@@ -268,7 +260,7 @@ const PersonalQuestionBank = () => {
         {bankScope === BANK_SCOPE.CLASS && selectedClassId && (
           <div className={cx('card')}>
             <div className={cx('sectionTitle')}>
-              <BookOpen size={18} /> {t('bank.byChapter')}
+              {t('bank.byChapter')}
             </div>
 
             {chaptersLoading ? (
@@ -300,7 +292,7 @@ const PersonalQuestionBank = () => {
                       aria-expanded={cfg.expanded}
                     >
                       <span className={cx('partName')}>
-                        <BookOpen size={20} /> {chapter.title}
+                        {chapter.title}
                       </span>
                       <span className={cx('partBadge')}>{t('bank.questionCountRaw', { count: displayCount })}</span>
                       {cfg.expanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
@@ -340,7 +332,7 @@ const PersonalQuestionBank = () => {
                                       {q.questionText || t('parts.noContent')}
                                       {collectionName ? (
                                         <span className={cx('collectionBadge')} title={t('bank.collectionBadgeTitle')}>
-                                          <Library size={12} /> {collectionName}
+                                          {collectionName}
                                         </span>
                                       ) : (
                                         <span
@@ -411,7 +403,6 @@ const PersonalQuestionBank = () => {
           examParts?.length > 0 && (
             <div className={cx('card')}>
               <div className={cx('sectionTitle')}>
-                <BookOpen size={18} />{' '}
                 {bankScope === BANK_SCOPE.ADMIN
                   ? t('bank.adminByPart')
                   : t('bank.byPart')}
@@ -436,7 +427,7 @@ const PersonalQuestionBank = () => {
                       aria-expanded={cfg.expanded}
                     >
                       <span className={cx('partName')}>
-                        <BookOpen size={20} /> {part.name}
+                        {part.name}
                       </span>
                       <span className={cx('partBadge')}>
                         {collectionFilter ? t('bank.questionCountRaw', { count: `${total}/${totalAll}` }) : t('parts.questionCount', { count: total })}
@@ -473,7 +464,7 @@ const PersonalQuestionBank = () => {
                                     {q.questionText || t('parts.noContent')}
                                     {collectionName ? (
                                       <span className={cx('collectionBadge')} title={t('bank.collectionBadgeTitle')}>
-                                        <Library size={12} /> {collectionName}
+                                        {collectionName}
                                       </span>
                                     ) : (
                                       <span

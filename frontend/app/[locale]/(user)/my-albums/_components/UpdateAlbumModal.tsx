@@ -4,8 +4,6 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from 'react-toastify';
 import classNames from "classnames/bind";
-import { FaEdit, FaInfoCircle } from "react-icons/fa";
-import { IoSaveOutline } from "react-icons/io5";
 import CommonFormModal from "@/app/components/modal/CommonFormModal";
 import ModalActionFooter from "@/app/components/modal/ModalActionFooter";
 import styles from "@/app/components/modal/CommonFormModal.module.scss";
@@ -79,16 +77,12 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalP
                     loading={loading}
                     onCancel={onClose}
                     onSubmit={handleUpdate}
-                    submitIcon={IoSaveOutline}
                 />
             )}
         >
             <div className={cx("formGroup")}>
                 <label className={cx("label")}>{t('albumForm.name')}</label>
                 <div className={cx("inputWrapper")}>
-                    <span className={cx("inputIcon")}>
-                        <FaEdit />
-                    </span>
                     <input
                         type="text"
                         className={cx("inputControl")}
@@ -114,7 +108,6 @@ function UpdateAlbumModal({ show, onClose, onSuccess, album }: UpdateAlbumModalP
                     />
                 </div>
                 <div className={cx("tip")}>
-                    <FaInfoCircle />
                     <span>{t('albumForm.descriptionTip')}</span>
                 </div>
             </div>

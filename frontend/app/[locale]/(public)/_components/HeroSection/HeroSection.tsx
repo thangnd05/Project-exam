@@ -2,7 +2,6 @@
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
-import { FiCheck } from 'react-icons/fi';
 import routes from '@/app/configs/Routes';
 import Link from '@/app/i18n/navigation';
 import { PROVIDERS } from '../../_lib/providers';
@@ -54,7 +53,6 @@ function HeroSection() {
             <motion.ul className={cx('highlights')} {...rise(0.24)}>
               {HIGHLIGHTS.map((key) => (
                 <li key={key}>
-                  <FiCheck aria-hidden="true" />
                   <span>{t(`highlights.${key}`)}</span>
                 </li>
               ))}

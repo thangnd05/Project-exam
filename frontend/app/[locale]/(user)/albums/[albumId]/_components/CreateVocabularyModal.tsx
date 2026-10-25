@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { IoText, IoLanguage } from 'react-icons/io5';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
@@ -79,9 +78,6 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVoca
             <div className={cx('formGroup')}>
                 <label className={cx('label')}>{t('vocabForm.word')}</label>
                 <div className={cx('inputWrapper')}>
-                    <span className={cx('inputIcon')}>
-                        <IoText />
-                    </span>
                     <input
                         type="text"
                         name="word"
@@ -98,9 +94,6 @@ const CreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: CreateVoca
             <div className={cx('formGroup')}>
                 <label className={cx('label')}>{t('vocabForm.meaning')}</label>
                 <div className={cx('inputWrapper')}>
-                    <span className={cx('inputIcon')}>
-                        <IoLanguage />
-                    </span>
                     <input
                         type="text"
                         name="meaning"

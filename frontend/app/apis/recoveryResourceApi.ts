@@ -10,12 +10,6 @@ export const getAllResources = (): Promise<RecoveryResourceResponse[]> =>
 export const getResourceById = (id: string): Promise<RecoveryResourceResponse> =>
   axios.get(`${BASE_URL}/${id}`).then((res) => res.data);
 
-export const getResourcesByTag = (tagId: string): Promise<RecoveryResourceResponse[]> =>
-  axios.get(`${BASE_URL}/by-tag/${tagId}`).then((res) => res.data);
-
-export const getResourcesByPart = (examPartId: string): Promise<RecoveryResourceResponse[]> =>
-  axios.get(`${BASE_URL}/by-part/${examPartId}`).then((res) => res.data);
-
 export const getResourcesByParts = (examPartIds?: string[] | null): Promise<RecoveryResourceResponse[]> =>
   axios
     .get(`${BASE_URL}/by-parts`, {

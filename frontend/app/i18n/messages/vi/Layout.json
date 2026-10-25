@@ -18,8 +18,8 @@
   },
   "streakHint": {
     "title": "Chuỗi ngày học và xu",
-    "streak": "🔥 Chuỗi tăng mỗi ngày bạn làm bài hoặc học một nhiệm vụ trong lộ trình. Bỏ một ngày là chuỗi về 0.",
-    "coins": "🪙 Hoàn thành nhiệm vụ để nhận xu, dùng xu đổi khung và huy hiệu cho avatar. Bấm vào số xu để xem nhiệm vụ, chấm đỏ nghĩa là có thưởng chưa nhận."
+    "streak": "Chuỗi tăng mỗi ngày bạn làm bài hoặc học một nhiệm vụ trong lộ trình. Bỏ một ngày là chuỗi về 0.",
+    "coins": "Hoàn thành nhiệm vụ để nhận xu, dùng xu đổi khung và huy hiệu cho avatar. Bấm vào số xu để xem nhiệm vụ, chấm đỏ nghĩa là có thưởng chưa nhận."
   },
   "appearance": {
     "title": "Giao diện",

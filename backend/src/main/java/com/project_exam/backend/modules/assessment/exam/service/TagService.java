@@ -159,23 +159,6 @@ public class TagService {
         return kept;
     }
 
-    /**
-     * Resolve tag theo tên. Spec dạng "Tag" hoặc "Phần thi > Tag".
-     * Chỉ xét tag dùng chung hoặc thuộc đúng phần thi {@code examPartId}; ưu tiên tag của phần thi.
-     */
-    public List<String> resolveTagIdsByNames(Collection<String> specs, String examTypeId, String examPartId) {
-        TagNameResolution resolution = resolveTagNames(specs, examTypeId, examPartId);
-        if (!resolution.unmatched().isEmpty()) {
-            log.warn("Import tags: bỏ qua {} spec không khớp tag có sẵn (examType={}, examPart={}): {}",
-                    resolution.unmatched().size(), examTypeId, examPartId, resolution.unmatched());
-        }
-        if (!resolution.ambiguous().isEmpty()) {
-            log.warn("Import tags: bỏ qua {} tag trùng tên (examPart={}): {}",
-                    resolution.ambiguous().size(), examPartId, resolution.ambiguous());
-        }
-        return resolution.ids();
-    }
-
     /** Kết quả resolve tag theo tên, kèm các spec không khớp hoặc trùng tên để báo cho người dùng. */
     public record TagNameResolution(List<String> ids, List<String> unmatched, List<String> ambiguous) {
     }

@@ -53,11 +53,6 @@ export function getReadinessLabel(level?: string | null, t: MyTargetTranslator =
   return t(`readiness.levels.${readinessLevelKey(level)}.label`);
 }
 
-export function getReadinessMessage(level?: string | null, t: MyTargetTranslator = fallbackT()): string | null {
-  if (!level) return null;
-  return t(`readiness.levels.${readinessLevelKey(level)}.message`);
-}
-
 export function getReadinessClassName(
   level: string | null | undefined,
   pageCx: (className: string) => string,

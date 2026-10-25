@@ -2,7 +2,6 @@
 
 import { Spinner } from 'react-bootstrap';
 import { PlusCircle } from 'lucide-react';
-import { IoRocketOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import styles from '@/app/features/tests/CreateTestModal.module.scss';
@@ -41,13 +40,7 @@ const FormFooter = ({
                 </ButtonPrime>
             )}
             <ButtonPrime type="button" variant="primary" size="md" onClick={onSubmit} disabled={loading}>
-                {loading ? (
-                    <Spinner size="sm" />
-                ) : (
-                    <>
-                        <IoRocketOutline /> {submitLabel ?? t('formFooter.saveAndPublish')}
-                    </>
-                )}
+                {loading ? <Spinner size="sm" /> : (submitLabel ?? t('formFooter.saveAndPublish'))}
             </ButtonPrime>
         </div>
     );

@@ -152,7 +152,6 @@
     "description": "Manage lectures, videos and documents linked to knowledge tags.",
     "add": "Add resource",
     "searchPlaceholder": "Search by title, description, tag...",
-    "allExamTypes": "All exam types",
     "empty": "No resources found.",
     "sharedGroup": "Shared",
     "partFallback": "Exam part",

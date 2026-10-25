@@ -15,8 +15,6 @@ const SECTIONS: Record<string, SectionConfig> = {
   saved: { titleKey: 'savedPosts', Component: SavedPostsPage },
 };
 
-export const PROFILE_SECTION_KEYS = Object.keys(SECTIONS);
-
 type ProfileSectionModalProps = {
   section?: string | null;
   onClose?: () => void;

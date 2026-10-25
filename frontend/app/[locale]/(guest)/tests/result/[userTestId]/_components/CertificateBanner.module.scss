@@ -16,7 +16,6 @@
   border-color: var(--premium-badge-border);
   background: var(--premium-badge-bg);
 
-  .icon,
   .title {
     color: var(--premium-badge-text);
   }
@@ -25,14 +24,6 @@
 .banner.pending {
   border-color: var(--border-color);
   background: var(--surface-tint);
-
-  .icon {
-    color: var(--text-secondary);
-  }
-}
-
-.icon {
-  flex-shrink: 0;
 }
 
 .content {

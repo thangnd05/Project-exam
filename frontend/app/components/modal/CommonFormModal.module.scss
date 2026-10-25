@@ -83,20 +83,9 @@
   position: relative;
 }
 
-.inputIcon {
-  position: absolute;
-  left: 16px;
-  top: 24px;
-  transform: translateY(-50%);
-  color: var(--slate-400);
-  font-size: 1.8rem;
-  pointer-events: none;
-  transition: all 0.3s;
-}
-
 .inputControl {
   width: 100%;
-  padding: 14px 16px 14px 48px;
+  padding: 14px 16px;
   border-radius: 16px;
   border: 2px solid var(--slate-200);
   font-size: 1.6rem;
@@ -139,7 +128,6 @@
 }
 
 .inputControl.textarea {
-  padding-left: 16px;
   resize: none;
 }
 
@@ -161,10 +149,6 @@
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-.tip svg {
-  color: var(--primary-text);
 }
 
 .footer {

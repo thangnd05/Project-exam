@@ -11,7 +11,6 @@ import classNames from 'classnames/bind';
 import {useTranslations} from 'next-intl';
 import {
   CheckCircle,
-  X,
 } from 'lucide-react';
 import {
   getExtraTextContents,
@@ -66,7 +65,7 @@ const ViewQuestionModal = ({show, onHide, questionId}: ViewQuestionModalProps) =
       maxWidth={800}
       footer={
         <ButtonPrime variant="ghost" size="lg" onClick={onHide}>
-          <X size={20} className="me-1" /> {tCommon('close')}
+          {tCommon('close')}
         </ButtonPrime>
       }
     >

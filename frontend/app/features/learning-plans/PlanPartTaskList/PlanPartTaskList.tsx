@@ -6,13 +6,9 @@ import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import {
   ArrowUpRight,
-  BookOpen,
   Check,
   ChevronDown,
-  Flag,
-  History,
   Lock,
-  Sparkles,
   Trophy,
 } from 'lucide-react';
 import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
@@ -199,7 +195,7 @@ function PlanPartTaskList({
               </span>
               {done && (
                 <span className={cx('partDoneBadge')}>
-                  <Trophy size={13} /> {t('taskList.completed')}
+                  {t('taskList.completed')}
                 </span>
               )}
               <ChevronDown className={cx('partChevron', { partChevronOpen: open })} size={20} />
@@ -289,7 +285,7 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
         <div className={cx('resourceBox')}>
           <div className={cx('resourceInfo')}>
             <div className={cx('resourceLabel')}>
-              <BookOpen size={14} /> {t('taskList.resourceIntro')}
+              {t('taskList.resourceIntro')}
               <span className={cx('resourceCount')}>
                 {t('taskList.resourceCount', { count: group.partResources!.length })}
               </span>
@@ -353,7 +349,7 @@ function StageMap({ group, learningPlanId, recommendedTaskId, studyAction, onStu
                 top: `${nodeY(tasks.length - 1) + 42}px`,
               }}
             >
-              <Flag size={14} /> {t('taskList.end')}
+              {t('taskList.end')}
             </span>
           </div>
         </div>
@@ -499,7 +495,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
       <div className={cx('taskBadges')}>
         {isRecommended && (
           <span className={cx('chip', 'chipPrimary')}>
-            <Sparkles size={12} /> {t('taskList.recommended')}
+            {t('taskList.recommended')}
           </span>
         )}
         {nearPass && <span className={cx('chip', 'chipWarning')}>{t('taskList.nearPass', { gap })}</span>}
@@ -513,7 +509,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
       {!isLocked && !isCapstone && (resource?.url || resource?.resourceId) && (
         <div className={cx('stagePanelResource')}>
           <div className={cx('resourceLabel')}>
-            <BookOpen size={14} /> {t('taskList.readFirst')}
+            {t('taskList.readFirst')}
           </div>
           <RecoveryResourceLink resource={resource} className={cx('resourceLink')}>
             {resource.title || resource.originalFileName || t('common.openResource')}
@@ -580,7 +576,7 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
               href={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/history`}
               className={cx('btn', 'btnOutline', 'btnSm')}
             >
-              <History size={14} /> {t('taskList.history')}
+              {t('taskList.history')}
             </Link>
           )}
           {isPassed && (

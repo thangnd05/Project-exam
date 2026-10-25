@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Alert } from 'react-bootstrap';
-import { IoBookOutline, IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
+import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -277,7 +277,7 @@ const JsonQuestionsPreview = ({
               aria-expanded={isOpen}
             >
               <span className={cx('bankPartName')}>
-                <IoBookOutline size={20} /> {part.name}
+                {part.name}
               </span>
               <span className="d-flex align-items-center gap-2">
                 {partIssues > 0 && <span className={cx('tagWarningBadge')}>{t('jsonPreview.partIssues', { count: partIssues })}</span>}

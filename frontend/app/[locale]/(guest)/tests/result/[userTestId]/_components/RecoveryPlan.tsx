@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter } from '@/app/i18n/navigation';
-import { IoCalendarOutline} from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import { buildPracticeRecoveryMessage, buildRecoveryMessage } from '@/app/features/my-target/readiness-label';
@@ -84,7 +83,6 @@ function RecoveryPlan({
           className={cx('recoveryPlanCta')}
           onClick={() => router.push(buildPlanFromTestUrl({ userTestId, examTypeId, isGuest: true }))}
         >
-          <IoCalendarOutline size={20} aria-hidden />
           {t('signUpForPlan')}
         </button>
       )}
@@ -94,7 +92,6 @@ function RecoveryPlan({
           className={cx('recoveryPlanCta')}
           onClick={handleGoToPlan}
         >
-          <IoCalendarOutline size={20} aria-hidden />
           {t('createPlan')}
         </button>
       )}

@@ -92,8 +92,6 @@
     "description": "Cấu hình các phần thi cho từng loại kỳ thi.",
     "add": "Thêm phần thi",
     "searchPlaceholder": "Tìm phần thi theo tên, mô tả, loại kỳ thi...",
-    "filterByExamType": "Lọc theo loại kỳ thi",
-    "allExamTypes": "-- Tất cả loại kỳ thi --",
     "unknownExamType": "Không xác định",
     "empty": "Không có phần thi nào.",
     "partCount": "{count} phần thi",
@@ -215,7 +213,6 @@
       "side": "Bên cạnh câu hỏi (2 cột)",
       "stacked": "Trên câu hỏi (xếp dọc)"
     },
-    "propertiesSection": "Thuộc tính yếu tố",
     "zone": "Vùng",
     "align": "Canh vị trí",
     "alignOptions": {
@@ -419,7 +416,6 @@
     "jsonSubmit": "Tạo dữ liệu",
     "jsonHelp": "Dán mảng JSON theo format:",
     "searchPlaceholder": "Tìm theo exam type, skill hoặc điểm...",
-    "allExamTypes": "Tất cả loại kỳ thi",
     "allSkills": "Tất cả kỹ năng",
     "addTitle": "Thêm cấu hình quy đổi",
     "selectExamType": "Chọn loại kỳ thi",

@@ -21,11 +21,6 @@ import { getApiErrorMessage } from '@/app/utils/apiError';
 import classNames from 'classnames/bind';
 import {
   IoCreateOutline,
-  IoSettingsOutline,
-  IoListOutline,
-  IoImageOutline,
-  IoRocketOutline,
-  IoShuffleOutline,
 } from 'react-icons/io5';
 import EditQuestionModal from '@/app/features/tests/EditQuestionModal';
 import { PermissionCode } from '@/app/enums';
@@ -283,14 +278,13 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
           cancelLabel={tCommon('cancelShort')}
           submitLabel={t('editTest.submit')}
           loadingLabel={t('editTest.saving')}
-          submitIcon={IoRocketOutline}
         />
       }
     >
       <div>
         <div className={cxCreate('configCard')}>
           <div className={cxCreate('sectionTitle')}>
-            <IoSettingsOutline /> {t('form.section.testConfig')}
+            {t('form.section.testConfig')}
           </div>
           <Row className="g-3">
             <Col md={8}>
@@ -310,7 +304,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
             <Col md={4}>
               <div className={cxCreate('formGroupModern')}>
-                <label><IoImageOutline /> {t('form.fields.bannerUrl')}</label>
+                <label>{t('form.fields.bannerUrl')}</label>
                 <input
                   type="text"
                   className={cxCreate('inputModern')}
@@ -499,7 +493,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
         <div className={cxCreate('configCard')} style={{ marginTop: 16 }}>
           <div className={cxCreate('sectionTitle')}>
-            <IoListOutline /> {t('editTest.questionList')}
+            {t('editTest.questionList')}
             <Button
               type="button"
               variant="outline-secondary"
@@ -509,7 +503,6 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
               disabled={shuffleMutation.isPending || loadingDetail || groupedQuestions.length === 0}
               title={t('editTest.shuffleHint')}
             >
-              <IoShuffleOutline size={16} />{' '}
               {shuffleMutation.isPending ? t('editTest.shuffling') : t('editTest.shuffleNow')}
             </Button>
           </div>

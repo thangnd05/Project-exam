@@ -18,8 +18,8 @@
   },
   "streakHint": {
     "title": "Study streak and coins",
-    "streak": "🔥 Your streak grows every day you take a test or complete a task in your study plan. Miss a day and it resets to 0.",
-    "coins": "🪙 Complete quests to earn coins, then spend them on avatar frames and badges. Tap your coin count to see quests; a red dot means a reward is waiting."
+    "streak": "Your streak grows every day you take a test or complete a task in your study plan. Miss a day and it resets to 0.",
+    "coins": "Complete quests to earn coins, then spend them on avatar frames and badges. Tap your coin count to see quests; a red dot means a reward is waiting."
   },
   "appearance": {
     "title": "Appearance",

@@ -22,8 +22,6 @@ public interface ExamPartRepository extends JpaRepository<ExamPart, String> {
             """)
     List<ExamPart> findAllOrdered();
 
-    ExamPart findByName(String name);
-
 
     long countBySkillId(String skillId);
 

@@ -26,7 +26,6 @@
     "react-toastify": "^11.0.5",
     "recharts": "^3.7.0",
     "slick-carousel": "^1.8.1",
-    "web-vitals": "^2.1.4",
     "world-atlas": "^2.0.2"
   },
   "scripts": {

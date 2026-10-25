@@ -8,8 +8,6 @@ import {
   IoPencilOutline,
   IoTrashOutline,
   IoStatsChartOutline,
-  IoTimeOutline,
-  IoPeopleOutline,
 } from 'react-icons/io5';
 import classNames from 'classnames/bind';
 import styles from '@/app/features/tests/TestManagementTable/TestManagementTable.module.scss';
@@ -56,12 +54,10 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManag
           <tr>
             <th>{t('name')}</th>
             <th>
-              <IoTimeOutline className="me-2" />
               {t('duration')}
             </th>
             <th>{t('status')}</th>
             <th>
-              <IoPeopleOutline className="me-2" />
               {t('totalAttempts')}
             </th>
             <th className="text-center">{t('actions')}</th>

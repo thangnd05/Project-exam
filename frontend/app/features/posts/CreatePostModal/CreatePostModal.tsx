@@ -7,7 +7,6 @@ import { useTranslations } from 'next-intl';
 
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
-import { FaEdit, FaImage, FaTag } from 'react-icons/fa';
 import { useAuth } from '@/app/hooks/useAuth';
 import type { CategoryResponse, PostResponse } from '@/app/types';
 import RichTextEditor, { type RichTextEditorHandle } from '@/app/components/RichTextEditor/RichTextEditor';
@@ -167,9 +166,6 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
       <div className={cx('formGroup')}>
         <label className={cx('label')}>{t('titleLabel')}</label>
         <div className={cx('inputWrapper')}>
-          <span className={cx('inputIcon')}>
-            <FaEdit />
-          </span>
           <input
             type="text"
             className={cx('inputControl')}
@@ -185,9 +181,6 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
         <div className={cx('col', 'formGroup')}>
           <label className={cx('label')}>{t('categoryLabel')}</label>
           <div className={cx('inputWrapper')}>
-            <span className={cx('inputIcon')}>
-              <FaTag />
-            </span>
             <select
               className={cx('inputControl')}
               value={categoryId}
@@ -223,9 +216,6 @@ function CreatePostModal({ show, onClose, onRefresh, categories = [], editingPos
         <div className={cx('col', 'formGroup')}>
           <label className={cx('label')}>{t('thumbnailUrlLabel')}</label>
           <div className={cx('inputWrapper')}>
-            <span className={cx('inputIcon')}>
-              <FaImage />
-            </span>
             <input
               type="text"
               className={cx('inputControl')}

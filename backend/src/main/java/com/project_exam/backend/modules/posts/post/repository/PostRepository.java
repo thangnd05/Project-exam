@@ -10,5 +10,4 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, String>, JpaSpecificationExecutor<Post> {
     List<Post> findByUserId(String userId);
-    List<Post> findByStatus(Post.PostStatus status);
 }

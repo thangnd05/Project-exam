@@ -41,12 +41,6 @@
     },
     "capstone1": "Stage final task — attempt 1",
     "capstone2": "Stage final task — attempt 2",
-    "summary": {
-      "target": "reach your target",
-      "targetScore": "reach {score} points",
-      "syllabus": "Following the syllabus, no diagnosis yet. {total} tasks spread across all sections to {target}.",
-      "diagnosis": "Readiness {readiness}%. {total} tasks for the sections below target to {target}."
-    },
     "resync": {
       "achieved": "You’ve reached your new target — the current plan is marked as completed, no new plan needed.",
       "reopened": "Updated to your new target — {count, plural, one {# task needs} other {# tasks need}} to be passed again because the new threshold is higher.",

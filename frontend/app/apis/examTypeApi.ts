@@ -12,10 +12,6 @@ export const getStandardExamTypes = (): Promise<ExamTypeResponse[]> => {
   return axios.get(`${BASE_URL}/standard`).then((response) => response.data);
 };
 
-export const getFlexibleExamTypes = (): Promise<ExamTypeResponse[]> => {
-  return axios.get(`${BASE_URL}/flexible`).then((response) => response.data);
-};
-
 export const getExamTypeById = (examTypeId: string): Promise<ExamTypeResponse> => {
   return axios.get(`${BASE_URL}/${examTypeId}`).then((response) => response.data);
 };

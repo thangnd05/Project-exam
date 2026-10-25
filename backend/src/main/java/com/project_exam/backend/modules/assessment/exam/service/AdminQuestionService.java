@@ -28,7 +28,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -287,12 +286,5 @@ public class AdminQuestionService {
 
     private static boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
-    }
-
-    public Map<String, Long> countByUsageScope(Collection<Question.UsageScope> scopes) {
-        return scopes.stream().collect(Collectors.toMap(
-                Enum::name,
-                scope -> questionRepository.count(
-                        (root, query, cb) -> cb.equal(root.get("usageScope"), scope))));
     }
 }

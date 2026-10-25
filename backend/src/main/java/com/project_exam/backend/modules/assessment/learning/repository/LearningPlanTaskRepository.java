@@ -40,7 +40,4 @@ public interface LearningPlanTaskRepository extends JpaRepository<LearningPlanTa
 
     List<LearningPlanTask> findByLearningPlanIdAndStatusOrderByTaskOrderAsc(
             String learningPlanId, TaskStatus status);
-
-    Optional<LearningPlanTask> findFirstByLearningPlanIdAndStatusOrderByTaskOrderAsc(
-            String learningPlanId, TaskStatus status);
 }

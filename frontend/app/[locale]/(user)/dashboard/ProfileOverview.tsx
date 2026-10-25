@@ -5,7 +5,6 @@ import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { Alert, Spinner } from 'react-bootstrap';
-import { IoClipboardOutline, IoLockClosedOutline, IoSchoolOutline, IoStatsChartOutline } from 'react-icons/io5';
 import dynamic from 'next/dynamic';
 import ChangePasswordModal from './_components/ChangePasswordModal';
 import UpdateProfileModal from './_components/UpdateProfileModal';
@@ -205,7 +204,6 @@ function ProfileOverview() {
                       fullWidth
                       onClick={() => setShowChangePasswordModal(true)}
                     >
-                      <IoLockClosedOutline />
                       {t('profile.changePassword')}
                     </ButtonPrime>
                   </div>
@@ -250,9 +248,6 @@ function ProfileOverview() {
             <main className={cx('rightCol')}>
               <section className={cx('statsRow')}>
                 <article className={cx('statCard', 'statCardCompact')}>
-                  <div className={cx('statIconWrap')}>
-                    <IoStatsChartOutline />
-                  </div>
                   <div className={cx('statInfo')}>
                     <span className={cx('statLabel')}>{t('stats.totalAttempts')}</span>
                     <strong className={cx('statValue')}>{formatNumber(profileOverview.testStats?.totalAttempts, intlLocale)}</strong>
@@ -260,9 +255,6 @@ function ProfileOverview() {
                 </article>
 
                 <article className={cx('statCard', 'statCardCompact')}>
-                  <div className={cx('statIconWrap')}>
-                    <IoClipboardOutline />
-                  </div>
                   <div className={cx('statInfo')}>
                     <span className={cx('statLabel')}>{t('stats.savedFlashcards')}</span>
                     <strong className={cx('statValue')}>{formatNumber(profileOverview.vocabularyStats?.totalVocabulary, intlLocale)}</strong>
@@ -270,9 +262,6 @@ function ProfileOverview() {
                 </article>
 
                 <article className={cx('statCard', 'statCardCompact')}>
-                  <div className={cx('statIconWrap')}>
-                    <IoSchoolOutline />
-                  </div>
                   <div className={cx('statInfo')}>
                     <span className={cx('statLabel')}>{t('stats.currentClasses')}</span>
                     <strong className={cx('statValue')}>{formatNumber(profileOverview.classStats?.approvedClassCount, intlLocale)}</strong>

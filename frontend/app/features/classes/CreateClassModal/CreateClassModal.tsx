@@ -8,7 +8,6 @@ import { Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { useCreateClass } from '@/app/features/classes/hooks/useMyClasses';
 import classNames from 'classnames/bind';
-import { FaEdit, FaInfoCircle } from 'react-icons/fa';
 import { useAuth } from '@/app/hooks/useAuth';
 import routes from '@/app/configs/Routes';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
@@ -105,9 +104,6 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
       <div className={cx('formGroup')}>
         <label className={cx('label')}>{t('common.className')}</label>
         <div className={cx('inputWrapper')}>
-          <span className={cx('inputIcon')}>
-            <FaEdit />
-          </span>
           <input
             type="text"
             className={cx('inputControl')}
@@ -132,7 +128,6 @@ function CreateClassModal({ show, onClose }: CreateClassModalProps) {
           />
         </div>
         <div className={cx('tip')}>
-          <FaInfoCircle />
           <span>{t('common.classDescriptionTip')}</span>
         </div>
       </div>

@@ -27,10 +27,6 @@ export const logout = (): Promise<AuthMessageResponse> => {
   return axios.post(`${BASE_URL}/logout`).then((res) => res.data);
 };
 
-export const refresh = (): Promise<AuthMessageResponse> => {
-  return axios.post(`${BASE_URL}/refresh`).then((res) => res.data);
-};
-
 export const changePassword = (payload: ChangePasswordRequest): Promise<AuthMessageResponse> => {
   return axios.post(`${BASE_URL}/change-password`, payload).then((res) => res.data);
 };

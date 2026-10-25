@@ -8,10 +8,6 @@ export const getExamCategories = (): Promise<ExamCategoryResponse[]> => {
   return axios.get(BASE_URL).then((res) => res.data);
 };
 
-export const getExamCategoryById = (id: string): Promise<ExamCategoryResponse> => {
-  return axios.get(`${BASE_URL}/${id}`).then((res) => res.data);
-};
-
 export const createExamCategory = (payload: ExamCategoryRequest): Promise<ExamCategoryResponse> => {
   return axios.post(ADMIN_BASE_URL, payload).then((res) => res.data);
 };

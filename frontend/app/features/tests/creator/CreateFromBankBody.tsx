@@ -12,19 +12,9 @@ import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useTranslations } from 'next-intl';
 import {
-  IoLibraryOutline,
-  IoSettingsOutline,
-  IoCheckboxOutline,
-  IoShuffleOutline,
-  IoBookOutline,
-  IoTimeOutline,
-  IoRocketOutline,
   IoChevronDownOutline,
   IoChevronUpOutline,
   IoCreateOutline,
-  IoServerOutline,
-  IoSchoolOutline,
-  IoFilterOutline,
 } from 'react-icons/io5';
 import { useBaseMetaData } from '@/app/features/tests/creator/hooks/useBaseMetaData';
 import { durationMinutesFromExamType } from '@/app/features/exam-types/hooks/useExamTypes';
@@ -348,7 +338,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
 
         <div className={cx('configCard')}>
           <div className={cx('sectionTitle')}>
-            <IoSettingsOutline /> 1. {t('info.section')}
+            1. {t('info.section')}
           </div>
           <Row className="g-3">
             <Col md={8}>
@@ -366,7 +356,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             </Col>
             <Col md={4}>
               <div className={cx('formGroupModern')}>
-                <label><IoTimeOutline /> {t('info.duration')}</label>
+                <label>{t('info.duration')}</label>
                 <input
                   type="number"
                   min={0}
@@ -397,7 +387,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             </Col>
             <Col md={4}>
               <div className={cx('formGroupModern')}>
-                <label><IoLibraryOutline /> {t('info.collection')}</label>
+                <label>{t('info.collection')}</label>
                 <select
                   className={cx('inputModern')}
                   value={testInfo.collectionId || ''}
@@ -419,7 +409,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             </Col>
             <Col md={4}>
               <div className={cx('formGroupModern')}>
-                <label><IoRocketOutline /> {t('info.maxAttempts')}</label>
+                <label>{t('info.maxAttempts')}</label>
                 <input
                   type="number"
                   min={0}
@@ -474,7 +464,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
 
         <div className={cx('configCard')}>
           <div className={cx('sectionTitle')}>
-            <IoServerOutline /> 2. {t('source.section')}
+            2. {t('source.section')}
           </div>
           <p className={cx('bankHint')}>
             {t.rich('source.hint', { strong: (chunks) => <strong>{chunks}</strong> })}
@@ -498,7 +488,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
               onClick={() => setBankSource(BANK_SOURCES.PERSONAL)}
               aria-pressed={bankSource === BANK_SOURCES.PERSONAL}
             >
-              <IoLibraryOutline size={18} /> {t('source.personal')}
+              {t('source.personal')}
             </button>
             {isClassMode && (
               <button
@@ -507,7 +497,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 onClick={() => setBankSource(BANK_SOURCES.CLASS)}
                 aria-pressed={bankSource === BANK_SOURCES.CLASS}
               >
-                <IoSchoolOutline size={18} /> {t('source.class')}
+                {t('source.class')}
               </button>
             )}
             {canAccessAdminBank && (
@@ -517,14 +507,14 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 onClick={() => setBankSource(BANK_SOURCES.ADMIN)}
                 aria-pressed={bankSource === BANK_SOURCES.ADMIN}
               >
-                <IoServerOutline size={18} /> {t('source.admin')}
+                {t('source.admin')}
               </button>
             )}
           </div>
 
           <div className={cx('bankScopeRow')} style={{ marginTop: 16 }}>
             <div className={cx('bankScopeLabel')}>
-              <IoFilterOutline size={16} /> {t('scope.label')}
+              {t('scope.label')}
             </div>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {BANK_SCOPE_OPTIONS.map((opt) => (
@@ -547,7 +537,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
 
           {isClassMode && bankSource === BANK_SOURCES.CLASS && (
             <div className={cx('formGroupModern')} style={{ marginTop: 14, maxWidth: 480 }}>
-              <label><IoBookOutline /> {t('source.chapterFilter')}</label>
+              <label>{t('source.chapterFilter')}</label>
               <select
                 className={cx('inputModern')}
                 value={selectedChapterId}
@@ -568,7 +558,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
         {testInfo.examTypeId && (examParts || []).length > 0 && (
           <div className={cx('configCard')}>
             <div className={cx('sectionTitle')}>
-              <IoLibraryOutline /> 3. {t('parts.section')}
+              3. {t('parts.section')}
               <span
                 style={{
                   marginLeft: 10,
@@ -621,7 +611,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                   ? t('parts.applyByCollectionTitle')
                   : t('parts.applyByCollectionNoCollectionTitle')}
               >
-                <IoLibraryOutline size={18} /> {t('parts.applyByCollection')}
+                {t('parts.applyByCollection')}
               </button>
               <button
                 type="button"
@@ -629,7 +619,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                 onClick={() => applyModeToAllParts(SELECTION_MODES.RANDOM)}
                 title={t('parts.applyRandomTitle')}
               >
-                <IoShuffleOutline size={18} /> {t('parts.applyRandom')}
+                {t('parts.applyRandom')}
               </button>
             </div>
 
@@ -650,7 +640,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                     aria-expanded={cfg.expanded}
                   >
                     <span className={cx('bankPartName')}>
-                      <IoBookOutline size={20} /> {part.name}
+                      {part.name}
                     </span>
                     <span className={cx('bankPartBadge')}>{t('parts.questionCount', { count: maxInBank })}</span>
                     {cfg.expanded ? <IoChevronUpOutline size={22} /> : <IoChevronDownOutline size={22} />}
@@ -666,7 +656,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.RANDOM)}
                           aria-pressed={cfg.mode === SELECTION_MODES.RANDOM}
                         >
-                          <IoShuffleOutline size={18} /> {t('modes.random')}
+                          {t('modes.random')}
                         </button>
                         <button
                           type="button"
@@ -675,7 +665,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                           aria-pressed={cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION}
                           title={testInfo.collectionId ? undefined : t('modes.byCollectionNoCollectionTitle')}
                         >
-                          <IoLibraryOutline size={18} /> {t('modes.byCollection')}
+                          {t('modes.byCollection')}
                         </button>
                         <button
                           type="button"
@@ -683,7 +673,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.SEQUENTIAL)}
                           aria-pressed={cfg.mode === SELECTION_MODES.SEQUENTIAL}
                         >
-                          <IoRocketOutline size={18} /> {t('modes.sequential')}
+                          {t('modes.sequential')}
                         </button>
                         <button
                           type="button"
@@ -691,7 +681,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.MANUAL)}
                           aria-pressed={cfg.mode === SELECTION_MODES.MANUAL}
                         >
-                          <IoCheckboxOutline size={18} /> {t('modes.manual')}
+                          {t('modes.manual')}
                         </button>
                       </div>
 
@@ -870,7 +860,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             size="md"
             disabled={createTestMutation.isPending || !hasAnyPartWithQuestions || !testInfo.examTypeId}
           >
-            {createTestMutation.isPending ? <><Spinner animation="border" size="sm" /> {t('submit.creating')}</> : <><IoRocketOutline /> {t('submit.submit')}</>}
+            {createTestMutation.isPending ? <><Spinner animation="border" size="sm" /> {t('submit.creating')}</> : t('submit.submit')}
           </ButtonPrime>
         </div>
       </Form>

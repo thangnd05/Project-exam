@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Form, Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { Flame } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { AdminCard, AdminFieldError, AdminPageHeader } from '@/app/[locale]/(admin)/_components/common';
@@ -62,13 +61,7 @@ function StreakRecoverManagement() {
         </div>
       ) : (
         <AdminCard maxWidth={480}>
-          <div
-            className="d-flex align-items-center gap-2 mb-3 fw-bold"
-            style={{ fontSize: '1.6rem', color: '#f08c00' }}
-          >
-            <Flame size={28} />
-            <span>{t('streakRecover.cardTitle')}</span>
-          </div>
+          <div className="mb-3 fw-bold" style={{ fontSize: '1.6rem' }}>{t('streakRecover.cardTitle')}</div>
 
           <Form.Group className="mb-3">
             <Form.Label>{t('streakRecover.costLabel')}</Form.Label>

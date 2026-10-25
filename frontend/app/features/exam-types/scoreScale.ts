@@ -28,7 +28,3 @@ export function scoreToPercent(score: number | string, scale: ScoreScale): numbe
   const pct = ((Number(score) - scale.min) / span) * 100;
   return Math.max(0, Math.min(100, Math.round(pct)));
 }
-
-export function clampScore(score: number, scale: ScoreScale): number {
-  return Math.max(scale.min, Math.min(scale.max, Math.round(score)));
-}

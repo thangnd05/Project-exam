@@ -20,7 +20,7 @@ import UpdateVocabularyModal from './_components/UpdateVocabularyModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import classNames from 'classnames/bind';
-import { IoAdd, IoFlashOutline, IoTrashOutline, IoPencilOutline, IoChevronBack, IoChevronForward, IoListOutline, IoSchoolOutline, IoVolumeHighOutline, IoCodeSlashOutline } from 'react-icons/io5';
+import { IoAdd, IoTrashOutline, IoPencilOutline, IoChevronBack, IoChevronForward, IoSchoolOutline, IoVolumeHighOutline } from 'react-icons/io5';
 import type { VocabularyResponse } from '@/app/types';
 import { BREAKPOINTS } from '@/app/assets/styles/breakpoints';
 
@@ -116,7 +116,6 @@ const AlbumDetail = () => {
           actionIcon={IoAdd}
           onSecondaryAction={() => setShowBulkModal(true)}
           secondaryActionText={t('albumDetail.importJson')}
-          secondaryActionIcon={IoCodeSlashOutline}
         />
 
         <div className={cx('custom-actions')}>
@@ -131,7 +130,6 @@ const AlbumDetail = () => {
               onClick={() => router.push(`/practice/${albumId}`)}
               disabled={vocabularies.length === 0}
             >
-              <IoSchoolOutline />
               {t('albumDetail.practice')}
             </button>
 
@@ -143,7 +141,6 @@ const AlbumDetail = () => {
               }}
               disabled={vocabularies.length === 0}
             >
-              {flashMode ? <IoListOutline /> : <IoFlashOutline />}
               {flashMode ? t('albumDetail.listMode') : t('albumDetail.flashcardMode')}
             </button>
           </div>

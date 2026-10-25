@@ -9,7 +9,6 @@ import {toast} from 'react-toastify';
 import { getClassById } from '@/app/apis/classApi';
 import { useUpdateClass } from '@/app/features/classes/hooks/useMyClasses';
 import classNames from 'classnames/bind';
-import {FaEdit, FaInfoCircle} from 'react-icons/fa';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import styles from '@/app/components/modal/CommonFormModal.module.scss';
@@ -122,9 +121,6 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
       <div className={cx('formGroup')}>
         <label className={cx('label')}>{t('common.className')}</label>
         <div className={cx('inputWrapper')}>
-          <span className={cx('inputIcon')}>
-            <FaEdit />
-          </span>
           <input
             type="text"
             className={cx('inputControl')}
@@ -149,7 +145,6 @@ function EditClassModal({show, onClose, classData, onSuccess}: EditClassModalPro
           />
         </div>
         <div className={cx('tip')}>
-          <FaInfoCircle />
           <span>{t('common.classDescriptionTip')}</span>
         </div>
       </div>

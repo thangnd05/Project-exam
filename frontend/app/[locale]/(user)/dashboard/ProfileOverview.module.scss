@@ -194,18 +194,6 @@
   padding: 20px;
 }
 
-.statIconWrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  font-size: var(--font-size-xxl);
-  background: var(--brand-50);
-  color: var(--primary-text);
-}
-
 .statInfo {
   display: flex;
   flex-direction: column;

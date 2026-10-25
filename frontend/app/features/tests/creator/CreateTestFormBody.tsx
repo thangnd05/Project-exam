@@ -15,15 +15,7 @@ import type {
   TestJsonImportPreviewResponse,
 } from '@/app/types';
 import {
-  IoCalendarOutline,
-  IoTimeOutline,
-  IoImageOutline,
-  IoInformationCircleOutline,
-  IoSchoolOutline,
-  IoBookOutline,
-  IoRocketOutline,
   IoAddOutline,
-  IoLibraryOutline,
 } from 'react-icons/io5';
 import { Trash, PlusCircle, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
@@ -725,13 +717,13 @@ const CreateTestFormBody = ({
               <>
                 <Col md={6}>
                   <div className={cx('formGroupModern')}>
-                    <label><IoSchoolOutline /> {t('form.fields.class')}</label>
+                    <label>{t('form.fields.class')}</label>
                     <input className={cx('inputModern', 'inputDisabled')} value={className} disabled />
                   </div>
                 </Col>
                 <Col md={6}>
                   <div className={cx('formGroupModern')}>
-                    <label><IoBookOutline /> {t('form.fields.chapter')}</label>
+                    <label>{t('form.fields.chapter')}</label>
                     <input className={cx('inputModern', 'inputDisabled')} value={chapterName} disabled />
                   </div>
                 </Col>
@@ -747,7 +739,7 @@ const CreateTestFormBody = ({
                 </Col>
                 <Col md={4}>
                   <div className={cx('formGroupModern')}>
-                    <label><IoImageOutline /> {t('form.fields.bannerUrl')}</label>
+                    <label>{t('form.fields.bannerUrl')}</label>
                     <input className={cx('inputModern')} value={testInfo.bannerUrl} onChange={(e) => setTestInfo({ ...testInfo, bannerUrl: e.target.value })} />
                   </div>
                 </Col>
@@ -782,7 +774,7 @@ const CreateTestFormBody = ({
             {activeCreatorType === CREATOR_TYPES.TEST && (
               <Col md={4}>
                 <div className={cx('formGroupModern')}>
-                  <label><IoLibraryOutline /> {t('form.fields.testCollection')}</label>
+                  <label>{t('form.fields.testCollection')}</label>
                   <select className={cx('inputModern')} value={testInfo.collectionId || ''} onChange={(e) => setTestInfo({ ...testInfo, collectionId: e.target.value })}>
                     <option value="">{t('form.fields.emptyOption')}</option>
                     {collectionOptions.map((c) => (
@@ -797,7 +789,7 @@ const CreateTestFormBody = ({
             {(activeCreatorType === CREATOR_TYPES.BULK || activeCreatorType === CREATOR_TYPES.PASSAGE) && (
               <Col md={4}>
                 <div className={cx('formGroupModern')}>
-                  <label><IoLibraryOutline /> {t('form.fields.groupCollection')}</label>
+                  <label>{t('form.fields.groupCollection')}</label>
                   <select className={cx('inputModern')} value={testInfo.collectionId || ''} onChange={(e) => setTestInfo({ ...testInfo, collectionId: e.target.value })}>
                     <option value="">{t('form.fields.emptyOption')}</option>
                     {collectionOptions.map((c) => (
@@ -835,13 +827,13 @@ const CreateTestFormBody = ({
                   <>
                     <Col md={4}>
                       <div className={cx('formGroupModern')}>
-                        <label><IoTimeOutline /> {t('form.fields.duration')}</label>
+                        <label>{t('form.fields.duration')}</label>
                         <input type="number" className={cx('inputModern')} value={testInfo.durationMinutes} onChange={(e) => setTestInfo({ ...testInfo, durationMinutes: e.target.value })} />
                       </div>
                     </Col>
                     <Col md={4}>
                       <div className={cx('formGroupModern')}>
-                        <label><IoRocketOutline /> {t('form.fields.maxAttempts')}</label>
+                        <label>{t('form.fields.maxAttempts')}</label>
                         <input type="number" className={cx('inputModern')} value={testInfo.maxAttempts} onChange={(e) => setTestInfo({ ...testInfo, maxAttempts: e.target.value })} />
                       </div>
                     </Col>
@@ -873,19 +865,19 @@ const CreateTestFormBody = ({
                     </Col>
                     <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 6 : 4}>
                       <div className={cx('formGroupModern')}>
-                        <label><IoCalendarOutline /> {t('form.fields.availableFrom')}</label>
+                        <label>{t('form.fields.availableFrom')}</label>
                         <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableFrom} onChange={(e) => setTestInfo({ ...testInfo, availableFrom: e.target.value })} />
                       </div>
                     </Col>
                     <Col md={activeCreatorType === CREATOR_TYPES.TEST ? 6 : 4}>
                       <div className={cx('formGroupModern')}>
-                        <label><IoCalendarOutline /> {t('form.fields.availableTo')}</label>
+                        <label>{t('form.fields.availableTo')}</label>
                         <input type="datetime-local" className={cx('inputModern')} value={testInfo.availableTo} onChange={(e) => setTestInfo({ ...testInfo, availableTo: e.target.value })} />
                       </div>
                     </Col>
                     <Col md={12}>
                       <div className={cx('formGroupModern')}>
-                        <label><IoInformationCircleOutline /> {t('form.fields.description')}</label>
+                        <label>{t('form.fields.description')}</label>
                         <textarea className={cx('inputModern')} rows={2} value={testInfo.description} onChange={(e) => setTestInfo({ ...testInfo, description: e.target.value })} />
                       </div>
                     </Col>
