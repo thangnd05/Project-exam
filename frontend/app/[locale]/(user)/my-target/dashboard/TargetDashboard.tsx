@@ -19,6 +19,7 @@ import {
   withExam,
 } from '@/app/features/exam-types/hooks/useExamParam';
 import MockHistoryPanel from './_components/MockHistoryPanel';
+import PlanComparisonSection from './_components/PlanComparisonSection';
 import TargetDashboardPartChart, { type PartChartRow } from './_components/TargetDashboardPartChart';
 import { useTargetDashboard } from '@/app/features/my-target/hooks/useTargetDashboard';
 import { getReadinessClassName, getReadinessLabel } from '@/app/features/my-target/readiness-label';
@@ -296,6 +297,8 @@ function TargetDashboard() {
           scaleSource={selectedExamType}
         />
       )}
+
+      {!loading && <PlanComparisonSection plans={plans || []} examTypeName={examTypeName} />}
     </div>
   );
 }

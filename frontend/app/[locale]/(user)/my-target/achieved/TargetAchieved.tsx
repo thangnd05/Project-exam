@@ -10,6 +10,7 @@ import { useTargetAchieved } from '@/app/features/my-target/hooks/useTargetAchie
 import { examTypeIdFromParams, useNormalizeExamParam, withExam } from '@/app/features/exam-types/hooks/useExamParam';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
+import { planCompareHref } from '@/app/features/learning-plans/planCompare';
 
 const cx = classNames.bind(styles);
 
@@ -149,7 +150,7 @@ function TargetAchieved() {
                   {' '}- {t('achieved.next.newTargetDesc')}
                 </li>
                 <li>
-                  <Link href={withExam('/learning-plans/compare', examTypeId, examTypes)}>
+                  <Link href={planCompareHref(examTypeId, examTypes)}>
                     {t('achieved.next.journey')}
                   </Link>
                   {' '}- {t('achieved.next.journeyDesc')}

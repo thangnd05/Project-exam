@@ -74,7 +74,6 @@ Cột "Ví dụ": slug kỳ thi/đề (`aws/saa-c03`, `aws-dop-c02-test-1`) và 
 | `/dashboard` | Hồ sơ / tổng quan cá nhân | 👤 | `/dashboard` |
 | `/my-target/dashboard` | Bảng mục tiêu (`?examTypeId=`) | 👤 | `/my-target/dashboard?examTypeId=9d4b2e7a-1c3f-4a5e-8b6d-2f0a1b3c4d5e` |
 | `/my-target/achieved` | Đã đạt mục tiêu | 👤 | `/my-target/achieved` |
-| `/learning-plans/compare` | So sánh các lộ trình | 👤 | `/learning-plans/compare` |
 | `/learning-plans/:learningPlanId` | Chi tiết lộ trình | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e` |
 | `/learning-plans/:learningPlanId/tasks/:taskId/history` | Lịch sử làm một nhiệm vụ | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/tasks/8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c/history` |
 | `/tests/:testId/history` | Lịch sử làm đề | 👤 | `/tests/aws-dop-c02-test-1/history` |
@@ -189,12 +188,11 @@ Tất cả 🔒, mỗi trang kiểm tra quyền riêng. Không có link từ gia
 | Từ | Đi tới | Ví dụ |
 |---|---|---|
 | `/learning-plans` (trung chuyển) | Khách → `/my-target` · có query → `/learning-plans/generate?...` · có lộ trình ACTIVE → lộ trình mới nhất · chưa có → `/learning-plans/generate` | `/learning-plans` → `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e` |
-| Tab mục tiêu/lộ trình (dùng chung) | `/my-target` · `/learning-plans/generate` · `/learning-plans/compare` · `/my-target/dashboard` | |
+| Tab mục tiêu/lộ trình (dùng chung) | `/my-target` · `/learning-plans/generate` · `/my-target/dashboard` | |
 | `/my-target` | Lưu xong → `?next=` hoặc `/learning-plans/generate?examTypeId=` · khách bấm lưu → `/login` | `/my-target?examTypeId=9d4b…4d5e` → `/learning-plans/generate?examTypeId=9d4b…4d5e` |
-| `/learning-plans/generate` | Tạo xong → `/learning-plans/:id` · khách → `/login` · `/exam-types`, kỳ thi nguồn · `/my-target?...` · danh sách: `/learning-plans/:id`, `/learning-plans/:id#chon-ai-hoc`, `/learning-plans/compare` | |
-| `/my-target/dashboard` | `/my-target`, `/my-target/achieved`, lộ trình đang học, `/learning-plans/generate?userTestId=` · lịch sử thi thử → `/tests/result/:userTestId`, `/` | |
-| `/my-target/achieved` | `/my-target/dashboard`, `/my-target`, `/learning-plans/compare`, `/` | |
-| `/learning-plans/compare` | `/learning-plans/generate`, `/tests/result/:sourceUserTestId`, `/learning-plans/:id`, `/learning-plans/:id/study` | |
+| `/learning-plans/generate` | Tạo xong → `/learning-plans/:id` · khách → `/login` · `/exam-types`, kỳ thi nguồn · `/my-target?...` · danh sách: `/learning-plans/:id`, `/learning-plans/:id#chon-ai-hoc`, so sánh `/my-target/dashboard#plan-compare` (khi có ≥ 2 lộ trình) | |
+| `/my-target/dashboard` | `/my-target`, `/my-target/achieved`, lộ trình đang học, `/learning-plans/generate?userTestId=` · lịch sử thi thử → `/tests/result/:userTestId` · mục so sánh lộ trình (`#plan-compare`, khi có ≥ 2 lộ trình): `/tests/result/:sourceUserTestId`, `/learning-plans/:id`, `/learning-plans/:id/study`, `/` | |
+| `/my-target/achieved` | `/my-target/dashboard`, `/my-target`, `/my-target/dashboard#plan-compare`, `/` | |
 | `/learning-plans/:id` | `/learning-plans/:id/study?taskId=` · nhiệm vụ: `.../tasks/:taskId/history`, `.../tasks/:taskId/result` · lộ trình thay thế · `/learning-plans/generate[?examTypeId=&userTestId=]` · kỳ thi | `/learning-plans/3b7f…4d5e` → `/learning-plans/3b7f…4d5e/study?taskId=8a1c…5b6c` |
 | `/learning-plans/:id/study` | Xong nhiệm vụ → `.../tasks/:taskId/result` · thoát → `/learning-plans/:id` · tài liệu phục hồi `/resources/:resourceId` · kỳ thi | |
 | `.../tasks/:taskId/result` | `/learning-plans/:id` · làm lại / nhiệm vụ tiếp → `/learning-plans/:id/study?taskId=` | |
@@ -262,5 +260,6 @@ Không có lối vào trên giao diện (link bị comment hoặc không có lin
 - Lớp học: `/my-classes`, `/class/:classId/chapters`, `/class/:classId/members`, `/classes/:classId/chapters/:chapterId/tests`
 - `/admin/create-test-from-bank`
 - `/my-target/mocks` (chỉ để chuyển link cũ sang `/my-target/dashboard`)
+- `/learning-plans/compare` (chỉ để chuyển link cũ sang `/my-target/dashboard#plan-compare`)
 
 Ghi chú khác: `PROTECTED_PREFIXES` trong [proxy.ts](proxy.ts) có `/tests/history` và `/tests/leaderboard`, nhưng URL thật là `/tests/:testId/history` nên proxy không chặn; hai trang này chỉ được bảo vệ bởi `AuthGuard` của layout `(user)` ở phía client.

@@ -16,7 +16,6 @@ import { useLearningPlanList } from '@/app/[locale]/(guest)/learning-plans/gener
 import { useDeletePlan } from '@/app/[locale]/(guest)/learning-plans/generate/_hooks/useDeletePlan';
 import { useSwitchPlan } from '@/app/[locale]/(guest)/learning-plans/generate/_hooks/useSwitchPlan';
 import { useResyncPlan } from '@/app/features/learning-plans/hooks/useResyncPlan';
-import { withExam } from '@/app/features/exam-types/hooks/useExamParam';
 import { parseCode } from '@/app/[locale]/(public)/_lib/certificationMeta';
 import { formatDateTime } from '@/app/utils/format-date-time';
 import { getApiErrorMessage } from '@/app/utils/apiError';
@@ -29,6 +28,7 @@ import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './LearningPlanList.module.scss';
 import { LearningPlanStatus } from '@/app/enums';
 import type { PlanListItem } from '@/app/[locale]/(guest)/learning-plans/generate/_hooks/useLearningPlanList';
+import { MIN_PLANS_TO_COMPARE, planCompareHref } from '@/app/features/learning-plans/planCompare';
 
 const cx = classNamesBind.bind(styles);
 const ui = classNamesBind.bind(uiStyles);
@@ -155,7 +155,8 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
 
   const currentFilter = isControlled ? examTypeId : filterExamTypeId;
 
-  const compareHref = withExam('/learning-plans/compare', currentFilter, examTypes);
+  const compareHref = planCompareHref(currentFilter, examTypes);
+  const canCompare = showCompareLink && plans.length >= MIN_PLANS_TO_COMPARE;
 
   const renderPlan = (p: PlanListItem) => {
     const isActive = p.status === LearningPlanStatus.ACTIVE;
@@ -327,9 +328,9 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
             : t.rich('planList.count', { count: plans.length, strong: (chunks) => <strong>{chunks}</strong> })}
         </span>
       </div>
-      {wrapInCard && (showCompareLink || showRefreshButton) && (
+      {wrapInCard && (canCompare || showRefreshButton) && (
         <div className={cx('headActions')}>
-          {showCompareLink && (
+          {canCompare && (
             <Link href={compareHref} className={ui('btnSecondary', 'btnSm')}>
               {t('planList.compare')}
             </Link>

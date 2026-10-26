@@ -15,7 +15,7 @@ import {
   YAxis,
 } from 'recharts';
 import { planStageLabel, planStatusLabel } from '@/app/features/learning-plans/planLabels';
-import styles from '@/app/[locale]/(user)/learning-plans/compare/PlanComparison.module.scss';
+import styles from './PlanComparison.module.scss';
 import { brandColors } from '@/app/assets/styles/brandColors';
 
 export type PlanComparisonChartRow = {

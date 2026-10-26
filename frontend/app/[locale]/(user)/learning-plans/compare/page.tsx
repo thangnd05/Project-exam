@@ -1,5 +1,5 @@
-import PlanComparison from './PlanComparison';
+import PlanCompareRedirect from './PlanCompareRedirect';
 
 export default function Page() {
-  return <PlanComparison />;
+  return <PlanCompareRedirect />;
 }
