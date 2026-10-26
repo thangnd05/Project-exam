@@ -7,7 +7,7 @@ import { Container } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { motion, type Variants } from 'framer-motion';
-import { CirclePlus, FolderOpen, LayoutGrid, List, Plus } from "lucide-react";
+import { FolderOpen, LayoutGrid, List, Plus } from "lucide-react";
 
 import styles from './MyAlbum.module.scss';
 
@@ -17,6 +17,7 @@ import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import PageHeaderViewToggle from '@/app/components/PageHeader/PageHeaderViewToggle';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import AlbumManagementTable from './_components/AlbumManagementTable/AlbumManagementTable';
 import { useMyAlbums } from './_hooks/useAlbums';
 import type { VocabularyAlbumResponse } from '@/app/types';
@@ -110,22 +111,16 @@ function MyAlbum() {
 
         <div className={cx('content-section')}>
           {albums.length === 0 ? (
-            <motion.div
-              className={cx('empty-state')}
-              initial={{ opacity: 0, y: 20, scale: 0.97 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div className={cx('empty-icon')}>
-                <FolderOpen size="1em" />
-              </div>
-              <h4>{t('myAlbums.emptyTitle')}</h4>
-              <p>{t('myAlbums.emptyDescription')}</p>
-              <button className={cx('btn-create-empty')} onClick={() => setShowModal(true)}>
-                <CirclePlus size="1em" />
-                {t('myAlbums.createNow')}
-              </button>
-            </motion.div>
+            <EmptyState
+              icon={FolderOpen}
+              title={t('myAlbums.emptyTitle')}
+              description={t('myAlbums.emptyDescription')}
+              action={
+                <ButtonPrime variant="primary" onClick={() => setShowModal(true)}>
+                  {t('myAlbums.createNow')}
+                </ButtonPrime>
+              }
+            />
           ) : viewMode === 'grid' ? (
             <div className={cx('album-grid')}>
               {albums.map((album, index) => {

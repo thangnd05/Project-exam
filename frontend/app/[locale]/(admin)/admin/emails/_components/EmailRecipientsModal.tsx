@@ -3,7 +3,7 @@
 import {useState} from 'react';
 import {RefreshCw} from 'lucide-react';
 import {toast} from 'react-toastify';
-import {useLocale, useTranslations} from 'next-intl';
+import {useTranslations} from 'next-intl';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -13,6 +13,7 @@ import {EmailStatus, EmailType} from '@/app/enums';
 import type {EmailRecipientResponse, EmailResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
 import {useEmailMutations, useEmailRecipients} from '@/app/[locale]/(admin)/admin/emails/_hooks/useAdminEmails';
+import { formatDateTime } from '@/app/utils/format-date-time';
 
 const PAGE_SIZE = 20;
 
@@ -30,7 +31,6 @@ type EmailRecipientsModalProps = {
 
 function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps) {
   const t = useTranslations('AdminSystem.emails.recipients');
-  const locale = useLocale();
   const [page, setPage] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
   const [retrying, setRetrying] = useState(false);
@@ -63,7 +63,6 @@ function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps)
     }
   };
 
-  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN') : '-');
 
   const columns: AdminTableColumn[] = [
     {
@@ -92,8 +91,8 @@ function EmailRecipientsModal({show, email, onClose}: EmailRecipientsModalProps)
         <span className="small text-danger">{row.errorMessage || '-'}</span>
       ),
     },
-    {key: 'sentAt', header: t('sentAt'), render: (row: EmailRecipientResponse) => formatDate(row.sentAt)},
-    {key: 'createdAt', header: t('queuedAt'), render: (row: EmailRecipientResponse) => formatDate(row.createdAt)},
+    {key: 'sentAt', header: t('sentAt'), render: (row: EmailRecipientResponse) => formatDateTime(row.sentAt)},
+    {key: 'createdAt', header: t('queuedAt'), render: (row: EmailRecipientResponse) => formatDateTime(row.createdAt)},
   ];
 
   const canRetry = email?.type === EmailType.MANUAL && (email?.failedCount ?? 0) > 0;

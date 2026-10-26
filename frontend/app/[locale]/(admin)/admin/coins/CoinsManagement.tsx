@@ -3,7 +3,7 @@
 import {useMemo, useState} from 'react';
 import {Button, Form} from 'react-bootstrap';
 import {Coins, Edit, Plus, Trash2} from 'lucide-react';
-import {useLocale, useTranslations} from 'next-intl';
+import {useTranslations} from 'next-intl';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
@@ -19,6 +19,7 @@ import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/A
 import type {CoinWalletResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
 import { useAdminCoins, useCoinUserOptions } from './_hooks/useAdminCoins';
+import { formatDateTime } from '@/app/utils/format-date-time';
 
 interface CoinFormState {
   userId: string;
@@ -34,7 +35,6 @@ function CoinsManagement() {
   const t = useTranslations('AdminSystem.coins');
   const tAdmin = useTranslations('AdminCommon');
   const tCommon = useTranslations('Common');
-  const locale = useLocale();
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingWallet, setEditingWallet] = useState<CoinWalletResponse | null>(null);
@@ -164,7 +164,7 @@ function CoinsManagement() {
       key: 'updatedAt',
       header: t('updatedAt'),
       render: (wallet: CoinWalletResponse) =>
-        wallet.updatedAt ? new Date(wallet.updatedAt).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN') : '-',
+        formatDateTime(wallet.updatedAt),
     },
   ];
 

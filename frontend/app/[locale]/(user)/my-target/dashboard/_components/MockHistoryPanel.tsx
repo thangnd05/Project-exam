@@ -9,7 +9,7 @@ import { ChevronDown } from 'lucide-react';
 import { getEnhancedResult } from '@/app/apis/enhancedResultApi';
 import Pagination from '@/app/components/Pagination/Pagination';
 import {
-  formatDateTime24 as formatDate,
+  formatDateTime,
   formatDayMonth,
   formatHourMinute24,
 } from '@/app/utils/format-date-time';
@@ -139,7 +139,7 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
         key: t.userTestId,
         order: idx + 1,
         dateLabel,
-        fullDate: formatDate(t.finishedAt),
+        fullDate: formatDateTime(t.finishedAt),
         totalScore,
         readinessScore,
         isTargetMet: enhancedLoaded ? e.isTargetMet : null,
@@ -241,7 +241,7 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
                       <td className={cx('mono', 'dim')}>
                         {totalElements - (currentPage * PAGE_SIZE + idx)}
                       </td>
-                      <td className={cx('mono', 'dim')}>{formatDate(t.finishedAt)}</td>
+                      <td className={cx('mono', 'dim')}>{formatDateTime(t.finishedAt)}</td>
                       <td className={cx('testName')}>{t.testTitle || '-'}</td>
                       <td className={cx('right', 'mono', 'strong')}>
                         {(enhancedLoaded ? e.totalScore : t.totalScore) ?? '-'}

@@ -182,27 +182,6 @@
   }
 }
 
-.empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 120px 0;
-  text-align: center;
-
-  p,
-  h4 {
-    margin-top: 20px;
-    font-size: var(--font-size-lg);
-    color: var(--text-secondary);
-    font-weight: 500;
-  }
-}
-
-.empty svg {
-  color: var(--border-color);
-}
-
 @keyframes fadeInUp {
   from {
     opacity: 0;

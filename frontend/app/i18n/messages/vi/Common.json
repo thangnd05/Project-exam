@@ -13,6 +13,7 @@
     "reload": "Tải lại trang",
     "code": "Mã lỗi: {digest}"
   },
+  "loadErrorTitle": "Không tải được dữ liệu",
   "confirmDelete": {
     "title": "Xác nhận xóa",
     "message": "Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác.",

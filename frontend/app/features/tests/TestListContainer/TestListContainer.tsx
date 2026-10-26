@@ -6,9 +6,10 @@ import {Container} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
 import type {Variants} from 'framer-motion';
-import { List, LayoutGrid } from 'lucide-react';
+import { List, LayoutGrid, FileText } from 'lucide-react';
 
 import styles from '@/app/features/tests/TestListContainer/TestListContainer.module.scss';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import PageHeaderViewToggle from '@/app/components/PageHeader/PageHeaderViewToggle';
 import TestCard from '@/app/features/tests/TestCard/TestCard';
@@ -124,10 +125,7 @@ const TestListContainer = ({
             )
           ) : (
             emptyState || (
-              <div className={cx('empty-state')}>
-                <h4>{t('empty.title')}</h4>
-                <p>{t('empty.desc')}</p>
-              </div>
+              <EmptyState icon={FileText} title={t('empty.title')} description={t('empty.desc')} />
             )
           )}
 

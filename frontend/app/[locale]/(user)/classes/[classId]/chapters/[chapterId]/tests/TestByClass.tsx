@@ -3,19 +3,16 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import classNames from 'classnames/bind';
 import { FileText, CirclePlus } from 'lucide-react';
 import { toast } from 'react-toastify';
 
-import styles from './TestByClass.module.scss';
 import { useTestByClass } from './_hooks/useTestByClass';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import CreateTestModal from '@/app/features/tests/CreateTestModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import TestListContainer from '@/app/features/tests/TestListContainer/TestListContainer';
 import type { TestResponse } from '@/app/types';
 import Loading from '@/app/components/Loading/Loading';
-
-const cx = classNames.bind(styles);
 
 function TestByClass() {
   const t = useTranslations('Classes');
@@ -72,11 +69,11 @@ function TestByClass() {
   }
 
   const emptyState = (
-    <div className={cx('empty-state')}>
-      <FileText className={cx('icon')} />
-      <h4>{t('classTests.emptyTitle')}</h4>
-      <p>{t('classTests.emptyDescription')}</p>
-    </div>
+    <EmptyState
+      icon={FileText}
+      title={t('classTests.emptyTitle')}
+      description={t('classTests.emptyDescription')}
+    />
   );
 
   return (

@@ -2,7 +2,7 @@
 
 import Link from '@/app/i18n/navigation';
 import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { motion, AnimatePresence, type Variants } from 'framer-motion';
 import { Search, Eye, Heart, MessageCircle, Clock, Plus, Info, Newspaper, Bookmark } from 'lucide-react';
@@ -15,6 +15,7 @@ import CreatePostModal from '@/app/features/posts/CreatePostModal/CreatePostModa
 import ProfileSectionModal from '@/app/features/posts/ProfileSectionModal/ProfileSectionModal';
 import styles from './posts.module.scss';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
+import { formatLongDate } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 const MotionLink = motion.create(Link);
@@ -34,7 +35,6 @@ const cardVariants: Variants = {
 
 function Posts() {
   const t = useTranslations('Posts');
-  const dateLocale = useLocale() === 'en' ? 'en-US' : 'vi-VN';
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -165,7 +165,7 @@ function Posts() {
               <div className={cx('cardContent')}>
                 <div className={cx('cardMeta')}>
                   <Clock size={14} />
-                  <span>{new Date(post.createdAt ?? '').toLocaleDateString(dateLocale)}</span>
+                  <span>{formatLongDate(post.createdAt)}</span>
                 </div>
                 <h3>{post.title}</h3>
                 <p className={cx('cardExcerpt')}>{post.title}</p>

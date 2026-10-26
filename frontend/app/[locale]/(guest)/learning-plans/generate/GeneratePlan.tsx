@@ -8,7 +8,7 @@ import { useTranslations } from 'next-intl';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import { TriangleAlert } from 'lucide-react';
-import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
+import { formatDateTime } from '@/app/utils/format-date-time';
 import LearningPlanList from './_components/LearningPlanList';
 import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
 import ExamPillPicker from '@/app/features/my-target/ExamPillPicker/ExamPillPicker';
@@ -305,7 +305,7 @@ function GeneratePlan() {
             />
             <span className={cx('testText')}>
               <span className={cx('testTitle')}>{t.testTitle || tr('generate.picker.testFallback')}</span>
-              <span className={cx('testMeta')}>{formatDate(t.finishedAt)}</span>
+              <span className={cx('testMeta')}>{formatDateTime(t.finishedAt)}</span>
             </span>
             {isPracticeAttempt(t) && <span className={ui('pill')}>{tr('generate.picker.practicePill')}</span>}
             <span className={cx('testScore')}>

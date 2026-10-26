@@ -4,7 +4,7 @@ import Link from '@/app/i18n/navigation';
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
+import { formatDateTime } from '@/app/utils/format-date-time';
 import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { isPracticeAttempt } from '@/app/features/learning-plans/planLabels';
@@ -87,7 +87,7 @@ function MockStageGuide({ plan }: MockStageGuideProps) {
               {t('mockGuide.freshMock')}{' '}
               <strong>
                 {freshMock.testTitle ? `${freshMock.testTitle}  ` : ''}
-                {formatDate(freshMock.finishedAt)}
+                {formatDateTime(freshMock.finishedAt)}
                 {freshMock.totalScore != null ? ` · ${t('mockGuide.score', { score: freshMock.totalScore })}` : ''}
               </strong>
               {isPracticeAttempt(freshMock) && (

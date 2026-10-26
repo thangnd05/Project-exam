@@ -13,6 +13,7 @@
     "reload": "Reload page",
     "code": "Error code: {digest}"
   },
+  "loadErrorTitle": "Couldn't load data",
   "confirmDelete": {
     "title": "Confirm deletion",
     "message": "Are you sure you want to delete this item? This action cannot be undone.",

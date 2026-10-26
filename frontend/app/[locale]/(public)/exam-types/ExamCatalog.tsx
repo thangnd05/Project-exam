@@ -8,6 +8,8 @@ import {Container} from 'react-bootstrap';
 import { ArrowRight, CircleAlert, FileText, Search } from 'lucide-react';
 
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import {buildExamTypeDetailPath} from '@/app/configs/Routes';
 import {examTypeKeys} from '@/app/configs/queryKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
@@ -76,6 +78,7 @@ const vendorTag = ({vendor, exam}: CatalogExam) => {
 
 function ExamCatalog() {
   const t = useTranslations('ExamTypes');
+  const tCommon = useTranslations('Common');
   const formatFullSpec = useFormatFullSpec();
 
   const formatQuick = (test?: QuickChallengeCardResponse) => {
@@ -84,7 +87,7 @@ function ExamCatalog() {
     return `${t('spec.questions', {count: test.totalQuestions})}${minutes}`;
   };
 
-  const {data: exams = [], isLoading, isError} = useQuery({
+  const {data: exams = [], isLoading, isError, refetch} = useQuery({
     queryKey: examTypeKeys.standard,
     queryFn: getStandardExamTypes,
     select: toCatalog,
@@ -139,33 +142,37 @@ function ExamCatalog() {
 
     if (isError) {
       return (
-        <div className={cx('empty-state')}>
-          <CircleAlert size="1em" className={cx('icon')} />
-          <h4>{t('catalog.loadError.title')}</h4>
-          <p>{t('catalog.loadError.hint')}</p>
-        </div>
+        <EmptyState
+          tone="danger"
+          icon={CircleAlert}
+          title={t('catalog.loadError.title')}
+          description={t('catalog.loadError.hint')}
+          action={
+            <ButtonPrime variant="outline" onClick={() => refetch()}>
+              {tCommon('error.retry')}
+            </ButtonPrime>
+          }
+        />
       );
     }
 
     if (exams.length === 0) {
       return (
-        <div className={cx('empty-state')}>
-          <FileText size="1em" className={cx('icon')} />
-          <h4>{t('catalog.empty.title')}</h4>
-          <p>{t('catalog.empty.hint')}</p>
-        </div>
+        <EmptyState icon={FileText} title={t('catalog.empty.title')} description={t('catalog.empty.hint')} />
       );
     }
 
     if (visible.length === 0) {
       return (
-        <div className={cx('empty-state')}>
-          <Search size="1em" className={cx('icon')} />
-          <h4>{t('catalog.noMatch')}</h4>
-          <button type="button" className={cx('textBtn')} onClick={resetFilters}>
-            {t('catalog.resetFilters')}
-          </button>
-        </div>
+        <EmptyState
+          icon={Search}
+          title={t('catalog.noMatch')}
+          action={
+            <ButtonPrime variant="outline" onClick={resetFilters}>
+              {t('catalog.resetFilters')}
+            </ButtonPrime>
+          }
+        />
       );
     }
 

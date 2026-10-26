@@ -3,13 +3,15 @@
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
-import { Container, Alert } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
+import { Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
-import { BookOpen, FileText, Calendar, Plus, LayoutGrid, List } from 'lucide-react';
+import { BookOpen, FileText, Calendar, Plus, LayoutGrid, List, CircleAlert } from 'lucide-react';
 
 import styles from './ChapterOfClass.module.scss';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import CreateChapterModal from './_components/CreateChapterModal';
 import UpdateChapterModal from './_components/UpdateChapterModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -21,13 +23,14 @@ import { useChaptersOfClass } from './_hooks/useChaptersOfClass';
 import type { ChapterResponse } from '@/app/types';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import Loading from '@/app/components/Loading/Loading';
+import { formatDate } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
 const ChapterOfClass = () => {
   const { classId } = useParams<{ classId: string }>();
   const t = useTranslations('Classes');
-  const locale = useLocale();
+  const tCommon = useTranslations('Common');
   const router = useRouter();
 
   const {
@@ -39,8 +42,6 @@ const ChapterOfClass = () => {
     deleteChapterMutation,
     refetchChapters,
   } = useChaptersOfClass(classId);
-
-  const message = isError ? t('chapters.loadFailed') : '';
 
   const [showCreateChapter, setShowCreateChapter] = useState(false);
   const [showUpdateChapter, setShowUpdateChapter] = useState(false);
@@ -113,18 +114,24 @@ const ChapterOfClass = () => {
           />
         </PageHeader>
 
-        {message && (
-          <Alert variant="danger" className="text-center shadow-sm">
-            {message}
-          </Alert>
-        )}
-
-        {chapters.length === 0 ? (
-          <div className={cx('empty')}>
-            <FileText size={100} />
-            <h4>{t('chapters.emptyTitle')}</h4>
-            <p>{t('chapters.emptyDescription')}</p>
-          </div>
+        {isError ? (
+          <EmptyState
+            tone="danger"
+            icon={CircleAlert}
+            title={tCommon('loadErrorTitle')}
+            description={t('chapters.loadFailed')}
+            action={
+              <ButtonPrime variant="outline" onClick={() => refetchChapters()}>
+                {tCommon('error.retry')}
+              </ButtonPrime>
+            }
+          />
+        ) : chapters.length === 0 ? (
+          <EmptyState
+            icon={FileText}
+            title={t('chapters.emptyTitle')}
+            description={t('chapters.emptyDescription')}
+          />
         ) : (
           <>
             {viewMode === 'grid' ? (
@@ -150,9 +157,7 @@ const ChapterOfClass = () => {
                       <Calendar size="1em" />
                       <span>
                         {t('chapters.updatedAt', {
-                          date: new Date(chapter.createdAt!).toLocaleDateString(
-                            locale === 'en' ? 'en-US' : 'vi-VN',
-                          ),
+                          date: formatDate(chapter.createdAt),
                         })}
                       </span>
                     </div>

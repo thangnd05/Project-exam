@@ -2,17 +2,16 @@
 
 import { useRouter } from '@/app/i18n/navigation';
 import classNames from 'classnames/bind';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { useAttemptCertificate } from '@/app/features/certificates/hooks/useCertificates';
 import { AttemptCertificateState } from '@/app/enums';
 import styles from './CertificateBanner.module.scss';
+import { formatDate } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
-const formatDate = (value: string | null | undefined, locale: string) =>
-  value ? new Date(value).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN') : '';
 
 type CertificateBannerProps = {
   userTestId?: string;
@@ -22,7 +21,6 @@ type CertificateBannerProps = {
 function CertificateBanner({ userTestId, enabled }: CertificateBannerProps) {
   const router = useRouter();
   const t = useTranslations('TestTaking.certificateBanner');
-  const locale = useLocale();
   const { data } = useAttemptCertificate(userTestId, enabled);
 
   if (!data || data.state === AttemptCertificateState.NOT_APPLICABLE) {
@@ -61,7 +59,7 @@ function CertificateBanner({ userTestId, enabled }: CertificateBannerProps) {
         </h3>
         <p className={cx('desc')}>
           {certificate?.design?.title || t('fallbackTitle')}
-          {!justIssued && certificate?.issuedAt && ` · ${t('issuedOn', { date: formatDate(certificate.issuedAt, locale) })}`}
+          {!justIssued && certificate?.issuedAt && ` · ${t('issuedOn', { date: formatDate(certificate.issuedAt, '') })}`}
           {!justIssued && ` · ${t('noReissue')}`}
         </p>
       </div>

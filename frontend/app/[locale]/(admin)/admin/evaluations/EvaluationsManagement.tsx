@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import {useLocale, useTranslations} from 'next-intl';
+import {useTranslations} from 'next-intl';
 import {Eye, Trash2} from 'lucide-react';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -20,6 +20,7 @@ import {
 import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import {EVALUATION_GENERAL_FILTER} from '@/app/apis/evaluationApi';
 import type {EvaluationTestStats} from '@/app/types';
+import { formatDateTime } from '@/app/utils/format-date-time';
 import {
   useAdminEvaluations,
   useEvaluationMutations,
@@ -36,7 +37,6 @@ const ratingVariant = (rating: number) => (rating >= 4 ? 'success' : rating >= 3
 
 function EvaluationsManagement() {
   const t = useTranslations('AdminContent.evaluations');
-  const dateLocale = useLocale() === 'en' ? 'en-US' : 'vi-VN';
   const ITEMS_PER_PAGE = 10;
   const [tab, setTab] = useState<Tab>('byTest');
   const [currentPage, setCurrentPage] = useState(1);
@@ -142,9 +142,7 @@ function EvaluationsManagement() {
       key: 'created_at',
       header: t('columns.createdAt'),
       render: (evaluation: AdminEvaluation) =>
-        evaluation.created_at
-          ? new Date(evaluation.created_at).toLocaleString(dateLocale)
-          : '-',
+        formatDateTime(evaluation.created_at),
     },
   ];
 

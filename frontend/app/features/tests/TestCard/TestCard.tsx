@@ -2,7 +2,7 @@
 
 import { useRouter } from '@/app/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import { formatDayMonthTime, formatFullDateTime } from '@/app/utils/format-date-time';
+import { formatDayMonthTime, formatDateTime } from '@/app/utils/format-date-time';
 import { Clock, Calendar, Hourglass, Lock, LockOpen, SquarePen, User, LogIn } from 'lucide-react';
 import classNames from 'classnames/bind';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
@@ -150,7 +150,7 @@ function TestCard({ test, countdowns }: TestCardProps) {
 
                 <div className={cx('info-item', 'created-line')}>
                     <SquarePen size="1em" />
-                    <span>{t('card.createdAt')} <strong>{formatFullDateTime(test.createdAt)}</strong></span>
+                    <span>{t('card.createdAt')} <strong>{formatDateTime(test.createdAt)}</strong></span>
                 </div>
 
                 <div className={cx('btn-group', {hasRank: showLeaderboard, solo: !isAuthenticated})}>

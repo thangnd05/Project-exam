@@ -4,7 +4,7 @@
 
 .caption {
     text-align: center;
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     color: var(--slate-500);
     margin-top: 6px;
     min-height: 18px;
@@ -58,7 +58,7 @@
     border-radius: 4px;
     background: var(--slate-100);
     color: var(--slate-600);
-    font-size: 10px;
+    font-size: 1rem;
     font-weight: 700;
     letter-spacing: 0.03em;
     line-height: 1;
@@ -69,14 +69,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 13px;
+    font-size: var(--font-size-smd);
     color: var(--slate-800);
 }
 
 .countryCount {
     font-weight: 700;
     color: var(--slate-800);
-    font-size: 13px;
+    font-size: var(--font-size-smd);
 }
 
 .countryTrack {
@@ -97,5 +97,5 @@
     text-align: center;
     color: var(--slate-400);
     padding: 24px 0;
-    font-size: 13px;
+    font-size: var(--font-size-smd);
 }

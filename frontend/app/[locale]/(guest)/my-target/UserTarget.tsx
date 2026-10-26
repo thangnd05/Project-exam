@@ -169,7 +169,7 @@ function UserTarget() {
 
   const handleSave = () => {
     if (!targetScore || !selectedExamTypeId) {
-      toast.warn(t('setTarget.toast.enterScoreFirst'));
+      toast.warning(t('setTarget.toast.enterScoreFirst'));
       return;
     }
     if (!isAuthenticated) {

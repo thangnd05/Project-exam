@@ -8,6 +8,7 @@ import { toDateTimeLocalInput, fromDateTimeLocalInput } from '@/app/utils/format
 import { Spinner, Row, Col, Accordion, Form } from 'react-bootstrap';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import BaseModal from '@/app/components/modal/BaseModal';
+import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import { getAdminTestById, shuffleTestQuestions, updateTest } from '@/app/apis/testApi';
 import { getExamTypes } from '@/app/apis/examTypeApi';
@@ -20,7 +21,7 @@ import { toast } from 'react-toastify';
 import { useTranslations } from 'next-intl';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import classNames from 'classnames/bind';
-import { SquarePen } from 'lucide-react';
+import { Shuffle, SquarePen } from 'lucide-react';
 import EditQuestionModal from '@/app/features/tests/EditQuestionModal';
 import { PermissionCode } from '@/app/enums';
 import type {
@@ -95,6 +96,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
   const queryClient = useQueryClient();
   const canSetPricing = useHasPermission(PermissionCode.TEST_MANAGE_PRICING);
   const [editingQuestionId, setEditingQuestionId] = useState<string | null>(null);
+  const [confirmingShuffle, setConfirmingShuffle] = useState(false);
   const [formData, setFormData] = useState(EMPTY_FORM);
   const testId = test?.testId || test?.id;
 
@@ -185,8 +187,8 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
 
   const handleShuffleNow = () => {
     const testId = test?.testId || test?.id;
+    setConfirmingShuffle(false);
     if (!testId) return;
-    if (!window.confirm(t('editTest.shuffleConfirm'))) return;
     shuffleMutation.mutate(testId);
   };
 
@@ -498,7 +500,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
               variant="outline"
               size="sm"
               className="ms-auto"
-              onClick={handleShuffleNow}
+              onClick={() => setConfirmingShuffle(true)}
               disabled={shuffleMutation.isPending || loadingDetail || groupedQuestions.length === 0}
               title={t('editTest.shuffleHint')}
             >
@@ -554,6 +556,15 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
         </div>
       </div>
     </BaseModal>
+    <ConfirmModal
+      show={confirmingShuffle}
+      onClose={() => setConfirmingShuffle(false)}
+      onConfirm={handleShuffleNow}
+      icon={Shuffle}
+      title={t('editTest.shuffleNow')}
+      message={t('editTest.shuffleConfirm')}
+      confirmText={t('editTest.shuffleNow')}
+    />
     <EditQuestionModal
       show={!!editingQuestionId}
       onHide={() => setEditingQuestionId(null)}

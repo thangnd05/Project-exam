@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import Link, { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
 import DOMPurify from 'dompurify';
 import classNames from 'classnames/bind';
@@ -28,6 +28,7 @@ import { ReactType } from '@/app/enums';
 import type { CommentResponse } from '@/app/types';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
 import { BREAKPOINTS } from '@/app/assets/styles/breakpoints';
+import { formatDateTime, formatLongDate } from '@/app/utils/format-date-time';
 
 const Slider = dynamic(() => import('react-slick'), { ssr: false });
 
@@ -42,7 +43,6 @@ function PostDetail() {
   const queryClient = useQueryClient();
   const t = useTranslations('Posts.detail');
   const localizeHref = useLocalizeHref();
-  const dateLocale = useLocale() === 'en' ? 'en-US' : 'vi-VN';
 
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -343,7 +343,7 @@ function PostDetail() {
                 setReplyingToId(comment.id);
                 setReplyContent('');
               }}>{t('reply')}</button>
-              <span className={cx('time')}>{new Date(comment.createdAt ?? '').toLocaleString(dateLocale)}</span>
+              <span className={cx('time')}>{formatDateTime(comment.createdAt)}</span>
               {user && user.userId === comment.userId && (
                 <>
                   <button onClick={() => {
@@ -483,7 +483,7 @@ function PostDetail() {
             </div>
           </div>
           <div className={cx('metaSide')}>
-            {new Date(post.createdAt ?? '').toLocaleDateString(dateLocale)}
+            {formatLongDate(post.createdAt)}
           </div>
         </div>
 
@@ -541,7 +541,7 @@ function PostDetail() {
                       </div>
                       <span className="text-primary fw-bold small mb-2 d-block">{rel.categories?.[0]?.name || 'Blog'}</span>
                       <h4>{rel.title}</h4>
-                      <div className={cx('meta')}>{new Date(rel.createdAt ?? '').toLocaleDateString(dateLocale)}</div>
+                      <div className={cx('meta')}>{formatLongDate(rel.createdAt)}</div>
                     </div>
                   </div>
                 ))}

@@ -2,10 +2,11 @@
 
 import {Table, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import { Pencil, Trash2 } from 'lucide-react';
-import {useLocale, useTranslations} from 'next-intl';
+import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 import styles from './ChapterManagementTable.module.scss';
 import type { ChapterResponse } from '@/app/types';
+import { formatDate } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
@@ -18,7 +19,6 @@ type ChapterManagementTableProps = {
 
 function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}: ChapterManagementTableProps) {
   const t = useTranslations('Classes');
-  const locale = useLocale();
   return (
     <div className={cx('table-responsive')}>
       <Table hover className={cx('management-table')}>
@@ -47,7 +47,7 @@ function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}: Chapt
               </td>
               <td>
                 <span className={cx('chapter-date')}>
-                  {new Date(chapter.createdAt!).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN')}
+                  {formatDate(chapter.createdAt)}
                 </span>
               </td>
               <td>

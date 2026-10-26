@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import TrafficHeatmap from '@/app/[locale]/(admin)/_components/TrafficHeatmap';
 import OverviewCard from '@/app/[locale]/(admin)/_components/OverviewCard';
 import { AdminPageHeader } from '@/app/[locale]/(admin)/_components/common';
@@ -17,6 +17,7 @@ const localISODate = (d: Date = new Date()) => {
 
 import styles from './AdminDashboard.module.scss';
 import Loading from '@/app/components/Loading/Loading';
+import { formatLongDate } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
@@ -51,7 +52,6 @@ const TrafficHeatmapCard = ({ delay }: { delay: number }) => {
 const AdminDashboard = () => {
     const { stats, traffic, isLoading, isError } = useDashboardStats();
     const t = useTranslations('AdminSystem');
-    const locale = useLocale();
 
     return (
         <div className={cx('dashboard')}>
@@ -60,12 +60,7 @@ const AdminDashboard = () => {
                 description={t('dashboard.description')}
             >
                 <span className={cx('dateBadge')}>
-                    {new Date().toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    })}
+                    {formatLongDate(new Date(), { weekday: true })}
                 </span>
             </AdminPageHeader>
 

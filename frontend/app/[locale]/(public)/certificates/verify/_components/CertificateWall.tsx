@@ -4,9 +4,10 @@ import Link from '@/app/i18n/navigation';
 import { useState } from 'react';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import { Award, Maximize2 } from 'lucide-react';
+import { Award, CircleAlert, Maximize2 } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import CertificateCanvas from '@/app/features/certificates/CertificateCanvas/CertificateCanvas';
 import { usePublicCertificates } from '@/app/features/certificates/hooks/useCertificates';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
@@ -24,7 +25,8 @@ const isRecent = (value?: string) =>
 
 function CertificateWall() {
   const t = useTranslations('Certificates');
-  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const tCommon = useTranslations('Common');
+  const { data, isLoading, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
     usePublicCertificates();
   const [previewCode, setPreviewCode] = useState<string | null>(null);
 
@@ -56,13 +58,22 @@ function CertificateWall() {
         </ul>
       )}
 
-      {isError && <div className={cx('state')}>{t('wall.loadError')}</div>}
+      {isError && (
+        <EmptyState
+          tone="danger"
+          icon={CircleAlert}
+          title={tCommon('loadErrorTitle')}
+          description={t('wall.loadError')}
+          action={
+            <ButtonPrime variant="outline" onClick={() => refetch()}>
+              {tCommon('error.retry')}
+            </ButtonPrime>
+          }
+        />
+      )}
 
       {!isLoading && !isError && certificates.length === 0 && (
-        <div className={cx('empty')}>
-          <Award size={36} />
-          <p>{t('wall.empty')}</p>
-        </div>
+        <EmptyState icon={Award} title={t('wall.empty')} />
       )}
 
       {certificates.length > 0 && (

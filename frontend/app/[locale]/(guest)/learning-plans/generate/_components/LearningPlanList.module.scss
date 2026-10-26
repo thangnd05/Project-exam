@@ -124,20 +124,3 @@
 .deleteBtn {
   margin-left: 4px;
 }
-
-.empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 28px 16px;
-  border: 1px dashed var(--slate-300);
-  border-radius: 12px;
-  font-size: var(--font-size-smd);
-  color: var(--slate-500);
-
-  svg {
-    font-size: var(--font-size-lg);
-    color: var(--slate-400);
-  }
-}

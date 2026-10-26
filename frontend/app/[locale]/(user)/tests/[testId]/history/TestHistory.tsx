@@ -3,7 +3,7 @@
 import Link from '@/app/i18n/navigation';
 import { Container } from 'react-bootstrap';
 import classNamesBind from 'classnames/bind';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { ArrowRight, FileText } from 'lucide-react';
 
 import { UserTestStatus } from '@/app/enums';
@@ -15,21 +15,11 @@ import TestPageHeader from '../_components/TestPageHeader';
 import styles from '../_components/TestPage.module.scss';
 import { useTestHistory } from './_hooks/useTestHistory';
 import { formatDuration, formatScore } from '../_lib/formatAttempt';
+import { formatDateTime } from '@/app/utils/format-date-time';
 
 const cx = classNamesBind.bind(styles);
 const ui = classNamesBind.bind(uiStyles);
 
-const formatDateTime = (dateStr: string | undefined, locale: string) => {
-  if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN', {
-    hour12: false,
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
 
 type StatusLabelKey = 'completed' | 'inProgress' | 'expired';
 
@@ -57,7 +47,6 @@ function summarize(attempts: UserTestResponse[]) {
 // testRef do page server tra từ slug trên URL (/tests/aws-dop-c02-test-1/history) rồi truyền xuống.
 function TestHistory({ testRef }: { testRef: TestRef }) {
   const t = useTranslations('TestTaking.history');
-  const locale = useLocale();
   const { attempts, testInfo, isLoading } = useTestHistory(testRef.testId);
   const summary = summarize(attempts);
 
@@ -145,8 +134,8 @@ function TestHistory({ testRef }: { testRef: TestRef }) {
                           {isPracticeAttempt(a) && <span className={ui('pill')}>{t('practice')}</span>}
                         </span>
                       </td>
-                      <td className={cx('mono', 'dim')}>{formatDateTime(a.startedAt, locale)}</td>
-                      <td className={cx('mono', 'dim')}>{formatDateTime(a.finishedAt, locale)}</td>
+                      <td className={cx('mono', 'dim')}>{formatDateTime(a.startedAt, '—')}</td>
+                      <td className={cx('mono', 'dim')}>{formatDateTime(a.finishedAt, '—')}</td>
                       <td className={cx('mono', 'dim')}>{formatDuration(a.durationTaken)}</td>
                       <td className={cx('right')}>
                         <span className={cx('attemptCell', 'attemptCellEnd')}>

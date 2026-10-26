@@ -1,0 +1,67 @@
+@import 'app/assets/styles/mixins.scss';
+
+// Cùng khuôn với trạng thái rỗng của Kho đề thi / Kho tài liệu: khung nét đứt, icon xám nhạt, chữ căn giữa.
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 64px 32px;
+  text-align: center;
+  border: 2px dashed var(--slate-300);
+  border-radius: 16px;
+  background: var(--bg-white);
+
+  @include down(sm) {
+    padding: 48px 20px;
+  }
+}
+
+.compact {
+  padding: 32px 16px;
+  border: none;
+  background: transparent;
+}
+
+.icon {
+  margin-bottom: 12px;
+  font-size: 4.8rem;
+  color: var(--slate-300);
+
+  .compact & {
+    margin-bottom: 4px;
+    font-size: 3.2rem;
+  }
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-color);
+}
+
+.description {
+  max-width: 48ch;
+  margin: 0;
+  font-size: var(--font-size-ssm);
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.action {
+  margin-top: 12px;
+}
+
+.danger {
+  border-color: var(--danger-border);
+  background: var(--danger-bg);
+
+  .icon {
+    color: var(--red-500);
+  }
+
+  &.compact {
+    background: transparent;
+  }
+}

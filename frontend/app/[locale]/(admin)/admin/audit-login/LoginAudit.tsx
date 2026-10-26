@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
 import {useTranslations} from 'next-intl';
 
-import {formatDateTime} from '@/app/utils/format-date-time';
+import {formatFullDateTime} from '@/app/utils/format-date-time';
 import {AdminPageHeader, AdminTable, AdminToolbar} from '@/app/[locale]/(admin)/_components/common';
 import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import {useLoginAudit, type LoginAuditRow} from './_hooks/useLoginAudit';
@@ -47,7 +47,7 @@ function LoginAudit() {
     {
       key: 'login_time',
       header: t('time'),
-      render: (row: LoginAuditRow) => formatDateTime(row.login_time),
+      render: (row: LoginAuditRow) => formatFullDateTime(row.login_time),
     },
     {key: 'action', header: 'Action', render: (row: LoginAuditRow) => row.action || '-'},
     {key: 'user_id', header: 'User ID', render: (row: LoginAuditRow) => row.user_id ?? '-'},

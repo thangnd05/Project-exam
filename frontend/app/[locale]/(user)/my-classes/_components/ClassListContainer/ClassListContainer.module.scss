@@ -27,29 +27,7 @@
   margin-bottom: 60px;
 }
 
-.empty-box {
-  text-align: center;
-  padding: 80px 40px;
-  background: var(--bg-white);
-  border-radius: var(--radius-xl);
-  border: 2px dashed var(--slate-300);
+// Trạng thái rỗng đặt trong lưới thì chiếm trọn hàng.
+.grid-empty {
   grid-column: 1 / -1;
-
-  .icon {
-    font-size: 8rem;
-    color: var(--slate-200);
-    margin-bottom: 20px;
-  }
-
-  h4 {
-    font-size: var(--font-size-xxl);
-    font-weight: 700;
-    color: var(--dark-color);
-  }
-
-  p {
-    font-size: var(--font-size-base);
-    color: var(--text-secondary);
-    margin-top: 10px;
-  }
 }

@@ -318,38 +318,6 @@
   gap: 8px;
 }
 
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-}
-
-.empty-icon-wrapper {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: var(--input-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-
-  svg {
-    font-size: 4rem;
-    color: var(--border-color);
-  }
-}
-
-.empty-state p {
-  font-size: var(--font-size-lg);
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
 @include down(md) {
   .wrapper {
     padding: 18px 0 44px;

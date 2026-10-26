@@ -10,7 +10,7 @@ import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTa
 import ExamPillPicker from '@/app/features/my-target/ExamPillPicker/ExamPillPicker';
 import ExamHeading from '@/app/features/my-target/ExamHeading/ExamHeading';
 import { sortPartsByLookup } from '@/app/features/exam-types/partOrder';
-import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
+import { formatDateTime } from '@/app/utils/format-date-time';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import {
   examTypeIdFromParams,
@@ -164,7 +164,7 @@ function TargetDashboard() {
                 <strong>{t('dashboard.achievedTitle', { score: target.targetScore ?? '' })}</strong>
                 {' '}
                 {target.achievedAt
-                  ? t('dashboard.achievedAt', { date: formatDate(target.achievedAt) })
+                  ? t('dashboard.achievedAt', { date: formatDateTime(target.achievedAt) })
                   : t('dashboard.latestMockScore', { score: latestEnhanced?.totalScore ?? 0 })}
               </span>
               <Link

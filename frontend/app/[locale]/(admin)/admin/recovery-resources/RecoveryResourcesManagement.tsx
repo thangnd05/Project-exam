@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import {useLocale, useTranslations} from 'next-intl';
+import {useTranslations} from 'next-intl';
 import {Badge, Button, Spinner} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Download, Edit, ExternalLink, Plus, Trash2} from 'lucide-react';
@@ -22,6 +22,7 @@ import type {RecoveryResourceRequest, RecoveryResourceResponse, TagResponse} fro
 import {getApiErrorMessage} from '@/app/utils/apiError';
 import {useRecoveryResources, useTagsByExamType} from './_hooks/useRecoveryResources';
 import styles from './RecoveryResourcesManagement.module.scss';
+import { formatDate } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
@@ -39,7 +40,6 @@ interface ResourceCardProps {
   onEdit: (resource: RecoveryResourceResponse) => void;
   onDelete: (resource: RecoveryResourceResponse) => void;
   onDownload: (url: string, originalFileName?: string) => void;
-  formatDate: (dateStr?: string) => string;
   cx: typeof cx;
 }
 
@@ -48,7 +48,6 @@ function ResourceCard({
   onEdit,
   onDelete,
   onDownload,
-  formatDate,
   cx,
 }: ResourceCardProps) {
   const t = useTranslations('AdminUsers');
@@ -91,7 +90,7 @@ function ResourceCard({
       )}
 
       <div className={cx('cardFooter')}>
-        <span>{formatDate(resource.createdAt)}</span>
+        <span>{formatDate(resource.createdAt, '')}</span>
         <div className={cx('footerActions')}>
           <RecoveryResourceLink resource={resource} className={cx('viewLink')}>
             <ExternalLink size={14} /> {t('recoveryResources.view')}
@@ -116,7 +115,6 @@ function ResourceCard({
 function RecoveryResourcesManagement() {
   const t = useTranslations('AdminUsers');
   const tCommon = useTranslations('Common');
-  const locale = useLocale();
   const [selectedExamTypeId, setSelectedExamTypeId] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showFormModal, setShowFormModal] = useState(false);
@@ -294,7 +292,6 @@ function RecoveryResourcesManagement() {
       onEdit={openEditModal}
       onDelete={setDeletingResource}
       onDownload={handleDownload}
-      formatDate={formatDate}
       cx={cx}
     />
   );
@@ -412,10 +409,6 @@ function RecoveryResourcesManagement() {
     }
   };
 
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return '';
-    return new Date(dateStr).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN');
-  };
 
   return (
     <div className={cx('resourcesPage')}>

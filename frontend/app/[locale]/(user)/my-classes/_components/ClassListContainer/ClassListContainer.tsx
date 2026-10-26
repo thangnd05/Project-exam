@@ -8,6 +8,7 @@ import type {Variants} from 'framer-motion';
 import { List, LayoutGrid, GraduationCap, Users } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from './ClassListContainer.module.scss';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import PageHeaderViewToggle from '@/app/components/PageHeader/PageHeaderViewToggle';
 import ClassCard from '@/app/[locale]/(user)/my-classes/_components/ClassCard/ClassCard';
@@ -36,15 +37,6 @@ const cardVariants: Variants = {
       ease: [0.22, 1, 0.36, 1],
     },
   }),
-};
-
-const emptyVariants: Variants = {
-  hidden: {opacity: 0, scale: 0.97},
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: {duration: 0.5, ease: [0.22, 1, 0.36, 1]},
-  },
 };
 
 type ClassListContainerProps = {
@@ -129,16 +121,11 @@ const ClassListContainer = ({
                   </motion.div>
                 ))
               ) : (
-                <motion.div
-                  className={cx('empty-box')}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{once: true, amount: 0.4}}
-                  variants={emptyVariants}
-                >
-                  <Users size="1em" className={cx('icon')} />
-                  <h4>{t('common.noTeachingClasses')}</h4>
-                </motion.div>
+                <EmptyState
+                  className={cx('grid-empty')}
+                  icon={Users}
+                  title={t('common.noTeachingClasses')}
+                />
               )}
             </div>
 
@@ -171,16 +158,11 @@ const ClassListContainer = ({
                   </motion.div>
                 ))
               ) : (
-                <motion.div
-                  className={cx('empty-box')}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{once: true, amount: 0.4}}
-                  variants={emptyVariants}
-                >
-                  <GraduationCap size="1em" className={cx('icon')} />
-                  <h4>{t('classList.noLearningClasses')}</h4>
-                </motion.div>
+                <EmptyState
+                  className={cx('grid-empty')}
+                  icon={GraduationCap}
+                  title={t('classList.noLearningClasses')}
+                />
               )}
             </div>
           </>
@@ -207,11 +189,11 @@ const ClassListContainer = ({
                 />
               </>
             ) : (
-              <div className={cx('empty-box')}>
-                <GraduationCap size="1em" className={cx('icon')} />
-                <h4>{t('common.noTeachingClasses')}</h4>
-                <p>{t('classList.joinHint')}</p>
-              </div>
+              <EmptyState
+                icon={GraduationCap}
+                title={t('common.noTeachingClasses')}
+                description={t('classList.joinHint')}
+              />
             )}
           </>
         )}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import {useLocale, useTranslations} from 'next-intl';
+import {useTranslations} from 'next-intl';
 import {Badge, Button, Form} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Trash2} from 'lucide-react';
@@ -22,6 +22,7 @@ import {
 import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import {getApiErrorMessage} from '@/app/utils/apiError';
 import styles from './UsersManagement.module.scss';
+import { formatDate } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
@@ -66,7 +67,6 @@ const ITEMS_PER_PAGE = 10;
 function UsersManagement() {
   const t = useTranslations('AdminUsers');
   const tCommon = useTranslations('Common');
-  const locale = useLocale();
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -310,9 +310,7 @@ function UsersManagement() {
       key: 'created_at',
       header: t('users.columns.createdAt'),
       render: (user: AdminUserRow) =>
-        user.created_at
-          ? new Date(user.created_at).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN')
-          : '-',
+        formatDate(user.created_at),
     },
   ];
 

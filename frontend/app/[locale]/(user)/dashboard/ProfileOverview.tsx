@@ -4,13 +4,14 @@ import { useRouter } from '@/app/i18n/navigation';
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
-import { Alert } from 'react-bootstrap';
+import { CircleAlert, UserRound } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import ChangePasswordModal from './_components/ChangePasswordModal';
 import UpdateProfileModal from './_components/UpdateProfileModal';
 import ProfileSectionModal from '@/app/features/posts/ProfileSectionModal/ProfileSectionModal';
 import styles from './ProfileOverview.module.scss';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import routes from '@/app/configs/Routes';
 import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import { useCosmetics } from '@/app/features/gamification/cosmetic/hooks/useCosmetics';
@@ -21,6 +22,7 @@ import {
 } from './_hooks/useProfileDashboard';
 import { formatDuration, type DashboardT } from './_lib/formatDuration';
 import Loading from '@/app/components/Loading/Loading';
+import { formatDateTime } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
@@ -35,12 +37,6 @@ const MonthlyTimeLine = dynamic(
 
 const TARGET_VISIBLE_COUNT = 2;
 
-const formatDateTime = (value: string | null | undefined, intlLocale: string) => {
-  if (!value) return '--';
-  const parsedDate = new Date(value);
-  if (Number.isNaN(parsedDate.getTime())) return '--';
-  return parsedDate.toLocaleString(intlLocale);
-};
 
 const formatNumber = (value: unknown, intlLocale: string) => {
   const safeValue = Number(value) || 0;
@@ -134,9 +130,17 @@ function ProfileOverview() {
         </header>
 
         {errorMessage && (
-          <Alert variant="danger" className={cx('alertBox')}>
-            {errorMessage}
-          </Alert>
+          <EmptyState
+            tone="danger"
+            icon={CircleAlert}
+            title={tCommon('loadErrorTitle')}
+            description={errorMessage}
+            action={
+              <ButtonPrime variant="outline" onClick={() => refetchProfileOverview()}>
+                {tCommon('error.retry')}
+              </ButtonPrime>
+            }
+          />
         )}
 
         {!errorMessage && profileOverview && (
@@ -170,7 +174,7 @@ function ProfileOverview() {
                     </span>
                     <span className={cx('metaItem')}>
                       <span className={cx('metaLabel')}>{t('profile.joinedAt')}</span>
-                      {formatDateTime(profileOverview.createdAt, intlLocale)}
+                      {formatDateTime(profileOverview.createdAt, '--')}
                     </span>
                     <span className={cx('metaItem')}>
                       <span className={cx('metaLabel')}>{t('profile.status')}</span>
@@ -422,9 +426,7 @@ function ProfileOverview() {
         )}
 
         {!errorMessage && !profileOverview && (
-          <Alert variant="info" className={cx('alertBox')}>
-            {t('profile.noData')}
-          </Alert>
+          <EmptyState icon={UserRound} title={t('profile.noData')} />
         )}
       </div>
 

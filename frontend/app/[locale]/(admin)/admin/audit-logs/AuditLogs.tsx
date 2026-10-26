@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
 import {useTranslations} from 'next-intl';
 
-import {formatDateTime} from '@/app/utils/format-date-time';
+import {formatFullDateTime} from '@/app/utils/format-date-time';
 import {AdminPageHeader, AdminTable, AdminToolbar} from '@/app/[locale]/(admin)/_components/common';
 import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import {useAuditLogs, type AuditLogRow} from './_hooks/useAuditLogs';
@@ -57,7 +57,7 @@ function AuditLogs() {
     {
       key: 'created_at',
       header: t('time'),
-      render: (log: AuditLogRow) => formatDateTime(log.created_at),
+      render: (log: AuditLogRow) => formatFullDateTime(log.created_at),
     },
     {key: 'action', header: t('action')},
     {

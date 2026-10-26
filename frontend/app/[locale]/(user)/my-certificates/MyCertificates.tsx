@@ -1,30 +1,30 @@
 'use client';
 
 import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
-import { useLocale, useTranslations } from 'next-intl';
-import { Container, Alert } from 'react-bootstrap';
+import { useTranslations } from 'next-intl';
+import { Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import { Award, ExternalLink } from 'lucide-react';
+import { Award, CircleAlert, ExternalLink } from 'lucide-react';
 
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import CertificateCanvas from '@/app/features/certificates/CertificateCanvas/CertificateCanvas';
 import { useMyCertificates } from '@/app/features/certificates/hooks/useCertificates';
 import { CertificateStatus } from '@/app/enums';
 import styles from './MyCertificates.module.scss';
 import Loading from '@/app/components/Loading/Loading';
+import { formatDate } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
-const formatDate = (value: string | undefined, locale: string) =>
-  value ? new Date(value).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN') : '--';
 
 function MyCertificates() {
   const t = useTranslations('Account');
-  const locale = useLocale();
+  const tCommon = useTranslations('Common');
   const localizeHref = useLocalizeHref();
   const router = useRouter();
-  const { data: certificates = [], isLoading, isError } = useMyCertificates();
+  const { data: certificates = [], isLoading, isError, refetch } = useMyCertificates();
 
   const activeCount = certificates.filter(
     (c) => c.status === CertificateStatus.ACTIVE && !c.expired,
@@ -45,18 +45,30 @@ function MyCertificates() {
         )}
 
         {isError && (
-          <Alert variant="danger" className={cx('alert')}>{t('myCertificates.loadFailed')}</Alert>
+          <EmptyState
+            tone="danger"
+            icon={CircleAlert}
+            title={tCommon('loadErrorTitle')}
+            description={t('myCertificates.loadFailed')}
+            action={
+              <ButtonPrime variant="outline" onClick={() => refetch()}>
+                {tCommon('error.retry')}
+              </ButtonPrime>
+            }
+          />
         )}
 
         {!isLoading && !isError && certificates.length === 0 && (
-          <div className={cx('empty')}>
-            <Award className={cx('emptyIcon')} strokeWidth={1.5} />
-            <h4>{t('myCertificates.emptyTitle')}</h4>
-            <p>{t('myCertificates.emptyDescription')}</p>
-            <ButtonPrime variant="primary" onClick={() => router.push('/')}>
-              {t('myCertificates.findMockTest')}
-            </ButtonPrime>
-          </div>
+          <EmptyState
+            icon={Award}
+            title={t('myCertificates.emptyTitle')}
+            description={t('myCertificates.emptyDescription')}
+            action={
+              <ButtonPrime variant="primary" onClick={() => router.push('/')}>
+                {t('myCertificates.findMockTest')}
+              </ButtonPrime>
+            }
+          />
         )}
 
         {!isLoading && certificates.length > 0 && (
@@ -87,8 +99,8 @@ function MyCertificates() {
                       {certificate.design?.title || t('myCertificates.fallbackTitle')}
                     </h3>
                     <p className={cx('cardMeta')}>
-                      {t('myCertificates.issuedOn', { date: formatDate(certificate.issuedAt, locale) })}
-                      {certificate.expiresAt && ` · ${t('myCertificates.expiresOn', { date: formatDate(certificate.expiresAt, locale) })}`}
+                      {t('myCertificates.issuedOn', { date: formatDate(certificate.issuedAt, '--') })}
+                      {certificate.expiresAt && ` · ${t('myCertificates.expiresOn', { date: formatDate(certificate.expiresAt, '--') })}`}
                     </p>
                     <div className={cx('cardActions')}>
                       <ButtonPrime

@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAlbumVocabularies, useDeleteVocabulary } from './_hooks/useAlbumVocabularies';
 import { getTtsUrl } from '@/app/utils/mediaUrl';
-import { Container, Table, Alert } from 'react-bootstrap';
+import { Container, Table } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import CreateVocabularyModal from './_components/CreateVocabularyModal';
@@ -14,8 +14,9 @@ import BulkCreateVocabularyModal from './_components/BulkCreateVocabularyModal';
 import UpdateVocabularyModal from './_components/UpdateVocabularyModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import classNames from 'classnames/bind';
-import { Plus, Trash2, Pencil, ChevronLeft, ChevronRight, GraduationCap, Volume2 } from 'lucide-react';
+import { Plus, Trash2, Pencil, ChevronLeft, ChevronRight, GraduationCap, Volume2, CircleAlert } from 'lucide-react';
 import type { VocabularyResponse } from '@/app/types';
 import { BREAKPOINTS } from '@/app/assets/styles/breakpoints';
 
@@ -26,6 +27,7 @@ const cx = classNames.bind(styles);
 
 const AlbumDetail = () => {
   const t = useTranslations('Vocabulary');
+  const tCommon = useTranslations('Common');
   const { albumId } = useParams<{ albumId: string }>();
   const [showModal, setShowModal] = useState(false);
   const [showBulkModal, setShowBulkModal] = useState(false);
@@ -91,7 +93,17 @@ const AlbumDetail = () => {
 
   if (errorMsg) return (
     <Container className="mt-5">
-      <Alert variant="danger">{errorMsg}</Alert>
+      <EmptyState
+        tone="danger"
+        icon={CircleAlert}
+        title={tCommon('loadErrorTitle')}
+        description={errorMsg}
+        action={
+          <ButtonPrime variant="outline" onClick={() => fetchVocabularies()}>
+            {tCommon('error.retry')}
+          </ButtonPrime>
+        }
+      />
     </Container>
   );
 

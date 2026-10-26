@@ -9,6 +9,7 @@ import routes from '@/app/configs/Routes';
 
 import TestListContainer from '@/app/features/tests/TestListContainer/TestListContainer';
 import Pagination from '@/app/components/Pagination/Pagination';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import { useCollectionTests, useCollectionName } from '@/app/[locale]/(public)/exam-types/[group]/_hooks/useCollectionTests';
 import Loading from '@/app/components/Loading/Loading';
 
@@ -55,11 +56,7 @@ function TestByCollection({ examTypeId, examHref }: TestByCollectionProps) {
   }
 
   const emptyState = (
-    <div style={{ textAlign: 'center', padding: '40px 0' }}>
-      <FileText size="1em" style={{ fontSize: '4rem', color: '#94a3b8' }} />
-      <h4 style={{ marginTop: 12 }}>{t('empty.title')}</h4>
-      <p className="text-muted">{t('empty.hint')}</p>
-    </div>
+    <EmptyState icon={FileText} title={t('empty.title')} description={t('empty.hint')} />
   );
 
   const goBack = () => router.push(localizeHref(examHref || routes.home));

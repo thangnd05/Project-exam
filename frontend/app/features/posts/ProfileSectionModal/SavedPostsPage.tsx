@@ -2,19 +2,21 @@
 
 import Link, { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import { useEffect, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { motion, type Variants } from 'framer-motion';
-import { Alert, Spinner, Dropdown } from 'react-bootstrap';
-import { Eye, Heart, MessageCircle, Bookmark, Search, EllipsisVertical, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
+import { Spinner, Dropdown } from 'react-bootstrap';
+import { Eye, Heart, MessageCircle, Bookmark, Search, EllipsisVertical, ChevronLeft, ChevronRight, ImageIcon, CircleAlert } from 'lucide-react';
 import { toast } from 'react-toastify';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import routes from '@/app/configs/Routes';
 import { useSavedPosts, useUnsavePost } from '@/app/features/posts/hooks/useSavedPosts';
 import type { PostSummaryResponse } from '@/app/types';
 import styles from '@/app/features/posts/ProfileSectionModal/PostsListPage.module.scss';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
-import { formatCount, formatDate } from './postFormat';
+import { formatCount } from './postFormat';
+import { formatLongDate } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
@@ -36,8 +38,8 @@ type SavedPostsPageProps = {
 function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
   const router = useRouter();
   const t = useTranslations('Posts');
+  const tCommon = useTranslations('Common');
   const localizeHref = useLocalizeHref();
-  const dateLocale = useLocale() === 'en' ? 'en-US' : 'vi-VN';
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -163,17 +165,25 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
         )}
 
         {!loading && errorMessage && (
-          <Alert variant="danger" className={cx('alertBox')}>{errorMessage}</Alert>
+          <EmptyState
+            compact={embedded}
+            tone="danger"
+            icon={CircleAlert}
+            title={tCommon('loadErrorTitle')}
+            description={errorMessage}
+          />
         )}
 
         {!loading && !errorMessage && posts.length === 0 && (
-          <Alert variant="info" className={cx('alertBox')}>
-            {hasActiveFilter ? (
-              <>{t('saved.emptyFiltered')}</>
-            ) : (
-              <>{t.rich('saved.empty', { icon: () => <Bookmark size="1em" /> })}</>
-            )}
-          </Alert>
+          <EmptyState
+            compact={embedded}
+            icon={hasActiveFilter ? Search : Bookmark}
+            title={
+              hasActiveFilter
+                ? t('saved.emptyFiltered')
+                : t.rich('saved.empty', { icon: () => <Bookmark size="1em" /> })
+            }
+          />
         )}
 
         {!loading && !errorMessage && posts.length > 0 && (
@@ -223,7 +233,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
                         )}
                         <span>{post.authorName || t('saved.anonymous')}</span>
                       </span>
-                      <span className={cx('date')}>{formatDate(post.createdAt, dateLocale)}</span>
+                      <span className={cx('date')}>{formatLongDate(post.createdAt, {}, '--')}</span>
                     </div>
 
                     <Link href={detailUrl} className={cx('cardTitleLink')}>

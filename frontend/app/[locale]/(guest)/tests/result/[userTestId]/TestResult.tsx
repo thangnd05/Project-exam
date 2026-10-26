@@ -3,11 +3,11 @@
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/app/i18n/navigation';
 import { useMemo } from "react";
-import { Container, Alert } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { toast } from "react-toastify";
 import classNames from "classnames/bind";
 import { useTranslations } from "next-intl";
-import { CircleCheck, House, ChartNoAxesColumnIncreasing, Clock, GraduationCap, Lock, Calendar } from "lucide-react";
+import { CircleCheck, House, ChartNoAxesColumnIncreasing, Clock, GraduationCap, Lock, Calendar, CircleAlert } from "lucide-react";
 
 import { useAuth } from "@/app/hooks/useAuth";
 import { useMounted } from "@/app/hooks/useMounted";
@@ -18,6 +18,7 @@ import { buildPlanFromTestUrl } from "@/app/[locale]/(guest)/tests/result/[userT
 import { useTestResult } from "./_hooks/useTestResult";
 import { useTestEvaluationPrompt } from "./_hooks/useTestEvaluationPrompt";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";
+import EmptyState from "@/app/components/EmptyState/EmptyState";
 import CertificateBanner from "./_components/CertificateBanner";
 import GuestSaveBanner from "./_components/GuestSaveBanner";
 import ReadinessGauge from "./_components/ReadinessGauge";
@@ -34,6 +35,7 @@ const TestResult = () => {
   const { userTestId } = useParams<{ userTestId: string }>();
   const router = useRouter();
   const t = useTranslations("TestTaking.result");
+  const tCommon = useTranslations("Common");
   const { isAuthenticated, loading: authLoading } = useAuth();
   const isGuest = !authLoading && !isAuthenticated;
   const guestCfg = useMemo(
@@ -107,10 +109,17 @@ const TestResult = () => {
     return (
       <div className={cx("wrapper")}>
         <Container>
-          <Alert variant="danger">{error}</Alert>
-          <ButtonPrime variant="primary" className="mt-3" onClick={() => router.push("/")}>
-            {t("backHome")}
-          </ButtonPrime>
+          <EmptyState
+            tone="danger"
+            icon={CircleAlert}
+            title={tCommon("loadErrorTitle")}
+            description={error}
+            action={
+              <ButtonPrime variant="primary" onClick={() => router.push("/")}>
+                {t("backHome")}
+              </ButtonPrime>
+            }
+          />
         </Container>
       </div>
     );

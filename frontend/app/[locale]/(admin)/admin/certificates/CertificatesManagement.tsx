@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Badge, Button, Form } from 'react-bootstrap';
 import { Edit, Plus, Trash2, ShieldX } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
@@ -27,6 +27,7 @@ import type {
   CertificateTemplateResponse,
 } from '@/app/types';
 import { getApiErrorMessage } from '@/app/utils/apiError';
+import { formatDate } from '@/app/utils/format-date-time';
 import {
   useCertificateTemplates,
   useIssuedCertificates,
@@ -70,12 +71,9 @@ const buildPayload = (formState: CertificateTemplateFormState): CertificateTempl
   active: formState.active !== false,
 });
 
-const formatDate = (locale: string, value?: string) =>
-  value ? new Date(value).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN') : '-';
 
 function CertificatesManagement() {
   const t = useTranslations('AdminSystem.certificates');
-  const locale = useLocale();
   const [tab, setTab] = useState('templates');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -264,7 +262,7 @@ function CertificatesManagement() {
     },
     { key: 'testTitle', header: t('columns.test'), render: (item: CertificateResponse) => item.testTitle || '-' },
     { key: 'score', header: t('columns.score') },
-    { key: 'issuedAt', header: t('columns.issuedAt'), render: (item: CertificateResponse) => formatDate(locale, item.issuedAt) },
+    { key: 'issuedAt', header: t('columns.issuedAt'), render: (item: CertificateResponse) => formatDate(item.issuedAt) },
     {
       key: 'status',
       header: t('columns.status'),

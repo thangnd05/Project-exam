@@ -166,7 +166,7 @@ $radius-lg: 16px;
     gap: 16px;
     min-height: 320px;
     color: $text-secondary;
-    font-size: 15px;
+    font-size: var(--font-size-md);
 }
 
 .emptyCell {

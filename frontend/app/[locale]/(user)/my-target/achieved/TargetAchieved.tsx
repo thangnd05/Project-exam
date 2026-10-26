@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
-import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
+import { formatDateTime } from '@/app/utils/format-date-time';
 import { useTargetAchieved } from '@/app/features/my-target/hooks/useTargetAchieved';
 import { examTypeIdFromParams, useNormalizeExamParam, withExam } from '@/app/features/exam-types/hooks/useExamParam';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -114,8 +114,8 @@ function TargetAchieved() {
             </p>
             <p className={cx('heroMeta')}>
               {target.achievedAt
-                ? <>{t('achieved.achievedAt', { date: formatDate(target.achievedAt) })}</>
-                : <>{t('achieved.mockAchieved', { date: formatDate(latestMock?.finishedAt) })}</>}
+                ? <>{t('achieved.achievedAt', { date: formatDateTime(target.achievedAt) })}</>
+                : <>{t('achieved.mockAchieved', { date: formatDateTime(latestMock?.finishedAt) })}</>}
             </p>
           </div>
 

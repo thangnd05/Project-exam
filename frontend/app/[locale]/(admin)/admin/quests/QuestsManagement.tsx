@@ -1,13 +1,13 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import {useLocale, useTranslations} from 'next-intl';
+import {useTranslations} from 'next-intl';
 import {Button, Form} from 'react-bootstrap';
 import {Edit, Plus, Trash2} from 'lucide-react';
 import {toast} from 'react-toastify';
 
 import {useQuests} from './_hooks/useQuests';
-import {toDateTimeLocalInput, fromDateTimeLocalInput} from '@/app/utils/format-date-time';
+import { toDateTimeLocalInput, fromDateTimeLocalInput, formatDateTime } from '@/app/utils/format-date-time';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -59,7 +59,6 @@ const toInputDateTime = (value?: string) => toDateTimeLocalInput(value);
 function QuestsManagement() {
   const t = useTranslations('AdminUsers');
   const tCommon = useTranslations('Common');
-  const locale = useLocale();
   const [keyword, setKeyword] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingQuestId, setEditingQuestId] = useState<string | null>(null);
@@ -181,8 +180,6 @@ function QuestsManagement() {
     return type ? t(`quests.conditions.${type.labelKey}`) : quest.conditionLabel;
   };
 
-  const formatDate = (value?: string) =>
-    value ? new Date(value).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN') : '-';
 
   const columns: AdminTableColumn[] = [
     {
@@ -213,8 +210,8 @@ function QuestsManagement() {
       header: t('quests.columns.time'),
       render: (quest: QuestResponse) => (
         <div className="d-flex flex-column">
-          <span>{t('quests.from', {date: formatDate(quest.startAt)})}</span>
-          <span>{t('quests.to', {date: formatDate(quest.endAt)})}</span>
+          <span>{t('quests.from', {date: formatDateTime(quest.startAt)})}</span>
+          <span>{t('quests.to', {date: formatDateTime(quest.endAt)})}</span>
         </div>
       ),
     },

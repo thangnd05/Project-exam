@@ -8,6 +8,8 @@ import {useTranslations} from 'next-intl';
 
 import {getExamTypes} from '@/app/apis/examTypeApi';
 import {getAllResources} from '@/app/apis/recoveryResourceApi';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
 import {examTypeKeys} from '@/app/configs/queryKeys';
 import type {ExamTypeResponse} from '@/app/types/exam-type';
@@ -128,11 +130,12 @@ const vendorTag = (group: ExamGroup, otherLabel: string) => {
 
 function ResourceLibrary() {
   const t = useTranslations('Resources');
+  const tCommon = useTranslations('Common');
   const [selectedExamId, setSelectedExamId] = useState('');
   const [selectedPart, setSelectedPart] = useState(ALL_PARTS);
   const [keyword, setKeyword] = useState('');
 
-  const {data: resources = [], isLoading: resourcesLoading, isError} = useQuery({
+  const {data: resources = [], isLoading: resourcesLoading, isError, refetch} = useQuery({
     queryKey: ['recovery-resources', 'public'],
     queryFn: getAllResources,
     select: asList,
@@ -207,33 +210,37 @@ function ResourceLibrary() {
 
     if (isError) {
       return (
-        <div className={cx('empty')}>
-          <CircleAlert size="1em" className={cx('icon')} />
-          <h2>{t('library.loadError.title')}</h2>
-          <p>{t('library.loadError.message')}</p>
-        </div>
+        <EmptyState
+          tone="danger"
+          icon={CircleAlert}
+          title={t('library.loadError.title')}
+          description={t('library.loadError.message')}
+          action={
+            <ButtonPrime variant="outline" onClick={() => refetch()}>
+              {tCommon('error.retry')}
+            </ButtonPrime>
+          }
+        />
       );
     }
 
     if (resources.length === 0) {
       return (
-        <div className={cx('empty')}>
-          <FileText size="1em" className={cx('icon')} />
-          <h2>{t('library.empty.title')}</h2>
-          <p>{t('library.empty.message')}</p>
-        </div>
+        <EmptyState icon={FileText} title={t('library.empty.title')} description={t('library.empty.message')} />
       );
     }
 
     if (!activeGroup || visible.length === 0) {
       return (
-        <div className={cx('empty')}>
-          <Search size="1em" className={cx('icon')} />
-          <h2>{t('library.noMatch.title')}</h2>
-          <button type="button" className={cx('textBtn')} onClick={resetFilters}>
-            {t('library.resetFilters')}
-          </button>
-        </div>
+        <EmptyState
+          icon={Search}
+          title={t('library.noMatch.title')}
+          action={
+            <ButtonPrime variant="outline" onClick={resetFilters}>
+              {t('library.resetFilters')}
+            </ButtonPrime>
+          }
+        />
       );
     }
 

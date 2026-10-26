@@ -18,6 +18,7 @@ import {
 
 import styles from './Analytics.module.scss';
 import Loading from '@/app/components/Loading/Loading';
+import { formatFullNumber } from '@/app/utils/formatNumber';
 
 const cx = classNames.bind(styles);
 
@@ -165,7 +166,7 @@ const Analytics = () => {
                         <Col lg={8}>
                             <ChartCard title={t('locationsTitle')} delay={0.3} action={monthSelect}>
                                 <div className={cx('monthSummary')}>
-                                    <span className={cx('summaryValue')}>{locTotalVisits.toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN')}</span>
+                                    <span className={cx('summaryValue')}>{formatFullNumber(locTotalVisits, locale)}</span>
                                     <span className={cx('summaryLabel')}>
                                         {locMonth.includes('-')
                                             ? t('publicVisitsInMonth', {

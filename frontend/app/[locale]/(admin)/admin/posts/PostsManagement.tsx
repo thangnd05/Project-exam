@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { Badge, Button } from 'react-bootstrap';
 import { Eye, CheckCircle, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -19,6 +19,7 @@ import type { PostSummaryResponse } from '@/app/types';
 
 const cx = classNames.bind(styles);
 import { useAdminPosts, useApprovePost, useDeletePost } from './_hooks/useAdminPosts';
+import { formatDate } from '@/app/utils/format-date-time';
 
 const STATUS_VARIANT: Record<string, string> = { APPROVED: 'success', PENDING: 'warning' };
 
@@ -30,7 +31,6 @@ const STATUS_FILTERS = [
 
 const PostsManagement = () => {
     const t = useTranslations('AdminUsers');
-    const locale = useLocale();
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('PENDING');
     const [currentPage, setCurrentPage] = useState(0);
@@ -112,7 +112,7 @@ const PostsManagement = () => {
             key: 'createdAt',
             header: t('posts.columns.createdAt'),
             render: (post: PostSummaryResponse) =>
-                new Date(post.createdAt as string).toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN'),
+                formatDate(post.createdAt),
         },
         {
             key: 'status',

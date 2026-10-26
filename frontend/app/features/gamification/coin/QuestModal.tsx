@@ -17,6 +17,7 @@ import CosmeticShop from '@/app/features/gamification/cosmetic/CosmeticShop';
 import {QuestConditionType} from '@/app/enums';
 import type {UserQuestResponse} from '@/app/types';
 import styles from '@/app/features/gamification/coin/QuestModal.module.scss';
+import { formatDateTime } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
@@ -77,7 +78,7 @@ function QuestModal({show, onClose}: QuestModalProps) {
   };
 
   const formatEndAt = (value?: string) =>
-    value ? new Date(value).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN') : null;
+    value ? formatDateTime(value) : null;
 
   const balanceBadge = (
     <span className={cx('balanceBadge')}>

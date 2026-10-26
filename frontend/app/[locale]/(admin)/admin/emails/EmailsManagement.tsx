@@ -4,7 +4,7 @@ import {useMemo, useState} from 'react';
 import {Button} from 'react-bootstrap';
 import {Edit, History, Plus, Send, Trash2} from 'lucide-react';
 import {toast} from 'react-toastify';
-import {useLocale, useTranslations} from 'next-intl';
+import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -24,6 +24,7 @@ import EmailEditorModal from './_components/EmailEditorModal';
 import EmailRecipientsModal from './_components/EmailRecipientsModal';
 import SendEmailModal from './_components/SendEmailModal';
 import {useAutoEmails, useEmailMutations, useManualEmails} from './_hooks/useAdminEmails';
+import { formatDateTime } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
@@ -37,7 +38,6 @@ const TABS = [
 function EmailsManagement() {
   const t = useTranslations('AdminSystem.emails');
   const tAdmin = useTranslations('AdminCommon');
-  const locale = useLocale();
   const [activeTab, setActiveTab] = useState('auto');
   const [keyword, setKeyword] = useState('');
   const [manualPage, setManualPage] = useState(0);
@@ -104,7 +104,6 @@ function EmailsManagement() {
     }
   };
 
-  const formatDate = (value?: string) => (value ? new Date(value).toLocaleString(locale === 'en' ? 'en-US' : 'vi-VN') : '-');
 
   const statusColumn: AdminTableColumn = {
     key: 'active',
@@ -167,7 +166,7 @@ function EmailsManagement() {
       render: (email: EmailResponse) => email.pendingCount,
     },
     statusColumn,
-    {key: 'createdAt', header: t('columns.createdAt'), render: (email: EmailResponse) => formatDate(email.createdAt)},
+    {key: 'createdAt', header: t('columns.createdAt'), render: (email: EmailResponse) => formatDateTime(email.createdAt)},
   ];
 
   const isAutoTab = activeTab === 'auto';

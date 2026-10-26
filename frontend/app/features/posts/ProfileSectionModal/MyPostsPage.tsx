@@ -2,21 +2,24 @@
 
 import Link, { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import { useEffect, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { motion, type Variants } from 'framer-motion';
-import { Alert, Spinner, Dropdown } from 'react-bootstrap';
-import { Eye, Heart, MessageCircle, Bookmark, Search, EllipsisVertical, Pencil, Trash2, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
+import { Spinner, Dropdown } from 'react-bootstrap';
+import { Eye, Heart, MessageCircle, Bookmark, Search, EllipsisVertical, Pencil, Trash2, ChevronLeft, ChevronRight, ImageIcon, CircleAlert, FileText } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { fetchPostById } from '@/app/features/posts/hooks/usePosts';
 import CreatePostModal from '@/app/features/posts/CreatePostModal/CreatePostModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import routes from '@/app/configs/Routes';
 import { useMyPosts } from '@/app/features/posts/ProfileSectionModal/useMyPosts';
 import type { PostResponse, PostSummaryResponse } from '@/app/types';
 import styles from '@/app/features/posts/ProfileSectionModal/PostsListPage.module.scss';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
-import { formatCount, formatDate } from './postFormat';
+import { formatCount } from './postFormat';
+import { formatLongDate } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
@@ -51,8 +54,8 @@ type MyPostsPageProps = {
 function MyPostsPage({ embedded = false }: MyPostsPageProps) {
   const router = useRouter();
   const t = useTranslations('Posts');
+  const tCommon = useTranslations('Common');
   const localizeHref = useLocalizeHref();
-  const dateLocale = useLocale() === 'en' ? 'en-US' : 'vi-VN';
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [editingPost, setEditingPost] = useState<PostResponse | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -223,17 +226,30 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
         )}
 
         {!loading && errorMessage && (
-          <Alert variant="danger" className={cx('alertBox')}>{errorMessage}</Alert>
+          <EmptyState
+            compact={embedded}
+            tone="danger"
+            icon={CircleAlert}
+            title={tCommon('loadErrorTitle')}
+            description={errorMessage}
+            action={
+              <ButtonPrime variant="outline" onClick={() => fetchData()}>
+                {tCommon('error.retry')}
+              </ButtonPrime>
+            }
+          />
         )}
 
         {!loading && !errorMessage && posts.length === 0 && (
-          <Alert variant="info" className={cx('alertBox')}>
-            {hasActiveFilter ? (
-              <>{t('myPosts.emptyFiltered')}</>
-            ) : (
-              <>{t.rich('myPosts.empty', { link: (chunks) => <Link href={routes.posts}>{chunks}</Link> })}</>
-            )}
-          </Alert>
+          <EmptyState
+            compact={embedded}
+            icon={hasActiveFilter ? Search : FileText}
+            title={
+              hasActiveFilter
+                ? t('myPosts.emptyFiltered')
+                : t.rich('myPosts.empty', { link: (chunks) => <Link href={routes.posts}>{chunks}</Link> })
+            }
+          />
         )}
 
         {!loading && !errorMessage && posts.length > 0 && (
@@ -276,7 +292,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
                   <div className={cx('cardBody')}>
                     <div className={cx('cardMeta')}>
                       <span className={cx('statusBadge', status.cls)}>{status.text.toUpperCase()}</span>
-                      <span className={cx('date')}>{formatDate(post.createdAt, dateLocale)}</span>
+                      <span className={cx('date')}>{formatLongDate(post.createdAt, {}, '--')}</span>
                     </div>
 
                     <Link href={detailUrl} className={cx('cardTitleLink')}>

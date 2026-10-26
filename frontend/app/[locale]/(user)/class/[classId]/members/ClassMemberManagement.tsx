@@ -3,40 +3,32 @@
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
-import { Users, CircleCheck, Clock, UserMinus, Search, RefreshCw, ChevronDown, ChevronUp, type LucideIcon } from 'lucide-react';
+import { Users, CircleCheck, Clock, UserMinus, Search, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react';
 import { Badge, Table, Tabs, Tab } from 'react-bootstrap';
 
 import styles from './ClassMemberManagement.module.scss';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import { useClassMembers } from './_hooks/useClassMembers';
 import { ClassMemberStatus } from '@/app/enums';
 import type { ClassMemberResponse } from '@/app/types';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import Loading from '@/app/components/Loading/Loading';
+import { formatDateTime } from '@/app/utils/format-date-time';
 
 const cx = classNames.bind(styles);
 
 type SortKey = 'fullName' | 'joinedAt';
 type SortConfig = { key: SortKey; direction: 'asc' | 'desc' };
 
-const EmptyState = ({ message, icon: Icon }: { message: string; icon: LucideIcon }) => (
-  <div className={cx('empty-state')}>
-    <div className={cx('empty-icon-wrapper')}>
-      <Icon size="1em" />
-    </div>
-    <p>{message}</p>
-  </div>
-);
-
 const ClassMemberManagement = () => {
   const { classId } = useParams<{ classId: string }>();
   const t = useTranslations('Classes');
-  const locale = useLocale();
   const router = useRouter();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -134,17 +126,6 @@ const ClassMemberManagement = () => {
     return getSortedMembers(filtered);
   };
 
-  const formatDate = (dateStr?: string) => {
-    if (!dateStr) return '-';
-    const d = new Date(dateStr);
-    return d.toLocaleDateString(locale === 'en' ? 'en-US' : 'vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
 
   const getStatusBadge = (status?: ClassMemberStatus) => {
     const statusMap: Record<string, { variant: string; label?: React.ReactNode; icon?: React.ReactNode }> = {
@@ -169,7 +150,7 @@ const ClassMemberManagement = () => {
       <td className={cx('td-id')}>
         <span className={cx('user-id')}>{member.fullName || t('members.unnamed')}</span>
       </td>
-      <td className={cx('td-joined')}>{formatDate(member.joinedAt)}</td>
+      <td className={cx('td-joined')}>{formatDateTime(member.joinedAt)}</td>
       <td className={cx('td-status')}>{getStatusBadge(member.status)}</td>
       {showActions && (
         <td className={cx('td-actions')}>
@@ -300,12 +281,9 @@ const ClassMemberManagement = () => {
             <div className={cx('tab-content-wrapper')}>
               {filteredApproved.length === 0 ? (
                 <EmptyState
-                  message={
-                    searchTerm
-                      ? t('members.noMatch')
-                      : t('members.noApproved')
-                  }
-                  icon={Users}
+                  compact
+                  icon={searchTerm ? Search : Users}
+                  title={searchTerm ? t('members.noMatch') : t('members.noApproved')}
                 />
               ) : (
                 <div className={cx('table-wrapper')}>
@@ -351,12 +329,9 @@ const ClassMemberManagement = () => {
             <div className={cx('tab-content-wrapper')}>
               {filteredPending.length === 0 ? (
                 <EmptyState
-                  message={
-                    searchTerm
-                      ? t('members.noPendingMatch')
-                      : t('members.noPending')
-                  }
-                  icon={Clock}
+                  compact
+                  icon={searchTerm ? Search : Clock}
+                  title={searchTerm ? t('members.noPendingMatch') : t('members.noPending')}
                 />
               ) : (
                 <>

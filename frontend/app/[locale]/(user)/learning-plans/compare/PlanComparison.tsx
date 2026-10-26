@@ -9,7 +9,7 @@ import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
-import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
+import { formatDateTime } from '@/app/utils/format-date-time';
 import dynamic from 'next/dynamic';
 import { usePlanComparison } from './_hooks/usePlanComparison';
 import { planStageLabel, planStatusLabel, planStatusVariant } from '@/app/features/learning-plans/planLabels';
@@ -66,7 +66,7 @@ function PlanComparison() {
         readiness,
         status: p.status,
         planStage: p.planStage,
-        createdAt: formatDate(p.createdAt),
+        createdAt: formatDateTime(p.createdAt),
         diffVsPrev,
       };
     });
@@ -163,7 +163,7 @@ function PlanComparison() {
                       ) : '-'}
                     </li>
                     <li className={cx('muted')}>
-                      {t('compare.createdAt', { date: formatDate(p.createdAt) })}
+                      {t('compare.createdAt', { date: formatDateTime(p.createdAt) })}
                     </li>
                     {p.replacedByPlanId && (
                       <li>

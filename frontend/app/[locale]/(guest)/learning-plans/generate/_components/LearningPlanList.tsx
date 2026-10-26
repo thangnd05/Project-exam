@@ -6,7 +6,9 @@ import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useTranslations } from 'next-intl';
-import { MapIcon, ArrowLeftRight } from 'lucide-react';
+import { MapIcon, ArrowLeftRight, CircleAlert } from 'lucide-react';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
+import EmptyState from '@/app/components/EmptyState/EmptyState';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ExamPillPicker from '@/app/features/my-target/ExamPillPicker/ExamPillPicker';
@@ -16,7 +18,7 @@ import { useSwitchPlan } from '@/app/[locale]/(guest)/learning-plans/generate/_h
 import { useResyncPlan } from '@/app/features/learning-plans/hooks/useResyncPlan';
 import { withExam } from '@/app/features/exam-types/hooks/useExamParam';
 import { parseCode } from '@/app/[locale]/(public)/_lib/certificationMeta';
-import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
+import { formatDateTime } from '@/app/utils/format-date-time';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import {
   buildResyncMessage,
@@ -188,7 +190,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
             <span>
               {t.rich('planList.tasksProgress', { passed, total, strong: (chunks) => <strong>{chunks}</strong> })}
             </span>
-            {p.createdAt && <span>{formatDate(p.createdAt)}</span>}
+            {p.createdAt && <span>{formatDateTime(p.createdAt)}</span>}
           </div>
           <div
             className={cx('progress')}
@@ -258,24 +260,28 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
       />
 
       {error && (
-        <div className={ui('notice', 'noticeDanger')}>
-          <span>{error}</span>
-        </div>
+        <EmptyState
+          compact
+          tone="danger"
+          icon={CircleAlert}
+          title={tc('loadErrorTitle')}
+          description={error}
+          action={
+            <ButtonPrime variant="outline" onClick={() => reload()}>
+              {tc('error.retry')}
+            </ButtonPrime>
+          }
+        />
       )}
       {loading && <div className={ui('skeleton')} aria-hidden="true" />}
 
-      {!loading && plans.length === 0 && (emptyMessage || emptyAction) && (
-        <div className={ui('notice', 'noticeInfo')}>
-          <span>{emptyMessage}</span>
-          {emptyAction}
-        </div>
-      )}
-
-      {!loading && plans.length === 0 && !emptyMessage && !emptyAction && (
-        <div className={cx('empty')}>
-          <MapIcon size="1em" aria-hidden="true" />
-          <span>{t('common.noPlansForExam')}</span>
-        </div>
+      {!loading && !error && plans.length === 0 && (
+        <EmptyState
+          compact
+          icon={MapIcon}
+          title={emptyMessage || t('common.noPlansForExam')}
+          action={emptyAction}
+        />
       )}
 
       {!loading && plans.length > 0 && <ul className={cx('list')}>{plans.map(renderPlan)}</ul>}
