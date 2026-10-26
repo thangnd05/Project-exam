@@ -22,7 +22,7 @@ import StreakBadge from '@/app/features/gamification/streak/StreakBadge';
 import SettingsModal from '@/app/components/layouts/Header/ThemeToggle/SettingsModal';
 import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import {useStreak} from '@/app/features/gamification/streak/hooks/useStreak';
-import { GraduationCap, House, Plus, Route, User, X } from 'lucide-react';
+import { GraduationCap, House, Library, Plus, Route, User, X } from 'lucide-react';
 
 const cx = classNames.bind(styles);
 
@@ -75,6 +75,7 @@ function MobileBottomNav() {
 
   const isHomeActive = pathname === routes.home;
   const isExamActive = pathname.startsWith('/exam-types');
+  const isResourcesActive = pathname.startsWith(routes.resources);
   // const isPostsActive = pathname.startsWith('/posts');
   const isPlanActive =
     pathname.startsWith(routes.myTarget) || pathname.startsWith(routes.learningPlans);
@@ -144,6 +145,15 @@ function MobileBottomNav() {
           <Newspaper size="1em" className={cx('tabIcon')} />
           <span className={cx('tabLabel')}>Bài viết</span>
         </Link> */}
+
+        <Link
+          href={routes.resources}
+          className={cx('tab', {active: isResourcesActive})}
+          aria-current={isResourcesActive ? 'page' : undefined}
+        >
+          <Library size="1em" className={cx('tabIcon')} />
+          <span className={cx('tabLabel')}>{t('resources')}</span>
+        </Link>
 
         {canCreateTest && (
           <button
@@ -249,13 +259,6 @@ function MobileBottomNav() {
                   )}
 
                   <div className={cx('menuList')}>
-                    <Link
-                      href={routes.resources}
-                      className={cx('menuItem')}
-                      onClick={closeSheet}
-                    >
-                      {t('resources')}
-                    </Link>
                     {user ? (
                       <>
                         <Link

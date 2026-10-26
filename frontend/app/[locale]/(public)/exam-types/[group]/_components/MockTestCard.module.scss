@@ -1,5 +1,4 @@
 // Cùng khuôn thẻ ở Kho đề thi (ExamCatalog.module.scss).
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .card {
   display: flex;
@@ -35,7 +34,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   padding: 2px 10px;
   border-radius: var(--radius-pill);
   background: var(--brand-800);
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -71,7 +70,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .index {
   display: block;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--brand-700);
@@ -93,7 +92,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   padding: 10px 0;
   border-top: 1px solid var(--slate-100);
   border-bottom: 1px solid var(--slate-100);
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-xs2);
   color: var(--slate-500);
 

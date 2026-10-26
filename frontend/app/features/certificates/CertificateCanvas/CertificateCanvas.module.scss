@@ -13,7 +13,7 @@
   -webkit-print-color-adjust: exact;
 
   --certificate-accent: var(--brand-600);
-  --certificate-serif: var(--font-playfair), 'Noto Serif', Georgia, 'Times New Roman', serif;
+  --certificate-serif: var(--font-serif);
 }
 
 .canvas.hasBackground .frame {
@@ -322,7 +322,7 @@
 }
 
 .code {
-  font-family: 'Courier New', monospace;
+  font-family: var(--font-mono);
   font-size: 1.9cqw;
   font-weight: var(--font-weight-bold);
   letter-spacing: 0.15cqw;

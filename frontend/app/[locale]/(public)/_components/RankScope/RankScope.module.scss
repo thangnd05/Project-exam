@@ -1,7 +1,6 @@
 @import 'app/assets/styles/mixins.scss';
 
 // RankScope theo mẫu FrostScope: thẻ trắng phẳng trên nền băng nhạt, bảng 4 cột top 5.
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .section {
   display: flex;
@@ -228,7 +227,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .rankNo {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-base);
   font-weight: 500;
   text-align: center;
@@ -251,7 +250,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   height: 36px;
   border: 1px solid;
   border-radius: 50%;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-smd);
   font-weight: 700;
 }
@@ -289,14 +288,14 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .scoreVal {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-base);
   font-weight: 900;
   color: var(--slate-900);
 }
 
 .scoreMax {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   color: var(--slate-400);
 }

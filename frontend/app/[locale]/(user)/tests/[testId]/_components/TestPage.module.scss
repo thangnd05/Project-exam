@@ -2,7 +2,6 @@
 // Nút, nhãn, thông báo, trạng thái rỗng lấy từ FlatUi.module.scss.
 @import 'app/assets/styles/mixins.scss';
 
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .wrapper {
   min-height: calc(100vh - 200px);
@@ -21,7 +20,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 16px;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   color: var(--slate-500);
 
@@ -75,7 +74,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .code {
   display: block;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--brand-700);
@@ -93,7 +92,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   display: flex;
   flex-wrap: wrap;
   margin-top: 4px;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: 1.15rem;
   color: var(--slate-500);
 
@@ -191,7 +190,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .statValue {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: 2.6rem;
   font-weight: 700;
   line-height: 1.15;
@@ -206,7 +205,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .statMeta {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-xs2);
   color: var(--slate-500);
 }
@@ -240,7 +239,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   padding: 1px 9px;
   border-radius: var(--radius-pill);
   background: rgb(var(--brand-700-rgb) / 0.1);
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--brand-700);
@@ -248,7 +247,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .sectionNote {
   margin-left: auto;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: 1.15rem;
   color: var(--slate-500);
 }
@@ -302,7 +301,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .mono {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
 }
 
@@ -311,7 +310,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .score {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-md);
   font-weight: 700;
   color: var(--slate-900);
@@ -367,7 +366,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .rank {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-smd);
   font-weight: 700;
   color: var(--slate-500);
@@ -394,7 +393,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .myRankValue {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: 3rem;
   font-weight: 700;
   line-height: 1.1;
@@ -420,7 +419,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   gap: 2px;
 
   strong {
-    font-family: $mono;
+    font-family: var(--font-mono);
     font-size: var(--font-size-lg);
     font-weight: 700;
     color: var(--slate-900);
@@ -488,7 +487,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--medal);
@@ -508,7 +507,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .podiumScore {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-2xl);
   font-weight: 700;
   color: var(--slate-900);

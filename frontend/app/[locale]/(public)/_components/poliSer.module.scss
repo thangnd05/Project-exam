@@ -1,7 +1,6 @@
 @import 'app/assets/styles/mixins.scss';
 
 // Trang văn bản (Chính sách, Điều khoản, Giới thiệu) theo mẫu FrostScope: một cột đọc liên tục, không đóng khung.
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .page {
   max-width: 768px;
@@ -79,12 +78,12 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .mono {
-  font-family: $mono;
+  font-family: var(--font-mono);
 }
 
 // Dòng hộp thư tranh chấp: chữ mono đậm như mẫu.
 .contactLine {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-ssm);
   color: var(--slate-900);
 

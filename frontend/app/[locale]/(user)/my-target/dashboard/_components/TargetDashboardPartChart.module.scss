@@ -1,5 +1,3 @@
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
-
 .list {
   margin: 0;
   padding: 0;
@@ -34,7 +32,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .values {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   color: var(--slate-500);
 

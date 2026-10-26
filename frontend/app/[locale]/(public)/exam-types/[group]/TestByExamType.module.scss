@@ -1,7 +1,6 @@
 @import 'app/assets/styles/mixins.scss';
 
 // Trang kỳ thi cùng khuôn với Kho đề thi / Kho tài liệu; nút, nhãn, trạng thái rỗng lấy từ FlatUi.module.scss.
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .wrapper {
   min-height: calc(100vh - 200px);
@@ -20,7 +19,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 16px;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   color: var(--slate-500);
 
@@ -71,7 +70,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .code {
   display: block;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--brand-700);
@@ -102,7 +101,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   flex-wrap: wrap;
   gap: 4px 0;
   margin-top: 12px;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   color: var(--slate-500);
 
@@ -154,7 +153,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   padding: 1px 9px;
   border-radius: var(--radius-pill);
   background: rgb(var(--brand-700-rgb) / 0.1);
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--brand-700);

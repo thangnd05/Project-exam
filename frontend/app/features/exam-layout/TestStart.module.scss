@@ -481,7 +481,7 @@
 }
 
 .exam-stat-value {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: var(--font-size-ssm);
   font-weight: 700;
   color: var(--slate-900);
@@ -606,7 +606,7 @@
 }
 
 .dashboard-progress {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-weight: 700;
   color: var(--exam-ink);
   font-variant-numeric: tabular-nums;

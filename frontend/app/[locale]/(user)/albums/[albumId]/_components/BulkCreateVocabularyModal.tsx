@@ -175,7 +175,7 @@ const BulkCreateVocabularyModal = ({ show, onClose, onSuccess, albumId }: BulkCr
                         onChange={(e) => setJsonInput(e.target.value)}
                         disabled={loading || aiLoading}
                         rows={12}
-                        style={{ fontFamily: 'monospace', fontSize: '1.3rem' }}
+                        style={{ fontFamily: 'var(--font-mono)', fontSize: '1.3rem' }}
                     />
                 </div>
                 <small className="text-muted mt-2 d-block">

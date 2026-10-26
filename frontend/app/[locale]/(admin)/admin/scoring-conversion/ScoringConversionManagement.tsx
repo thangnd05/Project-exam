@@ -263,7 +263,7 @@ function ScoringConversionManagement() {
           as="textarea"
           ref={jsonTextareaRef}
           rows={12}
-          style={{fontFamily: 'monospace', fontSize: '1.4rem'}}
+          style={{fontFamily: 'var(--font-mono)', fontSize: '1.4rem'}}
           placeholder='[{"examTypeId":"...","skillId":"...","numCorrect":0,"convertedScore":5}]'
           value={jsonCreateValue}
           onChange={(event) => setJsonCreateValue(event.target.value)}

@@ -1,7 +1,6 @@
 @import 'app/assets/styles/mixins.scss';
 
 // Khung chung (tiêu đề, thẻ, nút, nhãn, thông báo) nằm ở FlatUi.module.scss; ở đây chỉ phần riêng của trang.
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .achieved {
   align-items: center;
@@ -51,7 +50,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .statValue {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-2xxl);
   font-weight: 700;
   line-height: 1.15;
@@ -68,7 +67,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .statMeta {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: 1.15rem;
   color: var(--slate-500);
 

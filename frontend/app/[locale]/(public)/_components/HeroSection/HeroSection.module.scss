@@ -164,6 +164,11 @@
   font-weight: 500;
   color: var(--text-on-dark-muted);
 
+  // Màn hẹp xếp một cột, tránh 3 mục rớt dòng lệch 2 + 1.
+  @include down(md) {
+    flex-direction: column;
+  }
+
   li {
     display: inline-flex;
     align-items: center;

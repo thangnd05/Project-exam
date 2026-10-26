@@ -1,6 +1,5 @@
 @import 'app/assets/styles/mixins.scss';
 
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .section {
   margin-bottom: 20px;
@@ -75,14 +74,14 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .examPill {
-  font-family: $mono;
+  font-family: var(--font-mono);
 }
 
 .meta {
   display: flex;
   flex-wrap: wrap;
   gap: 2px 0;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-xs2);
   color: var(--slate-500);
 

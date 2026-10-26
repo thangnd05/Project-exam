@@ -1,7 +1,6 @@
 @import 'app/assets/styles/mixins.scss';
 
 // Kho kỳ thi theo mẫu FrostScope exams.html: thanh lọc + lưới thẻ chứng chỉ nền sáng.
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .wrapper {
   padding: 24px 0 60px;
@@ -82,7 +81,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   color: var(--slate-500);
 
@@ -241,7 +240,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .vendorTag {
   padding: 2px 10px;
   border-radius: var(--radius-pill);
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -269,7 +268,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .code {
   display: block;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--brand-700);
@@ -309,7 +308,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   padding: 10px 0;
   border-top: 1px solid var(--slate-100);
   border-bottom: 1px solid var(--slate-100);
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-xs2);
   color: var(--slate-500);
 

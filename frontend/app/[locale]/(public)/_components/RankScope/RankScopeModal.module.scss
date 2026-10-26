@@ -1,7 +1,6 @@
 @import 'app/assets/styles/mixins.scss';
 
 // Modal bảng xếp hạng theo mẫu FrostScope: thẻ than chì tối, hàng bo tròn, hạng 1 viền xanh băng.
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 // Ghép thêm class của Bootstrap để thắng style mặc định bất kể thứ tự nạp CSS.
 :global(.modal-backdrop).backdrop {
@@ -162,7 +161,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .rankNo {
   width: 24px;
   flex-shrink: 0;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-ssm);
   font-weight: 700;
   text-align: center;
@@ -213,7 +212,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .scoreVal {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-base);
   font-weight: 700;
   color: var(--text-on-dark);

@@ -538,6 +538,8 @@
   --bs-link-hover-color: var(--primary-text-hover);
   --surface-shadow: 0 8px 32px 0 var(--primary-alpha-10);
   --font-family: var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-serif: var(--font-playfair), Georgia, serif;
 }
 
 :root {

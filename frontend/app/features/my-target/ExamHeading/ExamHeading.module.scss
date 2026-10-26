@@ -1,6 +1,5 @@
 @import 'app/assets/styles/mixins.scss';
 
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .head {
   display: flex;
@@ -30,7 +29,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .code {
   display: block;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--brand-700);

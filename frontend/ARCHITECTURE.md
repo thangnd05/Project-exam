@@ -97,6 +97,7 @@ mà không tự biến thành URL.
 | File `.ts` không phải component | camelCase như hiện có (`useTestSession.ts`, `planLabels.ts`) |
 | Style | SCSS module cạnh component; cấm hex/rgba literal - dùng token trong GlobalStyles |
 | Lớp nổi | Header, thanh dưới, nút nổi, modal dùng `var(--z-*)` trong GlobalStyles; toast/tooltip luôn trên modal |
+| Font | Chỉ 3 token: `--font-family` (Inter, giao diện), `--font-mono` (JetBrains Mono, mã/nhãn kỹ thuật), `--font-serif` (Playfair, chứng chỉ và tiêu đề bài viết); không khai font-family literal |
 | Icon / loading | Chỉ dùng `lucide-react`; tải cả trang/khu vực dùng `<Loading />`, `Spinner` chỉ cho nút hoặc dòng nhỏ |
 | Server state | TanStack Query, `queryFn` gọi hàm trong `app/apis/`, không dùng `useEffect` + `useState` để fetch |
 | Query key | Tài nguyên được đọc ở ≥2 nơi phải dùng key trong `app/configs/queryKeys.ts` (một gốc cho mỗi tài nguyên, mutation invalidate gốc). Cùng key thì cùng `queryFn`; biến đổi dữ liệu đặt trong `select` |

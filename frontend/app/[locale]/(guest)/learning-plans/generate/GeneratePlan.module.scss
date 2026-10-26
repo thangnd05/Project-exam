@@ -1,7 +1,6 @@
 @import 'app/assets/styles/mixins.scss';
 
 // Khung chung (tiêu đề, thẻ, nút, nhãn, thông báo) nằm ở FlatUi.module.scss; ở đây chỉ phần riêng của trang.
-$mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 /* ---------- Bố cục: form | các bước ---------- */
 
@@ -190,14 +189,14 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .testMeta {
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-xs2);
   color: var(--slate-500);
 }
 
 .testScore {
   flex-shrink: 0;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-base);
   font-weight: 700;
   color: var(--slate-900);
@@ -277,7 +276,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .stepNum {
   flex-shrink: 0;
-  font-family: $mono;
+  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   font-weight: 700;
   line-height: 1.7;
