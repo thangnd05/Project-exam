@@ -2,7 +2,7 @@
 
 import {useState} from 'react';
 import {useTranslations} from 'next-intl';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
+import { Eye, EyeOff } from 'lucide-react';
 import { useChangePassword } from '@/app/[locale]/(user)/dashboard/_hooks/useChangePassword';
 import classNames from 'classnames/bind';
 import {toast} from 'react-toastify';
@@ -140,7 +140,7 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
             onClick={() => toggleVisibility('oldPassword')}
             aria-label={visibleFields.oldPassword ? t('changePassword.hidePassword') : t('changePassword.showPassword')}
           >
-            {visibleFields.oldPassword ? <FiEyeOff /> : <FiEye />}
+            {visibleFields.oldPassword ? <EyeOff size="1em" /> : <Eye size="1em" />}
           </button>
         </div>
       </div>
@@ -165,7 +165,7 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
             onClick={() => toggleVisibility('newPassword')}
             aria-label={visibleFields.newPassword ? t('changePassword.hidePassword') : t('changePassword.showPassword')}
           >
-            {visibleFields.newPassword ? <FiEyeOff /> : <FiEye />}
+            {visibleFields.newPassword ? <EyeOff size="1em" /> : <Eye size="1em" />}
           </button>
         </div>
       </div>
@@ -192,7 +192,7 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
             onClick={() => toggleVisibility('confirmNewPassword')}
             aria-label={visibleFields.confirmNewPassword ? t('changePassword.hidePassword') : t('changePassword.showPassword')}
           >
-            {visibleFields.confirmNewPassword ? <FiEyeOff /> : <FiEye />}
+            {visibleFields.confirmNewPassword ? <EyeOff size="1em" /> : <Eye size="1em" />}
           </button>
         </div>
       </div>

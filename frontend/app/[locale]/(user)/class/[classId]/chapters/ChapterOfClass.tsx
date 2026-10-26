@@ -4,10 +4,10 @@ import { useParams } from 'next/navigation';
 import { useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { Container, Spinner, Alert } from 'react-bootstrap';
+import { Container, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
-import { IoBookOutline, IoDocumentTextOutline, IoCalendarOutline, IoAdd, IoGridOutline, IoListOutline } from 'react-icons/io5';
+import { BookOpen, FileText, Calendar, Plus, LayoutGrid, List } from 'lucide-react';
 
 import styles from './ChapterOfClass.module.scss';
 import CreateChapterModal from './_components/CreateChapterModal';
@@ -20,6 +20,7 @@ import routes from '@/app/configs/Routes';
 import { useChaptersOfClass } from './_hooks/useChaptersOfClass';
 import type { ChapterResponse } from '@/app/types';
 import { getApiErrorMessage } from '@/app/utils/apiError';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -83,10 +84,7 @@ const ChapterOfClass = () => {
 
   if (loading) {
     return (
-      <div className={cx('loading')}>
-        <Spinner animation="border" />
-        <p>{t('chapters.loading')}</p>
-      </div>
+      <Loading label={t('chapters.loading')} />
     );
   }
 
@@ -102,15 +100,15 @@ const ChapterOfClass = () => {
           label={t('chapters.label')}
           badgeLabel={t('chapters.classCode', { code: classQr })}
           actionText={t('chapters.create')}
-          actionIcon={IoAdd}
+          actionIcon={Plus}
           onAction={() => setShowCreateChapter(true)}
         >
           <PageHeaderViewToggle
             activeKey={viewMode}
             onChange={setViewMode}
             options={[
-              { key: 'grid', title: t('common.viewGrid'), icon: IoGridOutline },
-              { key: 'list', title: t('chapters.viewList'), icon: IoListOutline },
+              { key: 'grid', title: t('common.viewGrid'), icon: LayoutGrid },
+              { key: 'list', title: t('chapters.viewList'), icon: List },
             ]}
           />
         </PageHeader>
@@ -123,7 +121,7 @@ const ChapterOfClass = () => {
 
         {chapters.length === 0 ? (
           <div className={cx('empty')}>
-            <IoDocumentTextOutline size={100} />
+            <FileText size={100} />
             <h4>{t('chapters.emptyTitle')}</h4>
             <p>{t('chapters.emptyDescription')}</p>
           </div>
@@ -139,7 +137,7 @@ const ChapterOfClass = () => {
                   >
                     <div className={cx('card-top')}>
                       <div className={cx('card-icon')}>
-                        <IoBookOutline />
+                        <BookOpen size="1em" />
                       </div>
                       <span className={cx('index')}>
                         {(index + 1).toString().padStart(2, '0')}
@@ -149,7 +147,7 @@ const ChapterOfClass = () => {
                     <h3 className={cx('chapter-title')}>{chapter.title}</h3>
 
                     <div className={cx('chapter-info')}>
-                      <IoCalendarOutline />
+                      <Calendar size="1em" />
                       <span>
                         {t('chapters.updatedAt', {
                           date: new Date(chapter.createdAt!).toLocaleDateString(

@@ -6,7 +6,7 @@
   padding: 56px 0 40px;
   border-top: 1px solid rgb(var(--surface-dark-border-rgb) / 0.8);
   background: var(--footer-bg);
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--text-on-dark-muted);
 }
 
@@ -63,7 +63,7 @@
 
 .tagline {
   margin: 0;
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 600;
   line-height: 1.6;
   color: var(--text-on-dark);
@@ -85,7 +85,7 @@
 
   svg {
     flex-shrink: 0;
-    font-size: 1.6rem;
+    font-size: var(--font-size-base);
     color: var(--primary);
   }
 
@@ -104,7 +104,7 @@
 
 .colTitle {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -132,7 +132,7 @@
 
 .note {
   padding-top: 4px;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   line-height: 1.5;
   color: rgb(var(--text-on-dark-rgb) / 0.5);
 }

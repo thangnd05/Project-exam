@@ -22,7 +22,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   gap: 6px;
   margin-bottom: 16px;
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--slate-500);
 
   a {
@@ -36,7 +36,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   }
 
   svg {
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     color: var(--slate-300);
   }
 
@@ -76,14 +76,14 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .code {
   display: block;
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--brand-700);
 }
 
 .title {
   margin: 0;
-  font-size: 2rem;
+  font-size: var(--font-size-xl);
   font-weight: 700;
   line-height: 1.3;
   color: var(--slate-900);
@@ -133,7 +133,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   margin-bottom: -1px;
   padding: 12px 10px;
   border-bottom: 2px solid transparent;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 600;
   white-space: nowrap;
   color: var(--slate-500);
@@ -199,7 +199,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
   small {
     margin-left: 4px;
-    font-size: 1.3rem;
+    font-size: var(--font-size-smd);
     font-weight: 500;
     color: var(--slate-400);
   }
@@ -207,7 +207,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .statMeta {
   font-family: $mono;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   color: var(--slate-500);
 }
 
@@ -238,10 +238,10 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .sectionCount {
   padding: 1px 9px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgb(var(--brand-700-rgb) / 0.1);
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--brand-700);
 }
@@ -265,7 +265,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
 
   th {
     padding: 12px 16px;
@@ -303,7 +303,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .mono {
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
 }
 
 .dim {
@@ -312,7 +312,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .score {
   font-family: $mono;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
   color: var(--slate-900);
 }
@@ -355,7 +355,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   height: 32px;
   border-radius: 50%;
   background: var(--slate-100);
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--slate-600);
 }
@@ -368,7 +368,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .rank {
   font-family: $mono;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 700;
   color: var(--slate-500);
 }
@@ -402,7 +402,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
   small {
     margin-left: 4px;
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     font-weight: 500;
     color: var(--slate-500);
   }
@@ -421,7 +421,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
   strong {
     font-family: $mono;
-    font-size: 1.8rem;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     color: var(--slate-900);
   }
@@ -429,7 +429,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .myRankHint {
   margin-left: auto;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--slate-500);
 
   @include down(md) {
@@ -489,12 +489,12 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   align-items: center;
   gap: 6px;
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--medal);
 
   svg {
-    font-size: 1.8rem;
+    font-size: var(--font-size-lg);
   }
 }
 
@@ -509,7 +509,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .podiumScore {
   font-family: $mono;
-  font-size: 2.4rem;
+  font-size: var(--font-size-2xl);
   font-weight: 700;
   color: var(--slate-900);
 }

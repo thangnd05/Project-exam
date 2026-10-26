@@ -4,8 +4,7 @@ import Link from '@/app/i18n/navigation';
 import { Container } from 'react-bootstrap';
 import classNamesBind from 'classnames/bind';
 import { useLocale, useTranslations } from 'next-intl';
-import { FiArrowRight } from 'react-icons/fi';
-import { IoDocumentTextOutline } from 'react-icons/io5';
+import { ArrowRight, FileText } from 'lucide-react';
 
 import { UserTestStatus } from '@/app/enums';
 import { isPracticeAttempt } from '@/app/features/learning-plans/planLabels';
@@ -75,7 +74,7 @@ function TestHistory({ testRef }: { testRef: TestRef }) {
     if (attempts.length === 0) {
       return (
         <div className={ui('empty')}>
-          <IoDocumentTextOutline className={ui('emptyIcon')} aria-hidden="true" />
+          <FileText size="1em" className={ui('emptyIcon')} aria-hidden="true" />
           <h2>{t('empty.title')}</h2>
           <p>{t('empty.desc')}</p>
         </div>
@@ -162,7 +161,7 @@ function TestHistory({ testRef }: { testRef: TestRef }) {
                         {a.status === UserTestStatus.COMPLETED ? (
                           <Link href={`/tests/result/${a.userTestId}`} className={ui('btnSecondary', 'btnSm')}>
                             {t('viewResult')}
-                            <FiArrowRight aria-hidden="true" />
+                            <ArrowRight size="1em" aria-hidden="true" />
                           </Link>
                         ) : (
                           <span className={cx('dim')}>—</span>

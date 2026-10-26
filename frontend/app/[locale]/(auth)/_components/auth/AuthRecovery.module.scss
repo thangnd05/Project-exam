@@ -65,7 +65,7 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  font-size: 2.4rem;
+  font-size: var(--font-size-2xl);
   color: var(--text-on-brand);
   background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-act-color) 100%);
 
@@ -125,8 +125,8 @@
   background-color: var(--bg-white);
   border: 1px solid var(--slate-300);
   padding: 11px 18px;
-  border-radius: 999px;
-  font-size: 1.4rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-ssm);
   font-weight: 500;
   color: var(--text-color);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -168,7 +168,7 @@
   background: transparent;
   border-radius: var(--radius-md);
   color: var(--text-secondary);
-  font-size: 1.8rem;
+  font-size: var(--font-size-lg);
   cursor: pointer;
 
   &:hover {
@@ -178,13 +178,13 @@
 }
 
 .hint {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--text-secondary);
   line-height: 1.6;
 }
 
 .fieldError {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--red-600);
 }
@@ -213,7 +213,7 @@
   width: 100%;
   padding: 13px 18px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: var(--font-size-ssm);
   font-weight: 700;
   color: var(--brand-50);
@@ -239,7 +239,7 @@
 .ghostBtn {
   width: 100%;
   padding: 12px 18px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--slate-300);
   background-color: transparent;
   color: var(--text-color);
@@ -340,6 +340,6 @@
   }
 
   .title {
-    font-size: 2.2rem;
+    font-size: var(--font-size-xxl);
   }
 }

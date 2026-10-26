@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { IoPlay } from 'react-icons/io5';
+import { Play } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 
@@ -101,7 +101,7 @@ function GatedAudioPlayer({ urls = [], onCompleted }: GatedAudioPlayerProps) {
           </div>
           <div className={cx('armRow')}>
             <ButtonPrime variant="primary" size="md" onClick={tryPlay}>
-              <IoPlay /> {t('playAudio')}
+              <Play size="1em" fill="currentColor" /> {t('playAudio')}
             </ButtonPrime>
             <ButtonPrime variant="ghost" size="md" onClick={complete}>
               {t('next')}

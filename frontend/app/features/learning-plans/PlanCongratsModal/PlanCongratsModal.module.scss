@@ -47,7 +47,7 @@
   border-radius: 50%;
   background: var(--on-primary-gradient-soft);
   color: var(--on-primary-gradient);
-  font-size: 1.8rem;
+  font-size: var(--font-size-lg);
   cursor: pointer;
   transition: background 0.2s ease;
 
@@ -78,14 +78,14 @@
 
 .heroTitle {
   margin: 0 0 0.6rem;
-  font-size: 2.4rem;
+  font-size: var(--font-size-2xl);
   font-weight: 800;
   letter-spacing: 0.02em;
 }
 
 .heroSub {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   opacity: 0.92;
 }
 
@@ -99,10 +99,10 @@
   gap: 0.6rem;
   margin-bottom: 1.6rem;
   padding: 0.6rem 1.4rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--emerald-50);
   color: var(--emerald-700);
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 700;
 }
 
@@ -133,7 +133,7 @@
   border-radius: 50%;
   background: var(--emerald-100);
   color: var(--emerald-700);
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 800;
 }
 
@@ -160,7 +160,7 @@
   border-radius: 10px;
   background: var(--primary-gradient);
   color: var(--on-primary-gradient);
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -177,7 +177,7 @@
   border-radius: 10px;
   background: var(--bg-white);
   color: var(--slate-600);
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -246,6 +246,6 @@
     padding: 1.8rem 1.6rem;
   }
   .heroTitle {
-    font-size: 2rem;
+    font-size: var(--font-size-xl);
   }
 }

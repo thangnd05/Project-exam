@@ -6,8 +6,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { isAxiosError } from 'axios';
 import classNames from 'classnames/bind';
-import { FiEye, FiEyeOff, FiLock } from 'react-icons/fi';
-import { MdCheckCircle, MdErrorOutline } from 'react-icons/md';
+import { Eye, EyeOff, Lock, CircleCheck, CircleAlert } from 'lucide-react';
 import routes from '@/app/configs/Routes';
 import { useResetPasswordMutation, useResetTokenQuery } from '@/app/features/auth/hooks/useAuthActions';
 import type { ResetTokenInvalidReason } from '@/app/types';
@@ -194,7 +193,7 @@ function ResetPassword() {
       <div className={cx('page')}>
         <div className={cx('card')}>
           <div className={cx('badge', 'danger')}>
-            <MdErrorOutline />
+            <CircleAlert size="1em" />
           </div>
           <h1 className={cx('title')}>{t('reset.linkUnusable')}</h1>
           <p className={cx('subtitle')}>
@@ -224,7 +223,7 @@ function ResetPassword() {
       <div className={cx('page')}>
         <div className={cx('card')}>
           <div className={cx('badge', 'success')}>
-            <MdCheckCircle />
+            <CircleCheck size="1em" />
           </div>
           <h1 className={cx('title')}>{t('reset.doneTitle')}</h1>
           <p className={cx('subtitle')}>
@@ -246,7 +245,7 @@ function ResetPassword() {
     <div className={cx('page')}>
       <div className={cx('card')}>
         <div className={cx('badge')}>
-          <FiLock />
+          <Lock size="1em" />
         </div>
         <h1 className={cx('title')}>{t('reset.title')}</h1>
         <p className={cx('subtitle')}>
@@ -301,7 +300,7 @@ function ResetPassword() {
                 onClick={() => setShowPassword((prev) => !prev)}
                 aria-label={showPassword ? t('common.hidePassword') : t('common.showPassword')}
               >
-                {showPassword ? <FiEyeOff /> : <FiEye />}
+                {showPassword ? <EyeOff size="1em" /> : <Eye size="1em" />}
               </button>
             </div>
 
@@ -333,7 +332,7 @@ function ResetPassword() {
                 onClick={() => setShowConfirm((prev) => !prev)}
                 aria-label={showConfirm ? t('common.hidePassword') : t('common.showPassword')}
               >
-                {showConfirm ? <FiEyeOff /> : <FiEye />}
+                {showConfirm ? <EyeOff size="1em" /> : <Eye size="1em" />}
               </button>
             </div>
             {touched.confirm && confirmPassword.length > 0 && !confirmOk && (

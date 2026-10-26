@@ -3,7 +3,7 @@
 import { useMounted } from '@/app/hooks/useMounted';
 import {useEffect} from 'react';
 import ReactDOM from 'react-dom';
-import {IoClose} from 'react-icons/io5';
+import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import styles from './BaseModal.module.scss';
@@ -85,7 +85,7 @@ function BaseModal({
               onClick={onClose}
               aria-label={tCommon('close')}
             >
-              <IoClose />
+              <X size="1em" />
             </button>
           )}
         </div>

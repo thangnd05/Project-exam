@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaStar } from 'react-icons/fa';
+import { Star } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
@@ -105,7 +105,7 @@ const TestEvaluationModal = ({
                                     onMouseEnter={() => setHovered(value)}
                                     disabled={submitting}
                                 >
-                                    <FaStar />
+                                    <Star size="1em" fill="currentColor" />
                                 </button>
                             );
                         })}

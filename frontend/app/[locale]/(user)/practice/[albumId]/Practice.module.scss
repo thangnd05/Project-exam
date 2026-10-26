@@ -11,10 +11,10 @@ $input-bg: var(--input-bg);
 $border-color: var(--border-color);
 $success: var(--success);
 $danger: var(--red-500);
-$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-$shadow-card: 0 14px 28px rgba(0, 0, 0, 0.05), 0 10px 10px rgba(0, 0, 0, 0.05);
+$shadow-sm: var(--shadow-sm);
+$shadow-md: var(--shadow-md);
+$shadow-lg: var(--shadow-lg);
+$shadow-card: var(--shadow-card);
 $radius-sm: 0.5rem;
 $radius-md: 0.75rem;
 $radius-lg: 1rem;
@@ -24,35 +24,6 @@ $transition: all 0.3s ease;
 .wrapper {
     min-height: 100vh;
     padding: 2rem 0;
-}
-
-.loadingContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 60vh;
-}
-
-.loadingContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 3rem;
-    background: $bg-white;
-    border-radius: $radius-xl;
-    box-shadow: $shadow-card;
-}
-
-.spinner {
-    width: 3rem;
-    height: 3rem;
-}
-
-.loadingText {
-    font-size: 1.6rem;
-    color: $text-secondary;
-    margin: 0;
 }
 
 .finishedContainer {
@@ -74,7 +45,7 @@ $transition: all 0.3s ease;
 }
 
 .finishedTitle {
-    font-size: 2.4rem;
+    font-size: var(--font-size-2xl);
     font-weight: 700;
     color: $text-primary;
     margin-bottom: 0.75rem;
@@ -118,8 +89,8 @@ $transition: all 0.3s ease;
     gap: 0.75rem;
     padding: 1.25rem 2rem;
     border-radius: $radius-lg;
-    color: white;
-    font-size: 1.4rem;
+    color: var(--white);
+    font-size: var(--font-size-ssm);
     font-weight: 500;
     box-shadow: $shadow-lg;
     z-index: 1000;
@@ -173,7 +144,7 @@ $transition: all 0.3s ease;
 }
 
 .questionText {
-    font-size: 2rem;
+    font-size: var(--font-size-xl);
     font-weight: 600;
     color: var(--on-primary-gradient);
     margin-bottom: 1.5rem;
@@ -270,7 +241,7 @@ $transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     font-weight: 700;
     color: $primary;
     flex-shrink: 0;
@@ -387,7 +358,7 @@ $transition: all 0.3s ease;
 }
 
 .resultTitle {
-    font-size: 1.6rem;
+    font-size: var(--font-size-base);
     font-weight: 700;
     color: $text-primary;
 }
@@ -423,7 +394,7 @@ $transition: all 0.3s ease;
 }
 
 .answerMeaning {
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     color: $success;
 }
 
@@ -443,7 +414,7 @@ $transition: all 0.3s ease;
 }
 
 .statValue {
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     font-weight: 600;
     color: $text-primary;
 }
@@ -494,7 +465,7 @@ $transition: all 0.3s ease;
     }
 
     .optionText {
-        font-size: 1.4rem;
+        font-size: var(--font-size-ssm);
     }
 
     .actionButtons {

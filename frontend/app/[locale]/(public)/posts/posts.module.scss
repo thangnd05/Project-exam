@@ -13,14 +13,14 @@
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #fff;
+  background: var(--on-hero-soft);
+  border: 1px solid var(--on-hero-track);
+  color: var(--white);
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.28);
+    background: var(--on-hero-border);
     border-color: rgba(255, 255, 255, 0.45);
     transform: translateY(-1px);
   }
@@ -76,7 +76,7 @@
     color: var(--on-primary-gradient);
     padding: 6px 16px;
     border-radius: 30px;
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     box-shadow: 0 4px 12px rgb(var(--primary-rgb) / 0.3);
     z-index: 10;
@@ -122,7 +122,7 @@
     }
 
     @include down(sm) {
-      font-size: 2.4rem;
+      font-size: var(--font-size-2xl);
     }
   }
 
@@ -170,7 +170,7 @@
         }
 
         span:last-child {
-          font-size: 1.2rem;
+          font-size: var(--font-size-sm);
           color: var(--text-secondary);
         }
       }
@@ -182,7 +182,7 @@
       gap: 8px;
       color: var(--primary-text);
       font-weight: 700;
-      font-size: 1.4rem;
+      font-size: var(--font-size-ssm);
       background: none;
       border: none;
       padding: 0;
@@ -231,7 +231,7 @@
   .pill {
     padding: 10px 24px;
     border-radius: 30px;
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     font-weight: 600;
     white-space: nowrap;
     border: 1px solid var(--border-color);
@@ -275,7 +275,7 @@
   color: var(--on-primary-gradient);
   padding: 10px 24px;
   border-radius: 30px;
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 700;
   border: none;
   cursor: pointer;
@@ -304,7 +304,7 @@
     border-radius: 30px;
     border: 1px solid var(--border-color);
     background-color: var(--bg-white);
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     outline: none;
     transition: all 0.2s ease;
 
@@ -399,12 +399,12 @@
       gap: 12px;
       margin-bottom: 12px;
       color: var(--text-secondary);
-      font-size: 1.2rem;
+      font-size: var(--font-size-sm);
       font-weight: 500;
     }
 
     h3 {
-      font-size: 1.8rem;
+      font-size: var(--font-size-lg);
       font-weight: 700;
       color: var(--text-color);
       margin-bottom: 12px;
@@ -417,7 +417,7 @@
     }
 
     .cardExcerpt {
-      font-size: 1.4rem;
+      font-size: var(--font-size-ssm);
       color: var(--text-secondary);
       line-height: 1.6;
       margin-bottom: 24px;
@@ -459,7 +459,7 @@
         display: flex;
         gap: 16px;
         color: var(--text-secondary);
-        font-size: 1.2rem;
+        font-size: var(--font-size-sm);
 
         span {
           display: flex;
@@ -487,7 +487,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     font-weight: 600;
     color: var(--text-color);
     cursor: pointer;

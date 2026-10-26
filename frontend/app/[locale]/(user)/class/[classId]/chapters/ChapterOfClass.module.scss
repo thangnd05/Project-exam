@@ -18,7 +18,7 @@
   border: 1px solid var(--border-color);
   border-radius: 14px;
   color: var(--text-color);
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -27,12 +27,12 @@
 
   &:hover {
     background: var(--accent-color);
-    color: #fff;
+    color: var(--white);
     transform: translateX(-5px);
   }
 
   svg {
-    font-size: 1.8rem;
+    font-size: var(--font-size-lg);
   }
 }
 
@@ -96,7 +96,7 @@
     align-items: center;
     justify-content: center;
     color: var(--primary-text);
-    font-size: 2.4rem;
+    font-size: var(--font-size-2xl);
     transition: all 0.4s ease;
   }
 
@@ -111,7 +111,7 @@
 
 .chapter-title {
   font-weight: 700;
-  font-size: 2rem;
+  font-size: var(--font-size-xl);
   color: var(--dark-color);
   margin-bottom: 12px;
   line-height: 1.4;
@@ -121,12 +121,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   color: var(--text-secondary);
   margin-bottom: 20px;
 
   svg {
-    font-size: 1.6rem;
+    font-size: var(--font-size-base);
   }
 }
 
@@ -135,7 +135,7 @@
   width: 100%;
   padding: 14px;
   background: var(--accent-color);
-  color: #fff;
+  color: var(--white);
   border-radius: 12px;
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-md);
@@ -170,19 +170,18 @@
   font-family: var(--font-family);
 
   svg {
-    font-size: 1.8rem;
+    font-size: var(--font-size-lg);
   }
 
   &:hover {
     background: var(--accent-color);
     border-color: var(--accent-color);
-    color: white;
+    color: var(--white);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgb(var(--primary-rgb) / 0.25);
   }
 }
 
-.loading,
 .empty {
   display: flex;
   flex-direction: column;
@@ -194,7 +193,7 @@
   p,
   h4 {
     margin-top: 20px;
-    font-size: 1.8rem;
+    font-size: var(--font-size-lg);
     color: var(--text-secondary);
     font-weight: 500;
   }

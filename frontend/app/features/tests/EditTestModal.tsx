@@ -5,7 +5,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { examCategoryKeys, examTypeKeys, questionCollectionKeys } from '@/app/configs/queryKeys';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
 import { toDateTimeLocalInput, fromDateTimeLocalInput } from '@/app/utils/format-date-time';
-import { Button, Spinner, Row, Col, Accordion, Form } from 'react-bootstrap';
+import { Spinner, Row, Col, Accordion, Form } from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
 import { getAdminTestById, shuffleTestQuestions, updateTest } from '@/app/apis/testApi';
@@ -19,9 +20,7 @@ import { toast } from 'react-toastify';
 import { useTranslations } from 'next-intl';
 import { getApiErrorMessage } from '@/app/utils/apiError';
 import classNames from 'classnames/bind';
-import {
-  IoCreateOutline,
-} from 'react-icons/io5';
+import { SquarePen } from 'lucide-react';
 import EditQuestionModal from '@/app/features/tests/EditQuestionModal';
 import { PermissionCode } from '@/app/enums';
 import type {
@@ -494,9 +493,9 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
         <div className={cxCreate('configCard')} style={{ marginTop: 16 }}>
           <div className={cxCreate('sectionTitle')}>
             {t('editTest.questionList')}
-            <Button
+            <ButtonPrime
               type="button"
-              variant="outline-secondary"
+              variant="outline"
               size="sm"
               className="ms-auto"
               onClick={handleShuffleNow}
@@ -504,7 +503,7 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
               title={t('editTest.shuffleHint')}
             >
               {shuffleMutation.isPending ? t('editTest.shuffling') : t('editTest.shuffleNow')}
-            </Button>
+            </ButtonPrime>
           </div>
           {loadingDetail ? (
             <div className="text-center py-4">
@@ -534,15 +533,15 @@ const EditTestModal = ({ show, onHide, test, onSuccess }: EditTestModalProps) =>
                           >
                             <span className="text-muted fw-bold">{qIndex + 1}.</span>
                             <span className="flex-grow-1">{q.questionText}</span>
-                            <Button
+                            <ButtonPrime
                               type="button"
-                              variant="outline-primary"
-                              size="sm"
+                              variant="outline"
+                              size="icon"
                               onClick={() => setEditingQuestionId(q.questionId)}
                               aria-label={t('editTest.editQuestion', { number: qIndex + 1 })}
                             >
-                              <IoCreateOutline size={16} />
-                            </Button>
+                              <SquarePen size={16} />
+                            </ButtonPrime>
                           </div>
                         ))}
                       </div>

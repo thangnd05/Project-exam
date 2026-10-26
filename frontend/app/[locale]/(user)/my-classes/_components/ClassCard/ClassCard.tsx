@@ -1,6 +1,6 @@
 'use client';
 
-import { IoPeopleOutline, IoKeyOutline, IoPersonOutline } from 'react-icons/io5';
+import { Users, KeyRound, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
@@ -55,7 +55,7 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
       <div className={cx('class-name')}>{classData.className}</div>
 
       <div className={cx('info-item')}>
-        <IoPersonOutline />
+        <User size="1em" />
         {role === 'teacher' ? (
           <span>{t.rich('classCard.role', { strong: (chunks) => <strong>{chunks}</strong> })}</span>
         ) : (
@@ -64,7 +64,7 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
       </div>
 
       <div className={cx('info-item')}>
-        <IoPeopleOutline />
+        <Users size="1em" />
         <span>{t('classCard.classCode')}</span>
         <button
           type="button"
@@ -72,7 +72,7 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
           onClick={handleCopyCode}
           title={t('classCard.copyTitle')}
         >
-          <IoKeyOutline size={14} />
+          <KeyRound size={14} />
           {classQr}
         </button>
       </div>

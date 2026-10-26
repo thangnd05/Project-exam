@@ -13,6 +13,7 @@ import {
   useMarkVocabKnown,
 } from './_hooks/usePractice';
 import {Container, Spinner} from 'react-bootstrap';
+import Loading from '@/app/components/Loading/Loading';
 import classNames from 'classnames/bind';
 import {motion, AnimatePresence} from 'framer-motion';
 import {
@@ -163,16 +164,7 @@ const Practice = () => {
     if (!streakReady || blocked || loading) {
         return (
             <div className={cx('wrapper')}>
-                <Container className={cx('loadingContainer')}>
-                    <motion.div
-                        initial={{opacity: 0, scale: 0.8}}
-                        animate={{opacity: 1, scale: 1}}
-                        className={cx('loadingContent')}
-                    >
-                        <Spinner animation="border" variant="primary" className={cx('spinner')} />
-                        <p className={cx('loadingText')}>{t('practice.loading')}</p>
-                    </motion.div>
-                </Container>
+                <Loading label={t('practice.loading')} />
                 <StreakRestoreModal show={blocked} onClose={allow} />
             </div>
         );

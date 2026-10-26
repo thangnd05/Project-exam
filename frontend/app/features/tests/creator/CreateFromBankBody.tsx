@@ -11,11 +11,7 @@ import { buildCollectionTree, getCollectionWithDescendantIds } from '@/app/featu
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useTranslations } from 'next-intl';
-import {
-  IoChevronDownOutline,
-  IoChevronUpOutline,
-  IoCreateOutline,
-} from 'react-icons/io5';
+import { ChevronDown, ChevronUp, SquarePen } from 'lucide-react';
 import { useBaseMetaData } from '@/app/features/tests/creator/hooks/useBaseMetaData';
 import { durationMinutesFromExamType } from '@/app/features/exam-types/hooks/useExamTypes';
 import { useHasPermission } from '@/app/hooks/usePermission';
@@ -643,7 +639,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                       {part.name}
                     </span>
                     <span className={cx('bankPartBadge')}>{t('parts.questionCount', { count: maxInBank })}</span>
-                    {cfg.expanded ? <IoChevronUpOutline size={22} /> : <IoChevronDownOutline size={22} />}
+                    {cfg.expanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
                   </button>
 
                   {cfg.expanded && (
@@ -821,7 +817,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                                                 }}
                                                 title={t('parts.editQuestion')}
                                               >
-                                                <IoCreateOutline size={18} />
+                                                <SquarePen size={18} />
                                               </button>
                                             )}
                                           </li>

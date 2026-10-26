@@ -81,7 +81,7 @@
   right: -0.8rem;
   z-index: 2;
   padding: 0.3rem 1.1rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--badge-accent);
   color: var(--white);
   font-size: var(--font-size-xs2);

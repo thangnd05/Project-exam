@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import {Badge, Button, Form} from 'react-bootstrap';
+import {Badge, Form} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {useLocale, useTranslations} from 'next-intl';
 import {Eye, Trash2} from 'lucide-react';
 
@@ -226,9 +227,9 @@ function EvaluationsManagement() {
               <option value="1">{t('filters.stars', {count: 1})}</option>
             </Form.Select>
             {testFilter !== 'all' && (
-              <Button variant="outline-secondary" onClick={() => setTestFilter('all')}>
+              <ButtonPrime variant="outline" onClick={() => setTestFilter('all')}>
                 {t('filters.clearTest')}
-              </Button>
+              </ButtonPrime>
             )}
           </AdminToolbar>
           <AdminFieldError

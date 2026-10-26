@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Container, Spinner, Form } from 'react-bootstrap';
+import { Container, Form } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { Search } from 'lucide-react';
 
@@ -15,6 +15,7 @@ import { CertificateVerifyState } from '@/app/enums';
 import CertificateWall from './_components/CertificateWall';
 import { getCertificateStateView } from './_components/certificateStateView';
 import styles from './CertificateVerify.module.scss';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -69,10 +70,7 @@ function CertificateVerify() {
         )}
 
         {isLoading && code && (
-          <div className={cx('state')}>
-            <Spinner animation="border" />
-            <p>{t('verify.checking', { code })}</p>
-          </div>
+          <Loading label={t('verify.checking', { code })} />
         )}
 
         {!isLoading && code && showCertificate && (

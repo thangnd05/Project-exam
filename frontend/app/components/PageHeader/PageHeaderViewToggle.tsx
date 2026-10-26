@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import type { LucideIcon } from 'lucide-react';
 import styles from './PageHeader.module.scss';
 
 const cx = classNames.bind(styles);
@@ -8,7 +9,7 @@ const cx = classNames.bind(styles);
 type PageHeaderViewToggleOption = {
   key: string;
   title?: string;
-  icon?: React.ElementType;
+  icon?: LucideIcon;
 };
 
 type PageHeaderViewToggleProps = {
@@ -31,7 +32,7 @@ function PageHeaderViewToggle({options, activeKey, onChange}: PageHeaderViewTogg
             onClick={() => onChange(option.key)}
             title={option.title}
           >
-            {Icon ? <Icon /> : null}
+            {Icon ? <Icon size="1em" /> : null}
           </button>
         );
       })}

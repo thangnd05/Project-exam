@@ -120,6 +120,8 @@
     "revokeTitle": "Thu hồi chứng chỉ",
     "deletePermanently": "Xoá hẳn chứng chỉ",
     "revoke": "Thu hồi",
+    "editTemplate": "Sửa mẫu chứng chỉ",
+    "deleteTemplate": "Xoá mẫu chứng chỉ",
     "deleteTemplateMessage": "Xoá mẫu chứng chỉ \"{title}\"? Loại đề này sẽ ngừng cấp chứng chỉ mới. Chứng chỉ đã cấp vẫn giữ nguyên vì đã lưu bản chụp riêng.",
     "deleteCertificateMessage": "Xoá hẳn chứng chỉ {code} của {name}? Mã này sẽ không tra cứu được nữa và không khôi phục lại được. Nếu chỉ muốn vô hiệu hoá mà vẫn giữ dấu vết thì dùng thu hồi.",
     "revokeMessage": "Thu hồi chứng chỉ {code} của {name}? Trang tra cứu sẽ báo chứng chỉ không còn giá trị, và người này có thể được cấp lại nếu đạt ở lần thi sau.",

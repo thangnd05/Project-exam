@@ -1,10 +1,6 @@
+@import 'app/assets/styles/mixins.scss';
+
 // Cùng kiểu bộ lọc "Kỳ thi:" ở Kho tài liệu (ResourceLibrary).
-$vendor-colors: (
-  "aws": #f79400,
-  "azure": #0089d6,
-  "gcp": #4cb050,
-  "other": #64748b,
-);
 
 .row {
   display: flex;
@@ -22,7 +18,7 @@ $vendor-colors: (
 .label {
   flex-shrink: 0;
   margin-right: 4px;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -35,9 +31,9 @@ $vendor-colors: (
   flex-shrink: 0;
   padding: 6px 14px;
   border: 1px solid var(--slate-300);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--bg-white);
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   white-space: nowrap;
   color: var(--slate-600);

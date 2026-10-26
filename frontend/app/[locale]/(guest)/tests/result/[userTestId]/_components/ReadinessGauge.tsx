@@ -17,15 +17,15 @@ type GaugeColor = { color: string; bg: string };
 
 const COLOR_MAP: Record<string, GaugeColor> = {
 
-  EXCELLENT:  { color: '#16a34a', bg: '#f0fdf4' },
+  EXCELLENT:  { color: 'var(--green-600)', bg: 'var(--green-50)' },
   GOOD:       { color: brandColors.primary, bg: brandColors.brand50 },
-  FAIR:       { color: brandColors.unique, bg: '#fffbeb' },
-  WEAK:       { color: '#ef4444', bg: '#fef2f2' },
+  FAIR:       { color: brandColors.unique, bg: 'var(--amber-50)' },
+  WEAK:       { color: 'var(--red-500)', bg: 'var(--red-50)' },
 
-  READY:             { color: '#16a34a', bg: '#f0fdf4' },
+  READY:             { color: 'var(--green-600)', bg: 'var(--green-50)' },
   ALMOST_READY:      { color: brandColors.primary, bg: brandColors.brand50 },
-  NEEDS_IMPROVEMENT: { color: brandColors.unique, bg: '#fffbeb' },
-  NOT_READY:         { color: '#ef4444', bg: '#fef2f2' },
+  NEEDS_IMPROVEMENT: { color: brandColors.unique, bg: 'var(--amber-50)' },
+  NOT_READY:         { color: 'var(--red-500)', bg: 'var(--red-50)' },
 
   STARTING:   { color: brandColors.primary, bg: brandColors.brand50 },
 };
@@ -71,7 +71,7 @@ function ReadinessGauge({ enhanced, isPractice = false }: ReadinessGaugeProps) {
     <div className={cx('gaugeContainer')} style={{ background: effectiveBg, borderColor: effectiveColor, borderWidth: 1, borderStyle: 'solid' }}>
       <div className={cx('gaugeFlex')}>
         <svg width="130" height="130" viewBox="0 0 130 130">
-          <circle cx="65" cy="65" r={radius} fill="none" stroke="#e2e8f0" strokeWidth="10" />
+          <circle cx="65" cy="65" r={radius} fill="none" stroke="var(--slate-200)" strokeWidth="10" />
           <circle
             cx="65" cy="65" r={radius} fill="none"
             stroke={effectiveColor} strokeWidth="10"
@@ -84,7 +84,7 @@ function ReadinessGauge({ enhanced, isPractice = false }: ReadinessGaugeProps) {
           <text x="65" y="60" textAnchor="middle" fontSize={hasTarget ? "22" : "28"} fontWeight="800" fill={effectiveColor}>
             {displayValue}
           </text>
-          <text x="65" y="80" textAnchor="middle" fontSize="11" fill="#64748b">
+          <text x="65" y="80" textAnchor="middle" fontSize="11" fill="var(--slate-500)">
             {gaugeLabel}
           </text>
         </svg>

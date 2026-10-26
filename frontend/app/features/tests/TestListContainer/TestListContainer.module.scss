@@ -79,7 +79,7 @@ $brand-border: var(--slate-200);
   padding: 14px 28px;
   border-radius: 16px;
   font-weight: 700;
-  font-size: 1.8rem;
+  font-size: var(--font-size-lg);
   border: none;
   transition: all 0.3s ease;
   box-shadow: 0 8px 20px var(--primary-alpha-28);

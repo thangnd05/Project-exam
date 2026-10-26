@@ -12,7 +12,7 @@
 
 .label {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -34,7 +34,7 @@
   border: 1px solid var(--border-color);
   border-radius: 12px;
   background: var(--bg-white);
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 600;
   color: var(--text-color);
   text-align: left;
@@ -66,14 +66,14 @@
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 2px solid currentColor;
 }
 
 .swatch-frost {
-  background: rgb(119 187 221);
+  background: var(--swatch-frost);
 }
 
 .swatch-gold {
-  background: rgb(201 168 75);
+  background: var(--swatch-gold);
 }

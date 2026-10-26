@@ -75,7 +75,7 @@
 
 .tagChip {
   padding: 0.2rem 0.7rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--brand-50);
   color: var(--primary-text);
   font-weight: 500;
@@ -95,7 +95,7 @@
 .scopePill {
   display: inline-block;
   padding: 0.3rem 0.9rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
   font-weight: 600;
   white-space: nowrap;

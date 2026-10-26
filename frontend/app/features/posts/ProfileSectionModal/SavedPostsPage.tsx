@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { motion, type Variants } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
-import { IoEyeOutline, IoHeartOutline, IoChatbubbleOutline, IoBookmarkOutline, IoSearchOutline, IoEllipsisVertical, IoChevronBackOutline, IoChevronForwardOutline, IoImageOutline } from 'react-icons/io5';
+import { Eye, Heart, MessageCircle, Bookmark, Search, EllipsisVertical, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import routes from '@/app/configs/Routes';
@@ -103,7 +103,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
           onClick={() => currentPage > 0 && setCurrentPage(currentPage - 1)}
           disabled={currentPage === 0}
         >
-          <IoChevronBackOutline />
+          <ChevronLeft size="1em" />
         </button>
         {pages.map((p, idx) => (
           <button
@@ -122,7 +122,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
           onClick={() => currentPage < totalPages - 1 && setCurrentPage(currentPage + 1)}
           disabled={currentPage >= totalPages - 1}
         >
-          <IoChevronForwardOutline />
+          <ChevronRight size="1em" />
         </button>
       </div>
     );
@@ -145,7 +145,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
 
         <div className={cx('toolbar')}>
           <div className={cx('searchBox')}>
-            <IoSearchOutline className={cx('searchIcon')} />
+            <Search size="1em" className={cx('searchIcon')} />
             <input
               type="text"
               placeholder={t('saved.searchPlaceholder')}
@@ -171,7 +171,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
             {hasActiveFilter ? (
               <>{t('saved.emptyFiltered')}</>
             ) : (
-              <>{t.rich('saved.empty', { icon: () => <IoBookmarkOutline /> })}</>
+              <>{t.rich('saved.empty', { icon: () => <Bookmark size="1em" /> })}</>
             )}
           </Alert>
         )}
@@ -204,7 +204,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
                       />
                     ) : (
                       <div className={cx('thumbnailPlaceholder')}>
-                        <IoImageOutline size={32} />
+                        <ImageIcon size={32} />
                       </div>
                     )}
                   </Link>
@@ -231,24 +231,24 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
                     </Link>
 
                     <div className={cx('stats')}>
-                      <span><IoEyeOutline /> {formatCount(post.viewCount)}</span>
-                      <span><IoHeartOutline /> {formatCount(post.totalReacts)}</span>
-                      <span><IoChatbubbleOutline /> {formatCount(post.commentCount)}</span>
-                      <span title={t('common.saves')}><IoBookmarkOutline /> {formatCount(post.saveCount)}</span>
+                      <span><Eye size="1em" /> {formatCount(post.viewCount)}</span>
+                      <span><Heart size="1em" /> {formatCount(post.totalReacts)}</span>
+                      <span><MessageCircle size="1em" /> {formatCount(post.commentCount)}</span>
+                      <span title={t('common.saves')}><Bookmark size="1em" /> {formatCount(post.saveCount)}</span>
                     </div>
                   </div>
 
                   <Dropdown align="end" className={cx('cardMenu')}>
                     <Dropdown.Toggle as="button" className={cx('menuToggle')} disabled={actionLoadingId === post.id}>
-                      <IoEllipsisVertical />
+                      <EllipsisVertical size="1em" />
                     </Dropdown.Toggle>
                     <Dropdown.Menu className={cx('menuDropdown')}>
                       <Dropdown.Item onClick={() => router.push(localizeHref(detailUrl))}>
-                        <IoEyeOutline /> {t('common.viewDetail')}
+                        <Eye size="1em" /> {t('common.viewDetail')}
                       </Dropdown.Item>
                       <Dropdown.Divider />
                       <Dropdown.Item className={cx('dangerItem')} onClick={() => setUnsavingPost(post)}>
-                        <IoBookmarkOutline /> {t('saved.unsave')}
+                        <Bookmark size="1em" /> {t('saved.unsave')}
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
@@ -265,7 +265,7 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
         show={Boolean(unsavingPost)}
         onClose={() => setUnsavingPost(null)}
         onConfirm={handleUnsave}
-        icon={IoBookmarkOutline}
+        icon={Bookmark}
         title={t('saved.unsaveTitle')}
         message={t('saved.unsaveMessage', { title: unsavingPost?.title ?? '' })}
         confirmText={t('saved.unsave')}

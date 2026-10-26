@@ -96,6 +96,8 @@ mà không tự biến thành URL.
 | Component chính | `'use client'`, `export default`, tên trùng thư mục route, bỏ hậu tố `Page` |
 | File `.ts` không phải component | camelCase như hiện có (`useTestSession.ts`, `planLabels.ts`) |
 | Style | SCSS module cạnh component; cấm hex/rgba literal - dùng token trong GlobalStyles |
+| Lớp nổi | Header, thanh dưới, nút nổi, modal dùng `var(--z-*)` trong GlobalStyles; toast/tooltip luôn trên modal |
+| Icon / loading | Chỉ dùng `lucide-react`; tải cả trang/khu vực dùng `<Loading />`, `Spinner` chỉ cho nút hoặc dòng nhỏ |
 | Server state | TanStack Query, `queryFn` gọi hàm trong `app/apis/`, không dùng `useEffect` + `useState` để fetch |
 | Query key | Tài nguyên được đọc ở ≥2 nơi phải dùng key trong `app/configs/queryKeys.ts` (một gốc cho mỗi tài nguyên, mutation invalidate gốc). Cùng key thì cùng `queryFn`; biến đổi dữ liệu đặt trong `select` |
 | Kiểu dữ liệu API | lấy từ `@/app/types`, enum từ `@/app/enums` (mirror DTO backend) |

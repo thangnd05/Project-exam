@@ -30,7 +30,7 @@
 }
 
 .modalTitle {
-  font-size: 2rem;
+  font-size: var(--font-size-xl);
   font-weight: 800;
   color: var(--gray-900);
   margin: 0;
@@ -142,7 +142,7 @@
 }
 
 .existingMediaDoc {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--slate-600);
   word-break: break-all;
   border: 1px dashed var(--slate-300);

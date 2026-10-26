@@ -5,7 +5,7 @@ import { useRouter } from '@/app/i18n/navigation';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import { IoArrowForward, IoTrashOutline } from 'react-icons/io5';
+import { ArrowRight, Trash2 } from 'lucide-react';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
@@ -94,7 +94,7 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
                   {t('saveHint')}
                 </span>
               </span>
-              <IoArrowForward className={px('optionArrow')} aria-hidden="true" />
+              <ArrowRight size="1em" className={px('optionArrow')} aria-hidden="true" />
             </button>
 
             <button type="button" className={px('option', 'optionDanger')} onClick={openExitConfirm}>
@@ -104,7 +104,7 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
                   {t('exitHint')}
                 </span>
               </span>
-              <IoArrowForward className={px('optionArrow')} aria-hidden="true" />
+              <ArrowRight size="1em" className={px('optionArrow')} aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -116,7 +116,7 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
         onConfirm={handleDiscard}
         title={t('confirmTitle')}
         message={t('confirmMessage')}
-        icon={IoTrashOutline}
+        icon={Trash2}
         variant="danger"
         confirmText={t('confirmText')}
         cancelText={t('cancelText')}

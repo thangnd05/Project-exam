@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { FiMail } from 'react-icons/fi';
+import { Mail } from 'lucide-react';
 
 import { imageAssets } from '@/app/assets/images';
 import routes from '@/app/configs/Routes';
@@ -70,7 +70,7 @@ function Footer() {
             <p className={styles.tagline}>{t('tagline')}</p>
             <p className={styles.description}>{t('description')}</p>
             <a href={`mailto:${CONTACT_EMAIL}`} className={styles.mail}>
-              <FiMail aria-hidden="true" />
+              <Mail size="1em" aria-hidden="true" />
               <span>{CONTACT_EMAIL}</span>
             </a>
           </div>

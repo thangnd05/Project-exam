@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useTranslations } from 'next-intl';
-import { IoMapOutline, IoSwapHorizontalOutline } from 'react-icons/io5';
+import { MapIcon, ArrowLeftRight } from 'lucide-react';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ExamPillPicker from '@/app/features/my-target/ExamPillPicker/ExamPillPicker';
@@ -273,7 +273,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
 
       {!loading && plans.length === 0 && !emptyMessage && !emptyAction && (
         <div className={cx('empty')}>
-          <IoMapOutline aria-hidden="true" />
+          <MapIcon size="1em" aria-hidden="true" />
           <span>{t('common.noPlansForExam')}</span>
         </div>
       )}
@@ -289,7 +289,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
         onClose={() => setSwitchTarget(null)}
         onConfirm={handleSwitchConfirm}
         title={t('planList.switchModal.title')}
-        icon={IoSwapHorizontalOutline}
+        icon={ArrowLeftRight}
         confirmText={t('planList.switchModal.confirm')}
         message={
           switchTarget

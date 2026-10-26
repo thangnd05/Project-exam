@@ -7,7 +7,7 @@
 
 .lead {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   line-height: 1.5;
   text-align: center;
   color: var(--text-color);
@@ -28,7 +28,7 @@
   padding: 14px 16px;
   border-radius: 14px;
   border: 1px solid var(--border-color);
-  background: var(--surface-color, #fff);
+  background: var(--bg-white);
   text-align: left;
   cursor: pointer;
   transition:
@@ -72,5 +72,5 @@
 .optionArrow {
   flex-shrink: 0;
   color: var(--text-secondary);
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
 }

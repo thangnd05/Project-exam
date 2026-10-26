@@ -86,7 +86,7 @@
         margin-bottom: 12px;
 
         .index {
-            font-size: 2.4rem;
+            font-size: var(--font-size-2xl);
         }
     }
 }.album-title {
@@ -207,7 +207,7 @@
     }
 
     p {
-        font-size: 1.6rem;
+        font-size: var(--font-size-base);
         color: var(--text-secondary);
         margin-bottom: 30px;
     }
@@ -225,7 +225,7 @@
         }
 
         p {
-            font-size: 1.4rem;
+            font-size: var(--font-size-ssm);
             margin-bottom: 24px;
         }
     }
@@ -241,7 +241,7 @@
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border: none;
         background: var(--primary);
-        color: white;
+        color: var(--white);
         margin: 0 auto;
         cursor: pointer;
 
@@ -251,7 +251,7 @@
         }
 
         svg {
-            font-size: 1.8rem;
+            font-size: var(--font-size-lg);
         }
     }
 }

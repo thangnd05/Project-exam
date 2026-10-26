@@ -6,8 +6,8 @@ import { useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
-import { IoPeopleOutline, IoCheckmarkCircle, IoTimeOutline, IoPersonRemoveOutline, IoSearchOutline, IoRefreshOutline, IoChevronDown, IoChevronUp } from 'react-icons/io5';
-import { Spinner, Badge, Table, Tabs, Tab } from 'react-bootstrap';
+import { Users, CircleCheck, Clock, UserMinus, Search, RefreshCw, ChevronDown, ChevronUp, type LucideIcon } from 'lucide-react';
+import { Badge, Table, Tabs, Tab } from 'react-bootstrap';
 
 import styles from './ClassMemberManagement.module.scss';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -17,16 +17,17 @@ import { useClassMembers } from './_hooks/useClassMembers';
 import { ClassMemberStatus } from '@/app/enums';
 import type { ClassMemberResponse } from '@/app/types';
 import { getApiErrorMessage } from '@/app/utils/apiError';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
 type SortKey = 'fullName' | 'joinedAt';
 type SortConfig = { key: SortKey; direction: 'asc' | 'desc' };
 
-const EmptyState = ({ message, icon: Icon }: { message: string; icon: React.ElementType }) => (
+const EmptyState = ({ message, icon: Icon }: { message: string; icon: LucideIcon }) => (
   <div className={cx('empty-state')}>
     <div className={cx('empty-icon-wrapper')}>
-      <Icon />
+      <Icon size="1em" />
     </div>
     <p>{message}</p>
   </div>
@@ -160,7 +161,7 @@ const ClassMemberManagement = () => {
 
   const renderSortIcon = (key: SortKey) => {
     if (sortConfig.key !== key) return null;
-    return sortConfig.direction === 'asc' ? <IoChevronUp /> : <IoChevronDown />;
+    return sortConfig.direction === 'asc' ? <ChevronUp size="1em" /> : <ChevronDown size="1em" />;
   };
 
   const renderMemberRow = (member: ClassMemberResponse, showActions = false) => (
@@ -181,7 +182,7 @@ const ClassMemberManagement = () => {
                 disabled={actionLoading}
                 title={t('members.approveTitle')}
               >
-                <IoCheckmarkCircle />
+                <CircleCheck size="1em" />
                 <span>{t('members.approve')}</span>
               </ButtonPrime>
             )}
@@ -195,7 +196,7 @@ const ClassMemberManagement = () => {
               disabled={actionLoading}
               title={t('members.removeTitle')}
             >
-              <IoPersonRemoveOutline />
+              <UserMinus size="1em" />
               <span>{t('members.remove')}</span>
             </ButtonPrime>
           </div>
@@ -208,10 +209,7 @@ const ClassMemberManagement = () => {
   if (loading) {
     return (
       <div className={cx('wrapper')}>
-        <div className={cx('loading-container')}>
-          <Spinner animation="grow" variant="primary" />
-          <p>{t('members.loading')}</p>
-        </div>
+        <Loading label={t('members.loading')} />
       </div>
     );
   }
@@ -252,7 +250,7 @@ const ClassMemberManagement = () => {
 
       <div className={cx('toolbar')}>
         <div className={cx('search-box')}>
-          <IoSearchOutline className={cx('search-icon')} />
+          <Search size="1em" className={cx('search-icon')} />
           <input
             type="text"
             placeholder={t('members.searchPlaceholder')}
@@ -269,7 +267,7 @@ const ClassMemberManagement = () => {
               refreshMembers().then(() => toast.success(t('members.refreshed')))
             }
           >
-            <IoRefreshOutline />
+            <RefreshCw size="1em" />
             <span>{t('members.refresh')}</span>
           </ButtonPrime>
 
@@ -307,7 +305,7 @@ const ClassMemberManagement = () => {
                       ? t('members.noMatch')
                       : t('members.noApproved')
                   }
-                  icon={IoPeopleOutline}
+                  icon={Users}
                 />
               ) : (
                 <div className={cx('table-wrapper')}>
@@ -358,12 +356,12 @@ const ClassMemberManagement = () => {
                       ? t('members.noPendingMatch')
                       : t('members.noPending')
                   }
-                  icon={IoTimeOutline}
+                  icon={Clock}
                 />
               ) : (
                 <>
                   <div className={cx('pending-notice')}>
-                    <IoTimeOutline />
+                    <Clock size="1em" />
                     <span>
                       {t.rich('members.pendingNotice', {
                         count: filteredPending.length,

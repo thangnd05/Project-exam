@@ -46,7 +46,7 @@
     background-color: var(--brand-50);
     color: var(--primary-text);
     border-radius: 4px;
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     font-weight: 700;
     text-transform: uppercase;
     margin-bottom: 24px;
@@ -66,7 +66,7 @@
   }
 
   .excerptDetail {
-    font-size: 1.6rem;
+    font-size: var(--font-size-base);
     color: var(--text-secondary);
     font-style: italic;
     line-height: 1.5;
@@ -101,7 +101,7 @@
 
       a {
         font-weight: 700;
-        font-size: 1.4rem;
+        font-size: var(--font-size-ssm);
         color: var(--text-color);
         text-decoration: none;
 
@@ -146,8 +146,8 @@
   top: 50%;
   transform: translateY(-50%);
   background: var(--text-color);
-  color: #fff;
-  font-size: 1.2rem;
+  color: var(--white);
+  font-size: var(--font-size-sm);
   font-weight: 600;
   padding: 6px 10px;
   border-radius: 8px;
@@ -198,13 +198,13 @@
   }
 
   .count {
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     font-weight: 600;
   }
 }.articleBody {
   max-width: var(--blog-reading-width);
   margin: 0 auto;
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   line-height: 1.75;
   color: var(--text-color);
 
@@ -250,7 +250,7 @@
   .imgCaption {
     display: block;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     color: var(--text-secondary);
     font-style: italic;
     margin-top: -24px;
@@ -265,7 +265,7 @@
     overflow-x: auto;
     position: relative;
     margin: 40px 0;
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
 
     .copyBtn {
       position: absolute;
@@ -273,7 +273,7 @@
       right: 12px;
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      color: white;
+      color: var(--white);
       padding: 4px 10px;
       border-radius: 4px;
       font-size: var(--font-size-xs2);
@@ -314,7 +314,7 @@
       border-radius: var(--radius-md);
       padding: 16px;
       min-height: 100px;
-      font-size: 1.4rem;
+      font-size: var(--font-size-ssm);
       outline: none;
 
       &:focus {
@@ -368,7 +368,7 @@
         font-size: 1rem;
         font-weight: 700;
         padding: 2px 6px;
-        border-radius: 999px;
+        border-radius: var(--radius-pill);
       }
 
     }
@@ -395,7 +395,7 @@
         background: none;
         border: none;
         color: var(--text-secondary);
-        font-size: 1.2rem;
+        font-size: var(--font-size-sm);
         font-weight: 600;
         cursor: pointer;
         display: flex;
@@ -408,7 +408,7 @@
       }
 
       .time {
-        font-size: 1.2rem;
+        font-size: var(--font-size-sm);
         color: var(--text-secondary);
       }
     }
@@ -496,7 +496,7 @@
     &:hover {
       background: var(--primary) !important;
       &:before {
-        color: #fff;
+        color: var(--white);
       }
     }
   }
@@ -558,7 +558,7 @@
 
   .meta {
     padding: 0 20px 20px;
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     color: var(--text-secondary);
   }
 }

@@ -4,7 +4,7 @@ import { useRouter } from '@/app/i18n/navigation';
 import { useMemo, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
-import { Alert, Spinner } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 import dynamic from 'next/dynamic';
 import ChangePasswordModal from './_components/ChangePasswordModal';
 import UpdateProfileModal from './_components/UpdateProfileModal';
@@ -20,6 +20,7 @@ import {
   useMyActivity,
 } from './_hooks/useProfileDashboard';
 import { formatDuration, type DashboardT } from './_lib/formatDuration';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -116,10 +117,7 @@ function ProfileOverview() {
 
   if (loading) {
     return (
-      <div className={cx('loadingWrap')}>
-        <Spinner animation="border" />
-        <span>{t('profile.loading')}</span>
-      </div>
+      <Loading label={t('profile.loading')} />
     );
   }
 

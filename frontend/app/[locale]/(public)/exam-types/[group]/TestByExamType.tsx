@@ -5,11 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Container } from 'react-bootstrap';
 import classNamesBind from 'classnames/bind';
-import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
-import {
-  IoChevronDown,
-  IoDocumentTextOutline,
-} from 'react-icons/io5';
+import { ArrowRight, ChevronRight, ChevronDown, FileText } from 'lucide-react';
 import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
 import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
@@ -44,7 +40,7 @@ function ExamCard({ exam }: { exam: ExamTypeResponse }) {
         <span className={cx('childName')}>{stripCode(name) || code}</span>
         {exam.description && <span className={cx('childDesc')}>{exam.description}</span>}
       </span>
-      <FiChevronRight className={cx('childArrow')} aria-hidden="true" />
+      <ChevronRight size="1em" className={cx('childArrow')} aria-hidden="true" />
     </Link>
   );
 }
@@ -142,11 +138,11 @@ function TestByExamType({ examTypeId, examSlug }: { examTypeId: string; examSlug
       <Link href={routes.examTypes}>{t('catalog.title')}</Link>
       {examType?.parentName && (
         <>
-          <FiChevronRight aria-hidden="true" />
+          <ChevronRight size="1em" aria-hidden="true" />
           <span>{examType.parentName}</span>
         </>
       )}
-      <FiChevronRight aria-hidden="true" />
+      <ChevronRight size="1em" aria-hidden="true" />
       <span aria-current="page">{code || title}</span>
     </nav>
   );
@@ -262,7 +258,7 @@ function TestByExamType({ examTypeId, examSlug }: { examTypeId: string; examSlug
                           })}
                     </span>
                   </span>
-                  <IoChevronDown className={cx('chevron')} aria-hidden="true" />
+                  <ChevronDown size="1em" className={cx('chevron')} aria-hidden="true" />
                 </button>
                 {certificateOpen && (
                   <div id="certificate-exams" className={cx('certificateBody')}>
@@ -302,13 +298,13 @@ function TestByExamType({ examTypeId, examSlug }: { examTypeId: string; examSlug
                 </>
               ) : (
                 <div className={ui('empty')}>
-                  <IoDocumentTextOutline className={ui('emptyIcon')} aria-hidden="true" />
+                  <FileText size="1em" className={ui('emptyIcon')} aria-hidden="true" />
                   <h3>{t('detail.empty.title')}</h3>
                   <p>{t('detail.empty.desc')}</p>
                   {quick && (
                     <button type="button" className={ui('btnPrimary')} onClick={() => requestStart(quick)}>
                       {t('quickStart')}
-                      <FiArrowRight aria-hidden="true" />
+                      <ArrowRight size="1em" aria-hidden="true" />
                     </button>
                   )}
                 </div>

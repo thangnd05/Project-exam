@@ -18,7 +18,7 @@
     height: 100%;
     background: rgb(var(--slate-900-rgb) / 0.6);
     backdrop-filter: blur(4px);
-    z-index: 10001;
+    z-index: var(--z-modal);
 
     display: flex;
     align-items: center;
@@ -57,11 +57,11 @@
 
         svg {
             color: var(--on-primary-gradient);
-            font-size: 2.4rem;
+            font-size: var(--font-size-2xl);
         }
 
         .title {
-            font-size: 2.4rem;
+            font-size: var(--font-size-2xl);
             font-weight: 800;
             color: var(--on-primary-gradient);
             margin: 0 !important;
@@ -145,7 +145,7 @@
 }
 
 .sectionTitle {
-    font-size: 1.8rem;
+    font-size: var(--font-size-lg);
     font-weight: 800;
     color: var(--slate-800);
     margin-bottom: 20px;
@@ -155,7 +155,7 @@
 
     svg {
         color: var(--primary-text);
-        font-size: 2rem;
+        font-size: var(--font-size-xl);
     }
 }
 
@@ -163,7 +163,7 @@
     margin-bottom: 16px;
 
     label {
-        font-size: 1.4rem;
+        font-size: var(--font-size-ssm);
         font-weight: 700;
         color: var(--slate-600);
         margin-bottom: 8px;
@@ -182,7 +182,7 @@
     padding: 12px 16px;
     border-radius: 12px;
     border: 2px solid var(--slate-200);
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     font-family: var(--font-family);
     color: var(--slate-800);
     background: var(--bg-white);
@@ -265,7 +265,7 @@
         flex: 1;
         border: none;
         background: transparent;
-        font-size: 1.4rem;
+        font-size: var(--font-size-ssm);
         padding: 4px 8px;
 
         &:focus {
@@ -367,7 +367,7 @@
 }
 
 .groupSummaryBadge {
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     font-weight: 500;
     color: var(--slate-500);
     white-space: nowrap;
@@ -398,7 +398,7 @@
     width: 100%;
     padding: 10px 14px;
     background: var(--bg-white);
-    border: 2px dashed #cbd5e0;
+    border: 2px dashed var(--slate-300);
     border-radius: 10px;
     font-size: var(--font-size-smd);
     font-weight: 600;
@@ -453,7 +453,7 @@
     background: var(--slate-50);
     border: none;
     cursor: pointer;
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     color: var(--slate-800);
     transition: background 0.2s;
     gap: 12px;
@@ -480,7 +480,7 @@
     background: var(--brand-100);
     color: var(--primary-text-hover);
     font-weight: 600;
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
 }
 
 .bankPartBody {
@@ -542,7 +542,7 @@
 }
 
 .bankRandomHint {
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     color: var(--slate-400);
 }
 
@@ -631,7 +631,7 @@
     font-weight: 700;
     color: var(--slate-500);
     min-width: 24px;
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
 }
 
 .bankQuestionText {
@@ -662,7 +662,7 @@
 }
 
 .bankTotalCount {
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     color: var(--slate-600);
     margin-top: 14px;
     margin-bottom: 0;
@@ -706,11 +706,11 @@
 
         .titleWrapper {
             .title {
-                font-size: 1.8rem;
+                font-size: var(--font-size-lg);
             }
 
             svg {
-                font-size: 2rem;
+                font-size: var(--font-size-xl);
             }
         }
     }
@@ -747,10 +747,10 @@
 .bankScopeBadge {
     flex-shrink: 0;
     padding: 2px 8px;
-    border-radius: 999px;
-    background: #ede9fe;
-    color: #6d28d9;
-    font-size: 1.1rem;
+    border-radius: var(--radius-pill);
+    background: rgb(var(--violet-500-rgb) / 0.12);
+    color: var(--violet-500);
+    font-size: var(--font-size-xs2);
     font-weight: 700;
     white-space: nowrap;
 }
@@ -784,7 +784,7 @@
     border-radius: 8px;
     background: var(--brand-100);
     color: var(--primary-text-hover);
-    font-size: 1.1rem;
+    font-size: var(--font-size-xs2);
     font-weight: 600;
 }
 
@@ -823,7 +823,7 @@
     border-radius: 10px;
     background: var(--slate-100);
     color: var(--slate-600);
-    font-size: 1.1rem;
+    font-size: var(--font-size-xs2);
     font-weight: 600;
 }
 
@@ -831,7 +831,7 @@
     border: none;
     background: transparent;
     color: var(--primary-text);
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     font-weight: 600;
     cursor: pointer;
     padding: 2px 4px;
@@ -867,8 +867,8 @@
 }
 
 .jsonTagChip.missing {
-    background: var(--danger-bg, #fdecec);
-    color: var(--danger-text, #b42318);
+    background: var(--danger-bg);
+    color: var(--danger-text);
 }
 
 // Cảnh báo tag: dùng chung cho bản xem trước file JSON và khung soạn thảo câu hỏi.
@@ -877,16 +877,16 @@
     margin: 0 8px;
     padding: 1px 8px;
     border-radius: 8px;
-    background: var(--warning-bg, #fff4e5);
-    color: var(--warning-text, #9a5b00);
-    border: 1px solid var(--warning-border, #f5c26b);
-    font-size: 1.1rem;
+    background: var(--warning-bg);
+    color: var(--warning-text);
+    border: 1px solid var(--warning-border);
+    font-size: var(--font-size-xs2);
     font-weight: 600;
     white-space: nowrap;
 }
 
 .jsonQuestionItem.hasTagIssue {
-    background: var(--warning-bg, #fff4e5);
+    background: var(--warning-bg);
 }
 
 .tagSummaryBar {
@@ -901,8 +901,8 @@
     background: var(--slate-50);
 
     &.hasIssue {
-        border-color: var(--warning-border, #f5c26b);
-        background: var(--warning-bg, #fff4e5);
+        border-color: var(--warning-border);
+        background: var(--warning-bg);
     }
 }
 
@@ -915,7 +915,7 @@
     }
 
     &.warn {
-        color: var(--warning-text, #9a5b00);
+        color: var(--warning-text);
     }
 
     &.danger {
@@ -930,7 +930,7 @@
     border: 1px solid var(--slate-300);
     background: var(--bg-white);
     font-weight: 600;
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     cursor: pointer;
 
     &:hover {
@@ -952,7 +952,7 @@
     border-radius: 8px;
     border: 1px solid var(--slate-200);
     background: var(--bg-white);
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     cursor: pointer;
 
     &:disabled {
@@ -969,7 +969,7 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     color: var(--slate-600);
 
     select {

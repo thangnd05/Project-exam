@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
-import { FiAlertTriangle } from 'react-icons/fi';
+import { TriangleAlert } from 'lucide-react';
 import { formatDateTime24 as formatDate } from '@/app/utils/format-date-time';
 import LearningPlanList from './_components/LearningPlanList';
 import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
@@ -414,7 +414,7 @@ function GeneratePlan() {
               {renderTestPicker()}
               {isPracticeAttempt(selectedTest) && (
                 <p className={cx('practiceWarning')}>
-                  <FiAlertTriangle aria-hidden="true" />
+                  <TriangleAlert size="1em" aria-hidden="true" />
                   <span>
                     {t('generate.form.practiceWarning')}
                   </span>

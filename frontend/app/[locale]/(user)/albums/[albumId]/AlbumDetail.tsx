@@ -6,12 +6,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAlbumVocabularies, useDeleteVocabulary } from './_hooks/useAlbumVocabularies';
 import { getTtsUrl } from '@/app/utils/mediaUrl';
-import {
-  Container,
-  Table,
-  Spinner,
-  Alert,
-} from 'react-bootstrap';
+import { Container, Table, Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
 import CreateVocabularyModal from './_components/CreateVocabularyModal';
@@ -20,11 +15,12 @@ import UpdateVocabularyModal from './_components/UpdateVocabularyModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import classNames from 'classnames/bind';
-import { IoAdd, IoTrashOutline, IoPencilOutline, IoChevronBack, IoChevronForward, IoSchoolOutline, IoVolumeHighOutline } from 'react-icons/io5';
+import { Plus, Trash2, Pencil, ChevronLeft, ChevronRight, GraduationCap, Volume2 } from 'lucide-react';
 import type { VocabularyResponse } from '@/app/types';
 import { BREAKPOINTS } from '@/app/assets/styles/breakpoints';
 
 import styles from './AlbumDetail.module.scss';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -90,10 +86,7 @@ const AlbumDetail = () => {
 
   if (loading)
     return (
-      <div className={cx('loading-box')}>
-        <Spinner animation="grow" variant="primary" />
-        <p>{t('albumDetail.loading')}</p>
-      </div>
+      <Loading label={t('albumDetail.loading')} />
     );
 
   if (errorMsg) return (
@@ -113,14 +106,14 @@ const AlbumDetail = () => {
           label={t('albumDetail.label')}
           onAction={() => setShowModal(true)}
           actionText={t('albumDetail.addWord')}
-          actionIcon={IoAdd}
+          actionIcon={Plus}
           onSecondaryAction={() => setShowBulkModal(true)}
           secondaryActionText={t('albumDetail.importJson')}
         />
 
         <div className={cx('custom-actions')}>
           <ButtonPrime variant="ghost" onClick={() => router.back()}>
-            <IoChevronBack />
+            <ChevronLeft size="1em" />
             {t('albumDetail.backToAlbum')}
           </ButtonPrime>
 
@@ -163,7 +156,7 @@ const AlbumDetail = () => {
                       playAudio(currentVocab.word);
                     }}
                   >
-                    <IoVolumeHighOutline size={24} />
+                    <Volume2 size={24} />
                   </button>
                 </div>
 
@@ -185,7 +178,7 @@ const AlbumDetail = () => {
                   setCurrentIndex((prev) => prev - 1);
                 }}
               >
-                <IoChevronBack />
+                <ChevronLeft size="1em" />
               </button>
               <div className={cx('progress-text')}>
                 {currentIndex + 1} / {vocabularies.length}
@@ -198,7 +191,7 @@ const AlbumDetail = () => {
                   setCurrentIndex((prev) => prev + 1);
                 }}
               >
-                <IoChevronForward />
+                <ChevronRight size="1em" />
               </button>
             </div>
           </div>
@@ -232,7 +225,7 @@ const AlbumDetail = () => {
                         className={cx('btn-play')}
                         onClick={() => playAudio(vocab.word)}
                       >
-                        <IoVolumeHighOutline size={20} />
+                        <Volume2 size={20} />
                       </div>
                     </td>
                     <td className="text-center">
@@ -242,14 +235,14 @@ const AlbumDetail = () => {
                           onClick={() => handleEditClick(vocab)}
                           title={t('albumDetail.editWord')}
                         >
-                          <IoPencilOutline size={22} />
+                          <Pencil size={22} />
                         </button>
                         <button
                           className="btn btn-link text-danger p-0"
                           onClick={() => handleDeleteClick(vocab)}
                           title={t('albumDetail.deleteWord')}
                         >
-                          <IoTrashOutline size={22} />
+                          <Trash2 size={22} />
                         </button>
                       </div>
                     </td>
@@ -259,7 +252,7 @@ const AlbumDetail = () => {
             </Table>
             {vocabularies.length === 0 && (
               <div className="text-center py-5 text-muted">
-                <IoSchoolOutline size={64} className="mb-3 opacity-25" />
+                <GraduationCap size={64} className="mb-3 opacity-25" />
                 <h5>{t('albumDetail.empty')}</h5>
               </div>
             )}

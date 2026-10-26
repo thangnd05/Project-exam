@@ -1,6 +1,6 @@
 'use client';
 
-import { IoListOutline, IoCloseOutline } from 'react-icons/io5';
+import { List, X } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 
@@ -26,7 +26,7 @@ function QuestionNavBlock({ open, onToggle, toggleLabel, hideLabel }: QuestionNa
       aria-expanded={open}
       aria-label={open ? t('hideQuestionList') : t('showQuestionList')}
     >
-      {open ? <IoCloseOutline size={22} /> : <IoListOutline size={22} />}
+      {open ? <X size={22} /> : <List size={22} />}
       <span>
         {open
           ? (customBlockLabel(hideLabel) ?? t('hide'))

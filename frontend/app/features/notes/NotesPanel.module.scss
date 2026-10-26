@@ -5,10 +5,10 @@
   min-width: 24px;
   height: 24px;
   padding: 0 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.25);
-  color: #fff;
-  font-size: 1.3rem;
+  border-radius: var(--radius-pill);
+  background: var(--on-hero-track);
+  color: var(--white);
+  font-size: var(--font-size-smd);
   font-weight: 700;
 }
 
@@ -32,13 +32,13 @@
   border-radius: var(--radius-md);
   background: transparent;
   color: var(--primary-text);
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease;
 
   svg {
-    font-size: 2rem;
+    font-size: var(--font-size-xl);
   }
 
   &:hover {
@@ -54,7 +54,7 @@
   gap: 10px;
   padding: 40px 20px;
   color: var(--text-secondary);
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   text-align: center;
 
   .emptyIcon {
@@ -90,7 +90,7 @@
 }
 
 .noteTitle {
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   font-weight: 700;
   color: var(--dark-color);
   margin: 0 0 4px;
@@ -100,7 +100,7 @@
 }
 
 .notePreview {
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   line-height: 1.5;
   color: var(--text-secondary);
   margin: 0 0 6px;
@@ -119,7 +119,7 @@
 }
 
 .noteTime {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--text-secondary);
   opacity: 0.8;
 }
@@ -153,8 +153,8 @@
   }
 
   &.danger:hover {
-    color: #dc3545;
-    border-color: #dc3545;
+    color: var(--red-600);
+    border-color: var(--red-600);
   }
 }
 
@@ -163,22 +163,22 @@
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: var(--text-secondary);
 
   button {
     padding: 4px 10px;
     border-radius: var(--radius-sm);
     border: 1px solid transparent;
-    font-size: 1.3rem;
+    font-size: var(--font-size-smd);
     font-weight: 700;
     cursor: pointer;
   }
 }
 
 .confirmYes {
-  background: #dc3545;
-  color: #fff;
+  background: var(--red-600);
+  color: var(--white);
 
   &:disabled {
     opacity: 0.6;
@@ -207,7 +207,7 @@
   border: none;
   background: transparent;
   color: var(--text-secondary);
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 600;
   cursor: pointer;
 
@@ -228,7 +228,7 @@
   border-radius: var(--radius-md);
   background: var(--bg-white);
   color: var(--dark-color);
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   outline: none;
   transition: border-color 0.2s ease;
 

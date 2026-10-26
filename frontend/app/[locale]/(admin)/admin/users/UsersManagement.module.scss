@@ -16,7 +16,7 @@ $text-secondary: var(--slate-500);
     align-items: center;
     justify-content: center;
     color: var(--on-primary-gradient);
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
     font-weight: 700;
     flex-shrink: 0;
     box-shadow: 0 4px 10px rgb(var(--primary-rgb) / 0.25);
@@ -36,13 +36,13 @@ $text-secondary: var(--slate-500);
 }
 
 .userName {
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     font-weight: 600;
     color: $text-primary;
 }
 
 .userUsername {
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     font-weight: 500;
     color: $text-secondary;
 }
@@ -51,8 +51,8 @@ $text-secondary: var(--slate-500);
     display: inline-flex;
     align-items: center;
     padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 1.1rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-xs2);
     font-weight: 700;
     color: var(--premium-badge-text);
     background: var(--premium-badge-bg);

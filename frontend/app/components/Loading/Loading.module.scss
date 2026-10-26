@@ -43,7 +43,7 @@
 }
 
 .label {
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 500;
   letter-spacing: 0.02em;
   animation: fade 1.4s ease-in-out infinite;

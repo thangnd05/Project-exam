@@ -86,7 +86,7 @@
   align-items: center;
   gap: 6px;
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--primary-alpha-08);
   font-size: var(--font-size-smd);
   font-weight: 600;
@@ -306,7 +306,7 @@
 
 .guide-count {
   padding: 1px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--input-bg);
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
@@ -315,7 +315,7 @@
 .guide-chevron {
   flex-shrink: 0;
   margin-left: auto;
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   transition: transform 0.2s ease;
 }
 
@@ -332,7 +332,7 @@
   display: inline-block;
   padding: 4px 10px;
   border: 1px solid var(--border-color);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--primary-text);

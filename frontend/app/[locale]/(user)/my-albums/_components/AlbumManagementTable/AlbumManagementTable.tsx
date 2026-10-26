@@ -2,7 +2,7 @@
 
 import { useRouter } from '@/app/i18n/navigation';
 import {Table, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
-import { IoPencilOutline, IoTrashOutline, IoPlayOutline } from 'react-icons/io5';
+import { Pencil, Trash2, Play } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import type { VocabularyAlbumResponse } from '@/app/types';
@@ -53,7 +53,7 @@ const AlbumManagementTable = ({albums, onDelete, onEdit}: AlbumManagementTablePr
                           router.push(`/albums/${album.albumId}`);
                         }}
                       >
-                        <IoPlayOutline />
+                        <Play size="1em" />
                       </Button>
                     </OverlayTrigger>
 
@@ -66,7 +66,7 @@ const AlbumManagementTable = ({albums, onDelete, onEdit}: AlbumManagementTablePr
                           onEdit(album);
                         }}
                       >
-                        <IoPencilOutline />
+                        <Pencil size="1em" />
                       </Button>
                     </OverlayTrigger>
 
@@ -79,7 +79,7 @@ const AlbumManagementTable = ({albums, onDelete, onEdit}: AlbumManagementTablePr
                           onDelete(album);
                         }}
                       >
-                        <IoTrashOutline />
+                        <Trash2 size="1em" />
                       </Button>
                     </OverlayTrigger>
                   </div>

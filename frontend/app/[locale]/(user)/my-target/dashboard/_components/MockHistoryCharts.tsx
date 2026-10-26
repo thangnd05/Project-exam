@@ -21,8 +21,8 @@ import { getScoreScale, type ScoreScaleSource } from '@/app/features/exam-types/
 
 const cx = classNames.bind(styles);
 
-const READINESS_COLOR = '#16a34a';
-const BAR_TARGET_MET = '#16a34a';
+const READINESS_COLOR = 'var(--green-600)';
+const BAR_TARGET_MET = 'var(--green-600)';
 const brand = brandColors;
 const BAR_DEFAULT = brand.primary;
 const BAR_BELOW = brand.unique;
@@ -138,10 +138,10 @@ function MockHistoryCharts({
               data={chartData}
               margin={{ top: 12, right: hasReadiness ? 48 : 16, left: 8, bottom: 8 }}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--slate-200)" />
               <XAxis
                 dataKey="dateLabel"
-                tick={{ fontSize: 12, fill: '#64748b' }}
+                tick={{ fontSize: 12, fill: 'var(--slate-500)' }}
                 tickLine={false}
               />
               {hasScore && (
@@ -149,14 +149,14 @@ function MockHistoryCharts({
                   yAxisId="score"
                   orientation="left"
                   domain={[scoreScale.min, scoreScale.max]}
-                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tick={{ fontSize: 12, fill: 'var(--slate-500)' }}
                   tickLine={false}
                   axisLine={false}
                   label={{
                     value: t('mockCharts.axisScore'),
                     angle: -90,
                     position: 'insideLeft',
-                    style: { fontSize: 11, fill: '#94a3b8' },
+                    style: { fontSize: 11, fill: 'var(--slate-400)' },
                   }}
                 />
               )}
@@ -165,14 +165,14 @@ function MockHistoryCharts({
                   yAxisId="readiness"
                   orientation="right"
                   domain={[0, 100]}
-                  tick={{ fontSize: 12, fill: '#64748b' }}
+                  tick={{ fontSize: 12, fill: 'var(--slate-500)' }}
                   tickLine={false}
                   axisLine={false}
                   label={{
                     value: t('mockCharts.axisReadiness'),
                     angle: 90,
                     position: 'insideRight',
-                    style: { fontSize: 11, fill: '#94a3b8' },
+                    style: { fontSize: 11, fill: 'var(--slate-400)' },
                   }}
                 />
               )}
@@ -189,12 +189,12 @@ function MockHistoryCharts({
                 <ReferenceLine
                   yAxisId="score"
                   y={targetScore}
-                  stroke="#ef4444"
+                  stroke="var(--red-500)"
                   strokeDasharray="6 4"
                   label={{
                     value: t('mockCharts.targetLine', { score: targetScore }),
                     position: 'insideTopRight',
-                    fill: '#ef4444',
+                    fill: 'var(--red-500)',
                     fontSize: 11,
                   }}
                 />

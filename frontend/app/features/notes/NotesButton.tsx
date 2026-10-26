@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/app/hooks/useAuth';
 import NotesPanel from '@/app/features/notes/NotesPanel';
 import styles from '@/app/features/notes/NotesButton.module.scss';
-import { FaNoteSticky } from 'react-icons/fa6';
+import { StickyNote } from 'lucide-react';
 
 const cx = classNames.bind(styles);
 
@@ -27,7 +27,7 @@ function NotesButton() {
         aria-label={t('myNotes')}
         onClick={() => setShowPanel(true)}
       >
-        <FaNoteSticky />
+        <StickyNote size="1em" />
       </button>
 
       <NotesPanel show={showPanel} onClose={() => setShowPanel(false)} />

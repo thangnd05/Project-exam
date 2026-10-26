@@ -16,7 +16,7 @@
 
 .title {
   margin: 0 0 6px 0;
-  font-size: 2.4rem;
+  font-size: var(--font-size-2xl);
   font-weight: 800;
   color: var(--dark-color);
 }
@@ -25,16 +25,6 @@
   margin: 0;
   color: var(--text-secondary);
   font-size: 1.45rem;
-}
-
-.loadingWrap {
-  min-height: 55vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  color: var(--text-secondary);
-  font-size: 1.4rem;
 }
 
 .alertBox {
@@ -82,7 +72,7 @@
 
 .name {
   margin: 0;
-  font-size: 2rem;
+  font-size: var(--font-size-xl);
   font-weight: 800;
   color: var(--dark-color);
 }
@@ -142,7 +132,7 @@
 .cardTitle {
   margin: 0 0 16px 0;
   color: var(--dark-color);
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   font-weight: 700;
 }
 
@@ -162,7 +152,7 @@
   border: 1px solid transparent;
   background: var(--input-bg);
   color: var(--text-secondary);
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 600;
   text-align: left;
   cursor: pointer;
@@ -227,7 +217,7 @@
 
 .chartSubtitle {
   margin: 4px 0 0;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--text-secondary);
 }
 
@@ -286,7 +276,7 @@
 .targetEmptyText {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
 }
 
 .targetList {
@@ -341,15 +331,15 @@
   align-items: center;
   gap: 4px;
   background: var(--success-text);
-  color: #fff;
-  border-radius: 999px;
+  color: var(--white);
+  border-radius: var(--radius-pill);
   padding: 3px 10px;
   font-size: 1.15rem;
   font-weight: 700;
 }
 
 .targetScore {
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   font-weight: 800;
   color: var(--primary-text);
   white-space: nowrap;
@@ -369,14 +359,14 @@
   width: 100%;
   height: 8px;
   background: var(--border-color);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   overflow: hidden;
 }
 
 .targetProgressFill {
   height: 100%;
   background: var(--accent-color);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   transition: width 0.3s ease;
 
   .achieved & {
@@ -385,7 +375,7 @@
 }
 
 .targetProgressLabel {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--text-secondary);
   font-weight: 600;
 }
@@ -401,7 +391,7 @@
   align-items: center;
   background: var(--input-bg);
   border: 1px solid var(--border-color);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 3px 10px;
   font-size: 1.15rem;
   color: var(--text-secondary);
@@ -441,6 +431,6 @@
   }
 
   .title {
-    font-size: 2rem;
+    font-size: var(--font-size-xl);
   }
 }

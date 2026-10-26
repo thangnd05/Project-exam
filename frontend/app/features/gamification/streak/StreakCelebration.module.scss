@@ -7,20 +7,20 @@
 .body {
   text-align: center;
   padding: 36px 28px 30px;
-  background: linear-gradient(180deg, var(--orange-50) 0%, #ffffff 60%);
+  background: linear-gradient(180deg, var(--orange-50) 0%, var(--bg-white) 60%);
 }
 
 .flame {
   font-size: 6.4rem;
-  color: #ff922b;
-  filter: drop-shadow(0 4px 12px rgba(255, 146, 43, 0.4));
+  color: var(--streak);
+  filter: drop-shadow(0 4px 12px rgb(var(--streak-rgb) / 0.4));
   margin-bottom: 8px;
 }
 
 .count {
   font-size: 4rem;
   font-weight: 800;
-  color: #ff922b;
+  color: var(--streak);
   margin: 0;
 }
 
@@ -41,16 +41,16 @@
 .btn {
   min-width: 160px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 10px 0;
   font-weight: 700;
-  background: linear-gradient(135deg, #ffa94d 0%, #ff922b 100%);
-  box-shadow: 0 4px 14px rgba(255, 146, 43, 0.38);
+  background: var(--streak-gradient);
+  box-shadow: 0 4px 14px rgb(var(--streak-rgb) / 0.38);
 
   &:hover,
   &:focus,
   &:active {
-    background: linear-gradient(135deg, #ff9c33 0%, #f97c12 100%) !important;
-    box-shadow: 0 4px 14px rgba(255, 146, 43, 0.5);
+    background: var(--streak-gradient-hover) !important;
+    box-shadow: 0 4px 14px rgb(var(--streak-rgb) / 0.5);
   }
 }

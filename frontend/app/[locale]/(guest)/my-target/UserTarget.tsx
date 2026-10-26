@@ -4,8 +4,7 @@ import Link, { useRouter } from '@/app/i18n/navigation';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
-import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
-import { IoFlagOutline } from 'react-icons/io5';
+import { ArrowRight, ChevronRight, Flag } from 'lucide-react';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
@@ -348,7 +347,7 @@ function UserTarget() {
         {hasSavedTarget && (
           <Link href={nextAfterTarget} className={ui('btnSecondary')}>
             {t('setTarget.summary.generatePlan')}
-            <FiArrowRight aria-hidden="true" />
+            <ArrowRight size="1em" aria-hidden="true" />
           </Link>
         )}
         {hasSavedTarget && (
@@ -384,7 +383,7 @@ function UserTarget() {
 
       {!selectedExamTypeId ? (
         <div className={ui('empty')}>
-          <IoFlagOutline className={ui('emptyIcon')} aria-hidden="true" />
+          <Flag size="1em" className={ui('emptyIcon')} aria-hidden="true" />
           <h2>{t('setTarget.empty.title')}</h2>
           <p>{t('setTarget.empty.description')}</p>
         </div>
@@ -452,7 +451,7 @@ function UserTarget() {
             {targetScore && partRequirements.length > 0 && (
               <details className={cx('advanced')} open={Object.keys(customParts).length > 0}>
                 <summary className={cx('advancedTitle')}>
-                  <FiChevronRight className={cx('chevron')} aria-hidden="true" />
+                  <ChevronRight size="1em" className={cx('chevron')} aria-hidden="true" />
                   {t('setTarget.advanced.title')}
                   <span className={cx('optional')}>{t('setTarget.advanced.optional')}</span>
                 </summary>

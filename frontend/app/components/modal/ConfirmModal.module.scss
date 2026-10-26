@@ -8,7 +8,7 @@
     height: 100%;
     background: rgb(var(--slate-900-rgb) / 0.6);
     backdrop-filter: blur(4px);
-    z-index: 10001;
+    z-index: var(--z-modal);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -45,11 +45,11 @@
 
         .headerIcon {
             color: var(--on-primary-gradient);
-            font-size: 2.4rem;
+            font-size: var(--font-size-2xl);
         }
 
         .title {
-            font-size: 2rem;
+            font-size: var(--font-size-xl);
             font-weight: 800;
             color: var(--on-primary-gradient);
             margin: 0;
@@ -67,7 +67,7 @@
         align-items: center;
         justify-content: center;
         color: var(--on-primary-gradient);
-        font-size: 2rem;
+        font-size: var(--font-size-xl);
         cursor: pointer;
         transition: all 0.2s;
 
@@ -134,7 +134,7 @@
         flex: 1;
         padding: 14px;
         font-weight: 700;
-        font-size: 1.4rem;
+        font-size: var(--font-size-ssm);
         border-radius: 14px;
         border: none;
         cursor: pointer;
@@ -168,7 +168,7 @@
         }
 
         &.danger {
-            color: #fff;
+            color: var(--white);
             background: var(--red-500);
             box-shadow: 0 4px 15px rgb(var(--red-500-rgb) / 0.3);
 
@@ -180,7 +180,7 @@
         }
 
         &.warning {
-            color: #fff;
+            color: var(--white);
             background: var(--warning);
             box-shadow: 0 4px 15px rgb(var(--warning-rgb) / 0.3);
 
@@ -247,7 +247,7 @@
         padding: 16px 20px;
 
         .titleWrapper .title {
-            font-size: 1.6rem;
+            font-size: var(--font-size-base);
         }
     }
 

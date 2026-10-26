@@ -5,8 +5,7 @@ import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
-import { FiArrowRight } from 'react-icons/fi';
-import { IoFlagOutline, IoTrophyOutline } from 'react-icons/io5';
+import { ArrowRight, Flag, Trophy } from 'lucide-react';
 import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
 import ExamPillPicker from '@/app/features/my-target/ExamPillPicker/ExamPillPicker';
 import ExamHeading from '@/app/features/my-target/ExamHeading/ExamHeading';
@@ -147,7 +146,7 @@ function TargetDashboard() {
 
       {!loading && !target?.hasTarget && examTypeId && (
         <div className={ui('empty')}>
-          <IoFlagOutline className={ui('emptyIcon')} aria-hidden="true" />
+          <Flag size="1em" className={ui('emptyIcon')} aria-hidden="true" />
           <h2>{t('dashboard.noTarget.title')}</h2>
           <p>{t('dashboard.noTarget.description')}</p>
           <Link href={withExam('/my-target', examTypeId, examTypes)} className={ui('btnPrimary')}>
@@ -160,7 +159,7 @@ function TargetDashboard() {
         <>
           {isAchieved && (
             <div className={classNames(ui('notice', 'noticeSuccess'), pageCx('achieved'))}>
-              <IoTrophyOutline className={pageCx('achievedIcon')} aria-hidden="true" />
+              <Trophy size="1em" className={pageCx('achievedIcon')} aria-hidden="true" />
               <span>
                 <strong>{t('dashboard.achievedTitle', { score: target.targetScore ?? '' })}</strong>
                 {' '}
@@ -260,7 +259,7 @@ function TargetDashboard() {
                       className={classNames(ui('btnPrimary', 'btnSm'), pageCx('statAction'))}
                     >
                       {t('dashboard.openPlan')}
-                      <FiArrowRight aria-hidden="true" />
+                      <ArrowRight size="1em" aria-hidden="true" />
                     </Link>
                   </>
                 ) : (
@@ -273,7 +272,7 @@ function TargetDashboard() {
                         className={classNames(ui('btnPrimary', 'btnSm'), pageCx('statAction'))}
                       >
                         {t('dashboard.generatePlan')}
-                        <FiArrowRight aria-hidden="true" />
+                        <ArrowRight size="1em" aria-hidden="true" />
                       </Link>
                     )}
                   </>

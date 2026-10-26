@@ -6,7 +6,7 @@ import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import style from '@/app/features/gamification/streak/StreakCelebration.module.scss';
 import { useStreak } from '@/app/features/gamification/streak/hooks/useStreak';
-import { FaFire } from 'react-icons/fa6';
+import { Flame } from 'lucide-react';
 
 const cx = classNames.bind(style);
 
@@ -28,7 +28,7 @@ function StreakCelebration() {
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 260, damping: 14 }}
         >
-          <FaFire />
+          <Flame size="1em" fill="currentColor" />
         </motion.div>
         <h3 className={cx('count')}>{t('days', { count: currentStreak })}</h3>
         <p className={cx('title')}>{t('title')}</p>

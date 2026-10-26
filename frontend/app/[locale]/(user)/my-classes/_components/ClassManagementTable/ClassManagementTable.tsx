@@ -1,11 +1,7 @@
 'use client';
 
 import { Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import {
-  IoPencilOutline,
-  IoTrashOutline,
-  IoPeopleOutline,
-} from 'react-icons/io5';
+import { Pencil, Trash2, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import styles from './ClassManagementTable.module.scss';
@@ -55,7 +51,7 @@ const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }: C
                         className={cx('btn-action', 'edit')}
                         onClick={() => onEdit(clazz)}
                       >
-                        <IoPencilOutline />
+                        <Pencil size="1em" />
                       </button>
                     </OverlayTrigger>
                   )}
@@ -66,7 +62,7 @@ const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }: C
                         className={cx('btn-action', 'delete')}
                         onClick={() => onDelete(clazz)}
                       >
-                        <IoTrashOutline />
+                        <Trash2 size="1em" />
                       </button>
                     </OverlayTrigger>
                   )}
@@ -77,7 +73,7 @@ const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }: C
                         className={cx('btn-action', 'manage')}
                         onClick={() => onManageStudents(clazz.classId)}
                       >
-                        <IoPeopleOutline />
+                        <Users size="1em" />
                       </button>
                     </OverlayTrigger>
                   )}

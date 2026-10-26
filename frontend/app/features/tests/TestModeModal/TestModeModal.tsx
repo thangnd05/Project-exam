@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
-import { IoChevronDown } from 'react-icons/io5';
+import { ChevronDown } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 import BaseModal from '@/app/components/modal/BaseModal';
@@ -278,7 +278,7 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
                     <summary className={cx('guide-summary')}>
                       <span>{t('mode.guideTitle')}</span>
                       <span className={cx('guide-count')}>{partResources.length}</span>
-                      <IoChevronDown className={cx('guide-chevron')} aria-hidden="true" />
+                      <ChevronDown size="1em" className={cx('guide-chevron')} aria-hidden="true" />
                     </summary>
                     <ul className={cx('guide-list')}>
                       {partResources.map((r) => (

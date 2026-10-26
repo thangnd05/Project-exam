@@ -3,19 +3,11 @@
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/app/i18n/navigation';
 import { useMemo } from "react";
-import { Container, Spinner, Alert } from "react-bootstrap";
+import { Container, Alert } from "react-bootstrap";
 import { toast } from "react-toastify";
 import classNames from "classnames/bind";
 import { useTranslations } from "next-intl";
-import {
-  IoCheckmarkCircle,
-  IoHomeOutline,
-  IoStatsChartOutline,
-  IoTimeOutline,
-  IoSchoolOutline,
-  IoLockClosedOutline,
-  IoCalendarOutline,
-} from "react-icons/io5";
+import { CircleCheck, House, ChartNoAxesColumnIncreasing, Clock, GraduationCap, Lock, Calendar } from "lucide-react";
 
 import { useAuth } from "@/app/hooks/useAuth";
 import { useMounted } from "@/app/hooks/useMounted";
@@ -34,6 +26,7 @@ import TagAnalysisTable from "./_components/TagAnalysisTable";
 import TestEvaluationModal from "./_components/TestEvaluationModal";
 import styles from "./TestResult.module.scss";
 import { buildTestPath } from '@/app/configs/Routes';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -106,12 +99,7 @@ const TestResult = () => {
   if (loading)
     return (
       <div className={cx("wrapper")}>
-        <Container className="d-flex flex-column align-items-center justify-content-center">
-          <Spinner animation="border" />
-          <p className="mt-3 fw-bold text-primary">
-            {t("loading")}
-          </p>
-        </Container>
+        <Loading label={t("loading")} />
       </div>
     );
 
@@ -167,7 +155,7 @@ const TestResult = () => {
 
               <div className={cx("stats-grid")}>
                 <div className={cx("stat-item", "correct")}>
-                  <IoCheckmarkCircle size={24} />
+                  <CircleCheck size={24} />
                   <div className={cx("stat-text")}>
                     <span className={cx("stat-val")}>{result?.correct || 0}</span>
                     <span className={cx("stat-label")}>{t("stats.correct")}</span>
@@ -175,7 +163,7 @@ const TestResult = () => {
                 </div>
 
                 <div className={cx("stat-item", "wrong")}>
-                  <IoStatsChartOutline size={24} />
+                  <ChartNoAxesColumnIncreasing size={24} />
                   <div className={cx("stat-text")}>
                     <span className={cx("stat-val")}>{result?.wrong || 0}</span>
                     <span className={cx("stat-label")}>{t("stats.wrong")}</span>
@@ -183,7 +171,7 @@ const TestResult = () => {
                 </div>
 
                 <div className={cx("stat-item", "total")}>
-                  <IoSchoolOutline size={24} />
+                  <GraduationCap size={24} />
                   <div className={cx("stat-text")}>
                     <span className={cx("stat-val")}>{result?.total || 0}</span>
                     <span className={cx("stat-label")}>{t("stats.total")}</span>
@@ -191,7 +179,7 @@ const TestResult = () => {
                 </div>
 
                 <div className={cx("stat-item")}>
-                  <IoTimeOutline size={24} />
+                  <Clock size={24} />
                   <div className={cx("stat-text")}>
                     <span className={cx("stat-val")}>
                       {formatTime(result?.startedAt, result?.finishedAt)}
@@ -205,7 +193,7 @@ const TestResult = () => {
             <div className={cx("actions")}>
               {!canReview && (
                 <div className={cx("lock-message")}>
-                  <IoLockClosedOutline />
+                  <Lock size="1em" />
                   <span>
                     {t("answersLocked")}
                   </span>
@@ -217,7 +205,7 @@ const TestResult = () => {
                 className={cx({ "is-locked": !canReview })}
                 onClick={handleShowDetail}
               >
-                {!canReview ? <IoLockClosedOutline /> : <IoStatsChartOutline />}
+                {!canReview ? <Lock size="1em" /> : <ChartNoAxesColumnIncreasing size="1em" />}
                 {t("viewAnswers")}
               </ButtonPrime>
 
@@ -226,16 +214,16 @@ const TestResult = () => {
                   variant="ghost"
                   onClick={() => router.push(buildTestPath({ testId }, 'history'))}
                 >
-                  <IoSchoolOutline /> {t("history")}
+                  <GraduationCap size="1em" /> {t("history")}
                 </ButtonPrime>
               )}
 
               <ButtonPrime variant="ghost" onClick={() => router.push("/")}>
-                <IoHomeOutline /> {t("home")}
+                <House size="1em" /> {t("home")}
               </ButtonPrime>
 
               <ButtonPrime variant="primary" onClick={handlePlanFromTest}>
-                <IoCalendarOutline /> {t("planFromTest")}
+                <Calendar size="1em" /> {t("planFromTest")}
               </ButtonPrime>
             </div>
           </div>

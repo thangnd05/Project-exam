@@ -1,5 +1,5 @@
 'use client';
-import {IoArrowForward} from 'react-icons/io5';
+import { ArrowRight } from 'lucide-react';
 import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 
@@ -159,7 +159,7 @@ function QuickTestConfirmModal({
               {isGuest ? t('confirm.planTitleGuest') : t('confirm.planTitle')}
             </span>
           </span>
-          <IoArrowForward className={cx('planArrow')} aria-hidden="true" />
+          <ArrowRight size="1em" className={cx('planArrow')} aria-hidden="true" />
         </button>
       </div>
     </BaseModal>

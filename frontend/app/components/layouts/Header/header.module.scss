@@ -2,10 +2,10 @@
 
 // Header dạng thanh nổi bo tròn theo mẫu FrostScope: nền than chì gần đặc, chữ bạc, điểm nhấn xanh băng.
 .wrapper {
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: var(--z-header);
   padding: 12px clamp(12px, 2vw, 16px) 0;
   isolation: isolate;
   background: transparent;
@@ -17,7 +17,7 @@
   margin: 0 auto;
   width: 100%;
   padding: 10px clamp(18px, 2.4vw, 32px);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   // Kính mờ: nền bán trong suốt + blur vừa phải để vẫn thấy nhòe nội dung phía sau.
   background-color: rgb(var(--brand-900-rgb) / 0.55);
   backdrop-filter: blur(10px) saturate(1.4);
@@ -54,13 +54,13 @@
     &:active,
     &:focus-visible {
       color: var(--slate-900);
-      background-color: rgb(255 255 255 / 0.7);
+      background-color: var(--glass-bg);
     }
 
     &:global(.active),
     &.active {
       color: var(--brand-700);
-      background-color: rgb(255 255 255 / 0.7);
+      background-color: var(--glass-bg);
     }
   }
 
@@ -233,7 +233,7 @@
   font-size: 1.35rem;
   font-weight: 600;
   padding: 7px 14px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   color: var(--text-on-dark-muted);
   text-decoration: none;
   white-space: nowrap;
@@ -287,14 +287,14 @@
   --bs-btn-active-color: var(--text-on-brand);
   --bs-btn-active-bg: var(--brand-400);
   --bs-btn-active-border-color: transparent;
-  --bs-btn-border-radius: 999px;
+  --bs-btn-border-radius: var(--radius-pill);
 
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 8px 18px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--primary);
   color: var(--text-on-brand);
   font-size: 1.35rem;
@@ -363,7 +363,7 @@
   min-height: 40px;
   padding: 3px 12px 3px 4px;
   border: 1px solid var(--surface-dark-border);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   transition: border-color 0.2s ease, background-color 0.2s ease;
 
   &:hover {
@@ -391,7 +391,7 @@
   display: block;
   max-width: 120px;
   font-weight: 700;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -462,7 +462,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--text-on-dark-muted);
 }
 
@@ -489,7 +489,7 @@
   font-weight: 600;
   padding: 7px 14px;
   border: none;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: transparent;
   color: var(--text-on-dark-muted);
   cursor: pointer;
@@ -518,7 +518,7 @@
 }
 
 .classDropdown {
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   min-width: 200px;
   margin-top: 8px !important;
   padding: 8px;

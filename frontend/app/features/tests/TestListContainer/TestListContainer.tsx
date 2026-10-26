@@ -6,7 +6,7 @@ import {Container} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {motion} from 'framer-motion';
 import type {Variants} from 'framer-motion';
-import {IoListOutline, IoGridOutline} from 'react-icons/io5';
+import { List, LayoutGrid } from 'lucide-react';
 
 import styles from '@/app/features/tests/TestListContainer/TestListContainer.module.scss';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
@@ -85,11 +85,11 @@ const TestListContainer = ({
               activeKey={viewMode}
               onChange={setViewMode}
               options={[
-                {key: 'grid', title: t('gridView'), icon: IoGridOutline},
+                {key: 'grid', title: t('gridView'), icon: LayoutGrid},
                 {
                   key: 'table',
                   title: t('tableView'),
-                  icon: IoListOutline,
+                  icon: List,
                 },
               ]}
             />

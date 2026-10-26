@@ -3,10 +3,10 @@
 import { useParams } from 'next/navigation';
 import { useRouter } from '@/app/i18n/navigation';
 import { useEffect, useMemo } from "react";
-import { Container, Spinner, Alert } from "react-bootstrap";
+import { Container, Alert } from "react-bootstrap";
 import classNames from "classnames/bind";
 import { useTranslations } from "next-intl";
-import { IoHomeOutline } from "react-icons/io5";
+import { House } from "lucide-react";
 
 import { useAuth } from "@/app/hooks/useAuth";
 import { getGuestSessionId, guestHeaders } from "@/app/utils/guestSession";
@@ -20,6 +20,7 @@ import type { QuestionAdminResponse, UserAnswerResponse } from "@/app/types";
 import styles from "./TestReview.module.scss";
 import reviewQStyles from "@/app/assets/styles/ReviewQuestions.module.scss";
 import MediaImage from '@/app/components/MediaImage/MediaImage';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -305,10 +306,7 @@ const TestReview = () => {
   if (loading)
     return (
       <div className={cx("wrapper")}>
-        <Container className={cx("state-box")}>
-          <Spinner animation="border" variant="primary" />
-          <p className="fw-bold text-primary">{t("loading")}</p>
-        </Container>
+        <Loading label={t("loading")} />
       </div>
     );
 
@@ -338,7 +336,7 @@ const TestReview = () => {
             {t("backToResult")}
           </ButtonPrime>
           <ButtonPrime variant="ghost" onClick={() => router.push("/")}>
-            <IoHomeOutline /> {t("home")}
+            <House size="1em" /> {t("home")}
           </ButtonPrime>
         </div>
 

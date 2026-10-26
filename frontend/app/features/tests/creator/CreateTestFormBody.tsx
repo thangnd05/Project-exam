@@ -14,10 +14,7 @@ import type {
   TagResponse,
   TestJsonImportPreviewResponse,
 } from '@/app/types';
-import {
-  IoAddOutline,
-} from 'react-icons/io5';
-import { Trash, PlusCircle, ChevronDown, ChevronRight } from 'lucide-react';
+import { Trash, PlusCircle, ChevronDown, ChevronRight, Plus } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useTranslations } from 'next-intl';
@@ -1267,7 +1264,7 @@ const CreateTestFormBody = ({
             </div>
             );
           })}
-          <ButtonPrime type="button" variant="outline" size="sm" className={cx('btnSecondary', 'btnGroupAdd')} onClick={addGroup}><IoAddOutline size={20} /> {t('form.passage.addGroup')}</ButtonPrime>
+          <ButtonPrime type="button" variant="outline" size="sm" className={cx('btnSecondary', 'btnGroupAdd')} onClick={addGroup}><Plus size={20} /> {t('form.passage.addGroup')}</ButtonPrime>
         </>
       )}
 

@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Alert } from 'react-bootstrap';
-import { IoChevronDownOutline, IoChevronUpOutline } from 'react-icons/io5';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -283,7 +283,7 @@ const JsonQuestionsPreview = ({
                 {partIssues > 0 && <span className={cx('tagWarningBadge')}>{t('jsonPreview.partIssues', { count: partIssues })}</span>}
                 <span className={cx('bankPartBadge')}>{t('jsonPreview.questionCount', { count: partQuestionCount })}</span>
               </span>
-              {isOpen ? <IoChevronUpOutline size={22} /> : <IoChevronDownOutline size={22} />}
+              {isOpen ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
             </button>
             {isOpen && (
               <div className={cx('bankPartBody')}>

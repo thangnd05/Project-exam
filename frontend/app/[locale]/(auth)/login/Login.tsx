@@ -21,9 +21,8 @@ import {
 import routes from '@/app/configs/Routes';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
-import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa";
-import { FiArrowLeft, FiArrowRight, FiAtSign, FiEye, FiEyeOff, FiLock, FiMail, FiUser } from 'react-icons/fi';
+import { ArrowLeft, ArrowRight, AtSign, Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
+import { FacebookLogo, GoogleLogo } from '@/app/[locale]/(auth)/login/_components/SocialLogos';
 import { imageAssets } from '@/app/assets/images';
 import { SITE_NAME } from '@/app/constants/site';
 import ForgotPassword from '@/app/[locale]/(auth)/_components/auth/ForgotPassword';
@@ -221,11 +220,11 @@ function Login() {
   const socialButtons = (
     <div className={cx('socialBtns')}>
       <a href={GOOGLE_AUTH_URL} className={cx('socialBtn')} onClick={handleSocialClick}>
-        <FcGoogle size={18} aria-hidden="true" />
+        <GoogleLogo size={18} aria-hidden="true" />
         <span>{t('login.continueWithGoogle')}</span>
       </a>
       <a href={FACEBOOK_AUTH_URL} className={cx('socialBtn')} onClick={handleSocialClick}>
-        <FaFacebook size={18} color="#1877F2" aria-hidden="true" />
+        <FacebookLogo size={18} color="#1877F2" aria-hidden="true" />
         <span>{t('login.continueWithFacebook')}</span>
       </a>
     </div>
@@ -238,7 +237,7 @@ function Login() {
       onClick={toggle}
       aria-label={shown ? t('common.hidePassword') : t('common.showPassword')}
     >
-      {shown ? <FiEyeOff /> : <FiEye />}
+      {shown ? <EyeOff size="1em" /> : <Eye size="1em" />}
     </button>
   );
 
@@ -253,7 +252,7 @@ function Login() {
       <div className={cx('field')}>
         <label htmlFor="login-identifier">{t('login.identifierLabel')}</label>
         <div className={cx('control')}>
-          <FiMail className={cx('fieldIcon')} aria-hidden="true" />
+          <Mail size="1em" className={cx('fieldIcon')} aria-hidden="true" />
           <input
             id="login-identifier"
             type="text"
@@ -279,7 +278,7 @@ function Login() {
           </button>
         </div>
         <div className={cx('control')}>
-          <FiLock className={cx('fieldIcon')} aria-hidden="true" />
+          <Lock size="1em" className={cx('fieldIcon')} aria-hidden="true" />
           <input
             id="login-password"
             type={showLoginPassword ? 'text' : 'password'}
@@ -300,7 +299,7 @@ function Login() {
       <button type="submit" className={cx('submitBtn')} disabled={loading}>
         {loading && <span className={cx('loadingSpinner')} />}
         <span>{loading ? t('login.signingIn') : t('common.signInNow')}</span>
-        {!loading && <FiArrowRight aria-hidden="true" />}
+        {!loading && <ArrowRight size="1em" aria-hidden="true" />}
       </button>
     </form>
   );
@@ -310,7 +309,7 @@ function Login() {
       <div className={cx('field')}>
         <label htmlFor="reg-fullname">{t('login.fullNameLabel')}</label>
         <div className={cx('control')}>
-          <FiUser className={cx('fieldIcon')} aria-hidden="true" />
+          <User size="1em" className={cx('fieldIcon')} aria-hidden="true" />
           <input
             id="reg-fullname"
             type="text"
@@ -327,7 +326,7 @@ function Login() {
       <div className={cx('field')}>
         <label htmlFor="reg-email">{t('login.emailLabel')}</label>
         <div className={cx('control')}>
-          <FiMail className={cx('fieldIcon')} aria-hidden="true" />
+          <Mail size="1em" className={cx('fieldIcon')} aria-hidden="true" />
           <input
             id="reg-email"
             type="email"
@@ -344,7 +343,7 @@ function Login() {
       <div className={cx('field')}>
         <label htmlFor="reg-username">{t('login.usernameLabel')}</label>
         <div className={cx('control')}>
-          <FiAtSign className={cx('fieldIcon')} aria-hidden="true" />
+          <AtSign size="1em" className={cx('fieldIcon')} aria-hidden="true" />
           <input
             id="reg-username"
             type="text"
@@ -361,7 +360,7 @@ function Login() {
       <div className={cx('field')}>
         <label htmlFor="reg-password">{t('login.passwordLabel')}</label>
         <div className={cx('control')}>
-          <FiLock className={cx('fieldIcon')} aria-hidden="true" />
+          <Lock size="1em" className={cx('fieldIcon')} aria-hidden="true" />
           <input
             id="reg-password"
             type={showRegPassword ? 'text' : 'password'}
@@ -398,7 +397,7 @@ function Login() {
       <button type="submit" className={cx('submitBtn')} disabled={loading}>
         {loading && <span className={cx('loadingSpinner')} />}
         <span>{loading ? tCommon('processing') : t('login.createAccount')}</span>
-        {!loading && <FiArrowRight aria-hidden="true" />}
+        {!loading && <ArrowRight size="1em" aria-hidden="true" />}
       </button>
     </form>
   );
@@ -407,7 +406,7 @@ function Login() {
     <div className={cx('authPage')}>
       <div className={cx('topBar')}>
         <Link href={routes.home} className={cx('backHome')}>
-          <FiArrowLeft aria-hidden="true" />
+          <ArrowLeft size="1em" aria-hidden="true" />
           <span>{t('login.backHome')}</span>
         </Link>
         <div className={cx('topSwitch')}>

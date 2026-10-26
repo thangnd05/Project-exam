@@ -3,9 +3,8 @@
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Spinner } from 'react-bootstrap';
 import classNames from 'classnames/bind';
-import { IoDocumentTextOutline, IoAddCircleOutline } from 'react-icons/io5';
+import { FileText, CirclePlus } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 import styles from './TestByClass.module.scss';
@@ -14,6 +13,7 @@ import CreateTestModal from '@/app/features/tests/CreateTestModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import TestListContainer from '@/app/features/tests/TestListContainer/TestListContainer';
 import type { TestResponse } from '@/app/types';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -67,19 +67,13 @@ function TestByClass() {
 
   if (isLoading) {
     return (
-      <div
-        className="d-flex flex-column align-items-center justify-content-center"
-        style={{ minHeight: '60vh' }}
-      >
-        <Spinner animation="grow" variant="primary" />
-        <p className="mt-3 fw-bold text-primary">{t('classTests.loading')}</p>
-      </div>
+      <Loading label={t('classTests.loading')} />
     );
   }
 
   const emptyState = (
     <div className={cx('empty-state')}>
-      <IoDocumentTextOutline className={cx('icon')} />
+      <FileText className={cx('icon')} />
       <h4>{t('classTests.emptyTitle')}</h4>
       <p>{t('classTests.emptyDescription')}</p>
     </div>
@@ -91,7 +85,7 @@ function TestByClass() {
         title={className || t('classTests.classFallback')}
         label={t('classTests.label')}
         actionText={t('classTests.create')}
-        actionIcon={IoAddCircleOutline}
+        actionIcon={CirclePlus}
         onAction={() => setShowCreateTestModal(true)}
         tests={tests}
         countdowns={countdowns}

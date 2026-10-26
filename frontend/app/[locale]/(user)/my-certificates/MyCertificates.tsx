@@ -2,7 +2,7 @@
 
 import { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
 import { useLocale, useTranslations } from 'next-intl';
-import { Container, Spinner, Alert } from 'react-bootstrap';
+import { Container, Alert } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { Award, ExternalLink } from 'lucide-react';
 
@@ -12,6 +12,7 @@ import CertificateCanvas from '@/app/features/certificates/CertificateCanvas/Cer
 import { useMyCertificates } from '@/app/features/certificates/hooks/useCertificates';
 import { CertificateStatus } from '@/app/enums';
 import styles from './MyCertificates.module.scss';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -40,10 +41,7 @@ function MyCertificates() {
         />
 
         {isLoading && (
-          <div className={cx('state')}>
-            <Spinner animation="grow" variant="primary" />
-            <p>{t('certificates.loading')}</p>
-          </div>
+          <Loading label={t('certificates.loading')} />
         )}
 
         {isError && (

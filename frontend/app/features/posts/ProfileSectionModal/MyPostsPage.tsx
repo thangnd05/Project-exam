@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { motion, type Variants } from 'framer-motion';
 import { Alert, Spinner, Dropdown } from 'react-bootstrap';
-import { IoEyeOutline, IoHeartOutline, IoChatbubbleOutline, IoBookmarkOutline, IoSearchOutline, IoEllipsisVertical, IoPencilOutline, IoTrashOutline, IoChevronBackOutline, IoChevronForwardOutline, IoImageOutline } from 'react-icons/io5';
+import { Eye, Heart, MessageCircle, Bookmark, Search, EllipsisVertical, Pencil, Trash2, ChevronLeft, ChevronRight, ImageIcon } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { fetchPostById } from '@/app/features/posts/hooks/usePosts';
 import CreatePostModal from '@/app/features/posts/CreatePostModal/CreatePostModal';
@@ -146,7 +146,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
           onClick={() => currentPage > 0 && setCurrentPage(currentPage - 1)}
           disabled={currentPage === 0}
         >
-          <IoChevronBackOutline />
+          <ChevronLeft size="1em" />
         </button>
 
         {pages.map((p, idx) => (
@@ -167,7 +167,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
           onClick={() => currentPage < totalPages - 1 && setCurrentPage(currentPage + 1)}
           disabled={currentPage >= totalPages - 1}
         >
-          <IoChevronForwardOutline />
+          <ChevronRight size="1em" />
         </button>
       </div>
     );
@@ -190,7 +190,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
 
         <div className={cx('toolbar')}>
           <div className={cx('searchBox')}>
-            <IoSearchOutline className={cx('searchIcon')} />
+            <Search size="1em" className={cx('searchIcon')} />
             <input
               type="text"
               placeholder={t('myPosts.searchPlaceholder')}
@@ -268,7 +268,7 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
                       />
                     ) : (
                       <div className={cx('thumbnailPlaceholder')}>
-                        <IoImageOutline size={32} />
+                        <ImageIcon size={32} />
                       </div>
                     )}
                   </Link>
@@ -284,27 +284,27 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
                     </Link>
 
                     <div className={cx('stats')}>
-                      <span><IoEyeOutline /> {formatCount(post.viewCount)}</span>
-                      <span><IoHeartOutline /> {formatCount(post.totalReacts)}</span>
-                      <span><IoChatbubbleOutline /> {formatCount(post.commentCount)}</span>
-                      <span title={t('common.saves')}><IoBookmarkOutline /> {formatCount(post.saveCount)}</span>
+                      <span><Eye size="1em" /> {formatCount(post.viewCount)}</span>
+                      <span><Heart size="1em" /> {formatCount(post.totalReacts)}</span>
+                      <span><MessageCircle size="1em" /> {formatCount(post.commentCount)}</span>
+                      <span title={t('common.saves')}><Bookmark size="1em" /> {formatCount(post.saveCount)}</span>
                     </div>
                   </div>
 
                   <Dropdown align="end" className={cx('cardMenu')}>
                     <Dropdown.Toggle as="button" className={cx('menuToggle')} disabled={actionLoadingId === post.id}>
-                      <IoEllipsisVertical />
+                      <EllipsisVertical size="1em" />
                     </Dropdown.Toggle>
                     <Dropdown.Menu className={cx('menuDropdown')}>
                       <Dropdown.Item onClick={() => handleEdit(post.id)}>
-                        <IoPencilOutline /> {t('myPosts.edit')}
+                        <Pencil size="1em" /> {t('myPosts.edit')}
                       </Dropdown.Item>
                       <Dropdown.Item onClick={() => router.push(localizeHref(detailUrl))}>
-                        <IoEyeOutline /> {t('common.viewDetail')}
+                        <Eye size="1em" /> {t('common.viewDetail')}
                       </Dropdown.Item>
                       <Dropdown.Divider />
                       <Dropdown.Item className={cx('dangerItem')} onClick={() => setDeletingPost(post)}>
-                        <IoTrashOutline /> {t('myPosts.delete')}
+                        <Trash2 size="1em" /> {t('myPosts.delete')}
                       </Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>

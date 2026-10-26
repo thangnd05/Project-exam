@@ -4,7 +4,7 @@ import {useState} from 'react';
 import {Modal} from 'react-bootstrap';
 import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
-import {FiX} from 'react-icons/fi';
+import { X } from 'lucide-react';
 
 import type {Vendor} from '@/app/[locale]/(public)/_lib/certificationMeta';
 import {displayName, initials, useRankBoard} from './useRankBoard';
@@ -88,7 +88,7 @@ function RankScopeModal({show, onClose, onJoin}: RankScopeModalProps) {
           <p className={cx('subtitle')}>{t('modal.subtitle')}</p>
         </div>
         <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label={t('modal.close')}>
-          <FiX aria-hidden="true" />
+          <X size="1em" aria-hidden="true" />
         </button>
       </div>
 

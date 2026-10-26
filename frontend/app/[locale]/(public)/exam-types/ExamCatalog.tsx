@@ -5,8 +5,7 @@ import {useQuery} from '@tanstack/react-query';
 import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 import {Container} from 'react-bootstrap';
-import {FiArrowRight} from 'react-icons/fi';
-import {IoAlertCircleOutline, IoDocumentTextOutline, IoSearchOutline} from 'react-icons/io5';
+import { ArrowRight, CircleAlert, FileText, Search } from 'lucide-react';
 
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
 import {buildExamTypeDetailPath} from '@/app/configs/Routes';
@@ -141,7 +140,7 @@ function ExamCatalog() {
     if (isError) {
       return (
         <div className={cx('empty-state')}>
-          <IoAlertCircleOutline className={cx('icon')} />
+          <CircleAlert size="1em" className={cx('icon')} />
           <h4>{t('catalog.loadError.title')}</h4>
           <p>{t('catalog.loadError.hint')}</p>
         </div>
@@ -151,7 +150,7 @@ function ExamCatalog() {
     if (exams.length === 0) {
       return (
         <div className={cx('empty-state')}>
-          <IoDocumentTextOutline className={cx('icon')} />
+          <FileText size="1em" className={cx('icon')} />
           <h4>{t('catalog.empty.title')}</h4>
           <p>{t('catalog.empty.hint')}</p>
         </div>
@@ -161,7 +160,7 @@ function ExamCatalog() {
     if (visible.length === 0) {
       return (
         <div className={cx('empty-state')}>
-          <IoSearchOutline className={cx('icon')} />
+          <Search size="1em" className={cx('icon')} />
           <h4>{t('catalog.noMatch')}</h4>
           <button type="button" className={cx('textBtn')} onClick={resetFilters}>
             {t('catalog.resetFilters')}
@@ -220,7 +219,7 @@ function ExamCatalog() {
                 </button>
                 <Link href={href} className={cx('btnSecondary')} title={t('catalog.viewFullMock', {name: code || title})}>
                   {t('fullMock')}
-                  <FiArrowRight aria-hidden="true" />
+                  <ArrowRight size="1em" aria-hidden="true" />
                 </Link>
               </div>
             </article>
@@ -238,7 +237,7 @@ function ExamCatalog() {
         <div className={cx('controls')}>
           <div className={cx('searchRow')}>
             <label className={cx('search')}>
-              <IoSearchOutline className={cx('searchIcon')} aria-hidden="true" />
+              <Search size="1em" className={cx('searchIcon')} aria-hidden="true" />
               <span className="visually-hidden">{t('catalog.searchLabel')}</span>
               <input
                 type="search"

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Row, Col, Spinner } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { useLocale, useTranslations } from 'next-intl';
@@ -16,6 +16,7 @@ const localISODate = (d: Date = new Date()) => {
 };
 
 import styles from './AdminDashboard.module.scss';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -69,10 +70,7 @@ const AdminDashboard = () => {
             </AdminPageHeader>
 
             {isLoading ? (
-                <div className={cx('loadingState')}>
-                    <Spinner animation="border" variant="primary" />
-                    <span>{t('stats.loading')}</span>
-                </div>
+                <Loading label={t('stats.loading')} />
             ) : isError ? (
                 <div className={cx('loadingState')}>
                     <span>{t('stats.loadError')}</span>

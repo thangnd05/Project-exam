@@ -3,7 +3,7 @@
 import {useEffect, useState} from 'react';
 import classNames from 'classnames/bind';
 import styles from './ScrollToTop.module.scss';
-import { FaArrowUp } from 'react-icons/fa6';
+import { ArrowUp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 const cx = classNames.bind(styles);
@@ -35,7 +35,7 @@ function ScrollToTop() {
       aria-hidden={!showScroll}
       tabIndex={showScroll ? 0 : -1}
     >
-      <FaArrowUp />
+      <ArrowUp size="1em" />
     </button>
   );
 }

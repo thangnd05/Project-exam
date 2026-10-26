@@ -21,7 +21,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   gap: 6px;
   margin-bottom: 16px;
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--slate-500);
 
   a {
@@ -35,7 +35,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   }
 
   svg {
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     color: var(--slate-300);
   }
 
@@ -72,14 +72,14 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .code {
   display: block;
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--brand-700);
 }
 
 .title {
   margin: 0;
-  font-size: 2.2rem;
+  font-size: var(--font-size-xxl);
   font-weight: 700;
   line-height: 1.3;
   color: var(--slate-900);
@@ -92,7 +92,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .desc {
   max-width: 640px;
   margin: 6px 0 0;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   line-height: 1.55;
   color: var(--slate-500);
 }
@@ -103,7 +103,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   gap: 4px 0;
   margin-top: 12px;
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--slate-500);
 
   span + span::before {
@@ -145,17 +145,17 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .sectionTitle {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: var(--font-size-lg);
   font-weight: 700;
   color: var(--slate-900);
 }
 
 .sectionCount {
   padding: 1px 9px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgb(var(--brand-700-rgb) / 0.1);
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--brand-700);
 }
@@ -226,19 +226,19 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   align-items: center;
   flex-wrap: wrap;
   gap: 6px 8px;
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
   color: var(--slate-900);
 }
 
 .certificateDesc {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--slate-500);
 }
 
 .chevron {
   flex-shrink: 0;
-  font-size: 1.8rem;
+  font-size: var(--font-size-lg);
   color: var(--slate-400);
   transition: transform 0.2s ease;
 }
@@ -309,7 +309,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .childName {
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 700;
   line-height: 1.35;
   color: var(--slate-900);
@@ -326,7 +326,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .childArrow {
   flex-shrink: 0;
-  font-size: 1.8rem;
+  font-size: var(--font-size-lg);
   color: var(--slate-400);
   transition: color 0.2s ease;
 }

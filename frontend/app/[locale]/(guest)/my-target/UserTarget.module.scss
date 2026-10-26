@@ -47,10 +47,10 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   min-width: 64px;
   padding: 6px 14px;
   border: 1px solid var(--slate-300);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--bg-white);
   font-family: $mono;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 600;
   color: var(--slate-600);
   cursor: pointer;
@@ -84,7 +84,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   margin: 0;
   padding: 0 16px;
   border: 1px solid var(--slate-300);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--bg-white);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -100,13 +100,13 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
     border: none;
     background: transparent;
     font-family: $mono;
-    font-size: 1.8rem;
+    font-size: var(--font-size-lg);
     font-weight: 700;
     color: var(--slate-900);
     outline: none;
 
     &::placeholder {
-      font-size: 1.3rem;
+      font-size: var(--font-size-smd);
       font-weight: 500;
       color: var(--slate-400);
     }
@@ -115,19 +115,19 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .scoreUnit {
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--slate-400);
 }
 
 .milestoneHint {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--slate-500);
 }
 
 .hint {
   margin: 12px 0 0;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   color: var(--slate-500);
 }
@@ -149,7 +149,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 700;
   color: var(--slate-900);
   list-style: none;
@@ -165,7 +165,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .chevron {
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   color: var(--slate-400);
   transition: transform 0.2s ease, color 0.2s ease;
 
@@ -177,7 +177,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .optional {
   padding: 1px 8px;
   border: 1px solid var(--slate-200);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--slate-50);
   font-size: 1.05rem;
   font-weight: 600;
@@ -209,7 +209,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .partName {
   min-width: 0;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 600;
   color: var(--slate-900);
 }
@@ -217,7 +217,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .partTotal {
   display: block;
   font-family: $mono;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   font-weight: 500;
   color: var(--slate-400);
 }
@@ -251,7 +251,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
     border: none;
     background: transparent;
     font-family: $mono;
-    font-size: 1.3rem;
+    font-size: var(--font-size-smd);
     font-weight: 700;
     text-align: right;
     color: var(--slate-900);
@@ -259,7 +259,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   }
 
   span {
-    font-size: 1.1rem;
+    font-size: var(--font-size-xs2);
     color: var(--slate-400);
   }
 
@@ -323,14 +323,14 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .statLabel {
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   font-weight: 600;
   color: var(--slate-500);
 }
 
 .statValue {
   font-family: $mono;
-  font-size: 2.4rem;
+  font-size: var(--font-size-2xl);
   font-weight: 700;
   line-height: 1.2;
   color: var(--slate-900);
@@ -338,7 +338,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .statDiff {
   font-family: $mono;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   font-weight: 700;
 
   &.ok {
@@ -370,7 +370,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .partBarName {
   min-width: 0;
   overflow: hidden;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -380,13 +380,13 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .partBarValue {
   flex-shrink: 0;
   font-family: $mono;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   color: var(--slate-500);
 }
 
 .partBarTrack {
   height: 6px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--slate-100);
   overflow: hidden;
 
@@ -404,7 +404,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   padding-top: 14px;
   border-top: 1px solid var(--slate-100);
   font-family: $mono;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   line-height: 1.6;
   color: var(--slate-500);
 }
@@ -415,7 +415,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   border: 1px solid var(--author-tag-border);
   border-radius: 10px;
   background: var(--author-tag-bg);
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--author-tag-text);
 }
 

@@ -4,8 +4,7 @@ import Link from '@/app/i18n/navigation';
 import classNamesBind from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import { formatDayMonthTime } from '@/app/utils/format-date-time';
-import { FiArrowRight } from 'react-icons/fi';
-import { IoTrophyOutline } from 'react-icons/io5';
+import { ArrowRight, Trophy } from 'lucide-react';
 import TestModeModal from '@/app/features/tests/TestModeModal/TestModeModal';
 import { useTestStart } from '@/app/features/tests/TestCard/hooks/useTestStart';
 import type { TestResponse } from '@/app/types';
@@ -72,7 +71,7 @@ function MockTestCard({ test, index, kind, questions, countdowns }: MockTestCard
                 title={tTests('leaderboard')}
                 aria-label={tTests('leaderboard')}
               >
-                <IoTrophyOutline aria-hidden="true" />
+                <Trophy size="1em" aria-hidden="true" />
               </Link>
             )}
           </span>
@@ -109,7 +108,7 @@ function MockTestCard({ test, index, kind, questions, countdowns }: MockTestCard
           disabled={!canStart}
         >
           {needsLogin && canStart ? tTests('loginToStart') : buttonText}
-          {canStart && <FiArrowRight aria-hidden="true" />}
+          {canStart && <ArrowRight size="1em" aria-hidden="true" />}
         </button>
         {isAuthenticated && (
           <Link

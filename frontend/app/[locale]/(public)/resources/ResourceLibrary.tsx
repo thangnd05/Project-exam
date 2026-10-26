@@ -1,7 +1,6 @@
 'use client';
 import { useMemo, useState } from 'react';
-import { IoAlertCircleOutline, IoDocumentTextOutline, IoSearchOutline } from 'react-icons/io5';
-import { FiArrowRight } from 'react-icons/fi';
+import { CircleAlert, FileText, Search, ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import {Container} from 'react-bootstrap';
@@ -209,7 +208,7 @@ function ResourceLibrary() {
     if (isError) {
       return (
         <div className={cx('empty')}>
-          <IoAlertCircleOutline className={cx('icon')} />
+          <CircleAlert size="1em" className={cx('icon')} />
           <h2>{t('library.loadError.title')}</h2>
           <p>{t('library.loadError.message')}</p>
         </div>
@@ -219,7 +218,7 @@ function ResourceLibrary() {
     if (resources.length === 0) {
       return (
         <div className={cx('empty')}>
-          <IoDocumentTextOutline className={cx('icon')} />
+          <FileText size="1em" className={cx('icon')} />
           <h2>{t('library.empty.title')}</h2>
           <p>{t('library.empty.message')}</p>
         </div>
@@ -229,7 +228,7 @@ function ResourceLibrary() {
     if (!activeGroup || visible.length === 0) {
       return (
         <div className={cx('empty')}>
-          <IoSearchOutline className={cx('icon')} />
+          <Search size="1em" className={cx('icon')} />
           <h2>{t('library.noMatch.title')}</h2>
           <button type="button" className={cx('textBtn')} onClick={resetFilters}>
             {t('library.resetFilters')}
@@ -272,7 +271,7 @@ function ResourceLibrary() {
 
                   <div className={cx('cardBody')}>
                     <span className={cx('docIcon')} aria-hidden="true">
-                      <IoDocumentTextOutline />
+                      <FileText size="1em" />
                     </span>
                     <div className={cx('cardText')}>
                       {fileType && <span className={cx('fileType')}>{fileType}</span>}
@@ -292,7 +291,7 @@ function ResourceLibrary() {
 
                 <span className={cx('readBtn')}>
                   {t('library.readResource')}
-                  <FiArrowRight aria-hidden="true" />
+                  <ArrowRight size="1em" aria-hidden="true" />
                 </span>
               </RecoveryResourceLink>
             );
@@ -310,7 +309,7 @@ function ResourceLibrary() {
         <div className={cx('controls')}>
           <div className={cx('searchRow')}>
             <label className={cx('search')}>
-              <IoSearchOutline className={cx('searchIcon')} aria-hidden="true" />
+              <Search size="1em" className={cx('searchIcon')} aria-hidden="true" />
               <span className="visually-hidden">{t('library.searchLabel')}</span>
               <input
                 type="search"

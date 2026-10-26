@@ -1,7 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { IoTrashOutline } from 'react-icons/io5';
+import { Trash2 } from 'lucide-react';
 import ConfirmModal from './ConfirmModal';
 
 type ConfirmDeleteModalProps = {
@@ -21,7 +21,7 @@ const ConfirmDeleteModal = ({ show, onClose, onConfirm, title, message }: Confir
             onConfirm={onConfirm}
             title={title || t('title')}
             message={message || t('message')}
-            icon={IoTrashOutline}
+            icon={Trash2}
             variant="danger"
             confirmText={t('confirm')}
         />

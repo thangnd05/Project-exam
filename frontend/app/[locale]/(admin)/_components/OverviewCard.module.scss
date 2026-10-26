@@ -44,7 +44,7 @@ $border-color: var(--border-color);
     color: $text-muted;
     background: $bg-light;
     padding: 2px 8px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
 }
 
 .value {

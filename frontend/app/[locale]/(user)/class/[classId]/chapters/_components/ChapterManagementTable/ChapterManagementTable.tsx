@@ -1,7 +1,7 @@
 'use client';
 
 import {Table, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
-import {IoPencilOutline, IoTrashOutline} from 'react-icons/io5';
+import { Pencil, Trash2 } from 'lucide-react';
 import {useLocale, useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 import styles from './ChapterManagementTable.module.scss';
@@ -61,7 +61,7 @@ function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}: Chapt
                         onEdit(chapter);
                       }}
                     >
-                      <IoPencilOutline />
+                      <Pencil size="1em" />
                     </Button>
                   </OverlayTrigger>
 
@@ -74,7 +74,7 @@ function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}: Chapt
                         onDelete(chapter);
                       }}
                     >
-                      <IoTrashOutline />
+                      <Trash2 size="1em" />
                     </Button>
                   </OverlayTrigger>
                 </div>

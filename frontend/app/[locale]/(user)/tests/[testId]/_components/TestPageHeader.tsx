@@ -3,7 +3,7 @@
 import Link from '@/app/i18n/navigation';
 import classNamesBind from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import { FiArrowRight, FiChevronRight } from 'react-icons/fi';
+import { ArrowRight, ChevronRight } from 'lucide-react';
 import ExamBadge from '@/app/[locale]/(public)/_components/ExamBadge/ExamBadge';
 import { badgeUrl, parseCode } from '@/app/[locale]/(public)/_lib/certificationMeta';
 import routes, { buildExamTypeDetailPath, buildTestPath } from '@/app/configs/Routes';
@@ -39,7 +39,7 @@ function StartButton({ test }: { test: TestResponse }) {
     <>
       <button type="button" className={ui('btnPrimary')} onClick={handleStart} disabled={!canStart}>
         {canStart ? ((test.attemptsUsed ?? 0) > 0 ? t('retake') : t('start')) : buttonText}
-        {canStart && <FiArrowRight aria-hidden="true" />}
+        {canStart && <ArrowRight size="1em" aria-hidden="true" />}
       </button>
       <TestModeModal
         show={modeModal.show}
@@ -88,11 +88,11 @@ function TestPageHeader({ testRef, test, active }: TestPageHeaderProps) {
         <Link href={routes.examTypes}>{t('examLibrary')}</Link>
         {examType && (
           <>
-            <FiChevronRight aria-hidden="true" />
+            <ChevronRight size="1em" aria-hidden="true" />
             <Link href={buildExamTypeDetailPath(examType)}>{code || examName}</Link>
           </>
         )}
-        <FiChevronRight aria-hidden="true" />
+        <ChevronRight size="1em" aria-hidden="true" />
         <span aria-current="page">{title}</span>
       </nav>
 

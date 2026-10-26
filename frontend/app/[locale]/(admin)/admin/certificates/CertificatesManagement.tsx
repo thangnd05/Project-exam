@@ -324,16 +324,16 @@ function CertificatesManagement() {
             emptyText={t('templatesEmpty')}
             rowActions={(item: CertificateTemplateResponse) => (
               <>
-                <Button variant="light" size="sm" onClick={() => openEditModal(item)}>
-                  <Edit size={16} />
-                </Button>
-                <Button
-                  variant="light"
-                  size="sm"
+                <button title={t('editTemplate')} onClick={() => openEditModal(item)}>
+                  <Edit size={14} />
+                </button>
+                <button
+                  className="danger"
+                  title={t('deleteTemplate')}
                   onClick={() => setDeletingTemplate(item)}
                 >
-                  <Trash2 size={16} />
-                </Button>
+                  <Trash2 size={14} />
+                </button>
               </>
             )}
           />
@@ -377,23 +377,20 @@ function CertificatesManagement() {
             rowActions={(item: CertificateResponse) => (
               <>
                 {item.status === CertificateStatus.ACTIVE && (
-                  <Button
-                    variant="light"
-                    size="sm"
+                  <button
                     title={t('revokeTitle')}
                     onClick={() => setRevokingCertificate(item)}
                   >
-                    <ShieldX size={16} />
-                  </Button>
+                    <ShieldX size={14} />
+                  </button>
                 )}
-                <Button
-                  variant="light"
-                  size="sm"
+                <button
+                  className="danger"
                   title={t('deletePermanently')}
                   onClick={() => setDeletingCertificate(item)}
                 >
-                  <Trash2 size={16} />
-                </Button>
+                  <Trash2 size={14} />
+                </button>
               </>
             )}
           />

@@ -5,12 +5,7 @@ import { useTranslations } from 'next-intl';
 import {Container} from 'react-bootstrap';
 import {motion} from 'framer-motion';
 import type {Variants} from 'framer-motion';
-import {
-  IoListOutline,
-  IoGridOutline,
-  IoSchoolOutline,
-  IoPeopleOutline,
-} from 'react-icons/io5';
+import { List, LayoutGrid, GraduationCap, Users } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from './ClassListContainer.module.scss';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
@@ -84,8 +79,8 @@ const ClassListContainer = ({
   const hasAnyClasses = hasTeaching || hasLearning;
 
   const viewModeOptions = [
-    {key: 'grid', title: t('common.viewGrid'), icon: IoGridOutline},
-    {key: 'table', title: t('classList.viewTable'), icon: IoListOutline},
+    {key: 'grid', title: t('common.viewGrid'), icon: LayoutGrid},
+    {key: 'table', title: t('classList.viewTable'), icon: List},
   ];
 
   return (
@@ -141,7 +136,7 @@ const ClassListContainer = ({
                   viewport={{once: true, amount: 0.4}}
                   variants={emptyVariants}
                 >
-                  <IoPeopleOutline className={cx('icon')} />
+                  <Users size="1em" className={cx('icon')} />
                   <h4>{t('common.noTeachingClasses')}</h4>
                 </motion.div>
               )}
@@ -183,7 +178,7 @@ const ClassListContainer = ({
                   viewport={{once: true, amount: 0.4}}
                   variants={emptyVariants}
                 >
-                  <IoSchoolOutline className={cx('icon')} />
+                  <GraduationCap size="1em" className={cx('icon')} />
                   <h4>{t('classList.noLearningClasses')}</h4>
                 </motion.div>
               )}
@@ -197,7 +192,7 @@ const ClassListContainer = ({
               <>
                 <div className={cx('section-header', 'teaching-header')}>
                   <div className={cx('icon-box')}>
-                    <IoSchoolOutline />
+                    <GraduationCap size="1em" />
                   </div>
                   <h3>{t('common.teachingClasses')}</h3>
                 </div>
@@ -213,7 +208,7 @@ const ClassListContainer = ({
               </>
             ) : (
               <div className={cx('empty-box')}>
-                <IoSchoolOutline className={cx('icon')} />
+                <GraduationCap size="1em" className={cx('icon')} />
                 <h4>{t('common.noTeachingClasses')}</h4>
                 <p>{t('classList.joinHint')}</p>
               </div>

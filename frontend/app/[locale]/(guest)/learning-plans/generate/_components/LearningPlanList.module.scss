@@ -69,7 +69,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .title {
   margin: 0 4px 0 0;
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 700;
   color: var(--slate-900);
 }
@@ -83,7 +83,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   flex-wrap: wrap;
   gap: 2px 0;
   font-family: $mono;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   color: var(--slate-500);
 
   span + span::before {
@@ -102,7 +102,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   max-width: 320px;
   height: 5px;
   margin-top: 10px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--slate-100);
   overflow: hidden;
 
@@ -134,11 +134,11 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   padding: 28px 16px;
   border: 1px dashed var(--slate-300);
   border-radius: 12px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: var(--slate-500);
 
   svg {
-    font-size: 1.8rem;
+    font-size: var(--font-size-lg);
     color: var(--slate-400);
   }
 }

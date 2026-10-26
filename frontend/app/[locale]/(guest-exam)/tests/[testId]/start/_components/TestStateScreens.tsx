@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Spinner, Button } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import { IoLockClosedOutline, IoAlertCircleOutline, IoPlayCircleOutline } from 'react-icons/io5';
+import { Lock, CircleAlert, CirclePlay } from 'lucide-react';
+import Loading from '@/app/components/Loading/Loading';
 import { useExamTypeById } from '@/app/features/exam-types/hooks/useExamTypes';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
 import { QuestionType } from '@/app/enums';
@@ -24,7 +24,7 @@ function ExamTypeLogo({ examTypeId }: { examTypeId?: string }) {
   const [failed, setFailed] = useState(false);
   const src = getFullMediaUrl(examType?.imageUrl);
 
-  if (!src || failed) return <IoPlayCircleOutline size={52} color="var(--primary)" />;
+  if (!src || failed) return <CirclePlay size={52} color="var(--primary)" />;
   return (
     // eslint-disable-next-line @next/next/no-img-element -- logo do admin tải lên, host tuỳ ý và cần onError để hiện icon thay thế
     <img
@@ -81,8 +81,7 @@ export default function TestStateScreens({
   if (status === 'loading')
     return (
       <div className={cx('state-box')}>
-        <Spinner animation="grow" variant="primary" />
-        <h3>{t('loading')}</h3>
+        <Loading label={t('loading')} />
       </div>
     );
 
@@ -196,7 +195,7 @@ export default function TestStateScreens({
     const enough = balance >= cost;
     return (
       <div className={cx('state-box')}>
-        <IoLockClosedOutline size={80} color="var(--warning)" />
+        <Lock size={80} color="var(--warning)" />
         <h3>{t('payment.title')}</h3>
         <p>
            {t('payment.desc')}
@@ -229,23 +228,21 @@ export default function TestStateScreens({
   if (status === 'no-attempts')
     return (
       <div className={cx('state-box')}>
-        <IoAlertCircleOutline size={80} color="var(--danger-text)" />
+        <CircleAlert size={80} color="var(--danger-text)" />
         <h3>{t('noAttempts.title')}</h3>
         <p>{t('noAttempts.desc')}</p>
-        <Button
-          variant="primary"
-          className="mt-4 rounded-pill"
-          onClick={onBack}
-        >
-          {t('back')}
-        </Button>
+        <div className={cx('state-actions')}>
+          <button type="button" className={cx('state-btn', 'state-btn-primary')} onClick={onBack}>
+            {t('back')}
+          </button>
+        </div>
       </div>
     );
 
   if (status === 'locked')
     return (
       <div className={cx('state-box')}>
-        <IoLockClosedOutline size={80} color="var(--text-secondary)" />
+        <Lock size={80} color="var(--text-secondary)" />
         <h3>{t('locked.title')}</h3>
         <p>{t('locked.desc')}</p>
         <div className={cx('timer-box', 'mt-4')}>
@@ -257,23 +254,21 @@ export default function TestStateScreens({
   if (status === 'closed')
     return (
       <div className={cx('state-box')}>
-        <IoAlertCircleOutline size={80} color="var(--danger-text)" />
+        <CircleAlert size={80} color="var(--danger-text)" />
         <h3>{t('closed.title')}</h3>
         <p>{t('closed.desc')}</p>
-        <Button
-          variant="secondary"
-          className="mt-4 rounded-pill"
-          onClick={onBack}
-        >
-          {t('back')}
-        </Button>
+        <div className={cx('state-actions')}>
+          <button type="button" className={cx('state-btn', 'state-btn-primary')} onClick={onBack}>
+            {t('back')}
+          </button>
+        </div>
       </div>
     );
 
   if (status === 'error')
     return (
       <div className={cx('state-box')}>
-        <IoAlertCircleOutline size={80} color="var(--danger-text)" />
+        <CircleAlert size={80} color="var(--danger-text)" />
         <h3>{t('error.title')}</h3>
         <p>{t('error.desc')}</p>
         <div className={cx('state-actions')}>

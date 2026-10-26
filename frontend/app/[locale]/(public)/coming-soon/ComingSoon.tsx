@@ -2,7 +2,7 @@
 
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import { FiArrowRight, FiClock } from 'react-icons/fi';
+import { ArrowRight, Clock } from 'lucide-react';
 import routes from '@/app/configs/Routes';
 import Link from '@/app/i18n/navigation';
 import type { Provider } from '../_lib/providers';
@@ -33,7 +33,7 @@ export default function ComingSoon({ provider }: { provider?: Provider }) {
               className={cx('logo', `logo-${provider.size}`)}
             />
           ) : (
-            <FiClock className={cx('fallbackIcon')} aria-hidden="true" />
+            <Clock size="1em" className={cx('fallbackIcon')} aria-hidden="true" />
           )}
         </div>
       </div>
@@ -58,7 +58,7 @@ export default function ComingSoon({ provider }: { provider?: Provider }) {
       <div className={cx('actions')}>
         <Link href={routes.examTypes} className={cx('btnPrimary')}>
           {t('exploreExams')}
-          <FiArrowRight aria-hidden="true" />
+          <ArrowRight size="1em" aria-hidden="true" />
         </Link>
         <Link href={routes.home} className={cx('btnGhost')}>
           {t('backHome')}

@@ -3,7 +3,7 @@
 import { Container } from 'react-bootstrap';
 import classNamesBind from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import { IoPodiumOutline, IoTrophyOutline } from 'react-icons/io5';
+import { ChartNoAxesColumn, Trophy } from 'lucide-react';
 
 import type { TestRef } from '@/app/features/tests/testRef';
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
@@ -85,7 +85,7 @@ function TestLeaderboard({ testRef }: { testRef: TestRef }) {
     if (rows.length === 0) {
       return (
         <div className={ui('empty')}>
-          <IoPodiumOutline className={ui('emptyIcon')} aria-hidden="true" />
+          <ChartNoAxesColumn size="1em" className={ui('emptyIcon')} aria-hidden="true" />
           <h2>{t('empty.title')}</h2>
           <p>{t('empty.desc')}</p>
         </div>
@@ -126,7 +126,7 @@ function TestLeaderboard({ testRef }: { testRef: TestRef }) {
             <article key={row.id} className={cx('podiumCard', `medal${row.rank}`, { mine: row.isMe })}>
               <div className={cx('podiumTop')}>
                 <span className={cx('podiumRank')}>
-                  <IoTrophyOutline aria-hidden="true" />
+                  <Trophy size="1em" aria-hidden="true" />
                   {t('rankLabel', { rank: row.rank })}
                 </span>
               </div>

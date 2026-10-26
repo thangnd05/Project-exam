@@ -3,9 +3,9 @@
 import { usePathname, useRouter } from '@/app/i18n/navigation';
 import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Spinner } from 'react-bootstrap';
 import routes from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
+import Loading from '@/app/components/Loading/Loading';
 
 type FallbackProps = {
   label: string;
@@ -13,19 +13,7 @@ type FallbackProps = {
 
 function Fallback({ label }: FallbackProps) {
   return (
-    <div
-      style={{
-        minHeight: '60vh',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '1.2rem',
-      }}
-    >
-      <Spinner animation="border" variant="primary" />
-      <span style={{ color: 'var(--text-secondary)' }}>{label}</span>
-    </div>
+    <Loading label={label} />
   );
 }
 

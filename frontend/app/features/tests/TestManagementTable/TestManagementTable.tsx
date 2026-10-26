@@ -4,11 +4,7 @@ import { useRouter } from '@/app/i18n/navigation';
 import React from 'react';
 import { useTranslations } from 'next-intl';
 import {Table, Badge, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
-import {
-  IoPencilOutline,
-  IoTrashOutline,
-  IoStatsChartOutline,
-} from 'react-icons/io5';
+import { Pencil, Trash2, ChartNoAxesColumnIncreasing } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '@/app/features/tests/TestManagementTable/TestManagementTable.module.scss';
 import {getTestStatus} from '@/app/features/tests/testStatusHelper';
@@ -95,7 +91,7 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManag
                           className={cx('btn-action', 'edit')}
                           onClick={() => setEditingTest(test)}
                         >
-                          <IoPencilOutline />
+                          <Pencil size="1em" />
                         </Button>
                       </OverlayTrigger>
                     )}
@@ -107,7 +103,7 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManag
                           className={cx('btn-action', 'delete')}
                           onClick={() => onDelete(test.testId)}
                         >
-                          <IoTrashOutline />
+                          <Trash2 size="1em" />
                         </Button>
                       </OverlayTrigger>
                     )}
@@ -122,7 +118,7 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManag
                           router.push(buildTestPath(test, 'history'))
                         }
                       >
-                        <IoStatsChartOutline />
+                        <ChartNoAxesColumnIncreasing size="1em" />
                       </Button>
                     </OverlayTrigger>
                   </div>

@@ -74,13 +74,13 @@
     top: 50%;
     transform: translateY(-50%);
     color: var(--text-secondary);
-    font-size: 1.6rem;
+    font-size: var(--font-size-base);
   }
 
   input {
     width: 100%;
     padding: 12px 14px 12px 42px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     border: 1px solid var(--border-color);
     background: var(--bg-white);
     color: var(--text-color);
@@ -104,7 +104,7 @@
 
 .pill {
   padding: 8px 18px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border-color);
   background: var(--bg-white);
   color: var(--text-secondary);

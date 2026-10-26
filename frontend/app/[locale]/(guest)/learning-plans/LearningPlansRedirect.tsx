@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/app/i18n/navigation';
-import { Spinner } from 'react-bootstrap';
+import Loading from '@/app/components/Loading/Loading';
 import routes from '@/app/configs/Routes';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import { LearningPlanStatus } from '@/app/enums';
@@ -54,9 +54,7 @@ function LearningPlansRedirect() {
   }, [router, searchParams, isAuthenticated, loading]);
 
   return (
-    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-      <Spinner animation="border" variant="primary" />
-    </div>
+    <Loading />
   );
 }
 

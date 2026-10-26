@@ -22,7 +22,7 @@ import StreakBadge from '@/app/features/gamification/streak/StreakBadge';
 import SettingsModal from '@/app/components/layouts/Header/ThemeToggle/SettingsModal';
 import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import {useStreak} from '@/app/features/gamification/streak/hooks/useStreak';
-import { FaGraduationCap, FaHouse, FaPlus, FaRoute, FaUser, FaXmark } from 'react-icons/fa6';
+import { GraduationCap, House, Plus, Route, User, X } from 'lucide-react';
 
 const cx = classNames.bind(styles);
 
@@ -123,7 +123,7 @@ function MobileBottomNav() {
           className={cx('tab', {active: isHomeActive})}
           aria-current={isHomeActive ? 'page' : undefined}
         >
-          <FaHouse className={cx('tabIcon')} />
+          <House size="1em" className={cx('tabIcon')} />
           <span className={cx('tabLabel')}>{t('home')}</span>
         </Link>
 
@@ -132,7 +132,7 @@ function MobileBottomNav() {
           className={cx('tab', {active: isExamActive})}
           aria-current={isExamActive ? 'page' : undefined}
         >
-          <FaGraduationCap className={cx('tabIcon')} />
+          <GraduationCap size="1em" className={cx('tabIcon')} />
           <span className={cx('tabLabel')}>{t('examTypes')}</span>
         </Link>
 
@@ -141,7 +141,7 @@ function MobileBottomNav() {
           className={cx('tab', {active: isPostsActive})}
           aria-current={isPostsActive ? 'page' : undefined}
         >
-          <FaNewspaper className={cx('tabIcon')} />
+          <Newspaper size="1em" className={cx('tabIcon')} />
           <span className={cx('tabLabel')}>Bài viết</span>
         </Link> */}
 
@@ -152,7 +152,7 @@ function MobileBottomNav() {
             onClick={handleCreateTest}
             aria-label={t('createTest')}
           >
-            <FaPlus />
+            <Plus size="1em" />
           </button>
         )}
 
@@ -161,7 +161,7 @@ function MobileBottomNav() {
           className={cx('tab', {active: isPlanActive})}
           aria-current={isPlanActive ? 'page' : undefined}
         >
-          <FaRoute className={cx('tabIcon')} />
+          <Route size="1em" className={cx('tabIcon')} />
           <span className={cx('tabLabel')}>{t('learningPlans')}</span>
         </Link>
 
@@ -183,7 +183,7 @@ function MobileBottomNav() {
               className={cx('tabAvatar')}
             />
           ) : (
-            <FaUser className={cx('tabIcon')} />
+            <User size="1em" className={cx('tabIcon')} />
           )}
           <span className={cx('tabLabel')}>{t('menu')}</span>
         </button>
@@ -219,7 +219,7 @@ function MobileBottomNav() {
                 onClick={closeSheet}
                 aria-label={t('close')}
               >
-                <FaXmark />
+                <X size="1em" />
               </button>
             </div>
 

@@ -262,7 +262,7 @@ function MilestonesManagement() {
               value={newScore}
               onChange={(e) => setNewScore(e.target.value)}
             />
-            <span style={{alignSelf: 'center', color: '#6b7280', fontSize: '0.85rem'}}>
+            <span style={{alignSelf: 'center', color: 'var(--gray-500)', fontSize: '0.85rem'}}>
               {t('milestones.perPart', {percent: newScore ? evenPctForScore(newScore) : 0})}
             </span>
             <Form.Control
@@ -400,7 +400,7 @@ function MilestonesManagement() {
                   );
                 })}
                 {(!m.partRequirements || m.partRequirements.length === 0) && (
-                  <span style={{color: '#9ca3af', fontSize: '0.85rem', padding: 16}}>
+                  <span style={{color: 'var(--gray-400)', fontSize: '0.85rem', padding: 16}}>
                     {t('milestones.noPartConfig')}
                   </span>
                 )}

@@ -120,6 +120,8 @@
     "revokeTitle": "Revoke certificate",
     "deletePermanently": "Permanently delete certificate",
     "revoke": "Revoke",
+    "editTemplate": "Edit certificate template",
+    "deleteTemplate": "Delete certificate template",
     "deleteTemplateMessage": "Delete the certificate template \"{title}\"? This exam type will stop issuing new certificates. Already issued certificates stay unchanged because they store their own snapshot.",
     "deleteCertificateMessage": "Permanently delete certificate {code} of {name}? This code will no longer be verifiable and cannot be restored. To only invalidate it while keeping a record, use revoke instead.",
     "revokeMessage": "Revoke certificate {code} of {name}? The verification page will show it as no longer valid, and this person can be certified again after passing a later attempt.",

@@ -10,14 +10,14 @@
 }
 
 .title {
-  font-size: 2.2rem;
+  font-size: var(--font-size-xxl);
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-color);
   margin: 0;
 }
 
 .message {
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   color: var(--text-secondary);
   max-width: 52rem;
   margin: 0;
@@ -31,7 +31,7 @@
 }
 
 .digest {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--text-secondary);
   font-family: monospace;
 }

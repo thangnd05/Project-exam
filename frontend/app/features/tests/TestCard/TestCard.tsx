@@ -3,16 +3,7 @@
 import { useRouter } from '@/app/i18n/navigation';
 import { useTranslations } from 'next-intl';
 import { formatDayMonthTime, formatFullDateTime } from '@/app/utils/format-date-time';
-import {
-    IoTimeOutline,
-    IoCalendarOutline,
-    IoHourglassOutline,
-    IoLockClosedOutline,
-    IoLockOpenOutline,
-    IoCreateOutline,
-    IoPersonOutline,
-    IoLogInOutline,
-} from 'react-icons/io5';
+import { Clock, Calendar, Hourglass, Lock, LockOpen, SquarePen, User, LogIn } from 'lucide-react';
 import classNames from 'classnames/bind';
 import MediaImage from '@/app/components/MediaImage/MediaImage';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
@@ -108,9 +99,9 @@ function TestCard({ test, countdowns }: TestCardProps) {
                 {(test.costCoins ?? 0) > 0 && (
                     <div className={cx('cost-badge', { owned: test.owned })}>
                         {test.owned ? (
-                            <IoLockOpenOutline size={14} />
+                            <LockOpen size={14} />
                         ) : (
-                            <IoLockClosedOutline size={14} />
+                            <Lock size={14} />
                         )}
                         {test.owned ? t('owned') : t('coins', { count: test.costCoins ?? 0 })}
                     </div>
@@ -124,7 +115,7 @@ function TestCard({ test, countdowns }: TestCardProps) {
 
                 <div className={cx('info-list')}>
                     <div className={cx('info-item')}>
-                        <IoTimeOutline />
+                        <Clock size="1em" />
                         <span>
                             {t('card.duration')}{' '}
                             <strong>
@@ -136,19 +127,19 @@ function TestCard({ test, countdowns }: TestCardProps) {
                     </div>
 
                     <div className={cx('info-item')}>
-                        <IoCalendarOutline />
+                        <Calendar size="1em" />
                         <span>{t('card.opensAt')} <strong>{formatDayMonthTime(test.availableFrom)}</strong></span>
                     </div>
 
                     <div className={cx('info-item')}>
-                        <IoHourglassOutline />
+                        <Hourglass size="1em" />
                         <span>{t('card.deadline')} <strong>{formatDayMonthTime(test.availableTo)}</strong></span>
                     </div>
                 </div>
 
                 {guestAllowed !== null && (
                     <div className={cx('access-line', guestAllowed ? 'access-guest' : 'access-login')}>
-                        {guestAllowed ? <IoPersonOutline /> : <IoLogInOutline />}
+                        {guestAllowed ? <User size="1em" /> : <LogIn size="1em" />}
                         <span>
                             {guestAllowed
                                 ? t('card.guestAllowed')
@@ -158,7 +149,7 @@ function TestCard({ test, countdowns }: TestCardProps) {
                 )}
 
                 <div className={cx('info-item', 'created-line')}>
-                    <IoCreateOutline />
+                    <SquarePen size="1em" />
                     <span>{t('card.createdAt')} <strong>{formatFullDateTime(test.createdAt)}</strong></span>
                 </div>
 

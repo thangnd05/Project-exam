@@ -23,7 +23,7 @@
 }
 
 .qText {
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   margin-bottom: 1.4rem;
   color: var(--dark-color);
   display: block;
@@ -70,7 +70,7 @@
 
 .userPill {
   margin-left: 0.8rem;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   opacity: 0.8;
 }

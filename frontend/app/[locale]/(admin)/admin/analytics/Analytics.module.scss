@@ -144,7 +144,7 @@ $radius-lg: 16px;
 .monthTag {
     flex-shrink: 0;
     padding: 4px 10px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: rgb(var(--primary-rgb) / 0.1);
     color: var(--primary-text);
     font-size: var(--font-size-sm);

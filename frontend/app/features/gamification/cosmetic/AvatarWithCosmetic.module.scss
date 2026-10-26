@@ -25,7 +25,7 @@
   border-radius: 50%;
   object-fit: cover;
   display: block;
-  border: 2px solid #fff;
+  border: 2px solid var(--bg-white);
   box-sizing: border-box;
   background: var(--slate-100);
 }
@@ -35,7 +35,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid #fff;
+  border: 2px solid var(--bg-white);
   box-sizing: border-box;
   background: var(--primary-gradient);
   color: var(--on-primary-gradient);
@@ -76,7 +76,7 @@
 }
 
 .effect-glow {
-  background: linear-gradient(135deg, #ffd43b, #fab005);
+  background: var(--coin-gradient);
   animation: cosmeticGlow 1.8s ease-in-out infinite;
 }
 
@@ -107,10 +107,10 @@
 @keyframes cosmeticGlow {
   0%,
   100% {
-    box-shadow: 0 0 4px 1px rgba(250, 176, 5, 0.55);
+    box-shadow: 0 0 4px 1px rgb(var(--coin-glow-rgb) / 0.55);
   }
   50% {
-    box-shadow: 0 0 13px 4px rgba(250, 176, 5, 0.95);
+    box-shadow: 0 0 13px 4px rgb(var(--coin-glow-rgb) / 0.95);
   }
 }
 

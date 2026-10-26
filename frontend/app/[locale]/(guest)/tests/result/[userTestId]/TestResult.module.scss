@@ -110,7 +110,7 @@
 
     .label {
         display: block;
-        font-size: 1.6rem;
+        font-size: var(--font-size-base);
         font-weight: 700;
         color: var(--primary-text);
         text-transform: uppercase;
@@ -133,7 +133,7 @@
 
     .scale-hint {
         margin-top: 6px;
-        font-size: 1.3rem;
+        font-size: var(--font-size-smd);
         color: var(--text-secondary);
     }
 }
@@ -236,7 +236,7 @@
     color: var(--orange-700);
     padding: 12px;
     border-radius: 12px;
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     font-weight: 600;
     margin-bottom: 0;
     border: 1px solid var(--orange-100);
@@ -245,7 +245,7 @@
 .percentile-box {
     margin-top: 4px;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: var(--font-size-sm);
     color: var(--text-secondary);
 
     strong {

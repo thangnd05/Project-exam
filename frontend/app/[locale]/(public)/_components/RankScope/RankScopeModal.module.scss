@@ -46,7 +46,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .subtitle {
   margin: 0;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--text-on-dark-muted);
 }
 
@@ -60,7 +60,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   border: none;
   border-radius: 50%;
   background: rgb(255 255 255 / 0.05);
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   color: var(--text-on-dark-muted);
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
@@ -91,7 +91,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   border: none;
   border-radius: 8px;
   background: transparent;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--text-on-dark-muted);
   cursor: pointer;
@@ -163,7 +163,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   width: 24px;
   flex-shrink: 0;
   font-family: $mono;
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 700;
   text-align: center;
   color: var(--text-on-dark-muted);
@@ -179,7 +179,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   border: 1px solid rgb(var(--frost-silver-rgb) / 0.2);
   border-radius: 50%;
   background: rgb(var(--surface-dark-border-rgb) / 0.6);
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
   color: var(--text-on-dark-muted);
 }
@@ -196,13 +196,13 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .name {
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 700;
   color: var(--text-on-dark);
 }
 
 .exam {
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   color: var(--text-on-dark-muted);
 }
 
@@ -214,13 +214,13 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .scoreVal {
   font-family: $mono;
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   font-weight: 700;
   color: var(--text-on-dark);
 }
 
 .scoreMax {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: rgb(var(--frost-silver-rgb) / 0.6);
 }
 
@@ -278,7 +278,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .empty {
   padding: 40px 16px;
   text-align: center;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   color: var(--text-on-dark-muted);
 
   p {
@@ -287,7 +287,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .emptyTitle {
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   font-weight: 700;
   color: var(--text-on-dark);
 }
@@ -302,7 +302,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   gap: 12px;
   padding-top: 16px;
   border-top: 1px solid var(--surface-dark-border);
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
 
   @include down(sm) {
     flex-direction: column;
@@ -328,7 +328,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   padding: 8px 16px;
   border: none;
   border-radius: 12px;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   cursor: pointer;
   transition: background-color 0.2s ease;
 }

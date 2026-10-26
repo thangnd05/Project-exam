@@ -25,7 +25,7 @@
   gap: 8px;
   margin: 0 0 14px 0;
   color: var(--slate-800);
-  font-size: 1.8rem;
+  font-size: var(--font-size-lg);
   font-weight: 800;
 }
 
@@ -99,9 +99,9 @@
 .partBadge {
   background: var(--brand-100);
   color: var(--primary-text-hover);
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 700;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   min-width: 64px;
   padding: 4px 10px;
   text-align: center;
@@ -133,7 +133,7 @@
 .chapterBadge {
   background: var(--slate-100);
   color: var(--slate-600);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 2px 8px;
   font-size: 1.15rem;
 }
@@ -174,7 +174,7 @@
   gap: 4px;
   margin-left: 8px;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: var(--font-size-xs2);
   font-weight: 600;
   background: var(--brand-100);

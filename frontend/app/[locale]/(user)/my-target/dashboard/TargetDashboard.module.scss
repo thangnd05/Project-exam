@@ -9,7 +9,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .achievedIcon {
   flex-shrink: 0;
-  font-size: 2.2rem;
+  font-size: var(--font-size-xxl);
 }
 
 .examHead {
@@ -52,7 +52,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .statValue {
   font-family: $mono;
-  font-size: 2.8rem;
+  font-size: var(--font-size-2xxl);
   font-weight: 700;
   line-height: 1.15;
   color: var(--slate-900);
@@ -60,7 +60,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .statValueText {
   font-family: var(--font-family);
-  font-size: 2rem;
+  font-size: var(--font-size-xl);
 }
 
 .muted {
@@ -79,7 +79,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .statHint {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   color: var(--slate-500);
 }
@@ -96,7 +96,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   align-self: stretch;
   height: 6px;
   margin-top: 4px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--slate-100);
   overflow: hidden;
 

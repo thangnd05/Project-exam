@@ -161,7 +161,7 @@
   }
 
   .passage-content {
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     line-height: 1.5;
     white-space: pre-wrap;
     color: var(--gray-900);
@@ -202,12 +202,3 @@
   }
 }
 
-.state-box {
-  min-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  text-align: center;
-}

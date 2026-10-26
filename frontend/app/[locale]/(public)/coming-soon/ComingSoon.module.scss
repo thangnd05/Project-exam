@@ -190,7 +190,7 @@
   justify-content: center;
   gap: 8px;
   padding: 13px 28px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: var(--font-size-md);
   text-decoration: none;
   transition: transform 0.2s ease, background-color 0.2s ease;

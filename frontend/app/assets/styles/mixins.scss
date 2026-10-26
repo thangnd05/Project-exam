@@ -10,6 +10,16 @@ $breakpoints: (
   wide: 1536px,
 );
 
+// Màu nhận diện hãng, giữ đúng màu thương hiệu của từng nhà cung cấp (dùng chung cho mọi bộ lọc kỳ thi).
+$vendor-colors: (
+  "aws": #f79400,
+  "azure": #0089d6,
+  "gcp": #4cb050,
+  "linux": #334155,
+  "oracle": #c74634,
+  "other": #64748b,
+);
+
 // Từ mốc trở lên: @include up(lg) { ... }
 @mixin up($bp) {
   @media (min-width: map-get($breakpoints, $bp)) {

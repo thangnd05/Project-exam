@@ -40,7 +40,7 @@
     padding: 10px 20px;
     border-radius: 12px;
     font-weight: 700;
-    font-size: 1.4rem;
+    font-size: var(--font-size-ssm);
     transition: all 0.3s;
     border: none;
     background: transparent;
@@ -93,7 +93,7 @@
 
         th {
             padding: 20px;
-            font-size: 1.4rem;
+            font-size: var(--font-size-ssm);
             font-weight: 700;
             color: var(--text-secondary);
             text-transform: uppercase;
@@ -103,7 +103,7 @@
 
             @include down(sm) {
                 padding: 15px 12px;
-                font-size: 1.2rem;
+                font-size: var(--font-size-sm);
             }
         }
     }
@@ -130,7 +130,7 @@
 
             @include down(sm) {
                 padding: 15px 12px;
-                font-size: 1.4rem;
+                font-size: var(--font-size-ssm);
             }
         }
     }
@@ -139,11 +139,11 @@
 .word-main {
     font-weight: 800;
     color: var(--primary-text);
-    font-size: 1.8rem;
+    font-size: var(--font-size-lg);
     text-transform: capitalize;
 
     @include down(sm) {
-        font-size: 1.6rem;
+        font-size: var(--font-size-base);
     }
 }
 
@@ -168,7 +168,7 @@
 
     &:hover {
         background: var(--primary);
-        color: white;
+        color: var(--white);
         transform: scale(1.03);
     }
 }
@@ -263,12 +263,12 @@
         text-align: center;
 
         @include down(sm) {
-            font-size: 2rem;
+            font-size: var(--font-size-xl);
         }
     }
 
     .example {
-        font-size: 1.6rem;
+        font-size: var(--font-size-base);
         opacity: 0.9;
         text-align: center;
         font-style: italic;
@@ -288,7 +288,7 @@
     }
 
     .progress-text {
-        font-size: 1.6rem;
+        font-size: var(--font-size-base);
         font-weight: 700;
         color: var(--text-secondary);
     }
@@ -303,13 +303,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.4rem;
+    font-size: var(--font-size-2xl);
     color: var(--primary-text);
     transition: all 0.3s;
 
     &:hover:not(:disabled) {
         background: var(--primary);
-        color: white;
+        color: var(--white);
         transform: translateY(-2px);
     }
 
@@ -321,20 +321,7 @@
     @include down(sm) {
         width: 48px;
         height: 48px;
-        font-size: 2rem;
+        font-size: var(--font-size-xl);
     }
 }
 
-.loading-box {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 100px 0;
-
-    p {
-        margin-top: 20px;
-        color: var(--primary-text);
-        font-weight: 700;
-        font-size: 1.8rem;
-    }
-}

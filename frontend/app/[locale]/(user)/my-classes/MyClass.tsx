@@ -4,11 +4,9 @@ import { useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQueryClient } from '@tanstack/react-query';
-import { Spinner, Alert } from 'react-bootstrap';
+import { Alert } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import classNames from 'classnames/bind';
 
-import styles from './MyClass.module.scss';
 import routes from '@/app/configs/Routes';
 import ClassListContainer from './_components/ClassListContainer/ClassListContainer';
 import EditClassModal from './_components/EditClassModal';
@@ -19,8 +17,7 @@ import {
   useDeleteClass,
 } from '@/app/features/classes/hooks/useMyClasses';
 import type { ClassStudentResponse } from '@/app/types';
-
-const cx = classNames.bind(styles);
+import Loading from '@/app/components/Loading/Loading';
 
 const MyClasses = () => {
   const [selectedClass, setSelectedClass] = useState<ClassStudentResponse | null>(null);
@@ -88,10 +85,7 @@ const MyClasses = () => {
 
   if (loading) {
     return (
-      <div className={cx('loading-container')}>
-        <Spinner animation="grow" variant="primary" />
-        <p>{t('myClasses.loading')}</p>
-      </div>
+      <Loading label={t('myClasses.loading')} />
     );
   }
 

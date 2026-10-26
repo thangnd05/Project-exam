@@ -3,11 +3,11 @@
 import { useRouter } from '@/app/i18n/navigation';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Spinner, Container } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { motion, type Variants } from 'framer-motion';
-import { IoAddCircleOutline, IoFolderOpenOutline, IoGridOutline, IoListOutline, IoAdd } from "react-icons/io5";
+import { CirclePlus, FolderOpen, LayoutGrid, List, Plus } from "lucide-react";
 
 import styles from './MyAlbum.module.scss';
 
@@ -20,6 +20,7 @@ import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import AlbumManagementTable from './_components/AlbumManagementTable/AlbumManagementTable';
 import { useMyAlbums } from './_hooks/useAlbums';
 import type { VocabularyAlbumResponse } from '@/app/types';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -83,10 +84,7 @@ function MyAlbum() {
 
   if (loading)
     return (
-      <div className="d-flex flex-column justify-content-center align-items-center" style={{ minHeight: '60vh' }}>
-        <Spinner animation="grow" variant="primary" />
-        <p className="mt-3 fw-bold text-primary fs-4">{t('myAlbums.loading')}</p>
-      </div>
+      <Loading label={t('myAlbums.loading')} />
     );
 
   return (
@@ -97,15 +95,15 @@ function MyAlbum() {
           title={t('myAlbums.title')}
           label={t('myAlbums.label')}
           actionText={t('myAlbums.createAction')}
-          actionIcon={IoAdd}
+          actionIcon={Plus}
           onAction={() => setShowModal(true)}
         >
           <PageHeaderViewToggle
             activeKey={viewMode}
             onChange={setViewMode}
             options={[
-              { key: 'grid', title: t('myAlbums.gridView'), icon: IoGridOutline },
-              { key: 'table', title: t('myAlbums.listView'), icon: IoListOutline },
+              { key: 'grid', title: t('myAlbums.gridView'), icon: LayoutGrid },
+              { key: 'table', title: t('myAlbums.listView'), icon: List },
             ]}
           />
         </PageHeader>
@@ -119,12 +117,12 @@ function MyAlbum() {
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className={cx('empty-icon')}>
-                <IoFolderOpenOutline />
+                <FolderOpen size="1em" />
               </div>
               <h4>{t('myAlbums.emptyTitle')}</h4>
               <p>{t('myAlbums.emptyDescription')}</p>
               <button className={cx('btn-create-empty')} onClick={() => setShowModal(true)}>
-                <IoAddCircleOutline />
+                <CirclePlus size="1em" />
                 {t('myAlbums.createNow')}
               </button>
             </motion.div>

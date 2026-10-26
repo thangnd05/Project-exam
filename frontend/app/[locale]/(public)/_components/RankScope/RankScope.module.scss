@@ -56,7 +56,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .subtitle {
   margin: 2px 0 0;
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 500;
   color: var(--slate-500);
 }
@@ -68,9 +68,9 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   gap: 8px;
   padding: 8px 18px;
   border: 1px solid var(--slate-300);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: transparent;
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 600;
   color: var(--slate-700);
   cursor: pointer;
@@ -92,7 +92,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .refreshIcon {
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   color: var(--slate-500);
 }
 
@@ -107,7 +107,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .arrow {
-  font-size: 1.5rem;
+  font-size: var(--font-size-md);
   color: var(--slate-400);
   transition: transform 0.2s ease;
 }
@@ -134,7 +134,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   border: none;
   border-bottom: 2px solid transparent;
   background: none;
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 500;
   white-space: nowrap;
   color: var(--slate-500);
@@ -181,7 +181,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   padding-bottom: 10px;
   border-bottom: 1px solid rgb(var(--slate-200-rgb) / 0.8);
   background: rgb(var(--slate-50-rgb) / 0.9);
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -229,7 +229,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .rankNo {
   font-family: $mono;
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   font-weight: 500;
   text-align: center;
 }
@@ -252,14 +252,14 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   border: 1px solid;
   border-radius: 50%;
   font-family: $mono;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 700;
 }
 
 .personName {
   margin: 0;
   overflow: hidden;
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 700;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -276,7 +276,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .certName {
   overflow: hidden;
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   font-weight: 500;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -290,14 +290,14 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .scoreVal {
   font-family: $mono;
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   font-weight: 900;
   color: var(--slate-900);
 }
 
 .scoreMax {
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--slate-400);
 }
 
@@ -349,7 +349,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .skeleton {
   display: block;
   height: 14px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: linear-gradient(90deg, var(--slate-100) 0%, var(--slate-50) 50%, var(--slate-100) 100%);
   background-size: 200% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
@@ -368,7 +368,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .empty {
   padding: 48px 24px;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: var(--font-size-ssm);
   color: var(--slate-500);
 
   p {
@@ -377,7 +377,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 }
 
 .emptyTitle {
-  font-size: 1.6rem;
+  font-size: var(--font-size-base);
   font-weight: 700;
   color: var(--slate-900);
 }

@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { IoArrowBack, IoArrowForward } from 'react-icons/io5';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 
@@ -430,7 +430,7 @@ function ExamLayoutRenderer({
             onClick={goPrev}
             disabled={!canGoPrev}
           >
-            <IoArrowBack aria-hidden />
+            <ArrowLeft size="1em" aria-hidden />
             {t('prev')}
           </button>
         )}
@@ -444,7 +444,7 @@ function ExamLayoutRenderer({
         {showStepNav && !isLastStep && (
           <button type="button" className={cx('step-btn', 'step-btn-next')} onClick={goNext}>
             {t('next')}
-            <IoArrowForward aria-hidden />
+            <ArrowRight size="1em" aria-hidden />
           </button>
         )}
         {/* Câu cuối mà bố cục không có nút nộp bài: nút "Câu tiếp" thành "Nộp bài" như mẫu. */}

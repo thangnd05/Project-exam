@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
-import { IoPersonCircleOutline, IoCameraOutline } from 'react-icons/io5';
+import { CircleUser, Camera } from 'lucide-react';
 import { Spinner } from 'react-bootstrap';
 import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import CommonFormModal from '@/app/components/modal/CommonFormModal';
@@ -183,11 +183,11 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
             />
           ) : (
             <div className={cx('avatarPlaceholder')}>
-              <IoPersonCircleOutline size={64} color="#cbd5e1" />
+              <CircleUser size={64} color="#cbd5e1" />
             </div>
           )}
           <div className={cx('avatarOverlay')}>
-            <IoCameraOutline size={24} />
+            <Camera size={24} />
           </div>
         </div>
         <input

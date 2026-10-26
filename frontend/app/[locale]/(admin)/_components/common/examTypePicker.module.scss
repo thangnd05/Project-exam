@@ -1,13 +1,5 @@
 @import 'app/assets/styles/mixins.scss';
 
-// Cùng màu hãng với bộ lọc Kho đề thi (ExamCatalog) / ExamPillPicker.
-$vendor-colors: (
-  "aws": #f79400,
-  "azure": #0089d6,
-  "gcp": #4cb050,
-  "other": #64748b,
-);
-
 .picker {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
@@ -24,7 +16,7 @@ $vendor-colors: (
   display: inline-flex;
   align-items: center;
   min-height: 30px;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -44,7 +36,7 @@ $vendor-colors: (
   min-height: 30px;
   padding: 5px 14px;
   border: 1px solid var(--slate-300);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--bg-white);
   font-size: 1.25rem;
   font-weight: 600;

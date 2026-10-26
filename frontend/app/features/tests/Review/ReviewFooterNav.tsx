@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import { IoCheckmarkCircleOutline, IoCloseOutline, IoListOutline } from 'react-icons/io5';
+import { CircleCheck, X, List } from 'lucide-react';
 import styles from '@/app/assets/styles/ReviewFooter.module.scss';
 
 const cx = classNames.bind(styles);
@@ -37,7 +37,7 @@ function ReviewFooterNav({ items = [], correctCount = 0, onSelect }: ReviewFoote
         <div className={cx('footerPanel')}>
           <div className={cx('navCard')}>
             <div className={cx('navHeader')}>
-              <IoListOutline />
+              <List size="1em" />
               <span>{t('questionList')}</span>
             </div>
             <div className={cx('navGrid')}>
@@ -75,11 +75,11 @@ function ReviewFooterNav({ items = [], correctCount = 0, onSelect }: ReviewFoote
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
           >
-            {open ? <IoCloseOutline size={22} /> : <IoListOutline size={22} />}
+            {open ? <X size={22} /> : <List size={22} />}
             <span>{open ? t('hide') : t('showList')}</span>
           </button>
           <div className={cx('footerScore')}>
-            <IoCheckmarkCircleOutline aria-hidden />
+            <CircleCheck size="1em" aria-hidden />
             <span>
               {t('correctCount', { correct: correctCount, total: items.length })}
             </span>

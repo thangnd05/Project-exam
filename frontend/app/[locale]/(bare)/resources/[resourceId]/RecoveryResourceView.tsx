@@ -5,11 +5,11 @@ import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 import classNames from 'classnames/bind';
-import { Spinner } from 'react-bootstrap';
 import { Printer } from 'lucide-react';
 import routes from '@/app/configs/Routes';
 import { useRecoveryResourceView } from './_hooks/useRecoveryResourceView';
 import styles from './RecoveryResourceView.module.scss';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -38,10 +38,7 @@ function RecoveryResourceView() {
   if (loading) {
     return (
       <div id="recovery-resource-print-root" className={cx('wrapper')}>
-        <div className={cx('container', 'stateBox')}>
-          <Spinner animation="border" size="sm" />
-          <span>{t('view.loading')}</span>
-        </div>
+        <Loading label={t('view.loading')} />
       </div>
     );
   }

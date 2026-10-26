@@ -5,13 +5,7 @@ import { Spinner } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import {
-  IoAddOutline,
-  IoArrowBackOutline,
-  IoCreateOutline,
-  IoDocumentTextOutline,
-  IoTrashOutline,
-} from 'react-icons/io5';
+import { Plus, ArrowLeft, SquarePen, FileText, Trash2 } from 'lucide-react';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -128,7 +122,7 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
       {isEditor ? (
         <div className={cx('editor')}>
           <button type="button" className={cx('backBtn')} onClick={backToList}>
-            <IoArrowBackOutline />
+            <ArrowLeft size="1em" />
             {t('backToList')}
           </button>
 
@@ -156,7 +150,7 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
       ) : (
         <div className={cx('list')}>
           <button type="button" className={cx('newBtn')} onClick={() => openEditor(null)}>
-            <IoAddOutline />
+            <Plus size="1em" />
             {t('writeNew')}
           </button>
 
@@ -167,7 +161,7 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
             </div>
           ) : notes.length === 0 ? (
             <div className={cx('stateBox', 'empty')}>
-              <IoDocumentTextOutline className={cx('emptyIcon')} />
+              <FileText size="1em" className={cx('emptyIcon')} />
               <span>{t('empty')}</span>
             </div>
           ) : (
@@ -214,7 +208,7 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
                       title={t('editNote')}
                       onClick={() => openEditor(note)}
                     >
-                      <IoCreateOutline />
+                      <SquarePen size="1em" />
                     </button>
                     <button
                       type="button"
@@ -222,7 +216,7 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
                       title={t('deleteNote')}
                       onClick={() => setConfirmingId(note.noteId)}
                     >
-                      <IoTrashOutline />
+                      <Trash2 size="1em" />
                     </button>
                   </div>
                 )}

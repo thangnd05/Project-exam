@@ -5,7 +5,7 @@ import Link from '@/app/i18n/navigation';
 import {useTranslations} from 'next-intl';
 import {useQueryClient} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
-import {FiArrowRight, FiRefreshCw} from 'react-icons/fi';
+import { ArrowRight, RefreshCw } from 'lucide-react';
 
 import routes from '@/app/configs/Routes';
 import type {Vendor} from '@/app/[locale]/(public)/_lib/certificationMeta';
@@ -65,7 +65,7 @@ function RankScope() {
           <p>{t('emptyText')}</p>
           <Link href={routes.examTypes} className={cx('emptyLink')}>
             {t('emptyLink')}
-            <FiArrowRight aria-hidden="true" />
+            <ArrowRight size="1em" aria-hidden="true" />
           </Link>
         </div>
       );
@@ -111,7 +111,7 @@ function RankScope() {
               </p>
             </div>
             <button type="button" className={cx('outlineBtn')} onClick={refresh} disabled={isFetching}>
-              <FiRefreshCw key={spinKey} className={cx('refreshIcon', {spinning: spinKey > 0})} aria-hidden="true" />
+              <RefreshCw size="1em" key={spinKey} className={cx('refreshIcon', {spinning: spinKey > 0})} aria-hidden="true" />
               <span>{isFetching ? t('syncing') : t('refresh')}</span>
             </button>
           </div>
@@ -145,7 +145,7 @@ function RankScope() {
           <div className={cx('cardFoot')}>
             <button type="button" className={cx('outlineBtn')} onClick={() => setFullOpen(true)}>
               <span>{t('viewAll')}</span>
-              <FiArrowRight className={cx('arrow')} aria-hidden="true" />
+              <ArrowRight size="1em" className={cx('arrow')} aria-hidden="true" />
             </button>
           </div>
         </div>

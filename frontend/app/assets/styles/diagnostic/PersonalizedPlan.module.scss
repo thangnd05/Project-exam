@@ -224,7 +224,7 @@
   display: inline-flex;
   align-items: center;
   padding: 0.35rem 1rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   letter-spacing: 0.04em;
@@ -592,7 +592,7 @@
   background: linear-gradient(135deg, var(--success-bg), var(--bg-white));
 
   &:hover {
-    background: linear-gradient(135deg, #cdf3da, var(--bg-white));
+    background: linear-gradient(135deg, var(--success-200), var(--bg-white));
   }
 }
 
@@ -687,7 +687,7 @@
   gap: 0.4rem;
   flex-shrink: 0;
   padding: 0.4rem 1rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   background: var(--success-bg);
@@ -792,7 +792,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.3rem 1rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--bg-white);
   border: 1px solid var(--border-color);
   font-size: var(--font-size-xs);
@@ -810,7 +810,7 @@
 }
 
 .stageFlagEnd {
-  color: #fff;
+  color: var(--white);
   border-color: var(--primary);
   background: var(--primary);
   font-size: var(--font-size-sm);
@@ -959,7 +959,7 @@
   left: 50%;
   transform: translateX(-50%);
   padding: 0.25rem 0.85rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--brand-deeper);
   color: var(--white);
   font-size: var(--font-size-sm);
@@ -1072,7 +1072,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.25rem 0.9rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   border: 1px solid transparent;
@@ -1109,14 +1109,14 @@
 .meter {
   position: relative;
   height: 0.8rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--input-bg);
   overflow: hidden;
 }
 
 .meterFill {
   height: 100%;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--primary-gradient);
   transition: width 0.6s ease;
 }
@@ -1521,7 +1521,7 @@
 .planHeroBadge {
   font-size: var(--font-size-sm);
   padding: 0.3rem 0.9rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--on-hero-soft);
   border: 1px solid var(--on-hero-border);
   color: var(--on-hero-muted);
@@ -1581,14 +1581,14 @@
 
 .planHeroProgressBar {
   height: 1rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--on-hero-track);
   overflow: hidden;
 }
 
 .planHeroProgressFill {
   height: 100%;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--on-hero);
   transition: width 0.6s ease;
 }

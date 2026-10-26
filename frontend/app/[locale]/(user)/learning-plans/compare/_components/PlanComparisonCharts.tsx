@@ -31,10 +31,10 @@ export type PlanComparisonChartRow = {
 const cx = classNames.bind(styles);
 
 const COLOR_ACTIVE = brandColors.primary;
-const COLOR_COMPLETED = '#10b981';
-const COLOR_REPLACED = '#94a3b8';
-const COLOR_ABANDONED = '#ef4444';
-const COLOR_DEFAULT = '#64748b';
+const COLOR_COMPLETED = 'var(--green-500)';
+const COLOR_REPLACED = 'var(--slate-400)';
+const COLOR_ABANDONED = 'var(--red-500)';
+const COLOR_DEFAULT = 'var(--slate-500)';
 
 function barColor(status?: string) {
   if (status === 'ACTIVE') return COLOR_ACTIVE;
@@ -162,15 +162,15 @@ function PlanComparisonCharts({ chartData, examTypeName }: PlanComparisonChartsP
               data={chartData}
               margin={{ top: 16, right: 16, left: 8, bottom: 8 }}
             >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--slate-200)" />
               <XAxis
                 dataKey="label"
-                tick={{ fontSize: 12, fill: '#64748b' }}
+                tick={{ fontSize: 12, fill: 'var(--slate-500)' }}
                 tickLine={false}
               />
               <YAxis
                 domain={[0, Math.max(100, maxReadiness + 10)]}
-                tick={{ fontSize: 12, fill: '#64748b' }}
+                tick={{ fontSize: 12, fill: 'var(--slate-500)' }}
                 tickLine={false}
                 axisLine={false}
                 unit="%"

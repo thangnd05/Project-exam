@@ -101,6 +101,7 @@
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 20px;
+  --radius-pill: 999px;
 
   --brand-deep-rgb: 125 103 44;
   --brand-deeper-rgb: 63 52 32;
@@ -218,6 +219,32 @@
   --exam-ink-rgb: 10 37 64;
   --exam-ink: rgb(var(--exam-ink-rgb));
   --exam-ink-deep: rgb(0 24 46);
+}
+
+// Màu cố định, không đổi theo theme/palette: ô xem trước bảng màu và màu coin/streak của gamification.
+@mixin fixed-constants {
+  --swatch-gold: rgb(201 168 75);
+  --swatch-frost: rgb(var(--frost-ice-rgb));
+  --coin-gradient: linear-gradient(135deg, #ffd43b 0%, #fab005 100%);
+  --coin-gradient-strong: linear-gradient(135deg, #fab005 0%, #f08c00 100%);
+  --coin-text: #e8590c;
+  --coin-glow-rgb: 250 176 5;
+  --streak: #ff922b;
+  --streak-rgb: 255 146 43;
+  --streak-gradient: linear-gradient(135deg, #ffa94d 0%, #ff922b 100%);
+  --streak-gradient-hover: linear-gradient(135deg, #ff9c33 0%, #f97c12 100%);
+}
+
+// Thang z-index cho lớp nổi toàn trang. Thứ tự: header < thanh dưới < modal < tooltip/popover < toast,
+// để toast và tooltip (render ra body) không bị lớp nền modal che. z-index cục bộ trong component giữ số nhỏ.
+@mixin layers {
+  --z-header: 1000;
+  --z-floating: 1000;
+  --z-bottom-nav: 1040;
+  --z-bottom-sheet: 1080;
+  --z-modal: 10001;
+  --z-popover: 10050;
+  --z-toast: 10100;
 }
 
 @mixin palette-frost-light {
@@ -518,6 +545,8 @@
   @include palette-light-raw;
   @include theme-tokens;
   @include frost-constants;
+  @include fixed-constants;
+  @include layers;
 }
 
 :root[data-palette='frost'] {

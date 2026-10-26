@@ -48,9 +48,9 @@ const LocationsMap = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
 
     const fill = (name?: string) => {
         const v = counts[norm(name)];
-        if (!v) return '#e9eef5';
+        if (!v) return 'var(--slate-100)';
         const alpha = 0.25 + 0.75 * (v / max);
-        return `rgba(201, 168, 75, ${alpha})`;
+        return `rgb(var(--brand-500-rgb) / ${alpha})`;
     };
 
     return (
@@ -71,7 +71,7 @@ const LocationsMap = ({ countries = [] }: { countries?: CountryTraffic[] }) => {
                                     key={geo.rsmKey}
                                     geography={geo}
                                     fill={fill(name)}
-                                    stroke="#ffffff"
+                                    stroke="var(--bg-white)"
                                     strokeWidth={0.4}
                                     onMouseEnter={() => setHover({ name, v })}
                                     onMouseLeave={() => setHover(null)}

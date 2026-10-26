@@ -5,7 +5,7 @@
   width: 36px;
   height: 36px;
   flex-shrink: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid rgb(var(--brand-200-rgb) / 0.22);
   background: rgb(var(--brand-200-rgb) / 0.08);
   color: var(--text-on-dark);
@@ -39,7 +39,7 @@
 .label {
   margin: 0;
   padding: 6px 12px 4px;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -63,14 +63,14 @@
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 2px solid currentColor;
 }
 
 .swatch-frost {
-  background: rgb(119 187 221);
+  background: var(--swatch-frost);
 }
 
 .swatch-gold {
-  background: rgb(201 168 75);
+  background: var(--swatch-gold);
 }

@@ -109,7 +109,7 @@
 
   &.root {
     font-weight: 700;
-    font-size: 1.6rem;
+    font-size: var(--font-size-base);
     color: var(--slate-800);
   }
 
@@ -120,7 +120,7 @@
 }
 
 .sortOrder {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--gray-500);
   background: var(--brand-50);
@@ -135,7 +135,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--green-600);
   background: var(--green-50);
   padding: 0.1rem 0.7rem;
@@ -149,7 +149,7 @@
 }
 
 .childCount {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--gray-400);
   background: var(--gray-100);
   padding: 0.1rem 0.7rem;

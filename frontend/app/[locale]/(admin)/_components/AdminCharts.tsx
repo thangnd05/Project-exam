@@ -21,10 +21,10 @@ const brand = brandColors;
 
 type ChartTooltipProps = Partial<TooltipContentProps<number, string>>;
 
-const VIZ = { primary: brand.accent, muted: '#94a3b8' };
+const VIZ = { primary: brand.accent, muted: 'var(--slate-400)' };
 
-const AXIS_TICK = { fill: '#64748b', fontSize: 12 };
-const GRID_STROKE = '#e2e8f0';
+const AXIS_TICK = { fill: 'var(--slate-500)', fontSize: 12 };
+const GRID_STROKE = 'var(--slate-200)';
 
 // Width/height đều là % nên lần render đầu (trước khi ResizeObserver đo) recharts nhận -1×-1 và cảnh báo.
 // Kích thước giả 1×1 chỉ để qua lần render đó; ngay sau đó container được đo lại kích thước thật.
@@ -83,7 +83,7 @@ const MonthlyActivityTooltip = ({ active, payload, label }: ChartTooltipProps) =
             <div style={TOOLTIP_STYLE.labelStyle}>{label}</div>
             <div>{t.rich('tooltipVisits', { value: row.visits ?? 0, strong: (chunks) => <strong>{chunks}</strong> })}</div>
             <div>{t.rich('tooltipAttempts', { value: row.tests ?? 0, strong: (chunks) => <strong>{chunks}</strong> })}</div>
-            <div style={{ color: '#64748b', marginTop: 2 }}>
+            <div style={{ color: 'var(--slate-500)', marginTop: 2 }}>
                 {hasPeak ? t('peakHour', { hour: String(peak).padStart(2, '0') }) : t('noVisits')}
             </div>
         </div>

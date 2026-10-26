@@ -17,6 +17,7 @@ import {
 } from '@/app/[locale]/(admin)/_hooks/useDashboardStats';
 
 import styles from './Analytics.module.scss';
+import Loading from '@/app/components/Loading/Loading';
 
 const cx = classNames.bind(styles);
 
@@ -122,10 +123,7 @@ const Analytics = () => {
             />
 
             {isLoading ? (
-                <div className={cx('loadingState')}>
-                    <Spinner animation="border" variant="primary" />
-                    <span>{tStats('loading')}</span>
-                </div>
+                <Loading label={tStats('loading')} />
             ) : isError ? (
                 <div className={cx('loadingState')}>
                     <span>{tStats('loadError')}</span>

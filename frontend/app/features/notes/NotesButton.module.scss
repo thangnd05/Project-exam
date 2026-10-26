@@ -24,7 +24,7 @@ $scroll-bottom-mobile: 72px;
   cursor: pointer;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.18);
   opacity: 0.95;
-  z-index: 1000;
+  z-index: var(--z-floating);
   transition:
     background 0.25s ease,
     color 0.25s ease,

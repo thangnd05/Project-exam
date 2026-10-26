@@ -16,7 +16,7 @@
 
   :global(.ql-editor) {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.5rem;
+    font-size: var(--font-size-md);
   }
 
   :global(.ql-snow .ql-tooltip) {

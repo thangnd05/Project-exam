@@ -24,20 +24,20 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .chartCardTitle {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
   font-weight: 700;
   color: var(--slate-900);
 }
 
 .chartCardMeta {
   font-family: $mono;
-  font-size: 1.1rem;
+  font-size: var(--font-size-xs2);
   color: var(--slate-500);
 }
 
 .chartCardDesc {
   margin: 0 0 12px;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   color: var(--slate-500);
 }
@@ -49,7 +49,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .chartLoading,
 .chartLoadingInline {
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   color: var(--slate-500);
 }
 
@@ -77,7 +77,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   border-radius: 10px;
   background: var(--bg-white);
   box-shadow: 0 4px 14px rgb(0 0 0 / 0.08);
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
   color: var(--slate-700);
 
@@ -123,7 +123,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 1.3rem;
+  font-size: var(--font-size-smd);
 
   th {
     padding: 10px 14px;
@@ -161,7 +161,7 @@ $mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
 
 .mono {
   font-family: $mono;
-  font-size: 1.2rem;
+  font-size: var(--font-size-sm);
 }
 
 .dim {

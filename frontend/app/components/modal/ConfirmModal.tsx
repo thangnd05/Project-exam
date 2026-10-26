@@ -3,7 +3,7 @@
 import { useMounted } from '@/app/hooks/useMounted';
 import ReactDOM from 'react-dom';
 import { useTranslations } from 'next-intl';
-import { IoClose, IoWarningOutline } from 'react-icons/io5';
+import { X, TriangleAlert, type LucideIcon } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from './ConfirmModal.module.scss';
 
@@ -15,7 +15,7 @@ type ConfirmModalProps = {
     onConfirm?: () => void;
     title?: string;
     message?: React.ReactNode;
-    icon?: React.ElementType;
+    icon?: LucideIcon;
     variant?: string;
     confirmText?: string;
     cancelText?: string;
@@ -27,7 +27,7 @@ const ConfirmModal = ({
     onConfirm,
     title,
     message = '',
-    icon: Icon = IoWarningOutline,
+    icon: Icon = TriangleAlert,
     variant = 'primary',
     confirmText,
     cancelText,
@@ -45,12 +45,12 @@ const ConfirmModal = ({
                         <h3 className={cx('title')}>{title ?? t('confirm')}</h3>
                     </div>
                     <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label={t('close')}>
-                        <IoClose />
+                        <X size="1em" />
                     </button>
                 </div>
                 <div className={cx('body')}>
                     <div className={cx('iconCircle', variant)}>
-                        <Icon />
+                        <Icon size="1em" />
                     </div>
                     <p className={cx('message')}>{message}</p>
                 </div>
