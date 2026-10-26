@@ -11,6 +11,7 @@ import { useTaskHistory } from './_hooks/useTaskHistory';
 import { taskDisplayName, taskStatusLabel } from '@/app/features/learning-plans/planLabels';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { SessionStatus } from '@/app/enums';
+import PageHeader from '@/app/components/PageHeader/PageHeader';
 
 const cx = classNames.bind(styles);
 
@@ -78,28 +79,31 @@ function TaskHistory() {
         >
           ← {t('common.planName', { sequence: plan.planSequence ?? '?' })}
         </Link>
+      </div>
+
+      <PageHeader
+        title={t('common.taskTitle', {
+          part: task.examPartName || t('common.partFallback'),
+          task: taskDisplayName(t, task),
+        })}
+        meta={
+          <div className={cx('actionBar', 'mt-2')}>
+            <span className={cx('badge', 'badgeMuted')}>
+              {t('history.status', { status: taskStatusLabel(t, task.status) })}
+            </span>
+            <span className={cx('badge', 'badgeMuted')}>
+              {t('history.passNeeded', { pass: pass != null ? `${pass}%` : '-' })}
+            </span>
+          </div>
+        }
+      >
         <Link
           href={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}
           className={cx('btn', 'btnPrimary', 'btnSm')}
         >
           {t('history.continueTask')}
         </Link>
-      </div>
-
-      <h2 className={cx('title')}>
-        {t('common.taskTitle', {
-          part: task.examPartName || t('common.partFallback'),
-          task: taskDisplayName(t, task),
-        })}
-      </h2>
-      <div className={cx('actionBar')} style={{ marginBottom: '2rem' }}>
-        <span className={cx('badge', 'badgeMuted')}>
-          {t('history.status', { status: taskStatusLabel(t, task.status) })}
-        </span>
-        <span className={cx('badge', 'badgeMuted')}>
-          {t('history.passNeeded', { pass: pass != null ? `${pass}%` : '-' })}
-        </span>
-      </div>
+      </PageHeader>
 
       <div className={cx('statGrid')}>
         <div className={cx('statTile')}>

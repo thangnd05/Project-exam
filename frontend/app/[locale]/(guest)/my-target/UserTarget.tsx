@@ -26,6 +26,7 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { buildLoginUrl } from '@/app/features/auth/authRedirect';
 import type { MilestoneResponse } from '@/app/types';
 import { useCurrentUserTarget, useUserTargetData } from './_hooks/useUserTargetData';
+import PageHeader from '@/app/components/PageHeader/PageHeader';
 import {
   useSaveUserTarget,
   useDeleteUserTarget,
@@ -367,12 +368,7 @@ function UserTarget() {
   return (
     <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
       <TargetPlanTabs active="target" examTypeId={selectedExamTypeId} examTypes={examTypes} />
-      <header className={ui('pageHead')}>
-        <h1 className={ui('pageTitle')}>{t('setTarget.title')}</h1>
-        <p className={ui('pageSubtitle')}>
-          {t('setTarget.subtitle')}
-        </p>
-      </header>
+      <PageHeader title={t('setTarget.title')} description={t('setTarget.subtitle')} />
 
       <ExamPillPicker
         className={ui('pickerRow')}

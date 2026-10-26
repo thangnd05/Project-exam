@@ -12,6 +12,7 @@ import ProfileSectionModal from '@/app/features/posts/ProfileSectionModal/Profil
 import styles from './ProfileOverview.module.scss';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import EmptyState from '@/app/components/EmptyState/EmptyState';
+import PageHeader from '@/app/components/PageHeader/PageHeader';
 import routes from '@/app/configs/Routes';
 import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import { useCosmetics } from '@/app/features/gamification/cosmetic/hooks/useCosmetics';
@@ -120,14 +121,7 @@ function ProfileOverview() {
   return (
     <div className={cx('wrapper')}>
       <div className={cx('container')}>
-        <header className={cx('header')}>
-          <h1 className={cx('title')}>
-            {t('profile.title')}
-          </h1>
-          <p className={cx('subtitle')}>
-            {t('profile.subtitle')}
-          </p>
-        </header>
+        <PageHeader title={t('profile.title')} description={t('profile.subtitle')} />
 
         {errorMessage && (
           <EmptyState

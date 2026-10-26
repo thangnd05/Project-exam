@@ -16,6 +16,7 @@ import { planStageLabel, planStatusLabel, planStatusVariant } from '@/app/featur
 import pageStyles from './PlanComparison.module.scss';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { LearningPlanStatus } from '@/app/enums';
+import PageHeader from '@/app/components/PageHeader/PageHeader';
 
 const cx = classNames.bind(styles);
 const pageCx = classNames.bind(pageStyles);
@@ -75,9 +76,7 @@ function PlanComparison() {
   return (
     <div className={cx('wrapper')}>
       <TargetPlanTabs active="compare" examTypeId={examTypeId} examTypes={examTypes} />
-      <div className={cx('headerBar')}>
-        <h2 className={cx('title')}>{t('compare.title')}</h2>
-      </div>
+      <PageHeader title={t('compare.title')} />
 
       <div className={cx('filterRow')}>
         <div className={cx('fieldGroup')}>

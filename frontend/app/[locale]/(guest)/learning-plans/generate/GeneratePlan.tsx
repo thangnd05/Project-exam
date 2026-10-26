@@ -24,6 +24,7 @@ import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.s
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './GeneratePlan.module.scss';
 import type { PlanResponse } from '@/app/types';
+import PageHeader from '@/app/components/PageHeader/PageHeader';
 import {
   useActivePlan,
   useCompletedUserTests,
@@ -321,12 +322,7 @@ function GeneratePlan() {
   return (
     <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
       <TargetPlanTabs active="plan" examTypeId={sourceExamTypeId} examTypes={examTypes} />
-      <header className={ui('pageHead')}>
-        <h1 className={ui('pageTitle')}>{t('generate.title')}</h1>
-        <p className={ui('pageSubtitle')}>
-          {t('generate.subtitle')}
-        </p>
-      </header>
+      <PageHeader title={t('generate.title')} description={t('generate.subtitle')} />
 
       <ExamPillPicker
         className={ui('pickerRow')}

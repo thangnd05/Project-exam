@@ -99,6 +99,7 @@ mà không tự biến thành URL.
 | Lớp nổi | Header, thanh dưới, nút nổi, modal dùng `var(--z-*)` trong GlobalStyles; toast/tooltip luôn trên modal |
 | Font | Chỉ 3 token: `--font-family` (Inter, giao diện), `--font-mono` (JetBrains Mono, mã/nhãn kỹ thuật), `--font-serif` (Playfair, chứng chỉ và tiêu đề bài viết); không khai font-family literal |
 | Ngày giờ / số | Chỉ dùng `app/utils/format-date-time.ts` (`formatDate`, `formatDateTime`, `formatFullDateTime` cho audit, `formatLongDate` cho bài viết/tiêu đề) và `formatNumber.ts`; không gọi `toLocale*String` trực tiếp |
+| Tiêu đề trang | Trang người dùng dùng `<PageHeader />` (mặc định kiểu phẳng FrostScope); dải gradient `variant="band"` chỉ cho admin qua `AdminPageHeader` |
 | Rỗng / lỗi tải | Vùng nội dung chính dùng `<EmptyState />` (`tone="danger"` khi lỗi tải); xác nhận thao tác dùng `ConfirmModal`, không dùng `window.confirm` |
 | Icon / loading | Chỉ dùng `lucide-react`; tải cả trang/khu vực dùng `<Loading />`, `Spinner` chỉ cho nút hoặc dòng nhỏ |
 | Server state | TanStack Query, `queryFn` gọi hàm trong `app/apis/`, không dùng `useEffect` + `useState` để fetch |

@@ -10,23 +10,6 @@
   margin: 0 auto;
 }
 
-.header {
-  margin-bottom: 24px;
-}
-
-.title {
-  margin: 0 0 6px 0;
-  font-size: var(--font-size-2xl);
-  font-weight: 800;
-  color: var(--dark-color);
-}
-
-.subtitle {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: 1.45rem;
-}
-
 .dashboardGrid {
   display: grid;
   grid-template-columns: 320px 1fr;
@@ -424,9 +407,5 @@
 
   .chartsRow {
     grid-template-columns: 1fr;
-  }
-
-  .title {
-    font-size: var(--font-size-xl);
   }
 }

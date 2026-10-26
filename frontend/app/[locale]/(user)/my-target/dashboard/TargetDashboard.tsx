@@ -26,6 +26,7 @@ import { LearningPlanStatus } from '@/app/enums';
 import pageStyles from './TargetDashboard.module.scss';
 import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
+import PageHeader from '@/app/components/PageHeader/PageHeader';
 
 const planCx = classNamesBind.bind(planStyles);
 const pageCx = classNamesBind.bind(pageStyles);
@@ -120,12 +121,7 @@ function TargetDashboard() {
   return (
     <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
       <TargetPlanTabs active="overview" examTypeId={examTypeId} examTypes={examTypes} />
-      <header className={ui('pageHead')}>
-        <h1 className={ui('pageTitle')}>{t('dashboard.title')}</h1>
-        <p className={ui('pageSubtitle')}>
-          {t('dashboard.subtitle')}
-        </p>
-      </header>
+      <PageHeader title={t('dashboard.title')} description={t('dashboard.subtitle')} />
 
       <ExamPillPicker
         className={ui('pickerRow')}

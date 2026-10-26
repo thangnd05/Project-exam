@@ -21,6 +21,9 @@ type PageHeaderProps = {
   meta?: React.ReactNode;
   footer?: React.ReactNode;
   compact?: boolean;
+  // flat: đầu trang phẳng kiểu FrostScope (mặc định cho trang người dùng, cùng khuôn Kho đề thi / Mục tiêu).
+  // band: dải gradient brand, chỉ khu admin dùng (qua AdminPageHeader).
+  variant?: 'flat' | 'band';
   children?: React.ReactNode;
 };
 
@@ -40,10 +43,21 @@ const PageHeader = ({
   meta,
   footer,
   compact = false,
+  variant = 'flat',
   children,
 }: PageHeaderProps) => {
+  const band = variant === 'band';
+  // Kiểu phẳng không gắn icon trang trí vào nút hành động.
+  const showIcons = band;
+
   return (
-    <div className={cx('headerHero', 'theme-locked', { hasFooter: Boolean(footer), compact }, className)}>
+    <header
+      className={cx(
+        band ? 'headerHero' : 'flatHead',
+        { 'theme-locked': band, hasFooter: Boolean(footer), compact },
+        className,
+      )}
+    >
       <div className={cx('heroMain')}>
         <div className={cx('heroContent')}>
           {label && <span className={cx('label', labelClassName)}>{label}</span>}
@@ -53,25 +67,27 @@ const PageHeader = ({
           {meta}
         </div>
 
-        <div className={cx('actions-wrapper')}>
-          {onAction && actionText && (
-            <button className={cx('actionBtn')} onClick={onAction}>
-              {Icon && <Icon size={24} />}
-              {actionText}
-            </button>
-          )}
-          {onSecondaryAction && secondaryActionText && (
-            <button className={cx('actionBtn', 'secondary')} onClick={onSecondaryAction}>
-              {SecondaryIcon && <SecondaryIcon size={24} />}
-              {secondaryActionText}
-            </button>
-          )}
-          {children}
-        </div>
+        {(onAction || onSecondaryAction || children) && (
+          <div className={cx('actions-wrapper')}>
+            {onAction && actionText && (
+              <button type="button" className={cx('actionBtn')} onClick={onAction}>
+                {showIcons && Icon && <Icon size={24} />}
+                {actionText}
+              </button>
+            )}
+            {onSecondaryAction && secondaryActionText && (
+              <button type="button" className={cx('actionBtn', 'secondary')} onClick={onSecondaryAction}>
+                {showIcons && SecondaryIcon && <SecondaryIcon size={24} />}
+                {secondaryActionText}
+              </button>
+            )}
+            {children}
+          </div>
+        )}
       </div>
 
       {footer && <div className={cx('heroFooter')}>{footer}</div>}
-    </div>
+    </header>
   );
 };
 
