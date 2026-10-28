@@ -1,6 +1,6 @@
 'use client';
 
-import {useMemo} from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import Image from 'next/image';
 import {useQuery} from '@tanstack/react-query';
 import Link, { useLocalizeHref, useRouter } from '@/app/i18n/navigation';
@@ -26,6 +26,14 @@ import styles from './CertificationOrbit.module.scss';
 const cx = classNames.bind(styles);
 
 const SLOTS_PER_ORBIT = 6;
+
+// Tự tính tỉ lệ cụm quỹ đạo theo đúng bản thiết kế FrostScope (fitOrbitalSystem):
+// kích thước chuẩn ~815px (vòng ngoài 750px + huy hiệu), chừa ~95px cho header nổi + lề dưới, 16px lề mỗi bên.
+const ORBIT_FIT_SIZE = 815;
+const ORBIT_MAX_SCALE = 0.88;
+const ORBIT_RESERVED_HEIGHT = 95;
+const ORBIT_RESERVED_WIDTH = 32;
+const ORBIT_MIN_USABLE = 280;
 
 type Badge = {src: string; label: string; href?: string};
 
@@ -132,12 +140,32 @@ function CertificationOrbit() {
     [available],
   );
 
+  // Các mốc --scale trong SCSS chỉ là giá trị dự phòng trước khi đo; đo xong ghi đè bằng style inline.
+  const sectionRef = useRef<HTMLElement>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const section = sectionRef.current;
+    const canvas = canvasRef.current;
+    if (!section || !canvas) return undefined;
+
+    const fit = () => {
+      const usableHeight = Math.max(ORBIT_MIN_USABLE, section.clientHeight - ORBIT_RESERVED_HEIGHT);
+      const usableWidth = Math.max(ORBIT_MIN_USABLE, section.clientWidth - ORBIT_RESERVED_WIDTH);
+      const scale = Math.min(usableHeight / ORBIT_FIT_SIZE, usableWidth / ORBIT_FIT_SIZE, ORBIT_MAX_SCALE);
+      canvas.style.setProperty('--scale', scale.toFixed(3));
+    };
+
+    fit();
+    window.addEventListener('resize', fit, {passive: true});
+    return () => window.removeEventListener('resize', fit);
+  }, []);
+
   return (
-    <section id="certifications" className={cx('section', 'theme-locked')}>
+    <section ref={sectionRef} id="certifications" className={cx('section', 'theme-locked')}>
       <div className={cx('ambient')} aria-hidden="true" />
 
       <div className={cx('system')}>
-        <div className={cx('canvas')}>
+        <div ref={canvasRef} className={cx('canvas')}>
           <div className={cx('core')}>
             <div className={cx('coreHalo')} aria-hidden="true" />
             <h2 className={cx('title')}>{t('title')}</h2>
@@ -145,10 +173,10 @@ function CertificationOrbit() {
               {t('lede')}
             </p>
             <div className={cx('actions')}>
-              <ButtonPrime onClick={openQuick}>
+              <ButtonPrime size="sm" className={cx('cta')} onClick={openQuick}>
                 {t('practiceNow')}
               </ButtonPrime>
-              <ButtonPrime variant="onDark" onClick={() => router.push(localizeHref(routes.learningPlans))}>
+              <ButtonPrime size="sm" variant="onDark" className={cx('cta')} onClick={() => router.push(localizeHref(routes.learningPlans))}>
                 {t('buildPlan')}
               </ButtonPrime>
             </div>
