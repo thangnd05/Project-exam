@@ -101,6 +101,8 @@
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
   --radius-xl: 20px;
+  // Bo góc chung cho thẻ, khung trống, skeleton trên các trang (theo rounded-2xl của bản thiết kế FrostScope).
+  --radius-card: 16px;
   --radius-pill: 999px;
 
   --brand-deep-rgb: 125 103 44;

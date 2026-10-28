@@ -47,7 +47,7 @@
 .chartCard {
   background: var(--bg-white);
   border: 1px solid var(--slate-300);
-  border-radius: 8px;
+  border-radius: var(--radius-card);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
   padding: 1.2rem 1.4rem 1.4rem;
   margin-bottom: 1.6rem;

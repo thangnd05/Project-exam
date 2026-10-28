@@ -50,7 +50,7 @@
 .head {
   margin-bottom: 24px;
   border: 1px solid var(--slate-200);
-  border-radius: 16px;
+  border-radius: var(--radius-card);
   background: var(--bg-white);
   overflow: hidden;
 }
@@ -157,7 +157,7 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   margin-bottom: 24px;
   border: 1px solid var(--slate-200);
-  border-radius: 16px;
+  border-radius: var(--radius-card);
   background: var(--bg-white);
   overflow: hidden;
 
@@ -257,7 +257,7 @@
 .tableWrap {
   overflow-x: auto;
   border: 1px solid var(--slate-200);
-  border-radius: 16px;
+  border-radius: var(--radius-card);
   background: var(--bg-white);
 }
 
@@ -382,7 +382,7 @@
   margin-bottom: 24px;
   padding: 18px 24px;
   border: 1px solid rgb(var(--brand-700-rgb) / 0.3);
-  border-radius: 16px;
+  border-radius: var(--radius-card);
   background: rgb(var(--brand-700-rgb) / 0.05);
 }
 
@@ -456,7 +456,7 @@
   padding: 18px 20px;
   border: 1px solid var(--slate-200);
   border-top: 3px solid var(--medal);
-  border-radius: 16px;
+  border-radius: var(--radius-card);
   background: var(--bg-white);
 
   &.mine {
@@ -519,7 +519,7 @@
   height: 96px;
   margin-bottom: 24px;
   border: 1px solid var(--slate-200);
-  border-radius: 16px;
+  border-radius: var(--radius-card);
   background: linear-gradient(90deg, var(--slate-100) 0%, var(--bg-white) 45%, var(--slate-100) 100%);
   background-size: 180% 100%;
   animation: shimmer 1.4s ease-in-out infinite;
