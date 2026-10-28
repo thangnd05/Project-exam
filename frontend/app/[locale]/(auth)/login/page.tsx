@@ -10,6 +10,9 @@ export async function generateMetadata({ params }: PageProps<'/[locale]/login'>)
   return {
     title: t('meta.loginTitle'),
     description: t('meta.loginDescription'),
+    // Không đưa vào kết quả tìm kiếm nhưng vẫn cho đi theo link. robots.txt không được chặn trang này,
+    // nếu không Googlebot không đọc được chỉ thị noindex.
+    robots: { index: false, follow: true },
   };
 }
 

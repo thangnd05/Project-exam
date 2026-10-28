@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "About",
-    "description": "The story and mission of {siteName}."
+    "title": "About {siteName} | Personalized cloud certification exam prep platform",
+    "description": "Learn about {siteName}, the platform that helps learners assess their skills, identify knowledge gaps and build a cloud certification study plan."
   },
   "title": "About the {siteShortName} system",
   "intro": "Hello! Welcome to <strong>{siteShortName}</strong>, a modern online learning and testing platform built to help teachers and students create, take, and manage exams quickly, conveniently, and effectively.",

@@ -3,6 +3,9 @@
     "title": "Resources",
     "description": "Exam prep resources on {siteShortName}, organized by exam."
   },
+  "detailMeta": {
+    "title": "Resource"
+  },
   "library": {
     "pageTitle": "Resource library",
     "searchLabel": "Search resources",

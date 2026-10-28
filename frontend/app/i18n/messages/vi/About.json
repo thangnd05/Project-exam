@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Giới thiệu",
-    "description": "Câu chuyện và sứ mệnh của {siteName}."
+    "title": "Giới thiệu {siteName} | Nền tảng luyện thi chứng chỉ Cloud cá nhân hóa",
+    "description": "Tìm hiểu {siteName}, nền tảng giúp người học đánh giá năng lực, nhận diện lỗ hổng kiến thức và xây dựng lộ trình ôn thi chứng chỉ cloud."
   },
   "title": "Giới thiệu về hệ thống {siteShortName}",
   "intro": "Xin chào! Chào mừng bạn đến với <strong>{siteShortName}</strong>  nền tảng học tập và kiểm tra trực tuyến hiện đại, được xây dựng để hỗ trợ giáo viên và học sinh trong việc tạo, tham gia và quản lý bài thi một cách nhanh chóng, thuận tiện và hiệu quả.",

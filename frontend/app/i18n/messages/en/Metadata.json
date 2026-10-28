@@ -1,5 +1,22 @@
 {
-  "title": "{siteName} - Online certification exam prep & practice tests",
-  "description": "Online certification exam prep and practice tests: questions that match the real exam format, automatic scoring, weak-spot diagnosis and a personalized study plan.",
-  "noscript": "You need to enable JavaScript to use this app."
+  "title": "{siteName} | Personalized cloud certification exam prep platform",
+  "description": "Prepare for Cloud, DevOps and Kubernetes certifications with {siteName}. Assess your skills, pinpoint your weak spots and study with a personalized learning path.",
+  "noscript": "You need to enable JavaScript to use this app.",
+  "private": {
+    "dashboard": "Dashboard",
+    "goals": "Goals",
+    "goalDetail": "Goal details",
+    "goalsAchieved": "Achieved goals",
+    "planCompare": "Compare learning paths",
+    "planDetail": "Learning path details",
+    "taskHistory": "Task history",
+    "mockAttempts": "Mock exam history",
+    "certificates": "My certificates",
+    "mockTake": "Take mock exam",
+    "attemptResult": "Exam result",
+    "attemptReview": "Review exam",
+    "learningPaths": "Learning paths",
+    "planCreate": "Create learning path",
+    "goalNew": "Set a goal"
+  }
 }

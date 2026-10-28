@@ -1,11 +1,34 @@
 {
   "meta": {
-    "title": "Exam Library",
-    "description": "Cloud certification practice exams on {siteShortName}: filter by vendor and level, take a quick test or a full-length mock that mirrors the real exam."
+    "title": "Cloud certification exams",
+    "description": "Explore AWS, Azure and Google Cloud certification exams. Choose your target exam, assess your skills and build a study plan with {siteName}."
   },
   "detailMeta": {
-    "title": "{name} Practice Exams",
-    "description": "{name} practice exams: take them online, get instant scoring and review detailed answer explanations."
+    "title": "{name}",
+    "description": "Learn about the {name} exam: knowledge areas, exam structure and how to prepare. Assess your skills and get ready for the certification with {siteName}.",
+    "bySlug": {
+      "saa-c03": "Learn about the AWS SAA-C03 exam: knowledge areas, exam structure and how to prepare. Assess your skills and get ready for the certification with {siteName}.",
+      "az-104": "Explore the AZ-104 Microsoft Azure Administrator exam: what it covers, the skills to prepare and how to build a personalized study plan on {siteName}.",
+      "associate-cloud-engineer": "Learn about the Google Cloud Associate Cloud Engineer exam, what you need to know, the exam structure and a study plan that matches your skills."
+    }
+  },
+  "groupMeta": {
+    "title": "{name} certification exams",
+    "description": "Explore {name} certification exams by level and role. Choose the right exam, test your knowledge and build a personalized study plan.",
+    "bySlug": {
+      "aws": {
+        "title": "AWS certification exams",
+        "description": "Explore AWS certification exams by level and role. Choose the right exam, test your knowledge and build a personalized study plan."
+      },
+      "azure": {
+        "title": "Microsoft Azure certification exams",
+        "description": "Explore Microsoft Azure certification exams, learn which skills to prepare and build a study plan that matches your current level."
+      },
+      "google-cloud": {
+        "title": "Google Cloud certification exams",
+        "description": "Browse Google Cloud certification exams by level. Learn what each exam covers, identify your weak spots and prepare with a personalized study plan."
+      }
+    }
   },
   "collectionMeta": {
     "title": "{name} Exam Set",

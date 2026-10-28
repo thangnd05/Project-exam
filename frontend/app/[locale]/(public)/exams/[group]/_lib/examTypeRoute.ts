@@ -6,7 +6,6 @@ import { localeAlternates } from '@/app/i18n/metadata';
 import { localizeHref, routing } from '@/app/i18n/routing';
 import type { ExamTypeResponse } from '@/app/types';
 import { fetchPublicResource } from '@/app/utils/serverApi';
-import { toMetaDescription } from '@/app/utils/seo';
 
 const toLocale = (raw: string) => (hasLocale(routing.locales, raw) ? raw : routing.defaultLocale);
 
@@ -23,7 +22,7 @@ export function loadExamType(segments: string[]) {
 }
 
 /**
- * Dùng trong page: không có kỳ thi thì 404; đang ở link cũ (/exam-types/<uuid>), sai hoa thường
+ * Dùng trong page: không có kỳ thi thì 404; đang ở link cũ (/exams/<uuid>), sai hoa thường
  * hoặc lệch nhóm cha thì chuyển hướng 308 về đường dẫn slug chuẩn để Google chỉ giữ một URL.
  */
 export async function requireExamType(segments: string[], locale: string, collectionId?: string) {
@@ -37,7 +36,7 @@ export async function requireExamType(segments: string[], locale: string, collec
     const canonical = collectionId
       ? buildExamTypeCollectionPath(exam, collectionId)
       : buildExamTypeDetailPath(exam);
-    const current = `/exam-types/${segments.map(encodeURIComponent).join('/')}${
+    const current = `/exams/${segments.map(encodeURIComponent).join('/')}${
       collectionId ? `/collections/${encodeURIComponent(collectionId)}` : ''
     }`;
     if (canonical !== current) permanentRedirect(localizeHref(canonical, locale));
@@ -45,17 +44,32 @@ export async function requireExamType(segments: string[], locale: string, collec
   return exam;
 }
 
-/** Metadata cho trang danh sách đề của kỳ thi, kèm canonical URL dạng slug. */
+/**
+ * Metadata cho trang nhóm hãng (/exams/aws) hoặc trang kỳ thi (/exams/aws/saa-c03), kèm canonical URL dạng slug.
+ * Tiêu đề/mô tả theo bảng SEO: slug có trong `bySlug` thì dùng câu viết riêng, còn lại dùng mẫu chung.
+ */
 export async function examTypeMetadata(segments: string[], locale: string) {
   const res = await loadExamType(segments);
   if (!res.ok || !res.data.name) return {};
   const examType = res.data;
   const name = res.data.name;
-  const t = await getTranslations({ locale: toLocale(locale), namespace: 'ExamTypes.detailMeta' });
+  const slug = examType.slug ?? '';
+  const t = await getTranslations({ locale: toLocale(locale), namespace: 'ExamTypes' });
 
-  const title = t('title', { name });
-  const description =
-    toMetaDescription(examType.description) || t('description', { name });
+  let title: string;
+  let description: string;
+  // Nhóm hãng có kỳ thi con; kỳ thi lá (kể cả kỳ thi một cấp như /exams/toeic) dùng mẫu của trang kỳ thi.
+  if (Number(examType.childCount ?? 0) > 0) {
+    const titleKey = `groupMeta.bySlug.${slug}.title` as 'groupMeta.bySlug.aws.title';
+    const descriptionKey = `groupMeta.bySlug.${slug}.description` as 'groupMeta.bySlug.aws.description';
+    const hasOwn = Boolean(slug) && t.has(titleKey);
+    title = hasOwn ? t(titleKey) : t('groupMeta.title', { name });
+    description = hasOwn ? t(descriptionKey) : t('groupMeta.description', { name });
+  } else {
+    const key = `detailMeta.bySlug.${slug}` as 'detailMeta.bySlug.saa-c03';
+    title = t('detailMeta.title', { name });
+    description = slug && t.has(key) ? t(key) : t('detailMeta.description', { name });
+  }
   const cover = examType.imageUrl || undefined;
   const images = cover ? [{ url: cover }] : undefined;
 

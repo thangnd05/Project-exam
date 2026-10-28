@@ -1,19 +1,23 @@
 import type { MetadataRoute } from 'next';
-import type {
-  ExamTypeResponse,
-  PageResponse,
-  PostSummaryResponse,
-  RecoveryResourceResponse,
-} from '@/app/types';
+import type { ExamTypeResponse, PageResponse, PostSummaryResponse } from '@/app/types';
 import { fetchPublicJson } from '@/app/utils/serverApi';
-import { buildExamTypeDetailPath } from '@/app/configs/Routes';
+import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { routing } from '@/app/i18n/routing';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 export const revalidate = 3600;
 
-const STATIC_PATHS = ['', '/about', '/posts', '/policy', '/service', '/certificates/verify', '/exam-types'];
+const STATIC_PATHS = [
+  '',
+  routes.about,
+  routes.contact,
+  routes.policy,
+  routes.service,
+  routes.examTypes,
+  routes.posts,
+  routes.certificateVerifyHome,
+];
 
 const MAX_POSTS = 500;
 
@@ -34,15 +38,15 @@ function withLocales(entries: MetadataRoute.Sitemap, pathOf: (url: string) => st
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [posts, examTypes, resources] = await Promise.all([
+  // Trang tài liệu /resources/:id là noindex theo bảng SEO nên không đưa vào đây.
+  const [posts, examTypes] = await Promise.all([
     fetchPublicJson<PageResponse<PostSummaryResponse>>(`/api/posts?page=0&size=${MAX_POSTS}`, 3600),
     fetchPublicJson<ExamTypeResponse[]>('/api/exam-types', 3600),
-    fetchPublicJson<RecoveryResourceResponse[]>('/api/recovery-resources', 3600),
   ]);
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map((p) => ({
     url: `${SITE_URL}${p}`,
-    changeFrequency: p === '/posts' ? 'daily' : 'monthly',
+    changeFrequency: p === routes.posts ? 'daily' : 'monthly',
     priority: p === '' ? 1 : 0.7,
   }));
 
@@ -59,15 +63,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const resourceEntries: MetadataRoute.Sitemap = (resources || []).map((resource) => ({
-    url: `${SITE_URL}/resources/${resource.resourceId}`,
-    lastModified: resource.createdAt ? new Date(resource.createdAt) : undefined,
-    changeFrequency: 'monthly',
-    priority: 0.5,
-  }));
-
   return withLocales(
-    [...staticEntries, ...examTypeEntries, ...postEntries, ...resourceEntries],
+    [...staticEntries, ...examTypeEntries, ...postEntries],
     (url) => url.slice(SITE_URL.length),
   );
 }

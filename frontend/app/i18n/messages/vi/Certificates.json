@@ -4,7 +4,7 @@
     "description": "Xác thực chứng chỉ do {siteName} cấp bằng mã tra cứu, xem danh mục chứng chỉ đang cấp và các chứng chỉ vừa được cấp."
   },
   "codeMeta": {
-    "title": "Xác thực chứng chỉ",
+    "title": "Xác minh chứng chỉ",
     "description": "Kiểm tra tính hợp lệ của chứng chỉ do {siteName} cấp bằng mã chứng chỉ in trên bản chứng chỉ."
   },
   "verify": {

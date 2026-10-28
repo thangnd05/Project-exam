@@ -3,6 +3,9 @@
     "title": "Tài liệu",
     "description": "Tài liệu luyện thi trên {siteShortName}, chia theo từng kỳ thi."
   },
+  "detailMeta": {
+    "title": "Trang tài nguyên"
+  },
   "library": {
     "pageTitle": "Kho tài liệu",
     "searchLabel": "Tìm tài liệu",

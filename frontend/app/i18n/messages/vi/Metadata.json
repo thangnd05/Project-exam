@@ -1,5 +1,22 @@
 {
-  "title": "{siteName} - Luyện thi & thi thử chứng chỉ trực tuyến",
-  "description": "Nền tảng luyện thi & thi thử chứng chỉ trực tuyến: đề bám sát format thật, chấm điểm tự động, chẩn đoán điểm yếu và lộ trình học cá nhân hoá.",
-  "noscript": "Bạn cần bật JavaScript để dùng ứng dụng này."
+  "title": "{siteName} | Nền tảng luyện thi chứng chỉ Cloud cá nhân hóa",
+  "description": "Ôn thi chứng chỉ Cloud, DevOps và Kubernetes cùng {siteName}. Đánh giá năng lực, xác định điểm yếu và học theo lộ trình cá nhân hóa.",
+  "noscript": "Bạn cần bật JavaScript để dùng ứng dụng này.",
+  "private": {
+    "dashboard": "Trang quản trị",
+    "goals": "Danh sách mục tiêu",
+    "goalDetail": "Chi tiết mục tiêu",
+    "goalsAchieved": "Mục tiêu đã đạt",
+    "planCompare": "So sánh lộ trình",
+    "planDetail": "Chi tiết lộ trình",
+    "taskHistory": "Lịch sử nhiệm vụ",
+    "mockAttempts": "Lịch sử thi thử",
+    "certificates": "Chứng chỉ cá nhân",
+    "mockTake": "Làm bài thi thử",
+    "attemptResult": "Kết quả bài thi",
+    "attemptReview": "Xem lại bài thi",
+    "learningPaths": "Lộ trình học tập",
+    "planCreate": "Tạo lộ trình",
+    "goalNew": "Thiết lập mục tiêu"
+  }
 }

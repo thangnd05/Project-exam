@@ -12,14 +12,13 @@ const providerOf = async (searchParams: ComingSoonPageProps['searchParams']) => 
   return findProvider(typeof provider === 'string' ? provider : undefined);
 };
 
-// Trang giữ chỗ cho đề chưa có nên không cho lập chỉ mục.
-export async function generateMetadata({ params, searchParams }: ComingSoonPageProps) {
+// Trang giữ chỗ cho đề chưa có nên không cho lập chỉ mục; tiêu đề cố định, không đổi theo ?provider=.
+export async function generateMetadata({ params }: ComingSoonPageProps) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: 'Common.comingSoon' });
-  const provider = await providerOf(searchParams);
   return {
-    title: provider ? `${provider.name} · ${t('pageTitle')}` : t('pageTitle'),
+    title: t('pageTitle'),
     robots: { index: false, follow: true },
   };
 }

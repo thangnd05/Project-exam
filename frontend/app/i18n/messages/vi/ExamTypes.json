@@ -1,11 +1,34 @@
 {
   "meta": {
-    "title": "Kho đề thi",
-    "description": "Kho đề thi chứng chỉ Cloud trên {siteShortName}: lọc theo hãng và cấp độ, thi nhanh hoặc làm đề full sát format thật."
+    "title": "Danh sách kỳ thi chứng chỉ Cloud",
+    "description": "Khám phá các kỳ thi chứng chỉ AWS, Azure, Google Cloud. Chọn kỳ thi mục tiêu, đánh giá năng lực và xây dựng lộ trình ôn tập cùng {siteName}."
   },
   "detailMeta": {
-    "title": "Đề thi {name}",
-    "description": "Danh sách đề thi thử {name}: làm bài online, chấm điểm tự động và xem đáp án chi tiết."
+    "title": "{name}",
+    "description": "Tìm hiểu kỳ thi {name}: nội dung kiến thức, cấu trúc kỳ thi và hướng ôn tập. Đánh giá năng lực và chuẩn bị cho chứng chỉ cùng {siteName}.",
+    "bySlug": {
+      "saa-c03": "Tìm hiểu kỳ thi AWS SAA-C03: nội dung kiến thức, cấu trúc kỳ thi và hướng ôn tập. Đánh giá năng lực và chuẩn bị cho chứng chỉ cùng {siteName}.",
+      "az-104": "Khám phá kỳ thi AZ-104 Microsoft Azure Administrator: nội dung, kỹ năng cần chuẩn bị và cách xây dựng lộ trình ôn tập cá nhân hóa tại {siteName}.",
+      "associate-cloud-engineer": "Tìm hiểu kỳ thi Google Cloud Associate Cloud Engineer, các nội dung cần nắm, cấu trúc thi và lộ trình ôn tập phù hợp với năng lực của bạn."
+    }
+  },
+  "groupMeta": {
+    "title": "Các kỳ thi chứng chỉ {name}",
+    "description": "Tìm hiểu các kỳ thi chứng chỉ {name} theo cấp độ và vai trò. Chọn kỳ thi phù hợp, kiểm tra kiến thức và xây dựng lộ trình ôn tập cá nhân hóa.",
+    "bySlug": {
+      "aws": {
+        "title": "Các kỳ thi chứng chỉ AWS",
+        "description": "Tìm hiểu các kỳ thi chứng chỉ AWS theo cấp độ và vai trò. Chọn kỳ thi phù hợp, kiểm tra kiến thức và xây dựng lộ trình ôn tập cá nhân hóa."
+      },
+      "azure": {
+        "title": "Các kỳ thi chứng chỉ Microsoft Azure",
+        "description": "Khám phá các kỳ thi chứng chỉ Microsoft Azure, tìm hiểu kỹ năng cần chuẩn bị và xây dựng lộ trình ôn tập phù hợp với năng lực của bạn."
+      },
+      "google-cloud": {
+        "title": "Các kỳ thi chứng chỉ Google Cloud",
+        "description": "Tổng hợp các kỳ thi chứng chỉ Google Cloud theo cấp độ. Tìm hiểu nội dung thi, nhận diện điểm yếu và chuẩn bị theo lộ trình cá nhân hóa."
+      }
+    }
   },
   "collectionMeta": {
     "title": "Bộ đề {name}",
