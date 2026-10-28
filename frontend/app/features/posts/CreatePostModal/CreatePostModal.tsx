@@ -1,6 +1,6 @@
 'use client';
 
-import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
+import { buildLoginUrlFromHere } from '@/app/utils/redirect';
 import { useRouter } from '@/app/i18n/navigation';
 import { useState, useRef, useMemo, useCallback } from 'react';
 import { useTranslations } from 'next-intl';

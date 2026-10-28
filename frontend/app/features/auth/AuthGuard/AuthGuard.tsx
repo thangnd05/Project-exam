@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import routes from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
+import { buildLoginUrlFromHere } from '@/app/utils/redirect';
 import Loading from '@/app/components/Loading/Loading';
 
 type FallbackProps = {
@@ -38,11 +39,7 @@ function AuthGuard({ children, requiredPermission, allowGuest = false }: AuthGua
 
   useEffect(() => {
     if (needsLogin) {
-      const params = new URLSearchParams({
-        from: pathname,
-        flash: t('guard.loginRequired'),
-      });
-      router.replace(`${routes.login}?${params.toString()}`);
+      router.replace(buildLoginUrlFromHere(t('guard.loginRequired')));
     } else if (lacksPermission) {
       router.replace(routes.notFoundPage);
     }

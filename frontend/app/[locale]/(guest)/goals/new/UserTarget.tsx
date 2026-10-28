@@ -23,7 +23,7 @@ import styles from './UserTarget.module.scss';
 import { sortPartsByLookup } from '@/app/features/exam-types/partOrder';
 import useMilestoneScoring from '@/app/features/my-target/hooks/useMilestoneScoring';
 import { useAuth } from '@/app/hooks/useAuth';
-import { buildLoginUrl } from '@/app/features/auth/authRedirect';
+import { buildLoginUrl, safeRedirect } from '@/app/utils/redirect';
 import type { MilestoneResponse } from '@/app/types';
 import { useCurrentUserTarget, useUserTargetData } from './_hooks/useUserTargetData';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
@@ -76,9 +76,10 @@ function UserTarget() {
 
   // Được điều hướng tới đây chỉ để đặt mục tiêu thì giữ đúng bước tiếp theo của luồng cũ.
   const nextAfterTarget = useMemo(() => {
-    const next = searchParams.get('next');
-    if (next && next.startsWith('/') && !next.startsWith('//')) return next;
-    return withExam('/learning-paths/create', selectedExamTypeId, examTypes);
+    return safeRedirect(
+      searchParams.get('next'),
+      withExam('/learning-paths/create', selectedExamTypeId, examTypes),
+    );
   }, [searchParams, selectedExamTypeId, examTypes]);
 
   const {

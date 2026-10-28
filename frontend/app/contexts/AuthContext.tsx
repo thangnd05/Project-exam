@@ -7,9 +7,7 @@ import { toast } from 'react-toastify';
 import { queryClient } from '@/app/configs/queryClient';
 import { getCurrentUser, logout as logoutRequest } from '@/app/apis/authApi';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
-import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
-import { splitLocale } from '@/app/i18n/routing';
-import routes from '@/app/configs/Routes';
+import { buildLoginUrlFromHere, isAuthPage } from '@/app/utils/redirect';
 import type { UserResponse } from '@/app/types';
 
 // Phần tối thiểu của Google Identity Services (script ngoài) mà app dùng tới.
@@ -134,9 +132,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         toast.info(reason);
       }
 
-      const publicPaths = [routes.login, routes.forgot, routes.reset];
-      const onPublicPage = publicPaths.some((p) => splitLocale(window.location.pathname).pathname.startsWith(p));
-      if (!onPublicPage) {
+      if (!isAuthPage(window.location.pathname)) {
         // Kèm from để đăng nhập lại xong quay về đúng trang đang xem.
         window.location.href = buildLoginUrlFromHere();
       }

@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/app/i18n/navigation';
 import { buildTestPath } from '@/app/configs/Routes';
+import { buildLoginUrl } from '@/app/utils/redirect';
 import { useEffect, useLayoutEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { invalidatePlanQueries } from '@/app/features/learning-plans/plan-cache';
@@ -273,10 +274,9 @@ export function useTestSession(testId: string) {
 
         if (testData.status === 'LOGIN_REQUIRED') {
           router.push(
-            `/login?${new URLSearchParams({
-              from: buildTestPath({ testId, slug: testData.slug }, 'start'),
+            buildLoginUrl(buildTestPath({ testId, slug: testData.slug }, 'start'), {
               flash: t('loginRequiredFlash'),
-            }).toString()}`,
+            }),
           );
           return;
         }

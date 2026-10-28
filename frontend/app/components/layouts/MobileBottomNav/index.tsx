@@ -11,6 +11,7 @@ import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './MobileBottomNav.module.scss';
 import routes from '@/app/configs/Routes';
+import {buildLoginUrl} from '@/app/utils/redirect';
 import {useAuth} from '@/app/hooks/useAuth';
 import {useCosmetics} from '@/app/features/gamification/cosmetic/hooks/useCosmetics';
 import images from '@/app/assets/images';
@@ -85,6 +86,8 @@ function MobileBottomNav() {
     pathname.startsWith(routes.learningPlanBase);
   // Mục tiêu, lộ trình cũng nằm dưới /dashboard nên Hồ sơ chỉ sáng ở đúng trang quản trị và các trang còn lại bên dưới.
   const isProfileActive = pathname.startsWith(routes.dashboard) && !isPlanActive;
+  // Như Header: đăng nhập xong quay lại trang đang xem.
+  const loginFrom = isHomeActive ? null : pathname;
 
   // const requireLogin = (message: string) => {
   //   if (user) {
@@ -297,7 +300,7 @@ function MobileBottomNav() {
                       <>
                         <ButtonPrime
                           as="link"
-                          href={`${routes.login}?mode=signin`}
+                          href={buildLoginUrl(loginFrom, {mode: 'signin'})}
                           variant="ghost"
                           fullWidth
                           className={cx('menuItem')}
@@ -307,7 +310,7 @@ function MobileBottomNav() {
                         </ButtonPrime>
                         <ButtonPrime
                           as="link"
-                          href={`${routes.login}?mode=signup`}
+                          href={buildLoginUrl(loginFrom, {mode: 'signup'})}
                           variant="ghost"
                           fullWidth
                           className={cx('menuItem')}

@@ -1,5 +1,5 @@
 import routes from '@/app/configs/Routes';
-import { buildGuestSignupUrl } from '@/app/features/auth/authRedirect';
+import { buildGuestSignupUrl } from '@/app/utils/redirect';
 import { setGuestClaimIntent } from '@/app/utils/guestSession';
 
 type PlanFromTestOptions = {

@@ -7,7 +7,7 @@ import { getTestStatus, splitCountdown } from '@/app/features/tests/testStatusHe
 import type { TestModeSelection } from '@/app/features/tests/TestModeModal/TestModeModal';
 import { useAuth } from '@/app/hooks/useAuth';
 import { useGuestAllowedCategories } from '@/app/features/tests/TestCard/hooks/useGuestAllowedCategories';
-import { buildLoginUrl } from '@/app/features/auth/authRedirect';
+import { buildLoginUrlFromHere } from '@/app/utils/redirect';
 import type { TestResponse } from '@/app/types';
 import { buildTestPath } from '@/app/configs/Routes';
 
@@ -40,11 +40,7 @@ export function useTestStart(test: TestResponse, countdowns?: Record<string, num
     if (!canStart) return;
     // Khách mở đề cần tài khoản thì đưa thẳng sang đăng nhập, không để bấm tới bước bắt đầu mới biết.
     if (needsLogin) {
-      router.push(
-        buildLoginUrl(window.location.pathname + window.location.search, {
-          flash: t('loginFlash'),
-        }),
-      );
+      router.push(buildLoginUrlFromHere(t('loginFlash')));
       return;
     }
     setShowModeModal(true);

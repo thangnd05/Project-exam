@@ -18,7 +18,7 @@ import { getLearnerLevel } from '@/app/features/learning-plans/learnerLevel';
 import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
 import { getApiErrorMessage } from '@/app/utils/apiError';
-import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
+import { buildLoginUrlFromHere } from '@/app/utils/redirect';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';

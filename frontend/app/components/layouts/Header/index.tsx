@@ -14,7 +14,7 @@ import classNames from 'classnames/bind';
 import {useAuth} from '@/app/hooks/useAuth';
 import routes from '@/app/configs/Routes';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
-import {buildLoginUrl} from '@/app/features/auth/authRedirect';
+import {buildLoginUrl} from '@/app/utils/redirect';
 // import JoinClassModal from '@/app/features/classes/JoinClassModal/JoinClassModal';
 // import CreateClassModal from '@/app/features/classes/CreateClassModal/CreateClassModal';
 import CreateTestModal from '@/app/features/tests/CreateTestModal';

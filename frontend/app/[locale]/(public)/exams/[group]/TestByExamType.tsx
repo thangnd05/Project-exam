@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Container } from 'react-bootstrap';
 import classNamesBind from 'classnames/bind';
 import { ArrowRight, ChevronRight, ChevronDown, FileText } from 'lucide-react';
-import { buildLoginUrlFromHere } from '@/app/features/auth/authRedirect';
+import { buildLoginUrlFromHere } from '@/app/utils/redirect';
 import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import { useAuth } from '@/app/hooks/useAuth';
 import { withExam } from '@/app/features/exam-types/hooks/useExamParam';

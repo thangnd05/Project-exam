@@ -13,11 +13,8 @@ import {
   useLoginMutation,
   useRegisterMutation,
 } from '@/app/features/auth/hooks/useAuthActions';
-import {
-  getRedirectTarget,
-  saveOAuthRedirect,
-  claimGuestAfterLogin,
-} from '@/app/features/auth/authRedirect';
+import { getRedirectTarget, saveOAuthRedirect } from '@/app/utils/redirect';
+import { claimGuestAfterLogin } from '@/app/features/auth/claimGuest';
 import routes from '@/app/configs/Routes';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import classNames from 'classnames/bind';

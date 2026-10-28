@@ -5,7 +5,8 @@ import { useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/app/hooks/useAuth';
 import { fetchCurrentUser } from '@/app/features/auth/hooks/useAuthActions';
-import { claimGuestAfterLogin, takeOAuthRedirect } from '@/app/features/auth/authRedirect';
+import { claimGuestAfterLogin } from '@/app/features/auth/claimGuest';
+import { takeOAuthRedirect } from '@/app/utils/redirect';
 import { localizeHref, splitLocale } from '@/app/i18n/routing';
 
 // Quá thời gian này mà chưa lấy được tài khoản thì trả về trang đăng nhập, không để người dùng đứng chờ mãi.

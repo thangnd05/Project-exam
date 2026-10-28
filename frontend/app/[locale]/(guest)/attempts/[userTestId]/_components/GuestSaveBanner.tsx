@@ -7,7 +7,7 @@ import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 
 import BaseModal from '@/app/components/modal/BaseModal';
-import { buildLoginUrl } from '@/app/features/auth/authRedirect';
+import { buildLoginUrl } from '@/app/utils/redirect';
 import { clearGuestSessionId, setGuestClaimIntent } from '@/app/utils/guestSession';
 import { buildGeneratePlanUrl, buildTargetUrl } from '@/app/[locale]/(guest)/attempts/[userTestId]/_lib/planFromTest';
 import promptStyles from './GuestSaveBanner.module.scss';

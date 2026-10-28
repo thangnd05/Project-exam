@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import createIntlMiddleware from 'next-intl/middleware';
 import { localizeHref, routing, splitLocale } from '@/app/i18n/routing';
+import { buildLoginUrl } from '@/app/utils/redirect';
 
 const AUTH_COOKIE = 'accessToken';
 // Access token chỉ sống 15 phút; còn cookie này (sống bằng refresh token) nghĩa là client tự refresh được.
@@ -72,10 +73,8 @@ export default async function proxy(request: NextRequest) {
 
   const hasSession = request.cookies.has(AUTH_COOKIE) || request.cookies.has(SESSION_HINT_COOKIE);
   if (isProtected(pathname) && !hasSession) {
-    const loginUrl = new URL(localizeHref('/login', locale), request.url);
-    loginUrl.searchParams.set('from', `${pathname}${search}`);
-    loginUrl.searchParams.set('flash', LOGIN_REQUIRED_FLASH[locale]);
-    return NextResponse.redirect(loginUrl);
+    const loginPath = buildLoginUrl(`${pathname}${search}`, { flash: LOGIN_REQUIRED_FLASH[locale] });
+    return NextResponse.redirect(new URL(localizeHref(loginPath, locale), request.url));
   }
 
   return handleI18n(request);
