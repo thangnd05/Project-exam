@@ -20,7 +20,7 @@
     "confirm": "Yes, delete"
   },
   "notFound": {
-    "pageTitle": "Page not found",
+    "pageTitle": "404",
     "title": "Oops, where did this page go?",
     "description": "The link you followed doesn't exist or has been removed. Use the button below to head back.",
     "backHome": "Back to homepage"

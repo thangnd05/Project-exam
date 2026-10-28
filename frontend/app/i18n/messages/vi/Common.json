@@ -20,18 +20,18 @@
     "confirm": "Đồng ý xóa"
   },
   "notFound": {
-    "pageTitle": "Không tìm thấy trang",
+    "pageTitle": "404",
     "title": "Ơ, trang này đi đâu mất rồi?",
     "description": "Đường dẫn bạn truy cập không tồn tại hoặc đã bị xóa. Hãy giúp mình click vào nút bên dưới",
     "backHome": "Quay về trang chủ"
   },
   "comingSoon": {
-    "pageTitle": "Sắp ra mắt",
+    "pageTitle": "Đang cập nhật",
     "badge": "Sắp ra mắt",
-    "title": "Đề thi này đang được chuẩn bị",
-    "titleProvider": "Đề luyện thi <glow>{name}</glow> đang được chuẩn bị",
-    "description": "Chúng tôi đang xây dựng ngân hàng câu hỏi bám sát blueprint chính thức. Trong lúc chờ, bạn có thể luyện với các đề đã có sẵn.",
-    "descriptionProvider": "Chúng tôi đang xây dựng ngân hàng câu hỏi {name} bám sát blueprint chính thức. Trong lúc chờ, bạn có thể luyện với các đề đã có sẵn.",
+    "title": "Đề thi này đang được cập nhật",
+    "titleProvider": "Đề luyện thi <glow>{name}</glow> đang được cập nhật",
+    "description": "Chúng tôi đang cập nhập ngân hàng câu hỏi bám sát blueprint chính thức. Trong lúc chờ, bạn có thể luyện với các đề đã có sẵn.",
+    "descriptionProvider": "Chúng tôi đang cập nhập ngân hàng câu hỏi {name} bám sát blueprint chính thức. Trong lúc chờ, bạn có thể luyện với các đề đã có sẵn.",
     "exploreExams": "Xem các đề đã có",
     "backHome": "Về trang chủ"
   }
