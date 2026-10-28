@@ -42,7 +42,7 @@ const COLUMNS: { titleKey: 'practice' | 'aboutUs' | 'legal'; links: FooterLink[]
     titleKey: 'aboutUs',
     links: [
       { labelKey: 'about', href: routes.about },
-      { labelKey: 'contact', href: `mailto:${CONTACT_EMAIL}` },
+      { labelKey: 'contact', href: routes.contact },
     ],
   },
   {

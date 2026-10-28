@@ -6,17 +6,18 @@ Tổng hợp từ `app/[locale]/**/page.tsx`, [app/configs/Routes.ts](app/config
 
 ## Quy ước chung
 
-- **Ngôn ngữ**: tiếng Việt không có tiền tố (`/exam-types`), tiếng Anh nằm dưới `/en` (`/en/exam-types`). Mọi URL bên dưới đều có bản `/en/...` tương ứng.
-- **Đăng nhập**: [proxy.ts](proxy.ts) chặn các tiền tố `/admin`, `/certificates`, `/dashboard`, `/learning-plans`, `/my-*`... Chưa đăng nhập thì chuyển sang `/login?from=<url cũ>&flash=...`.
-  - Ngoại lệ mở cho khách: `/certificates/verify/**`, và đúng 3 trang `/learning-plans`, `/learning-plans/generate`, `/my-target` (khách xem được, bấm thao tác mới bắt đăng nhập).
-  - Các layout `(user)`, `(user-focus)`, `(admin)`... còn bọc `AuthGuard` phía client: chưa đăng nhập → `/login?...`, không đủ quyền → `/not-found`.
-- **Slug**: kỳ thi dùng `/exam-types/<nhóm>/<kỳ thi>` (vd `/exam-types/aws/saa-c03`). Link cũ `/exam-types/<uuid>` được proxy trả 308 sang slug. Bài thi dùng `/tests/<slug hoặc testId>/<start|history|leaderboard>`.
+- **Ngôn ngữ**: tiếng Việt không có tiền tố (`/exams`), tiếng Anh nằm dưới `/en` (`/en/exams`). Mọi URL bên dưới đều có bản `/en/...` tương ứng.
+- **Đăng nhập**: [proxy.ts](proxy.ts) chặn các tiền tố `/admin`, `/dashboard`, `/albums`, `/class(es)`, `/my-albums`, `/my-classes`, `/practice`. Chưa đăng nhập thì chuyển sang `/login?from=<url cũ>&flash=...`.
+  - Trang khách xem được, bấm thao tác mới bắt đăng nhập, nằm ngoài các tiền tố trên: `/learning-paths`, `/learning-paths/create`, `/goals/new`, làm bài `/mock-exams/:id/take`, kết quả `/attempts/:id`.
+  - Các layout `(user)`, `(user-focus)`, `(admin)`... còn bọc `AuthGuard` phía client: chưa đăng nhập → `/login?...`, không đủ quyền → `/404`.
+- **URL cũ** (308, khai trong [next.config.mjs](next.config.mjs)): `/my-target` → `/goals/new`; `/my-target/dashboard|mocks|achieved` → `/dashboard/goals[/achieved]`; `/learning-plans` → `/learning-paths`, `/learning-plans/generate` → `/learning-paths/create`, `/learning-plans/:id/**` → `/dashboard/learning-paths/:id/**`, `/dashboard/learning-paths/:id/tasks/:taskId/history` → `/dashboard/tasks/:taskId/history`; `/tests/:id/start` → `/mock-exams/:id/take`; `/tests/result/:id[/review]` → `/attempts/:id[/review]`; `/tests/:id/history|leaderboard` → `/dashboard/mock-exams/:id/attempts|leaderboard`; `/my-certificates`, `/certificates/:id` → `/dashboard/certificates[/:id]`; `/admin/personal-question-bank` → `/dashboard/question-bank`, `/admin/create-test-from-bank` → `/dashboard/question-bank/create-test`; `/exam-types/**` → `/exams/**`, `/policy` → `/privacy-policy`, `/service` → `/terms`, `/forgot` → `/forgot-password`.
+- **Slug**: kỳ thi dùng `/exams/<nhóm>/<kỳ thi>` (vd `/exams/aws/saa-c03`). Link cũ `/exams/<uuid>` được proxy trả 308 sang slug. Mã kỳ thi ở trang mục tiêu/lộ trình là slug nhóm + slug kỳ thi: `/dashboard/goals/aws-saa-c03`, `?exam=aws-saa-c03`. Đề dùng slug hoặc testId: `/mock-exams/<đề>/take`, `/dashboard/mock-exams/<đề>/attempts|leaderboard`. Trang tạo lộ trình nhận bài nguồn qua `?attempt=<userTestId>` (link cũ `?userTestId=` vẫn đọc được).
 - **Không phải trang** (rewrite sang backend): `/api/*`, `/oauth2/authorization/*`, `/login/oauth2/*`.
-- URL không khớp route nào → trang 404.
+- URL không khớp route nào → trang 404 (giữ nguyên URL). Trang 404 cũng có URL riêng `/404` (trả mã 404, tiêu đề "404 | FrostScope"); `/not-found` cũ không còn.
 
 Ký hiệu cột "Truy cập": 🌐 công khai · 👤 cần đăng nhập · 👁 khách xem được, thao tác cần đăng nhập · 🔒 admin (theo quyền trong [adminPermissions.ts](app/configs/adminPermissions.ts)).
 
-Cột "Ví dụ": slug kỳ thi/đề (`aws/saa-c03`, `aws-dop-c02-test-1`) và định dạng mã chứng chỉ (`EXAM-<năm>-<6 ký tự>`) lấy theo code thật; các UUID chỉ là giá trị minh hoạ, thay bằng id có trong database. Bản tiếng Anh thì thêm `/en` phía trước, vd `/en/exam-types/aws/saa-c03`.
+Cột "Ví dụ": slug kỳ thi/đề (`aws/saa-c03`, `aws-dop-c02-test-1`) và định dạng mã chứng chỉ (`EXAM-<năm>-<6 ký tự>`) lấy theo code thật; các UUID chỉ là giá trị minh hoạ, thay bằng id có trong database. Bản tiếng Anh thì thêm `/en` phía trước, vd `/en/exams/aws/saa-c03`.
 
 ---
 
@@ -28,14 +29,15 @@ Cột "Ví dụ": slug kỳ thi/đề (`aws/saa-c03`, `aws-dop-c02-test-1`) và 
 |---|---|---|---|
 | `/` | Trang chủ (Hero, Certification Orbit, Rank Scope) | 🌐 | `/` |
 | `/about` | Giới thiệu | 🌐 | `/about` |
-| `/policy` | Chính sách | 🌐 | `/policy` |
-| `/service` | Điều khoản dịch vụ | 🌐 | `/service` |
+| `/contact` | Liên hệ (email hợp tác, tư vấn, khiếu nại) | 🌐 | `/contact` |
+| `/privacy-policy` | Chính sách | 🌐 | `/privacy-policy` |
+| `/terms` | Điều khoản dịch vụ | 🌐 | `/terms` |
 | `/coming-soon` | Sắp ra mắt (nhà cung cấp chưa có đề) | 🌐 | `/coming-soon?provider=azure` |
-| `/exam-types` | Danh mục kỳ thi | 🌐 | `/exam-types` |
-| `/exam-types/:group` | Nhóm kỳ thi / kỳ thi một cấp (danh sách đề, bộ đề) | 🌐 | `/exam-types/aws` · `/exam-types/toeic` |
-| `/exam-types/:group/:exam` | Chi tiết kỳ thi (đề thi thử, bộ đề) | 🌐 | `/exam-types/aws/saa-c03` |
-| `/exam-types/:group/collections/:collectionId` | Bộ đề thuộc kỳ thi một cấp | 🌐 | `/exam-types/toeic/collections/0b6d2f1e-3c4a-4e5b-8f7a-9c1d2e3f4a5b` |
-| `/exam-types/:group/:exam/collections/:collectionId` | Bộ đề thuộc kỳ thi hai cấp | 🌐 | `/exam-types/aws/saa-c03/collections/0b6d2f1e-3c4a-4e5b-8f7a-9c1d2e3f4a5b` |
+| `/exams` | Danh mục kỳ thi | 🌐 | `/exams` |
+| `/exams/:group` | Nhóm kỳ thi / kỳ thi một cấp (danh sách đề, bộ đề) | 🌐 | `/exams/aws` · `/exams/toeic` |
+| `/exams/:group/:exam` | Chi tiết kỳ thi (đề thi thử, bộ đề) | 🌐 | `/exams/aws/saa-c03` |
+| `/exams/:group/collections/:collectionId` | Bộ đề thuộc kỳ thi một cấp | 🌐 | `/exams/toeic/collections/0b6d2f1e-3c4a-4e5b-8f7a-9c1d2e3f4a5b` |
+| `/exams/:group/:exam/collections/:collectionId` | Bộ đề thuộc kỳ thi hai cấp | 🌐 | `/exams/aws/saa-c03/collections/0b6d2f1e-3c4a-4e5b-8f7a-9c1d2e3f4a5b` |
 | `/resources` | Tài liệu ôn tập | 🌐 | `/resources` |
 | `/certificates/verify/:code` | Xác minh chứng chỉ theo mã (kèm ô tra cứu + tường chứng chỉ) | 🌐 | `/certificates/verify/EXAM-2026-K7P3QX` |
 | `/posts/:postId` | Chi tiết bài viết (chỉ mở từ trang admin Bài viết) | 🌐 | `/posts/2a7e4c9d-1b3f-4d6a-8e2c-5f9b0a1c3d4e` |
@@ -44,8 +46,8 @@ Cột "Ví dụ": slug kỳ thi/đề (`aws/saa-c03`, `aws-dop-c02-test-1`) và 
 
 | URL | Trang | Truy cập | Ví dụ |
 |---|---|---|---|
-| `/login` | Đăng nhập / đăng ký (`?mode=signin\|signup`, `?from=`, `?flash=`, `?error=`) | 🌐 | `/login?mode=signup&from=/my-target` |
-| `/forgot` | Quên mật khẩu | 🌐 | `/forgot` |
+| `/login` | Đăng nhập / đăng ký (`?mode=signin\|signup`, `?from=`, `?flash=`, `?error=`) | 🌐 | `/login?mode=signup&from=/goals/new` |
+| `/forgot-password` | Quên mật khẩu | 🌐 | `/forgot-password` |
 | `/reset` | Đặt lại mật khẩu (link từ email) | 🌐 | `/reset?token=<token trong email>` |
 | `/oauth2/redirect` | Nhận kết quả đăng nhập Google/Facebook rồi chuyển tiếp | 🌐 | `/oauth2/redirect` (backend tự chuyển về) |
 
@@ -54,41 +56,41 @@ Cột "Ví dụ": slug kỳ thi/đề (`aws/saa-c03`, `aws-dop-c02-test-1`) và 
 | URL | Trang | Truy cập | Ví dụ |
 |---|---|---|---|
 | `/resources/:resourceId` | Xem tài liệu phục hồi (mở từ trang học lộ trình) | 🌐 | `/resources/6c8a1f3e-2d4b-4a7c-9e5f-0b1c2d3e4f5a` |
-| `/not-found` | Trang 404 (AuthGuard đẩy về đây khi thiếu quyền) | 🌐 | `/not-found` |
 
 ### Khách & người dùng `(guest)`, `(guest-exam)`, `(guest-focus)` — khách vẫn làm bài được
 
 | URL | Trang | Truy cập | Ví dụ |
 |---|---|---|---|
-| `/tests/:testId/start` | Làm bài thi (giao diện thi) | 🌐 | `/tests/aws-dop-c02-test-1/start` |
-| `/tests/result/:userTestId` | Kết quả bài thi | 🌐 | `/tests/result/5e2f9c1a-7b3d-4e8a-9c6f-1d2b3a4c5e6f` |
-| `/tests/result/:userTestId/review` | Xem lại đáp án (focus mode) | 🌐 | `/tests/result/5e2f9c1a-7b3d-4e8a-9c6f-1d2b3a4c5e6f/review` |
-| `/learning-plans` | Trang trung chuyển "Lộ trình" (chỉ redirect, xem mục 3) | 👁 | `/learning-plans` |
-| `/learning-plans/generate` | Sinh lộ trình học + danh sách lộ trình | 👁 | `/learning-plans/generate?userTestId=5e2f9c1a-7b3d-4e8a-9c6f-1d2b3a4c5e6f&examTypeId=9d4b2e7a-1c3f-4a5e-8b6d-2f0a1b3c4d5e` |
-| `/my-target` | Đặt mục tiêu kỳ thi (`?examTypeId=`, `?next=`) | 👁 | `/my-target?examTypeId=9d4b2e7a-1c3f-4a5e-8b6d-2f0a1b3c4d5e` |
+| `/mock-exams/:testId/take` | Làm bài thi (giao diện thi) | 🌐 | `/mock-exams/aws-dop-c02-test-1/take` |
+| `/attempts/:userTestId` | Kết quả bài thi | 🌐 | `/attempts/5e2f9c1a-7b3d-4e8a-9c6f-1d2b3a4c5e6f` |
+| `/attempts/:userTestId/review` | Xem lại đáp án (focus mode) | 🌐 | `/attempts/5e2f9c1a-7b3d-4e8a-9c6f-1d2b3a4c5e6f/review` |
+| `/learning-paths` | Trang trung chuyển "Lộ trình" (chỉ redirect, xem mục 3) | 👁 | `/learning-paths` |
+| `/learning-paths/create` | Sinh lộ trình học + danh sách lộ trình | 👁 | `/learning-paths/create?attempt=5e2f9c1a-7b3d-4e8a-9c6f-1d2b3a4c5e6f&examTypeId=9d4b2e7a-1c3f-4a5e-8b6d-2f0a1b3c4d5e` |
+| `/goals/new` | Đặt mục tiêu kỳ thi (`?examTypeId=`, `?next=`) | 👁 | `/goals/new?examTypeId=9d4b2e7a-1c3f-4a5e-8b6d-2f0a1b3c4d5e` |
 
 ### Người dùng `(user)` — cần đăng nhập
 
 | URL | Trang | Truy cập | Ví dụ |
 |---|---|---|---|
 | `/dashboard` | Hồ sơ / tổng quan cá nhân | 👤 | `/dashboard` |
-| `/my-target/dashboard` | Bảng mục tiêu (`?examTypeId=`) | 👤 | `/my-target/dashboard?examTypeId=9d4b2e7a-1c3f-4a5e-8b6d-2f0a1b3c4d5e` |
-| `/my-target/achieved` | Đã đạt mục tiêu | 👤 | `/my-target/achieved` |
-| `/learning-plans/:learningPlanId` | Chi tiết lộ trình | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e` |
-| `/learning-plans/:learningPlanId/tasks/:taskId/history` | Lịch sử làm một nhiệm vụ | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/tasks/8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c/history` |
-| `/tests/:testId/history` | Lịch sử làm đề | 👤 | `/tests/aws-dop-c02-test-1/history` |
-| `/tests/:testId/leaderboard` | Bảng xếp hạng đề | 👤 | `/tests/aws-dop-c02-test-1/leaderboard` |
-| `/my-certificates` | Chứng chỉ của tôi | 👤 | `/my-certificates` |
-| `/certificates/:certificateId` | Chi tiết chứng chỉ | 👤 | `/certificates/4d9e2a7b-1f3c-4b5d-8e6a-2c0b1a3d4e5f` |
-| `/admin/personal-question-bank` | Ngân hàng câu hỏi cá nhân (chỉ tài khoản ADMIN: nút "Tạo đề" → "Ngân hàng câu hỏi") | 👤 | `/admin/personal-question-bank` |
+| `/dashboard/goals` · `/dashboard/goals/:examCode` | Danh sách mục tiêu · mục tiêu theo kỳ thi (mã = slug nhóm + slug kỳ thi) | 👤 | `/dashboard/goals/aws-saa-c03` |
+| `/dashboard/goals/achieved` | Đã đạt mục tiêu | 👤 | `/dashboard/goals/achieved` |
+| `/dashboard/learning-paths/compare` | So sánh lộ trình của một kỳ thi (`?exam=`) | 👤 | `/dashboard/learning-paths/compare?exam=aws-saa-c03` |
+| `/dashboard/learning-paths/:learningPlanId` | Chi tiết lộ trình | 👤 | `/dashboard/learning-paths/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e` |
+| `/dashboard/tasks/:taskId/history` | Lịch sử làm một nhiệm vụ | 👤 | `/dashboard/tasks/8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c/history` |
+| `/dashboard/mock-exams/:testId/attempts` | Lịch sử làm đề | 👤 | `/dashboard/mock-exams/aws-dop-c02-test-1/attempts` |
+| `/dashboard/mock-exams/:testId/leaderboard` | Bảng xếp hạng đề | 👤 | `/dashboard/mock-exams/aws-dop-c02-test-1/leaderboard` |
+| `/dashboard/certificates` | Chứng chỉ của tôi | 👤 | `/dashboard/certificates` |
+| `/dashboard/certificates/:certificateId` | Chi tiết chứng chỉ | 👤 | `/dashboard/certificates/4d9e2a7b-1f3c-4b5d-8e6a-2c0b1a3d4e5f` |
+| `/dashboard/question-bank` | Ngân hàng câu hỏi cá nhân (chỉ tài khoản ADMIN: nút "Tạo đề" → "Ngân hàng câu hỏi") | 👤 | `/dashboard/question-bank` |
 
 ### Người dùng – focus mode `(user-focus)` — không Header/Footer
 
 | URL | Trang | Truy cập | Ví dụ |
 |---|---|---|---|
-| `/learning-plans/:learningPlanId/study` | Học nhiệm vụ (`?taskId=`) | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/study?taskId=8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c` |
-| `/learning-plans/:learningPlanId/tasks/:taskId/result` | Kết quả nhiệm vụ | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/tasks/8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c/result` |
-| `/learning-plans/:learningPlanId/sessions/:sessionId/review` | Xem lại một phiên học (`?taskId=`) | 👤 | `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/sessions/6b8d0f2a-3c5e-4a7b-9d1f-4e6a8c0b2d3f/review?taskId=8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c` |
+| `/dashboard/learning-paths/:learningPlanId/study` | Học nhiệm vụ (`?taskId=`) | 👤 | `/dashboard/learning-paths/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/study?taskId=8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c` |
+| `/dashboard/learning-paths/:learningPlanId/tasks/:taskId/result` | Kết quả nhiệm vụ | 👤 | `/dashboard/learning-paths/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/tasks/8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c/result` |
+| `/dashboard/learning-paths/:learningPlanId/sessions/:sessionId/review` | Xem lại một phiên học (`?taskId=`) | 👤 | `/dashboard/learning-paths/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e/sessions/6b8d0f2a-3c5e-4a7b-9d1f-4e6a8c0b2d3f/review?taskId=8a1c3e5f-2b4d-4f6a-9c7e-1d2e3f4a5b6c` |
 
 ### Quản trị `(admin)` — layout có sidebar riêng
 
@@ -131,17 +133,17 @@ Tất cả 🔒, mỗi trang kiểm tra quyền riêng. Không có link từ gia
 
 **Header** ([Header/index.tsx](app/components/layouts/Header/index.tsx))
 - Logo → `/`
-- Menu: Kỳ thi `/exam-types` · Tài liệu `/resources` · Lộ trình `/learning-plans`
-- Tài khoản ADMIN: nút "Tạo đề" (mở modal, trong modal có nút sang `/admin/personal-question-bank`)
+- Menu: Kỳ thi `/exams` · Tài liệu `/resources` · Lộ trình `/learning-paths`
+- Tài khoản ADMIN: nút "Tạo đề" (mở modal, trong modal có nút sang `/dashboard/question-bank`)
 - Khách: Đăng nhập `/login?mode=signin&from=<trang hiện tại>` · Đăng ký `/login?mode=signup&from=...`
-- Menu tài khoản: Hồ sơ `/dashboard` · Chứng chỉ của tôi `/my-certificates` · Cài đặt (modal, đổi ngôn ngữ = đổi tiền tố URL) · Đăng xuất → `/`
+- Menu tài khoản: Hồ sơ `/dashboard` · Chứng chỉ của tôi `/dashboard/certificates` · Cài đặt (modal, đổi ngôn ngữ = đổi tiền tố URL) · Đăng xuất → `/`
 
-**Thanh điều hướng mobile** ([MobileBottomNav](app/components/layouts/MobileBottomNav/index.tsx)) — ẩn trên `/login`, `/forgot`, `/reset`, `/oauth2`, `/admin`
-- Trang chủ `/` · Kỳ thi `/exam-types` · (ADMIN: nút "Tạo đề") · Lộ trình `/learning-plans`
-- Menu thêm: `/resources`; đã đăng nhập: `/dashboard`, `/my-certificates`; khách: `/login?mode=signin`, `/login?mode=signup`
+**Thanh điều hướng mobile** ([MobileBottomNav](app/components/layouts/MobileBottomNav/index.tsx)) — ẩn trên `/login`, `/forgot-password`, `/reset`, `/oauth2`, `/admin`
+- Trang chủ `/` · Kỳ thi `/exams` · (ADMIN: nút "Tạo đề") · Lộ trình `/learning-paths`
+- Menu thêm: `/resources`; đã đăng nhập: `/dashboard`, `/dashboard/certificates`; khách: `/login?mode=signin`, `/login?mode=signup`
 
 **Footer** ([Footer](app/components/layouts/Footer/index.tsx))
-- `/` · `/exam-types` · `/learning-plans/generate` · `/about` · `/policy` · `/service`
+- `/` · `/exams` · `/learning-paths/create` · `/about` · `/contact` · `/privacy-policy` · `/terms`
 
 **Trang 404** → `/`
 
@@ -153,13 +155,13 @@ Tất cả 🔒, mỗi trang kiểm tra quyền riêng. Không có link từ gia
 
 | Từ | Đi tới | Ví dụ |
 |---|---|---|
-| `/` (Hero) | Logo nhà cung cấp: có đề → `/exam-types`, chưa có → `/coming-soon?provider=` · "Thi nhanh" → `/tests/:slug/start` · chưa có mục tiêu → `/my-target` hoặc `/learning-plans/generate` · khách → `/login?...` | `/` → `/coming-soon?provider=azure` |
-| `/` (Certification Orbit) | `/exam-types/:group/:exam`, `/learning-plans`, `/coming-soon` | `/` → `/exam-types/aws/saa-c03` |
-| `/` (Rank Scope) | `/exam-types` | |
-| `/coming-soon` | `/exam-types`, `/` | |
-| `/exam-types` | `/exam-types/:group[/:exam]` | `/exam-types` → `/exam-types/aws/saa-c03` |
-| `/exam-types/:group[/:exam]` | Bộ đề `.../collections/:collectionId` · Thẻ đề: Bắt đầu `/tests/:slug/start`, Lịch sử `/tests/:slug/history`, Xếp hạng `/tests/:slug/leaderboard` · Đặt mục tiêu `/my-target?examTypeId=` (khách → `/login`) · `/exam-types`, `/resources` | `/exam-types/aws/saa-c03` → `/tests/aws-dop-c02-test-1/start` |
-| `.../collections/:collectionId` | Về kỳ thi `/exam-types/:group[/:exam]` · đề trong bộ → `/tests/:slug/start` | |
+| `/` (Hero) | Logo nhà cung cấp: có đề → `/exams`, chưa có → `/coming-soon?provider=` · "Thi nhanh" → `/mock-exams/:slug/take` · chưa có mục tiêu → `/goals/new` hoặc `/learning-paths/create` · khách → `/login?...` | `/` → `/coming-soon?provider=azure` |
+| `/` (Certification Orbit) | `/exams/:group/:exam`, `/learning-paths`, `/coming-soon` | `/` → `/exams/aws/saa-c03` |
+| `/` (Rank Scope) | `/exams` | |
+| `/coming-soon` | `/exams`, `/` | |
+| `/exams` | `/exams/:group[/:exam]` | `/exams` → `/exams/aws/saa-c03` |
+| `/exams/:group[/:exam]` | Bộ đề `.../collections/:collectionId` · Thẻ đề: Bắt đầu `/mock-exams/:slug/take`, Lịch sử `/dashboard/mock-exams/:slug/attempts`, Xếp hạng `/dashboard/mock-exams/:slug/leaderboard` · Đặt mục tiêu `/goals/new?examTypeId=` (khách → `/login`) · `/exams`, `/resources` | `/exams/aws/saa-c03` → `/mock-exams/aws-dop-c02-test-1/take` |
+| `.../collections/:collectionId` | Về kỳ thi `/exams/:group[/:exam]` · đề trong bộ → `/mock-exams/:slug/take` | |
 | `/certificates/verify/:code` | Nhập mã khác → `/certificates/verify/:code` · tường chứng chỉ → `/certificates/verify/:code` | `/certificates/verify/EXAM-2026-K7P3QX` → `/certificates/verify/EXAM-2026-M4N8RT` |
 | `/posts/:postId` | `/`, bài liên quan `/posts/:id` | |
 | `/resources/:resourceId` | `/` | |
@@ -168,44 +170,45 @@ Tất cả 🔒, mỗi trang kiểm tra quyền riêng. Không có link từ gia
 
 | Từ | Đi tới | Ví dụ |
 |---|---|---|
-| `/login` | Thành công → URL trong `?from=` (mặc định `/`) · quên mật khẩu (form nội tuyến) · `/service`, `/policy` · Google/Facebook → `/oauth2/authorization/*` (backend) → `/oauth2/redirect` | `/login?from=/my-certificates` → `/my-certificates` |
+| `/login` | Thành công → URL trong `?from=` (mặc định `/`) · quên mật khẩu (form nội tuyến) · `/terms`, `/privacy-policy` · Google/Facebook → `/oauth2/authorization/*` (backend) → `/oauth2/redirect` | `/login?from=/dashboard/certificates` → `/dashboard/certificates` |
 | `/oauth2/redirect` | Lỗi → `/login?error=...` · thành công → URL đã lưu trước khi đăng nhập (mặc định `/`) | |
-| `/forgot` | `/login` | |
-| `/reset` | Thành công → `/login` · `/forgot` | |
+| `/forgot-password` | `/login` | |
+| `/reset` | Thành công → `/login` · `/forgot-password` | |
 
 ### Làm bài & kết quả
 
 | Từ | Đi tới | Ví dụ |
 |---|---|---|
-| `/tests/:testId/start` | Nộp bài / hết giờ → `/tests/result/:userTestId` · link bằng id được đổi sang `/tests/:slug/start` | `/tests/aws-dop-c02-test-1/start` → `/tests/result/5e2f9c1a-7b3d-4e8a-9c6f-1d2b3a4c5e6f` |
-| `/tests/result/:userTestId` | Xem lại → `.../review` (bảng phân tích tag → `.../review#rq-<questionId>`) · Lịch sử → `/tests/:testId/history` · Gauge sẵn sàng → kỳ thi · Tạo lộ trình → `/learning-plans/generate?userTestId=&examTypeId=` (chưa có mục tiêu → `/my-target?examTypeId=&next=...`) · Chứng chỉ → `/certificates/:certificateId`, `/learning-plans/generate` · Khách lưu bài → `/login?...` · Về `/` | `/tests/result/5e2f…5e6f` → `/learning-plans/generate?userTestId=5e2f…5e6f&examTypeId=9d4b…4d5e` |
-| `/tests/result/:userTestId/review` | `/tests/result/:userTestId`, `/` | |
-| `/tests/:testId/history` | Tab (header đề): `/exam-types`, kỳ thi, `/tests/:slug/history`, `/tests/:slug/leaderboard`, `/tests/:slug/start` · lượt làm → `/tests/result/:userTestId` | `/tests/aws-dop-c02-test-1/history` → `/tests/aws-dop-c02-test-1/leaderboard` |
-| `/tests/:testId/leaderboard` | Tab giống trang lịch sử | |
+| `/mock-exams/:testId/take` | Nộp bài / hết giờ → `/attempts/:userTestId` · link bằng id được đổi sang `/mock-exams/:slug/take` | `/mock-exams/aws-dop-c02-test-1/take` → `/attempts/5e2f9c1a-7b3d-4e8a-9c6f-1d2b3a4c5e6f` |
+| `/attempts/:userTestId` | Xem lại → `.../review` (bảng phân tích tag → `.../review#rq-<questionId>`) · Lịch sử → `/dashboard/mock-exams/:testId/attempts` · Gauge sẵn sàng → kỳ thi · Tạo lộ trình → `/learning-paths/create?attempt=&examTypeId=` (chưa có mục tiêu → `/goals/new?examTypeId=&next=...`) · Chứng chỉ → `/dashboard/certificates/:certificateId`, `/learning-paths/create` · Khách lưu bài → `/login?...` · Về `/` | `/attempts/5e2f…5e6f` → `/learning-paths/create?attempt=5e2f…5e6f&examTypeId=9d4b…4d5e` |
+| `/attempts/:userTestId/review` | `/attempts/:userTestId`, `/` | |
+| `/dashboard/mock-exams/:testId/attempts` | Tab (header đề): `/exams`, kỳ thi, `/dashboard/mock-exams/:slug/attempts`, `/dashboard/mock-exams/:slug/leaderboard`, `/mock-exams/:slug/take` · lượt làm → `/attempts/:userTestId` | `/dashboard/mock-exams/aws-dop-c02-test-1/attempts` → `/dashboard/mock-exams/aws-dop-c02-test-1/leaderboard` |
+| `/dashboard/mock-exams/:testId/leaderboard` | Tab giống trang lịch sử | |
 
 ### Mục tiêu & lộ trình
 
 | Từ | Đi tới | Ví dụ |
 |---|---|---|
-| `/learning-plans` (trung chuyển) | Khách → `/my-target` · có query → `/learning-plans/generate?...` · có lộ trình ACTIVE → lộ trình mới nhất · chưa có → `/learning-plans/generate` | `/learning-plans` → `/learning-plans/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e` |
-| Tab mục tiêu/lộ trình (dùng chung) | `/my-target` · `/learning-plans/generate` · `/my-target/dashboard` | |
-| `/my-target` | Lưu xong → `?next=` hoặc `/learning-plans/generate?examTypeId=` · khách bấm lưu → `/login` | `/my-target?examTypeId=9d4b…4d5e` → `/learning-plans/generate?examTypeId=9d4b…4d5e` |
-| `/learning-plans/generate` | Tạo xong → `/learning-plans/:id` · khách → `/login` · `/exam-types`, kỳ thi nguồn · `/my-target?...` · danh sách: `/learning-plans/:id`, `/learning-plans/:id#chon-ai-hoc`, so sánh `/my-target/dashboard#plan-compare` (khi có ≥ 2 lộ trình) | |
-| `/my-target/dashboard` | `/my-target`, `/my-target/achieved`, lộ trình đang học, `/learning-plans/generate?userTestId=` · lịch sử thi thử → `/tests/result/:userTestId` · mục so sánh lộ trình (`#plan-compare`, khi có ≥ 2 lộ trình): `/tests/result/:sourceUserTestId`, `/learning-plans/:id`, `/learning-plans/:id/study`, `/` | |
-| `/my-target/achieved` | `/my-target/dashboard`, `/my-target`, `/my-target/dashboard#plan-compare`, `/` | |
-| `/learning-plans/:id` | `/learning-plans/:id/study?taskId=` · nhiệm vụ: `.../tasks/:taskId/history`, `.../tasks/:taskId/result` · lộ trình thay thế · `/learning-plans/generate[?examTypeId=&userTestId=]` · kỳ thi | `/learning-plans/3b7f…4d5e` → `/learning-plans/3b7f…4d5e/study?taskId=8a1c…5b6c` |
-| `/learning-plans/:id/study` | Xong nhiệm vụ → `.../tasks/:taskId/result` · thoát → `/learning-plans/:id` · tài liệu phục hồi `/resources/:resourceId` · kỳ thi | |
-| `.../tasks/:taskId/result` | `/learning-plans/:id` · làm lại / nhiệm vụ tiếp → `/learning-plans/:id/study?taskId=` | |
-| `.../tasks/:taskId/history` | `/learning-plans/:id`, `/learning-plans/:id/study?taskId=`, `.../sessions/:sessionId/review?taskId=` | |
-| `.../sessions/:sessionId/review` | `.../tasks/:taskId/history`, `/learning-plans/:id`, `/learning-plans/:id/study?taskId=` | |
+| `/learning-paths` (trung chuyển) | Khách → `/goals/new` · có query → `/learning-paths/create?...` · có lộ trình ACTIVE → lộ trình mới nhất · chưa có → `/learning-paths/create` | `/learning-paths` → `/dashboard/learning-paths/3b7f1d2c-4e5a-4c6b-9d8e-0f1a2b3c4d5e` |
+| Tab mục tiêu/lộ trình (dùng chung) | `/goals/new` · `/learning-paths/create` · `/dashboard/goals/:examCode` · `/dashboard/learning-paths/compare` | |
+| `/goals/new` | Lưu xong → `?next=` hoặc `/learning-paths/create?examTypeId=` · khách bấm lưu → `/login` | `/goals/new?examTypeId=9d4b…4d5e` → `/learning-paths/create?examTypeId=9d4b…4d5e` |
+| `/learning-paths/create` | Tạo xong → `/dashboard/learning-paths/:id` · khách → `/login` · `/exams`, kỳ thi nguồn · `/goals/new?...` · danh sách: `/dashboard/learning-paths/:id`, `/dashboard/learning-paths/:id#chon-ai-hoc`, so sánh `/dashboard/learning-paths/compare` (khi có ≥ 2 lộ trình) | |
+| `/dashboard/goals` | `/goals/new`, `/dashboard/goals/achieved`, lộ trình đang học, `/learning-paths/create?attempt=` · lịch sử thi thử → `/attempts/:userTestId` · đổi kỳ thi → `/dashboard/goals/:examCode` | |
+| `/dashboard/learning-paths/compare` | `/attempts/:sourceUserTestId`, `/dashboard/learning-paths/:id`, `/dashboard/learning-paths/:id/study`, `/learning-paths/create` | |
+| `/dashboard/goals/achieved` | `/dashboard/goals`, `/goals/new`, `/dashboard/learning-paths/compare`, `/` | |
+| `/dashboard/learning-paths/:id` | `/dashboard/learning-paths/:id/study?taskId=` · nhiệm vụ: `/dashboard/tasks/:taskId/history`, `.../tasks/:taskId/result` · lộ trình thay thế · `/learning-paths/create[?examTypeId=&attempt=]` · kỳ thi | `/dashboard/learning-paths/3b7f…4d5e` → `/dashboard/learning-paths/3b7f…4d5e/study?taskId=8a1c…5b6c` |
+| `/dashboard/learning-paths/:id/study` | Xong nhiệm vụ → `.../tasks/:taskId/result` · thoát → `/dashboard/learning-paths/:id` · tài liệu phục hồi `/resources/:resourceId` · kỳ thi | |
+| `.../tasks/:taskId/result` | `/dashboard/learning-paths/:id` · làm lại / nhiệm vụ tiếp → `/dashboard/learning-paths/:id/study?taskId=` | |
+| `/dashboard/tasks/:taskId/history` | `/dashboard/learning-paths/:id`, `/dashboard/learning-paths/:id/study?taskId=`, `.../sessions/:sessionId/review?taskId=` | |
+| `.../sessions/:sessionId/review` | `/dashboard/tasks/:taskId/history`, `/dashboard/learning-paths/:id`, `/dashboard/learning-paths/:id/study?taskId=` | |
 
 ### Cá nhân
 
 | Từ | Đi tới | Ví dụ |
 |---|---|---|
-| `/dashboard` | Lối tắt: `/exam-types`, `/learning-plans`, `/resources`, `/my-certificates` · thẻ mục tiêu: `/my-target`, `/my-target/dashboard?examTypeId=`, `/learning-plans/generate?examTypeId=` | `/dashboard` → `/my-target/dashboard?examTypeId=9d4b…4d5e` |
-| `/my-certificates` | Xem/tải → `/certificates/:certificateId` · Xác minh (tab mới) → `/certificates/verify/:code` · `/` | `/my-certificates` → `/certificates/verify/EXAM-2026-K7P3QX` |
-| `/certificates/:certificateId` | Link xác minh `/certificates/verify/:code`, `/my-certificates` | |
+| `/dashboard` | Lối tắt: `/exams`, `/learning-paths`, `/resources`, `/dashboard/certificates` · thẻ mục tiêu: `/goals/new`, `/dashboard/goals?examTypeId=`, `/learning-paths/create?examTypeId=` | `/dashboard` → `/dashboard/goals?examTypeId=9d4b…4d5e` |
+| `/dashboard/certificates` | Xem/tải → `/dashboard/certificates/:certificateId` · Xác minh (tab mới) → `/certificates/verify/:code` · `/` | `/dashboard/certificates` → `/certificates/verify/EXAM-2026-K7P3QX` |
+| `/dashboard/certificates/:certificateId` | Link xác minh `/certificates/verify/:code`, `/dashboard/certificates` | |
 
 ### Quản trị
 
@@ -221,32 +224,32 @@ Tất cả 🔒, mỗi trang kiểm tra quyền riêng. Không có link từ gia
 
 ```mermaid
 flowchart LR
-  Home["/"] --> Exams["/exam-types"]
+  Home["/"] --> Exams["/exams"]
   Home -->|Thi nhanh| Start
-  Exams --> Exam["/exam-types/:group/:exam"]
+  Exams --> Exam["/exams/:group/:exam"]
   Exam --> Coll[".../collections/:id"]
-  Exam --> Start["/tests/:slug/start"]
+  Exam --> Start["/mock-exams/:slug/take"]
   Coll --> Start
-  Exam --> Hist["/tests/:slug/history"]
-  Exam --> Lead["/tests/:slug/leaderboard"]
-  Start --> Result["/tests/result/:userTestId"]
+  Exam --> Hist["/dashboard/mock-exams/:slug/attempts"]
+  Exam --> Lead["/dashboard/mock-exams/:slug/leaderboard"]
+  Start --> Result["/attempts/:userTestId"]
   Result --> Review[".../review"]
-  Result --> Target["/my-target"]
-  Result --> Gen["/learning-plans/generate"]
+  Result --> Target["/goals/new"]
+  Result --> Gen["/learning-paths/create"]
   Hist --> Result
   Target --> Gen
-  Gen --> Plan["/learning-plans/:id"]
+  Gen --> Plan["/dashboard/learning-paths/:id"]
   Plan --> Study[".../study?taskId="]
   Study --> TaskRes[".../tasks/:taskId/result"]
   TaskRes --> Study
   TaskRes --> Plan
-  Plan --> TaskHist[".../tasks/:taskId/history"]
+  Plan --> TaskHist["/dashboard/tasks/:taskId/history"]
   TaskHist --> SessRev[".../sessions/:sid/review"]
   Result --> Cert["/certificates/:id"]
   Cert --> Verify["/certificates/verify/:code"]
 ```
 
-Luồng khách: làm bài → kết quả → "Lưu / tạo lộ trình" → `/login?mode=signup&from=/my-target?examTypeId=..&next=/learning-plans/generate?userTestId=..` → đặt mục tiêu → sinh lộ trình (bài vừa làm được gắn vào tài khoản sau khi đăng nhập).
+Luồng khách: làm bài → kết quả → "Lưu / tạo lộ trình" → `/login?mode=signup&from=/goals/new?examTypeId=..&next=/learning-paths/create?attempt=..` → đặt mục tiêu → sinh lộ trình (bài vừa làm được gắn vào tài khoản sau khi đăng nhập).
 
 ---
 
@@ -258,8 +261,60 @@ Không có lối vào trên giao diện (link bị comment hoặc không có lin
 - Trang tra cứu chứng chỉ gốc `/certificates/verify` (link "Chứng chỉ" trên Header đã ẩn; trang `/certificates/verify/:code` vẫn dùng)
 - Thẻ ghi nhớ: `/my-albums`, `/albums/:albumId`, `/practice/:albumId`
 - Lớp học: `/my-classes`, `/class/:classId/chapters`, `/class/:classId/members`, `/classes/:classId/chapters/:chapterId/tests`
-- `/admin/create-test-from-bank`
-- `/my-target/mocks` (chỉ để chuyển link cũ sang `/my-target/dashboard`)
-- `/learning-plans/compare` (chỉ để chuyển link cũ sang `/my-target/dashboard#plan-compare`)
+- `/dashboard/question-bank/create-test`
 
-Ghi chú khác: `PROTECTED_PREFIXES` trong [proxy.ts](proxy.ts) có `/tests/history` và `/tests/leaderboard`, nhưng URL thật là `/tests/:testId/history` nên proxy không chặn; hai trang này chỉ được bảo vệ bởi `AuthGuard` của layout `(user)` ở phía client.
+---
+
+## 6. SEO: tiêu đề, mô tả, index
+
+Làm theo bảng SEO. Tiêu đề ghép theo mẫu `%s | FrostScope` ở [app/[locale]/layout.tsx](app/[locale]/layout.tsx), trừ trang chủ và `/about` (tên thương hiệu đã đứng đầu). Chữ nằm ở `app/i18n/messages/<vi|en>/<Namespace>.json`, khóa ghi ở cột cuối; sửa tiêu đề/mô tả thì sửa trong JSON, cả hai ngôn ngữ.
+
+### Trang index (có trong sitemap)
+
+| Trang | URL | Tiêu đề (vi) | Khóa tiêu đề / mô tả |
+|---|---|---|---|
+| Trang chủ | `/` | FrostScope \| Nền tảng luyện thi chứng chỉ Cloud cá nhân hóa | `Metadata.title` / `Metadata.description` |
+| Giới thiệu | `/about` | Giới thiệu FrostScope \| Nền tảng luyện thi chứng chỉ Cloud cá nhân hóa | `About.meta.*` |
+| Liên hệ | `/contact` | Liên hệ \| FrostScope | `Contact.meta.*` |
+| Chính sách bảo mật | `/privacy-policy` | Chính sách bảo mật \| FrostScope | `Policy.meta.*` |
+| Điều khoản sử dụng | `/terms` | Điều khoản sử dụng \| FrostScope | `Service.meta.*` |
+| Danh sách kỳ thi | `/exams` | Danh sách kỳ thi chứng chỉ Cloud \| FrostScope | `ExamTypes.meta.*` |
+| Nhóm hãng | `/exams/aws` · `/exams/azure` · `/exams/google-cloud` | Các kỳ thi chứng chỉ AWS \| FrostScope (Azure: "Microsoft Azure", GCP: "Google Cloud") | `ExamTypes.groupMeta.bySlug.<slug>.*`; hãng khác dùng `ExamTypes.groupMeta.title/description` với `{name}` |
+| Chi tiết kỳ thi | `/exams/aws/saa-c03` · `/exams/azure/az-104` · `/exams/google-cloud/associate-cloud-engineer` | `{Tên kỳ thi}` \| FrostScope | Tiêu đề: `ExamTypes.detailMeta.title`; mô tả: `ExamTypes.detailMeta.bySlug.<slug>`, kỳ thi khác dùng `ExamTypes.detailMeta.description` |
+
+- Trang hãng và trang kỳ thi chọn câu theo slug trong database ([examTypeRoute.ts](app/[locale]/(public)/exams/[group]/_lib/examTypeRoute.ts)): slug đổi thì câu viết riêng không còn khớp, trang rơi về mẫu chung. `{Tên kỳ thi}` là trường `name` của kỳ thi, vd "AWS Certified Solutions Architect – Associate (SAA-C03)".
+- Trang công khai không khai `robots` đều được index, kể cả trang không có trong bảng (bộ đề, `/posts`, danh sách `/resources`...). [sitemap.ts](app/sitemap.ts) gồm trang tĩnh trong bảng, `/posts`, `/certificates/verify`, mọi kỳ thi và bài viết, mỗi URL kèm bản `/en`.
+
+### Trang noindex, follow (không có trong sitemap)
+
+Các trang dưới đây không nằm trong sitemap và **không** bị chặn trong robots.txt, để Googlebot tải được trang và đọc chỉ thị noindex. Chỉ `/login` và `/forgot-password` có mô tả, các trang còn lại không có.
+
+| Trang | URL | Tiêu đề (vi) | Khóa tiêu đề / nơi đặt noindex |
+|---|---|---|---|
+| Đăng nhập | `/login` | Đăng nhập \| FrostScope | `Auth.meta.login*` / metadata của trang |
+| Quên mật khẩu | `/forgot-password` | Quên mật khẩu \| FrostScope | `Auth.meta.forgot*` / metadata của trang |
+| Trang quản trị | `/dashboard` | Trang quản trị \| FrostScope | `Metadata.private.dashboard` / layout `(user)` |
+| Danh sách mục tiêu | `/dashboard/goals` | Danh sách mục tiêu \| FrostScope | `Metadata.private.goals` / layout `(user)` |
+| Mục tiêu theo kỳ thi | `/dashboard/goals/:examCode` (vd `aws-saa-c03`) | Chi tiết mục tiêu \| FrostScope | `Metadata.private.goalDetail` / layout `(user)` |
+| Mục tiêu đã đạt | `/dashboard/goals/achieved` | Mục tiêu đã đạt \| FrostScope | `Metadata.private.goalsAchieved` / layout `(user)` |
+| So sánh lộ trình | `/dashboard/learning-paths/compare` | So sánh lộ trình \| FrostScope | `Metadata.private.planCompare` / layout `(user)` |
+| Chi tiết lộ trình | `/dashboard/learning-paths/:learningPlanId` | Chi tiết lộ trình \| FrostScope | `Metadata.private.planDetail` / layout `(user)` |
+| Lịch sử nhiệm vụ | `/dashboard/tasks/:taskId/history` | Lịch sử nhiệm vụ \| FrostScope | `Metadata.private.taskHistory` / layout `(user)` |
+| Lịch sử thi thử | `/dashboard/mock-exams/:testId/attempts` | Lịch sử thi thử \| FrostScope | `Metadata.private.mockAttempts` / layout `(user)` |
+| Chứng chỉ cá nhân | `/dashboard/certificates` | Chứng chỉ cá nhân \| FrostScope | `Metadata.private.certificates` / layout `(user)` |
+| Làm bài thi thử | `/mock-exams/:testId/take` (vd `aws-dop-c02-01`) | Làm bài thi thử \| FrostScope | `Metadata.private.mockTake` / layout `(guest-exam)` |
+| Kết quả làm bài | `/attempts/:userTestId` | Kết quả bài thi \| FrostScope | `Metadata.private.attemptResult` / layout `(guest)` |
+| Xem lại đáp án | `/attempts/:userTestId/review` | Xem lại bài thi \| FrostScope | `Metadata.private.attemptReview` / layout `(guest-focus)` |
+| Điều hướng lộ trình | `/learning-paths` | Lộ trình học tập \| FrostScope | `Metadata.private.learningPaths` / layout `(guest)` |
+| Tạo lộ trình | `/learning-paths/create?attempt=<userTestId>` | Tạo lộ trình \| FrostScope | `Metadata.private.planCreate` / layout `(guest)` |
+| Thiết lập mục tiêu | `/goals/new?exam=<mã kỳ thi>` (vd `aws-dop-c02`) | Thiết lập mục tiêu \| FrostScope | `Metadata.private.goalNew` / layout `(guest)` |
+| Trang tài nguyên | `/resources/:resourceId` | Trang tài nguyên \| FrostScope | `Resources.detailMeta.title` / metadata của trang |
+
+- Trang dưới `/dashboard` còn được [proxy.ts](proxy.ts) chặn ở server khi chưa đăng nhập; noindex không thay cho đăng nhập.
+- Không có trong bảng nhưng cũng noindex: các trang khác dưới `/dashboard/**` (gồm `(user-focus)`), `/coming-soon`, `/certificates/verify/:code`. Trang 404 là `noindex, nofollow`.
+- `noindex, follow` là hằng `PRIVATE_ROBOTS` trong [app/i18n/metadata.ts](app/i18n/metadata.ts); trang mới đặt trong các nhóm route trên tự nhận qua layout.
+
+### URL
+
+- Không có `/` ở cuối (bảng SEO ghi `/about/`): `/about/` được Next trả 308 sang `/about`. Canonical, hreflang (`localeAlternates` trong [app/i18n/metadata.ts](app/i18n/metadata.ts)) và sitemap đều dùng dạng không `/`.
+- Bản tiếng Anh thêm `/en` phía trước, tiêu đề/mô tả lấy từ `messages/en`.

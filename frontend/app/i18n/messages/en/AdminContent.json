@@ -156,7 +156,7 @@
       "name": "Name",
       "slug": "Slug (URL path)",
       "slugPlaceholder": "e.g. saa-c03",
-      "slugHelp": "Used in URLs, e.g. /exam-types/aws/saa-c03. Lowercase letters without accents, digits and hyphens only.",
+      "slugHelp": "Used in URLs, e.g. /exams/aws/saa-c03. Lowercase letters without accents, digits and hyphens only.",
       "slugChangeWarning": "Changing the slug breaks links that use the old slug.",
       "description": "Description",
       "imageUrl": "Cover image URL (optional)",

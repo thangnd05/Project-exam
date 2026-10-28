@@ -3,7 +3,8 @@
     "ariaLabel": "Target and study plan",
     "target": "Target",
     "plan": "Create plan",
-    "overview": "Overview"
+    "overview": "Overview",
+    "compare": "Compare"
   },
   "examPicker": {
     "label": "Exam",

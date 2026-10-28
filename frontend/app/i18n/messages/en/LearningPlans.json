@@ -231,6 +231,10 @@
   },
   "compare": {
     "title": "Compare study plans",
+    "subtitle": "See the starting readiness and progress of every plan you have created for this exam.",
+    "emptyTitle": "Not enough plans to compare yet",
+    "emptyDescription": "You need at least {min} plans for this exam. Take another mock exam and create a new plan to compare.",
+    "generateMore": "Create a new plan",
     "examType": "Exam",
     "generateFirst": "Create your first plan",
     "diffVsPrev": "({diff}% vs plan #{sequence})",

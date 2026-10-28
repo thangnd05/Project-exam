@@ -4,7 +4,7 @@ import { fetchPublicResource } from '@/app/utils/serverApi';
 export type TestRef = { testId: string; slug: string };
 
 /**
- * Dùng trong page server của /tests/[testId]/...: đoạn URL là slug (hoặc id ở link cũ),
+ * Dùng trong page server của /mock-exams/[testId]/take và /dashboard/mock-exams/[testId]/...: đoạn URL là slug (hoặc id ở link cũ),
  * trả testId để component gọi API. Không có đề thì 404. Link id cũ đã được proxy chuyển sang slug.
  */
 export async function requireTestRef(key: string): Promise<TestRef> {

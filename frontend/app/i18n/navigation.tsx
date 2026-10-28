@@ -35,7 +35,7 @@ export function useRouter(): NextRouter {
   );
 }
 
-// Pathname không kèm tiền tố ngôn ngữ ('/en/exam-types' -> '/exam-types'), để so khớp route như trước.
+// Pathname không kèm tiền tố ngôn ngữ ('/en/exams' -> '/exams'), để so khớp route như trước.
 export function usePathname(): string {
   return splitLocale(useNextPathname()).pathname;
 }

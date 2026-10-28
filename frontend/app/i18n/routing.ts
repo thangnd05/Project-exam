@@ -1,6 +1,6 @@
 import { defineRouting } from 'next-intl/routing';
 
-// Tiếng Việt là mặc định và không có tiền tố (/exam-types), tiếng Anh nằm dưới /en (/en/exam-types).
+// Tiếng Việt là mặc định và không có tiền tố (/exams), tiếng Anh nằm dưới /en (/en/exams).
 // Ngôn ngữ chỉ lấy từ URL: không đoán theo Accept-Language hay cookie, để người Việt dùng trình duyệt
 // tiếng Anh không bị đẩy sang /en, và mỗi URL luôn ra đúng một bản cho bộ máy tìm kiếm.
 export const routing = defineRouting({
@@ -29,7 +29,7 @@ export function isPagePath(pathname: string): boolean {
   return !FILE_EXTENSION.test(pathname);
 }
 
-// '/en/exam-types' -> { locale: 'en', pathname: '/exam-types' }; '/exam-types' -> locale mặc định.
+// '/en/exams' -> { locale: 'en', pathname: '/exams' }; '/exams' -> locale mặc định.
 export function splitLocale(pathname: string): { locale: Locale; pathname: string } {
   const [, first, ...rest] = pathname.split('/');
   const locale = routing.locales.find((l) => l === first);

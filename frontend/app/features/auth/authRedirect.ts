@@ -7,7 +7,7 @@ const OAUTH_REDIRECT_KEY = 'postLoginRedirect';
 
 type SearchParamsLike = { get(name: string): string | null };
 
-const AUTH_PAGES = ['/login', '/forgot', '/reset'];
+const AUTH_PAGES = ['/login', '/forgot-password', '/reset'];
 const PROBE_ORIGIN = 'https://internal.invalid';
 
 const isInternalPath = (target: string): boolean => {

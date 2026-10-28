@@ -97,7 +97,7 @@ mà không tự biến thành URL.
 | File `.ts` không phải component | camelCase như hiện có (`useTestSession.ts`, `planLabels.ts`) |
 | Style | SCSS module cạnh component; cấm hex/rgba literal - dùng token trong GlobalStyles |
 | Lớp nổi | Header, thanh dưới, nút nổi, modal dùng `var(--z-*)` trong GlobalStyles; toast/tooltip luôn trên modal |
-| Font | Chỉ 3 token: `--font-family` (Inter, giao diện), `--font-mono` (JetBrains Mono, mã/nhãn kỹ thuật), `--font-serif` (Playfair, chứng chỉ và tiêu đề bài viết); không khai font-family literal |
+| Font | Chỉ 3 token: `--font-family` (Be Vietnam Pro, giao diện), `--font-mono` (JetBrains Mono, mã/nhãn kỹ thuật), `--font-serif` (Playfair, chứng chỉ và tiêu đề bài viết); không khai font-family literal |
 | Ngày giờ / số | Chỉ dùng `app/utils/format-date-time.ts` (`formatDate`, `formatDateTime`, `formatFullDateTime` cho audit, `formatLongDate` cho bài viết/tiêu đề) và `formatNumber.ts`; không gọi `toLocale*String` trực tiếp |
 | Tiêu đề trang | Trang người dùng dùng `<PageHeader />` (mặc định kiểu phẳng FrostScope); dải gradient `variant="band"` chỉ cho admin qua `AdminPageHeader` |
 | Rỗng / lỗi tải | Vùng nội dung chính dùng `<EmptyState />` (`tone="danger"` khi lỗi tải); xác nhận thao tác dùng `ConfirmModal`, không dùng `window.confirm` |
@@ -127,11 +127,10 @@ mang tên nó, không còn hàng chục `index.js` trùng tên như cấu trúc 
 | Kiểu dữ liệu backend trả về | `app/types/` |
 | Màu, biến CSS | `app/assets/styles/GlobalStyles/` |
 
-> **Bẫy hay nhầm nhất:** 27 trang quản trị nằm ở `(admin)/admin/*`, nhưng
-> `/admin/create-test-from-bank` và `/admin/personal-question-bank` lại nằm ở
-> **`(user)/admin/*`**. Hai trang này chỉ cần đăng nhập chứ không cần quyền admin, nên phải
-> ở nhóm có guard khác - URL giống nhau nhưng lớp bảo vệ khác nhau. Tìm trong `(admin)` sẽ
-> không thấy chúng.
+> **URL `/admin/*` chỉ dành cho khu quản trị** (`(admin)/admin/*`, cần quyền admin). Trang chỉ
+> cần đăng nhập thì để dưới `/dashboard/*` ở nhóm `(user)`, kể cả khi chỉ tài khoản ADMIN thấy
+> lối vào - vd. ngân hàng câu hỏi cá nhân `(user)/dashboard/question-bank` (trước là
+> `/admin/personal-question-bank`, `next.config` đã chuyển hướng URL cũ).
 
 ## 5. Điểm cần biết
 

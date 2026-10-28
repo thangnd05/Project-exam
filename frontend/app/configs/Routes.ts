@@ -4,12 +4,13 @@ const routes = {
   posts: '/posts',
   postDetail: '/posts/:postId',
   recoveryResourceView: '/resources/:resourceId',
-  policy: '/policy',
-  service: '/service',
+  policy: '/privacy-policy',
+  service: '/terms',
+  contact: '/contact',
 
   classChapterPage: '/class/:classId/chapters',
 
-  personalQuestionBank: '/admin/personal-question-bank',
+  personalQuestionBank: '/dashboard/question-bank',
 
   adminDashboard: '/admin/dashboard',
   adminUsers: '/admin/users',
@@ -40,16 +41,18 @@ const routes = {
   adminStreakRecover: '/admin/streak-recover',
   adminCertificates: '/admin/certificates',
 
-  testHistory: '/tests/:testId/history',
-  examTypes: '/exam-types',
+  examTypes: '/exams',
   resources: '/resources',
   comingSoon: '/coming-soon',
 
-  myCertificates: '/my-certificates',
+  myCertificates: '/dashboard/certificates',
   certificateVerifyHome: '/certificates/verify',
 
-  learningPlans: '/learning-plans',
-  generatePlan: '/learning-plans/generate',
+  learningPlans: '/learning-paths',
+  generatePlan: '/learning-paths/create',
+  // Chi tiết lộ trình và các trang con là trang cá nhân: /dashboard/learning-paths/<id>/...
+  learningPlanBase: '/dashboard/learning-paths',
+  planCompare: '/dashboard/learning-paths/compare',
 
   myAlbums: '/my-albums',
 
@@ -58,13 +61,14 @@ const routes = {
   classMemberManagement: '/class/:classId/members',
 
   login: '/login',
-  forgot: '/forgot',
+  forgot: '/forgot-password',
   reset: '/reset',
   dashboard: '/dashboard',
-  myTarget: '/my-target',
-  targetDashboard: '/my-target/dashboard',
+  myTarget: '/goals/new',
+  targetDashboard: '/dashboard/goals',
+  targetAchieved: '/dashboard/goals/achieved',
 
-  notFoundPage: '/not-found',
+  notFoundPage: '/404',
 } as const;
 
 type ExamTypeRef =
@@ -74,7 +78,7 @@ type ExamTypeRef =
   | undefined
   | { examTypeId?: string | null; slug?: string | null; parentSlug?: string | null };
 
-// Có slug thì dùng đường dẫn slug (/exam-types/aws/saa-c03); chỉ có id thì dùng /exam-types/<id>,
+// Có slug thì dùng đường dẫn slug (/exams/aws/saa-c03); chỉ có id thì dùng /exams/<id>,
 // trang chi tiết sẽ tự chuyển hướng 308 sang đường dẫn slug.
 function examTypeSegment(exam: ExamTypeRef): string {
   if (exam && typeof exam === 'object') {
@@ -90,7 +94,7 @@ function examTypeSegment(exam: ExamTypeRef): string {
 
 export function buildExamTypeDetailPath(exam: ExamTypeRef): string {
   const segment = examTypeSegment(exam);
-  return segment ? `/exam-types/${segment}` : routes.home;
+  return segment ? `/exams/${segment}` : routes.home;
 }
 
 export function buildExamTypeCollectionPath(
@@ -99,17 +103,36 @@ export function buildExamTypeCollectionPath(
 ): string {
   const segment = examTypeSegment(exam);
   if (!segment || !collectionId) return routes.home;
-  return `/exam-types/${segment}/collections/${encodeURIComponent(collectionId)}`;
+  return `/exams/${segment}/collections/${encodeURIComponent(collectionId)}`;
 }
 
 export type TestPage = 'start' | 'history' | 'leaderboard';
 
-// Có slug thì dùng /tests/aws-dop-c02-test-1/<trang>; chỉ có id thì /tests/<id>/<trang>, proxy chuyển hướng 308 sang slug.
+// Làm bài là trang chung (/mock-exams/<đề>/take); lịch sử và bảng xếp hạng là trang cá nhân dưới /dashboard/mock-exams.
+const TEST_PAGE_PATH: Record<TestPage, (key: string) => string> = {
+  start: (key) => `/mock-exams/${key}/take`,
+  history: (key) => `/dashboard/mock-exams/${key}/attempts`,
+  leaderboard: (key) => `/dashboard/mock-exams/${key}/leaderboard`,
+};
+
+// Có slug thì dùng slug của đề (aws-dop-c02-test-1); chỉ có id thì dùng id, trang server tự tra ra đề.
 export function buildTestPath(
   test: { slug?: string | null; testId: string },
   page: TestPage,
 ): string {
-  return `/tests/${encodeURIComponent(test.slug || test.testId)}/${page}`;
+  return TEST_PAGE_PATH[page](encodeURIComponent(test.slug || test.testId));
+}
+
+// Mã kỳ thi trên URL mục tiêu: slug nhóm + slug kỳ thi (aws-saa-c03), kỳ thi một cấp thì chỉ slug.
+export function examGoalCode(exam: { slug?: string | null; parentSlug?: string | null }): string {
+  if (!exam.slug) return '';
+  return exam.parentSlug ? `${exam.parentSlug}-${exam.slug}` : exam.slug;
+}
+
+/** Trang mục tiêu của một kỳ thi: /dashboard/goals/aws-saa-c03 (chưa có slug thì về danh sách mục tiêu). */
+export function buildGoalPath(exam: { slug?: string | null; parentSlug?: string | null } | null | undefined): string {
+  const code = exam ? examGoalCode(exam) : '';
+  return code ? `${routes.targetDashboard}/${encodeURIComponent(code)}` : routes.targetDashboard;
 }
 
 export default routes;

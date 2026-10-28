@@ -156,7 +156,7 @@
       "name": "Tên",
       "slug": "Slug (đường dẫn)",
       "slugPlaceholder": "vd: saa-c03",
-      "slugHelp": "Dùng trong URL, vd /exam-types/aws/saa-c03. Chỉ gồm chữ thường không dấu, số và gạch ngang.",
+      "slugHelp": "Dùng trong URL, vd /exams/aws/saa-c03. Chỉ gồm chữ thường không dấu, số và gạch ngang.",
       "slugChangeWarning": "Đổi slug thì link dạng slug cũ sẽ không mở được nữa.",
       "description": "Mô tả",
       "imageUrl": "URL ảnh đại diện (tùy chọn)",

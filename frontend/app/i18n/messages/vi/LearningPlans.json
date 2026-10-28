@@ -231,6 +231,10 @@
   },
   "compare": {
     "title": "So sánh các lộ trình",
+    "subtitle": "Xem mức sẵn sàng ban đầu và tiến độ của từng lộ trình bạn đã tạo cho kỳ thi.",
+    "emptyTitle": "Chưa đủ lộ trình để so sánh",
+    "emptyDescription": "Cần ít nhất {min} lộ trình của kỳ thi này. Làm thêm bài thi thử rồi tạo lộ trình mới để so sánh.",
+    "generateMore": "Tạo lộ trình mới",
     "examType": "Loại kỳ thi",
     "generateFirst": "Sinh lộ trình đầu tiên",
     "diffVsPrev": "({diff}% so với lộ trình #{sequence})",
