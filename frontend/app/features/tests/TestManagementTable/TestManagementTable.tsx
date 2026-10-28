@@ -3,7 +3,8 @@
 import { useRouter } from '@/app/i18n/navigation';
 import React from 'react';
 import { useTranslations } from 'next-intl';
-import {Table, Badge, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Table, Badge, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { Pencil, Trash2, ChartNoAxesColumnIncreasing } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '@/app/features/tests/TestManagementTable/TestManagementTable.module.scss';
@@ -86,40 +87,43 @@ const TestManagementTable = ({tests, onDelete, onRefresh, countdowns}: TestManag
                   <div className={cx('action-group')}>
                     {onRefresh && (
                       <OverlayTrigger overlay={<Tooltip>{t('edit')}</Tooltip>}>
-                        <Button
-                          variant="link"
-                          className={cx('btn-action', 'edit')}
+                        <ButtonPrime
+                          size="icon"
+                          variant="ghost"
+                          aria-label={t('edit')}
                           onClick={() => setEditingTest(test)}
                         >
-                          <Pencil size="1em" />
-                        </Button>
+                          <Pencil size={18} />
+                        </ButtonPrime>
                       </OverlayTrigger>
                     )}
 
                     {onDelete && (
                       <OverlayTrigger overlay={<Tooltip>{t('delete')}</Tooltip>}>
-                        <Button
-                          variant="link"
-                          className={cx('btn-action', 'delete')}
+                        <ButtonPrime
+                          size="icon"
+                          variant="dangerGhost"
+                          aria-label={t('delete')}
                           onClick={() => onDelete(test.testId)}
                         >
-                          <Trash2 size="1em" />
-                        </Button>
+                          <Trash2 size={18} />
+                        </ButtonPrime>
                       </OverlayTrigger>
                     )}
 
                     <OverlayTrigger
                       overlay={<Tooltip>{t('viewScores')}</Tooltip>}
                     >
-                      <Button
-                        variant="link"
-                        className={cx('btn-action', 'stats')}
+                      <ButtonPrime
+                        size="icon"
+                        variant="ghost"
+                        aria-label={t('viewScores')}
                         onClick={() =>
                           router.push(buildTestPath(test, 'history'))
                         }
                       >
-                        <ChartNoAxesColumnIncreasing size="1em" />
-                      </Button>
+                        <ChartNoAxesColumnIncreasing size={18} />
+                      </ButtonPrime>
                     </OverlayTrigger>
                   </div>
                 </td>

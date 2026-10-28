@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { Flame, CircleDollarSign } from 'lucide-react';
 
 import BaseModal from '@/app/components/modal/BaseModal';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { useStreak } from '@/app/features/gamification/streak/hooks/useStreak';
 import { useCoins } from '@/app/features/gamification/coin/hooks/useCoins';
 import { useRestoreStreak } from '@/app/features/gamification/streak/hooks/useRestoreStreak';
@@ -47,22 +48,12 @@ function StreakRestoreModal({ show, onClose }: StreakRestoreModalProps) {
       maxWidth={420}
       footer={
         <>
-          <button
-            type="button"
-            className={cx('cancelBtn')}
-            onClick={onClose}
-            disabled={busy}
-          >
+          <ButtonPrime variant="soft" size="md" onClick={onClose} disabled={busy}>
             {t('restore.later')}
-          </button>
-          <button
-            type="button"
-            className={cx('confirmBtn')}
-            onClick={handleRestore}
-            disabled={busy || !enough}
-          >
+          </ButtonPrime>
+          <ButtonPrime variant="streak" size="md" onClick={handleRestore} disabled={busy || !enough}>
             {busy ? t('restore.restoring') : enough ? t('restore.restore', { cost: recoverCost }) : t('restore.notEnough')}
-          </button>
+          </ButtonPrime>
         </>
       }
     >

@@ -13,6 +13,7 @@ import {formatFullNumber} from '@/app/utils/formatNumber';
 import {useCoins} from '@/app/features/gamification/coin/hooks/useCoins';
 import {useClaimQuest} from '@/app/features/gamification/coin/hooks/useClaimQuest';
 import BaseModal from '@/app/components/modal/BaseModal';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import CosmeticShop from '@/app/features/gamification/cosmetic/CosmeticShop';
 import {QuestConditionType} from '@/app/enums';
 import type {UserQuestResponse} from '@/app/types';
@@ -179,14 +180,15 @@ function QuestModal({show, onClose}: QuestModalProps) {
               {t('quests.claimedBadge')}
             </span>
           ) : quest.eligible ? (
-            <button
-              type="button"
+            <ButtonPrime
+              variant="coin"
+              size="sm"
               className={cx('claimBtn')}
               disabled={claimingId === quest.questId}
               onClick={() => handleClaim(quest)}
             >
               {claimingId === quest.questId ? t('quests.claiming') : t('quests.claim')}
-            </button>
+            </ButtonPrime>
           ) : null}
         </div>
       </div>

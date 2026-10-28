@@ -157,7 +157,6 @@ function TestCard({ test, countdowns }: TestCardProps) {
                     <ButtonPrime
                         variant="primary"
                         size="sm"
-                        className={cx('btn-primary-modern')}
                         onClick={handleStart}
                         disabled={!canStart}
                     >
@@ -168,7 +167,6 @@ function TestCard({ test, countdowns }: TestCardProps) {
                         <ButtonPrime
                             variant="outline"
                             size="sm"
-                            className={cx('btn-outline-modern')}
                             onClick={() =>
                                 router.push(buildTestPath(test, 'history'))
                             }
@@ -180,8 +178,7 @@ function TestCard({ test, countdowns }: TestCardProps) {
                     {showLeaderboard && (
                         <ButtonPrime
                             variant="ghost"
-                            size="sm"
-                            className={cx('btn-icon-modern')}
+                            size="icon"
                             title={t('leaderboard')}
                             aria-label={t('leaderboard')}
                             onClick={() =>

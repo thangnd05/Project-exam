@@ -2,45 +2,15 @@
 
 // Dùng BaseModal variant="plain" + ButtonPrime (brand/outline) như popup thi nhanh ở trang chủ.
 
+// Hai tab chế độ là ButtonPrime (ink khi chọn, ghost khi không) đặt trong rãnh nền nhạt.
 .tabs {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
   margin-bottom: 18px;
   padding: 4px;
-  border-radius: 14px;
+  border-radius: var(--radius-pill);
   background: var(--input-bg);
-}
-
-.tab {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px;
-  border: none;
-  border-radius: 10px;
-  background: transparent;
-  font-size: var(--font-size-md);
-  font-weight: 700;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover:not(.active) {
-    color: var(--text-color);
-  }
-
-  &.active {
-    background: var(--bg-white);
-    color: var(--primary-text);
-    box-shadow: var(--shadow-sm), 0 0 0 1px var(--border-color);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 2px;
-  }
 }
 
 // Chiều cao cố định để đổi tab không làm popup nhảy kích thước.
@@ -350,7 +320,6 @@
 
 .footerBtn {
   flex: 1;
-  justify-content: center;
 }
 
 .summary {
@@ -366,7 +335,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tab,
   .part-row,
   .checkbox,
   .guide-chevron,

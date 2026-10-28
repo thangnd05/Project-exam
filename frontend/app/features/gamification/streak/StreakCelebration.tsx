@@ -1,9 +1,10 @@
 'use client';
 
-import { Modal, Button } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import style from '@/app/features/gamification/streak/StreakCelebration.module.scss';
 import { useStreak } from '@/app/features/gamification/streak/hooks/useStreak';
 import { Flame } from 'lucide-react';
@@ -35,9 +36,9 @@ function StreakCelebration() {
         <p className={cx('subtitle')}>
           {t('subtitle', { count: currentStreak })}
         </p>
-        <Button className={cx('btn')} onClick={clearJustIncreased}>
+        <ButtonPrime variant="streak" className={cx('btn')} onClick={clearJustIncreased}>
           {t('continue')}
-        </Button>
+        </ButtonPrime>
       </Modal.Body>
     </Modal>
   );

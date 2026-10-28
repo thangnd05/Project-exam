@@ -2,6 +2,7 @@
 
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/features/tests/CreateTestModal.module.scss';
 import { CREATOR_TYPES } from '@/app/features/tests/creator/hooks/useCreateTest';
 import type { CreatorType } from '@/app/features/tests/creator/hooks/useCreateTest';
@@ -17,34 +18,30 @@ const CreatorTabs = ({ activeCreatorType, setCreatorType }: CreatorTabsProps) =>
     const t = useTranslations('TestCreator');
     return (
         <div className={cx('creatorTypeTabs')}>
-            <button
-                type="button"
-                className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.TEST })}
+            <ButtonPrime
+                variant={activeCreatorType === CREATOR_TYPES.TEST ? 'primary' : 'soft'}
                 onClick={() => setCreatorType(CREATOR_TYPES.TEST)}
             >
                 {t('creatorTabs.test')}
-            </button>
-            <button
-                type="button"
-                className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.BANK })}
+            </ButtonPrime>
+            <ButtonPrime
+                variant={activeCreatorType === CREATOR_TYPES.BANK ? 'primary' : 'soft'}
                 onClick={() => setCreatorType(CREATOR_TYPES.BANK)}
             >
                 {t('creatorTabs.bank')}
-            </button>
-            <button
-                type="button"
-                className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.BULK })}
+            </ButtonPrime>
+            <ButtonPrime
+                variant={activeCreatorType === CREATOR_TYPES.BULK ? 'primary' : 'soft'}
                 onClick={() => setCreatorType(CREATOR_TYPES.BULK)}
             >
                 {t('creatorTabs.bulk')}
-            </button>
-            <button
-                type="button"
-                className={cx('creatorTypeTab', { active: activeCreatorType === CREATOR_TYPES.PASSAGE })}
+            </ButtonPrime>
+            <ButtonPrime
+                variant={activeCreatorType === CREATOR_TYPES.PASSAGE ? 'primary' : 'soft'}
                 onClick={() => setCreatorType(CREATOR_TYPES.PASSAGE)}
             >
                 {t('creatorTabs.passage')}
-            </button>
+            </ButtonPrime>
         </div>
     );
 };

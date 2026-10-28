@@ -218,8 +218,9 @@ const JsonQuestionsPreview = ({
           <span className={cx('tagSummaryItem', 'danger')}>{t('jsonPreview.unmatched', { count: counts.unmatched })}</span>
         )}
         {(issueCount > 0 || issuesOnly) && (
-          <button
-            type="button"
+          <ButtonPrime
+            size="sm"
+            variant="outline"
             className={cx('tagFilterBtn')}
             onClick={() => {
               setIssuesOnly((v) => !v);
@@ -227,7 +228,7 @@ const JsonQuestionsPreview = ({
             }}
           >
             {issuesOnly ? t('form.editor.showAll') : t('jsonPreview.showIssuesOnly', { count: issueCount })}
-          </button>
+          </ButtonPrime>
         )}
       </div>
       {issueCount > 0 && (

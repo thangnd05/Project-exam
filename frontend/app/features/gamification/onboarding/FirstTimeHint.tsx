@@ -5,6 +5,7 @@ import type {ReactNode} from 'react';
 import {Overlay, Popover} from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import {useTranslations} from 'next-intl';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/features/gamification/onboarding/FirstTimeHint.module.scss';
 
 const cx = classNames.bind(styles);
@@ -67,9 +68,11 @@ function FirstTimeHint({hintKey, title, body, placement = 'bottom', enabled = tr
           <Popover.Body>
             <p className={cx('title')}>{title}</p>
             <div className={cx('body')}>{body}</div>
-            <button type="button" className={cx('okBtn')} onClick={dismiss}>
-              {t('ok')}
-            </button>
+            <div className={cx('actions')}>
+              <ButtonPrime variant="primary" size="sm" onClick={dismiss}>
+                {t('ok')}
+              </ButtonPrime>
+            </div>
           </Popover.Body>
         </Popover>
       </Overlay>

@@ -34,26 +34,11 @@
   text-shadow: 0 1px 2px rgb(var(--brand-900-rgb) / 0.25);
 }
 
+// Nút đóng là ButtonPrime onDark size icon; chỉ giữ vị trí góc trên phải của dải gradient.
 .closeBtn {
   position: absolute;
   top: 1rem;
   right: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 3.2rem;
-  height: 3.2rem;
-  border: none;
-  border-radius: 50%;
-  background: var(--on-primary-gradient-soft);
-  color: var(--on-primary-gradient);
-  font-size: var(--font-size-lg);
-  cursor: pointer;
-  transition: background 0.2s ease;
-
-  &:hover {
-    background: rgb(var(--brand-900-rgb) / 0.14);
-  }
 }
 
 .trophyRing {
@@ -152,39 +137,6 @@
   flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
-}
-
-.btnPrimary {
-  padding: 1rem 2.4rem;
-  border: none;
-  border-radius: 10px;
-  background: var(--primary-gradient);
-  color: var(--on-primary-gradient);
-  font-size: var(--font-size-md);
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--premium-shadow);
-  }
-}
-
-.btnGhost {
-  padding: 1rem 2rem;
-  border: 1px solid var(--gray-300);
-  border-radius: 10px;
-  background: var(--bg-white);
-  color: var(--slate-600);
-  font-size: var(--font-size-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease;
-
-  &:hover {
-    background: var(--slate-50);
-  }
 }
 
 .confetti {

@@ -1038,8 +1038,9 @@ const CreateTestFormBody = ({
                 {editorTagIssues.slice(0, 15).map((i) => t('form.editor.questionLabel', { number: i + 1 })).join(', ')}
                 {editorTagIssues.length > 15 ? ` ${t('form.editor.andMore', { count: editorTagIssues.length - 15 })}` : ''}
               </span>
-              <button
-                type="button"
+              <ButtonPrime
+                size="sm"
+                variant="outline"
                 className={cx('tagFilterBtn')}
                 onClick={() => {
                   setEditorIssuesOnly((v) => !v);
@@ -1047,7 +1048,7 @@ const CreateTestFormBody = ({
                 }}
               >
                 {editorIssuesOnly ? t('form.editor.showAll') : t('form.editor.showIssuesOnly')}
-              </button>
+              </ButtonPrime>
             </div>
           )}
           <Pager page={editorPageSafe} pageCount={editorPageCount} onChange={setEditorPage} />
@@ -1177,10 +1178,11 @@ const CreateTestFormBody = ({
                     type="button"
                     variant="outline"
                     size="sm"
+                    fullWidth
                     className={cx('btnSecondary')}
                     onClick={() => addGroupPassageText(gIndex)}
                   >
-                    <PlusCircle size={16} className="me-1" /> {t('form.passage.addText')}
+                    <PlusCircle size={16} /> {t('form.passage.addText')}
                   </ButtonPrime>
                 </div>
                 <div className={cx('formGroupModern')}>
@@ -1257,14 +1259,14 @@ const CreateTestFormBody = ({
                     minQuestions={group.questions.length}
                   />
                 ))}
-                <ButtonPrime type="button" variant="outline" size="sm" className={cx('btnSecondary')} onClick={() => addGroupQuestion(gIndex)}><PlusCircle size={18} /> {t('formFooter.addQuestion')}</ButtonPrime>
+                <ButtonPrime type="button" variant="outline" size="sm" fullWidth className={cx('btnSecondary')} onClick={() => addGroupQuestion(gIndex)}><PlusCircle size={18} /> {t('formFooter.addQuestion')}</ButtonPrime>
               </div>
               </>
               )}
             </div>
             );
           })}
-          <ButtonPrime type="button" variant="outline" size="sm" className={cx('btnSecondary', 'btnGroupAdd')} onClick={addGroup}><Plus size={20} /> {t('form.passage.addGroup')}</ButtonPrime>
+          <ButtonPrime type="button" variant="outline" size="sm" fullWidth className={cx('btnSecondary', 'btnGroupAdd')} onClick={addGroup}><Plus size={20} /> {t('form.passage.addGroup')}</ButtonPrime>
         </>
       )}
 

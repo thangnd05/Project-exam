@@ -143,35 +143,40 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
 
     return (
       <div className={cx('pagination')}>
-        <button
-          type="button"
-          className={cx('pageBtn', { disabled: currentPage === 0 })}
+        <ButtonPrime
+          variant="ghost"
+          size="icon"
           onClick={() => currentPage > 0 && setCurrentPage(currentPage - 1)}
           disabled={currentPage === 0}
         >
-          <ChevronLeft size="1em" />
-        </button>
+          <ChevronLeft size={16} />
+        </ButtonPrime>
 
-        {pages.map((p, idx) => (
-          <button
-            type="button"
-            key={`${p}-${idx}`}
-            className={cx('pageBtn', { active: p === currentPage, ellipsis: p === '...' })}
-            onClick={() => typeof p === 'number' && setCurrentPage(p)}
-            disabled={p === '...'}
-          >
-            {typeof p === 'number' ? p + 1 : p}
-          </button>
-        ))}
+        {pages.map((p, idx) =>
+          typeof p === 'number' ? (
+            <ButtonPrime
+              key={`${p}-${idx}`}
+              variant={p === currentPage ? 'primary' : 'ghost'}
+              size="sm"
+              onClick={() => setCurrentPage(p)}
+            >
+              {p + 1}
+            </ButtonPrime>
+          ) : (
+            <span key={`${p}-${idx}`} className={cx('ellipsis')}>
+              {p}
+            </span>
+          ),
+        )}
 
-        <button
-          type="button"
-          className={cx('pageBtn', { disabled: currentPage >= totalPages - 1 })}
+        <ButtonPrime
+          variant="ghost"
+          size="icon"
           onClick={() => currentPage < totalPages - 1 && setCurrentPage(currentPage + 1)}
           disabled={currentPage >= totalPages - 1}
         >
-          <ChevronRight size="1em" />
-        </button>
+          <ChevronRight size={16} />
+        </ButtonPrime>
       </div>
     );
   };
@@ -185,9 +190,9 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
               <h1 className={cx('title')}>{t('common.myPosts')}</h1>
               <p className={cx('subtitle')}>{t('myPosts.subtitle')}</p>
             </div>
-            <button type="button" className={cx('backLink')} onClick={() => router.push(localizeHref(routes.dashboard))}>
+            <ButtonPrime variant="link" size="sm" onClick={() => router.push(localizeHref(routes.dashboard))}>
               {t('common.backToProfile')}
-            </button>
+            </ButtonPrime>
           </header>
         )}
 
@@ -203,17 +208,17 @@ function MyPostsPage({ embedded = false }: MyPostsPageProps) {
           </div>
           <div className={cx('filterPills')}>
             {FILTER_OPTIONS.map((opt) => (
-              <button
+              <ButtonPrime
                 key={opt.value}
-                type="button"
-                className={cx('pill', { active: statusFilter === opt.value })}
+                variant={statusFilter === opt.value ? 'primary' : 'soft'}
+                size="sm"
                 onClick={() => {
                   setStatusFilter(opt.value);
                   setCurrentPage(0);
                 }}
               >
                 {t(`myPosts.status.${opt.labelKey}`)}
-              </button>
+              </ButtonPrime>
             ))}
           </div>
         </div>

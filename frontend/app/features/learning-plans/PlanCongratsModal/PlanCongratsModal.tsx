@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import classNames from 'classnames/bind';
 import { Trophy, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/features/learning-plans/PlanCongratsModal/PlanCongratsModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -44,9 +45,15 @@ function PlanCongratsModal({ show, onClose, onNext, totalTasks, planSequence }: 
           {CONFETTI_PIECES.map((style, i) => (
             <span key={i} className={cx('confetti')} style={style} aria-hidden />
           ))}
-          <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label={tc('close')}>
+          <ButtonPrime
+            variant="onDark"
+            size="icon"
+            className={cx('closeBtn')}
+            onClick={onClose}
+            aria-label={tc('close')}
+          >
             <X size={18} />
-          </button>
+          </ButtonPrime>
           <div className={cx('trophyRing')}>
             <Trophy />
           </div>
@@ -81,12 +88,12 @@ function PlanCongratsModal({ show, onClose, onNext, totalTasks, planSequence }: 
           </ul>
 
           <div className={cx('actions')}>
-            <button type="button" className={cx('btnPrimary')} onClick={onNext}>
+            <ButtonPrime variant="primary" onClick={onNext}>
               {t('common.nextStep')}
-            </button>
-            <button type="button" className={cx('btnGhost')} onClick={onClose}>
+            </ButtonPrime>
+            <ButtonPrime variant="outline" onClick={onClose}>
               {t('congrats.later')}
-            </button>
+            </ButtonPrime>
           </div>
         </div>
       </div>

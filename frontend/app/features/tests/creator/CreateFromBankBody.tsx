@@ -478,33 +478,30 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
               flexWrap: 'wrap',
             }}
           >
-            <button
-              type="button"
-              className={cx('bankModeTab', { active: bankSource === BANK_SOURCES.PERSONAL })}
+            <ButtonPrime
+              variant={bankSource === BANK_SOURCES.PERSONAL ? 'primary' : 'soft'}
               onClick={() => setBankSource(BANK_SOURCES.PERSONAL)}
               aria-pressed={bankSource === BANK_SOURCES.PERSONAL}
             >
               {t('source.personal')}
-            </button>
+            </ButtonPrime>
             {isClassMode && (
-              <button
-                type="button"
-                className={cx('bankModeTab', { active: bankSource === BANK_SOURCES.CLASS })}
+              <ButtonPrime
+                variant={bankSource === BANK_SOURCES.CLASS ? 'primary' : 'soft'}
                 onClick={() => setBankSource(BANK_SOURCES.CLASS)}
                 aria-pressed={bankSource === BANK_SOURCES.CLASS}
               >
                 {t('source.class')}
-              </button>
+              </ButtonPrime>
             )}
             {canAccessAdminBank && (
-              <button
-                type="button"
-                className={cx('bankModeTab', { active: bankSource === BANK_SOURCES.ADMIN })}
+              <ButtonPrime
+                variant={bankSource === BANK_SOURCES.ADMIN ? 'primary' : 'soft'}
                 onClick={() => setBankSource(BANK_SOURCES.ADMIN)}
                 aria-pressed={bankSource === BANK_SOURCES.ADMIN}
               >
                 {t('source.admin')}
-              </button>
+              </ButtonPrime>
             )}
           </div>
 
@@ -514,16 +511,15 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             </div>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
               {BANK_SCOPE_OPTIONS.map((opt) => (
-                <button
+                <ButtonPrime
                   key={opt.value}
-                  type="button"
-                  className={cx('bankModeTab', { active: bankScope === opt.value })}
+                  variant={bankScope === opt.value ? 'primary' : 'soft'}
                   onClick={() => setBankScope(opt.value)}
                   aria-pressed={bankScope === opt.value}
                   title={t(opt.hint)}
                 >
                   {t(opt.label)}
-                </button>
+                </ButtonPrime>
               ))}
             </div>
             <p className={cx('bankHint')} style={{ marginTop: 8, marginBottom: 0 }}>
@@ -599,24 +595,22 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
             </p>
 
             <div className={cx('bankModeTabs')}>
-              <button
-                type="button"
-                className={cx('bankModeTab', 'active')}
+              <ButtonPrime
+                variant="primary"
                 onClick={() => applyModeToAllParts(SELECTION_MODES.RANDOM_BY_COLLECTION)}
                 title={testInfo.collectionId
                   ? t('parts.applyByCollectionTitle')
                   : t('parts.applyByCollectionNoCollectionTitle')}
               >
                 {t('parts.applyByCollection')}
-              </button>
-              <button
-                type="button"
-                className={cx('bankModeTab')}
+              </ButtonPrime>
+              <ButtonPrime
+                variant="soft"
                 onClick={() => applyModeToAllParts(SELECTION_MODES.RANDOM)}
                 title={t('parts.applyRandomTitle')}
               >
                 {t('parts.applyRandom')}
-              </button>
+              </ButtonPrime>
             </div>
 
             {(examParts || []).map((part) => {
@@ -646,39 +640,35 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                     <div className={cx('bankPartBody')}>
 
                       <div className={cx('bankModeTabs')}>
-                        <button
-                          type="button"
-                          className={cx('bankModeTab', { active: cfg.mode === SELECTION_MODES.RANDOM })}
+                        <ButtonPrime
+                          variant={cfg.mode === SELECTION_MODES.RANDOM ? 'primary' : 'soft'}
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.RANDOM)}
                           aria-pressed={cfg.mode === SELECTION_MODES.RANDOM}
                         >
                           {t('modes.random')}
-                        </button>
-                        <button
-                          type="button"
-                          className={cx('bankModeTab', { active: cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION })}
+                        </ButtonPrime>
+                        <ButtonPrime
+                          variant={cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION ? 'primary' : 'soft'}
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.RANDOM_BY_COLLECTION)}
                           aria-pressed={cfg.mode === SELECTION_MODES.RANDOM_BY_COLLECTION}
                           title={testInfo.collectionId ? undefined : t('modes.byCollectionNoCollectionTitle')}
                         >
                           {t('modes.byCollection')}
-                        </button>
-                        <button
-                          type="button"
-                          className={cx('bankModeTab', { active: cfg.mode === SELECTION_MODES.SEQUENTIAL })}
+                        </ButtonPrime>
+                        <ButtonPrime
+                          variant={cfg.mode === SELECTION_MODES.SEQUENTIAL ? 'primary' : 'soft'}
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.SEQUENTIAL)}
                           aria-pressed={cfg.mode === SELECTION_MODES.SEQUENTIAL}
                         >
                           {t('modes.sequential')}
-                        </button>
-                        <button
-                          type="button"
-                          className={cx('bankModeTab', { active: cfg.mode === SELECTION_MODES.MANUAL })}
+                        </ButtonPrime>
+                        <ButtonPrime
+                          variant={cfg.mode === SELECTION_MODES.MANUAL ? 'primary' : 'soft'}
                           onClick={() => updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.MANUAL)}
                           aria-pressed={cfg.mode === SELECTION_MODES.MANUAL}
                         >
                           {t('modes.manual')}
-                        </button>
+                        </ButtonPrime>
                       </div>
 
                       {cfg.mode === SELECTION_MODES.RANDOM && (
@@ -808,8 +798,9 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                                               </span>
                                             )}
                                             {bankSource === BANK_SOURCES.PERSONAL && (
-                                              <button
-                                                type="button"
+                                              <ButtonPrime
+                                                size="icon"
+                                                variant="ghost"
                                                 className={cx('bankBtnEdit')}
                                                 onClick={() => {
                                                   setEditingPartId(part.examPartId);
@@ -818,7 +809,7 @@ const CreateFromBankBody = ({ onCancel, onSuccess, mode = 'personal', classId, c
                                                 title={t('parts.editQuestion')}
                                               >
                                                 <SquarePen size={18} />
-                                              </button>
+                                              </ButtonPrime>
                                             )}
                                           </li>
                                         );

@@ -1,6 +1,5 @@
 'use client';
 
-import Link from '@/app/i18n/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
@@ -13,6 +12,7 @@ import {
 } from 'lucide-react';
 import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
 import InfoTip from '@/app/components/InfoTip/InfoTip';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { taskCurrentAccuracy, taskGapToPass, taskUnpassedAttempts } from '@/app/features/learning-plans/PlanPartTaskList/taskProgress';
 import { TaskStatus } from '@/app/enums';
@@ -460,25 +460,27 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
 
   const studyButton =
     studyAction === 'button' ? (
-      <button
-        type="button"
-        className={cx('btn', 'btnPrimary', 'stageCta')}
+      <ButtonPrime
+        variant="primary"
+        className={cx('stageCta')}
         disabled={!canStudy}
         onClick={() => onStudyTask?.(task.taskId)}
       >
         {studyLabel}
-      </button>
+      </ButtonPrime>
     ) : (
-      <Link
-        href={`/learning-plans/${learningPlanId}/study?taskId=${task.taskId}`}
-        className={cx('btn', 'btnPrimary', 'stageCta')}
-        aria-disabled={!canStudy}
+      <ButtonPrime
+        as="link"
+        variant="primary"
+        href={`/dashboard/learning-paths/${learningPlanId}/study?taskId=${task.taskId}`}
+        className={cx('stageCta')}
+        disabled={!canStudy}
         onClick={(e) => {
           if (!canStudy) e.preventDefault();
         }}
       >
         {studyLabel}
-      </Link>
+      </ButtonPrime>
     );
 
   return (
@@ -572,20 +574,19 @@ function TaskDetailCard({ task, learningPlanId, isRecommended, studyAction, onSt
         <div className={cx('taskActions')}>
           {studyButton}
           {(task.attemptCount ?? 0) > 0 && (
-            <Link
-              href={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/history`}
-              className={cx('btn', 'btnOutline', 'btnSm')}
-            >
+            <ButtonPrime as="link" variant="outline" size="sm" href={`/dashboard/tasks/${task.taskId}/history`}>
               {t('taskList.history')}
-            </Link>
+            </ButtonPrime>
           )}
           {isPassed && (
-            <Link
-              href={`/learning-plans/${learningPlanId}/tasks/${task.taskId}/result`}
-              className={cx('btn', 'btnOutline', 'btnSm')}
+            <ButtonPrime
+              as="link"
+              variant="outline"
+              size="sm"
+              href={`/dashboard/learning-paths/${learningPlanId}/tasks/${task.taskId}/result`}
             >
               {t('taskList.explain')}
-            </Link>
+            </ButtonPrime>
           )}
         </div>
       )}

@@ -2,6 +2,7 @@
 
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/features/tests/CreateTestModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -22,12 +23,12 @@ const Pager = ({ page, pageCount, onChange }: PagerProps) => {
   if (pageCount <= 1) return null;
   return (
     <div className={cx('pager')}>
-      <button type="button" className={cx('pagerBtn')} disabled={page <= 0} onClick={() => onChange(0)}>
+      <ButtonPrime size="sm" variant="soft" disabled={page <= 0} onClick={() => onChange(0)}>
         {t('pager.first')}
-      </button>
-      <button type="button" className={cx('pagerBtn')} disabled={page <= 0} onClick={() => onChange(page - 1)}>
+      </ButtonPrime>
+      <ButtonPrime size="sm" variant="soft" disabled={page <= 0} onClick={() => onChange(page - 1)}>
         {t('pager.prev')}
-      </button>
+      </ButtonPrime>
       <span className={cx('pagerInfo')}>
         {t('pager.page')}
         <select value={page} onChange={(e) => onChange(Number(e.target.value))} aria-label={t('pager.selectPage')}>
@@ -37,12 +38,12 @@ const Pager = ({ page, pageCount, onChange }: PagerProps) => {
         </select>
         / {pageCount}
       </span>
-      <button type="button" className={cx('pagerBtn')} disabled={page >= pageCount - 1} onClick={() => onChange(page + 1)}>
+      <ButtonPrime size="sm" variant="soft" disabled={page >= pageCount - 1} onClick={() => onChange(page + 1)}>
         {t('pager.next')}
-      </button>
-      <button type="button" className={cx('pagerBtn')} disabled={page >= pageCount - 1} onClick={() => onChange(pageCount - 1)}>
+      </ButtonPrime>
+      <ButtonPrime size="sm" variant="soft" disabled={page >= pageCount - 1} onClick={() => onChange(pageCount - 1)}>
         {t('pager.last')}
-      </button>
+      </ButtonPrime>
     </div>
   );
 };

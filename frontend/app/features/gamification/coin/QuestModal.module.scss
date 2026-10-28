@@ -178,26 +178,9 @@
   color: var(--coin-text);
 }
 
+// Nút nhận thưởng là ButtonPrime coin; chỉ giữ chữ không xuống dòng.
 .claimBtn {
-  border: none;
-  border-radius: var(--radius-pill);
-  padding: 6px 16px;
   white-space: nowrap;
-  font-weight: 600;
-  font-size: var(--font-size-md);
-  color: var(--white);
-  background: var(--coin-gradient-strong);
-  cursor: pointer;
-  transition: filter 0.2s ease;
-
-  &:hover:not(:disabled) {
-    filter: brightness(1.05);
-  }
-
-  &:disabled {
-    background: var(--slate-300);
-    cursor: not-allowed;
-  }
 }
 
 .doneBadge {

@@ -121,10 +121,10 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
     >
       {isEditor ? (
         <div className={cx('editor')}>
-          <button type="button" className={cx('backBtn')} onClick={backToList}>
+          <ButtonPrime variant="link" className={cx('backBtn')} onClick={backToList}>
             <ArrowLeft size="1em" />
             {t('backToList')}
-          </button>
+          </ButtonPrime>
 
           <input
             type="text"
@@ -149,10 +149,10 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
         </div>
       ) : (
         <div className={cx('list')}>
-          <button type="button" className={cx('newBtn')} onClick={() => openEditor(null)}>
+          <ButtonPrime variant="outline" size="lg" fullWidth onClick={() => openEditor(null)}>
             <Plus size="1em" />
             {t('writeNew')}
-          </button>
+          </ButtonPrime>
 
           {isLoading ? (
             <div className={cx('stateBox')}>
@@ -184,40 +184,36 @@ function NotesPanel({ show, onClose }: NotesPanelProps) {
                 {confirmingId === note.noteId ? (
                   <div className={cx('confirmBox')}>
                     <span>{t('confirmDelete')}</span>
-                    <button
-                      type="button"
-                      className={cx('confirmYes')}
+                    <ButtonPrime
+                      variant="danger"
+                      size="sm"
                       onClick={() => handleDelete(note.noteId)}
                       disabled={deleteNoteMutation.isPending}
                     >
                       {t('delete')}
-                    </button>
-                    <button
-                      type="button"
-                      className={cx('confirmNo')}
-                      onClick={() => setConfirmingId(null)}
-                    >
+                    </ButtonPrime>
+                    <ButtonPrime variant="outline" size="sm" onClick={() => setConfirmingId(null)}>
                       {tCommon('cancelShort')}
-                    </button>
+                    </ButtonPrime>
                   </div>
                 ) : (
                   <div className={cx('noteActions')}>
-                    <button
-                      type="button"
-                      className={cx('iconBtn')}
+                    <ButtonPrime
+                      variant="ghost"
+                      size="icon"
                       title={t('editNote')}
                       onClick={() => openEditor(note)}
                     >
                       <SquarePen size="1em" />
-                    </button>
-                    <button
-                      type="button"
-                      className={cx('iconBtn', 'danger')}
+                    </ButtonPrime>
+                    <ButtonPrime
+                      variant="dangerGhost"
+                      size="icon"
                       title={t('deleteNote')}
                       onClick={() => setConfirmingId(note.noteId)}
                     >
                       <Trash2 size="1em" />
-                    </button>
+                    </ButtonPrime>
                   </div>
                 )}
               </article>

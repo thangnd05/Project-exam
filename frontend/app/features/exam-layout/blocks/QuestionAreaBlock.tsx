@@ -54,7 +54,7 @@ type QuestionAreaBlockProps = {
   flowSteps?: ExamFlowStep[];
   currentStepIndex?: number;
   goNext?: () => void;
-  // Số câu và nút Đánh dấu đã hiện trên thanh câu hiện tại của khung phòng thi -> thẻ câu không lặp lại.
+  // Số câu đã hiện trên thanh câu hiện tại của khung phòng thi -> thẻ câu không lặp lại.
   headInToolbar?: boolean;
 };
 
@@ -206,13 +206,13 @@ function QuestionAreaBlock({
     const instruction = instructionOf(q);
     return (
       <div key={q.questionId} id={`q-${q.questionId}`} className={cx('question-card')}>
-        {(!headInToolbar || instruction) && (
+        {(!headInToolbar || instruction || onToggleFlag) && (
           <div className={cx('q-head')}>
             {!headInToolbar && (
               <span className={cx('q-number')}>{t('questionNumber', { number: absoluteIndex })}</span>
             )}
             {instruction && <span className={cx('q-instruction')}>{instruction}</span>}
-            {onToggleFlag && !headInToolbar && (
+            {onToggleFlag && (
               <span className={cx('q-head-actions')}>
                 <FlagButton flagged={flagged} onToggle={() => onToggleFlag(q.questionId)} />
               </span>

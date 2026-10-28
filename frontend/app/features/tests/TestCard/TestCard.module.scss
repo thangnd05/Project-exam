@@ -190,40 +190,6 @@
     }
 }
 
-.btn-primary-modern {
-    padding: 9px 10px;
-    font-size: 1.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-}
-
-.btn-outline-modern {
-    padding: 9px 10px;
-    font-size: 1.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-}
-
-.btn-icon-modern {
-    color: var(--brand-unique);
-    padding: 9px 12px;
-    font-size: 1.7rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-
-    &:hover {
-        background: var(--brand-50);
-        border-color: var(--brand-unique);
-        color: var(--brand-unique);
-    }
-}
-
 .status-open {
     color: var(--emerald-800) !important;
     background: rgb(var(--emerald-500-rgb) / 0.18) !important;

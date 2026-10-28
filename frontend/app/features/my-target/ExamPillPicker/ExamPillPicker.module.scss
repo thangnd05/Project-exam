@@ -25,38 +25,16 @@
   color: var(--slate-400);
 }
 
+// Viên kỳ thi dùng ButtonPrime; chỉ giữ không co, không xuống dòng khi hàng cuộn ngang.
 .pill {
-  display: inline-flex;
-  align-items: center;
   flex-shrink: 0;
-  padding: 6px 14px;
-  border: 1px solid var(--slate-300);
-  border-radius: var(--radius-pill);
-  background: var(--bg-white);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
   white-space: nowrap;
-  color: var(--slate-600);
-  cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-
-  &:hover {
-    color: var(--slate-900);
-  }
-
-  &.active {
-    border-color: var(--brand-700);
-    background: rgb(var(--brand-700-rgb) / 0.1);
-    color: var(--brand-700);
-    font-weight: 700;
-  }
 }
 
 .dot {
   display: inline-block;
   width: 8px;
   height: 8px;
-  margin-right: 6px;
   border-radius: 50%;
 }
 

@@ -5,6 +5,7 @@ import { Container } from 'react-bootstrap';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import { CircleCheck, X, List } from 'lucide-react';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/assets/styles/ReviewFooter.module.scss';
 
 const cx = classNames.bind(styles);
@@ -69,15 +70,14 @@ function ReviewFooterNav({ items = [], correctCount = 0, onSelect }: ReviewFoote
       )}
       <div className={cx('footerButtons')}>
         <Container className={cx('footerButtonsInner')}>
-          <button
-            type="button"
-            className={cx('btnToggleInfo', { active: open })}
+          <ButtonPrime
+            variant={open ? 'brand' : 'outline'}
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
           >
             {open ? <X size={22} /> : <List size={22} />}
             <span>{open ? t('hide') : t('showList')}</span>
-          </button>
+          </ButtonPrime>
           <div className={cx('footerScore')}>
             <CircleCheck size="1em" aria-hidden />
             <span>

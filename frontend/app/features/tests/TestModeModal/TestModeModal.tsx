@@ -174,24 +174,22 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
       footer={footer}
     >
       <div className={cx('tabs')} role="tablist">
-        <button
-          type="button"
+        <ButtonPrime
+          variant={tab === 'exam' ? 'ink' : 'ghost'}
           role="tab"
           aria-selected={tab === 'exam'}
-          className={cx('tab', { active: tab === 'exam' })}
           onClick={() => setTab('exam')}
         >
           {t('mode.examTab')}
-        </button>
-        <button
-          type="button"
+        </ButtonPrime>
+        <ButtonPrime
+          variant={tab === 'practice' ? 'ink' : 'ghost'}
           role="tab"
           aria-selected={tab === 'practice'}
-          className={cx('tab', { active: tab === 'practice' })}
           onClick={() => setTab('practice')}
         >
           {t('mode.practiceTab')}
-        </button>
+        </ButtonPrime>
       </div>
 
       <div className={cx('panel')}>

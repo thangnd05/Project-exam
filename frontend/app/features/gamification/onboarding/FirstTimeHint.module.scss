@@ -28,15 +28,8 @@
   }
 }
 
-.okBtn {
-  display: block;
-  margin: 10px 0 0 auto;
-  padding: 6px 14px;
-  border: none;
-  border-radius: 8px;
-  background: var(--primary-btn-bg);
-  color: var(--primary-btn-fg);
-  font-size: var(--font-size-smd);
-  font-weight: 700;
-  cursor: pointer;
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
 }

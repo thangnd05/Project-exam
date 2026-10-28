@@ -4,24 +4,29 @@ import { List, X } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/features/exam-layout/TestStart.module.scss';
 import { customBlockLabel } from '@/app/features/exam-layout/layoutSchema';
 
 const cx = classNames.bind(styles);
 
 type QuestionNavBlockProps = {
+  /** Nằm trên thanh đầu tối (vùng TRÊN) thì dùng kiểu nút trên nền tối. */
+  onDark?: boolean;
   open?: boolean;
   onToggle?: () => void;
   toggleLabel?: string;
   hideLabel?: string;
 };
 
-function QuestionNavBlock({ open, onToggle, toggleLabel, hideLabel }: QuestionNavBlockProps) {
+function QuestionNavBlock({ onDark, open, onToggle, toggleLabel, hideLabel }: QuestionNavBlockProps) {
   const t = useTranslations('TestTaking.examLayout');
   return (
-    <button
-      type="button"
-      className={cx('btn-toggle-info', { active: open })}
+    <ButtonPrime
+      variant={onDark ? 'onDark' : open ? 'soft' : 'outline'}
+      size="sm"
+      shape="rounded"
+      className={cx('btn-toggle-info')}
       onClick={onToggle}
       aria-expanded={open}
       aria-label={open ? t('hideQuestionList') : t('showQuestionList')}
@@ -32,7 +37,7 @@ function QuestionNavBlock({ open, onToggle, toggleLabel, hideLabel }: QuestionNa
           ? (customBlockLabel(hideLabel) ?? t('hide'))
           : (customBlockLabel(toggleLabel) ?? t('questions'))}
       </span>
-    </button>
+    </ButtonPrime>
   );
 }
 

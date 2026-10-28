@@ -9,6 +9,7 @@ import { Spinner, Dropdown } from 'react-bootstrap';
 import { Eye, Heart, MessageCircle, Bookmark, Search, EllipsisVertical, ChevronLeft, ChevronRight, ImageIcon, CircleAlert } from 'lucide-react';
 import { toast } from 'react-toastify';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import EmptyState from '@/app/components/EmptyState/EmptyState';
 import routes from '@/app/configs/Routes';
 import { useSavedPosts, useUnsavePost } from '@/app/features/posts/hooks/useSavedPosts';
@@ -99,33 +100,38 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
 
     return (
       <div className={cx('pagination')}>
-        <button
-          type="button"
-          className={cx('pageBtn', { disabled: currentPage === 0 })}
+        <ButtonPrime
+          variant="ghost"
+          size="icon"
           onClick={() => currentPage > 0 && setCurrentPage(currentPage - 1)}
           disabled={currentPage === 0}
         >
-          <ChevronLeft size="1em" />
-        </button>
-        {pages.map((p, idx) => (
-          <button
-            type="button"
-            key={`${p}-${idx}`}
-            className={cx('pageBtn', { active: p === currentPage, ellipsis: p === '...' })}
-            onClick={() => typeof p === 'number' && setCurrentPage(p)}
-            disabled={p === '...'}
-          >
-            {typeof p === 'number' ? p + 1 : p}
-          </button>
-        ))}
-        <button
-          type="button"
-          className={cx('pageBtn', { disabled: currentPage >= totalPages - 1 })}
+          <ChevronLeft size={16} />
+        </ButtonPrime>
+        {pages.map((p, idx) =>
+          typeof p === 'number' ? (
+            <ButtonPrime
+              key={`${p}-${idx}`}
+              variant={p === currentPage ? 'primary' : 'ghost'}
+              size="sm"
+              onClick={() => setCurrentPage(p)}
+            >
+              {p + 1}
+            </ButtonPrime>
+          ) : (
+            <span key={`${p}-${idx}`} className={cx('ellipsis')}>
+              {p}
+            </span>
+          ),
+        )}
+        <ButtonPrime
+          variant="ghost"
+          size="icon"
           onClick={() => currentPage < totalPages - 1 && setCurrentPage(currentPage + 1)}
           disabled={currentPage >= totalPages - 1}
         >
-          <ChevronRight size="1em" />
-        </button>
+          <ChevronRight size={16} />
+        </ButtonPrime>
       </div>
     );
   };
@@ -139,9 +145,9 @@ function SavedPostsPage({ embedded = false }: SavedPostsPageProps) {
               <h1 className={cx('title')}>{t('saved.title')}</h1>
               <p className={cx('subtitle')}>{t('saved.subtitle')}</p>
             </div>
-            <button type="button" className={cx('backLink')} onClick={() => router.push(localizeHref(routes.dashboard))}>
+            <ButtonPrime variant="link" size="sm" onClick={() => router.push(localizeHref(routes.dashboard))}>
               {t('common.backToProfile')}
-            </button>
+            </ButtonPrime>
           </header>
         )}
 

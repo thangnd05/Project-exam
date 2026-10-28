@@ -12,6 +12,21 @@
   font-family: var(--font-family);
 }
 
+// Nút ButtonPrime variant="ink" trong phòng thi lấy màu mực navy riêng thay cho brand-800.
+// Popup xác nhận render qua portal nên bọc nút trong .exam-actions để nhận cùng biến.
+.exam-shell,
+.ready-screen,
+.state-box,
+.exam-actions {
+  --btn-ink-bg: var(--exam-ink);
+  --btn-ink-fg: var(--white);
+}
+
+// Chỉ để nút trong footer popup kế thừa biến màu, không tạo thêm hộp bố cục.
+.exam-actions {
+  display: contents;
+}
+
 // Xem trước ở trang chỉnh bố cục: lấp đầy "màn hình" giả lập mà trang chỉnh dựng sẵn.
 .exam-shell-preview {
   position: relative;
@@ -115,25 +130,6 @@
   }
 }
 
-.exam-header-exit {
-  padding: 6px 14px;
-  border-radius: 4px;
-  border: 1px solid rgb(255 255 255 / 0.22);
-  background: transparent;
-  color: rgb(255 255 255 / 0.8);
-  font-size: var(--font-size-smd);
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 0.15s,
-    color 0.15s;
-
-  &:hover {
-    background: rgb(255 255 255 / 0.08);
-    color: var(--white);
-  }
-}
-
 .exam-body {
   flex: 1;
   min-height: 0;
@@ -223,6 +219,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  background: var(--bg-white);
 }
 
 .exam-toolbar {
@@ -259,27 +256,6 @@
   b {
     font-weight: 800;
     color: var(--primary-text);
-  }
-}
-
-.exam-toolbar-sep {
-  flex: none;
-  width: 1px;
-  height: 14px;
-  background: var(--slate-300);
-}
-
-.exam-toolbar-part {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.exam-toolbar-sep,
-.exam-toolbar-part {
-  @include down(sm) {
-    display: none;
   }
 }
 
@@ -354,113 +330,16 @@
   }
 }
 
-.step-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 20px;
-  border-radius: 4px;
-  font-size: var(--font-size-smd);
-  font-weight: 600;
+// Nút Câu trước/Câu tiếp (ButtonPrime): giữ chữ trên một dòng, góc bo 4px như mẫu phòng thi.
+// Lồng trong .exam-bottom để thắng .rounded của ButtonPrime bất kể thứ tự nạp CSS.
+.exam-bottom .step-btn {
   white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background-color 0.15s,
-    opacity 0.15s;
-
-  &:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  @include down(sm) {
-    padding: 8px 14px;
-  }
+  border-radius: 4px;
 }
 
-.step-btn-prev {
-  border: 1px solid var(--slate-300);
-  background: var(--slate-100);
-  color: var(--slate-700);
-
-  &:hover:not(:disabled) {
-    background: var(--slate-200);
-  }
-}
-
-.step-btn-next {
-  border: 1px solid var(--exam-ink);
-  background: var(--exam-ink);
-  color: var(--white);
-
-  &:hover:not(:disabled) {
-    border-color: var(--exam-ink-deep);
-    background: var(--exam-ink-deep);
-  }
-}
-
-// Nút Đánh dấu: ô vuông có góc gấp giống ô câu đã đánh dấu trong danh sách.
+// Nút Đánh dấu (ButtonPrime): chỉ có chữ, giữ trên một dòng.
 .flag-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 4px;
-  border: 1px solid var(--slate-300);
-  background: var(--bg-white);
-  color: var(--slate-700);
-  font-size: var(--font-size-smd);
-  font-weight: 600;
-  line-height: 1.2;
   white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background-color 0.15s,
-    border-color 0.15s;
-
-  &:hover {
-    background: var(--slate-50);
-  }
-
-  .flag-swatch {
-    position: relative;
-    width: 14px;
-    height: 14px;
-    flex-shrink: 0;
-    border-radius: 2px;
-    border: 1px solid var(--slate-300);
-    background: var(--bg-white);
-    overflow: hidden;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      border-top: 7px solid var(--slate-400);
-      border-left: 7px solid transparent;
-    }
-  }
-
-  &.active {
-    border-color: var(--warning);
-    background: var(--warning-bg);
-    color: var(--slate-900);
-    font-weight: 700;
-
-    .flag-swatch::after {
-      border-top-color: var(--warning);
-    }
-  }
-
-  @include down(sm) {
-    padding: 6px 8px;
-
-    span:last-child {
-      display: none;
-    }
-  }
 }
 
 // ================= Khối thống kê (đồng hồ, tiến độ) =================
@@ -655,7 +534,7 @@
       position: absolute;
       top: 0;
       right: 0;
-      border-top: 8px solid var(--warning);
+      border-top: 8px solid var(--primary);
       border-left: 8px solid transparent;
     }
   }
@@ -664,6 +543,9 @@
 .question-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  // Lưới cuộn (bị giới hạn chiều cao) thì hàng auto co về min-height của ô, ô vuông tràn đè hàng dưới;
+  // max-content giữ hàng cao đúng bằng ô.
+  grid-auto-rows: max-content;
   gap: 8px;
   padding: 14px 16px 16px;
 }
@@ -705,13 +587,13 @@
       0 0 0 4px var(--primary-text);
   }
 
-  // Góc gấp màu cam, giữ nguyên màu nền để vẫn biết câu đã làm hay chưa.
+  // Góc gấp màu xanh thương hiệu, giữ nguyên màu nền để vẫn biết câu đã làm hay chưa.
   &.flagged::after {
     content: '';
     position: absolute;
     top: 0;
     right: 0;
-    border-top: 13px solid var(--warning);
+    border-top: 13px solid var(--primary);
     border-left: 13px solid transparent;
     pointer-events: none;
   }
@@ -1314,24 +1196,15 @@
   }
 }
 
-.mobile-nav-trigger {
+// ButtonPrime ink bo nhẹ; chỉ hiện dưới lg. Viết kèm thẻ để thắng display của .button
+// bất kể thứ tự nạp CSS module.
+button.mobile-nav-trigger {
   display: none;
+  white-space: nowrap;
 
   @include down(lg) {
     pointer-events: auto;
     display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 4px;
-    border: 1px solid var(--exam-ink);
-    background: var(--exam-ink);
-    color: var(--white);
-    font-size: var(--font-size-smd);
-    font-weight: 700;
-    white-space: nowrap;
-    cursor: pointer;
   }
 }
 
@@ -1419,129 +1292,39 @@
   }
 }
 
-.btn-toggle-info {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 7px 14px;
-  border-radius: 4px;
-  border: 1px solid var(--slate-300);
-  background: var(--bg-white);
-  font-size: var(--font-size-smd);
-  font-weight: 600;
-  color: var(--slate-700);
+// Nút mở danh sách câu (ButtonPrime): ẩn dưới lg vì đã có bảng trượt mobile.
+// Viết button.btn-toggle-info để thắng display của .button bất kể thứ tự nạp CSS module.
+button.btn-toggle-info {
   white-space: nowrap;
-  transition:
-    background-color 0.15s,
-    border-color 0.15s;
-  cursor: pointer;
-
-  &:hover,
-  &.active {
-    background: var(--slate-100);
-    border-color: var(--slate-400);
-  }
 
   @include down(lg) {
     display: none;
   }
 }
 
-.exam-header .btn-toggle-info {
-  border-color: rgb(255 255 255 / 0.22);
-  background: transparent;
-  color: var(--on-hero-muted);
-
-  &:hover,
-  &.active {
-    background: rgb(255 255 255 / 0.08);
-    color: var(--white);
-  }
+// Nút nộp bài là ButtonPrime (SubmitBlock); ở đây chỉ còn bố cục và màu mực theo chỗ đặt.
+.btn-submit {
+  white-space: nowrap;
 }
 
-// Nút nộp bài trong khung phòng thi: nền đậm như mẫu; ở cột bên thì trải hết bề ngang.
-// Bảng trượt trên mobile được portal ra ngoài khung nên cần liệt kê riêng.
-.exam-shell .btn-submit,
+// Bảng trượt trên mobile được portal ra ngoài .exam-shell nên đặt lại màu mực phòng thi.
 .mobile-nav-extras .btn-submit {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 9px 20px;
-  border-radius: 4px;
-  border: 1px solid var(--exam-ink);
-  background: var(--exam-ink);
-  color: var(--white);
-  font-size: var(--font-size-smd);
-  font-weight: 700;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: background-color 0.15s;
-
-  &:hover:not(:disabled) {
-    border-color: var(--exam-ink-deep);
-    background: var(--exam-ink-deep);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+  --btn-ink-bg: var(--exam-ink);
+  --btn-ink-fg: var(--white);
 }
 
 .exam-side .btn-submit {
   width: 100%;
-  padding: 11px 16px;
 }
 
 // Trên thanh đầu tối thì đảo màu để nút vẫn nổi.
 .exam-header .btn-submit {
-  border-color: var(--white);
-  background: var(--white);
-  color: var(--exam-ink);
-
-  &:hover:not(:disabled) {
-    filter: brightness(0.94);
-  }
+  --btn-ink-bg: var(--white);
+  --btn-ink-fg: var(--exam-ink);
 }
 
 .footer-actions .btn-submit {
-  background: var(--primary-gradient);
-  color: var(--on-primary-gradient);
-  border: none;
-  padding: 14px 44px;
-  border-radius: 12px;
-  font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-base);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    filter: brightness(1.05);
-    box-shadow: 0 10px 25px var(--primary-alpha-35);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  @include down(md) {
-    padding: 12px 28px;
-    font-size: var(--font-size-md);
-    gap: 8px;
-  }
-
-  @include down(sm) {
-    padding: 11px 20px;
-    font-size: var(--font-size-ssm);
-    flex-shrink: 0;
-  }
+  flex-shrink: 0;
 }
 
 .state-box {
@@ -1742,80 +1525,12 @@
   }
 }
 
-.ready-cancel-btn,
-.ready-start-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: var(--font-size-ssm);
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.ready-cancel-btn {
-  background: transparent;
-  color: var(--slate-600);
-
-  &:hover {
-    background: var(--slate-100);
-  }
-}
-
-.ready-start-btn {
-  padding: 12px 28px;
-  font-size: var(--font-size-md);
-  background: var(--exam-ink);
-  color: var(--white);
-
-  &:hover {
-    background: var(--exam-ink-deep);
-  }
-}
-
-// Dùng chung cho màn trạng thái và hộp xác nhận nộp bài.
+// Hàng nút của các màn trạng thái (thanh toán, hết lượt, lỗi...).
 .state-actions {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 12px;
-}
-
-.state-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 28px;
-  border-radius: 50px;
-  font-size: var(--font-size-base);
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-}
-
-.state-btn-secondary {
-  background: var(--slate-200);
-  color: var(--slate-600);
-
-  &:hover:not(:disabled) {
-    background: var(--slate-300);
-  }
-}
-
-.state-btn-primary {
-  background: var(--primary-gradient);
-  color: var(--on-primary-gradient);
-
-  &:hover:not(:disabled) {
-    filter: brightness(1.05);
-    box-shadow: 0 8px 20px rgb(var(--primary-rgb) / 0.25);
-  }
 }
 
 .submit-confirm-text {
@@ -1862,7 +1577,7 @@
   padding: 32px;
   @include auto-hide-scrollbar;
 
-  // Câu không kèm bài đọc bên cạnh: thẻ câu trắng nằm giữa nền xám như phòng thi mẫu.
+  // Câu không kèm bài đọc bên cạnh: nội dung nằm giữa với bề rộng đọc thoải mái.
   // Admin đặt "Bề rộng tối đa" thì dùng bề rộng đó thay cho mặc định.
   &:not(.split-layout) > * {
     max-width: var(--exam-content-width, 896px);
@@ -1870,6 +1585,22 @@
 
     & + * {
       margin-top: 16px;
+    }
+  }
+
+  // Câu nằm thẳng trên nền trắng của cột làm bài, không khung thẻ; nhiều câu thì ngăn bằng gạch.
+  &:not(.split-layout) > .question-card {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    overflow: visible;
+
+    & + .question-card {
+      margin-top: 32px;
+      padding-top: 32px;
+      border-top: 1px solid var(--slate-200);
     }
   }
 

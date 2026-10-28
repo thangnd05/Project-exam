@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import ReviewQuestionCard from '@/app/features/tests/Review/ReviewQuestionCard';
 import ReviewFooterNav from '@/app/features/tests/Review/ReviewFooterNav';
 import { QuestionType } from '@/app/enums';
@@ -78,24 +79,16 @@ function PlanResultView({ result, onRetry, onPickAnother, onNext }: PlanResultVi
         </div>
         <div className={cx('resultActions')}>
           {result.passed && onNext && (
-            <button type="button" className={cx('btn', 'btnPrimary', 'btnSm')} onClick={onNext}>
+            <ButtonPrime variant="primary" size="sm" onClick={onNext}>
               {t('resultView.next')}
-            </button>
+            </ButtonPrime>
           )}
-          <button
-            type="button"
-            className={cx('btn', result.passed && onNext ? 'btnOutline' : 'btnPrimary', 'btnSm')}
-            onClick={onRetry}
-          >
+          <ButtonPrime variant={result.passed && onNext ? 'outline' : 'primary'} size="sm" onClick={onRetry}>
             {result.passed ? t('resultView.redo') : t('common.retry')}
-          </button>
-          <button
-            type="button"
-            className={cx('btn', 'btnOutline', 'btnSm')}
-            onClick={onPickAnother}
-          >
+          </ButtonPrime>
+          <ButtonPrime variant="ghost" size="sm" onClick={onPickAnother}>
             {t('resultView.pickAnother')}
-          </button>
+          </ButtonPrime>
         </div>
       </div>
 

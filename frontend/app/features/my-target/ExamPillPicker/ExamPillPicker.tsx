@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { parseCode, parseVendor } from '@/app/[locale]/(public)/_lib/certificationMeta';
 import type { ExamTypeResponse } from '@/app/types/exam-type';
 import styles from './ExamPillPicker.module.scss';
@@ -56,28 +57,30 @@ function ExamPillPicker({
     <div className={cx('row', className)} role="group" aria-label={t('examPicker.ariaLabel', { label: pickerLabel.toLowerCase() })}>
       <span className={cx('label')}>{pickerLabel}:</span>
       {allLabel && (
-        <button
-          type="button"
+        <ButtonPrime
+          variant={!value ? 'ink' : 'outline'}
+          size="sm"
+          className={cx('pill')}
           aria-pressed={!value}
-          className={cx('pill', { active: !value })}
           onClick={() => onChange('')}
         >
           {allLabel}
-        </button>
+        </ButtonPrime>
       )}
       {pills.map((pill) => (
-        <button
+        <ButtonPrime
           key={pill.id}
-          type="button"
+          variant={pill.id === value ? 'ink' : 'outline'}
+          size="sm"
+          className={cx('pill')}
           title={pill.name}
           aria-pressed={pill.id === value}
-          className={cx('pill', { active: pill.id === value })}
           onClick={() => pill.id !== value && onChange(pill.id)}
         >
           <span className={cx('dot', `dot-${pill.vendor}`)} aria-hidden="true" />
           {pill.label}
           {countOf(pill.id)}
-        </button>
+        </ButtonPrime>
       ))}
     </div>
   );

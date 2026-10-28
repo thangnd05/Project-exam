@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import TestStartDashboard from '@/app/features/tests/TestStartDashboard';
 import QuestionAreaBlock from '@/app/features/exam-layout/blocks/QuestionAreaBlock';
 import TimerBlock from '@/app/features/exam-layout/blocks/TimerBlock';
@@ -13,7 +14,6 @@ import ProgressBlock from '@/app/features/exam-layout/blocks/ProgressBlock';
 import SubmitBlock from '@/app/features/exam-layout/blocks/SubmitBlock';
 import QuestionNavBlock from '@/app/features/exam-layout/blocks/QuestionNavBlock';
 import BannerBlock from '@/app/features/exam-layout/blocks/BannerBlock';
-import FlagButton from '@/app/features/exam-layout/blocks/FlagButton';
 import { BLOCK_TYPES, ZONES } from '@/app/features/exam-layout/layoutSchema';
 import type { LayoutBlock, LayoutConfig, LayoutTheme } from '@/app/features/exam-layout/layoutSchema';
 import type {
@@ -180,6 +180,7 @@ function ExamLayoutRenderer({
         if (zone !== ZONES.LEFT && zone !== ZONES.RIGHT) {
           return (
             <QuestionNavBlock
+              onDark={zone === ZONES.TOP}
               open={showInfoPanel}
               onToggle={() => setShowInfoPanel((v) => !v)}
               toggleLabel={block.props?.toggleLabel}
@@ -272,7 +273,7 @@ function ExamLayoutRenderer({
   const sideBlocksWithNav = [leftBlocks, rightBlocks].filter((blocks) => blocks.some(isNav));
   const sheetExtras = sideBlocksWithNav.flat().filter((b) => !isNav(b));
 
-  // Bước hiện tại chỉ có một câu: số câu và nút Đánh dấu chuyển lên thanh câu hiện tại như mẫu.
+  // Bước hiện tại chỉ có một câu: số câu chuyển lên thanh câu hiện tại như mẫu.
   const singleQuestion = currentStep?.questions.length === 1 ? currentStep.questions[0] : null;
   const stepNumbers = (currentStep?.questions || [])
     .map((q) => questionIndexMap[q.questionId])
@@ -298,8 +299,10 @@ function ExamLayoutRenderer({
 
   const mobileNavTrigger =
     hasNav && !preview ? (
-      <button
-        type="button"
+      <ButtonPrime
+        variant="ink"
+        size="sm"
+        shape="rounded"
         className={cx('mobile-nav-trigger')}
         onClick={() => setShowInfoPanel((v) => !v)}
         aria-expanded={showInfoPanel}
@@ -310,7 +313,7 @@ function ExamLayoutRenderer({
         <span className={cx('mobile-nav-count')}>
           {answered}/{total}
         </span>
-      </button>
+      </ButtonPrime>
     ) : null;
 
   const topGroups = splitHorizontal(topBlocks, 'left');
@@ -333,9 +336,9 @@ function ExamLayoutRenderer({
         <div className={cx('exam-header-group', 'right')}>
           {renderBlocks(topGroups.right, ZONES.TOP)}
           {onExit && (
-            <button type="button" className={cx('exam-header-exit')} onClick={onExit}>
+            <ButtonPrime variant="onDark" size="sm" shape="rounded" onClick={onExit}>
               {t('exit')}
-            </button>
+            </ButtonPrime>
           )}
         </div>
       </header>
@@ -390,24 +393,12 @@ function ExamLayoutRenderer({
             })}
           </span>
         )}
-        {isPaged && currentStep?.partName && (
-          <>
-            <span className={cx('exam-toolbar-sep')} aria-hidden />
-            <span className={cx('exam-toolbar-part')}>{currentStep.partName}</span>
-          </>
-        )}
         {renderBlocks(toolbarGroups.left, ZONES.TOOLBAR)}
       </div>
       <div className={cx('exam-toolbar-actions', 'center')}>
         {renderBlocks(toolbarGroups.center, ZONES.TOOLBAR)}
       </div>
       <div className={cx('exam-toolbar-actions')}>
-        {singleQuestion && onToggleFlag && (
-          <FlagButton
-            flagged={flaggedQuestionIds?.includes(singleQuestion.questionId) ?? false}
-            onToggle={() => onToggleFlag(singleQuestion.questionId)}
-          />
-        )}
         {renderBlocks(toolbarGroups.right, ZONES.TOOLBAR)}
         {mobileNavTrigger}
       </div>
@@ -424,15 +415,16 @@ function ExamLayoutRenderer({
     <div className={cx('exam-bottom')}>
       <div className={cx('exam-bottom-group')}>
         {showStepNav && (
-          <button
-            type="button"
-            className={cx('step-btn', 'step-btn-prev')}
+          <ButtonPrime
+            variant="soft"
+            shape="rounded"
+            className={cx('step-btn')}
             onClick={goPrev}
             disabled={!canGoPrev}
           >
             <ArrowLeft size="1em" aria-hidden />
             {t('prev')}
-          </button>
+          </ButtonPrime>
         )}
         {renderBlocks(bottomGroups.left, ZONES.BOTTOM)}
       </div>
@@ -442,21 +434,22 @@ function ExamLayoutRenderer({
       <div className={cx('exam-bottom-group', 'right')}>
         {renderBlocks(bottomGroups.right, ZONES.BOTTOM)}
         {showStepNav && !isLastStep && (
-          <button type="button" className={cx('step-btn', 'step-btn-next')} onClick={goNext}>
+          <ButtonPrime variant="ink" shape="rounded" className={cx('step-btn')} onClick={goNext}>
             {t('next')}
             <ArrowRight size="1em" aria-hidden />
-          </button>
+          </ButtonPrime>
         )}
         {/* Câu cuối mà bố cục không có nút nộp bài: nút "Câu tiếp" thành "Nộp bài" như mẫu. */}
         {showStepNav && isLastStep && !hasSubmitBlock && handleSubmit && (
-          <button
-            type="button"
-            className={cx('step-btn', 'step-btn-next')}
+          <ButtonPrime
+            variant="ink"
+            shape="rounded"
+            className={cx('step-btn')}
             onClick={preview ? undefined : handleSubmit}
             disabled={isSubmitting}
           >
             {t('submit')}
-          </button>
+          </ButtonPrime>
         )}
       </div>
     </div>

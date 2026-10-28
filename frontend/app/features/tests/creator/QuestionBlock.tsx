@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import { PlusCircle, Trash, ChevronDown, ChevronRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import styles from '@/app/features/tests/CreateTestModal.module.scss';
 import TagSelector from '@/app/features/tests/TagSelector/TagSelector';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import type {
     DraftAnswerFieldUpdate,
     DraftQuestion,
@@ -137,14 +138,14 @@ const QuestionBlock = ({
                         />
                         {t('questionBlock.multipleCorrect')}
                     </label>
-                    <Button
-                        variant="link"
-                        className="text-danger p-0"
+                    <ButtonPrime
+                        size="icon"
+                        variant="dangerGhost"
                         onClick={() => removeQuestionFn(index)}
                         disabled={minQuestions <= 1}
                     >
                         <Trash size={18} />
-                    </Button>
+                    </ButtonPrime>
                 </div>
             </div>
 
@@ -201,14 +202,14 @@ const QuestionBlock = ({
                             {question.mediaFiles.map((file, fIdx) => (
                                 <li key={fIdx} className="d-flex align-items-center gap-2 mb-1">
                                     <span className="small text-secondary">{file.name}</span>
-                                    <button
-                                        type="button"
-                                        className="btn btn-sm btn-outline-danger p-0 px-1"
+                                    <ButtonPrime
+                                        size="icon"
+                                        variant="dangerGhost"
                                         onClick={() => removeMediaFileFn(index, fIdx)}
                                         aria-label={t('questionBlock.removeFile', { name: file.name })}
                                     >
                                         <Trash size={14} />
-                                    </button>
+                                    </ButtonPrime>
                                     <LocalFilePreview file={file} />
                                 </li>
                             ))}
@@ -233,27 +234,30 @@ const QuestionBlock = ({
                                 placeholder={t('questionBlock.answerPlaceholder', { label: ans.answerLabel })}
                                 onChange={(e) => updateAnswerFn(index, aIndex, 'answerText', e.target.value)}
                             />
-                            <button
-                                type="button"
-                                className="btn btn-sm btn-outline-danger ms-2"
+                            <ButtonPrime
+                                size="icon"
+                                variant="dangerGhost"
+                                className="ms-2"
                                 onClick={() => removeAnswerFn?.(index, aIndex)}
                                 aria-label={t('questionBlock.removeAnswer', { label: ans.answerLabel })}
                             >
                                 <Trash size={14} />
-                            </button>
+                            </ButtonPrime>
                         </div>
                     </Col>
                 ))}
             </Row>
             <div className="mt-3">
-                <button
-                    type="button"
+                <ButtonPrime
+                    variant="outline"
+                    size="sm"
+                    fullWidth
                     className={cx('btnSecondary')}
                     onClick={() => addAnswerFn?.(index)}
                 >
-                    <PlusCircle size={16} className="me-1" />
+                    <PlusCircle size={16} />
                     {t('questionBlock.addAnswer')}
-                </button>
+                </ButtonPrime>
             </div>
             <div className="mt-3">
                 <label className="fw-bold mb-1 d-block">{t('questionBlock.explanation')}</label>

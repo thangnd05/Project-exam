@@ -17,6 +17,7 @@ import {
 } from '@/app/features/gamification/cosmetic/hooks/useCosmeticShop';
 import { useAuth } from '@/app/hooks/useAuth';
 import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import images from '@/app/assets/images';
 import { CosmeticType } from '@/app/enums';
 import type { CosmeticResponse } from '@/app/types';
@@ -151,14 +152,15 @@ function CosmeticShop() {
               <CircleDollarSign size={14} />
               {item.costCoins}
             </div>
-            <button
-              type="button"
-              className={cx('buyBtn')}
+            <ButtonPrime
+              variant="coin"
+              size="sm"
+              fullWidth
               disabled={busy || !canAfford}
               onClick={() => handleBuy(item)}
             >
               {busy ? t('buying') : canAfford ? t('buy') : t('notEnough')}
-            </button>
+            </ButtonPrime>
           </>
         ) : item.equipped ? (
           <>
@@ -166,26 +168,28 @@ function CosmeticShop() {
               <Check size={14} />
               {t('equipped')}
             </div>
-            <button
-              type="button"
-              className={cx('unequipBtn')}
+            <ButtonPrime
+              variant="soft"
+              size="sm"
+              fullWidth
               disabled={busy}
               onClick={() => handleUnequip(item)}
             >
               {t('unequip')}
-            </button>
+            </ButtonPrime>
           </>
         ) : (
           <>
             <div className={cx('ownedTag')}>{t('owned')}</div>
-            <button
-              type="button"
-              className={cx('equipBtn')}
+            <ButtonPrime
+              variant="primary"
+              size="sm"
+              fullWidth
               disabled={busy}
               onClick={() => handleEquip(item)}
             >
               {busy ? '...' : t('equip')}
-            </button>
+            </ButtonPrime>
           </>
         )}
       </div>

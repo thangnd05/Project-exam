@@ -38,19 +38,7 @@
   max-width: 320px;
 }
 
+// Nút tiếp tục là ButtonPrime streak; chỉ giữ bề rộng tối thiểu.
 .btn {
   min-width: 160px;
-  border: none;
-  border-radius: var(--radius-pill);
-  padding: 10px 0;
-  font-weight: 700;
-  background: var(--streak-gradient);
-  box-shadow: 0 4px 14px rgb(var(--streak-rgb) / 0.38);
-
-  &:hover,
-  &:focus,
-  &:active {
-    background: var(--streak-gradient-hover) !important;
-    box-shadow: 0 4px 14px rgb(var(--streak-rgb) / 0.5);
-  }
 }
