@@ -2,7 +2,7 @@
 
 import Link, { usePathname, useRouter } from '@/app/i18n/navigation';
 import { useTranslations } from 'next-intl';
-import {Button, Dropdown} from 'react-bootstrap';
+import {Dropdown} from 'react-bootstrap';
 import Image from 'next/image';
 import {useEffect, useRef, useState} from 'react';
 // import {useCallback, useEffect, useRef, useState} from 'react';
@@ -13,12 +13,14 @@ import images, {imageAssets} from '@/app/assets/images';
 import classNames from 'classnames/bind';
 import {useAuth} from '@/app/hooks/useAuth';
 import routes from '@/app/configs/Routes';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {buildLoginUrl} from '@/app/features/auth/authRedirect';
 // import JoinClassModal from '@/app/features/classes/JoinClassModal/JoinClassModal';
 // import CreateClassModal from '@/app/features/classes/CreateClassModal/CreateClassModal';
 import CreateTestModal from '@/app/features/tests/CreateTestModal';
 import AppearanceMenu from '@/app/components/layouts/Header/ThemeToggle/AppearanceMenu';
 import SettingsModal from '@/app/components/layouts/Header/ThemeToggle/SettingsModal';
+import GuestQuickTestCta from '@/app/components/layouts/Header/GuestQuickTestCta';
 import StreakBadge from '@/app/features/gamification/streak/StreakBadge';
 // Tạm ẩn số xu trên header.
 // import CoinQuestMenu from '@/app/features/gamification/coin/CoinQuestMenu';
@@ -131,6 +133,8 @@ function Header() {
   const pillRef = useRef<HTMLDivElement>(null);
   const onLight = useLightBehind(pillRef, pathname);
   const statVariant = onLight ? 'default' : 'onDark';
+  // Nút CTA: nền brand trên thanh tối, graphite (ink) khi thanh nằm trên nền sáng.
+  const ctaVariant = onLight ? 'ink' : 'primary';
 
   // const clearClassMenuTimer = useCallback(() => {
   //   if (classMenuTimer.current) {
@@ -248,7 +252,7 @@ function Header() {
               <Link
                 href={routes.examTypes}
                 className={cx('home', {
-                  active: pathname === routes.examTypes || pathname.startsWith('/exam-types/'),
+                  active: pathname === routes.examTypes || pathname.startsWith(`${routes.examTypes}/`),
                 })}
               >
                 {t('nav.examTypes')}
@@ -272,7 +276,11 @@ function Header() {
               <Link
                 href={routes.learningPlans}
                 className={cx('home', {
-                  active: pathname.startsWith(routes.myTarget) || pathname.startsWith(routes.learningPlans),
+                  active:
+                    pathname.startsWith(routes.myTarget) ||
+                    pathname.startsWith(routes.targetDashboard) ||
+                    pathname.startsWith(routes.learningPlans) ||
+                    pathname.startsWith(routes.learningPlanBase),
                 })}
               >
                 {t('nav.learningPlans')}
@@ -324,8 +332,9 @@ function Header() {
           </nav>
 
           <div className={cx('zoneRight')}>
-            {/* Đã đăng nhập thì chỉnh giao diện ở mục "Cài đặt" trong menu tài khoản. */}
-            {!user && (
+            {/* Tạm ẩn menu giao diện của khách — tính năng chỉnh màu để dành cho sau.
+                Đã đăng nhập thì chỉnh giao diện ở mục "Cài đặt" trong menu tài khoản. */}
+            {/* {!user && (
               <AppearanceMenu
                 classes={{
                   toggle: cx('themeToggle'),
@@ -334,7 +343,7 @@ function Header() {
                   divider: cx('dropdownDivider'),
                 }}
               />
-            )}
+            )} */}
             {showStats && (
               <div className={cx('mobileHeaderActions')}>
                 <div className={cx('statsCluster')}>
@@ -349,24 +358,15 @@ function Header() {
                   <Link href={buildLoginUrl(pathname === routes.home ? null : pathname, {mode: 'signin'})} className={cx('home')}>
                     {t('nav.login')}
                   </Link>
-                  <Link href={buildLoginUrl(pathname === routes.home ? null : pathname, {mode: 'signup'})} className={cx('ctaBtn')}>
-                    <span>{t('nav.signup')}</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
-                  </Link>
+                  <GuestQuickTestCta variant={ctaVariant} className={cx('ctaBtn')} />
                 </div>
               ) : (
                 <div className={cx('userMenuWrapper')}>
                   {canCreateTest && (
                     <div className={cx('ctaSlot')}>
-                      <Button
-                        variant=""
-                        className={cx('ctaBtn')}
-                        onClick={handleCreateTest}
-                      >
+                      <ButtonPrime variant={ctaVariant} className={cx('ctaBtn')} onClick={handleCreateTest}>
                         {t('nav.createTest')}
-                      </Button>
+                      </ButtonPrime>
                     </div>
                   )}
                   {showStats && (

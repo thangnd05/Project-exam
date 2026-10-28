@@ -8,6 +8,7 @@ import {createPortal} from 'react-dom';
 import classNames from 'classnames/bind';
 // import {toast} from 'react-toastify';
 
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './MobileBottomNav.module.scss';
 import routes from '@/app/configs/Routes';
 import {useAuth} from '@/app/hooks/useAuth';
@@ -28,7 +29,7 @@ const cx = classNames.bind(styles);
 
 const HIDDEN_PREFIXES = [
   '/login',
-  '/forgot',
+  '/forgot-password',
   '/reset',
   '/verify',
   '/oauth2',
@@ -74,13 +75,16 @@ function MobileBottomNav() {
   if (hidden) return null;
 
   const isHomeActive = pathname === routes.home;
-  const isExamActive = pathname.startsWith('/exam-types');
+  const isExamActive = pathname.startsWith(routes.examTypes);
   const isResourcesActive = pathname.startsWith(routes.resources);
   // const isPostsActive = pathname.startsWith('/posts');
   const isPlanActive =
-    pathname.startsWith(routes.myTarget) || pathname.startsWith(routes.learningPlans);
-  const isProfileActive =
-    pathname.startsWith(routes.dashboard) || pathname.startsWith(routes.myCertificates);
+    pathname.startsWith(routes.myTarget) ||
+    pathname.startsWith(routes.targetDashboard) ||
+    pathname.startsWith(routes.learningPlans) ||
+    pathname.startsWith(routes.learningPlanBase);
+  // Mục tiêu, lộ trình cũng nằm dưới /dashboard nên Hồ sơ chỉ sáng ở đúng trang quản trị và các trang còn lại bên dưới.
+  const isProfileActive = pathname.startsWith(routes.dashboard) && !isPlanActive;
 
   // const requireLogin = (message: string) => {
   //   if (user) {
@@ -156,14 +160,15 @@ function MobileBottomNav() {
         </Link>
 
         {canCreateTest && (
-          <button
-            type="button"
+          <ButtonPrime
+            variant="brand"
+            size="icon"
             className={cx('createBtn')}
             onClick={handleCreateTest}
             aria-label={t('createTest')}
           >
-            <Plus size="1em" />
-          </button>
+            <Plus size={18} />
+          </ButtonPrime>
         )}
 
         <Link
@@ -223,14 +228,9 @@ function MobileBottomNav() {
               <span className={cx('sheetTitle')}>
                 {t('menu')}
               </span>
-              <button
-                type="button"
-                className={cx('sheetClose')}
-                onClick={closeSheet}
-                aria-label={t('close')}
-              >
-                <X size="1em" />
-              </button>
+              <ButtonPrime variant="soft" size="icon" onClick={closeSheet} aria-label={t('close')}>
+                <X size={16} />
+              </ButtonPrime>
             </div>
 
             <div className={cx('sheetBody')}>
@@ -261,59 +261,73 @@ function MobileBottomNav() {
                   <div className={cx('menuList')}>
                     {user ? (
                       <>
-                        <Link
+                        <ButtonPrime
+                          as="link"
                           href={routes.dashboard}
+                          variant="ghost"
+                          fullWidth
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >
                           {t('profile')}
-                        </Link>
-                        <Link
+                        </ButtonPrime>
+                        <ButtonPrime
+                          as="link"
                           href={routes.myCertificates}
+                          variant="ghost"
+                          fullWidth
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >
                           {t('myCertificates')}
-                        </Link>
-                        <button
-                          type="button"
-                          className={cx('menuItem', 'menuItemButton')}
+                        </ButtonPrime>
+                        <ButtonPrime
+                          variant="ghost"
+                          fullWidth
+                          className={cx('menuItem')}
                           onClick={() => {
                             closeSheet();
                             setShowSettings(true);
                           }}
                         >
                           {t('settings')}
-                        </button>
+                        </ButtonPrime>
                       </>
                     ) : (
                       <>
-                        <Link
+                        <ButtonPrime
+                          as="link"
                           href={`${routes.login}?mode=signin`}
+                          variant="ghost"
+                          fullWidth
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >
                           {t('login')}
-                        </Link>
-                        <Link
+                        </ButtonPrime>
+                        <ButtonPrime
+                          as="link"
                           href={`${routes.login}?mode=signup`}
+                          variant="ghost"
+                          fullWidth
                           className={cx('menuItem')}
                           onClick={closeSheet}
                         >
                           {t('signup')}
-                        </Link>
+                        </ButtonPrime>
                       </>
                     )}
                   </div>
 
                   {user && (
-                    <button
-                      type="button"
+                    <ButtonPrime
+                      variant="dangerGhost"
+                      fullWidth
                       className={cx('logoutBtn')}
                       onClick={handleLogout}
                     >
                       {t('logout')}
-                    </button>
+                    </ButtonPrime>
                   )}
                 </>
             </div>
