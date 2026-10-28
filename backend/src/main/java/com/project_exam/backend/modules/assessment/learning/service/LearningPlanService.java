@@ -365,6 +365,14 @@ public class LearningPlanService {
                 loadDiagnosisSources(List.of(plan)));
     }
 
+    // Trang lịch sử nhiệm vụ chỉ có taskId trên URL (/dashboard/tasks/:taskId/history).
+    @Transactional
+    public PlanResponse getPlanByTask(String userId, String taskId) {
+        LearningPlanTask task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new NotFoundException("Không tìm thấy nhiệm vụ"));
+        return getPlan(userId, task.getLearningPlanId());
+    }
+
     @Transactional(readOnly = true)
     public List<PlanResponse> listPlans(String userId, String examTypeId) {
         List<LearningPlan> plans = examTypeId == null || examTypeId.isBlank()

@@ -144,7 +144,7 @@ public class ExamTypeService {
 
     private static final Pattern SLUG_PATTERN = Pattern.compile("^[a-z0-9]+(-[a-z0-9]+)*$");
 
-    /** Trùng tên trang con cố định trên frontend thì URL của kỳ thi bị trang đó che mất: /exam-types/aws/collections/... */
+    /** Trùng tên trang con cố định trên frontend thì URL của kỳ thi bị trang đó che mất: /exams/aws/collections/... */
     private static final Set<String> RESERVED_SLUGS = Set.of("collections");
 
     /** Slug do admin nhập: chữ thường, số, gạch ngang (vd "saa-c03"), không trùng kỳ thi khác. */

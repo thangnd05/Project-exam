@@ -30,7 +30,11 @@ export const getPlanById = (learningPlanId: string): Promise<PlanResponse> => {
   return axios.get(`${BASE_URL}/${learningPlanId}`).then((res) => res.data);
 };
 
-export const listPlans = (examTypeId?: string): Promise<PlanResponse[]> => {
+export const getPlanByTask = (taskId: string): Promise<PlanResponse> => {
+  return axios.get(`${BASE_URL}/tasks/${taskId}/plan`).then((res) => res.data);
+};
+
+export const listPlans =(examTypeId?: string): Promise<PlanResponse[]> => {
   return axios
     .get(BASE_URL, { params: examTypeId ? { examTypeId } : undefined })
     .then((res) => res.data);

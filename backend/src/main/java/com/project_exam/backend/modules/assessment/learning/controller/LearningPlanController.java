@@ -66,6 +66,15 @@ public class LearningPlanController {
         return ResponseEntity.ok(learningPlanService.getPlan(userId, learningPlanId));
     }
 
+    @GetMapping("/tasks/{taskId}/plan")
+    public ResponseEntity<PlanResponse> getByTask(
+            @PathVariable String taskId,
+            HttpServletRequest httpRequest
+    ) {
+        String userId = authUtils.getUserId(httpRequest);
+        return ResponseEntity.ok(learningPlanService.getPlanByTask(userId, taskId));
+    }
+
     @GetMapping
     public ResponseEntity<List<PlanResponse>> list(
             @RequestParam(required = false) String examTypeId,
