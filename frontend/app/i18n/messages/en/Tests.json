@@ -46,6 +46,11 @@
     "examTab": "Mock exam",
     "practiceTab": "Practice by section",
     "examDesc": "Take the full test under real, timed exam conditions.",
+    "stats": {
+      "duration": "Duration",
+      "questions": "Questions",
+      "sections": "Sections"
+    },
     "features": {
       "timed": "Timed like the real exam",
       "scoring": "Detailed scoring & saved history",
@@ -53,10 +58,11 @@
     },
     "startExam": "Start mock exam",
     "practiceHint": "Choose the sections to practice, <strong>no time limit</strong>.",
-    "guideTitle": "Overview & how to approach it",
+    "resourcesTitle": "Study materials",
     "loadingParts": "Loading test sections...",
     "noParts": "This test has no sections yet.",
-    "selectAll": "Select all {count, plural, one {# section} other {# sections}}",
+    "selectAll": "Select all",
+    "clearAll": "Clear all",
     "selected": "Selected <strong>{count}</strong> {count, plural, one {question} other {questions}}",
     "start": "Start"
   }

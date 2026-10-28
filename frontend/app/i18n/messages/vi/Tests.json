@@ -46,6 +46,11 @@
     "examTab": "Thi thử",
     "practiceTab": "Luyện theo phần",
     "examDesc": "Làm đầy đủ đề như thi thật, có tính giờ.",
+    "stats": {
+      "duration": "Thời gian",
+      "questions": "Số câu",
+      "sections": "Số phần"
+    },
     "features": {
       "timed": "Tính giờ như phòng thi thật",
       "scoring": "Chấm điểm chi tiết & lưu lịch sử",
@@ -53,10 +58,11 @@
     },
     "startExam": "Bắt đầu thi thử",
     "practiceHint": "Chọn phần muốn luyện, <strong>không giới hạn thời gian</strong>.",
-    "guideTitle": "Giới thiệu & cách làm",
+    "resourcesTitle": "Tài liệu ôn tập",
     "loadingParts": "Đang tải danh sách phần thi...",
     "noParts": "Đề này chưa có phần thi nào.",
-    "selectAll": "Chọn tất cả {count} phần",
+    "selectAll": "Chọn tất cả",
+    "clearAll": "Bỏ chọn tất cả",
     "selected": "Đã chọn <strong>{count}</strong> câu",
     "start": "Bắt đầu"
   }
