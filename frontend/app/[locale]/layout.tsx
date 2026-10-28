@@ -1,4 +1,4 @@
-import { Inter, JetBrains_Mono, Playfair_Display } from 'next/font/google';
+import { Be_Vietnam_Pro, JetBrains_Mono, Playfair_Display } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
@@ -14,13 +14,15 @@ import { OG_LOCALES } from '@/app/i18n/metadata';
 import { DEFAULT_PALETTE } from '@/app/constants/theme';
 import { SITE_NAME } from '@/app/constants/site';
 
-const inter = Inter({
+// Be Vietnam Pro không có bản variable nên phải khai đủ các độ đậm giao diện dùng tới.
+const beVietnamPro = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
+  weight: ['300', '400', '500', '600', '700', '800', '900'],
   display: 'swap',
-  variable: '--font-inter',
+  variable: '--font-be-vietnam-pro',
 });
 
-// Ba font, mỗi font một vai: Inter cho giao diện, JetBrains Mono cho mã/nhãn kỹ thuật,
+// Ba font, mỗi font một vai: Be Vietnam Pro cho giao diện, JetBrains Mono cho mã/nhãn kỹ thuật,
 // Playfair cho chứng chỉ và tiêu đề bài viết. Token tương ứng: --font-family, --font-mono, --font-serif.
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin', 'vietnamese'],
@@ -100,7 +102,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   return (
     <html
       lang={locale}
-      className={`${inter.variable} ${jetbrainsMono.variable} ${playfair.variable}`}
+      className={`${beVietnamPro.variable} ${jetbrainsMono.variable} ${playfair.variable}`}
       data-palette={DEFAULT_PALETTE}
       // Bootstrap reboot bật scroll-behavior: smooth trên :root; thuộc tính này để Next tắt cuộn mượt khi chuyển trang.
       data-scroll-behavior="smooth"
