@@ -1,7 +1,8 @@
 'use client';
 
 import {useMemo, useState} from 'react';
-import {Button, Form} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {Edit, Plus, Trash2} from 'lucide-react';
 import {useTranslations} from 'next-intl';
 
@@ -254,10 +255,10 @@ function CosmeticsManagement() {
         title={t('title')}
         description={t('description')}
       >
-        <Button onClick={openCreateModal}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={openCreateModal}>
+          <Plus size={16} />
           {t('add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminToolbar
@@ -279,16 +280,15 @@ function CosmeticsManagement() {
         getRowKey={(item: CosmeticResponse) => item.cosmeticId}
         rowActions={(item: CosmeticResponse) => (
           <>
-            <button title={tAdmin('actions.edit')} onClick={() => openEditModal(item)}>
+            <ButtonPrime size="icon" variant="ghost" title={tAdmin('actions.edit')} onClick={() => openEditModal(item)}>
               <Edit size={14} />
-            </button>
-            <button
-              className="danger"
+            </ButtonPrime>
+            <ButtonPrime size="icon" variant="dangerGhost"
               title={tAdmin('actions.delete')}
               onClick={() => setDeleting(item)}
             >
               <Trash2 size={14} />
-            </button>
+            </ButtonPrime>
           </>
         )}
       />

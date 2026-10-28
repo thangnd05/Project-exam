@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import {useTranslations} from 'next-intl';
-import {Badge, Button, Spinner} from 'react-bootstrap';
+import {Badge, Spinner} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import classNames from 'classnames/bind';
 import {Download, Edit, ExternalLink, Plus, Trash2} from 'lucide-react';
 
@@ -57,12 +58,12 @@ function ResourceCard({
       <div className={cx('cardHeader')}>
         <h3 className={cx('cardTitle')}>{resource.title}</h3>
         <div className={cx('cardActions')}>
-          <button type="button" onClick={() => onEdit(resource)} title={t('shared.edit')}>
+          <ButtonPrime size="icon" variant="ghost" onClick={() => onEdit(resource)} title={t('shared.edit')}>
             <Edit size={16} />
-          </button>
-          <button type="button" onClick={() => onDelete(resource)} title={t('shared.delete')}>
+          </ButtonPrime>
+          <ButtonPrime size="icon" variant="dangerGhost" onClick={() => onDelete(resource)} title={t('shared.delete')}>
             <Trash2 size={16} />
-          </button>
+          </ButtonPrime>
         </div>
       </div>
 
@@ -416,10 +417,10 @@ function RecoveryResourcesManagement() {
         title={t('recoveryResources.title')}
         description={t('recoveryResources.description')}
       >
-        <Button onClick={openCreateModal}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={openCreateModal}>
+          <Plus size={16} />
           {t('recoveryResources.add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminToolbar

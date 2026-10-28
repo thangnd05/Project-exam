@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import {useTranslations} from 'next-intl';
-import {Button, Form} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {Edit, Plus, Trash2} from 'lucide-react';
 import {toast} from 'react-toastify';
 
@@ -229,10 +230,10 @@ function QuestsManagement() {
         title={t('quests.title')}
         description={t('quests.description')}
       >
-        <Button onClick={openCreateModal}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={openCreateModal}>
+          <Plus size={16} />
           {t('quests.add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminToolbar
@@ -254,16 +255,15 @@ function QuestsManagement() {
         getRowKey={(quest: QuestResponse) => quest.questId}
         rowActions={(quest: QuestResponse) => (
           <>
-            <button title={t('shared.edit')} onClick={() => openEditModal(quest)}>
+            <ButtonPrime size="icon" variant="ghost" title={t('shared.edit')} onClick={() => openEditModal(quest)}>
               <Edit size={14} />
-            </button>
-            <button
-              className="danger"
+            </ButtonPrime>
+            <ButtonPrime size="icon" variant="dangerGhost"
               title={t('shared.delete')}
               onClick={() => setDeletingQuest(quest)}
             >
               <Trash2 size={14} />
-            </button>
+            </ButtonPrime>
           </>
         )}
       />

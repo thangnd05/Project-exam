@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import {Badge, Form} from 'react-bootstrap';
 import {useTranslations} from 'next-intl';
 import {Edit, Trash2} from 'lucide-react';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 import BaseModal from '@/app/components/modal/BaseModal';
 import ModalActionFooter from '@/app/components/modal/ModalActionFooter';
@@ -218,18 +219,16 @@ function TestsManagement() {
         getRowKey={(test: AdminTestRow) => test.testId}
         rowActions={(test: AdminTestRow) => (
           <>
-            <button type="button" onClick={() => openEditModal(test)} title={t('edit')}>
+            <ButtonPrime size="icon" variant="ghost" onClick={() => openEditModal(test)} title={t('edit')}>
               <Edit size={14} />
-            </button>
-            <button
-              type="button"
-              className="danger"
+            </ButtonPrime>
+            <ButtonPrime size="icon" variant="dangerGhost"
               onClick={() => handleDelete(test.testId)}
               title={t('delete')}
               disabled={submitting}
             >
               <Trash2 size={14} />
-            </button>
+            </ButtonPrime>
           </>
         )}
       />

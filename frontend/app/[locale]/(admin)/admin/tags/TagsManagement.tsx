@@ -2,7 +2,8 @@
 
 import { useCallback, useMemo, useState } from 'react';
 import {useTranslations} from 'next-intl';
-import {Button, Spinner} from 'react-bootstrap';
+import {Spinner} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import classNames from 'classnames/bind';
 import {ChevronDown, ChevronRight, Edit, FileText, Plus, Trash2} from 'lucide-react';
 
@@ -68,9 +69,9 @@ function PartGroupNode({group, isExpanded, searchTerm, onToggle, onAddToPart, on
       <div className={cx('treeNode')}>
         <div className={cx('treeNodeLeft')}>
           {hasTags ? (
-            <button className={cx('expandBtn')} onClick={() => onToggle(group.key)}>
+            <ButtonPrime size="icon" variant="ghost" className={cx('expandBtn')} onClick={() => onToggle(group.key)}>
               {open ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-            </button>
+            </ButtonPrime>
           ) : (
             <span className={cx('expandPlaceholder')} />
           )}
@@ -83,9 +84,9 @@ function PartGroupNode({group, isExpanded, searchTerm, onToggle, onAddToPart, on
           <span className={cx('childCount')} title={t('tagCount')}>{group.tags.length}</span>
         </div>
         <div className={cx('treeNodeActions')}>
-          <button onClick={() => onAddToPart(group.examPartId)} title={t('addToPart')}>
+          <ButtonPrime size="icon" variant="ghost" onClick={() => onAddToPart(group.examPartId)} title={t('addToPart')}>
             <Plus size={16} />
-          </button>
+          </ButtonPrime>
         </div>
       </div>
       {hasTags && open && (
@@ -107,12 +108,12 @@ function PartGroupNode({group, isExpanded, searchTerm, onToggle, onAddToPart, on
                 </span>
               </div>
               <div className={cx('treeNodeActions')}>
-                <button onClick={() => onEdit(tag)} title={t('edit')}>
+                <ButtonPrime size="icon" variant="ghost" onClick={() => onEdit(tag)} title={t('edit')}>
                   <Edit size={16} />
-                </button>
-                <button onClick={() => onDelete(tag)} title={t('delete')}>
+                </ButtonPrime>
+                <ButtonPrime size="icon" variant="dangerGhost" onClick={() => onDelete(tag)} title={t('delete')}>
                   <Trash2 size={16} />
-                </button>
+                </ButtonPrime>
               </div>
             </div>
           ))}
@@ -276,10 +277,10 @@ function TagsManagement() {
         title={t('title')}
         description={t('description')}
       >
-        <Button onClick={() => openCreateModal()} disabled={!selectedExamTypeId}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={() => openCreateModal()} disabled={!selectedExamTypeId}>
+          <Plus size={16} />
           {t('add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminToolbar
@@ -297,8 +298,8 @@ function TagsManagement() {
         <div className={cx('treeToolbar')}>
           <span className={cx('treeCount')}>{t('count', {count: tags.length})}</span>
           <div className={cx('treeToolbarActions')}>
-            <button onClick={expandAll}>{t('expandAll')}</button>
-            <button onClick={collapseAll}>{t('collapseAll')}</button>
+            <ButtonPrime variant="link" size="sm" onClick={expandAll}>{t('expandAll')}</ButtonPrime>
+            <ButtonPrime variant="link" size="sm" onClick={collapseAll}>{t('collapseAll')}</ButtonPrime>
           </div>
         </div>
 

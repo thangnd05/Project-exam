@@ -6,6 +6,7 @@ import classNames from 'classnames/bind';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
 import {useTranslations} from 'next-intl';
 
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './adminKit.module.scss';
 
 const cx = classNames.bind(styles);
@@ -188,37 +189,41 @@ function AdminTable<T extends object>({
             {t('range', {start: rangeStart, end: rangeEnd, total, item: itemLabel ?? t('item')})}
           </span>
           <div className={cx('pager')}>
-            <button
-              className={cx('pagerBtn')}
+            <ButtonPrime
+              variant="ghost"
+              size="icon"
               disabled={currentPage === 0}
               onClick={() => goTo(currentPage - 1)}
               aria-label={t('prevPage')}
             >
               <ChevronLeft size={16} />
-            </button>
+            </ButtonPrime>
             {buildPageItems(currentPage, totalPages).map((item, idx) =>
               item === '...' ? (
-                <span key={`e${idx}`} className={cx('pagerBtn', 'ellipsis')}>
+                <span key={`e${idx}`} className={cx('ellipsis')}>
                   …
                 </span>
               ) : (
-                <button
+                <ButtonPrime
                   key={item}
-                  className={cx('pagerBtn', {active: item === currentPage})}
+                  variant={item === currentPage ? 'ink' : 'ghost'}
+                  size="sm"
+                  aria-current={item === currentPage ? 'page' : undefined}
                   onClick={() => goTo(item)}
                 >
                   {item + 1}
-                </button>
+                </ButtonPrime>
               ),
             )}
-            <button
-              className={cx('pagerBtn')}
+            <ButtonPrime
+              variant="ghost"
+              size="icon"
               disabled={currentPage >= totalPages - 1}
               onClick={() => goTo(currentPage + 1)}
               aria-label={t('nextPage')}
             >
               <ChevronRight size={16} />
-            </button>
+            </ButtonPrime>
           </div>
         </div>
       )}

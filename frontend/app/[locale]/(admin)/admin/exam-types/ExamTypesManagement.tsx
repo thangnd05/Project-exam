@@ -2,7 +2,8 @@
 
 import { useRouter } from '@/app/i18n/navigation';
 import { useCallback, useMemo, useState } from 'react';
-import {Badge, Button, Spinner} from 'react-bootstrap';
+import {Badge, Spinner} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {useTranslations} from 'next-intl';
 import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Paintbrush, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
@@ -124,9 +125,9 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
       <div className={cx('treeNode')}>
         <div className={cx('treeNodeLeft')}>
           {hasChildren ? (
-            <button className={cx('expandBtn')} onClick={() => toggleExpand(node.exam_type_id)}>
+            <ButtonPrime size="icon" variant="ghost" className={cx('expandBtn')} onClick={() => toggleExpand(node.exam_type_id)}>
               {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-            </button>
+            </ButtonPrime>
           ) : (
             <span className={cx('expandPlaceholder')} />
           )}
@@ -145,19 +146,19 @@ function ExamTypeTreeNode({node, level, expandedIds, toggleExpand, onEdit, onEdi
         </div>
         <div className={cx('treeNodeActions')}>
           {level === 0 && (
-            <button className={cx('addBtn')} onClick={() => onAddChild(node)} title={t('addChild')}>
+            <ButtonPrime size="icon" variant="ghost" onClick={() => onAddChild(node)} title={t('addChild')}>
               <Plus size={16} />
-            </button>
+            </ButtonPrime>
           )}
-          <button onClick={() => onEditLayout(node)} title={t('editLayout')}>
+          <ButtonPrime size="icon" variant="ghost" onClick={() => onEditLayout(node)} title={t('editLayout')}>
             <Paintbrush size={16} />
-          </button>
-          <button onClick={() => onEdit(node)} title={t('edit')}>
+          </ButtonPrime>
+          <ButtonPrime size="icon" variant="ghost" onClick={() => onEdit(node)} title={t('edit')}>
             <Edit size={16} />
-          </button>
-          <button className={cx('deleteBtn')} onClick={() => onDelete(node)} title={t('delete')}>
+          </ButtonPrime>
+          <ButtonPrime size="icon" variant="dangerGhost" onClick={() => onDelete(node)} title={t('delete')}>
             <Trash2 size={16} />
-          </button>
+          </ButtonPrime>
         </div>
       </div>
       {hasChildren && (isExpanded || Boolean(kw)) && (
@@ -375,10 +376,10 @@ function ExamTypesManagement() {
         title={t('title')}
         description={t('description')}
       >
-        <Button onClick={openCreateModal}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={openCreateModal}>
+          <Plus size={16} />
           {t('add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminToolbar
@@ -394,8 +395,8 @@ function ExamTypesManagement() {
         <div className={cx('treeToolbar')}>
           <span className={cx('treeCount')}>{t('count', {count: examTypes.length})}</span>
           <div className={cx('treeToolbarActions')}>
-            <button onClick={expandAll}>{t('expandAll')}</button>
-            <button onClick={collapseAll}>{t('collapseAll')}</button>
+            <ButtonPrime variant="link" size="sm" onClick={expandAll}>{t('expandAll')}</ButtonPrime>
+            <ButtonPrime variant="link" size="sm" onClick={collapseAll}>{t('collapseAll')}</ButtonPrime>
           </div>
         </div>
 

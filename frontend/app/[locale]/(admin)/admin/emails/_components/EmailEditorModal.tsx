@@ -273,14 +273,15 @@ function EmailEditorModal({show, email, onClose}: EmailEditorModalProps) {
         <div className="mb-3 small text-muted">
           {t('variablesHint')}{' '}
           {email!.availableVars!.map((variable) => (
-            <button
+            <ButtonPrime
               key={variable}
-              type="button"
-              className="btn btn-sm btn-outline-secondary py-0 px-2 me-1 mb-1"
+              size="sm"
+              variant="soft"
+              className="me-1 mb-1"
               onClick={() => insertVariable(variable)}
             >
               {`{{${variable}}}`}
-            </button>
+            </ButtonPrime>
           ))}
         </div>
       )}

@@ -1,10 +1,9 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
-import {Button, Form} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
 import {useTranslations} from 'next-intl';
 import {Braces, Plus, Trash2} from 'lucide-react';
-import classNames from 'classnames/bind';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
@@ -18,9 +17,7 @@ import {
   AdminTable,
   AdminToolbar,
 } from '@/app/[locale]/(admin)/_components/common';
-import styles from '@/app/[locale]/(admin)/_components/common/adminKit.module.scss';
 
-const cx = classNames.bind(styles);
 import {useScoringConversion, type ScoringRuleItem} from './_hooks/useScoringConversion';
 
 const defaultFormState = {
@@ -217,7 +214,7 @@ function ScoringConversionManagement() {
         title={t('title')}
         description={t('description')}
       >
-        <Button
+        <ButtonPrime
           onClick={() => {
             setShowJsonCreateForm((previous) => !previous);
             setErrorMessage('');
@@ -226,7 +223,7 @@ function ScoringConversionManagement() {
         >
           <Braces size={16} />
           {t('createByJson')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <BaseModal
@@ -284,24 +281,22 @@ function ScoringConversionManagement() {
         }
       />
       <div className="d-flex flex-wrap gap-2">
-        <Button
-          type="button"
+        <ButtonPrime
           size="sm"
-          className={cx('pillBtn', {active: activeSkillId === 'all'})}
+          variant={activeSkillId === 'all' ? 'primary' : 'soft'}
           onClick={() => selectSkill('all')}
         >
           {t('allSkills')}
-        </Button>
+        </ButtonPrime>
         {skills.map((skill) => (
-          <Button
+          <ButtonPrime
             key={skill.skill_id}
-            type="button"
             size="sm"
-            className={cx('pillBtn', {active: activeSkillId === skill.skill_id})}
+            variant={activeSkillId === skill.skill_id ? 'primary' : 'soft'}
             onClick={() => selectSkill(skill.skill_id)}
           >
             {skill.name}
-          </Button>
+          </ButtonPrime>
         ))}
       </div>
 
@@ -377,9 +372,9 @@ function ScoringConversionManagement() {
         loading={loading}
         getRowKey={(rule: ScoringRuleItem) => rule.conversion_id}
         rowActions={(rule: ScoringRuleItem) => (
-          <button className="danger" title={t('delete')} onClick={() => setDeletingRule(rule)}>
+          <ButtonPrime size="icon" variant="dangerGhost" title={t('delete')} onClick={() => setDeletingRule(rule)}>
             <Trash2 size={14} />
-          </button>
+          </ButtonPrime>
         )}
       />
       <ConfirmDeleteModal

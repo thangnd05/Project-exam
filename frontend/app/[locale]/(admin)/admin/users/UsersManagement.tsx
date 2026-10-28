@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import {useTranslations} from 'next-intl';
-import {Badge, Button, Form} from 'react-bootstrap';
+import {Badge, Form} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
@@ -320,10 +321,10 @@ function UsersManagement() {
         title={t('users.title')}
         description={t('users.description')}
       >
-        <Button onClick={openCreateModal}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={openCreateModal}>
+          <Plus size={16} />
           {t('users.add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <StatCardGroup>
@@ -384,16 +385,15 @@ function UsersManagement() {
         onPageChange={(p) => setCurrentPage(p + 1)}
         rowActions={(user: AdminUserRow) => (
           <>
-            <button title={t('shared.edit')} onClick={() => openEditModal(user)}>
+            <ButtonPrime size="icon" variant="ghost" title={t('shared.edit')} onClick={() => openEditModal(user)}>
               <Edit size={16} />
-            </button>
-            <button
-              className="danger"
+            </ButtonPrime>
+            <ButtonPrime size="icon" variant="dangerGhost"
               title={t('shared.delete')}
               onClick={() => setUserToDelete(user)}
             >
               <Trash2 size={16} />
-            </button>
+            </ButtonPrime>
           </>
         )}
       />

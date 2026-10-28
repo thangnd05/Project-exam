@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Badge, Button, Form } from 'react-bootstrap';
+import { Badge, Form } from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { Edit, Plus, Trash2, ShieldX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
@@ -281,10 +282,10 @@ function CertificatesManagement() {
         description={t('description')}
       >
         {tab === 'templates' && (
-          <Button onClick={openCreateModal}>
-            <Plus size={16} className="me-1" />
+          <ButtonPrime onClick={openCreateModal}>
+            <Plus size={16} />
             {t('addTemplate')}
-          </Button>
+          </ButtonPrime>
         )}
       </AdminPageHeader>
 
@@ -322,16 +323,15 @@ function CertificatesManagement() {
             emptyText={t('templatesEmpty')}
             rowActions={(item: CertificateTemplateResponse) => (
               <>
-                <button title={t('editTemplate')} onClick={() => openEditModal(item)}>
+                <ButtonPrime size="icon" variant="ghost" title={t('editTemplate')} onClick={() => openEditModal(item)}>
                   <Edit size={14} />
-                </button>
-                <button
-                  className="danger"
+                </ButtonPrime>
+                <ButtonPrime size="icon" variant="dangerGhost"
                   title={t('deleteTemplate')}
                   onClick={() => setDeletingTemplate(item)}
                 >
                   <Trash2 size={14} />
-                </button>
+                </ButtonPrime>
               </>
             )}
           />
@@ -375,20 +375,19 @@ function CertificatesManagement() {
             rowActions={(item: CertificateResponse) => (
               <>
                 {item.status === CertificateStatus.ACTIVE && (
-                  <button
+                  <ButtonPrime size="icon" variant="ghost"
                     title={t('revokeTitle')}
                     onClick={() => setRevokingCertificate(item)}
                   >
                     <ShieldX size={14} />
-                  </button>
+                  </ButtonPrime>
                 )}
-                <button
-                  className="danger"
+                <ButtonPrime size="icon" variant="dangerGhost"
                   title={t('deletePermanently')}
                   onClick={() => setDeletingCertificate(item)}
                 >
                   <Trash2 size={14} />
-                </button>
+                </ButtonPrime>
               </>
             )}
           />

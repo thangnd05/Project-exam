@@ -181,9 +181,9 @@ function EvaluationsManagement() {
             emptyText={t('statsEmpty')}
             getRowKey={(s: EvaluationTestStats) => s.testId}
             rowActions={(s: EvaluationTestStats) => (
-              <button onClick={() => showTestEvaluations(s.testId)} title={t('viewTestEvaluations')}>
+              <ButtonPrime size="icon" variant="ghost" onClick={() => showTestEvaluations(s.testId)} title={t('viewTestEvaluations')}>
                 <Eye size={14} />
-              </button>
+              </ButtonPrime>
             )}
           />
         </>
@@ -247,13 +247,12 @@ function EvaluationsManagement() {
             pageSize={ITEMS_PER_PAGE}
             onPageChange={(p: number) => setCurrentPage(p + 1)}
             rowActions={(evaluation: AdminEvaluation) => (
-              <button
-                className="danger"
+              <ButtonPrime size="icon" variant="dangerGhost"
                 onClick={() => setDeletingEvaluation(evaluation)}
                 title={t('delete')}
               >
                 <Trash2 size={14} />
-              </button>
+              </ButtonPrime>
             )}
           />
         </>

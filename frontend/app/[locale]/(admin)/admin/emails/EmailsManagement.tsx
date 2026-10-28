@@ -1,11 +1,10 @@
 'use client';
 
 import {useMemo, useState} from 'react';
-import {Button} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {Edit, History, Plus, Send, Trash2} from 'lucide-react';
 import {toast} from 'react-toastify';
 import {useTranslations} from 'next-intl';
-import classNames from 'classnames/bind';
 
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import {
@@ -19,14 +18,12 @@ import {
 import type {AdminTableColumn} from '@/app/[locale]/(admin)/_components/common/AdminTable';
 import type {EmailResponse} from '@/app/types';
 import {getApiErrorMessage} from '@/app/utils/apiError';
-import styles from '@/app/[locale]/(admin)/_components/common/adminKit.module.scss';
 import EmailEditorModal from './_components/EmailEditorModal';
 import EmailRecipientsModal from './_components/EmailRecipientsModal';
 import SendEmailModal from './_components/SendEmailModal';
 import {useAutoEmails, useEmailMutations, useManualEmails} from './_hooks/useAdminEmails';
 import { formatDateTime } from '@/app/utils/format-date-time';
 
-const cx = classNames.bind(styles);
 
 const PAGE_SIZE = 10;
 
@@ -178,24 +175,23 @@ function EmailsManagement() {
         description={t('description')}
       >
         {!isAutoTab && (
-          <Button onClick={() => openEditor(null)}>
-            <Plus size={16} className="me-1" />
+          <ButtonPrime onClick={() => openEditor(null)}>
+            <Plus size={16} />
             {t('compose')}
-          </Button>
+          </ButtonPrime>
         )}
       </AdminPageHeader>
 
       <div className="d-flex gap-2">
         {TABS.map((tab) => (
-          <Button
+          <ButtonPrime
             key={tab.key}
-            type="button"
             size="sm"
-            className={cx('pillBtn', {active: activeTab === tab.key})}
+            variant={activeTab === tab.key ? 'primary' : 'soft'}
             onClick={() => setActiveTab(tab.key)}
           >
             {t(`tabs.${tab.label}`)}
-          </Button>
+          </ButtonPrime>
         ))}
       </div>
 
@@ -228,12 +224,12 @@ function EmailsManagement() {
           emptyText={t('autoEmpty')}
           rowActions={(email: EmailResponse) => (
             <>
-              <button title={t('actions.edit')} onClick={() => openEditor(email)}>
+              <ButtonPrime size="icon" variant="ghost" title={t('actions.edit')} onClick={() => openEditor(email)}>
                 <Edit size={14} />
-              </button>
-              <button title={t('actions.log')} onClick={() => setLogEmailId(email.emailId)}>
+              </ButtonPrime>
+              <ButtonPrime size="icon" variant="ghost" title={t('actions.log')} onClick={() => setLogEmailId(email.emailId)}>
                 <History size={14} />
-              </button>
+              </ButtonPrime>
             </>
           )}
         />
@@ -252,18 +248,18 @@ function EmailsManagement() {
           onPageChange={setManualPage}
           rowActions={(email: EmailResponse) => (
             <>
-              <button title={t('actions.edit')} onClick={() => openEditor(email)}>
+              <ButtonPrime size="icon" variant="ghost" title={t('actions.edit')} onClick={() => openEditor(email)}>
                 <Edit size={14} />
-              </button>
-              <button title={t('actions.send')} onClick={() => setSendingEmail(email)}>
+              </ButtonPrime>
+              <ButtonPrime size="icon" variant="ghost" title={t('actions.send')} onClick={() => setSendingEmail(email)}>
                 <Send size={14} />
-              </button>
-              <button title={t('actions.log')} onClick={() => setLogEmailId(email.emailId)}>
+              </ButtonPrime>
+              <ButtonPrime size="icon" variant="ghost" title={t('actions.log')} onClick={() => setLogEmailId(email.emailId)}>
                 <History size={14} />
-              </button>
-              <button className="danger" title={tAdmin('actions.delete')} onClick={() => setDeletingEmail(email)}>
+              </ButtonPrime>
+              <ButtonPrime size="icon" variant="dangerGhost" title={tAdmin('actions.delete')} onClick={() => setDeletingEmail(email)}>
                 <Trash2 size={14} />
-              </button>
+              </ButtonPrime>
             </>
           )}
         />

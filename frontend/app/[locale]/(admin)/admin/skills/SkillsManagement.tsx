@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import {Button, Form} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {useTranslations} from 'next-intl';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
@@ -150,10 +151,10 @@ function SkillsManagement() {
         title={t('title')}
         description={t('pageDescription')}
       >
-        <Button onClick={openCreateModal}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={openCreateModal}>
+          <Plus size={16} />
           {t('add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminToolbar
@@ -173,16 +174,15 @@ function SkillsManagement() {
         getRowKey={(skill: SkillItem) => skill.skill_id}
         rowActions={(skill: SkillItem) => (
           <>
-            <button title={t('edit')} onClick={() => openEditModal(skill)}>
+            <ButtonPrime size="icon" variant="ghost" title={t('edit')} onClick={() => openEditModal(skill)}>
               <Edit size={14} />
-            </button>
-            <button
-              className="danger"
+            </ButtonPrime>
+            <ButtonPrime size="icon" variant="dangerGhost"
               title={t('delete')}
               onClick={() => setDeletingSkill(skill)}
             >
               <Trash2 size={14} />
-            </button>
+            </ButtonPrime>
           </>
         )}
       />

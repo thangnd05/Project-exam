@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Badge, Button } from 'react-bootstrap';
+import { Badge } from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { Eye, CheckCircle, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import classNames from 'classnames/bind';
 
 import routes from '@/app/configs/Routes';
 import useDebouncedValue from '@/app/hooks/useDebouncedValue';
@@ -13,11 +13,9 @@ import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import { AdminPageHeader, AdminTable, AdminToolbar } from '@/app/[locale]/(admin)/_components/common';
 import type { AdminTableColumn } from '@/app/[locale]/(admin)/_components/common/AdminTable';
-import styles from '@/app/[locale]/(admin)/_components/common/adminKit.module.scss';
 import { PostStatus } from '@/app/enums';
 import type { PostSummaryResponse } from '@/app/types';
 
-const cx = classNames.bind(styles);
 import { useAdminPosts, useApprovePost, useDeletePost } from './_hooks/useAdminPosts';
 import { formatDate } from '@/app/utils/format-date-time';
 
@@ -137,14 +135,14 @@ const PostsManagement = () => {
             >
                 <div className="d-flex gap-2">
                     {STATUS_FILTERS.map((item) => (
-                        <Button
+                        <ButtonPrime
                             key={item.value}
                             size="sm"
-                            className={cx('pillBtn', {active: statusFilter === item.value})}
+                            variant={statusFilter === item.value ? 'primary' : 'soft'}
                             onClick={() => setStatusFilter(item.value)}
                         >
                             {t(`posts.filters.${item.labelKey}`)}
-                        </Button>
+                        </ButtonPrime>
                     ))}
                 </div>
             </AdminToolbar>
@@ -164,7 +162,7 @@ const PostsManagement = () => {
                 onPageChange={setCurrentPage}
                 rowActions={(post: PostSummaryResponse) => (
                     <>
-                        <button
+                        <ButtonPrime size="icon" variant="ghost"
                             title={t('posts.viewDetail')}
                             onClick={() =>
                                 window.open(
@@ -174,19 +172,18 @@ const PostsManagement = () => {
                             }
                         >
                             <Eye size={14} />
-                        </button>
+                        </ButtonPrime>
                         {post.status !== PostStatus.APPROVED && (
-                            <button title={t('posts.approve')} onClick={() => setApprovingPost(post)}>
+                            <ButtonPrime size="icon" variant="ghost" title={t('posts.approve')} onClick={() => setApprovingPost(post)}>
                                 <CheckCircle size={14} />
-                            </button>
+                            </ButtonPrime>
                         )}
-                        <button
-                            className="danger"
+                        <ButtonPrime size="icon" variant="dangerGhost"
                             title={t('posts.deletePost')}
                             onClick={() => setDeletingPost(post)}
                         >
                             <Trash2 size={14} />
-                        </button>
+                        </ButtonPrime>
                     </>
                 )}
             />

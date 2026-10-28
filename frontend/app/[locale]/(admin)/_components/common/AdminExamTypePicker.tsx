@@ -3,6 +3,7 @@
 import classNames from 'classnames/bind';
 import {useTranslations} from 'next-intl';
 
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {VENDORS} from '@/app/[locale]/(public)/_lib/certificationMeta';
 import {
   useExamTypeGroups,
@@ -51,16 +52,17 @@ function AdminExamTypePicker({
           </span>
           <div className={cx('pills')}>
             {group.exams.map((exam) => (
-              <button
+              <ButtonPrime
                 key={exam.id}
-                type="button"
+                variant={exam.id === value ? 'ink' : 'outline'}
+                size="sm"
                 title={exam.id === value && clearable ? t('clearHint', {name: exam.name}) : exam.name}
                 aria-pressed={exam.id === value}
-                className={cx('pill', {active: exam.id === value})}
+                className={cx('pill')}
                 onClick={() => select(exam.id)}
               >
                 {exam.label}
-              </button>
+              </ButtonPrime>
             ))}
           </div>
         </div>

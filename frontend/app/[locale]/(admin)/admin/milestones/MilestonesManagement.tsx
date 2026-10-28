@@ -307,20 +307,22 @@ function MilestonesManagement() {
               <div className={cx('milestoneActions')}>
                 {editingId !== m.examTargetMilestoneId && (
                   <>
-                    <button
-                      className={cx('iconButton')}
+                    <ButtonPrime
+                      size="icon"
+                      variant="outline"
                       title={t('milestones.editPartsTitle')}
                       onClick={() => handleStartEdit(m)}
                     >
                       <Pencil size={14} />
-                    </button>
-                    <button
-                      className={cx('iconButton', 'danger')}
+                    </ButtonPrime>
+                    <ButtonPrime
+                      size="icon"
+                      variant="dangerGhost"
                       title={t('shared.delete')}
                       onClick={() => setDeletingMilestone(m)}
                     >
                       <Trash2 size={14} />
-                    </button>
+                    </ButtonPrime>
                   </>
                 )}
               </div>

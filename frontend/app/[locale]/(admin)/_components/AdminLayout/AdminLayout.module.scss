@@ -118,23 +118,11 @@ $neutral-border: rgb(var(--slate-500-rgb) / 0.25);
   }
 }
 
-.closeBtn {
+// Nút đóng ngăn kéo là ButtonPrime onDark size icon (nằm trên nền than chì của sidebar), chỉ hiện ở tablet/mobile.
+// Lồng trong .logo (2 class) để display: none thắng display của ButtonPrime bất kể thứ tự nạp CSS module.
+.logo .closeBtn {
   display: none;
-  width: 36px;
-  height: 36px;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
-  border: 1px solid rgb(var(--surface-dark-border-rgb));
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--text-on-dark-muted);
-  cursor: pointer;
-
-  &:hover {
-    color: var(--text-on-dark);
-    background: $on-dark-faint;
-  }
 }
 
 .nav {
@@ -256,25 +244,13 @@ $neutral-border: rgb(var(--slate-500-rgb) / 0.25);
   border-top: 1px solid $on-dark-faint;
 }
 
-// Nút mũi tên tròn nằm vắt trên mép phải sidebar, ngang hàng logo.
-.collapseBtn {
+// Nút mũi tên tròn (ButtonPrime outline size icon) nằm vắt trên mép phải sidebar, ngang hàng logo.
+// Lồng trong .sidebar (2 class) để display: none ở tablet/mobile thắng display của ButtonPrime.
+.sidebar .collapseBtn {
   position: absolute;
   top: 18px;
-  right: -14px;
+  right: -15px;
   z-index: 1;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 1px solid var(--border-color);
-  border-radius: 50%;
-  background: var(--bg-white);
-  color: var(--text-color);
-  box-shadow: 0 2px 8px rgb(var(--slate-900-rgb) / 0.18);
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.15s ease;
 
   // Mở rộng vùng bấm ra quanh nút cho dễ trúng.
   &::before {
@@ -282,21 +258,6 @@ $neutral-border: rgb(var(--slate-500-rgb) / 0.25);
     position: absolute;
     inset: -8px;
     border-radius: 50%;
-  }
-
-  &:hover {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: var(--text-on-brand);
-    transform: scale(1.08);
-  }
-
-  &:focus {
-    outline: none;
-  }
-
-  &:focus-visible {
-    box-shadow: 0 0 0 3px rgb(var(--primary-rgb) / 0.45);
   }
 }
 
@@ -362,26 +323,10 @@ $neutral-border: rgb(var(--slate-500-rgb) / 0.25);
   min-width: 0;
 }
 
-.menuBtn {
+// Nút mở ngăn kéo là ButtonPrime ghost size icon, chỉ hiện ở tablet/mobile (lồng 2 class như .closeBtn).
+.topbarLeft .menuBtn {
   display: none;
-  width: 40px;
-  height: 40px;
-  align-items: center;
-  justify-content: center;
   flex-shrink: 0;
-  border: 1px solid $neutral-border;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--text-color);
-  cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-
-  &:hover,
-  &:focus-visible {
-    border-color: var(--primary);
-    background: rgb(var(--slate-500-rgb) / 0.1);
-    outline: none;
-  }
 }
 
 .crumbs {
@@ -557,12 +502,12 @@ $neutral-border: rgb(var(--slate-500-rgb) / 0.25);
     }
   }
 
-  .closeBtn,
-  .menuBtn {
+  .logo .closeBtn,
+  .topbarLeft .menuBtn {
     display: inline-flex;
   }
 
-  .collapseBtn {
+  .sidebar .collapseBtn {
     display: none;
   }
 

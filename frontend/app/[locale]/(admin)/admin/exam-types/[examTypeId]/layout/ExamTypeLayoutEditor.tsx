@@ -24,6 +24,7 @@ import {
 import type { LayoutBlock, LayoutConfig } from '@/app/features/exam-layout/layoutSchema';
 import ExamLayoutRenderer from '@/app/features/exam-layout/ExamLayoutRenderer';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { buildSampleExam } from '@/app/[locale]/(admin)/admin/exam-types/[examTypeId]/layout/_lib/sampleExamData';
 import ScaledPreview from './_components/ScaledPreview';
 import ZoneGlyph from './_components/ZoneGlyph';
@@ -535,17 +536,17 @@ function ExamTypeLayoutEditor() {
       </div>
 
       <div className={cx('propertyActions')}>
-        <button type="button" className={cx('secondaryBtn')} onClick={() => toggleVisible(selectedBlock.id)}>
+        <ButtonPrime variant="outline" size="sm" onClick={() => toggleVisible(selectedBlock.id)}>
           {selectedBlock.visible === false ? t('showBlock') : t('hideBlock')}
-        </button>
+        </ButtonPrime>
         {ADDABLE_BLOCK_TYPES.includes(selectedBlock.type) && (
-          <button type="button" className={cx('dangerBtn')} onClick={() => removeBlock(selectedBlock.id)}>
+          <ButtonPrime variant="dangerGhost" size="sm" onClick={() => removeBlock(selectedBlock.id)}>
             {t('removeBlock')}
-          </button>
+          </ButtonPrime>
         )}
-        <button type="button" className={cx('linkBtn', 'doneBtn')} onClick={() => setSelectedId(null)}>
+        <ButtonPrime variant="ghost" size="sm" className={cx('doneBtn')} onClick={() => setSelectedId(null)}>
           {t('done')}
-        </button>
+        </ButtonPrime>
       </div>
     </div>
   );
@@ -554,9 +555,9 @@ function ExamTypeLayoutEditor() {
     <div className={cx('editor')}>
       <div className={cx('header')}>
         <div className={cx('headerLeft')}>
-          <button type="button" className={cx('backBtn')} onClick={handleBack}>
+          <ButtonPrime variant="outline" size="sm" className={cx('backBtn')} onClick={handleBack}>
             <ArrowLeft size={16} aria-hidden /> {t('back')}
-          </button>
+          </ButtonPrime>
           <div>
             <h2>{t('title')}</h2>
             <div className={cx('subtitle')}>
@@ -571,17 +572,12 @@ function ExamTypeLayoutEditor() {
           <span className={cx('saveState', { dirty })} aria-live="polite">
             {dirty ? t('unsaved') : t('saved')}
           </span>
-          <button type="button" className={cx('secondaryBtn')} onClick={() => setConfirmReset(true)}>
+          <ButtonPrime variant="outline" size="sm" onClick={() => setConfirmReset(true)}>
             {t('resetDefault')}
-          </button>
-          <button
-            type="button"
-            className={cx('primaryBtn')}
-            onClick={handleSave}
-            disabled={saving || !dirty}
-          >
-            {saving && <Spinner size="sm" />} {t('save')}
-          </button>
+          </ButtonPrime>
+          <ButtonPrime size="sm" onClick={handleSave} loading={saving} disabled={!dirty}>
+            {t('save')}
+          </ButtonPrime>
         </div>
       </div>
 
@@ -656,9 +652,9 @@ function ExamTypeLayoutEditor() {
                         )}
                       </span>
                       <span className={cx('moveMenuWrap')} data-move-menu>
-                        <button
-                          type="button"
-                          className={cx('iconBtn')}
+                        <ButtonPrime
+                          size="icon"
+                          variant="ghost"
                           title={t('moveToZone')}
                           aria-label={t('moveToZone')}
                           aria-haspopup="menu"
@@ -669,7 +665,7 @@ function ExamTypeLayoutEditor() {
                           }}
                         >
                           <ArrowLeftRight size={16} />
-                        </button>
+                        </ButtonPrime>
                         {moveMenuId === block.id && (
                           <div className={cx('moveMenu')} role="menu" onClick={(e) => e.stopPropagation()}>
                             <div className={cx('moveMenuTitle')}>{t('moveToZone')}</div>
@@ -688,9 +684,9 @@ function ExamTypeLayoutEditor() {
                           </div>
                         )}
                       </span>
-                      <button
-                        type="button"
-                        className={cx('iconBtn')}
+                      <ButtonPrime
+                        size="icon"
+                        variant="ghost"
                         title={block.visible === false ? t('show') : t('hide')}
                         aria-label={block.visible === false ? t('show') : t('hide')}
                         onClick={(e) => {
@@ -699,11 +695,11 @@ function ExamTypeLayoutEditor() {
                         }}
                       >
                         {block.visible === false ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
+                      </ButtonPrime>
                       {ADDABLE_BLOCK_TYPES.includes(block.type) && (
-                        <button
-                          type="button"
-                          className={cx('iconBtn')}
+                        <ButtonPrime
+                          size="icon"
+                          variant="dangerGhost"
                           title={t('remove')}
                           aria-label={t('remove')}
                           onClick={(e) => {
@@ -712,7 +708,7 @@ function ExamTypeLayoutEditor() {
                           }}
                         >
                           <Trash2 size={16} />
-                        </button>
+                        </ButtonPrime>
                       )}
                     </div>
                     {selectedId === block.id && propertiesSection}
@@ -727,9 +723,9 @@ function ExamTypeLayoutEditor() {
             <h3>{t('addSection')}</h3>
             <div className={cx('paletteRow')}>
               {ADDABLE_BLOCK_TYPES.map((type) => (
-                <button key={type} type="button" className={cx('paletteBtn')} onClick={() => addBlock(type)}>
+                <ButtonPrime key={type} variant="soft" size="sm" onClick={() => addBlock(type)}>
                   + {blockLabel(type)}
-                </button>
+                </ButtonPrime>
               ))}
             </div>
           </div>
@@ -862,9 +858,9 @@ function ExamTypeLayoutEditor() {
                   {config.theme.primary || t('defaultValue')}
                 </span>
                 {config.theme.primary && (
-                  <button type="button" className={cx('linkBtn')} onClick={() => patchTheme({ primary: null })}>
+                  <ButtonPrime variant="link" onClick={() => patchTheme({ primary: null })}>
                     {t('useDefault')}
-                  </button>
+                  </ButtonPrime>
                 )}
               </div>
             </div>

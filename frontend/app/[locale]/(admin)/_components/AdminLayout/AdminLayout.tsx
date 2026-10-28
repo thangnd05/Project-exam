@@ -47,6 +47,7 @@ import { useTranslations } from 'next-intl';
 import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import {useCosmetics} from '@/app/features/gamification/cosmetic/hooks/useCosmetics';
 import SettingsModal from '@/app/components/layouts/Header/ThemeToggle/SettingsModal';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/[locale]/(admin)/_components/AdminLayout/AdminLayout.module.scss';
 
 const cx = classNames.bind(styles);
@@ -259,14 +260,15 @@ function AdminLayout({children}: AdminLayoutProps) {
               </>
             )}
           </Link>
-          <button
-            type="button"
+          <ButtonPrime
+            variant="onDark"
+            size="icon"
             className={cx('closeBtn')}
             onClick={() => setMobileOpen(false)}
             aria-label={t('closeMenu')}
           >
             <X size={20} />
-          </button>
+          </ButtonPrime>
         </div>
 
         <nav className={cx('nav')} aria-label={t('navigation')}>
@@ -315,8 +317,9 @@ function AdminLayout({children}: AdminLayoutProps) {
           </Link>
         </div>
 
-        <button
-          type="button"
+        <ButtonPrime
+          variant="outline"
+          size="icon"
           className={cx('collapseBtn')}
           onClick={() => setCollapsed(!collapsed)}
           aria-expanded={!collapsed}
@@ -324,22 +327,23 @@ function AdminLayout({children}: AdminLayoutProps) {
           title={collapsed ? t('expand') : t('collapse')}
         >
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-        </button>
+        </ButtonPrime>
       </aside>
 
       <div className={cx('mainArea', {collapsed})}>
         <header className={cx('topbar')}>
           <div className={cx('topbarPill')}>
             <div className={cx('topbarLeft')}>
-              <button
-                type="button"
+              <ButtonPrime
+                variant="ghost"
+                size="icon"
                 className={cx('menuBtn')}
                 onClick={() => setMobileOpen(true)}
                 aria-label={t('openMenu')}
                 aria-expanded={mobileOpen}
               >
                 <Menu size={20} />
-              </button>
+              </ButtonPrime>
               {activeGroup && activeItem && (
                 <div className={cx('crumbs')}>
                   <span className={cx('crumbGroup')}>{t(`groups.${activeGroup.label}`)}</span>

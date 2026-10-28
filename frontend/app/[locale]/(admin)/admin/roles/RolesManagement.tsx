@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import {useTranslations} from 'next-intl';
-import {Badge, Button, Form, Spinner} from 'react-bootstrap';
+import {Badge, Form, Spinner} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {Edit, Plus, ShieldCheck, Trash2} from 'lucide-react';
 
 import {useRoles, type AdminRoleRow} from './_hooks/useRoles';
@@ -213,10 +214,10 @@ function RolesManagement() {
         title={t('roles.title')}
         description={t('roles.description')}
       >
-        <Button onClick={openCreateModal}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={openCreateModal}>
+          <Plus size={16} />
           {t('roles.add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminToolbar
@@ -236,22 +237,21 @@ function RolesManagement() {
         getRowKey={(role: AdminRoleRow) => role.role_id}
         rowActions={(role: AdminRoleRow) => (
           <>
-            <button
+            <ButtonPrime size="icon" variant="ghost"
               onClick={() => openPermissionModal(role)}
               title={t('roles.actions.permissions')}
             >
               <ShieldCheck size={14} />
-            </button>
-            <button onClick={() => openEditModal(role)} title={t('roles.actions.edit')}>
+            </ButtonPrime>
+            <ButtonPrime size="icon" variant="ghost" onClick={() => openEditModal(role)} title={t('roles.actions.edit')}>
               <Edit size={14} />
-            </button>
-            <button
-              className="danger"
+            </ButtonPrime>
+            <ButtonPrime size="icon" variant="dangerGhost"
               onClick={() => setDeletingRole(role)}
               title={t('roles.actions.delete')}
             >
               <Trash2 size={14} />
-            </button>
+            </ButtonPrime>
           </>
         )}
       />

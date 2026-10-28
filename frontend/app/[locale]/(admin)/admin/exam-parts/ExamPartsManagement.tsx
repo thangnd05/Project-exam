@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useMemo, useState } from 'react';
-import {Button, Form} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 import {Edit, Plus, Trash2} from 'lucide-react';
@@ -206,16 +207,17 @@ function ExamPartsManagement() {
 
   const renderRowActions = (examPart: ExamPartItem) => (
     <>
-      <button onClick={() => openEditModal(examPart)} title={t('edit')}>
+      <ButtonPrime size="icon" variant="ghost" onClick={() => openEditModal(examPart)} title={t('edit')}>
         <Edit size={14} />
-      </button>
-      <button
-        className="danger"
+      </ButtonPrime>
+      <ButtonPrime
+        size="icon"
+        variant="dangerGhost"
         onClick={() => setDeletingExamPart(examPart)}
         title={t('delete')}
       >
         <Trash2 size={14} />
-      </button>
+      </ButtonPrime>
     </>
   );
 
@@ -225,10 +227,10 @@ function ExamPartsManagement() {
         title={t('title')}
         description={t('description')}
       >
-        <Button onClick={openCreateModal}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={openCreateModal}>
+          <Plus size={16} />
           {t('add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminToolbar

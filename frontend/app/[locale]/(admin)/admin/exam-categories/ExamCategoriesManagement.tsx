@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import {Badge, Button} from 'react-bootstrap';
+import {Badge} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {useTranslations} from 'next-intl';
 import {Edit, Plus, Trash2} from 'lucide-react';
 
@@ -167,10 +168,10 @@ function ExamCategoriesManagement() {
         title={t('title')}
         description={t('description')}
       >
-        <Button onClick={openCreateModal}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={openCreateModal}>
+          <Plus size={16} />
           {t('add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminToolbar
@@ -195,16 +196,15 @@ function ExamCategoriesManagement() {
         getRowKey={(item: ExamCategoryItem) => item.examCategoryId}
         rowActions={(item: ExamCategoryItem) => (
           <>
-            <button onClick={() => openEditModal(item)} title={t('edit')}>
+            <ButtonPrime size="icon" variant="ghost" onClick={() => openEditModal(item)} title={t('edit')}>
               <Edit size={14} />
-            </button>
-            <button
-              className="danger"
+            </ButtonPrime>
+            <ButtonPrime size="icon" variant="dangerGhost"
               onClick={() => setDeletingItem(item)}
               title={t('delete')}
             >
               <Trash2 size={14} />
-            </button>
+            </ButtonPrime>
           </>
         )}
       />

@@ -413,22 +413,18 @@ function QuestionsManagement() {
         onPageChange={setPage}
         rowActions={(row: AdminQuestionListItem) => (
           <>
-            <button
-              type="button"
-              className={cx('rowBtn')}
+            <ButtonPrime size="icon" variant="ghost"
               title={t('editQuestion')}
               onClick={() => setEditingQuestionId(row.questionId)}
             >
               <Edit size={16} />
-            </button>
-            <button
-              type="button"
-              className={cx('rowBtn', 'danger')}
+            </ButtonPrime>
+            <ButtonPrime size="icon" variant="dangerGhost"
               title={t('deleteQuestion')}
               onClick={() => setDeletingQuestion(row)}
             >
               <Trash2 size={16} />
-            </button>
+            </ButtonPrime>
           </>
         )}
       />

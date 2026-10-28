@@ -2,7 +2,7 @@
 
 import React, {useMemo, useState} from 'react';
 import {useTranslations} from 'next-intl';
-import {Badge, Button, Form, Spinner, Table} from 'react-bootstrap';
+import {Badge, Form, Spinner, Table} from 'react-bootstrap';
 import {Save, ShieldCheck} from 'lucide-react';
 import {toast} from 'react-toastify';
 import classNames from 'classnames/bind';
@@ -10,6 +10,7 @@ import classNames from 'classnames/bind';
 import {AdminFieldError, AdminPageHeader} from '@/app/[locale]/(admin)/_components/common';
 import {usePermissionsMatrix, type PermissionMatrix} from './_hooks/usePermissionsMatrix';
 import type {PermissionResponse, RoleResponse} from '@/app/types';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/[locale]/(admin)/_components/common/adminKit.module.scss';
 
 const cx = classNames.bind(styles);
@@ -133,19 +134,19 @@ function PermissionsManagement() {
         title={t('permissions.title')}
         description={t('permissions.description')}
       >
-        <Button onClick={handleSave} disabled={saving || dirtyRoleIds.length === 0}>
+        <ButtonPrime onClick={handleSave} disabled={saving || dirtyRoleIds.length === 0}>
           {saving ? (
-            <Spinner animation="border" size="sm" className="me-1" />
+            <Spinner animation="border" size="sm" />
           ) : (
-            <Save size={16} className="me-1" />
+            <Save size={16} />
           )}
           {t('permissions.saveChanges')}
           {dirtyRoleIds.length > 0 && (
-            <Badge bg="light" text="dark" className="ms-2">
+            <Badge bg="light" text="dark">
               {dirtyRoleIds.length}
             </Badge>
           )}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminFieldError message={displayError} />

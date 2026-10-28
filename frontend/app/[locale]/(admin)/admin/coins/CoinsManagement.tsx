@@ -1,7 +1,8 @@
 'use client';
 
 import {useMemo, useState} from 'react';
-import {Button, Form} from 'react-bootstrap';
+import {Form} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {Coins, Edit, Plus, Trash2} from 'lucide-react';
 import {useTranslations} from 'next-intl';
 
@@ -174,10 +175,10 @@ function CoinsManagement() {
         title={t('title')}
         description={t('description')}
       >
-        <Button onClick={openCreateModal}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={openCreateModal}>
+          <Plus size={16} />
           {t('add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminToolbar
@@ -203,16 +204,15 @@ function CoinsManagement() {
         getRowKey={(wallet: CoinWalletResponse) => wallet.userId as string}
         rowActions={(wallet: CoinWalletResponse) => (
           <>
-            <button title={tAdmin('actions.edit')} onClick={() => openEditModal(wallet)}>
+            <ButtonPrime size="icon" variant="ghost" title={tAdmin('actions.edit')} onClick={() => openEditModal(wallet)}>
               <Edit size={14} />
-            </button>
-            <button
-              className="danger"
+            </ButtonPrime>
+            <ButtonPrime size="icon" variant="dangerGhost"
               title={tAdmin('actions.delete')}
               onClick={() => setDeletingWallet(wallet)}
             >
               <Trash2 size={14} />
-            </button>
+            </ButtonPrime>
           </>
         )}
       />

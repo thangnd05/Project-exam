@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Form } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useTranslations } from 'next-intl';
@@ -85,10 +86,10 @@ const CategoriesManagement = () => {
                 title={t('title')}
                 description={t('description')}
             >
-                <Button onClick={openCreateModal}>
-                    <Plus size={16} className="me-1" />
+                <ButtonPrime onClick={openCreateModal}>
+                    <Plus size={16} />
                     {t('add')}
-                </Button>
+                </ButtonPrime>
             </AdminPageHeader>
 
             <AdminToolbar
@@ -107,16 +108,15 @@ const CategoriesManagement = () => {
                 getRowKey={(item: AdminCategory) => item.id}
                 rowActions={(item: AdminCategory) => (
                     <>
-                        <button onClick={() => openEditModal(item)} title={tAdmin('actions.edit')}>
+                        <ButtonPrime size="icon" variant="ghost" onClick={() => openEditModal(item)} title={tAdmin('actions.edit')}>
                             <Edit size={14} />
-                        </button>
-                        <button
-                            className="danger"
+                        </ButtonPrime>
+                        <ButtonPrime size="icon" variant="dangerGhost"
                             onClick={() => setDeletingCategory(item)}
                             title={tAdmin('actions.delete')}
                         >
                             <Trash2 size={14} />
-                        </button>
+                        </ButtonPrime>
                     </>
                 )}
             />

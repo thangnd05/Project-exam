@@ -1,7 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {Form, Button, Spinner} from 'react-bootstrap';
+import {Form, Spinner} from 'react-bootstrap';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {useTranslations} from 'next-intl';
 import {ChevronDown, ChevronRight, Edit, FolderTree, Library, Plus, Trash2} from 'lucide-react';
 import classNames from 'classnames/bind';
@@ -70,9 +71,9 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
       <div className={cx('treeNode')}>
         <div className={cx('treeNodeLeft')}>
           {hasChildren ? (
-            <button className={cx('expandBtn')} onClick={() => toggleExpand(node.collection_id)}>
+            <ButtonPrime size="icon" variant="ghost" className={cx('expandBtn')} onClick={() => toggleExpand(node.collection_id)}>
               {isExpanded ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
-            </button>
+            </ButtonPrime>
           ) : (
             <span className={cx('expandPlaceholder')} />
           )}
@@ -99,16 +100,16 @@ function CollectionTreeNode({node, level, expandedIds, toggleExpand, onEdit, onD
         </div>
         <div className={cx('treeNodeActions')}>
           {level === 0 && (
-            <button className={cx('addBtn')} onClick={() => onAddChild(node)} title={t('addChild')}>
+            <ButtonPrime size="icon" variant="ghost" onClick={() => onAddChild(node)} title={t('addChild')}>
               <Plus size={16} />
-            </button>
+            </ButtonPrime>
           )}
-          <button onClick={() => onEdit(node)} title={t('edit')}>
+          <ButtonPrime size="icon" variant="ghost" onClick={() => onEdit(node)} title={t('edit')}>
             <Edit size={16} />
-          </button>
-          <button className={cx('deleteBtn')} onClick={() => onDelete(node)} title={t('delete')}>
+          </ButtonPrime>
+          <ButtonPrime size="icon" variant="dangerGhost" onClick={() => onDelete(node)} title={t('delete')}>
             <Trash2 size={16} />
-          </button>
+          </ButtonPrime>
         </div>
       </div>
       {hasChildren && (isExpanded || Boolean(kw)) && (
@@ -335,10 +336,10 @@ function QuestionCollectionsManagement() {
         title={t('title')}
         description={t('description')}
       >
-        <Button onClick={openCreateModal}>
-          <Plus size={16} className="me-1" />
+        <ButtonPrime onClick={openCreateModal}>
+          <Plus size={16} />
           {t('add')}
-        </Button>
+        </ButtonPrime>
       </AdminPageHeader>
 
       <AdminToolbar
@@ -359,8 +360,8 @@ function QuestionCollectionsManagement() {
         <div className={cx('treeToolbar')}>
           <span className={cx('treeCount')}>{t('count', {count: collectionList.length})}</span>
           <div className={cx('treeToolbarActions')}>
-            <button onClick={expandAll}>{t('expandAll')}</button>
-            <button onClick={collapseAll}>{t('collapseAll')}</button>
+            <ButtonPrime variant="link" size="sm" onClick={expandAll}>{t('expandAll')}</ButtonPrime>
+            <ButtonPrime variant="link" size="sm" onClick={collapseAll}>{t('collapseAll')}</ButtonPrime>
           </div>
         </div>
 
