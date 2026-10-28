@@ -6,6 +6,7 @@ import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 import { X } from 'lucide-react';
 
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import type {Vendor} from '@/app/[locale]/(public)/_lib/certificationMeta';
 import {displayName, initials, useRankBoard} from './useRankBoard';
 import styles from './RankScopeModal.module.scss';
@@ -87,23 +88,30 @@ function RankScopeModal({show, onClose, onJoin}: RankScopeModalProps) {
           </h3>
           <p className={cx('subtitle')}>{t('modal.subtitle')}</p>
         </div>
-        <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label={t('modal.close')}>
+        <ButtonPrime
+          variant="onDark"
+          size="icon"
+          className={cx('closeBtn')}
+          onClick={onClose}
+          aria-label={t('modal.close')}
+        >
           <X size="1em" aria-hidden="true" />
-        </button>
+        </ButtonPrime>
       </div>
 
       <div className={cx('tabs')} role="tablist" aria-label={t('tabsAria')}>
         {tabs.map((id) => (
-          <button
+          <ButtonPrime
             key={id}
-            type="button"
+            variant={tab === id ? 'primary' : 'onDark'}
+            size="sm"
             role="tab"
             aria-selected={tab === id}
-            className={cx('tab', {activeTab: tab === id})}
+            className={cx('tab')}
             onClick={() => setTab(id)}
           >
             {t(`modal.tabs.${id}`)}
-          </button>
+          </ButtonPrime>
         ))}
       </div>
 
@@ -114,12 +122,12 @@ function RankScopeModal({show, onClose, onJoin}: RankScopeModalProps) {
       <div className={cx('foot')}>
         <span className={cx('note')}>{t('modal.note')}</span>
         <div className={cx('footActions')}>
-          <button type="button" className={cx('btnPrimary')} onClick={onJoin}>
+          <ButtonPrime className={cx('joinBtn')} onClick={onJoin}>
             {t('modal.join')}
-          </button>
-          <button type="button" className={cx('btnSecondary')} onClick={onClose}>
+          </ButtonPrime>
+          <ButtonPrime variant="onDark" onClick={onClose}>
             {t('modal.close')}
-          </button>
+          </ButtonPrime>
         </div>
       </div>
     </Modal>

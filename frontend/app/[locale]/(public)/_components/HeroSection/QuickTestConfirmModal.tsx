@@ -68,7 +68,7 @@ function QuickTestConfirmModal({
       onClose={onClose}
       title={t('confirm.title')}
       maxWidth={600}
-      variant="plain"
+      variant="exam"
       footer={
         <>
           <ButtonPrime

@@ -332,9 +332,9 @@ function ResourceLibrary() {
                   strong: (chunks) => <strong>{chunks}</strong>,
                 })}
               </span>
-              <button type="button" className={cx('textBtn')} onClick={resetFilters}>
+              <ButtonPrime variant="link" size="sm" onClick={resetFilters}>
                 {t('library.resetFilters')}
-              </button>
+              </ButtonPrime>
             </div>
           </div>
 
@@ -343,17 +343,18 @@ function ResourceLibrary() {
               <div className={cx('filterRow')} role="group" aria-label={t('library.examFilterLabel')}>
                 <span className={cx('filterLabel')}>{t('library.examLabel')}</span>
                 {groups.map((group) => (
-                  <button
+                  <ButtonPrime
                     key={group.id}
-                    type="button"
+                    variant={activeGroup?.id === group.id ? 'ink' : 'outline'}
+                    size="sm"
+                    className={cx('tab')}
                     title={group.name}
                     aria-pressed={activeGroup?.id === group.id}
-                    className={cx('examTab', {active: activeGroup?.id === group.id})}
                     onClick={() => selectExam(group.id)}
                   >
                     <span className={cx('dot', `dot-${group.vendor ?? 'other'}`)} aria-hidden="true" />
                     {group.code || group.name} ({group.resources.length})
-                  </button>
+                  </ButtonPrime>
                 ))}
               </div>
 
@@ -361,15 +362,16 @@ function ResourceLibrary() {
                 <div className={cx('filterRow')} role="group" aria-label={t('library.partFilterLabel')}>
                   <span className={cx('filterLabel')}>{t('library.partLabel')}</span>
                   {[ALL_PARTS, ...parts].map((part) => (
-                    <button
+                    <ButtonPrime
                       key={part}
-                      type="button"
+                      variant={activePart === part ? 'soft' : 'ghost'}
+                      size="sm"
+                      className={cx('tab')}
                       aria-pressed={activePart === part}
-                      className={cx('partTab', {active: activePart === part})}
                       onClick={() => setSelectedPart(part)}
                     >
                       {part === ALL_PARTS ? t('library.allParts') : part}
-                    </button>
+                    </ButtonPrime>
                   ))}
                 </div>
               )}

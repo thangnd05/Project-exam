@@ -2,6 +2,7 @@
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
 import Link from '@/app/i18n/navigation';
 import { PROVIDERS } from '../../_lib/providers';
@@ -34,25 +35,35 @@ function HeroSection() {
 
             <motion.h1 className={cx('headline')} {...rise(0.08)}>
               <span className={cx('headlineMuted')}>
-                {t('headline.line1')}
-                <br />
+                {t('headline.line1')}{' '}
+                <br className={cx('headlineBreak')} />
                 {t('headline.line2')}{' '}
               </span>
               <span className={cx('headlineGlow')}>{t('headline.glow')}</span>
             </motion.h1>
 
             <motion.div className={cx('actions')} {...rise(0.16)}>
-              <button type="button" className={cx('btnPrimary')} onClick={openQuick}>
+              <ButtonPrime size="lg" className={cx('btnMain')} onClick={openQuick}>
                 {t('startQuick')}
-              </button>
-              <a href="#certifications" className={cx('btnGhost')}>
+              </ButtonPrime>
+              <ButtonPrime as="a" href="#certifications" variant="onDark" size="lg" className={cx('btnGhost')}>
                 {t('exploreExams')}
-              </a>
+              </ButtonPrime>
             </motion.div>
 
             <motion.ul className={cx('highlights')} {...rise(0.24)}>
               {HIGHLIGHTS.map((key) => (
                 <li key={key}>
+                  <svg
+                    className={cx('check')}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth={2.5}
+                    aria-hidden="true"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
                   <span>{t(`highlights.${key}`)}</span>
                 </li>
               ))}
@@ -76,26 +87,28 @@ function HeroSection() {
       </div>
 
       <div className={cx('providers')}>
-        <p className={cx('providersLabel')}>{t('providersLabel')}</p>
-        <ul className={cx('providerList')}>
-          {/* Logo hãng hiển thị trắng đơn sắc; hãng chưa có đề dẫn sang trang Coming soon. */}
-          {PROVIDERS.map((p) => (
-            <li key={p.slug}>
-              <Link
-                href={p.available ? routes.examTypes : `${routes.comingSoon}?provider=${p.slug}`}
-                title={p.name}
-                className={cx('providerLink')}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/images/providers/${p.file}.webp`}
-                  alt={p.name}
-                  className={cx('providerLogo', `logo-${p.size}`)}
-                />
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <div className={cx('providersInner')}>
+          <p className={cx('providersLabel')}>{t('providersLabel')}</p>
+          <ul className={cx('providerList')}>
+            {/* Logo hãng hiển thị trắng đơn sắc; hãng chưa có đề dẫn sang trang Coming soon. */}
+            {PROVIDERS.map((p) => (
+              <li key={p.slug}>
+                <Link
+                  href={p.available ? routes.examTypes : `${routes.comingSoon}?provider=${p.slug}`}
+                  title={p.name}
+                  className={cx('providerLink')}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/images/providers/${p.file}.webp`}
+                    alt={p.name}
+                    className={cx('providerLogo', `logo-${p.size}`)}
+                  />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       <QuickTestConfirmModal {...confirmProps} />

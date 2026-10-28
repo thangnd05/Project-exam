@@ -215,19 +215,25 @@ function ExamCatalog() {
               </div>
 
               <div className={cx('actions')}>
-                <button
-                  type="button"
-                  className={cx('btnPrimary')}
+                <ButtonPrime
+                  variant="soft"
+                  size="sm"
                   onClick={() => requestStart(quick ?? null)}
                   disabled={!quick}
                   title={quick ? undefined : t('noQuick')}
                 >
                   {t('quickStart')}
-                </button>
-                <Link href={href} className={cx('btnSecondary')} title={t('catalog.viewFullMock', {name: code || title})}>
+                </ButtonPrime>
+                <ButtonPrime
+                  as="link"
+                  variant="ink"
+                  size="sm"
+                  href={href}
+                  title={t('catalog.viewFullMock', {name: code || title})}
+                >
                   {t('fullMock')}
                   <ArrowRight size="1em" aria-hidden="true" />
-                </Link>
+                </ButtonPrime>
               </div>
             </article>
           );
@@ -260,48 +266,51 @@ function ExamCatalog() {
                   strong: (chunks) => <strong>{chunks}</strong>,
                 })}
               </span>
-              <button type="button" className={cx('textBtn')} onClick={resetFilters}>
+              <ButtonPrime variant="link" size="sm" onClick={resetFilters}>
                 {t('catalog.resetFilters')}
-              </button>
+              </ButtonPrime>
             </div>
           </div>
 
           <div className={cx('filterRow')} role="group" aria-label={t('catalog.vendorFilter')}>
             <span className={cx('filterLabel')}>{t('catalog.vendorLabel')}</span>
-            <button
-              type="button"
-              className={cx('vendorTab', {active: vendor === 'all'})}
+            <ButtonPrime
+              variant={vendor === 'all' ? 'ink' : 'outline'}
+              size="sm"
+              className={cx('tab')}
               aria-pressed={vendor === 'all'}
               onClick={() => setVendor('all')}
             >
               {t('catalog.allCount', {count: exams.length})}
-            </button>
+            </ButtonPrime>
             {vendorTabs.map((v) => (
-              <button
+              <ButtonPrime
                 key={v.id}
-                type="button"
-                className={cx('vendorTab', {active: vendor === v.id})}
+                variant={vendor === v.id ? 'ink' : 'outline'}
+                size="sm"
+                className={cx('tab')}
                 aria-pressed={vendor === v.id}
                 onClick={() => setVendor(v.id)}
               >
                 <span className={cx('dot', `dot-${v.id}`)} aria-hidden="true" />
                 {v.label} ({v.count})
-              </button>
+              </ButtonPrime>
             ))}
           </div>
 
           <div className={cx('filterRow')} role="group" aria-label={t('catalog.levelFilter')}>
             <span className={cx('filterLabel')}>{t('catalog.levelLabel')}</span>
             {[{id: 'all' as const, label: t('catalog.all')}, ...LEVELS].map((l) => (
-              <button
+              <ButtonPrime
                 key={l.id}
-                type="button"
-                className={cx('levelTab', {active: level === l.id})}
+                variant={level === l.id ? 'soft' : 'ghost'}
+                size="sm"
+                className={cx('tab')}
                 aria-pressed={level === l.id}
                 onClick={() => setLevel(l.id)}
               >
                 {l.label}
-              </button>
+              </ButtonPrime>
             ))}
           </div>
         </div>

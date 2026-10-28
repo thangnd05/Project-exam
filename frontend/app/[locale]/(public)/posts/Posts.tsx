@@ -10,6 +10,7 @@ import { usePosts } from '@/app/features/posts/hooks/usePosts';
 import routes from '@/app/configs/Routes';
 import AvatarWithCosmetic from '@/app/features/gamification/cosmetic/AvatarWithCosmetic';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import Pagination from '@/app/components/Pagination/Pagination';
 import CreatePostModal from '@/app/features/posts/CreatePostModal/CreatePostModal';
 import ProfileSectionModal from '@/app/features/posts/ProfileSectionModal/ProfileSectionModal';
@@ -76,24 +77,24 @@ function Posts() {
           actionIcon={Plus}
           onAction={() => setShowCreateModal(true)}
         >
-          <button
-            type="button"
-            className={cx('headerIconBtn')}
+          <ButtonPrime
+            variant="soft"
+            size="icon"
             onClick={() => setActiveSection('posts')}
             title={t('common.myPosts')}
             aria-label={t('common.myPosts')}
           >
             <Newspaper size={22} />
-          </button>
-          <button
-            type="button"
-            className={cx('headerIconBtn')}
+          </ButtonPrime>
+          <ButtonPrime
+            variant="soft"
+            size="icon"
             onClick={() => setActiveSection('saved')}
             title={t('common.savedPosts')}
             aria-label={t('common.savedPosts')}
           >
             <Bookmark size={22} />
-          </button>
+          </ButtonPrime>
         </PageHeader>
 
         <motion.div
@@ -118,20 +119,22 @@ function Posts() {
             <span>{t('list.approvalNotice')}</span>
           </div>
           <div className={cx('filterPills')}>
-            <button
-              className={cx('pill', { active: !selectedCategory })}
+            <ButtonPrime
+              variant={!selectedCategory ? 'primary' : 'soft'}
+              className={cx('pill')}
               onClick={() => changeCategory(null)}
             >
               {t('list.all')}
-            </button>
+            </ButtonPrime>
             {categories.map(cat => (
-              <button
+              <ButtonPrime
                 key={cat.id}
-                className={cx('pill', { active: selectedCategory === cat.id })}
+                variant={selectedCategory === cat.id ? 'primary' : 'soft'}
+                className={cx('pill')}
                 onClick={() => changeCategory(cat.id)}
               >
                 {cat.name}
-              </button>
+              </ButtonPrime>
             ))}
           </div>
         </motion.div>

@@ -49,25 +49,9 @@
   color: var(--text-on-dark-muted);
 }
 
+// Nút đóng (ButtonPrime onDark, size icon): chỉ giữ bố cục để không bị co trong hàng tiêu đề.
 .closeBtn {
-  display: flex;
   flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 50%;
-  background: rgb(255 255 255 / 0.05);
-  font-size: var(--font-size-base);
-  color: var(--text-on-dark-muted);
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-
-  &:hover {
-    background: rgb(255 255 255 / 0.1);
-    color: var(--text-on-dark);
-  }
 }
 
 .tabs {
@@ -84,33 +68,9 @@
   }
 }
 
+// Tab là ButtonPrime (primary khi đang chọn, onDark khi không); ở đây chỉ giữ không co.
 .tab {
   flex-shrink: 0;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 8px;
-  background: transparent;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--text-on-dark-muted);
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-
-  &:hover {
-    background: rgb(255 255 255 / 0.05);
-    color: var(--text-on-dark);
-  }
-}
-
-.activeTab {
-  background: var(--primary);
-  font-weight: 700;
-  color: var(--text-on-brand);
-
-  &:hover {
-    background: var(--primary);
-    color: var(--text-on-brand);
-  }
 }
 
 /* ---------- Danh sách ---------- */
@@ -322,37 +282,10 @@
   }
 }
 
-.btnPrimary,
-.btnSecondary {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 12px;
-  font-size: var(--font-size-smd);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.btnPrimary {
-  background: var(--primary);
-  font-weight: 700;
-  color: var(--text-on-brand);
-
-  &:hover {
-    background: var(--brand-400);
-  }
-
+// Nút chính (ButtonPrime) giãn đều trên mobile; chỉ bố cục, màu/kích thước lấy từ variant.
+.joinBtn {
   @include down(sm) {
     flex: 1;
-  }
-}
-
-.btnSecondary {
-  background: var(--surface-dark-border);
-  font-weight: 600;
-  color: var(--text-on-dark);
-
-  &:hover {
-    filter: brightness(1.2);
   }
 }
 

@@ -331,26 +331,26 @@ function PostDetail() {
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
                 />
-                <button className="btn btn-primary btn-sm me-2" onClick={() => handleUpdateComment(comment.id)}>{t('save')}</button>
-                <button className="btn btn-light btn-sm" onClick={() => setEditingCommentId(null)}>{t('cancel')}</button>
+                <ButtonPrime size="sm" className="me-2" onClick={() => handleUpdateComment(comment.id)}>{t('save')}</ButtonPrime>
+                <ButtonPrime variant="ghost" size="sm" onClick={() => setEditingCommentId(null)}>{t('cancel')}</ButtonPrime>
               </div>
             ) : (
               <p className={cx('text')}>{comment.content}</p>
             )}
 
             <div className={cx('actions')}>
-              <button onClick={() => {
+              <ButtonPrime variant="link" size="sm" onClick={() => {
                 setReplyingToId(comment.id);
                 setReplyContent('');
-              }}>{t('reply')}</button>
+              }}>{t('reply')}</ButtonPrime>
               <span className={cx('time')}>{formatDateTime(comment.createdAt)}</span>
               {user && user.userId === comment.userId && (
                 <>
-                  <button onClick={() => {
+                  <ButtonPrime variant="link" size="sm" onClick={() => {
                     setEditingCommentId(comment.id);
                     setEditContent(comment.content ?? '');
-                  }}>{t('edit')}</button>
-                  <button onClick={() => setDeletingCommentId(comment.id)}>{t('delete')}</button>
+                  }}>{t('edit')}</ButtonPrime>
+                  <ButtonPrime variant="link" size="sm" onClick={() => setDeletingCommentId(comment.id)}>{t('delete')}</ButtonPrime>
                 </>
               )}
             </div>
@@ -363,20 +363,20 @@ function PostDetail() {
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
                 />
-                <button className="btn btn-primary btn-sm me-2" onClick={() => handleReply(comment.id)}>{t('send')}</button>
-                <button className="btn btn-light btn-sm" onClick={() => setReplyingToId(null)}>{t('cancel')}</button>
+                <ButtonPrime size="sm" className="me-2" onClick={() => handleReply(comment.id)}>{t('send')}</ButtonPrime>
+                <ButtonPrime variant="ghost" size="sm" onClick={() => setReplyingToId(null)}>{t('cancel')}</ButtonPrime>
               </div>
             )}
           </div>
         </div>
         {shouldCollapsible && !isExpanded && (
-          <button
-            type="button"
+          <ButtonPrime
+            variant="link"
             className={cx('toggleRepliesBtn')}
             onClick={() => setExpandedReplies(prev => ({ ...prev, [comment.id]: true }))}
           >
             {t('showAllReplies', { count: nestedReplyCount })}
-          </button>
+          </ButtonPrime>
         )}
 
         {hasReplies && isExpanded && (
@@ -390,13 +390,13 @@ function PostDetail() {
               )}
             </div>
             {shouldCollapsible && isExpanded && (
-              <button
-                type="button"
+              <ButtonPrime
+                variant="link"
                 className={cx('toggleRepliesBtn')}
                 onClick={() => setExpandedReplies(prev => ({ ...prev, [comment.id]: false }))}
               >
                 {t('hideReplies')}
-              </button>
+              </ButtonPrime>
             )}
           </>
         )}

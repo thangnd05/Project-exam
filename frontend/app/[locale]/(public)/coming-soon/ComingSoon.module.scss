@@ -183,67 +183,13 @@
   }
 }
 
-.btnPrimary,
-.btnGhost {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 13px 28px;
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-md);
-  text-decoration: none;
-  transition: transform 0.2s ease, background-color 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--primary);
-    outline-offset: 3px;
-  }
+// Mũi tên trong nút chính nhích sang phải khi hover.
+.ctaArrow svg {
+  transition: transform 0.2s ease;
 }
 
-.btnPrimary {
-  border: none;
-  background: var(--primary);
-  font-weight: 700;
-  color: var(--text-on-brand);
-  box-shadow: 0 10px 15px -3px rgb(var(--primary-rgb) / 0.2);
-
-  &:hover,
-  &:visited {
-    color: var(--text-on-brand);
-  }
-
-  &:hover {
-    background: var(--brand-400);
-  }
-
-  svg {
-    transition: transform 0.2s ease;
-  }
-
-  &:hover svg {
-    transform: translateX(3px);
-  }
-}
-
-.btnGhost {
-  border: 1px solid rgb(var(--text-on-dark-rgb) / 0.2);
-  background: rgb(var(--surface-dark-border-rgb) / 0.5);
-  font-weight: 600;
-  color: var(--text-on-dark);
-
-  &:hover,
-  &:visited {
-    color: var(--text-on-dark);
-  }
-
-  &:hover {
-    background: var(--surface-dark-border);
-  }
+.ctaArrow:hover svg {
+  transform: translateX(3px);
 }
 
 @keyframes cs-orbit {
@@ -257,15 +203,11 @@
     animation: none;
   }
 
-  .btnPrimary,
-  .btnGhost,
-  .btnPrimary svg {
+  .ctaArrow svg {
     transition: none;
   }
 
-  .btnPrimary:hover,
-  .btnGhost:hover,
-  .btnPrimary:hover svg {
+  .ctaArrow:hover svg {
     transform: none;
   }
 }

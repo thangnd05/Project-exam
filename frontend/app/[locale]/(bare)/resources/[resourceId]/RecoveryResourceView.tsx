@@ -1,6 +1,5 @@
 'use client';
 
-import Link from '@/app/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
@@ -10,6 +9,7 @@ import routes from '@/app/configs/Routes';
 import { useRecoveryResourceView } from './_hooks/useRecoveryResourceView';
 import styles from './RecoveryResourceView.module.scss';
 import Loading from '@/app/components/Loading/Loading';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);
 
@@ -57,13 +57,13 @@ function RecoveryResourceView() {
     <div id="recovery-resource-print-root" className={cx('wrapper')}>
       <div className={cx('container')}>
         <div className={cx('actions', 'noPrint')}>
-          <button type="button" className={cx('actionBtn', 'primary')} onClick={handlePrint}>
+          <ButtonPrime size="sm" onClick={handlePrint}>
             <Printer size={16} />
             {t('view.print')}
-          </button>
-          <Link href={routes.home} className={cx('actionBtn')}>
+          </ButtonPrime>
+          <ButtonPrime as="link" variant="outline" size="sm" href={routes.home}>
             {t('view.backHome')}
-          </Link>
+          </ButtonPrime>
         </div>
 
         <header className={cx('header')}>

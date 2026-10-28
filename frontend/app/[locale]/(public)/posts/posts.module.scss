@@ -6,26 +6,6 @@
   font-family: var(--font-family);
 }
 
-.headerIconBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: var(--on-hero-soft);
-  border: 1px solid var(--on-hero-track);
-  color: var(--on-hero);
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-
-  &:hover {
-    background: var(--on-hero-border);
-    border-color: var(--on-hero-border);
-    transform: translateY(-1px);
-  }
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -228,29 +208,9 @@
   gap: 12px;
   padding-bottom: 4px;
 
+  // Màu/đệm do ButtonPrime lo; tên danh mục dài không bị bẻ dòng.
   .pill {
-    padding: 10px 24px;
-    border-radius: 30px;
-    font-size: var(--font-size-ssm);
-    font-weight: 600;
     white-space: nowrap;
-    border: 1px solid var(--border-color);
-    background-color: var(--bg-white);
-    color: var(--text-color);
-    transition: all 0.2s ease;
-    cursor: pointer;
-
-    &:hover {
-      background-color: var(--hover-color);
-      border-color: var(--primary);
-    }
-
-    &.active {
-      background: var(--primary-gradient);
-      border-color: transparent;
-      color: var(--on-primary-gradient);
-      box-shadow: 0 4px 12px rgb(var(--primary-rgb) / 0.25);
-    }
   }
 }
 
@@ -264,32 +224,6 @@
   @include down(sm) {
     flex-direction: column;
     align-items: stretch;
-  }
-}
-
-.createBtn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--primary-gradient);
-  color: var(--on-primary-gradient);
-  padding: 10px 24px;
-  border-radius: 30px;
-  font-size: var(--font-size-ssm);
-  font-weight: 700;
-  border: none;
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 0 4px 12px var(--primary-alpha-20);
-  transition: all 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgb(var(--primary-rgb) / 0.3);
-  }
-
-  &:active {
-    transform: translateY(0);
   }
 }
 
@@ -467,49 +401,6 @@
           gap: 4px;
         }
       }
-    }
-  }
-}
-
-.pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  margin-top: 40px;
-
-  .pageBtn {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-white);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-size-ssm);
-    font-weight: 600;
-    color: var(--text-color);
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover:not(.disabled) {
-      border-color: var(--primary);
-      color: var(--primary-text);
-      background-color: var(--hover-color);
-    }
-
-    &.active {
-      background: var(--primary-gradient);
-      border-color: transparent;
-      color: var(--on-primary-gradient);
-      box-shadow: 0 4px 12px rgb(var(--primary-rgb) / 0.25);
-    }
-
-    &.disabled {
-      color: var(--text-secondary);
-      cursor: default;
-      opacity: 0.6;
     }
   }
 }

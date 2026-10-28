@@ -84,20 +84,6 @@
   font-weight: 500;
 }
 
-.textLink {
-  padding: 0;
-  border: none;
-  background: none;
-  font-size: inherit;
-  font-weight: 700;
-  color: var(--primary-text);
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
 .main {
   flex: 1;
   display: flex;
@@ -174,64 +160,11 @@
   background-color: var(--slate-100);
 }
 
-.tab {
-  padding: 8px 0;
-  border: none;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  font-size: var(--font-size-smd);
-  font-weight: 600;
-  color: var(--slate-500);
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    color: var(--slate-800);
-  }
-
-  &:focus-visible {
-    box-shadow: 0 0 0 2px rgb(var(--brand-700-rgb) / 0.4);
-  }
-}
-
-.activeTab {
-  font-weight: 700;
-  color: var(--text-color);
-  background-color: var(--bg-white);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
-
-  &:hover {
-    color: var(--text-color);
-  }
-}
-
 .socialBtns {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-bottom: 24px;
-}
-
-.socialBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 10px 16px;
-  border: 1px solid var(--slate-300);
-  border-radius: var(--radius-pill);
-  background-color: var(--bg-white);
-  font-size: var(--font-size-smd);
-  font-weight: 600;
-  color: var(--slate-700);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-
-  &:hover {
-    border-color: var(--slate-400);
-    background-color: var(--slate-50);
-    color: var(--slate-800);
-  }
 }
 
 .orDivider {
@@ -400,49 +333,9 @@
   }
 }
 
-// Nút gửi màu graphite theo mẫu; dark mode tự đảo thành nền sáng chữ tối qua token brand.
+// Nút gửi là ButtonPrime ink (dark mode tự đảo qua token brand); ở đây chỉ giữ khoảng cách.
 .submitBtn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  height: 46px;
   margin-top: 4px;
-  border: none;
-  border-radius: var(--radius-pill);
-  background-color: var(--brand-800);
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--brand-50);
-  box-shadow: 0 6px 16px rgb(var(--brand-900-rgb) / 0.18);
-  cursor: pointer;
-  transition: filter 0.2s ease, transform 0.15s ease;
-
-  &:hover:not(:disabled) {
-    filter: brightness(0.85);
-    transform: scale(1.01);
-  }
-
-  &:active:not(:disabled) {
-    transform: scale(0.99);
-  }
-
-  &:focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 3px rgb(var(--brand-500-rgb) / 0.55);
-  }
-
-  &:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-  }
-
-  @include dark-theme {
-    &:hover:not(:disabled) {
-      filter: brightness(1.08);
-    }
-  }
 }
 
 .loadingSpinner {

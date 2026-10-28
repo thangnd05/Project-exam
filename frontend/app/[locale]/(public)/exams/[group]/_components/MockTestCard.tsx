@@ -11,6 +11,7 @@ import type { TestResponse } from '@/app/types';
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './MockTestCard.module.scss';
 import { buildTestPath } from '@/app/configs/Routes';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const cx = classNamesBind.bind(styles);
 const ui = classNamesBind.bind(uiStyles);
@@ -101,22 +102,23 @@ function MockTestCard({ test, index, kind, questions, countdowns }: MockTestCard
       </div>
 
       <div className={cx('actions', { solo: !isAuthenticated })}>
-        <button
+        <ButtonPrime
+          variant="ink"
           type="button"
-          className={ui('btnPrimary')}
           onClick={handleStart}
           disabled={!canStart}
         >
           {needsLogin && canStart ? tTests('loginToStart') : buttonText}
           {canStart && <ArrowRight size="1em" aria-hidden="true" />}
-        </button>
+        </ButtonPrime>
         {isAuthenticated && (
-          <Link
+          <ButtonPrime
+            as="link"
+            variant="soft"
             href={buildTestPath(test, 'history')}
-            className={ui('btnSecondary')}
           >
             {tTests('history')}
-          </Link>
+          </ButtonPrime>
         )}
       </div>
 

@@ -21,6 +21,7 @@ import MockTestCard from './_components/MockTestCard';
 import { useTestsByExamType } from './_hooks/useTestsByExamType';
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './TestByExamType.module.scss';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const cx = classNamesBind.bind(styles);
 const ui = classNamesBind.bind(uiStyles);
@@ -74,8 +75,16 @@ function TestGrid({
   );
 }
 
-// examTypeId do server tra từ slug trên URL (/exam-types/aws/saa-c03) rồi truyền xuống.
-function TestByExamType({ examTypeId, examSlug }: { examTypeId: string; examSlug?: string }) {
+// examTypeId do server tra từ slug trên URL (/exams/aws/saa-c03) rồi truyền xuống.
+function TestByExamType({
+  examTypeId,
+  examSlug,
+  examParentSlug,
+}: {
+  examTypeId: string;
+  examSlug?: string;
+  examParentSlug?: string;
+}) {
   const t = useTranslations('ExamTypes');
   const formatFullSpec = useFormatFullSpec();
   const router = useRouter();
@@ -130,7 +139,7 @@ function TestByExamType({ examTypeId, examSlug }: { examTypeId: string; examSlug
       router.push(buildLoginUrlFromHere());
       return;
     }
-    router.push(withExam(routes.myTarget, examTypeId, [{ examTypeId, slug: examSlug }]));
+    router.push(withExam(routes.myTarget, examTypeId, [{ examTypeId, slug: examSlug, parentSlug: examParentSlug }]));
   };
 
   const breadcrumb = (
@@ -154,7 +163,7 @@ function TestByExamType({ examTypeId, examSlug }: { examTypeId: string; examSlug
     </>
   );
 
-  // Nhóm cha (/exam-types/aws): chỉ liệt kê các kỳ thi con.
+  // Nhóm cha (/exams/aws): chỉ liệt kê các kỳ thi con.
   if (children.length > 0) {
     return (
       <div className={cx('wrapper')}>
@@ -207,21 +216,21 @@ function TestByExamType({ examTypeId, examSlug }: { examTypeId: string; examSlug
                   </span>
                 </div>
                 <div className={cx('heroActions')}>
-                  <button
+                  <ButtonPrime
+                    variant="ink"
                     type="button"
-                    className={ui('btnPrimary')}
                     onClick={() => requestStart(quick)}
                     disabled={!quick}
                     title={quick ? t('detail.quickHint') : t('noQuick')}
                   >
                     {t('quickStart')}
-                  </button>
-                  <button type="button" className={ui('btnSecondary')} onClick={handleOpenTarget}>
+                  </ButtonPrime>
+                  <ButtonPrime variant="soft" type="button" onClick={handleOpenTarget}>
                     {t('detail.myTarget')}
-                  </button>
-                  <Link href={routes.resources} className={ui('btnSecondary')}>
+                  </ButtonPrime>
+                  <ButtonPrime as="link" variant="soft" href={routes.resources}>
                     {t('detail.resources')}
-                  </Link>
+                  </ButtonPrime>
                 </div>
               </div>
             </header>
@@ -302,10 +311,10 @@ function TestByExamType({ examTypeId, examSlug }: { examTypeId: string; examSlug
                   <h3>{t('detail.empty.title')}</h3>
                   <p>{t('detail.empty.desc')}</p>
                   {quick && (
-                    <button type="button" className={ui('btnPrimary')} onClick={() => requestStart(quick)}>
+                    <ButtonPrime variant="ink" type="button" onClick={() => requestStart(quick)}>
                       {t('quickStart')}
                       <ArrowRight size="1em" aria-hidden="true" />
-                    </button>
+                    </ButtonPrime>
                   )}
                 </div>
               )}

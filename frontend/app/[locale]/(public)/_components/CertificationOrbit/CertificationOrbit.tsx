@@ -8,6 +8,7 @@ import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
 
 import {getStandardExamTypes} from '@/app/apis/examTypeApi';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes, {buildExamTypeDetailPath} from '@/app/configs/Routes';
 import {examTypeKeys} from '@/app/configs/queryKeys';
 import QuickTestConfirmModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestConfirmModal';
@@ -144,12 +145,12 @@ function CertificationOrbit() {
               {t('lede')}
             </p>
             <div className={cx('actions')}>
-              <button type="button" className={cx('btnPrimary')} onClick={openQuick}>
+              <ButtonPrime onClick={openQuick}>
                 {t('practiceNow')}
-              </button>
-              <button type="button" className={cx('btnGhost')} onClick={() => router.push(localizeHref(routes.learningPlans))}>
+              </ButtonPrime>
+              <ButtonPrime variant="onDark" onClick={() => router.push(localizeHref(routes.learningPlans))}>
                 {t('buildPlan')}
-              </button>
+              </ButtonPrime>
             </div>
           </div>
 

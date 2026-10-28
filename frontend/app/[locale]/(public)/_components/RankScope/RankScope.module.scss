@@ -60,33 +60,12 @@
   color: var(--slate-500);
 }
 
-.outlineBtn {
-  display: inline-flex;
+// Chỉ bố cục cho nút ButtonPrime trong thẻ (màu/kích thước lấy từ variant): không co lại, mũi tên nhích khi hover.
+.cardBtn {
   flex-shrink: 0;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 18px;
-  border: 1px solid var(--slate-300);
-  border-radius: var(--radius-pill);
-  background: transparent;
-  font-size: var(--font-size-ssm);
-  font-weight: 600;
-  color: var(--slate-700);
-  cursor: pointer;
-  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
 
-  &:hover {
-    border-color: var(--slate-400);
-    background: var(--slate-100);
-    color: var(--slate-900);
-
-    .arrow {
-      transform: translateX(3px);
-    }
-  }
-
-  &:disabled {
-    cursor: progress;
+  &:hover .arrow {
+    transform: translateX(3px);
   }
 }
 

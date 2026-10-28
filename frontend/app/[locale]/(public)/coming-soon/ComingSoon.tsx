@@ -3,8 +3,8 @@
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import { ArrowRight, Clock } from 'lucide-react';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
-import Link from '@/app/i18n/navigation';
 import type { Provider } from '../_lib/providers';
 import styles from './ComingSoon.module.scss';
 
@@ -56,13 +56,13 @@ export default function ComingSoon({ provider }: { provider?: Provider }) {
       </p>
 
       <div className={cx('actions')}>
-        <Link href={routes.examTypes} className={cx('btnPrimary')}>
+        <ButtonPrime as="link" href={routes.examTypes} size="lg" className={cx('ctaArrow')}>
           {t('exploreExams')}
           <ArrowRight size="1em" aria-hidden="true" />
-        </Link>
-        <Link href={routes.home} className={cx('btnGhost')}>
+        </ButtonPrime>
+        <ButtonPrime as="link" href={routes.home} variant="onDark" size="lg">
           {t('backHome')}
-        </Link>
+        </ButtonPrime>
       </div>
     </section>
   );

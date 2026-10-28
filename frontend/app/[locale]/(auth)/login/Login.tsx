@@ -19,6 +19,7 @@ import {
   claimGuestAfterLogin,
 } from '@/app/features/auth/authRedirect';
 import routes from '@/app/configs/Routes';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import classNames from 'classnames/bind';
 import style from './login.module.scss';
 import { ArrowLeft, ArrowRight, AtSign, Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
@@ -219,14 +220,14 @@ function Login() {
 
   const socialButtons = (
     <div className={cx('socialBtns')}>
-      <a href={GOOGLE_AUTH_URL} className={cx('socialBtn')} onClick={handleSocialClick}>
+      <ButtonPrime as="a" variant="outline" href={GOOGLE_AUTH_URL} onClick={handleSocialClick}>
         <GoogleLogo size={18} aria-hidden="true" />
         <span>{t('login.continueWithGoogle')}</span>
-      </a>
-      <a href={FACEBOOK_AUTH_URL} className={cx('socialBtn')} onClick={handleSocialClick}>
+      </ButtonPrime>
+      <ButtonPrime as="a" variant="outline" href={FACEBOOK_AUTH_URL} onClick={handleSocialClick}>
         <FacebookLogo size={18} color="#1877F2" aria-hidden="true" />
         <span>{t('login.continueWithFacebook')}</span>
-      </a>
+      </ButtonPrime>
     </div>
   );
 
@@ -269,13 +270,13 @@ function Login() {
       <div className={cx('field')}>
         <div className={cx('labelRow')}>
           <label htmlFor="login-password">{t('login.passwordLabel')}</label>
-          <button
-            type="button"
-            className={cx('textLink')}
+          <ButtonPrime
+            variant="link"
+            size="sm"
             onClick={() => { setShowForgot(true); setMessage(''); }}
           >
             {t('login.forgotPassword')}
-          </button>
+          </ButtonPrime>
         </div>
         <div className={cx('control')}>
           <Lock size="1em" className={cx('fieldIcon')} aria-hidden="true" />
@@ -296,11 +297,11 @@ function Login() {
 
       {messageBox}
 
-      <button type="submit" className={cx('submitBtn')} disabled={loading}>
+      <ButtonPrime type="submit" variant="ink" size="lg" fullWidth className={cx('submitBtn')} disabled={loading}>
         {loading && <span className={cx('loadingSpinner')} />}
         <span>{loading ? t('login.signingIn') : t('common.signInNow')}</span>
         {!loading && <ArrowRight size="1em" aria-hidden="true" />}
-      </button>
+      </ButtonPrime>
     </form>
   );
 
@@ -394,11 +395,11 @@ function Login() {
 
       {messageBox}
 
-      <button type="submit" className={cx('submitBtn')} disabled={loading}>
+      <ButtonPrime type="submit" variant="ink" size="lg" fullWidth className={cx('submitBtn')} disabled={loading}>
         {loading && <span className={cx('loadingSpinner')} />}
         <span>{loading ? tCommon('processing') : t('login.createAccount')}</span>
         {!loading && <ArrowRight size="1em" aria-hidden="true" />}
-      </button>
+      </ButtonPrime>
     </form>
   );
 
@@ -413,9 +414,9 @@ function Login() {
           <span className={cx('topSwitchText')}>
             {isSignUp ? t('login.hasAccount') : t('login.noAccount')}
           </span>
-          <button type="button" className={cx('textLink')} onClick={() => switchMode(!isSignUp)}>
+          <ButtonPrime variant="link" size="sm" onClick={() => switchMode(!isSignUp)}>
             {isSignUp ? t('login.signIn') : t('login.signUpNow')}
-          </button>
+          </ButtonPrime>
         </div>
       </div>
 
@@ -432,24 +433,24 @@ function Login() {
             ) : (
               <>
                 <div className={cx('tabs')} role="tablist" aria-label={t('login.tabsLabel')}>
-                  <button
-                    type="button"
+                  <ButtonPrime
+                    variant={isSignUp ? 'ghost' : 'outline'}
+                    size="sm"
                     role="tab"
                     aria-selected={!isSignUp}
-                    className={cx('tab', { activeTab: !isSignUp })}
                     onClick={() => switchMode(false)}
                   >
                     {t('login.signIn')}
-                  </button>
-                  <button
-                    type="button"
+                  </ButtonPrime>
+                  <ButtonPrime
+                    variant={isSignUp ? 'outline' : 'ghost'}
+                    size="sm"
                     role="tab"
                     aria-selected={isSignUp}
-                    className={cx('tab', { activeTab: isSignUp })}
                     onClick={() => switchMode(true)}
                   >
                     {t('login.signUp')}
-                  </button>
+                  </ButtonPrime>
                 </div>
 
                 {socialButtons}

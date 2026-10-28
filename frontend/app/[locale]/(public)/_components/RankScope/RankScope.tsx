@@ -7,6 +7,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { ArrowRight, RefreshCw } from 'lucide-react';
 
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
 import type {Vendor} from '@/app/[locale]/(public)/_lib/certificationMeta';
 import QuickTestConfirmModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestConfirmModal';
@@ -110,10 +111,10 @@ function RankScope() {
                 {t('subtitle', {count: TOP})}
               </p>
             </div>
-            <button type="button" className={cx('outlineBtn')} onClick={refresh} disabled={isFetching}>
+            <ButtonPrime variant="outline" size="sm" className={cx('cardBtn')} onClick={refresh} disabled={isFetching}>
               <RefreshCw size="1em" key={spinKey} className={cx('refreshIcon', {spinning: spinKey > 0})} aria-hidden="true" />
               <span>{isFetching ? t('syncing') : t('refresh')}</span>
-            </button>
+            </ButtonPrime>
           </div>
 
           <div className={cx('tabs')} role="tablist" aria-label={t('tabsAria')}>
@@ -143,10 +144,10 @@ function RankScope() {
           </div>
 
           <div className={cx('cardFoot')}>
-            <button type="button" className={cx('outlineBtn')} onClick={() => setFullOpen(true)}>
+            <ButtonPrime variant="outline" size="sm" className={cx('cardBtn')} onClick={() => setFullOpen(true)}>
               <span>{t('viewAll')}</span>
               <ArrowRight size="1em" className={cx('arrow')} aria-hidden="true" />
-            </button>
+            </ButtonPrime>
           </div>
         </div>
       </div>

@@ -1,10 +1,10 @@
 'use client';
 
-import Link from '@/app/i18n/navigation';
 import {isAxiosError} from 'axios';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
 import {useForgotPasswordMutation} from '@/app/features/auth/hooks/useAuthActions';
 import style from '@/app/[locale]/(auth)/_components/auth/AuthRecovery.module.scss';
@@ -93,13 +93,13 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
   };
 
   const backToLogin = onBack ? (
-    <button type="button" className={cx('back-link', 'back-button')} onClick={onBack}>
+    <ButtonPrime variant="link" className={cx('back-link')} onClick={onBack}>
       {t('common.backToLogin')}
-    </button>
+    </ButtonPrime>
   ) : (
-    <Link href={routes.login} className={cx('back-link')}>
+    <ButtonPrime as="link" variant="link" href={routes.login} className={cx('back-link')}>
       {t('common.backToLogin')}
-    </Link>
+    </ButtonPrime>
   );
 
   const handleResend = async () => {
@@ -124,9 +124,9 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
           )}
 
           <div className={cx('actions')}>
-            <button
-              type="button"
-              className={cx('ghostBtn')}
+            <ButtonPrime
+              variant="outline"
+              fullWidth
               onClick={handleResend}
               disabled={cooldown > 0 || isSubmitting}
             >
@@ -135,17 +135,17 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
                 : cooldown > 0
                   ? t('forgot.resendIn', { seconds: cooldown })
                   : t('forgot.resend')}
-            </button>
-            <button
-              type="button"
-              className={cx('ghostBtn')}
+            </ButtonPrime>
+            <ButtonPrime
+              variant="ghost"
+              fullWidth
               onClick={() => {
                 setSentTo('');
                 setFormError('');
               }}
             >
               {t('forgot.useAnotherEmail')}
-            </button>
+            </ButtonPrime>
           </div>
 
           <p className={cx('footer')}>
@@ -192,9 +192,11 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
 
           {backToLogin}
 
-          <button
+          <ButtonPrime
             type="submit"
-            className={cx('submitBtn')}
+            variant="ink"
+            size="lg"
+            fullWidth
             disabled={!canSubmit || isSubmitting || cooldown > 0}
           >
             {isSubmitting && <span className={cx('spinner')} />}
@@ -203,7 +205,7 @@ function ForgotPassword({ embedded = false, onBack }: ForgotPasswordProps) {
               : cooldown > 0
                 ? t('forgot.retryIn', { seconds: cooldown })
                 : t('forgot.submit')}
-          </button>
+          </ButtonPrime>
         </form>
       </div>
     </div>

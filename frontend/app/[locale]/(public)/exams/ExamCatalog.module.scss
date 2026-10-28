@@ -91,21 +91,6 @@
   }
 }
 
-.textBtn {
-  padding: 0;
-  border: none;
-  background: none;
-  font-family: var(--font-family);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--brand-700);
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
 .filterRow {
   display: flex;
   align-items: center;
@@ -129,37 +114,15 @@
   color: var(--slate-400);
 }
 
-.vendorTab {
-  display: inline-flex;
-  align-items: center;
+// Tab lọc dùng ButtonPrime; chỉ giữ không co lại khi hàng lọc cuộn ngang.
+.tab {
   flex-shrink: 0;
-  padding: 6px 14px;
-  border: 1px solid var(--slate-300);
-  border-radius: var(--radius-pill);
-  background: var(--bg-white);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--slate-600);
-  cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-
-  &:hover {
-    color: var(--slate-900);
-  }
-
-  &.active {
-    border-color: var(--brand-700);
-    background: rgb(var(--brand-700-rgb) / 0.1);
-    color: var(--brand-700);
-    font-weight: 700;
-  }
 }
 
 .dot {
   display: inline-block;
   width: 8px;
   height: 8px;
-  margin-right: 6px;
   border-radius: 50%;
 }
 
@@ -170,29 +133,6 @@
 
   .tag-#{$name} {
     background-color: $color;
-  }
-}
-
-.levelTab {
-  flex-shrink: 0;
-  padding: 4px 12px;
-  border: none;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--slate-500);
-  cursor: pointer;
-  transition: color 0.2s ease, background-color 0.2s ease;
-
-  &:hover {
-    color: var(--slate-900);
-    background: rgb(var(--slate-200-rgb) / 0.6);
-  }
-
-  &.active {
-    color: var(--slate-900);
-    background: rgb(var(--slate-300-rgb) / 0.8);
   }
 }
 
@@ -219,7 +159,7 @@
   justify-content: space-between;
   padding: 20px;
   border: 1px solid var(--slate-200);
-  border-radius: 16px;
+  border-radius: 8px;
   background: var(--bg-white);
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 
@@ -239,7 +179,7 @@
 
 .vendorTag {
   padding: 2px 10px;
-  border-radius: var(--radius-pill);
+  border-radius: 4px;
   font-family: var(--font-mono);
   font-size: 1rem;
   font-weight: 700;
@@ -325,61 +265,11 @@
   padding-top: 4px;
 }
 
-.btnPrimary,
-.btnSecondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 12px;
-  border-radius: var(--radius-pill);
-  font-size: var(--font-size-sm);
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background-color 0.2s ease, filter 0.2s ease;
-}
-
-// Nút chính màu graphite; ở dark mode token brand đảo thành nền sáng chữ tối.
-.btnPrimary {
-  border: none;
-  background: var(--brand-800);
-  font-weight: 700;
-  color: var(--brand-50);
-
-  &:hover:not(:disabled) {
-    filter: brightness(0.85);
-  }
-
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
-
-  @include dark-theme {
-    &:hover:not(:disabled) {
-      filter: brightness(1.08);
-    }
-  }
-}
-
-.btnSecondary {
-  border: 1px solid var(--slate-200);
-  background: var(--slate-100);
-  font-weight: 600;
-  color: var(--slate-700);
-
-  &:hover {
-    background: var(--slate-200);
-    color: var(--slate-900);
-  }
-}
-
 /* ---------- Đang tải ---------- */
 
 .skeleton {
   height: 260px;
-  border-radius: 16px;
+  border-radius: 8px;
   border: 1px solid var(--slate-200);
   background: linear-gradient(90deg, var(--slate-100) 0%, var(--bg-white) 45%, var(--slate-100) 100%);
   background-size: 180% 100%;

@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 import { isAxiosError } from 'axios';
 import classNames from 'classnames/bind';
 import { Eye, EyeOff, Lock, CircleCheck, CircleAlert } from 'lucide-react';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
 import { useResetPasswordMutation, useResetTokenQuery } from '@/app/features/auth/hooks/useAuthActions';
 import type { ResetTokenInvalidReason } from '@/app/types';
@@ -203,15 +204,15 @@ function ResetPassword() {
           </p>
 
           <div className={cx('actions')}>
-            <Link href={routes.forgot} className={cx('submitBtn')} style={{ textDecoration: 'none' }}>
+            <ButtonPrime as="link" href={routes.forgot} variant="ink" size="lg" fullWidth>
               {t('reset.requestNewLink')}
-            </Link>
+            </ButtonPrime>
           </div>
 
           <p className={cx('footer')}>
-            <Link href={routes.login} className={cx('back-link')}>
+            <ButtonPrime as="link" variant="link" href={routes.login} className={cx('back-link')}>
               {t('common.backToLogin')}
-            </Link>
+            </ButtonPrime>
           </p>
         </div>
       </div>
@@ -230,9 +231,9 @@ function ResetPassword() {
             {t('reset.doneDescription', { countdown })}
           </p>
           <div className={cx('actions')}>
-            <Link href={routes.login} className={cx('submitBtn')} style={{ textDecoration: 'none' }}>
+            <ButtonPrime as="link" href={routes.login} variant="ink" size="lg" fullWidth>
               {t('common.signInNow')}
-            </Link>
+            </ButtonPrime>
           </div>
         </div>
       </div>
@@ -342,14 +343,14 @@ function ResetPassword() {
 
           {formError && <div className={cx('alert', 'alertError')}>{formError}</div>}
 
-          <Link href={routes.login} className={cx('back-link')}>
+          <ButtonPrime as="link" variant="link" href={routes.login} className={cx('back-link')}>
             {t('common.backToLogin')}
-          </Link>
+          </ButtonPrime>
 
-          <button type="submit" className={cx('submitBtn')} disabled={!canSubmit || expired}>
+          <ButtonPrime type="submit" variant="ink" size="lg" fullWidth disabled={!canSubmit || expired}>
             {isSubmitting && <span className={cx('spinner')} />}
             {isSubmitting ? t('reset.updating') : t('reset.submit')}
-          </button>
+          </ButtonPrime>
         </form>
       </div>
     </div>
