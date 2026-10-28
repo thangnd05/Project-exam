@@ -146,6 +146,13 @@ mang tên nó, không còn hàng chục `index.js` trùng tên như cấu trúc 
   được trường hợp access token hết hạn nhưng refresh token còn sống.
   - Đổi/bổ sung route cần đăng nhập thì phải sửa `PROTECTED_PREFIXES` trong `proxy.ts`, nó không tự
     suy ra từ nhóm route. (`matcher` giờ bắt mọi trang vì trang nào cũng phải qua bước ghép ngôn ngữ.)
+- **Điều hướng đăng nhập / quay lại dùng chung `app/utils/redirect.ts`.** Dựng link `/login?from=...`
+  (`buildLoginUrl`, `buildLoginUrlFromHere`), đọc lại đích (`getRedirectTarget`, `safeRedirect`) và lưu đích cho
+  OAuth (`saveOAuthRedirect`/`takeOAuthRedirect`) đều qua đây, kể cả `proxy.ts`. Đừng tự ghép `/login?...`
+  hay tự kiểm `startsWith('//')`: hàm ở đây đã chặn link ra ngoài và vòng lặp về trang đăng nhập.
+  - `/oauth2/redirect` nằm ở `(bare)` (ngoài `AuthGuard`): backend chuyển về đây cả khi OAuth thành công lẫn
+    thất bại (`?error=`), trang tự đưa về đúng đích / trang đăng nhập theo ngôn ngữ đã lưu.
+  - URL cũ → mới (308) khai ở `app/configs/legacyRedirects.mjs`, `next.config.mjs` tự thêm bản `/en`.
 - **`useSearchParams` bắt buộc nằm trong `<Suspense>`** - mỗi layout nhóm đã bọc sẵn.
 - **`queryClient` là singleton module-level** (`app/configs/queryClient.ts`). Đủ dùng vì
   app render phía client; nếu sau này fetch ở server thì phải đổi sang instance mỗi request.
