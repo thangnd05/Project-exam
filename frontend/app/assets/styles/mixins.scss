@@ -72,7 +72,7 @@ $vendor-colors: (
   justify-content: center;
   gap: 0.6rem;
   border: 1px solid transparent;
-  border-radius: 12px;
+  border-radius: var(--radius-pill);
   font-family: var(--font-family);
   font-weight: var(--font-weight-semibold);
   line-height: 1.25;
@@ -110,6 +110,150 @@ $vendor-colors: (
     color: var(--slate-500);
     box-shadow: none;
     opacity: 1;
+  }
+}
+
+// Nút chính graphite (Thi nhanh, Đọc tài liệu, Lưu mục tiêu...); ở dark mode token brand đảo thành nền sáng chữ tối.
+// Khu vực có màu mực riêng (phòng thi) đặt --btn-ink-bg / --btn-ink-fg trên khung ngoài để đổi màu.
+@mixin buttonInk {
+  background: var(--btn-ink-bg, var(--brand-800));
+  border-color: var(--btn-ink-bg, var(--brand-800));
+  font-weight: 700;
+  color: var(--btn-ink-fg, var(--brand-50));
+
+  &:hover:not(:disabled),
+  &:visited {
+    color: var(--btn-ink-fg, var(--brand-50));
+  }
+
+  &:hover:not(:disabled) {
+    filter: brightness(0.85);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+  }
+
+  @include dark-theme {
+    &:hover:not(:disabled) {
+      filter: brightness(1.08);
+    }
+  }
+}
+
+// Nút phụ nền xám nhạt đi cạnh nút ink.
+@mixin buttonSoft {
+  background: var(--slate-100);
+  border-color: var(--slate-200);
+  color: var(--slate-700);
+
+  &:visited {
+    color: var(--slate-700);
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--slate-200);
+    color: var(--slate-900);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+  }
+}
+
+// Nút phụ trên nền tối (hero, coming soon, ScopeRank): nền tối trong suốt, chữ sáng.
+@mixin buttonOnDark {
+  background: rgb(var(--surface-dark-border-rgb) / 0.5);
+  border-color: rgb(var(--text-on-dark-rgb) / 0.2);
+  color: var(--text-on-dark);
+
+  &:hover:not(:disabled),
+  &:visited {
+    color: var(--text-on-dark);
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--surface-dark-border);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgb(var(--text-on-dark-rgb) / 0.6);
+    outline-offset: 2px;
+  }
+}
+
+// Nút gradient xu (nhận thưởng, mua vật phẩm).
+@mixin buttonCoin {
+  background: var(--coin-gradient-strong);
+  border-color: transparent;
+  font-weight: 700;
+  color: var(--white);
+
+  &:hover:not(:disabled),
+  &:visited {
+    color: var(--white);
+  }
+
+  &:hover:not(:disabled) {
+    filter: brightness(1.05);
+  }
+
+  &:disabled {
+    background: var(--slate-200);
+    color: var(--slate-400);
+    opacity: 1;
+  }
+}
+
+// Nút gradient chuỗi ngày (chúc mừng, khôi phục chuỗi).
+@mixin buttonStreak {
+  background: var(--streak-gradient);
+  border-color: transparent;
+  font-weight: 700;
+  color: var(--white);
+
+  &:hover:not(:disabled),
+  &:visited {
+    color: var(--white);
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--streak-gradient-hover);
+  }
+
+  &:disabled {
+    background: var(--slate-200);
+    color: var(--slate-400);
+    opacity: 1;
+  }
+}
+
+@mixin buttonWarning {
+  background: var(--warning);
+  border-color: var(--warning);
+  color: var(--white);
+
+  &:hover:not(:disabled),
+  &:visited {
+    color: var(--white);
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--warning-700);
+    border-color: var(--warning-700);
+  }
+}
+
+// Nút dạng chữ (quay lại, làm mới...): không nền, không viền, không đệm; gạch chân khi rê chuột.
+@mixin buttonLink {
+  padding: 0;
+  background: transparent;
+  border-color: transparent;
+  color: var(--primary-text);
+
+  &:hover:not(:disabled) {
+    color: var(--primary-text);
+    text-decoration: underline;
   }
 }
 
@@ -173,14 +317,15 @@ $vendor-colors: (
   }
 }
 
+// Một thang kích thước cho mọi nút (ButtonPrime và class dùng mixin), theo kiểu phẳng của FlatUi.
 @mixin buttonSizeSm {
-  padding: 0.75rem 1.5rem;
+  padding: 0.6rem 1.4rem;
   font-size: var(--font-size-sm);
 }
 
 @mixin buttonSizeMd {
-  padding: 0.9rem 1.8rem;
-  font-size: var(--font-size-ssm);
+  padding: 1rem 1.8rem;
+  font-size: var(--font-size-smd);
 }
 
 @mixin buttonSizeLg {

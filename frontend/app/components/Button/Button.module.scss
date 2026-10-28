@@ -14,12 +14,24 @@
   @include globalStyles.buttonBrand;
 }
 
+.ink {
+  @include globalStyles.buttonInk;
+}
+
+.soft {
+  @include globalStyles.buttonSoft;
+}
+
 .outline {
   @include globalStyles.buttonOutline;
 }
 
 .ghost {
   @include globalStyles.buttonGhost;
+}
+
+.onDark {
+  @include globalStyles.buttonOnDark;
 }
 
 .danger {
@@ -34,6 +46,18 @@
   @include globalStyles.buttonSuccess;
 }
 
+.warning {
+  @include globalStyles.buttonWarning;
+}
+
+.coin {
+  @include globalStyles.buttonCoin;
+}
+
+.streak {
+  @include globalStyles.buttonStreak;
+}
+
 .sm {
   @include globalStyles.buttonSizeSm;
 }
@@ -46,11 +70,21 @@
   @include globalStyles.buttonSizeLg;
 }
 
+// Nút chỉ có icon: vuông đều, bo tròn thành hình tròn theo buttonBase.
 .icon {
   padding: 0.6rem;
-  border-radius: 10px;
+}
+
+// Nút chữ không có đệm dù đi kèm size nào (size chỉ còn quyết định cỡ chữ).
+.button.link {
+  @include globalStyles.buttonLink;
 }
 
 .fullWidth {
   width: 100%;
+}
+
+// Mặc định nút dạng viên thuốc; phòng thi dùng góc bo nhẹ cho khớp thẻ hướng dẫn.
+.rounded {
+  border-radius: var(--radius-md);
 }

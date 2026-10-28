@@ -16,8 +16,24 @@ type NativeProps = Omit<ButtonHTMLAttributes<HTMLElement>, 'type'> &
 
 type ButtonPrimeProps = NativeProps & {
   as?: 'button' | 'link' | 'a';
-  variant?: 'primary' | 'brand' | 'outline' | 'ghost' | 'danger' | 'dangerGhost' | 'success';
+  variant?:
+    | 'primary'
+    | 'brand'
+    | 'ink'
+    | 'soft'
+    | 'outline'
+    | 'ghost'
+    | 'onDark'
+    | 'link'
+    | 'danger'
+    | 'dangerGhost'
+    | 'success'
+    | 'warning'
+    | 'coin'
+    | 'streak';
   size?: 'sm' | 'md' | 'lg' | 'icon';
+  /** pill: viên thuốc (mặc định); rounded: góc bo nhẹ, dùng trong phòng thi. */
+  shape?: 'pill' | 'rounded';
   fullWidth?: boolean;
   loading?: boolean;
   disabled?: boolean;
@@ -31,6 +47,7 @@ const ButtonPrime = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPrim
     as = 'button',
     variant = 'primary',
     size = 'md',
+    shape = 'pill',
     fullWidth = false,
     loading = false,
     disabled = false,
@@ -48,6 +65,7 @@ const ButtonPrime = forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPrim
     size,
     {
       fullWidth,
+      rounded: shape === 'rounded',
     },
     className,
   );
