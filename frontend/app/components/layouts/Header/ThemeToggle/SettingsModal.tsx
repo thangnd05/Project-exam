@@ -53,6 +53,7 @@ function SettingsModal({ show, onClose }: SettingsModalProps) {
           </div>
         </section>
 
+        {/* Tạm tắt chọn bảng màu — tính năng để dành cho sau.
         <section className={cx('group')} role="radiogroup" aria-label={t('palette')}>
           <p className={cx('label')}>{t('palette')}</p>
           <div className={cx('options')}>
@@ -72,6 +73,7 @@ function SettingsModal({ show, onClose }: SettingsModalProps) {
             ))}
           </div>
         </section>
+        */}
 
         <section className={cx('group')} role="radiogroup" aria-label={t('language')}>
           <p className={cx('label')}>{t('language')}</p>
