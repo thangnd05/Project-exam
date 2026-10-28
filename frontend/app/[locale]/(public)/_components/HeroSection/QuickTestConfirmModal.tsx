@@ -68,13 +68,11 @@ function QuickTestConfirmModal({
       onClose={onClose}
       title={t('confirm.title')}
       maxWidth={600}
-      variant="exam"
       footer={
         <>
           <ButtonPrime
             variant="outline"
             size="lg"
-            className={cx('footerBtn')}
             onClick={onClose}
           >
             {tCommon('cancelShort')}
@@ -82,7 +80,6 @@ function QuickTestConfirmModal({
           <ButtonPrime
             variant="brand"
             size="lg"
-            className={cx('footerBtn')}
             onClick={chooseStudied}
           >
             {t('confirm.start')}

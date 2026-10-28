@@ -330,7 +330,7 @@
 .readBtn {
   @include buttonBase;
   @include buttonInk;
-  @include buttonSizeSm;
+  @include buttonSizeMd;
 }
 
 /* ---------- Đang tải ---------- */

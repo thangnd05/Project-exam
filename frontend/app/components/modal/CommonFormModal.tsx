@@ -16,7 +16,7 @@ type CommonFormModalProps = {
   children?: React.ReactNode;
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  variant?: 'default' | 'plain' | 'exam';
+  variant?: 'default' | 'exam';
 };
 
 function CommonFormModal({

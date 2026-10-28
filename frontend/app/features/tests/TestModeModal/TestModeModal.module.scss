@@ -1,7 +1,6 @@
 @import 'app/assets/styles/mixins.scss';
 
-// Dùng BaseModal variant="exam" + ButtonPrime (brand/outline) như popup thi nhanh ở trang chủ;
-// các khối bên trong bo góc nhỏ cho khớp khung vuông vắn của variant này.
+// Dùng khung BaseModal mặc định + ButtonPrime (brand/outline) như popup thi nhanh ở trang chủ.
 
 // Segmented control: rãnh nền nhạt, tab đang chọn nổi lên nền trắng có bóng nhẹ.
 .tabs {
@@ -10,13 +9,13 @@
   gap: 4px;
   margin-bottom: 20px;
   padding: 4px;
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--input-bg);
 }
 
 // Tăng độ ưu tiên để đè nền/hover/bo tròn của biến thể ghost trong ButtonPrime.
 .tabs .tab {
-  border-radius: 6px;
+  border-radius: 8px;
   color: var(--text-secondary);
 
   &:hover {
@@ -78,7 +77,7 @@
   flex-direction: column;
   gap: 2px;
   padding: 12px 14px;
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--input-bg);
 
   dt {
@@ -214,7 +213,7 @@
   height: 100%;
   padding: 12px 14px;
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--bg-white);
   text-align: left;
   cursor: pointer;
@@ -288,7 +287,7 @@
 
 .guide {
   margin-top: 14px;
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--input-bg);
 
   &[open] .guide-chevron {
@@ -317,7 +316,7 @@
   }
 
   &:focus-visible {
-    border-radius: 8px;
+    border-radius: 12px;
     outline: 2px solid var(--primary);
     outline-offset: 2px;
   }

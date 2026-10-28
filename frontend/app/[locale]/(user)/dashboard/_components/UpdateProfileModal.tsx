@@ -148,7 +148,7 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
 
   if (loading && show) {
     return (
-      <CommonFormModal show={show} onHide={closeModal} title={t('updateProfile.title')} variant="exam">
+      <CommonFormModal show={show} onHide={closeModal} title={t('updateProfile.title')}>
         <div className="d-flex justify-content-center p-4">
           <Spinner animation="border" variant="primary" />
         </div>
@@ -161,7 +161,6 @@ function UpdateProfileModal({ show, onHide, onUpdateSuccess }: UpdateProfileModa
       show={show}
       onHide={closeModal}
       title={t('updateProfile.title')}
-      variant="exam"
       footer={
         <ModalActionFooter
           cancelLabel={tCommon('cancelShort')}

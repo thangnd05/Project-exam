@@ -16,11 +16,14 @@
   animation: fadeIn 0.3s ease-out;
 }
 
+// Khung chung của cả app theo popup Quick Scope của bản thiết kế FrostScope: bo tròn lớn, viền brand mờ,
+// header phẳng cùng nền, đường kẻ trên/dưới thụt vào theo lề nội dung.
 .modalContent {
   background: var(--bg-white);
   width: 100%;
   max-width: 1200px;
   max-height: 90vh;
+  border: 1px solid rgb(var(--primary-rgb) / 0.25);
   border-radius: 24px;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   overflow: hidden;
@@ -30,13 +33,14 @@
 }
 
 .header {
-  background: var(--header-gradient);
-  --on-primary-gradient: var(--on-header);
-  --on-primary-gradient-soft: rgb(255 255 255 / 0.2);
-  text-shadow: 0 1px 2px rgb(var(--brand-900-rgb) / 0.25);
-  padding: 22px 22px 22px 28px;
+  // Badge trong headerExtra đọc hai biến này (đặt tên theo dải gradient cũ).
+  --on-primary-gradient: var(--text-color);
+  --on-primary-gradient-soft: var(--input-bg);
+  margin: 0 28px;
+  padding: 24px 0 14px;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex-shrink: 0;
@@ -57,22 +61,26 @@
 }
 
 .title {
-  font-size: var(--font-size-xxl);
-  font-weight: 800;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
   line-height: 1.3;
   color: var(--on-primary-gradient);
   margin: 0 !important;
-  letter-spacing: -0.4px;
+  letter-spacing: -0.2px;
 }
 
-// Nút đóng là ButtonPrime size icon (outline: chip trắng trên dải gradient; onDark trên header tối của plain/exam); chỉ giữ bố cục.
+// Nút đóng là ButtonPrime ghost bo góc: không nền, chỉ hiện ô vuông khi hover.
 .closeBtn {
   flex-shrink: 0;
-  margin-top: 1px;
+  color: var(--text-secondary);
+
+  &:hover {
+    color: var(--text-color);
+  }
 }
 
 .body {
-  padding: 30px;
+  padding: 18px 28px 20px;
   overflow-y: auto;
   flex: 1;
 
@@ -166,53 +174,34 @@
 }
 
 .footer {
-  padding: 20px 30px;
-  border-top: 1px solid var(--slate-100);
-  background: var(--bg-white);
+  margin: 0 28px;
+  padding: 16px 0 24px;
+  border-top: 1px solid var(--border-color);
   display: flex;
   gap: 12px;
   justify-content: flex-end;
   flex-shrink: 0;
 }
 
-// Không viền khung: viền sáng bao quanh header tối sẽ lộ thành nét trắng; overlay tối + bóng đổ đã đủ tách popup.
-.plain {
-  // Dải header cùng màu nền tối của hero trang chủ (--hero-bg), chữ sáng.
-  .header {
-    background: var(--hero-bg);
-    --on-primary-gradient: var(--text-on-dark);
-    // Badge trong headerExtra dùng biến này làm nền.
-    --on-primary-gradient-soft: var(--on-hero-soft);
-    text-shadow: none;
-    padding: 18px 20px 18px 28px;
-    align-items: center;
-  }
-
-  .title {
-    font-size: var(--font-size-xl);
-    font-weight: 700;
-    letter-spacing: -0.2px;
-  }
-
-  .body {
-    padding: 22px 28px 20px;
-  }
-
-  // Kẻ ngang trọn chiều rộng như header để hai đầu popup cân nhau.
-  .footer {
-    padding: 16px 28px 20px;
-    border-top-color: var(--border-color);
-  }
+// Footer chỉ gồm các nút thì chia đều chiều ngang; có phần tử khác (VD dòng tóm tắt) thì giữ nguyên bố cục.
+.modalContent:not(.exam) .footer:not(:has(> :not(button, a))) > * {
+  flex: 1;
 }
 
-// Đi kèm .plain; theo thẻ hướng dẫn trước giờ thi (.ready-card trong TestStart.module.scss).
+// Chỉ dùng cho màn chuẩn bị vào thi: góc vuông vắn, nút tách hai bên, khớp thẻ .ready-card trong TestStart.module.scss.
 .exam {
+  border-color: var(--slate-300);
   border-radius: 8px;
   box-shadow: 0 20px 40px -12px rgb(var(--slate-900-rgb) / 0.25);
+
+  .header {
+    border-bottom-color: var(--slate-200);
+  }
 
   .title {
     font-size: var(--font-size-lg);
     font-weight: 800;
+    color: var(--dark-color);
   }
 
   // Chọn theo thẻ để phủ cả ô nhập của CommonFormModal (.inputControl bo 16px, viền 2px).
@@ -225,14 +214,10 @@
     }
   }
 
-  // Tách hai bên: phần tử đầu sang trái, còn lại sang phải. Footer chỉ có một nút thì nút vẫn nằm bên phải.
   .footer {
+    justify-content: space-between;
     align-items: center;
     border-top-color: var(--slate-200);
-
-    > :first-child:not(:only-child) {
-      margin-right: auto;
-    }
   }
 }
 

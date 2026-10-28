@@ -171,7 +171,6 @@ function TestModeModal({ show, test, onClose, onStart }: TestModeModalProps) {
       onClose={onClose}
       title={t('mode.title')}
       maxWidth={640}
-      variant="exam"
       footer={footer}
     >
       {/* Segmented control: tab đang chọn nổi nền trắng trên rãnh nhạt thay vì nền đậm. */}

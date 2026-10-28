@@ -1,11 +1,9 @@
 'use client';
 
-import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import styles from './CommonFormModal.module.scss';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
-const cx = classNames.bind(styles);
+// Hai nút được BaseModal chia đều chiều ngang footer.
 
 type ModalActionFooterProps = {
   cancelLabel?: string;
@@ -33,7 +31,6 @@ function ModalActionFooter({
         type="button"
         variant="outline"
         size="lg"
-        className={cx('btnCancel')}
         onClick={onCancel}
         disabled={loading}
       >
@@ -44,7 +41,6 @@ function ModalActionFooter({
         type="button"
         variant="primary"
         size="lg"
-        className={cx('btnSubmit')}
         onClick={onSubmit}
         disabled={loading}
       >

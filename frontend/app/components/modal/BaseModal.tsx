@@ -21,9 +21,9 @@ type BaseModalProps = {
   closeOnOverlay?: boolean;
   closeOnEsc?: boolean;
   showCloseButton?: boolean;
-  // exam (mặc định, khung chung của cả app): header nền tối như hero, góc vuông vắn, nút tách hai bên.
-  // plain: như exam nhưng góc bo tròn lớn. default: header dải gradient (kiểu cũ, chỉ dùng khi cần).
-  variant?: 'default' | 'plain' | 'exam';
+  // default: khung chung của cả app (bo tròn lớn, header phẳng, đường kẻ ngăn cách).
+  // exam: góc vuông vắn, nút tách hai bên; chỉ dùng cho màn chuẩn bị vào thi.
+  variant?: 'default' | 'exam';
   children?: React.ReactNode;
 };
 
@@ -37,7 +37,7 @@ function BaseModal({
   closeOnOverlay = true,
   closeOnEsc = true,
   showCloseButton = true,
-  variant = 'exam',
+  variant = 'default',
   children,
 }: BaseModalProps) {
   const tCommon = useTranslations('Common');
@@ -71,7 +71,7 @@ function BaseModal({
       onClick={closeOnOverlay ? onClose : undefined}
     >
       <div
-        className={cx('modalContent', {plain: variant !== 'default', exam: variant === 'exam'})}
+        className={cx('modalContent', {exam: variant === 'exam'})}
         style={maxWidth ? {maxWidth} : undefined}
         onClick={(event) => event.stopPropagation()}
       >
@@ -82,9 +82,9 @@ function BaseModal({
           </div>
           {showCloseButton && (
             <ButtonPrime
-              variant={variant === 'default' ? 'outline' : 'onDark'}
+              variant="ghost"
               size="icon"
-              shape={variant === 'exam' ? 'rounded' : 'pill'}
+              shape="rounded"
               className={cx('closeBtn')}
               onClick={onClose}
               aria-label={tCommon('close')}

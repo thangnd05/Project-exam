@@ -217,7 +217,7 @@ function ExamCatalog() {
               <div className={cx('actions')}>
                 <ButtonPrime
                   variant="soft"
-                  size="sm"
+                  size="md"
                   onClick={() => requestStart(quick ?? null)}
                   disabled={!quick}
                   title={quick ? undefined : t('noQuick')}
@@ -227,7 +227,7 @@ function ExamCatalog() {
                 <ButtonPrime
                   as="link"
                   variant="ink"
-                  size="sm"
+                  size="md"
                   href={href}
                   title={t('catalog.viewFullMock', {name: code || title})}
                 >
