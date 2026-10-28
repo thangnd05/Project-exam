@@ -65,7 +65,7 @@
   letter-spacing: -0.4px;
 }
 
-// Nút đóng là ButtonPrime size icon (outline: chip trắng trên dải gradient; ghost ở plain/exam); chỉ giữ bố cục.
+// Nút đóng là ButtonPrime size icon (outline: chip trắng trên dải gradient; onDark trên header tối của plain/exam); chỉ giữ bố cục.
 .closeBtn {
   flex-shrink: 0;
   margin-top: 1px;
@@ -175,17 +175,17 @@
   flex-shrink: 0;
 }
 
+// Không viền khung: viền sáng bao quanh header tối sẽ lộ thành nét trắng; overlay tối + bóng đổ đã đủ tách popup.
 .plain {
-  border: 1px solid var(--border-color);
-
+  // Dải header cùng màu nền tối của hero trang chủ (--hero-bg), chữ sáng.
   .header {
-    background: var(--bg-white);
-    --on-primary-gradient: var(--text-color);
+    background: var(--hero-bg);
+    --on-primary-gradient: var(--text-on-dark);
+    // Badge trong headerExtra dùng biến này làm nền.
+    --on-primary-gradient-soft: var(--on-hero-soft);
     text-shadow: none;
-    margin: 0 28px;
-    padding: 24px 0 16px;
+    padding: 18px 20px 18px 28px;
     align-items: center;
-    border-bottom: 1px solid var(--border-color);
   }
 
   .title {
@@ -195,30 +195,24 @@
   }
 
   .body {
-    padding: 18px 28px 20px;
+    padding: 22px 28px 20px;
   }
 
+  // Kẻ ngang trọn chiều rộng như header để hai đầu popup cân nhau.
   .footer {
-    margin: 0 28px;
-    padding: 18px 0 24px;
+    padding: 16px 28px 20px;
     border-top-color: var(--border-color);
   }
 }
 
 // Đi kèm .plain; theo thẻ hướng dẫn trước giờ thi (.ready-card trong TestStart.module.scss).
 .exam {
-  border-color: var(--slate-300);
   border-radius: 8px;
   box-shadow: 0 20px 40px -12px rgb(var(--slate-900-rgb) / 0.25);
-
-  .header {
-    border-bottom-color: var(--slate-200);
-  }
 
   .title {
     font-size: var(--font-size-lg);
     font-weight: 800;
-    color: var(--dark-color);
   }
 
   // Chọn theo thẻ để phủ cả ô nhập của CommonFormModal (.inputControl bo 16px, viền 2px).
@@ -231,10 +225,14 @@
     }
   }
 
+  // Tách hai bên: phần tử đầu sang trái, còn lại sang phải. Footer chỉ có một nút thì nút vẫn nằm bên phải.
   .footer {
-    justify-content: space-between;
     align-items: center;
     border-top-color: var(--slate-200);
+
+    > :first-child:not(:only-child) {
+      margin-right: auto;
+    }
   }
 }
 

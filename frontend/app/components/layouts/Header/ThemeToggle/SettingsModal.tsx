@@ -31,7 +31,7 @@ function SettingsModal({ show, onClose }: SettingsModalProps) {
   const language = useLanguageSwitch();
 
   return (
-    <BaseModal show={show} onClose={onClose} title={tNav('settings')} maxWidth={440} variant="plain">
+    <BaseModal show={show} onClose={onClose} title={tNav('settings')} maxWidth={440}>
       <div className={cx('body')}>
         <section className={cx('group')} role="radiogroup" aria-label={t('mode')}>
           <p className={cx('label')}>{t('mode')}</p>
