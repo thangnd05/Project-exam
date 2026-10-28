@@ -5,9 +5,18 @@ import ReactDOM from 'react-dom';
 import { useTranslations } from 'next-intl';
 import { X, TriangleAlert, type LucideIcon } from 'lucide-react';
 import classNames from 'classnames/bind';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './ConfirmModal.module.scss';
 
 const cx = classNames.bind(styles);
+
+// Màu nút xác nhận theo variant của modal.
+const CONFIRM_VARIANT = {
+    primary: 'primary',
+    danger: 'danger',
+    warning: 'warning',
+    success: 'success',
+} as const;
 
 type ConfirmModalProps = {
     show?: boolean;
@@ -44,9 +53,10 @@ const ConfirmModal = ({
                     <div className={cx('titleWrapper')}>
                         <h3 className={cx('title')}>{title ?? t('confirm')}</h3>
                     </div>
-                    <button type="button" className={cx('closeBtn')} onClick={onClose} aria-label={t('close')}>
-                        <X size="1em" />
-                    </button>
+                    {/* Nút đóng trong suốt trên dải gradient của header. */}
+                    <ButtonPrime variant="onDark" size="icon" onClick={onClose} aria-label={t('close')}>
+                        <X size={20} />
+                    </ButtonPrime>
                 </div>
                 <div className={cx('body')}>
                     <div className={cx('iconCircle', variant)}>
@@ -55,12 +65,17 @@ const ConfirmModal = ({
                     <p className={cx('message')}>{message}</p>
                 </div>
                 <div className={cx('footer')}>
-                    <button type="button" className={cx('btnCancel')} onClick={onClose}>
+                    <ButtonPrime variant="soft" size="lg" className={cx('btnCancel')} onClick={onClose}>
                         {cancelText ?? t('cancel')}
-                    </button>
-                    <button type="button" className={cx('btnConfirm', variant)} onClick={onConfirm}>
+                    </ButtonPrime>
+                    <ButtonPrime
+                        variant={CONFIRM_VARIANT[variant as keyof typeof CONFIRM_VARIANT] ?? 'primary'}
+                        size="lg"
+                        className={cx('btnConfirm')}
+                        onClick={onConfirm}
+                    >
                         {confirmText ?? t('confirm')}
-                    </button>
+                    </ButtonPrime>
                 </div>
             </div>
         </div>,

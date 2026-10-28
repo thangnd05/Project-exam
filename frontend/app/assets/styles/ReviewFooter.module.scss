@@ -142,27 +142,6 @@
   }
 }
 
-.btnToggleInfo {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
-  border-radius: var(--radius-pill);
-  border: 2px solid var(--primary);
-  background: var(--bg-white);
-  color: var(--primary-text);
-  font-weight: 700;
-  font-size: var(--font-size-ssm);
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover,
-  &.active {
-    background: var(--primary);
-    color: var(--white);
-  }
-}
-
 .footerScore {
   display: inline-flex;
   align-items: center;

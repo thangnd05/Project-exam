@@ -16,8 +16,8 @@
 .card {
   margin-bottom: 20px;
   padding: 24px;
-  border: 1px solid var(--slate-200);
-  border-radius: 16px;
+  border: 1px solid var(--slate-300);
+  border-radius: 8px;
   background: var(--bg-white);
 
   @include down(md) {
@@ -73,94 +73,6 @@
   color: var(--slate-500);
 }
 
-/* ---------- Nút ---------- */
-
-.btnPrimary,
-.btnSecondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 18px;
-  border-radius: var(--radius-pill);
-  font-family: var(--font-family);
-  font-size: var(--font-size-smd);
-  white-space: nowrap;
-  text-align: center;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background-color 0.2s ease, filter 0.2s ease;
-
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
-}
-
-.btnSm {
-  padding: 6px 14px;
-  font-size: var(--font-size-sm);
-}
-
-// Nút chính graphite giống "Thi nhanh"; ở dark mode token brand đảo thành nền sáng chữ tối.
-.btnPrimary {
-  border: none;
-  background: var(--brand-800);
-  font-weight: 700;
-  color: var(--brand-50);
-
-  &:hover:not(:disabled) {
-    filter: brightness(0.85);
-    color: var(--brand-50);
-  }
-
-  @include dark-theme {
-    &:hover:not(:disabled) {
-      filter: brightness(1.08);
-    }
-  }
-}
-
-.btnSecondary {
-  border: 1px solid var(--slate-200);
-  background: var(--slate-100);
-  font-weight: 600;
-  color: var(--slate-700);
-
-  &:hover:not(:disabled) {
-    background: var(--slate-200);
-    color: var(--slate-900);
-  }
-}
-
-.textBtn,
-.dangerText {
-  padding: 0;
-  border: none;
-  background: none;
-  font-family: var(--font-family);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    text-decoration: underline;
-  }
-
-  &:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
-}
-
-.textBtn {
-  color: var(--brand-700);
-}
-
-.dangerText {
-  color: var(--danger-text);
-}
-
 /* ---------- Nhãn trạng thái ---------- */
 
 .pill {
@@ -168,7 +80,7 @@
   align-items: center;
   padding: 2px 10px;
   border: 1px solid var(--slate-200);
-  border-radius: var(--radius-pill);
+  border-radius: 4px;
   background: var(--slate-50);
   font-size: var(--font-size-xs2);
   font-weight: 600;
@@ -211,7 +123,7 @@
   margin-bottom: 20px;
   padding: 14px 18px;
   border: 1px solid var(--slate-200);
-  border-radius: 12px;
+  border-radius: 4px;
   background: var(--bg-white);
   font-size: var(--font-size-smd);
   line-height: 1.55;
@@ -258,7 +170,7 @@
   padding: 56px 32px;
   text-align: center;
   border: 2px dashed var(--slate-300);
-  border-radius: 16px;
+  border-radius: 8px;
   background: var(--bg-white);
 
   h2,
@@ -291,7 +203,7 @@
   height: 120px;
   margin-bottom: 20px;
   border: 1px solid var(--slate-200);
-  border-radius: 16px;
+  border-radius: 8px;
   background: linear-gradient(90deg, var(--slate-100) 0%, var(--bg-white) 45%, var(--slate-100) 100%);
   background-size: 180% 100%;
   animation: shimmer 1.4s ease-in-out infinite;

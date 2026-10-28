@@ -199,48 +199,10 @@
   }
 }
 
+// Màu/khuôn nút lấy từ ButtonPrime (ink + outline); ở đây chỉ giữ nút không co, không xuống dòng.
 .actionBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  width: fit-content;
   flex: 0 0 auto;
-  padding: 12px 22px;
-  border-radius: 14px;
-  font-size: var(--font-size-base);
-  font-weight: 700;
-  background: var(--bg-white);
-  color: var(--brand-700);
-  border: none;
-  cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s ease;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    color: var(--primary-text-hover);
-  }
-
-  @include down(sm) {
-    padding: 10px 16px;
-    font-size: var(--font-size-ssm);
-    border-radius: 12px;
-  }
-
-  &.secondary {
-    background: var(--on-hero-soft);
-    color: var(--white);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: none;
-
-    &:hover {
-      background: var(--on-hero-track);
-      border-color: rgba(255, 255, 255, 0.4);
-      color: var(--white);
-    }
-  }
 }
 
 .viewToggle {
@@ -259,37 +221,17 @@
   }
 }
 
+// Nút chuyển kiểu xem là ButtonPrime size icon (đang chọn: outline nền trắng, còn lại ghost);
+// ở đây chỉ giữ kích thước ô và cỡ icon.
 .toggleBtn {
   width: 46px;
   height: 46px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 12px;
   font-size: var(--font-size-xxl);
-  color: var(--on-hero-subtle);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    color: var(--on-hero);
-    background: var(--on-hero-soft);
-  }
-
-  &.active {
-    background: var(--bg-white);
-    color: var(--brand-700);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    transform: scale(1.05);
-  }
 
   @include down(sm) {
     width: 40px;
     height: 40px;
     font-size: var(--font-size-xl);
-    border-radius: 10px;
   }
 }
 
@@ -377,43 +319,6 @@
 
     @include down(md) {
       flex-wrap: wrap;
-    }
-  }
-
-  .actionBtn {
-    gap: 6px;
-    padding: 10px 18px;
-    border-radius: var(--radius-pill);
-    font-size: var(--font-size-smd);
-    background: var(--brand-800);
-    color: var(--brand-50);
-    box-shadow: none;
-    transition: filter 0.2s ease, background-color 0.2s ease;
-
-    &:hover {
-      transform: none;
-      box-shadow: none;
-      filter: brightness(0.85);
-      color: var(--brand-50);
-    }
-
-    @include dark-theme {
-      &:hover {
-        filter: brightness(1.08);
-      }
-    }
-
-    &.secondary {
-      background: transparent;
-      border: 1px solid var(--slate-300);
-      color: var(--slate-700);
-
-      &:hover {
-        filter: none;
-        background: var(--slate-50);
-        border-color: var(--slate-400);
-        color: var(--slate-900);
-      }
     }
   }
 }

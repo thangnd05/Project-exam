@@ -1,23 +1,23 @@
 @import 'app/assets/styles/mixins.scss';
 
+// Nút là ButtonPrime brand size icon; ở đây chỉ giữ vị trí cố định, kích thước ô và hiệu ứng ẩn/hiện.
 .scrollTopBtn {
   position: fixed;
   bottom: 20px;
   right: 20px;
+  z-index: var(--z-floating);
   width: 45px;
   height: 45px;
-  background: var(--primary);
-  color: var(--white);
-  border: 2px solid var(--primary);
-  border-radius: 6px;
-  font-size: var(--font-size-xl);
-  cursor: pointer;
-  box-shadow: 0 4px 8px var(--primary-alpha-20);
-  z-index: var(--z-floating);
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transform: translateY(14px) scale(0.88);
+
+  @include down(lg) {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+// Trạng thái ẩn/hiện viết dạng 2 class (:not(.visible) / .visible) để thắng transition, transform của
+// ButtonPrime bất kể thứ tự nạp CSS module.
+.scrollTopBtn:not(.visible),
+.scrollTopBtn.visible {
   transition:
     opacity 0.35s ease,
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
@@ -26,36 +26,39 @@
     color 0.25s ease,
     border-color 0.25s ease,
     box-shadow 0.25s ease;
+}
 
-  &.visible {
-    opacity: 0.95;
-    visibility: visible;
-    pointer-events: auto;
-    transform: translateY(0) scale(1);
-  }
+.scrollTopBtn:not(.visible) {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(14px) scale(0.88);
+}
 
-  &.visible:hover {
+.scrollTopBtn.visible {
+  opacity: 0.95;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+
+  &:hover:not(:disabled) {
     transform: translateY(-2px) scale(1);
-    box-shadow: 0 6px 12px var(--primary-alpha-28);
   }
 
-  &.visible:active {
+  &:active:not(:disabled) {
     transform: translateY(0) scale(0.96);
-    box-shadow: 0 3px 6px var(--primary-alpha-15);
   }
+}
 
-  @include down(lg) {
-    bottom: calc(72px + env(safe-area-inset-bottom, 0px));
-  }
-
-  @media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
+  .scrollTopBtn:not(.visible),
+  .scrollTopBtn.visible {
     transition: opacity 0.15s ease, visibility 0.15s;
     transform: none;
+  }
 
-    &.visible,
-    &.visible:hover,
-    &.visible:active {
-      transform: none;
-    }
+  .scrollTopBtn.visible:hover:not(:disabled),
+  .scrollTopBtn.visible:active:not(:disabled) {
+    transform: none;
   }
 }

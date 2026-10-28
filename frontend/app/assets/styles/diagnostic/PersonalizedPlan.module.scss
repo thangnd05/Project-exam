@@ -49,39 +49,6 @@
   flex-wrap: wrap;
 }
 
-.btn {
-  @include globalStyles.buttonBase;
-  @include globalStyles.buttonSizeMd;
-}
-
-.btnPrimary {
-  @include globalStyles.buttonBrand;
-}
-
-.btnSuccess {
-  @include globalStyles.buttonSuccess;
-}
-
-.btnDanger {
-  @include globalStyles.buttonDanger;
-}
-
-.btnOutline {
-  @include globalStyles.buttonOutline;
-}
-
-.btnGhost {
-  @include globalStyles.buttonGhost;
-}
-
-.btnLg {
-  @include globalStyles.buttonSizeLg;
-}
-
-.btnSm {
-  @include globalStyles.buttonSizeSm;
-}
-
 .pickTitle {
   font-size: var(--font-size-xl);
   margin-bottom: 0.8rem;
@@ -1048,12 +1015,10 @@
   padding-top: 1.2rem;
 }
 
+// Nút học trong thẻ chặng: màu/khuôn từ ButtonPrime, ở đây chỉ chia chỗ trong hàng.
 .stageCta {
   flex: 1 1 auto;
-  justify-content: center;
   min-width: 12rem;
-  padding: 0.85rem 1.4rem;
-  font-size: var(--font-size-ssm);
 }
 
 .taskBadges {
@@ -1541,27 +1506,6 @@
   color: var(--on-hero-subtle);
   opacity: 1;
   white-space: nowrap;
-}
-
-.planHeroCta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 1.1rem 2.2rem;
-  border-radius: var(--radius-md);
-  background: var(--white);
-  color: var(--primary-btn-fg);
-  font-size: var(--font-size-md);
-  font-weight: var(--font-weight-bold);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
-  transition: transform 0.15s, box-shadow 0.15s;
-  white-space: nowrap;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
-    color: var(--primary-btn-fg);
-  }
 }
 
 .planHeroProgressLabel {

@@ -1,6 +1,7 @@
 'use client';
 
 import classNames from 'classnames/bind';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './PageHeader.module.scss';
 
 const cx = classNames.bind(styles);
@@ -70,16 +71,16 @@ const PageHeader = ({
         {(onAction || onSecondaryAction || children) && (
           <div className={cx('actions-wrapper')}>
             {onAction && actionText && (
-              <button type="button" className={cx('actionBtn')} onClick={onAction}>
+              <ButtonPrime variant="ink" className={cx('actionBtn')} onClick={onAction}>
                 {showIcons && Icon && <Icon size={24} />}
                 {actionText}
-              </button>
+              </ButtonPrime>
             )}
             {onSecondaryAction && secondaryActionText && (
-              <button type="button" className={cx('actionBtn', 'secondary')} onClick={onSecondaryAction}>
+              <ButtonPrime variant="outline" className={cx('actionBtn')} onClick={onSecondaryAction}>
                 {showIcons && SecondaryIcon && <SecondaryIcon size={24} />}
                 {secondaryActionText}
-              </button>
+              </ButtonPrime>
             )}
             {children}
           </div>

@@ -2,6 +2,7 @@
 
 import {useEffect, useState} from 'react';
 import classNames from 'classnames/bind';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './ScrollToTop.module.scss';
 import { ArrowUp } from 'lucide-react';
 import { useTranslations } from 'next-intl';
@@ -27,16 +28,17 @@ function ScrollToTop() {
   };
 
   return (
-    <button
-      type="button"
+    <ButtonPrime
+      variant="brand"
+      size="icon"
       className={cx('scrollTopBtn', {visible: showScroll})}
       onClick={scrollToTop}
       aria-label={t('scrollToTop')}
       aria-hidden={!showScroll}
       tabIndex={showScroll ? 0 : -1}
     >
-      <ArrowUp size="1em" />
-    </button>
+      <ArrowUp size={20} />
+    </ButtonPrime>
   );
 }
 

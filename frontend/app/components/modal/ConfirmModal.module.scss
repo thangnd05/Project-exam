@@ -56,25 +56,6 @@
             letter-spacing: -0.3px;
         }
     }
-
-    .closeBtn {
-        background: var(--on-primary-gradient-soft);
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--on-primary-gradient);
-        font-size: var(--font-size-xl);
-        cursor: pointer;
-        transition: all 0.2s;
-
-        &:hover {
-            background: rgb(var(--brand-900-rgb) / 0.14);
-        }
-    }
 }
 
 .body {
@@ -129,78 +110,10 @@
     display: flex;
     gap: 12px;
 
+    // Hai nút chia đều chiều ngang footer.
     .btnCancel,
     .btnConfirm {
         flex: 1;
-        padding: 14px;
-        font-weight: 700;
-        font-size: var(--font-size-ssm);
-        border-radius: 14px;
-        border: none;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .btnCancel {
-        background: var(--slate-100);
-        color: var(--slate-600);
-
-        &:hover {
-            background: var(--slate-200);
-            color: var(--slate-800);
-        }
-    }
-
-    .btnConfirm {
-        color: var(--on-primary-gradient);
-
-        &.primary {
-            background: var(--primary-gradient);
-            box-shadow: 0 4px 15px rgb(var(--primary-rgb) / 0.25);
-
-            &:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px var(--primary-alpha-35);
-            }
-        }
-
-        &.danger {
-            color: var(--white);
-            background: var(--red-500);
-            box-shadow: 0 4px 15px rgb(var(--red-500-rgb) / 0.3);
-
-            &:hover {
-                background: var(--red-600);
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgb(var(--red-500-rgb) / 0.4);
-            }
-        }
-
-        &.warning {
-            color: var(--white);
-            background: var(--warning);
-            box-shadow: 0 4px 15px rgb(var(--warning-rgb) / 0.3);
-
-            &:hover {
-                background: var(--warning-700);
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgb(var(--warning-rgb) / 0.4);
-            }
-        }
-
-        &.success {
-            background: var(--green-600);
-            box-shadow: 0 4px 15px rgb(var(--green-600-rgb) / 0.3);
-
-            &:hover {
-                background: var(--green-700);
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px rgb(var(--green-600-rgb) / 0.4);
-            }
-        }
     }
 }
 

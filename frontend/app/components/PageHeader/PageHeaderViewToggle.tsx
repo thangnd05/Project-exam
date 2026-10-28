@@ -2,6 +2,7 @@
 
 import classNames from 'classnames/bind';
 import type { LucideIcon } from 'lucide-react';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './PageHeader.module.scss';
 
 const cx = classNames.bind(styles);
@@ -24,16 +25,20 @@ function PageHeaderViewToggle({options, activeKey, onChange}: PageHeaderViewTogg
       {options.map((option) => {
         const Icon = option.icon;
 
+        const active = activeKey === option.key;
+
         return (
-          <button
+          <ButtonPrime
             key={option.key}
-            type="button"
-            className={cx('toggleBtn', {active: activeKey === option.key})}
+            variant={active ? 'outline' : 'ghost'}
+            size="icon"
+            className={cx('toggleBtn')}
             onClick={() => onChange(option.key)}
             title={option.title}
+            aria-pressed={active}
           >
             {Icon ? <Icon size="1em" /> : null}
-          </button>
+          </ButtonPrime>
         );
       })}
     </div>

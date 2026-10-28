@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import { X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './BaseModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -21,7 +22,8 @@ type BaseModalProps = {
   closeOnEsc?: boolean;
   showCloseButton?: boolean;
   // plain: header phẳng cùng nền modal, có đường kẻ ngăn cách thay cho dải gradient.
-  variant?: 'default' | 'plain';
+  // exam: như plain nhưng góc vuông vắn, nút tách hai bên, khớp thẻ hướng dẫn của phòng thi.
+  variant?: 'default' | 'plain' | 'exam';
   children?: React.ReactNode;
 };
 
@@ -69,7 +71,7 @@ function BaseModal({
       onClick={closeOnOverlay ? onClose : undefined}
     >
       <div
-        className={cx('modalContent', {plain: variant === 'plain'})}
+        className={cx('modalContent', {plain: variant !== 'default', exam: variant === 'exam'})}
         style={maxWidth ? {maxWidth} : undefined}
         onClick={(event) => event.stopPropagation()}
       >
@@ -79,14 +81,16 @@ function BaseModal({
             {headerExtra}
           </div>
           {showCloseButton && (
-            <button
-              type="button"
+            <ButtonPrime
+              variant={variant === 'default' ? 'outline' : 'ghost'}
+              size="icon"
+              shape={variant === 'exam' ? 'rounded' : 'pill'}
               className={cx('closeBtn')}
               onClick={onClose}
               aria-label={tCommon('close')}
             >
-              <X size="1em" />
-            </button>
+              <X size={18} />
+            </ButtonPrime>
           )}
         </div>
 

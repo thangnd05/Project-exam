@@ -5,38 +5,3 @@
   gap: 12px;
   margin-top: 40px;
 }
-
-.pageBtn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--font-size-ssm);
-  font-weight: 600;
-  color: var(--text-color);
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover:not(.disabled):not(.active) {
-    border-color: var(--primary);
-    color: var(--primary-text);
-    background-color: var(--hover-color);
-  }
-
-  &.active {
-    background: var(--brand-surface);
-    border-color: transparent;
-    color: var(--on-primary-gradient);
-    box-shadow: var(--primary-btn-shadow);
-  }
-
-  &.disabled {
-    color: var(--text-secondary);
-    cursor: default;
-    opacity: 0.6;
-  }
-}

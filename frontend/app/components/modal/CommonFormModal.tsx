@@ -16,6 +16,7 @@ type CommonFormModalProps = {
   children?: React.ReactNode;
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl';
+  variant?: 'default' | 'plain' | 'exam';
 };
 
 function CommonFormModal({
@@ -25,6 +26,7 @@ function CommonFormModal({
   children,
   footer,
   size = 'md',
+  variant,
 }: CommonFormModalProps) {
   return (
     <BaseModal
@@ -33,6 +35,7 @@ function CommonFormModal({
       title={title}
       footer={footer}
       maxWidth={SIZE_MAX_WIDTH[size] || SIZE_MAX_WIDTH.md}
+      variant={variant}
     >
       {children}
     </BaseModal>
