@@ -9,6 +9,7 @@ import Posts from './Posts.json';
 import About from './About.json';
 import Policy from './Policy.json';
 import Service from './Service.json';
+import Contact from './Contact.json';
 import Resources from './Resources.json';
 import Certificates from './Certificates.json';
 import Gamification from './Gamification.json';
@@ -39,6 +40,7 @@ const messages = {
   About,
   Policy,
   Service,
+  Contact,
   Resources,
   Certificates,
   Gamification,

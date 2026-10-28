@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "title": "Contact",
+    "description": "Contact {siteName} for partnerships, advice on your study path or help using the platform."
+  },
+  "title": "Contact {siteShortName}",
+  "intro": "Need help or want to talk to the {siteShortName} team? Email the address that matches your request below for the fastest reply.",
+  "partnership": {
+    "title": "Partnerships",
+    "body": "Training centers, companies or individuals who want to collaborate on content, run exam prep for their team or work with {siteShortName}."
+  },
+  "support": {
+    "title": "Study path & platform guidance",
+    "body": "Questions about choosing a target exam, reading your skill assessment, building a study plan or account issues while using the platform."
+  },
+  "disputes": {
+    "title": "Complaints & disputes",
+    "body": "Reports about question content, scores, certificates or requests related to intellectual property."
+  },
+  "emailLabel": "Email:",
+  "responseTime": "We usually reply within 1–2 business days."
+}

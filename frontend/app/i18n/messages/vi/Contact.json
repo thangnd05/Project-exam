@@ -1,0 +1,22 @@
+{
+  "meta": {
+    "title": "Liên hệ",
+    "description": "Liên hệ với {siteName} để hợp tác, được tư vấn về lộ trình, cách sử dụng nền tảng."
+  },
+  "title": "Liên hệ {siteShortName}",
+  "intro": "Bạn cần hỗ trợ hoặc muốn trao đổi với đội ngũ {siteShortName}? Hãy gửi email theo đúng nhu cầu bên dưới để được phản hồi nhanh nhất.",
+  "partnership": {
+    "title": "Hợp tác",
+    "body": "Trung tâm đào tạo, doanh nghiệp hoặc cá nhân muốn hợp tác nội dung, triển khai luyện thi cho đội ngũ hay đồng hành cùng {siteShortName}."
+  },
+  "support": {
+    "title": "Tư vấn lộ trình & cách sử dụng",
+    "body": "Hỏi về cách chọn kỳ thi mục tiêu, đọc kết quả đánh giá năng lực, xây dựng lộ trình ôn tập hoặc các vấn đề tài khoản khi dùng nền tảng."
+  },
+  "disputes": {
+    "title": "Khiếu nại & tranh chấp",
+    "body": "Phản ánh về nội dung câu hỏi, điểm số, chứng nhận hoặc yêu cầu liên quan đến quyền sở hữu trí tuệ."
+  },
+  "emailLabel": "Email:",
+  "responseTime": "Chúng tôi thường phản hồi trong 1–2 ngày làm việc."
+}
