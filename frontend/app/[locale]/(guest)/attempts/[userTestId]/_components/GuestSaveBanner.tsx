@@ -7,9 +7,8 @@ import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 
 import BaseModal from '@/app/components/modal/BaseModal';
-import { buildLoginUrl } from '@/app/utils/redirect';
+import { buildLoginUrlFromHere } from '@/app/utils/redirect';
 import { clearGuestSessionId, setGuestClaimIntent } from '@/app/utils/guestSession';
-import { buildGeneratePlanUrl, buildTargetUrl } from '@/app/[locale]/(guest)/attempts/[userTestId]/_lib/planFromTest';
 import promptStyles from './GuestSaveBanner.module.scss';
 
 const px = classNames.bind(promptStyles);
@@ -18,10 +17,9 @@ const PROMPT_DELAY_MS = 1200;
 
 type GuestSaveBannerProps = {
   userTestId?: string;
-  examTypeId?: string;
 };
 
-function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
+function GuestSaveBanner({ userTestId }: GuestSaveBannerProps) {
   const router = useRouter();
   const t = useTranslations('TestTaking.guestSave');
   const [promptOpen, setPromptOpen] = useState(false);
@@ -36,16 +34,10 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
 
   if (!userTestId) return null;
 
-  // Đăng nhập xong bài khách được gắn vào tài khoản (claimGuestAfterLogin),
-  // rồi đi tiếp đặt mục tiêu → sinh lộ trình từ đúng bài vừa làm.
+  // Đăng nhập xong bài khách được gắn vào tài khoản (claimGuestAfterLogin) rồi quay lại đúng trang kết quả này.
   const handleSave = () => {
-    const next = examTypeId
-      ? buildTargetUrl(examTypeId, buildGeneratePlanUrl(userTestId, examTypeId))
-      : `/attempts/${userTestId}`;
     setGuestClaimIntent(userTestId);
-    router.push(buildLoginUrl(next, {
-      flash: t('loginFlash'),
-    }));
+    router.push(buildLoginUrlFromHere(t('loginFlash')));
   };
 
   // Lựa chọn Thoát đã ghi rõ kết quả sẽ bị xóa nên xóa luôn, không hỏi lại lần hai.

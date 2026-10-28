@@ -128,7 +128,7 @@ const TestResult = () => {
     <div className={cx("wrapper")}>
       <Container>
 
-        {isGuest && <GuestSaveBanner userTestId={userTestId} examTypeId={enhanced?.examTypeId} />}
+        {isGuest && <GuestSaveBanner userTestId={userTestId} />}
         <CertificateBanner userTestId={userTestId} enabled={!authLoading && isAuthenticated} />
 
         <div className={cx("result-layout")}>
