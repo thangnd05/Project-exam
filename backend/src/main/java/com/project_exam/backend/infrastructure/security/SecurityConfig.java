@@ -218,8 +218,9 @@ public class SecurityConfig {
                             SecurityContextHolder.clearContext();
                             response.sendRedirect(frontendOrigin + "/oauth2/redirect");
                         })
+                        // Về cùng trang trung gian như khi thành công: frontend biết ngôn ngữ người dùng đang xem để mở đúng trang đăng nhập.
                         .failureHandler((request, response, exception) ->
-                                response.sendRedirect(frontendOrigin + "/login?error=oauth2_failed"))
+                                response.sendRedirect(frontendOrigin + "/oauth2/redirect?error=oauth2_failed"))
                 );
 
         http.addFilterBefore(authRateLimitFilter, UsernamePasswordAuthenticationFilter.class);

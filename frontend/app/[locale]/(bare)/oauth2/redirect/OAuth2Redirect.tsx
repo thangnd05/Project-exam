@@ -28,6 +28,16 @@ function OAuth2Redirect() {
             router.replace(localizeHref(`/login?error=${error}`, locale));
         };
 
+        // Backend báo đăng nhập OAuth thất bại cũng trả về đây (?error=) để quay lại trang đăng nhập đúng ngôn ngữ.
+        // Hẹn sang lượt sau để StrictMode chạy effect hai lần cũng chỉ lấy đích đã lưu một lần.
+        if (new URLSearchParams(window.location.search).has('error')) {
+            const errorTimer = setTimeout(() => fail('oauth2_failed'), 0);
+            return () => {
+                finished = true;
+                clearTimeout(errorTimer);
+            };
+        }
+
         const timeoutId = setTimeout(() => fail('oauth2_timeout'), SYNC_TIMEOUT_MS);
 
         const syncUser = async () => {
