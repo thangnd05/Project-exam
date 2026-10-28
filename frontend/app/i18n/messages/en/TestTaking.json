@@ -85,11 +85,7 @@
     "saveTitle": "Sign in & save results",
     "saveHint": "This attempt is saved to your account and used to build your study plan.",
     "exitTitle": "Exit",
-    "exitHint": "Your results will be permanently deleted.",
-    "confirmTitle": "Delete results and exit?",
-    "confirmMessage": "These results will be permanently deleted. You won’t be able to review them or save them to an account later.",
-    "confirmText": "Delete & exit",
-    "cancelText": "Keep"
+    "exitHint": "Your results will be permanently deleted."
   },
   "history": {
     "empty": {
@@ -206,7 +202,6 @@
     "openFile": "Open file"
   },
   "readinessGauge": {
-    "correctStat": "<strong>{correct}/{total}</strong> answered correctly",
     "beginnerCta": "See the exam structure to start from the fundamentals",
     "fullTestCta": "Take a full mock test to find out exactly where you stand"
   },

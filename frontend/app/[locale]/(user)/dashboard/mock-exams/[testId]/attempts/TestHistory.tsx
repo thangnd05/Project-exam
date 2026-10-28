@@ -1,6 +1,5 @@
 'use client';
 
-import Link from '@/app/i18n/navigation';
 import { Container } from 'react-bootstrap';
 import classNamesBind from 'classnames/bind';
 import { useTranslations } from 'next-intl';
@@ -16,6 +15,7 @@ import styles from '../_components/TestPage.module.scss';
 import { useTestHistory } from './_hooks/useTestHistory';
 import { formatDuration, formatScore } from '../_lib/formatAttempt';
 import { formatDateTime } from '@/app/utils/format-date-time';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const cx = classNamesBind.bind(styles);
 const ui = classNamesBind.bind(uiStyles);
@@ -44,7 +44,7 @@ function summarize(attempts: UserTestResponse[]) {
   };
 }
 
-// testRef do page server tra từ slug trên URL (/tests/aws-dop-c02-test-1/history) rồi truyền xuống.
+// testRef do page server tra từ slug trên URL (/dashboard/mock-exams/aws-dop-c02-test-1/attempts) rồi truyền xuống.
 function TestHistory({ testRef }: { testRef: TestRef }) {
   const t = useTranslations('TestTaking.history');
   const { attempts, testInfo, isLoading } = useTestHistory(testRef.testId);
@@ -148,10 +148,10 @@ function TestHistory({ testRef }: { testRef: TestRef }) {
                       </td>
                       <td className={cx('right')}>
                         {a.status === UserTestStatus.COMPLETED ? (
-                          <Link href={`/tests/result/${a.userTestId}`} className={ui('btnSecondary', 'btnSm')}>
+                          <ButtonPrime as="link" variant="soft" size="sm" href={`/attempts/${a.userTestId}`}>
                             {t('viewResult')}
                             <ArrowRight size="1em" aria-hidden="true" />
-                          </Link>
+                          </ButtonPrime>
                         ) : (
                           <span className={cx('dim')}>—</span>
                         )}

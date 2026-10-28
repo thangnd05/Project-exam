@@ -347,7 +347,6 @@ const PersonalQuestionBank = () => {
                                       <ButtonPrime
                                         size="icon"
                                         variant="ghost"
-                                        className={cx('iconBtn')}
                                         onClick={() => setViewingQuestionId(id)}
                                         aria-label={t('bank.viewQuestion', { number: getQuestionDisplayNumber(q, idx) })}
                                       >
@@ -356,7 +355,6 @@ const PersonalQuestionBank = () => {
                                       <ButtonPrime
                                         size="icon"
                                         variant="ghost"
-                                        className={cx('iconBtn')}
                                         disabled={isDeleting(id)}
                                         onClick={() => {
                                           setEditingChapterId(chapter.chapterId);
@@ -370,7 +368,6 @@ const PersonalQuestionBank = () => {
                                       <ButtonPrime
                                         size="icon"
                                         variant="dangerGhost"
-                                        className={cx('iconBtn')}
                                         disabled={isDeleting(id)}
                                         onClick={() =>
                                           setDeleteQuestionTarget({
@@ -479,7 +476,6 @@ const PersonalQuestionBank = () => {
                                     <ButtonPrime
                                       size="icon"
                                       variant="ghost"
-                                      className={cx('iconBtn')}
                                       onClick={() => setViewingQuestionId(id)}
                                       aria-label={t('bank.viewQuestion', { number: getQuestionDisplayNumber(q, idx) })}
                                     >
@@ -490,7 +486,6 @@ const PersonalQuestionBank = () => {
                                         <ButtonPrime
                                           size="icon"
                                           variant="ghost"
-                                          className={cx('iconBtn')}
                                           disabled={isDeleting(id)}
                                           onClick={() => {
                                             setEditingPartId(part.examPartId);
@@ -504,7 +499,6 @@ const PersonalQuestionBank = () => {
                                         <ButtonPrime
                                           size="icon"
                                           variant="dangerGhost"
-                                          className={cx('iconBtn')}
                                           disabled={isDeleting(id)}
                                           onClick={() =>
                                             setDeleteQuestionTarget({

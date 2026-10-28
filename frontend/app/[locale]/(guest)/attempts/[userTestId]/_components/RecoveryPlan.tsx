@@ -2,10 +2,11 @@
 
 import { useRouter } from '@/app/i18n/navigation';
 import classNames from 'classnames/bind';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { useTranslations } from 'next-intl';
 import { buildPracticeRecoveryMessage, buildRecoveryMessage } from '@/app/features/my-target/readiness-label';
 import type { PartBreakdownResponse } from '@/app/types';
-import { buildPlanFromTestUrl, buildGeneratePlanUrl } from '@/app/[locale]/(guest)/tests/result/[userTestId]/_lib/planFromTest';
+import { buildPlanFromTestUrl, buildGeneratePlanUrl } from '@/app/[locale]/(guest)/attempts/[userTestId]/_lib/planFromTest';
 import styles from './Result.module.scss';
 
 const cx = classNames.bind(styles);
@@ -20,6 +21,8 @@ type RecoveryPlanProps = {
   isGuest?: boolean;
   // Có giá trị khi là bài luyện theo phần: các Part đã luyện kèm % mục tiêu từng Part.
   practiceParts?: PartBreakdownResponse[] | null;
+  // Khung chẩn đoán đã có nút chính (bài thử nhanh: làm đề đầy đủ) thì nút ở đây lùi xuống dạng viền.
+  secondaryCta?: boolean;
 };
 
 function RecoveryPlan({
@@ -31,6 +34,7 @@ function RecoveryPlan({
   readinessLevel,
   isGuest,
   practiceParts,
+  secondaryCta = false,
 }: RecoveryPlanProps) {
   const router = useRouter();
   const t = useTranslations('TestTaking.recoveryPlan');
@@ -52,6 +56,8 @@ function RecoveryPlan({
 
   if (!recoveryMessage && !canCreateTarget && !canCreatePlan && !canSignUp) return null;
 
+  const ctaVariant = secondaryCta ? 'outline' : 'primary';
+
   const handleGoToTarget = () => {
     router.push(buildPlanFromTestUrl({ userTestId, examTypeId, hasTarget: false }));
   };
@@ -69,31 +75,24 @@ function RecoveryPlan({
         <p className={cx('recoveryMessage')}>{recoveryMessage}</p>
       )}
       {canCreateTarget && (
-        <button
-          type="button"
-          className={cx('recoveryPlanCta', 'recoveryTargetCta')}
-          onClick={handleGoToTarget}
-        >
+        <ButtonPrime variant={ctaVariant} size="lg" fullWidth onClick={handleGoToTarget}>
           {t('setTarget')}
-        </button>
+        </ButtonPrime>
       )}
       {canSignUp && (
-        <button
-          type="button"
-          className={cx('recoveryPlanCta')}
+        <ButtonPrime
+          variant={ctaVariant}
+          size="lg"
+          fullWidth
           onClick={() => router.push(buildPlanFromTestUrl({ userTestId, examTypeId, isGuest: true }))}
         >
           {t('signUpForPlan')}
-        </button>
+        </ButtonPrime>
       )}
       {canCreatePlan && (
-        <button
-          type="button"
-          className={cx('recoveryPlanCta')}
-          onClick={handleGoToPlan}
-        >
+        <ButtonPrime variant={ctaVariant} size="lg" fullWidth onClick={handleGoToPlan}>
           {t('createPlan')}
-        </button>
+        </ButtonPrime>
       )}
     </div>
   );

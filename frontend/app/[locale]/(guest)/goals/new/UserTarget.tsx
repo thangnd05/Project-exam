@@ -1,6 +1,6 @@
 'use client';
 
-import Link, { useRouter } from '@/app/i18n/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'react-toastify';
@@ -27,6 +27,7 @@ import { buildLoginUrl } from '@/app/features/auth/authRedirect';
 import type { MilestoneResponse } from '@/app/types';
 import { useCurrentUserTarget, useUserTargetData } from './_hooks/useUserTargetData';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {
   useSaveUserTarget,
   useDeleteUserTarget,
@@ -68,12 +69,16 @@ function UserTarget() {
     setPrevExamTypeIdFromQuery(examTypeIdFromQuery);
     if (examTypeIdFromQuery) setSelectedExamTypeId(examTypeIdFromQuery);
   }
+  // URL không chỉ kỳ thi nào: chọn sẵn kỳ thi đầu tiên thay vì để trang trống.
+  if (!selectedExamTypeId && !examTypeIdFromQuery && examTypes.length > 0) {
+    setSelectedExamTypeId(examTypes[0].examTypeId);
+  }
 
   // Được điều hướng tới đây chỉ để đặt mục tiêu thì giữ đúng bước tiếp theo của luồng cũ.
   const nextAfterTarget = useMemo(() => {
     const next = searchParams.get('next');
     if (next && next.startsWith('/') && !next.startsWith('//')) return next;
-    return withExam('/learning-plans/generate', selectedExamTypeId, examTypes);
+    return withExam('/learning-paths/create', selectedExamTypeId, examTypes);
   }, [searchParams, selectedExamTypeId, examTypes]);
 
   const {
@@ -177,7 +182,7 @@ function UserTarget() {
       // Giữ cả next để đăng nhập xong quay lại đây, lưu xong vẫn đi tiếp đúng luồng.
       const backParams = setExamParam(searchParams, selectedExamTypeId, examTypes);
       router.push(
-        buildLoginUrl(`/my-target?${backParams.toString()}`, {
+        buildLoginUrl(`/goals/new?${backParams.toString()}`, {
           flash: t('setTarget.toast.loginRequired'),
         }),
       );
@@ -333,9 +338,9 @@ function UserTarget() {
       )}
 
       <div className={cx('summaryActions')}>
-        <button
+        <ButtonPrime
+          variant="ink"
           type="button"
-          className={ui('btnPrimary')}
           onClick={handleSave}
           disabled={loading || !targetScore}
         >
@@ -344,22 +349,23 @@ function UserTarget() {
             : hasSavedTarget
               ? t('setTarget.summary.update')
               : t('setTarget.summary.save')}
-        </button>
+        </ButtonPrime>
         {hasSavedTarget && (
-          <Link href={nextAfterTarget} className={ui('btnSecondary')}>
+          <ButtonPrime as="link" variant="soft" href={nextAfterTarget}>
             {t('setTarget.summary.generatePlan')}
             <ArrowRight size="1em" aria-hidden="true" />
-          </Link>
+          </ButtonPrime>
         )}
         {hasSavedTarget && (
-          <button
-            type="button"
-            className={classNames(ui('dangerText'), cx('deleteBtn'))}
+          <ButtonPrime
+            variant="dangerGhost"
+            size="sm"
+            className={cx('deleteBtn')}
             onClick={handleDelete}
             disabled={loading}
           >
             {t('setTarget.summary.delete')}
-          </button>
+          </ButtonPrime>
         )}
       </div>
     </aside>
@@ -393,19 +399,20 @@ function UserTarget() {
               {milestones.length > 0 && (
                 <div className={cx('chips')} role="group" aria-label={t('setTarget.milestonesAriaLabel')}>
                   {milestones.map((m) => (
-                    <button
+                    <ButtonPrime
                       key={m.examTargetMilestoneId}
-                      type="button"
+                      variant={Number(targetScore) === m.milestoneScore ? 'ink' : 'outline'}
+                      size="sm"
+                      className={cx('chip')}
                       title={m.description || undefined}
                       aria-pressed={Number(targetScore) === m.milestoneScore}
-                      className={cx('chip', { active: Number(targetScore) === m.milestoneScore })}
                       onClick={() => {
                         setTargetScore(String(m.milestoneScore));
                         setCustomParts({});
                       }}
                     >
                       {m.milestoneScore}
-                    </button>
+                    </ButtonPrime>
                   ))}
                 </div>
               )}
@@ -496,15 +503,16 @@ function UserTarget() {
                             />
                             <span>%</span>
                           </label>
-                          <button
-                            type="button"
-                            className={classNames(ui('textBtn'), cx('resetBtn', { hidden: !isCustom }))}
+                          <ButtonPrime
+                            variant="link"
+                            size="sm"
+                            className={cx('resetBtn', { hidden: !isCustom })}
                             onClick={() => handleResetPart(pr.examPartId)}
                             tabIndex={isCustom ? undefined : -1}
                             aria-hidden={!isCustom}
                           >
                             {t('setTarget.advanced.reset')}
-                          </button>
+                          </ButtonPrime>
                         </div>
                       </div>
                     );

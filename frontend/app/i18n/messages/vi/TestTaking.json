@@ -85,11 +85,7 @@
     "saveTitle": "Đăng nhập & lưu kết quả",
     "saveHint": "Bài vừa làm được lưu vào tài khoản và dùng để lập lộ trình ôn tập.",
     "exitTitle": "Thoát",
-    "exitHint": "Kết quả của bạn sẽ bị xóa vĩnh viễn.",
-    "confirmTitle": "Xóa kết quả và thoát?",
-    "confirmMessage": "Kết quả bài làm này sẽ bị xóa vĩnh viễn, bạn không thể xem lại hay lưu vào tài khoản sau này.",
-    "confirmText": "Xóa & thoát",
-    "cancelText": "Giữ lại"
+    "exitHint": "Kết quả của bạn sẽ bị xóa vĩnh viễn."
   },
   "history": {
     "empty": {
@@ -206,7 +202,6 @@
     "openFile": "Mở file"
   },
   "readinessGauge": {
-    "correctStat": "Trả lời đúng <strong>{correct}/{total}</strong> câu",
     "beginnerCta": "Xem cấu trúc kỳ thi để bắt đầu từ nền tảng",
     "fullTestCta": "Làm một đề thi thử đầy đủ để biết chính xác trình độ của bạn"
   },

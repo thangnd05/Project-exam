@@ -1,6 +1,6 @@
 'use client';
 
-import Link, { useRouter } from '@/app/i18n/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import { examTypeIdFromParams, setExamParam, useNormalizeExamParam } from '@/app/features/exam-types/hooks/useExamParam';
 import { useEffect, useMemo, useState } from 'react';
@@ -25,6 +25,7 @@ import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './GeneratePlan.module.scss';
 import type { PlanResponse } from '@/app/types';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {
   useActivePlan,
   useCompletedUserTests,
@@ -64,7 +65,8 @@ function GeneratePlan() {
   const requireLogin = () => router.push(buildLoginUrlFromHere(t('generate.loginRequired')));
 
   const forcedSyllabus = searchParams.get('source') === 'syllabus';
-  const userTestIdFromUrl = searchParams.get('userTestId') || '';
+  // ?attempt=<userTestId>; link cũ dùng ?userTestId= vẫn đọc được.
+  const userTestIdFromUrl = searchParams.get('attempt') || searchParams.get('userTestId') || '';
 
   const [userTestId, setUserTestId] = useState(userTestIdFromUrl);
   const [planSource, setPlanSource] = useState<PlanSource>(
@@ -205,7 +207,7 @@ function GeneratePlan() {
         // Sinh xong thì đưa thẳng vào lộ trình mới, người mới không phải tự tìm trong danh sách.
         if (!data?.targetAchieved && data?.learningPlanId) {
           setNavigating(true);
-          router.push(`/learning-plans/${data.learningPlanId}`);
+          router.push(`/dashboard/learning-paths/${data.learningPlanId}`);
           return;
         }
         setResult(data);
@@ -251,9 +253,9 @@ function GeneratePlan() {
       return (
         <div className={ui('notice', 'noticeInfo')}>
           <span>{t('generate.picker.guestNotice')}</span>
-          <button type="button" className={ui('btnPrimary', 'btnSm')} onClick={requireLogin}>
+          <ButtonPrime variant="ink" size="sm" type="button" onClick={requireLogin}>
             {t('common.login')}
-          </button>
+          </ButtonPrime>
         </div>
       );
     }
@@ -266,12 +268,14 @@ function GeneratePlan() {
           <span>
             {t('generate.picker.noTests')}
           </span>
-          <Link
+          <ButtonPrime
+            as="link"
+            variant="soft"
+            size="sm"
             href={sourceExamTypeId ? buildExamTypeDetailPath(sourceExamTypeId) : routes.examTypes}
-            className={ui('btnSecondary', 'btnSm')}
           >
             {t('generate.picker.chooseTest')}
-          </Link>
+          </ButtonPrime>
         </div>
       );
     }
@@ -283,9 +287,9 @@ function GeneratePlan() {
               exam: sourceExamTypeName || t('generate.picker.selectedExamFallback'),
             })}
           </span>
-          <Link href={buildExamTypeDetailPath(sourceExamTypeId)} className={ui('btnSecondary', 'btnSm')}>
+          <ButtonPrime as="link" variant="soft" size="sm" href={buildExamTypeDetailPath(sourceExamTypeId)}>
             {t('generate.picker.viewExams')}
-          </Link>
+          </ButtonPrime>
         </div>
       );
     }
@@ -339,9 +343,9 @@ function GeneratePlan() {
               error: targetError,
             })}
           </span>
-          <button type="button" className={ui('btnSecondary', 'btnSm')} onClick={() => refetchTarget()}>
+          <ButtonPrime variant="soft" size="sm" type="button" onClick={() => refetchTarget()}>
             {t('common.retry')}
-          </button>
+          </ButtonPrime>
         </div>
       )}
 
@@ -353,18 +357,20 @@ function GeneratePlan() {
               strong: (chunks) => <strong>{chunks}</strong>,
             })}
           </span>
-          <Link
-            href={`/my-target?${new URLSearchParams({
+          <ButtonPrime
+            as="link"
+            variant="ink"
+            size="sm"
+            href={`/goals/new?${new URLSearchParams({
               examTypeId: sourceExamTypeId,
               next: `${routes.generatePlan}?${new URLSearchParams({
                 examTypeId: sourceExamTypeId,
-                ...(userTestId ? { userTestId } : {}),
+                ...(userTestId ? { attempt: userTestId } : {}),
               }).toString()}`,
             }).toString()}`}
-            className={ui('btnPrimary', 'btnSm')}
           >
             {t('generate.noTarget.setTarget')}
-          </Link>
+          </ButtonPrime>
         </div>
       )}
 
@@ -420,16 +426,16 @@ function GeneratePlan() {
           )}
 
           <div className={cx('submitRow')}>
-            <button type="submit" className={ui('btnPrimary')} disabled={submitDisabled}>
+            <ButtonPrime variant="ink" type="submit" disabled={submitDisabled}>
               {submitting ? t('generate.form.submitting') : t('generate.form.submit')}
-            </button>
+            </ButtonPrime>
             {isGuest && (
               <span className={ui('hint')}>
                 {t.rich('generate.form.guestHint', {
                   login: (chunks) => (
-                    <button type="button" className={ui('textBtn')} onClick={requireLogin}>
+                    <ButtonPrime variant="link" size="sm" onClick={requireLogin}>
                       {chunks}
-                    </button>
+                    </ButtonPrime>
                   ),
                 })}
               </span>

@@ -94,48 +94,8 @@
 
 .btn-view {
   margin-top: 18px;
-  width: 100%;
-  background: var(--slate-100);
-  color: var(--dark-color);
-  padding: 10px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: var(--font-size-ssm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.3s;
-  border: none;
-
-  &:hover {
-    background: var(--primary);
-    color: var(--white);
-  }
 }
 
 .btn-manage-members {
   margin-top: 10px;
-  width: 100%;
-  background: var(--bg-white);
-  color: var(--primary-text);
-  padding: 10px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: var(--font-size-ssm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: all 0.3s;
-  border: 2px solid var(--primary);
-
-  svg {
-    font-size: var(--font-size-base);
-  }
-
-  &:hover {
-    background: var(--primary);
-    color: var(--white);
-  }
 }

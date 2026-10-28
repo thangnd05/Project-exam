@@ -162,34 +162,6 @@ $transition: all 0.3s ease;
     display: none;
 }
 
-.playBtn {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: var(--bg-white);
-    border: 3px solid rgba(255, 255, 255, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: $shadow-md;
-
-    &:hover {
-        transform: scale(1.1);
-        background: rgb(var(--surface-rgb) / 0.95);
-        box-shadow: $shadow-lg;
-    }
-
-    &:active {
-        transform: scale(0.95);
-    }
-
-    svg {
-        color: $primary;
-    }
-}
-
 .answerSection {
     padding: 2rem;
 }
@@ -505,11 +477,6 @@ $transition: all 0.3s ease;
 
     .audioPlayer {
         width: 100%;
-    }
-
-    .playBtn {
-        width: 44px;
-        height: 44px;
     }
 
     .toast {

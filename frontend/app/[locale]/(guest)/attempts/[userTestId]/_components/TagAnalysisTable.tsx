@@ -4,6 +4,7 @@ import { useRouter } from '@/app/i18n/navigation';
 import { useMemo, useState } from "react";
 import classNames from "classnames/bind";
 import { useLocale, useTranslations } from "next-intl";
+import ButtonPrime from "@/app/components/Button/ButtonPrime";
 import styles from "./TagAnalysisTable.module.scss";
 import type { EnhancedResultResponse, TagBreakdownResponse } from '@/app/types';
 import { EMPTY_LIST } from '@/app/utils/stableEmpty';
@@ -66,7 +67,7 @@ function TagAnalysisTable({ enhanced, userTestId }: TagAnalysisTableProps) {
   if (!hasData) return null;
 
   const goToQuestion = (questionId: string) => {
-    router.push(`/tests/result/${userTestId}/review#rq-${questionId}`);
+    router.push(`/attempts/${userTestId}/review#rq-${questionId}`);
   };
 
   return (
@@ -75,14 +76,15 @@ function TagAnalysisTable({ enhanced, userTestId }: TagAnalysisTableProps) {
 
       <div className={cx("tabs")}>
         {tabs.map((tab) => (
-          <button
+          <ButtonPrime
             key={tab.key}
-            type="button"
-            className={cx("tab", { active: tab.key === current?.key })}
+            variant={tab.key === current?.key ? "ink" : "soft"}
+            size="sm"
+            aria-pressed={tab.key === current?.key}
             onClick={() => setActive(tab.key)}
           >
             {tab.label}
-          </button>
+          </ButtonPrime>
         ))}
       </div>
 

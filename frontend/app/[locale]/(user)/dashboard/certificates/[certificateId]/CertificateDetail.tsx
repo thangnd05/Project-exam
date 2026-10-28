@@ -58,7 +58,7 @@ function CertificateDetail() {
             title={tCommon('loadErrorTitle')}
             description={t('certificateDetail.notFound')}
             action={
-              <ButtonPrime variant="primary" onClick={() => router.push('/my-certificates')}>
+              <ButtonPrime variant="primary" onClick={() => router.push('/dashboard/certificates')}>
                 {t('certificateDetail.backToList')}
               </ButtonPrime>
             }
@@ -91,7 +91,7 @@ function CertificateDetail() {
         />
 
         <div className={cx('toolbar')}>
-          <ButtonPrime variant="ghost" size="sm" onClick={() => router.push('/my-certificates')}>
+          <ButtonPrime variant="ghost" size="sm" onClick={() => router.push('/dashboard/certificates')}>
             <ArrowLeft size={16} /> {t('certificates.myCertificates')}
           </ButtonPrime>
         </div>

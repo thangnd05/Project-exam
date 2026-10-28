@@ -160,7 +160,9 @@ function ProfileOverview() {
                   <div className={cx('metaList')}>
                     <span className={cx('metaItem')}>
                       <span className={cx('metaLabel')}>{t('profile.email')}</span>
-                      {profileOverview.email || '--'}
+                      <span className={cx('metaValue')} title={profileOverview.email || undefined}>
+                        {profileOverview.email || '--'}
+                      </span>
                     </span>
                     <span className={cx('metaItem')}>
                       <span className={cx('metaLabel')}>{t('profile.role')}</span>
@@ -200,34 +202,34 @@ function ProfileOverview() {
               <section className={cx('quickActionsCard')}>
                 <h3 className={cx('cardTitle')}>{t('quickActions.title')}</h3>
                 <div className={cx('quickActionsList')}>
-                  <button onClick={() => router.push(routes.examTypes)} className={cx('actionBtn')}>
+                  <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => router.push(routes.examTypes)}>
                     <span>{t('quickActions.newTest')}</span>
-                  </button>
-                  <button onClick={() => router.push(routes.learningPlans)} className={cx('actionBtn')}>
+                  </ButtonPrime>
+                  <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => router.push(routes.learningPlans)}>
                     <span>{t('quickActions.learningPlans')}</span>
-                  </button>
-                  <button onClick={() => router.push(routes.resources)} className={cx('actionBtn')}>
+                  </ButtonPrime>
+                  <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => router.push(routes.resources)}>
                     <span>{t('quickActions.resources')}</span>
-                  </button>
-                  <button onClick={() => router.push(routes.myCertificates)} className={cx('actionBtn')}>
+                  </ButtonPrime>
+                  <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => router.push(routes.myCertificates)}>
                     <span>{t('quickActions.myCertificates')}</span>
-                  </button>
+                  </ButtonPrime>
                   {/* Thẻ ghi nhớ, Lớp học, Ngân hàng câu hỏi, Bài viết đang tạm ẩn trên web nên ẩn luôn lối tắt. */}
-                  {/* <button onClick={() => router.push(routes.myAlbums)} className={cx('actionBtn')}>
+                  {/* <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => router.push(routes.myAlbums)}>
                     <span>{t('quickActions.flashcards')}</span>
-                  </button>
-                  <button onClick={() => router.push(routes.myClasses)} className={cx('actionBtn')}>
+                  </ButtonPrime>
+                  <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => router.push(routes.myClasses)}>
                     <span>{t('quickActions.myClasses')}</span>
-                  </button>
-                  <button onClick={() => router.push(routes.personalQuestionBank)} className={cx('actionBtn')}>
+                  </ButtonPrime>
+                  <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => router.push(routes.personalQuestionBank)}>
                     <span>{t('quickActions.questionBank')}</span>
-                  </button>
-                  <button onClick={() => setActiveSection('posts')} className={cx('actionBtn')}>
+                  </ButtonPrime>
+                  <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => setActiveSection('posts')}>
                     <span>{t('quickActions.myPosts')}</span>
-                  </button>
-                  <button onClick={() => setActiveSection('saved')} className={cx('actionBtn')}>
+                  </ButtonPrime>
+                  <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => setActiveSection('saved')}>
                     <span>{t('quickActions.savedPosts')}</span>
-                  </button> */}
+                  </ButtonPrime> */}
                 </div>
               </section>
             </aside>

@@ -1,6 +1,6 @@
 'use client';
 
-import Link, { useRouter } from '@/app/i18n/navigation';
+import { useRouter } from '@/app/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import { useEffect, useState } from 'react';
@@ -180,7 +180,7 @@ function PlanStudy() {
   }, [selections, answersStorageKey, session?.sessionId]);
 
   const goToPicker = () => {
-    router.push(`/learning-plans/${learningPlanId}`);
+    router.push(`/dashboard/learning-paths/${learningPlanId}`);
   };
 
   const startTask = (taskId: string) => {
@@ -229,7 +229,7 @@ function PlanStudy() {
           if (res?.passed) refreshStreak();
 
           const taskId = taskIdFromUrl || session?.activeTask?.taskId;
-          router.push(`/learning-plans/${learningPlanId}/tasks/${taskId}/result`);
+          router.push(`/dashboard/learning-paths/${learningPlanId}/tasks/${taskId}/result`);
         },
         onError: (err: unknown) =>
           setFormError(
@@ -255,9 +255,9 @@ function PlanStudy() {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
-          <Link href={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
+          <ButtonPrime as="link" variant="ghost" size="sm" href={`/dashboard/learning-paths/${learningPlanId}`}>
             ← {t('common.plan')}
-          </Link>
+          </ButtonPrime>
         </div>
         <div className={cx('alert', 'alertDanger')}>{error || t('study.cannotOpen')}</div>
       </div>
@@ -281,18 +281,22 @@ function PlanStudy() {
             </small>
           </span>
           <div className={cx('actionBar')}>
-            <Link
+            <ButtonPrime
+              as="link"
+              variant="primary"
+              size="sm"
               href={buildExamTypeDetailPath(session.examTypeId)}
-              className={cx('btn', 'btnPrimary', 'btnSm')}
             >
               {t('common.takeMock')}
-            </Link>
-            <Link
-              href={`/learning-plans/${learningPlanId}`}
-              className={cx('btn', 'btnOutline', 'btnSm')}
+            </ButtonPrime>
+            <ButtonPrime
+              as="link"
+              variant="outline"
+              size="sm"
+              href={`/dashboard/learning-paths/${learningPlanId}`}
             >
               {t('common.nextStep')}
-            </Link>
+            </ButtonPrime>
           </div>
         </div>
       </div>
@@ -303,9 +307,9 @@ function PlanStudy() {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
-          <Link href={`/learning-plans/${learningPlanId}`} className={cx('btn', 'btnGhost', 'btnSm')}>
+          <ButtonPrime as="link" variant="ghost" size="sm" href={`/dashboard/learning-paths/${learningPlanId}`}>
             ← {t('common.plan')}
-          </Link>
+          </ButtonPrime>
         </div>
 
         {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
@@ -371,9 +375,9 @@ function PlanStudy() {
       })}
     >
       <div className={cx('headerBar')}>
-        <button type="button" className={cx('btn', 'btnOutline', 'btnSm')} onClick={goToPicker}>
+        <ButtonPrime variant="outline" size="sm" onClick={goToPicker}>
           {t('common.back')}
-        </button>
+        </ButtonPrime>
       </div>
 
       {error && <div className={cx('alert', 'alertDanger')}>{error}</div>}
@@ -502,6 +506,7 @@ function PlanStudy() {
                       </div>
                       <div className={ex('footer-right-group')}>
                         <SubmitBlock
+                          appearance="brand"
                           onSubmit={handleSubmit}
                           isSubmitting={submitting}
                           label={t('study.submit')}

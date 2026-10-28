@@ -139,32 +139,6 @@
   margin-bottom: 16px;
 }
 
-.modeTab {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 16px;
-  border-radius: 10px;
-  border: 1px solid var(--slate-200);
-  background: var(--slate-50);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--slate-500);
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-text);
-  }
-
-  &.active {
-    background: var(--primary-color);
-    color: var(--white);
-    border-color: transparent;
-  }
-}
-
 .randomRow {
   display: flex;
   align-items: center;
@@ -299,23 +273,9 @@
     word-break: break-word;
   }
 
+  // Giữ nút sửa không bị co khi nội dung câu hỏi dài.
   .btnEditQuestion {
-    background: transparent;
-    border: none;
-    color: var(--slate-400);
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
     flex-shrink: 0;
-
-    &:hover {
-      color: var(--primary-text);
-      background: var(--brand-100);
-    }
   }
 }
 

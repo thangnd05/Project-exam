@@ -1,6 +1,5 @@
 'use client';
 
-import Link from '@/app/i18n/navigation';
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
@@ -12,9 +11,9 @@ import EmptyState from '@/app/components/EmptyState/EmptyState';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ExamPillPicker from '@/app/features/my-target/ExamPillPicker/ExamPillPicker';
-import { useLearningPlanList } from '@/app/[locale]/(guest)/learning-plans/generate/_hooks/useLearningPlanList';
-import { useDeletePlan } from '@/app/[locale]/(guest)/learning-plans/generate/_hooks/useDeletePlan';
-import { useSwitchPlan } from '@/app/[locale]/(guest)/learning-plans/generate/_hooks/useSwitchPlan';
+import { useLearningPlanList } from '@/app/[locale]/(guest)/learning-paths/create/_hooks/useLearningPlanList';
+import { useDeletePlan } from '@/app/[locale]/(guest)/learning-paths/create/_hooks/useDeletePlan';
+import { useSwitchPlan } from '@/app/[locale]/(guest)/learning-paths/create/_hooks/useSwitchPlan';
 import { useResyncPlan } from '@/app/features/learning-plans/hooks/useResyncPlan';
 import { parseCode } from '@/app/[locale]/(public)/_lib/certificationMeta';
 import { formatDateTime } from '@/app/utils/format-date-time';
@@ -27,7 +26,7 @@ import {
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './LearningPlanList.module.scss';
 import { LearningPlanStatus } from '@/app/enums';
-import type { PlanListItem } from '@/app/[locale]/(guest)/learning-plans/generate/_hooks/useLearningPlanList';
+import type { PlanListItem } from '@/app/[locale]/(guest)/learning-paths/create/_hooks/useLearningPlanList';
 import { MIN_PLANS_TO_COMPARE, planCompareHref } from '@/app/features/learning-plans/planCompare';
 
 const cx = classNamesBind.bind(styles);
@@ -207,44 +206,48 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
 
         <div className={cx('actions')}>
           {p.targetOutdated && isActive && (
-            <button
+            <ButtonPrime
+              variant="soft"
+              size="sm"
               type="button"
-              className={ui('btnSecondary', 'btnSm')}
               disabled={resyncing === p.learningPlanId}
               title={t('planList.resyncTitle')}
               onClick={() => resyncMutation.mutate(p.learningPlanId)}
             >
               {resyncing === p.learningPlanId ? t('common.updating') : t('planList.resync')}
-            </button>
+            </ButtonPrime>
           )}
           {!isActive && (
-            <button
+            <ButtonPrime
+              variant="soft"
+              size="sm"
               type="button"
-              className={ui('btnSecondary', 'btnSm')}
               disabled={switching === p.learningPlanId}
               onClick={() => setSwitchTarget(p)}
             >
               {switching === p.learningPlanId ? t('planList.switching') : t('planList.switch')}
-            </button>
+            </ButtonPrime>
           )}
-          <Link href={`/learning-plans/${p.learningPlanId}`} className={ui('btnSecondary', 'btnSm')}>
+          <ButtonPrime as="link" variant="soft" size="sm" href={`/dashboard/learning-paths/${p.learningPlanId}`}>
             {t('planList.view')}
-          </Link>
-          <Link
-            href={`/learning-plans/${p.learningPlanId}#chon-ai-hoc`}
-            className={ui('btnPrimary', 'btnSm')}
+          </ButtonPrime>
+          <ButtonPrime
+            as="link"
+            variant="ink"
+            size="sm"
+            href={`/dashboard/learning-paths/${p.learningPlanId}#chon-ai-hoc`}
           >
             {t('planList.pickTask')}
-          </Link>
-          <button
-            type="button"
-            className={classNames(ui('dangerText'), cx('deleteBtn'))}
+          </ButtonPrime>
+          <ButtonPrime
+            variant="dangerGhost"
+            size="sm"
             disabled={isActive || deleting === p.learningPlanId}
             title={isActive ? t('planList.cannotDeleteActive') : undefined}
             onClick={() => setDeleteTarget(p)}
           >
             {deleting === p.learningPlanId ? t('planList.deleting') : t('planList.delete')}
-          </button>
+          </ButtonPrime>
         </div>
       </li>
     );
@@ -331,14 +334,14 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
       {wrapInCard && (canCompare || showRefreshButton) && (
         <div className={cx('headActions')}>
           {canCompare && (
-            <Link href={compareHref} className={ui('btnSecondary', 'btnSm')}>
+            <ButtonPrime as="link" variant="soft" size="sm" href={compareHref}>
               {t('planList.compare')}
-            </Link>
+            </ButtonPrime>
           )}
           {showRefreshButton && (
-            <button type="button" className={ui('textBtn')} onClick={() => reload()} disabled={loading}>
+            <ButtonPrime variant="link" size="sm" onClick={() => reload()} disabled={loading}>
               {t('planList.refresh')}
-            </button>
+            </ButtonPrime>
           )}
         </div>
       )}

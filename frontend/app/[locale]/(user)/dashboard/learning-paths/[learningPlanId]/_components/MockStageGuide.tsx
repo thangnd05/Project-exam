@@ -1,12 +1,12 @@
 'use client';
 
-import Link from '@/app/i18n/navigation';
 import { useQuery } from '@tanstack/react-query';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import { formatDateTime } from '@/app/utils/format-date-time';
 import { getMyCompletedUserTests } from '@/app/apis/userTestApi';
 import { buildExamTypeDetailPath } from '@/app/configs/Routes';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { isPracticeAttempt } from '@/app/features/learning-plans/planLabels';
 import type { PlanResponse, UserTestResponse } from '@/app/types';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
@@ -38,8 +38,8 @@ function MockStageGuide({ plan }: MockStageGuideProps) {
   const freshMock = findFreshMock(testsQuery.data, plan);
   const mockTestsTo = buildExamTypeDetailPath(plan.examTypeId);
   const generateTo = freshMock
-    ? `/learning-plans/generate?userTestId=${freshMock.userTestId}&examTypeId=${plan.examTypeId}`
-    : `/learning-plans/generate?examTypeId=${plan.examTypeId}`;
+    ? `/learning-paths/create?attempt=${freshMock.userTestId}&examTypeId=${plan.examTypeId}`
+    : `/learning-paths/create?examTypeId=${plan.examTypeId}`;
 
   return (
     <div className={cx('card')}>
@@ -60,13 +60,9 @@ function MockStageGuide({ plan }: MockStageGuideProps) {
                 {t('mockGuide.step1Desc')}
               </div>
               {!freshMock && (
-                <Link
-                  href={mockTestsTo}
-                  className={cx('btn', 'btnPrimary', 'btnSm')}
-                  style={{ marginTop: 8 }}
-                >
+                <ButtonPrime as="link" variant="primary" size="sm" href={mockTestsTo} style={{ marginTop: 8 }}>
                   {t('mockGuide.chooseMock')}
-                </Link>
+                </ButtonPrime>
               )}
             </div>
           </div>
@@ -97,9 +93,9 @@ function MockStageGuide({ plan }: MockStageGuideProps) {
                 </>
               )}
             </span>
-            <Link href={generateTo} className={cx('btn', 'btnPrimary', 'btnSm')}>
+            <ButtonPrime as="link" variant="primary" size="sm" href={generateTo}>
               {t('mockGuide.generateFromThis')}
-            </Link>
+            </ButtonPrime>
           </div>
         ) : (
           <p className={cx('muted')} style={{ marginTop: '1.2rem', marginBottom: 0 }}>

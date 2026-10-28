@@ -1,5 +1,16 @@
+@import 'app/assets/styles/mixins.scss';
+
 .sectionContainer {
   margin-top: 24px;
+
+  // Nút viên thuốc nhưng phẳng: không bóng đổ, không nhấc lên khi rê chuột.
+  > button {
+    box-shadow: none;
+
+    &:hover:not(:disabled) {
+      transform: none;
+    }
+  }
 }
 
 .sectionTitle {
@@ -11,7 +22,7 @@
 
 .gaugeContainer {
   padding: 20px;
-  border-radius: 16px;
+  border-radius: 4px;
   text-align: center;
   margin-top: 20px;
 }
@@ -26,6 +37,15 @@
 
 .gaugeInfo {
   text-align: left;
+
+  // Không có vòng tròn bên cạnh (bài thử nhanh): nhận xét nằm giữa khung.
+  &.centered {
+    text-align: center;
+
+    .gaugeMessage {
+      margin-inline: auto;
+    }
+  }
 }
 
 .gaugeTitle {
@@ -41,31 +61,16 @@
   margin-bottom: 8px;
 }
 
-.gaugeStat {
-  font-size: var(--font-size-ssm);
-  color: var(--text-secondary);
-
-  strong {
-    font-weight: 600;
-  }
-}
-
-.actionButton {
+// Nút "Thi đầy đủ" là ButtonPrime; màu theo mức sẵn sàng truyền inline.
+// Viên thuốc nhưng phẳng: bỏ bóng đổ và hiệu ứng nhấc lên của variant.
+// Lồng trong .gaugeContainer để thắng style của ButtonPrime bất kể thứ tự nạp CSS.
+.gaugeContainer .actionButton {
   margin-top: 16px;
-  padding: 12px 20px;
-  background: var(--primary-color);
-  color: var(--white);
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-block;
-  font-size: var(--font-size-md);
-  border: none;
-  transition: background-color 0.2s ease;
-  text-decoration: none;
+  box-shadow: none;
 
-  &:hover {
-    filter: brightness(0.9);
+  &:hover:not(:disabled) {
+    transform: none;
+    filter: brightness(0.92);
   }
 }
 
@@ -108,7 +113,7 @@
   cursor: pointer;
   padding: 8px 12px;
   background: var(--slate-50);
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid var(--slate-200);
   font-size: var(--font-size-ssm);
   color: var(--text-secondary);
@@ -159,7 +164,7 @@
   margin-left: 12px;
   padding: 10px 14px;
   background: var(--bg-white);
-  border-radius: 8px;
+  border-radius: 4px;
   border: 1px solid var(--slate-200);
 }
 
@@ -190,26 +195,3 @@
   line-height: 1.6;
 }
 
-.recoveryPlanCta {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  padding: 14px 20px;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  background: var(--primary-btn-bg);
-  color: var(--primary-btn-fg);
-  font-size: var(--font-size-ssm);
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    border-color: var(--primary);
-    color: var(--primary-btn-fg-hover);
-    box-shadow: var(--primary-btn-shadow-hover);
-  }
-}

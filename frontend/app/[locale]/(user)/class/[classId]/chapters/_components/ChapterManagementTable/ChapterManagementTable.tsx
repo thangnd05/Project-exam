@@ -1,9 +1,10 @@
 'use client';
 
-import {Table, Button, OverlayTrigger, Tooltip} from 'react-bootstrap';
+import {Table, OverlayTrigger, Tooltip} from 'react-bootstrap';
 import { Pencil, Trash2 } from 'lucide-react';
 import {useTranslations} from 'next-intl';
 import classNames from 'classnames/bind';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './ChapterManagementTable.module.scss';
 import type { ChapterResponse } from '@/app/types';
 import { formatDate } from '@/app/utils/format-date-time';
@@ -37,13 +38,14 @@ function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}: Chapt
               onClick={() => onViewTests(chapter.chapterId)}
             >
               <td className={cx('chapter-title')}>
-                <button
-                  type="button"
+                <ButtonPrime
+                  variant="link"
+                  size="lg"
                   className={cx('chapter-link-btn')}
                   onClick={() => onViewTests(chapter.chapterId)}
                 >
                   {chapter.title}
-                </button>
+                </ButtonPrime>
               </td>
               <td>
                 <span className={cx('chapter-date')}>
@@ -53,29 +55,31 @@ function ChapterManagementTable({chapters, onViewTests, onEdit, onDelete}: Chapt
               <td>
                 <div className={cx('action-group')}>
                   <OverlayTrigger overlay={<Tooltip>{t('chapterTable.edit')}</Tooltip>}>
-                    <Button
-                      variant="link"
-                      className={cx('btn-action', 'edit')}
+                    <ButtonPrime
+                      variant="ghost"
+                      size="icon"
+                      aria-label={t('chapterTable.edit')}
                       onClick={(event) => {
                         event.stopPropagation();
                         onEdit(chapter);
                       }}
                     >
-                      <Pencil size="1em" />
-                    </Button>
+                      <Pencil size={18} />
+                    </ButtonPrime>
                   </OverlayTrigger>
 
                   <OverlayTrigger overlay={<Tooltip>{t('chapterTable.delete')}</Tooltip>}>
-                    <Button
-                      variant="link"
-                      className={cx('btn-action', 'delete')}
+                    <ButtonPrime
+                      variant="dangerGhost"
+                      size="icon"
+                      aria-label={t('chapterTable.delete')}
                       onClick={(event) => {
                         event.stopPropagation();
                         onDelete(chapter);
                       }}
                     >
-                      <Trash2 size="1em" />
-                    </Button>
+                      <Trash2 size={18} />
+                    </ButtonPrime>
                   </OverlayTrigger>
                 </div>
               </td>

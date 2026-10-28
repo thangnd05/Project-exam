@@ -63,7 +63,7 @@
   margin: 0;
   padding: 16px;
   border: 1px solid var(--slate-200);
-  border-radius: 12px;
+  border-radius: 4px;
   background: var(--bg-white);
   cursor: pointer;
   transition: border-color 0.2s ease, background-color 0.2s ease;
@@ -130,7 +130,7 @@
   max-height: 320px;
   overflow-y: auto;
   border: 1px solid var(--slate-200);
-  border-radius: 12px;
+  border-radius: 4px;
 }
 
 .testItem {

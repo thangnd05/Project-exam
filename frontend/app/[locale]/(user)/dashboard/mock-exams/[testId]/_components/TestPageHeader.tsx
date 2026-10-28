@@ -12,11 +12,10 @@ import TestModeModal from '@/app/features/tests/TestModeModal/TestModeModal';
 import { useTestStart } from '@/app/features/tests/TestCard/hooks/useTestStart';
 import type { TestRef } from '@/app/features/tests/testRef';
 import type { TestResponse } from '@/app/types';
-import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './TestPage.module.scss';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const cx = classNamesBind.bind(styles);
-const ui = classNamesBind.bind(uiStyles);
 
 type TestPageTab = 'history' | 'leaderboard';
 
@@ -37,10 +36,10 @@ function StartButton({ test }: { test: TestResponse }) {
   const { canStart, buttonText, handleStart, modeModal } = useTestStart(test);
   return (
     <>
-      <button type="button" className={ui('btnPrimary')} onClick={handleStart} disabled={!canStart}>
+      <ButtonPrime variant="ink" type="button" onClick={handleStart} disabled={!canStart}>
         {canStart ? ((test.attemptsUsed ?? 0) > 0 ? t('retake') : t('start')) : buttonText}
         {canStart && <ArrowRight size="1em" aria-hidden="true" />}
-      </button>
+      </ButtonPrime>
       <TestModeModal
         show={modeModal.show}
         test={test}

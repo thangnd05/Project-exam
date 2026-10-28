@@ -92,9 +92,9 @@ const ChapterOfClass = () => {
   return (
     <div className={cx('wrapper')}>
       <Container className={cx('container')}>
-        <button className={cx('btn-back')} onClick={() => router.back()}>
+        <ButtonPrime variant="outline" className={cx('btn-back')} onClick={() => router.back()}>
           {t('chapters.backToClass')}
-        </button>
+        </ButtonPrime>
 
         <PageHeader
           title={className || t('chapters.defaultTitle')}
@@ -162,12 +162,14 @@ const ChapterOfClass = () => {
                       </span>
                     </div>
 
-                    <button
+                    <ButtonPrime
+                      variant="primary"
+                      fullWidth
                       className={cx('btn-view')}
                       onClick={() => handleViewTests(chapter.chapterId)}
                     >
                       {t('chapters.startLearning')}
-                    </button>
+                    </ButtonPrime>
                   </div>
                 ))}
               </div>

@@ -267,16 +267,18 @@ const Practice = () => {
                                     type="audio/mpeg"
                                 />
                             </audio>
-                            <button
-                                className={cx('playBtn')}
+                            <ButtonPrime
+                                variant="outline"
+                                size="icon"
                                 onClick={() => {
                                     if (audioRef.current) {
                                         audioRef.current.play();
                                     }
                                 }}
+                                aria-label={t('albumDetail.table.pronunciation')}
                             >
                                 <Volume2 size={28} />
-                            </button>
+                            </ButtonPrime>
                         </div>
                     </div>
 

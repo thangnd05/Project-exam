@@ -10,30 +10,7 @@
 }
 
 .btn-back {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: var(--white);
-  border: 1px solid var(--border-color);
-  border-radius: 14px;
-  color: var(--text-color);
-  font-size: var(--font-size-ssm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
   margin-bottom: 30px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-
-  &:hover {
-    background: var(--accent-color);
-    color: var(--white);
-    transform: translateX(-5px);
-  }
-
-  svg {
-    font-size: var(--font-size-lg);
-  }
 }
 
 .chapter-grid {
@@ -130,56 +107,9 @@
   }
 }
 
+// Đẩy nút xuống đáy thẻ để các thẻ cùng hàng thẳng nút.
 .btn-view {
   margin-top: auto;
-  width: 100%;
-  padding: 14px;
-  background: var(--accent-color);
-  color: var(--white);
-  border-radius: 12px;
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-md);
-  text-align: center;
-  transition: all 0.2s ease;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-}
-
-.btn-manage-members {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  background: rgb(var(--primary-rgb) / 0.06);
-  border: 2px solid rgb(var(--primary-rgb) / 0.25);
-  border-radius: 12px;
-  color: var(--primary-text);
-  font-weight: 700;
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  transition: all 0.3s;
-  font-family: var(--font-family);
-
-  svg {
-    font-size: var(--font-size-lg);
-  }
-
-  &:hover {
-    background: var(--accent-color);
-    border-color: var(--accent-color);
-    color: var(--white);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgb(var(--primary-rgb) / 0.25);
-  }
 }
 
 @keyframes fadeInUp {
@@ -191,24 +121,6 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-@include down(lg) {
-  .header-hero {
-    flex-direction: column;
-    text-align: center;
-    gap: 40px;
-    padding: 40px 30px;
-
-    h1 {
-      font-size: var(--font-size-2xxl);
-    }
-
-    .btn-create-chapter {
-      width: 100%;
-      justify-content: center;
-    }
   }
 }
 

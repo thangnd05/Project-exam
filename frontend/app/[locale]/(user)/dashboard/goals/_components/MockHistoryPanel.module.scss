@@ -7,7 +7,7 @@
 .chartCard {
   padding: 16px 18px 18px;
   border: 1px solid var(--slate-200);
-  border-radius: 12px;
+  border-radius: 4px;
   background: var(--bg-white);
 }
 
@@ -55,7 +55,7 @@
   padding: 32px;
   text-align: center;
   border: 1px dashed var(--slate-300);
-  border-radius: 12px;
+  border-radius: 4px;
 }
 
 .chartLoadingInline {
@@ -72,7 +72,7 @@
 .chartTooltip {
   padding: 8px 12px;
   border: 1px solid var(--slate-200);
-  border-radius: 10px;
+  border-radius: 4px;
   background: var(--bg-white);
   box-shadow: 0 4px 14px rgb(0 0 0 / 0.08);
   font-size: var(--font-size-sm);
@@ -115,7 +115,7 @@
   margin-top: 16px;
   overflow-x: auto;
   border: 1px solid var(--slate-200);
-  border-radius: 12px;
+  border-radius: 4px;
 }
 
 .table {

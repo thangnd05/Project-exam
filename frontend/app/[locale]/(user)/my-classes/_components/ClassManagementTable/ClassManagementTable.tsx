@@ -4,6 +4,7 @@ import { Table, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Pencil, Trash2, Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './ClassManagementTable.module.scss';
 import type { ClassStudentResponse } from '@/app/types';
 
@@ -47,34 +48,40 @@ const ClassManagementTable = ({ classes, onEdit, onDelete, onManageStudents }: C
                 <div className={cx('action-group')}>
                   {onEdit && (
                     <OverlayTrigger overlay={<Tooltip>{t('classTable.edit')}</Tooltip>}>
-                      <button
-                        className={cx('btn-action', 'edit')}
+                      <ButtonPrime
+                        variant="ghost"
+                        size="icon"
+                        aria-label={t('classTable.edit')}
                         onClick={() => onEdit(clazz)}
                       >
-                        <Pencil size="1em" />
-                      </button>
+                        <Pencil size={18} />
+                      </ButtonPrime>
                     </OverlayTrigger>
                   )}
 
                   {onDelete && (
                     <OverlayTrigger overlay={<Tooltip>{t('classTable.delete')}</Tooltip>}>
-                      <button
-                        className={cx('btn-action', 'delete')}
+                      <ButtonPrime
+                        variant="dangerGhost"
+                        size="icon"
+                        aria-label={t('classTable.delete')}
                         onClick={() => onDelete(clazz)}
                       >
-                        <Trash2 size="1em" />
-                      </button>
+                        <Trash2 size={18} />
+                      </ButtonPrime>
                     </OverlayTrigger>
                   )}
 
                   {onManageStudents && (
                     <OverlayTrigger overlay={<Tooltip>{t('common.manageStudents')}</Tooltip>}>
-                      <button
-                        className={cx('btn-action', 'manage')}
+                      <ButtonPrime
+                        variant="ghost"
+                        size="icon"
+                        aria-label={t('common.manageStudents')}
                         onClick={() => onManageStudents(clazz.classId)}
                       >
-                        <Users size="1em" />
-                      </button>
+                        <Users size={18} />
+                      </ButtonPrime>
                     </OverlayTrigger>
                   )}
                 </div>

@@ -1,6 +1,5 @@
 'use client';
 
-import Link from '@/app/i18n/navigation';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import classNames from 'classnames/bind';
@@ -21,8 +20,9 @@ import {
   taskDisplayName,
   type LearningPlansT,
 } from '@/app/features/learning-plans/planLabels';
-import { buildExamTypeDetailPath } from '@/app/configs/Routes';
+import routes, { buildExamTypeDetailPath } from '@/app/configs/Routes';
 import PageHeader from '@/app/components/PageHeader/PageHeader';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import { LearningPlanStatus, PlanStage } from '@/app/enums';
 import type { PlanResponse, PlanTaskResponse } from '@/app/types';
@@ -88,9 +88,9 @@ function PlanDetail() {
     return (
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
-          <Link href="/learning-plans/generate" className={cx('btn', 'btnOutline', 'btnSm')}>
+          <ButtonPrime as="link" variant="outline" size="sm" href={routes.generatePlan}>
             {t('common.back')}
-          </Link>
+          </ButtonPrime>
         </div>
         <div className={cx('alert', 'alertDanger')}>{error}</div>
       </div>
@@ -107,8 +107,8 @@ function PlanDetail() {
     : 0;
 
   const backTo = plan.examTypeId
-    ? `/learning-plans/generate?examTypeId=${plan.examTypeId}`
-    : '/learning-plans/generate';
+    ? `/learning-paths/create?examTypeId=${plan.examTypeId}`
+    : '/learning-paths/create';
 
   const passedTasks = plan.passedTasks ?? 0;
   const isMockStage = plan.planStage === PlanStage.MOCK;
@@ -124,16 +124,16 @@ function PlanDetail() {
         planSequence={plan.planSequence}
       />
       <div className={cx('headerBar')}>
-        <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
+        <ButtonPrime as="link" variant="outline" size="sm" href={backTo}>
           {t('common.back')}
-        </Link>
+        </ButtonPrime>
         <div className={cx('headerActions')}>
-          <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
+          <ButtonPrime as="link" variant="ghost" size="sm" href={backTo}>
             {t('detail.allPlans')}
-          </Link>
-          <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
+          </ButtonPrime>
+          <ButtonPrime as="link" variant="outline" size="sm" href={backTo}>
             {t('common.newPlan')}
-          </Link>
+          </ButtonPrime>
         </div>
       </div>
 
@@ -143,12 +143,9 @@ function PlanDetail() {
         <div className={cx('alert', 'alertWarning')}>
           <span>{t('detail.replaced')}</span>
           {plan.replacedByPlanId && (
-            <Link
-              href={`/learning-plans/${plan.replacedByPlanId}`}
-              className={cx('btn', 'btnPrimary', 'btnSm')}
-            >
+            <ButtonPrime as="link" variant="primary" size="sm" href={`/dashboard/learning-paths/${plan.replacedByPlanId}`}>
               {t('detail.viewNewPlan')}
-            </Link>
+            </ButtonPrime>
           )}
         </div>
       )}
@@ -161,17 +158,17 @@ function PlanDetail() {
               { strong: (chunks) => <strong>{chunks}</strong> },
             )}
           </span>
-          <button
-            type="button"
-            className={cx('btn', 'btnPrimary', 'btnSm')}
+          <ButtonPrime
+            variant="primary"
+            size="sm"
             disabled={resyncMutation.isPending}
             onClick={() => resyncMutation.mutate(plan.learningPlanId)}
           >
             {resyncMutation.isPending ? t('common.updating') : t('detail.resyncNow')}
-          </button>
-          <Link href={backTo} className={cx('btn', 'btnOutline', 'btnSm')}>
+          </ButtonPrime>
+          <ButtonPrime as="link" variant="outline" size="sm" href={backTo}>
             {t('detail.fromOtherTest')}
-          </Link>
+          </ButtonPrime>
         </div>
       )}
 
@@ -222,20 +219,22 @@ function PlanDetail() {
       >
         {!isReplaced && isMockStage && (
           <div className={cx('planHeroCtaBox')}>
-            <Link href={mockTestsTo} className={cx('planHeroCta')}>
+            <ButtonPrime as="link" variant="ink" size="lg" href={mockTestsTo}>
               {t('common.takeMock')}
-            </Link>
+            </ButtonPrime>
             <span className={cx('planHeroCtaHint')}>{t('detail.mockCtaHint')}</span>
           </div>
         )}
 
         {!isReplaced && !isMockStage && recommendedTask && (
-          <Link
-            href={`/learning-plans/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
-            className={cx('planHeroCta')}
+          <ButtonPrime
+            as="link"
+            variant="ink"
+            size="lg"
+            href={`/dashboard/learning-paths/${plan.learningPlanId}/study?taskId=${recommendedTask.taskId}`}
           >
             {t('detail.enterTask')}
-          </Link>
+          </ButtonPrime>
         )}
       </PageHeader>
 
@@ -246,12 +245,9 @@ function PlanDetail() {
           <span>
             {t.rich('detail.practiceSource', { strong: (chunks) => <strong>{chunks}</strong> })}
           </span>
-          <Link
-            href={`/learning-plans/generate?examTypeId=${plan.examTypeId}`}
-            className={cx('btn', 'btnPrimary', 'btnSm')}
-          >
+          <ButtonPrime as="link" variant="primary" size="sm" href={`/learning-paths/create?examTypeId=${plan.examTypeId}`}>
             {t('common.newPlan')}
-          </Link>
+          </ButtonPrime>
         </div>
       )}
 

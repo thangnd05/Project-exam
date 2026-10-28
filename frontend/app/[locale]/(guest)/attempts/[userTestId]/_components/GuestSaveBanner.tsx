@@ -5,13 +5,11 @@ import { useRouter } from '@/app/i18n/navigation';
 import { toast } from 'react-toastify';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
-import { ArrowRight, Trash2 } from 'lucide-react';
 
 import BaseModal from '@/app/components/modal/BaseModal';
-import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import { buildLoginUrl } from '@/app/features/auth/authRedirect';
 import { clearGuestSessionId, setGuestClaimIntent } from '@/app/utils/guestSession';
-import { buildGeneratePlanUrl, buildTargetUrl } from '@/app/[locale]/(guest)/tests/result/[userTestId]/_lib/planFromTest';
+import { buildGeneratePlanUrl, buildTargetUrl } from '@/app/[locale]/(guest)/attempts/[userTestId]/_lib/planFromTest';
 import promptStyles from './GuestSaveBanner.module.scss';
 
 const px = classNames.bind(promptStyles);
@@ -27,7 +25,6 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
   const router = useRouter();
   const t = useTranslations('TestTaking.guestSave');
   const [promptOpen, setPromptOpen] = useState(false);
-  const [confirmExit, setConfirmExit] = useState(false);
 
   // Cho khách nhìn thấy điểm trước rồi mới hỏi. Khách bắt buộc phải chọn lưu hoặc thoát,
   // nên mỗi lần vào trang (kể cả F5) đều hỏi lại.
@@ -44,29 +41,19 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
   const handleSave = () => {
     const next = examTypeId
       ? buildTargetUrl(examTypeId, buildGeneratePlanUrl(userTestId, examTypeId))
-      : `/tests/result/${userTestId}`;
+      : `/attempts/${userTestId}`;
     setGuestClaimIntent(userTestId);
     router.push(buildLoginUrl(next, {
       flash: t('loginFlash'),
     }));
   };
 
-  const openExitConfirm = () => {
-    setPromptOpen(false);
-    setConfirmExit(true);
-  };
-
-  // "Giữ lại" thì quay về hộp chọn, không để khách thoát khỏi lựa chọn.
-  const cancelExit = () => {
-    setConfirmExit(false);
-    setPromptOpen(true);
-  };
-
+  // Lựa chọn Thoát đã ghi rõ kết quả sẽ bị xóa nên xóa luôn, không hỏi lại lần hai.
   // Chỉ bỏ mã phiên khách trên trình duyệt: khách không xem hay nhận lại bài này được nữa,
   // còn bản ghi khách vẫn nằm trong database (userId = null).
   const handleDiscard = () => {
     clearGuestSessionId();
-    setConfirmExit(false);
+    setPromptOpen(false);
     toast.info(t('discarded'));
     router.replace('/');
   };
@@ -94,33 +81,19 @@ function GuestSaveBanner({ userTestId, examTypeId }: GuestSaveBannerProps) {
                   {t('saveHint')}
                 </span>
               </span>
-              <ArrowRight size="1em" className={px('optionArrow')} aria-hidden="true" />
             </button>
 
-            <button type="button" className={px('option', 'optionDanger')} onClick={openExitConfirm}>
+            <button type="button" className={px('option', 'optionDanger')} onClick={handleDiscard}>
               <span className={px('optionText')}>
                 <span className={px('optionTitle')}>{t('exitTitle')}</span>
                 <span className={px('optionHint')}>
                   {t('exitHint')}
                 </span>
               </span>
-              <ArrowRight size="1em" className={px('optionArrow')} aria-hidden="true" />
             </button>
           </div>
         </div>
       </BaseModal>
-
-      <ConfirmModal
-        show={confirmExit}
-        onClose={cancelExit}
-        onConfirm={handleDiscard}
-        title={t('confirmTitle')}
-        message={t('confirmMessage')}
-        icon={Trash2}
-        variant="danger"
-        confirmText={t('confirmText')}
-        cancelText={t('cancelText')}
-      />
     </>
   );
 }

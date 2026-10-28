@@ -295,23 +295,17 @@ const CreateTestFromBank = () => {
                     {cfg.expanded && (
                       <div className={cx('partCardBody')}>
                         <div className={cx('modeTabs')}>
-                          <button
-                            type="button"
-                            className={cx('modeTab', {
-                              active: cfg.mode === SELECTION_MODES.RANDOM,
-                            })}
+                          <ButtonPrime
+                            variant={cfg.mode === SELECTION_MODES.RANDOM ? 'primary' : 'soft'}
                             onClick={() =>
                               updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.RANDOM)
                             }
                             aria-pressed={cfg.mode === SELECTION_MODES.RANDOM}
                           >
                             {t('modes.random')}
-                          </button>
-                          <button
-                            type="button"
-                            className={cx('modeTab', {
-                              active: cfg.mode === SELECTION_MODES.SEQUENTIAL,
-                            })}
+                          </ButtonPrime>
+                          <ButtonPrime
+                            variant={cfg.mode === SELECTION_MODES.SEQUENTIAL ? 'primary' : 'soft'}
                             onClick={() =>
                               updatePartConfig(
                                 part.examPartId,
@@ -322,19 +316,16 @@ const CreateTestFromBank = () => {
                             aria-pressed={cfg.mode === SELECTION_MODES.SEQUENTIAL}
                           >
                             {t('modes.sequential')}
-                          </button>
-                          <button
-                            type="button"
-                            className={cx('modeTab', {
-                              active: cfg.mode === SELECTION_MODES.MANUAL,
-                            })}
+                          </ButtonPrime>
+                          <ButtonPrime
+                            variant={cfg.mode === SELECTION_MODES.MANUAL ? 'primary' : 'soft'}
                             onClick={() =>
                               updatePartConfig(part.examPartId, 'mode', SELECTION_MODES.MANUAL)
                             }
                             aria-pressed={cfg.mode === SELECTION_MODES.MANUAL}
                           >
                             {t('modes.manual')}
-                          </button>
+                          </ButtonPrime>
                         </div>
 
                         {cfg.mode === SELECTION_MODES.RANDOM && (
@@ -479,17 +470,19 @@ const CreateTestFromBank = () => {
                                                   <span className={cx('questionText')}>
                                                     {q.questionText || t('parts.noContent')}
                                                   </span>
-                                                  <button
-                                                    type="button"
+                                                  <ButtonPrime
+                                                    variant="ghost"
+                                                    size="icon"
                                                     className={cx('btnEditQuestion')}
                                                     onClick={() => {
                                                       setEditingPartId(part.examPartId);
                                                       setEditingQuestionId(id);
                                                     }}
                                                     title={t('parts.editQuestion')}
+                                                    aria-label={t('parts.editQuestion')}
                                                   >
                                                     <Pencil size={18} />
-                                                  </button>
+                                                  </ButtonPrime>
                                                 </li>
                                               );
                                             })}

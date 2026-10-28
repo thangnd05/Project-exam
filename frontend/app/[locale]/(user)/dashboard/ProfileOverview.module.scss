@@ -28,9 +28,10 @@
 .chartCard,
 .statCard {
   background: var(--bg-white);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: var(--shadow-md);
+  // Cùng khung với thẻ hướng dẫn trước giờ thi (.ready-card): góc 8px, viền slate, bóng rất nhẹ.
+  border: 1px solid var(--slate-300);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
 }
 
 .profileCard {
@@ -63,15 +64,15 @@
   font-weight: 600;
 }
 
+// Bảng kẻ dòng, tô xen kẽ như bảng thông tin của thẻ hướng dẫn trước giờ thi (.ready-table).
 .metaList {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  align-items: flex-start;
   text-align: left;
   background: var(--bg-white);
-  padding: 16px;
-  border-radius: 12px;
+  border: 1px solid var(--slate-200);
+  border-radius: 4px;
+  overflow: hidden;
   margin-bottom: 20px;
 }
 
@@ -79,9 +80,19 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  padding: 10px 14px;
   font-size: var(--font-size-smd);
-  color: var(--text-secondary);
-  word-break: break-all;
+  font-weight: 600;
+  color: var(--dark-color);
+  min-width: 0;
+
+  & + & {
+    border-top: 1px solid var(--slate-200);
+  }
+
+  &:nth-child(odd) {
+    background: var(--slate-50);
+  }
 }
 
 .metaLabel {
@@ -90,6 +101,14 @@
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--text-secondary);
+}
+
+// Email dài: giữ một dòng, cắt bằng dấu "…", di chuột vào xem đủ (title).
+.metaValue {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .verifiedText {
@@ -108,8 +127,11 @@
   padding: 20px;
 }
 
+// Tiêu đề thẻ có đường kẻ ngăn với nội dung, như phần đầu thẻ hướng dẫn (.ready-header).
 .cardTitle {
   margin: 0 0 16px 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--slate-200);
   color: var(--dark-color);
   font-size: var(--font-size-base);
   font-weight: 700;
@@ -119,27 +141,12 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
 
-.actionBtn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  background: var(--input-bg);
-  color: var(--text-secondary);
-  font-size: var(--font-size-ssm);
-  font-weight: 600;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: var(--brand-50);
-    color: var(--primary-text);
+  // Màu/khuôn từ ButtonPrime soft; chỉ dồn chữ sang trái cho giống một danh sách lối tắt.
+  // Lồng trong danh sách để thắng justify-content: center của .button bất kể thứ tự nạp CSS.
+  .actionBtn {
+    justify-content: flex-start;
+    text-align: left;
   }
 }
 
@@ -167,18 +174,24 @@
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+  // Tiêu đề nằm chung hàng với ô chọn: kẻ dưới cả hàng thay vì dưới riêng tiêu đề.
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--slate-200);
+  margin-bottom: 12px;
 
   .cardTitle {
     margin: 0;
+    padding-bottom: 0;
+    border-bottom: none;
   }
 }
 
 .monthSelect {
   appearance: auto;
   background: var(--bg-white);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 6px 10px;
+  border: 1px solid var(--slate-300);
+  border-radius: var(--radius-pill);
+  padding: 6px 12px;
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-secondary);
@@ -233,10 +246,14 @@
   justify-content: space-between;
   gap: 12px;
   flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--slate-200);
   margin-bottom: 8px;
 
   .cardTitle {
     margin: 0;
+    padding-bottom: 0;
+    border-bottom: none;
   }
 }
 
@@ -249,7 +266,7 @@
   padding: 24px 16px;
   background: var(--bg-white);
   border: 1px dashed var(--slate-300);
-  border-radius: 12px;
+  border-radius: 4px;
 }
 
 .targetEmptyText {
@@ -273,7 +290,7 @@
   flex-direction: column;
   gap: 12px;
   padding: 16px 0;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--slate-200);
 
   &:first-child {
     padding-top: 0;
@@ -311,7 +328,7 @@
   gap: 4px;
   background: var(--success-text);
   color: var(--white);
-  border-radius: var(--radius-pill);
+  border-radius: 4px;
   padding: 3px 10px;
   font-size: 1.15rem;
   font-weight: 700;
@@ -369,8 +386,8 @@
   display: inline-flex;
   align-items: center;
   background: var(--input-bg);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-pill);
+  border: 1px solid var(--slate-200);
+  border-radius: 4px;
   padding: 3px 10px;
   font-size: 1.15rem;
   color: var(--text-secondary);

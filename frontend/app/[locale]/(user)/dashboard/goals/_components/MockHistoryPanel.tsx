@@ -1,6 +1,5 @@
 'use client';
 
-import Link from '@/app/i18n/navigation';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useQueries, type UseQueryResult } from '@tanstack/react-query';
@@ -17,9 +16,10 @@ import type { EnhancedResultResponse } from '@/app/types';
 import type { ScoreScaleSource } from '@/app/features/exam-types/scoreScale';
 import dynamic from 'next/dynamic';
 import type { MockChartPoint } from './MockHistoryCharts';
-import { useMockHistory } from '@/app/[locale]/(user)/my-target/dashboard/_hooks/useMockHistory';
+import { useMockHistory } from '@/app/[locale]/(user)/dashboard/goals/_hooks/useMockHistory';
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './MockHistoryPanel.module.scss';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const cx = classNames.bind(styles);
 const ui = classNames.bind(uiStyles);
@@ -184,9 +184,9 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
       {!loading && totalElements === 0 && (
         <div className={ui('notice', 'noticeInfo')} style={{ marginBottom: 0 }}>
           <span>{tm('mockHistory.empty')}</span>
-          <Link href="/" className={ui('btnPrimary', 'btnSm')}>
+          <ButtonPrime as="link" variant="ink" size="sm" href="/">
             {tm('mockHistory.firstTest')}
-          </Link>
+          </ButtonPrime>
         </div>
       )}
 
@@ -201,9 +201,10 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
       )}
 
       {totalElements > 0 && (
-        <button
+        <ButtonPrime
+          variant="soft"
+          size="sm"
           type="button"
-          className={ui('btnSecondary', 'btnSm')}
           onClick={() => setTableOpen((prev) => !prev)}
           aria-expanded={tableOpen}
         >
@@ -211,7 +212,7 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
           {tableOpen
             ? tm('mockHistory.hideTable')
             : tm('mockHistory.showTable', { count: totalElements })}
-        </button>
+        </ButtonPrime>
       )}
 
       {tableOpen && tableRows.length > 0 && (
@@ -252,13 +253,9 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
                         ) : rowLoading ? (
                           '...'
                         ) : (
-                          <button
-                            type="button"
-                            className={ui('textBtn')}
-                            onClick={() => loadEnhanced(t.userTestId)}
-                          >
+                          <ButtonPrime variant="link" size="sm" onClick={() => loadEnhanced(t.userTestId)}>
                             {tm('mockHistory.table.load')}
-                          </button>
+                          </ButtonPrime>
                         )}
                       </td>
                       <td>
@@ -276,12 +273,14 @@ function MockHistoryPanel({ examTypeId, examTypeName, scaleSource }: MockHistory
                       </td>
                       <td className={cx('mono', 'dim')}>{formatDuration(t.durationTaken)}</td>
                       <td className={cx('right')}>
-                        <Link
-                          href={`/tests/result/${t.userTestId}`}
-                          className={ui('btnSecondary', 'btnSm')}
+                        <ButtonPrime
+                          as="link"
+                          variant="soft"
+                          size="sm"
+                          href={`/attempts/${t.userTestId}`}
                         >
                           {tm('mockHistory.table.diagnose')}
-                        </Link>
+                        </ButtonPrime>
                       </td>
                     </tr>
                   );

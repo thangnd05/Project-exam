@@ -130,16 +130,18 @@ const AlbumDetail = () => {
           </ButtonPrime>
 
           <div className={cx('mode-group')}>
-            <button
-              className={cx('btn-mode', { active: !flashMode })}
+            <ButtonPrime
+              variant={!flashMode ? 'primary' : 'ghost'}
+              className={cx('btn-mode')}
               onClick={() => router.push(`/practice/${albumId}`)}
               disabled={vocabularies.length === 0}
             >
               {t('albumDetail.practice')}
-            </button>
+            </ButtonPrime>
 
-            <button
-              className={cx('btn-mode', { active: flashMode })}
+            <ButtonPrime
+              variant={flashMode ? 'primary' : 'ghost'}
+              className={cx('btn-mode')}
               onClick={() => {
                 setFlashMode(!flashMode);
                 setFlipped(false);
@@ -147,7 +149,7 @@ const AlbumDetail = () => {
               disabled={vocabularies.length === 0}
             >
               {flashMode ? t('albumDetail.listMode') : t('albumDetail.flashcardMode')}
-            </button>
+            </ButtonPrime>
           </div>
         </div>
 
@@ -161,15 +163,18 @@ const AlbumDetail = () => {
                 <div className={cx('flashcard-front')}>
                   <div className={cx('word')}>{currentVocab.word}</div>
                   <div className={cx('phonetic')}>/{currentVocab.phonetic || '...'}/</div>
-                  <button
-                    className={cx('btn-play', 'btn-play-lg')}
+                  <ButtonPrime
+                    variant="soft"
+                    size="icon"
+                    className={cx('btn-play-lg')}
                     onClick={(e) => {
                       e.stopPropagation();
                       playAudio(currentVocab.word);
                     }}
+                    aria-label={t('albumDetail.table.pronunciation')}
                   >
                     <Volume2 size={24} />
-                  </button>
+                  </ButtonPrime>
                 </div>
 
                 <div className={cx('flashcard-back')}>
@@ -182,29 +187,31 @@ const AlbumDetail = () => {
             </div>
 
             <div className={cx('card-controls')}>
-              <button
-                className={cx('btn-nav')}
+              <ButtonPrime
+                variant="soft"
+                size="icon"
                 disabled={currentIndex === 0}
                 onClick={() => {
                   setFlipped(false);
                   setCurrentIndex((prev) => prev - 1);
                 }}
               >
-                <ChevronLeft size="1em" />
-              </button>
+                <ChevronLeft size={24} />
+              </ButtonPrime>
               <div className={cx('progress-text')}>
                 {currentIndex + 1} / {vocabularies.length}
               </div>
-              <button
-                className={cx('btn-nav')}
+              <ButtonPrime
+                variant="soft"
+                size="icon"
                 disabled={currentIndex === vocabularies.length - 1}
                 onClick={() => {
                   setFlipped(false);
                   setCurrentIndex((prev) => prev + 1);
                 }}
               >
-                <ChevronRight size="1em" />
-              </button>
+                <ChevronRight size={24} />
+              </ButtonPrime>
             </div>
           </div>
         ) : (
@@ -233,29 +240,33 @@ const AlbumDetail = () => {
                       {vocab.example || ''}
                     </td>
                     <td className={cx('audio-cell')}>
-                      <div
-                        className={cx('btn-play')}
+                      <ButtonPrime
+                        variant="soft"
+                        size="icon"
                         onClick={() => playAudio(vocab.word)}
+                        aria-label={t('albumDetail.table.pronunciation')}
                       >
                         <Volume2 size={20} />
-                      </div>
+                      </ButtonPrime>
                     </td>
                     <td className="text-center">
                       <div className="d-flex justify-content-center gap-2">
-                        <button
-                          className="btn btn-link text-primary p-0"
+                        <ButtonPrime
+                          variant="ghost"
+                          size="icon"
                           onClick={() => handleEditClick(vocab)}
                           title={t('albumDetail.editWord')}
                         >
-                          <Pencil size={22} />
-                        </button>
-                        <button
-                          className="btn btn-link text-danger p-0"
+                          <Pencil size={20} />
+                        </ButtonPrime>
+                        <ButtonPrime
+                          variant="dangerGhost"
+                          size="icon"
                           onClick={() => handleDeleteClick(vocab)}
                           title={t('albumDetail.deleteWord')}
                         >
-                          <Trash2 size={22} />
-                        </button>
+                          <Trash2 size={20} />
+                        </ButtonPrime>
                       </div>
                     </td>
                   </tr>

@@ -202,9 +202,9 @@ const ClassMemberManagement = () => {
   return (
     <div className={cx('wrapper')}>
 
-      <button className={cx('back-btn')} onClick={() => router.back()}>
+      <ButtonPrime variant="outline" size="sm" className={cx('back-btn')} onClick={() => router.back()}>
         <span>{t('members.back')}</span>
-      </button>
+      </ButtonPrime>
 
       <PageHeader
         title={classInfo?.className || t('members.classFallback', { id: classId })}

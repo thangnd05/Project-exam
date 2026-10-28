@@ -7,14 +7,14 @@ import { Container } from "react-bootstrap";
 import { toast } from "react-toastify";
 import classNames from "classnames/bind";
 import { useTranslations } from "next-intl";
-import { CircleCheck, House, ChartNoAxesColumnIncreasing, Clock, GraduationCap, Lock, Calendar, CircleAlert } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 
 import { useAuth } from "@/app/hooks/useAuth";
 import { useMounted } from "@/app/hooks/useMounted";
 import { getGuestSessionId, guestHeaders } from "@/app/utils/guestSession";
 import { isBeginnerLevel } from "@/app/features/learning-plans/learnerLevel";
 import { getScoreScale } from "@/app/features/exam-types/scoreScale";
-import { buildPlanFromTestUrl } from "@/app/[locale]/(guest)/tests/result/[userTestId]/_lib/planFromTest";
+import { buildPlanFromTestUrl } from "@/app/[locale]/(guest)/attempts/[userTestId]/_lib/planFromTest";
 import { useTestResult } from "./_hooks/useTestResult";
 import { useTestEvaluationPrompt } from "./_hooks/useTestEvaluationPrompt";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";
@@ -86,7 +86,7 @@ const TestResult = () => {
       toast.warning(t("reviewLocked"));
       return;
     }
-    router.push(`/tests/result/${userTestId}/review`);
+    router.push(`/attempts/${userTestId}/review`);
   };
 
   const handlePlanFromTest = () => {
@@ -163,24 +163,21 @@ const TestResult = () => {
               </div>
 
               <div className={cx("stats-grid")}>
-                <div className={cx("stat-item", "correct")}>
-                  <CircleCheck size={24} />
+                <div className={cx("stat-item")}>
                   <div className={cx("stat-text")}>
                     <span className={cx("stat-val")}>{result?.correct || 0}</span>
                     <span className={cx("stat-label")}>{t("stats.correct")}</span>
                   </div>
                 </div>
 
-                <div className={cx("stat-item", "wrong")}>
-                  <ChartNoAxesColumnIncreasing size={24} />
+                <div className={cx("stat-item")}>
                   <div className={cx("stat-text")}>
                     <span className={cx("stat-val")}>{result?.wrong || 0}</span>
                     <span className={cx("stat-label")}>{t("stats.wrong")}</span>
                   </div>
                 </div>
 
-                <div className={cx("stat-item", "total")}>
-                  <GraduationCap size={24} />
+                <div className={cx("stat-item")}>
                   <div className={cx("stat-text")}>
                     <span className={cx("stat-val")}>{result?.total || 0}</span>
                     <span className={cx("stat-label")}>{t("stats.total")}</span>
@@ -188,7 +185,6 @@ const TestResult = () => {
                 </div>
 
                 <div className={cx("stat-item")}>
-                  <Clock size={24} />
                   <div className={cx("stat-text")}>
                     <span className={cx("stat-val")}>
                       {formatTime(result?.startedAt, result?.finishedAt)}
@@ -202,19 +198,14 @@ const TestResult = () => {
             <div className={cx("actions")}>
               {!canReview && (
                 <div className={cx("lock-message")}>
-                  <Lock size="1em" />
-                  <span>
-                    {t("answersLocked")}
-                  </span>
+                  {t("answersLocked")}
                 </div>
               )}
 
               <ButtonPrime
-                variant="outline"
-                className={cx({ "is-locked": !canReview })}
+                variant={canReview ? "outline" : "soft"}
                 onClick={handleShowDetail}
               >
-                {!canReview ? <Lock size="1em" /> : <ChartNoAxesColumnIncreasing size="1em" />}
                 {t("viewAnswers")}
               </ButtonPrime>
 
@@ -223,17 +214,20 @@ const TestResult = () => {
                   variant="ghost"
                   onClick={() => router.push(buildTestPath({ testId }, 'history'))}
                 >
-                  <GraduationCap size="1em" /> {t("history")}
+                  {t("history")}
                 </ButtonPrime>
               )}
 
               <ButtonPrime variant="ghost" onClick={() => router.push("/")}>
-                <House size="1em" /> {t("home")}
+                {t("home")}
               </ButtonPrime>
 
-              <ButtonPrime variant="primary" onClick={handlePlanFromTest}>
-                <Calendar size="1em" /> {t("planFromTest")}
-              </ButtonPrime>
+              {/* Có khung chẩn đoán thì nút lập lộ trình nằm ở "Việc cần làm ngay", không lặp lại ở đây. */}
+              {!enhanced && (
+                <ButtonPrime variant="primary" onClick={handlePlanFromTest}>
+                  {t("planFromTest")}
+                </ButtonPrime>
+              )}
             </div>
           </div>
 
@@ -260,6 +254,7 @@ const TestResult = () => {
                   readinessLevel={enhanced.readinessLevel}
                   isGuest={isGuest}
                   practiceParts={practiceParts}
+                  secondaryCta={isQuickChallenge && Boolean(enhanced.examTypeId)}
                 />
               </div>
             </div>

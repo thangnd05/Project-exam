@@ -11,14 +11,14 @@ import ExamLayoutRenderer from '@/app/features/exam-layout/ExamLayoutRenderer';
 import { useExamTypeById } from '@/app/features/exam-types/hooks/useExamTypes';
 import StreakRestoreModal from '@/app/features/gamification/streak/StreakRestoreModal';
 import BaseModal from '@/app/components/modal/BaseModal';
-import ConfirmModal from '@/app/components/modal/ConfirmModal';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from '@/app/features/exam-layout/TestStart.module.scss';
 
 const cx = classNames.bind(styles);
 
 const STATE_SCREEN_STATUSES = ['loading', 'ready', 'payment', 'no-attempts', 'locked', 'closed', 'error'];
 
-// testRef do page server tra từ slug trên URL (/tests/aws-dop-c02-test-1/start) rồi truyền xuống.
+// testRef do page server tra từ slug trên URL (/mock-exams/aws-dop-c02-test-1/take) rồi truyền xuống.
 function TestStart({ testRef }: { testRef: TestRef }) {
   const router = useRouter();
   const t = useTranslations('TestTaking.start');
@@ -151,23 +151,16 @@ function TestStart({ testRef }: { testRef: TestRef }) {
         show={confirmOpen}
         onClose={closeConfirm}
         title={t('confirmSubmit.title')}
-        maxWidth={440}
+        maxWidth={480}
+        variant="exam"
         footer={
-          <div className={cx('state-actions')}>
-            <button
-              type="button"
-              className={cx('state-btn', 'state-btn-secondary')}
-              onClick={closeConfirm}
-            >
+          <div className={cx('exam-actions')}>
+            <ButtonPrime variant="ghost" shape="rounded" onClick={closeConfirm}>
               {t('confirmSubmit.continue')}
-            </button>
-            <button
-              type="button"
-              className={cx('state-btn', 'state-btn-primary')}
-              onClick={confirmSubmit}
-            >
+            </ButtonPrime>
+            <ButtonPrime variant="ink" size="lg" shape="rounded" onClick={confirmSubmit}>
               {t('confirmSubmit.submit')}
-            </button>
+            </ButtonPrime>
           </div>
         }
       >
@@ -190,15 +183,25 @@ function TestStart({ testRef }: { testRef: TestRef }) {
           )}
         </p>
       </BaseModal>
-      <ConfirmModal
+      <BaseModal
         show={exitOpen}
         onClose={() => setExitOpen(false)}
-        onConfirm={() => router.back()}
         title={t('confirmExit.title')}
-        message={t('confirmExit.message')}
-        confirmText={t('confirmExit.confirm')}
-        cancelText={t('confirmExit.cancel')}
-      />
+        maxWidth={480}
+        variant="exam"
+        footer={
+          <div className={cx('exam-actions')}>
+            <ButtonPrime variant="ghost" shape="rounded" onClick={() => setExitOpen(false)}>
+              {t('confirmExit.cancel')}
+            </ButtonPrime>
+            <ButtonPrime variant="ink" size="lg" shape="rounded" onClick={() => router.back()}>
+              {t('confirmExit.confirm')}
+            </ButtonPrime>
+          </div>
+        }
+      >
+        <p className={cx('submit-confirm-text')}>{t('confirmExit.message')}</p>
+      </BaseModal>
     </>
   );
 }

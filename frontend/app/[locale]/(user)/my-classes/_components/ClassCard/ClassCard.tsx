@@ -4,6 +4,7 @@ import { Users, KeyRound, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import classNames from 'classnames/bind';
 import { toast } from 'react-toastify';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import styles from './ClassCard.module.scss';
 import type { ClassStudentResponse } from '@/app/types';
 
@@ -77,12 +78,14 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
         </button>
       </div>
 
-      <button className={cx('btn-view')}>
+      <ButtonPrime variant="soft" fullWidth className={cx('btn-view')}>
         {role === 'teacher' ? t('classCard.viewTests') : t('classCard.takeTests')}
-      </button>
+      </ButtonPrime>
 
       {role === 'teacher' && (
-        <button
+        <ButtonPrime
+          variant="outline"
+          fullWidth
           className={cx('btn-manage-members')}
           onClick={(e) => {
             e.stopPropagation();
@@ -90,7 +93,7 @@ const ClassCard = ({ classData, role = 'teacher', onViewTests, onManageMembers }
           }}
         >
           {t('common.manageStudents')}
-        </button>
+        </ButtonPrime>
       )}
     </div>
   );

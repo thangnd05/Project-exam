@@ -108,6 +108,7 @@ function ChangePasswordModal({show, onHide}: ChangePasswordModalProps) {
       show={show}
       onHide={closeModal}
       title={t('changePassword.title')}
+      variant="exam"
       footer={
         <ModalActionFooter
           cancelLabel={tCommon('cancelShort')}

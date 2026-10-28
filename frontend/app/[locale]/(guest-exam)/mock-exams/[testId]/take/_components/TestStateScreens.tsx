@@ -5,6 +5,7 @@ import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
 import { Lock, CircleAlert, CirclePlay } from 'lucide-react';
 import Loading from '@/app/components/Loading/Loading';
+import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import { useExamTypeById } from '@/app/features/exam-types/hooks/useExamTypes';
 import { getFullMediaUrl } from '@/app/utils/mediaUrl';
 import { QuestionType } from '@/app/enums';
@@ -140,9 +141,9 @@ export default function TestStateScreens({
                 <span className={cx('exam-stat-value')}>{formatTime(minutes * 60)}</span>
               </div>
             )}
-            <button type="button" className={cx('exam-header-exit')} onClick={onBack}>
+            <ButtonPrime variant="onDark" size="sm" shape="rounded" onClick={onBack}>
               {tLayout('exit')}
-            </button>
+            </ButtonPrime>
           </div>
         </header>
 
@@ -177,12 +178,12 @@ export default function TestStateScreens({
             </ul>
 
             <footer className={cx('ready-footer')}>
-              <button type="button" className={cx('ready-cancel-btn')} onClick={onBack}>
+              <ButtonPrime variant="ghost" shape="rounded" onClick={onBack}>
                 {t('ready.cancel')}
-              </button>
-              <button type="button" className={cx('ready-start-btn')} onClick={onStart}>
+              </ButtonPrime>
+              <ButtonPrime variant="ink" size="lg" shape="rounded" onClick={onStart}>
                 {t('ready.start')}
-              </button>
+              </ButtonPrime>
             </footer>
           </div>
         </div>
@@ -201,16 +202,13 @@ export default function TestStateScreens({
            {t('payment.desc')}
         </p>
         <div className={cx('state-actions')}>
-          <button
-            type="button"
-            className={cx('state-btn', 'state-btn-secondary')}
-            onClick={onBack}
-          >
+          <ButtonPrime variant="soft" size="lg" shape="rounded" onClick={onBack}>
             {t('back')}
-          </button>
-          <button
-            type="button"
-            className={cx('state-btn', 'state-btn-primary')}
+          </ButtonPrime>
+          <ButtonPrime
+            variant="primary"
+            size="lg"
+            shape="rounded"
             disabled={purchasing || !enough}
             onClick={onPurchase}
           >
@@ -219,7 +217,7 @@ export default function TestStateScreens({
               : enough
                 ? t('payment.unlock', { cost })
                 : t('payment.notEnough')}
-          </button>
+          </ButtonPrime>
         </div>
       </div>
     );
@@ -232,9 +230,9 @@ export default function TestStateScreens({
         <h3>{t('noAttempts.title')}</h3>
         <p>{t('noAttempts.desc')}</p>
         <div className={cx('state-actions')}>
-          <button type="button" className={cx('state-btn', 'state-btn-primary')} onClick={onBack}>
+          <ButtonPrime variant="primary" size="lg" shape="rounded" onClick={onBack}>
             {t('back')}
-          </button>
+          </ButtonPrime>
         </div>
       </div>
     );
@@ -258,9 +256,9 @@ export default function TestStateScreens({
         <h3>{t('closed.title')}</h3>
         <p>{t('closed.desc')}</p>
         <div className={cx('state-actions')}>
-          <button type="button" className={cx('state-btn', 'state-btn-primary')} onClick={onBack}>
+          <ButtonPrime variant="primary" size="lg" shape="rounded" onClick={onBack}>
             {t('back')}
-          </button>
+          </ButtonPrime>
         </div>
       </div>
     );
@@ -272,21 +270,13 @@ export default function TestStateScreens({
         <h3>{t('error.title')}</h3>
         <p>{t('error.desc')}</p>
         <div className={cx('state-actions')}>
-          <button
-            type="button"
-            className={cx('state-btn', 'state-btn-secondary')}
-            onClick={onBack}
-          >
+          <ButtonPrime variant="soft" size="lg" shape="rounded" onClick={onBack}>
             {t('back')}
-          </button>
+          </ButtonPrime>
           {onRetry && (
-            <button
-              type="button"
-              className={cx('state-btn', 'state-btn-primary')}
-              onClick={onRetry}
-            >
+            <ButtonPrime variant="primary" size="lg" shape="rounded" onClick={onRetry}>
               {tCommon('error.retry')}
-            </button>
+            </ButtonPrime>
           )}
         </div>
       </div>
