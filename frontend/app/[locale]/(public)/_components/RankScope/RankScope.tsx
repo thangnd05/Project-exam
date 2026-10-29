@@ -5,7 +5,7 @@ import Link from '@/app/i18n/navigation';
 import {useTranslations} from 'next-intl';
 import {useQueryClient} from '@tanstack/react-query';
 import classNames from 'classnames/bind';
-import { ArrowRight, RefreshCw } from 'lucide-react';
+import { ArrowRight, RefreshCw, UserRound } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
@@ -72,7 +72,29 @@ function RankScope() {
       );
     }
 
-    return rows.map(({entry, exam}, i) => {
+    // Luôn đủ TOP hạng: hạng chưa có người hiện dòng giữ chỗ để bảng không bị cụt.
+    const vacant = Array.from({length: TOP - rows.length}, (_, i) => {
+      const rank = rows.length + i + 1;
+      return (
+        <div key={`vacant-${rank}`} className={cx('row', 'dataRow', 'vacantRow')} aria-hidden="true">
+          <div className={cx('rankNo')}>{String(rank).padStart(2, '0')}</div>
+          <div className={cx('person')}>
+            <span className={cx('avatar')}>
+              <UserRound size="1.25em" />
+            </span>
+            <span className={cx('ghost', 'ghostName')} />
+          </div>
+          <div className={cx('cert')}>
+            <span className={cx('ghost', 'ghostCert')} />
+          </div>
+          <div className={cx('score')}>
+            <span className={cx('ghost', 'ghostScore')} />
+          </div>
+        </div>
+      );
+    });
+
+    const filled = rows.map(({entry, exam}, i) => {
       const rank = i + 1;
       const tone = rank <= 3 ? `rank${rank}` : 'rankRest';
       const name = displayName(entry, t('anonymous'));
@@ -98,6 +120,8 @@ function RankScope() {
         </div>
       );
     });
+
+    return [...filled, ...vacant];
   };
 
   return (
@@ -111,7 +135,7 @@ function RankScope() {
                 {t('subtitle', {count: TOP})}
               </p>
             </div>
-            <ButtonPrime variant="outline" size="sm" className={cx('cardBtn')} onClick={refresh} disabled={isFetching}>
+            <ButtonPrime variant="outline" size="md" className={cx('cardBtn')} onClick={refresh} disabled={isFetching}>
               <RefreshCw size="1em" key={spinKey} className={cx('refreshIcon', {spinning: spinKey > 0})} aria-hidden="true" />
               <span>{isFetching ? t('syncing') : t('refresh')}</span>
             </ButtonPrime>
@@ -144,7 +168,7 @@ function RankScope() {
           </div>
 
           <div className={cx('cardFoot')}>
-            <ButtonPrime variant="outline" size="sm" className={cx('cardBtn')} onClick={() => setFullOpen(true)}>
+            <ButtonPrime variant="outline" size="md" className={cx('cardBtn')} onClick={() => setFullOpen(true)}>
               <span>{t('viewAll')}</span>
               <ArrowRight size="1em" className={cx('arrow')} aria-hidden="true" />
             </ButtonPrime>
