@@ -75,15 +75,18 @@
 
 /* ---------- Danh sách ---------- */
 
+// Cao cố định để modal không co giãn theo số người; nhiều hơn thì cuộn trong khung.
 .list {
   display: flex;
-  flex: 1;
   flex-direction: column;
   gap: 8px;
-  max-height: 50vh;
+  height: min(50vh, 440px);
+  min-height: 240px;
   margin: 8px 0;
   padding-right: 4px;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--frost-silver-rgb) / 0.25) transparent;
   animation: reveal 0.3s ease;
 }
 
@@ -235,6 +238,7 @@
 }
 
 .empty {
+  margin: auto 0;
   padding: 40px 16px;
   text-align: center;
   font-size: var(--font-size-smd);

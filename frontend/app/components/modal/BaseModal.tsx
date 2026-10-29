@@ -84,7 +84,6 @@ function BaseModal({
             <ButtonPrime
               variant="ghost"
               size="icon"
-              shape="rounded"
               className={cx('closeBtn')}
               onClick={onClose}
               aria-label={tCommon('close')}

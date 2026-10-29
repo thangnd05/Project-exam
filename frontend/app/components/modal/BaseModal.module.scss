@@ -69,7 +69,7 @@
   letter-spacing: -0.2px;
 }
 
-// Nút đóng là ButtonPrime ghost bo góc: không nền, chỉ hiện ô vuông khi hover.
+// Nút đóng là ButtonPrime ghost tròn như mọi nút icon: không nền, chỉ hiện nền tròn khi hover.
 .closeBtn {
   flex-shrink: 0;
   color: var(--text-secondary);
