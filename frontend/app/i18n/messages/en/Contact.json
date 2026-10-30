@@ -3,20 +3,49 @@
     "title": "Contact",
     "description": "Contact {siteName} for partnerships, advice on your study path or help using the platform."
   },
-  "title": "Contact {siteShortName}",
-  "intro": "Need help or want to talk to the {siteShortName} team? Email the address that matches your request below for the fastest reply.",
-  "partnership": {
-    "title": "Partnerships",
-    "body": "Training centers, companies or individuals who want to collaborate on content, run exam prep for their team or work with {siteShortName}."
-  },
+  "title": "Contact & Support Channels",
+  "intro": "We support learners and partners directly by email. Please choose a channel below for the fastest reply.",
   "support": {
-    "title": "Study path & platform guidance",
-    "body": "Questions about choosing a target exam, reading your skill assessment, building a study plan or account issues while using the platform."
+    "title": "Learning & Technical",
+    "body": "Help with taking mock exams, understanding the exam Blueprint, your personalized study path and account issues."
   },
   "disputes": {
-    "title": "Complaints & disputes",
-    "body": "Reports about question content, scores, certificates or requests related to intellectual property."
+    "title": "Complaints & Legal",
+    "body": "Reports about intellectual property, question bank copyright, terms of service and data privacy."
   },
-  "emailLabel": "Email:",
-  "responseTime": "We usually reply within 1–2 business days."
+  "partnership": {
+    "title": "Partnerships & Business",
+    "body": "Exam prep programs for engineering teams, Cloud/VPS infrastructure providers and affiliate partnerships."
+  },
+  "copy": "Copy",
+  "copied": "Copied!",
+  "copyTitle": "Copy email",
+  "copyFailed": "Couldn't copy the email, please copy it manually.",
+  "sendEmail": "Send email",
+  "hours": {
+    "title": "Working hours & request handling",
+    "body": "Monday to Friday: 08:30 - 18:00 (Closed on Saturdays, Sundays and public holidays)",
+    "sla": "SLA: 24h - 48h business hours"
+  },
+  "faq": {
+    "title": "Quick answers",
+    "subtitle": "What learners ask about most",
+    "start": {
+      "question": "How do I start a quick practice test?",
+      "answer": "Go to the <link>Exam library</link> and pick a realistic quick test, no account required to get started."
+    },
+    "plan": {
+      "question": "How is the personalized study path created?",
+      "answer": "After you finish the quick test, the system analyzes your error rate in each domain and automatically generates a path that fills your knowledge gaps."
+    },
+    "review": {
+      "question": "What if I find a question or answer that needs reviewing?",
+      "answer": "Please email <mail>{email}</mail> with the exam code and question number. Our technical team will verify and update it."
+    },
+    "certificate": {
+      "question": "Does {siteShortName} issue official certificates?",
+      "answer": "{siteShortName} is an exam prep and skill assessment platform. Official certificates are issued by the vendors (AWS, Microsoft, Google, LPI) when you take the real exam."
+    },
+    "cta": "Explore the exam library"
+  }
 }

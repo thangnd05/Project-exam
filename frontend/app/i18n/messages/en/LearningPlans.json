@@ -57,7 +57,6 @@
     "unknownError": "Unknown error",
     "targetLoadError": "Couldn’t load your target",
     "title": "Create a study plan",
-    "subtitle": "Your plan is split into stages, one per exam section. Each stage has short practice tasks on a single topic — get enough answers right to pass.",
     "thisExamFallback": "this exam",
     "targetError": "Couldn’t load the target for \"{exam}\": {error}.",
     "sources": {
@@ -175,7 +174,7 @@
     "practiceSource": "This plan was diagnosed from a <strong>section practice test</strong>, so it only covers the sections practiced. Take a full-length mock exam and create a new plan for full coverage.",
     "partsWithoutTasks": "These sections are below target but don’t have practice material yet — {siteShortName} is adding more:",
     "roadmapTitle": "Your task map",
-    "roadmapDesc": "{parts, plural, one {# stage} other {# stages}} · {tasks, plural, one {# task} other {# tasks}}. Each stage is one exam section, and each task is a short practice round on one topic — get enough answers right to pass."
+    "roadmapDesc": "{parts, plural, one {# stage} other {# stages}} · {tasks, plural, one {# task} other {# tasks}}"
   },
   "mockGuide": {
     "heading": "What’s next?",
@@ -231,7 +230,6 @@
   },
   "compare": {
     "title": "Compare study plans",
-    "subtitle": "See the starting readiness and progress of every plan you have created for this exam.",
     "emptyTitle": "Not enough plans to compare yet",
     "emptyDescription": "You need at least {min} plans for this exam. Take another mock exam and create a new plan to compare.",
     "generateMore": "Create a new plan",

@@ -31,6 +31,11 @@
     padding-left: 20px;
     list-style: disc;
 
+    // Reset toàn cục đặt list-style: none trên cả li nên phải lấy lại từ ul.
+    li {
+      list-style: inherit;
+    }
+
     li + li {
       margin-top: 8px;
     }
@@ -97,46 +102,66 @@
   color: var(--slate-500);
 }
 
-// Nội dung phẳng (h1/h2/p/ul liền nhau, không chia section) như trang Giới thiệu.
-.prose {
-  h1 {
-    padding-bottom: 24px;
-    margin: 0 0 40px;
-    border-bottom: 1px solid rgb(var(--slate-300-rgb) / 0.8);
-    font-size: var(--font-size-4xl);
-    font-weight: 800;
-    line-height: 1.2;
-    letter-spacing: -0.025em;
-    color: var(--slate-900);
-  }
+// Trang Giới thiệu theo mẫu riêng: dòng chữ khít hơn hai trang Chính sách và Điều khoản.
+.about {
+  padding-top: 46px;
+  padding-bottom: 36px;
+  line-height: 1.5;
 
-  h2 {
-    margin: 40px 0 12px;
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-bold);
-    line-height: 1.4;
-    letter-spacing: -0.025em;
-    color: var(--slate-900);
-  }
-
-  p,
-  ul {
-    margin: 0 0 12px;
-  }
-
-  .thankyou {
-    margin-top: 40px;
+  .title {
+    line-height: 1.11;
   }
 }
 
-.thankyou {
-  padding: 16px 20px;
-  border: 1px solid var(--brand-200);
-  border-radius: var(--radius-md);
-  background: var(--brand-50);
-  font-weight: var(--font-weight-semibold);
-  color: var(--brand-700);
-  text-align: center;
+// Dòng mô tả dưới tiêu đề trang Giới thiệu.
+.subtitle {
+  margin: 12px 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-ssm);
+  line-height: 1.43;
+  color: var(--slate-500);
+}
+
+// 4 giai đoạn học tập: tiêu đề nhỏ kèm đoạn mô tả, không đánh dấu đầu dòng.
+.stages {
+  padding-top: 8px;
+}
+
+.stage {
+  & + & {
+    margin-top: 16px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: inherit;
+    font-weight: var(--font-weight-bold);
+    line-height: inherit;
+    color: var(--slate-900);
+  }
+
+  p {
+    margin: 4px 0 0;
+  }
+}
+
+// Mục liên hệ cuối trang: có vạch ngăn phía trên, danh sách chữ mono không đầu dòng.
+.contactSection {
+  padding-top: 24px;
+  border-top: 1px solid rgb(var(--slate-300-rgb) / 0.8);
+}
+
+.page .contactList {
+  padding-left: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-ssm);
+  line-height: 1.43;
+  color: var(--slate-600);
+
+  li + li {
+    margin-top: 6px;
+  }
 }
 
 @include up(xl) {
@@ -151,13 +176,24 @@
     font-size: var(--font-size-ssm);
   }
 
-  .title,
-  .prose h1 {
+  .title {
     font-size: var(--font-size-3xl);
   }
 
-  .section h2,
-  .prose h2 {
+  .about {
+    line-height: 1.43;
+
+    .title {
+      line-height: 1.2;
+    }
+  }
+
+  .section h2 {
     font-size: var(--font-size-lg);
+  }
+
+  .subtitle,
+  .page .contactList {
+    font-size: var(--font-size-sm);
   }
 }

@@ -61,7 +61,6 @@
   },
   "setTarget": {
     "title": "Mục tiêu của tôi",
-    "subtitle": "Chọn kỳ thi và mức điểm bạn muốn đạt. {siteShortName} dựa vào đó để biết mỗi phần cần luyện tới đâu rồi lập lộ trình cho bạn.",
     "toast": {
       "enterScoreFirst": "Nhập điểm mục tiêu trước.",
       "loginRequired": "Bạn cần đăng nhập để lưu mục tiêu!",
@@ -139,7 +138,6 @@
   },
   "dashboard": {
     "title": "Tổng quan mục tiêu",
-    "subtitle": "Bài thi thử gần nhất so với mục tiêu, lộ trình đang học và % đúng từng phần thi.",
     "noTarget": {
       "title": "Chưa đặt mục tiêu cho kỳ thi này",
       "description": "Đặt mức điểm muốn đạt để xem tiến độ từng phần và sinh lộ trình phù hợp.",

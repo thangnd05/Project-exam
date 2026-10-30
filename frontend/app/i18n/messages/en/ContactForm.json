@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "title": "Contact",
+    "description": "Contact the {siteShortName} team. We're ready to help with questions about Cloud certification exams, study paths and account services."
+  },
+  "title": "Contact Us",
+  "intro": "Need help with your account, have feedback on exam content or want to discuss a partnership? Send a message to the {siteShortName} team.",
+  "support": {
+    "title": "General & Technical Support",
+    "body": "Questions about taking mock exams, your personalized study path or signing in to your account."
+  },
+  "disputes": {
+    "title": "Complaints & Disputes",
+    "body": "The official channel for issues about question copyright, service disputes and terms."
+  },
+  "hours": {
+    "title": "Working hours",
+    "body": "Monday to Friday, 08:30 to 18:00 (Vietnam time).",
+    "response": "Typical response time: within 24 to 48 business hours."
+  },
+  "form": {
+    "title": "Send us a message",
+    "subtitle": "Fill in the details below and we'll reply to your email as soon as possible.",
+    "name": "Full name",
+    "namePlaceholder": "e.g. Nguyen Van A",
+    "email": "Email address",
+    "emailPlaceholder": "email@example.com",
+    "topic": "Topic",
+    "topics": {
+      "exam": "Mock exams & study paths",
+      "account": "Account & sign-in issues",
+      "feedback": "Question feedback or technical issues",
+      "partnership": "Training & business partnerships",
+      "other": "Other"
+    },
+    "message": "Message",
+    "messagePlaceholder": "Enter the details you'd like to send to {siteShortName}...",
+    "submit": "Send message",
+    "sent": "Sent successfully",
+    "success": "Your message has been sent. The {siteShortName} team will reply to your email soon."
+  }
+}

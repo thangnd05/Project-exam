@@ -61,7 +61,6 @@
   },
   "setTarget": {
     "title": "My target",
-    "subtitle": "Pick an exam and the score you want to reach. {siteShortName} uses it to work out how far each section needs to go, then builds your study plan.",
     "toast": {
       "enterScoreFirst": "Enter a target score first.",
       "loginRequired": "Please sign in to save your target!",
@@ -139,7 +138,6 @@
   },
   "dashboard": {
     "title": "Target overview",
-    "subtitle": "Your latest mock test against your target, your active study plan, and % correct per section.",
     "noTarget": {
       "title": "No target set for this exam",
       "description": "Set the score you want to reach to track progress per section and generate a matching study plan.",

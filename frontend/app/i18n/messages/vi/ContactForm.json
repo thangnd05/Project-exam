@@ -1,0 +1,42 @@
+{
+  "meta": {
+    "title": "Liên hệ",
+    "description": "Liên hệ với đội ngũ {siteShortName}. Chúng tôi luôn sẵn sàng hỗ trợ giải đáp thắc mắc về đề thi chứng chỉ Cloud, lộ trình học tập và dịch vụ tài khoản."
+  },
+  "title": "Liên Hệ Với Chúng Tôi",
+  "intro": "Bạn cần hỗ trợ về tài khoản, góp ý nội dung bài thi hoặc trao đổi cơ hội hợp tác? Hãy gửi tin nhắn cho đội ngũ {siteShortName}.",
+  "support": {
+    "title": "Hỗ trợ chung & Kỹ thuật",
+    "body": "Hỏi đáp về cách làm bài thi thử, lộ trình học tập cá nhân hóa hoặc hỗ trợ đăng nhập tài khoản."
+  },
+  "disputes": {
+    "title": "Khiếu nại & Tranh chấp",
+    "body": "Kênh tiếp nhận chính thức các vấn đề liên quan đến bản quyền câu hỏi, tranh chấp dịch vụ và điều khoản."
+  },
+  "hours": {
+    "title": "Thời gian làm việc",
+    "body": "Thứ Hai đến Thứ Sáu, từ 08:30 đến 18:00 (giờ Việt Nam).",
+    "response": "Thời gian phản hồi thông thường: trong vòng 24 đến 48 giờ làm việc."
+  },
+  "form": {
+    "title": "Gửi tin nhắn trực tiếp",
+    "subtitle": "Điền thông tin bên dưới, chúng tôi sẽ phản hồi qua email của bạn sớm nhất.",
+    "name": "Họ và tên",
+    "namePlaceholder": "Ví dụ: Nguyễn Văn A",
+    "email": "Địa chỉ Email",
+    "emailPlaceholder": "email@example.com",
+    "topic": "Chủ đề cần hỗ trợ",
+    "topics": {
+      "exam": "Hỗ trợ đề thi thử & lộ trình học tập",
+      "account": "Vấn đề tài khoản & đăng nhập",
+      "feedback": "Góp ý cải thiện câu hỏi hoặc lỗi kỹ thuật",
+      "partnership": "Hợp tác đào tạo & doanh nghiệp",
+      "other": "Chủ đề khác"
+    },
+    "message": "Nội dung tin nhắn",
+    "messagePlaceholder": "Nhập chi tiết nội dung bạn muốn gửi tới {siteShortName}...",
+    "submit": "Gửi tin nhắn",
+    "sent": "Đã gửi thành công",
+    "success": "Tin nhắn đã được gửi thành công. Đội ngũ {siteShortName} sẽ phản hồi sớm qua email của bạn."
+  }
+}

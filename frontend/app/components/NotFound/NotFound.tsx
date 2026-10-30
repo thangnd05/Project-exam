@@ -3,6 +3,7 @@
 import classNames from "classnames/bind";
 import { useTranslations } from "next-intl";
 import ButtonPrime from "@/app/components/Button/ButtonPrime";
+import routes from "@/app/configs/Routes";
 import styles from "./NotFound.module.scss";
 
 const cx = classNames.bind(styles);
@@ -11,78 +12,21 @@ export default function NotFound() {
     const t = useTranslations("Common.notFound");
     return (
         <div className={cx("wrapper")}>
-            <div className={cx("card")}>
-                <div className={cx("mascotWrap")}>
-                    <svg
-                        className={cx("mascotSvg")}
-                        width="170"
-                        height="170"
-                        viewBox="0 0 160 160"
-                        fill="none"
-                        aria-hidden="true"
-                    >
+            <div className={cx("content")}>
+                <p className={cx("code")}>404</p>
 
-                        <ellipse
-                            className={cx("shadow")}
-                            cx="80"
-                            cy="146"
-                            rx="42"
-                            ry="8"
-                            fill="var(--primary)"
-                        />
-                        <g className={cx("mascot")}>
+                <h1 className={cx("title")}>{t("title")}</h1>
 
-                            <rect
-                                x="26"
-                                y="30"
-                                width="108"
-                                height="100"
-                                rx="42"
-                                fill="url(#nf-body)"
-                            />
+                <p className={cx("desc")}>{t("description")}</p>
 
-                            <circle cx="52" cy="92" r="8" fill="#ffb0c4" opacity="0.75" />
-                            <circle cx="108" cy="92" r="8" fill="#ffb0c4" opacity="0.75" />
-
-                            <circle className={cx("eye")} cx="62" cy="76" r="6.5" fill="#1e293b" />
-                            <circle className={cx("eye")} cx="98" cy="76" r="6.5" fill="#1e293b" />
-                            <circle cx="64" cy="74" r="2" fill="#ffffff" />
-                            <circle cx="100" cy="74" r="2" fill="#ffffff" />
-
-                            <ellipse cx="80" cy="102" rx="5" ry="6" fill="#1e293b" />
-                        </g>
-
-                        <text
-                            className={cx("question")}
-                            x="128"
-                            y="42"
-                            fontSize="34"
-                            fontWeight="800"
-                            fill="var(--primary)"
-                            textAnchor="middle"
-                        >
-                            ?
-                        </text>
-                        <defs>
-                            <linearGradient id="nf-body" x1="26" y1="30" x2="134" y2="130" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="var(--brand-100)" />
-                                <stop offset="1" stopColor="var(--brand-200)" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
+                <div className={cx("actions")}>
+                    <ButtonPrime as="link" href={routes.home} variant="ink">
+                        {t("backHome")}
+                    </ButtonPrime>
+                    <ButtonPrime as="link" href={routes.examTypes} variant="outline">
+                        {t("examTypes")}
+                    </ButtonPrime>
                 </div>
-
-                <h1 className={cx("code")}>404</h1>
-
-                <h2 className={cx("title")}>{t("title")}</h2>
-
-                <p className={cx("desc")}>
-                    {t("description")}
-                </p>
-
-                <ButtonPrime as="link" href="/" variant="primary" size="lg">
-                    {t("backHome")}
-                </ButtonPrime>
             </div>
         </div>
     );

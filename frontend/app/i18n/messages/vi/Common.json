@@ -21,9 +21,10 @@
   },
   "notFound": {
     "pageTitle": "404",
-    "title": "Ơ, trang này đi đâu mất rồi?",
-    "description": "Đường dẫn bạn truy cập không tồn tại hoặc đã bị xóa. Hãy giúp mình click vào nút bên dưới",
-    "backHome": "Quay về trang chủ"
+    "title": "Không tìm thấy trang",
+    "description": "Trang bạn đang truy cập không tồn tại, đã bị gỡ bỏ hoặc đường dẫn đã thay đổi.",
+    "backHome": "Về trang chủ",
+    "examTypes": "Kho đề thi"
   },
   "comingSoon": {
     "pageTitle": "Đang cập nhật",

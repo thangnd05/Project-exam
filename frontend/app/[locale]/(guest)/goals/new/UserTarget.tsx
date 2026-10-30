@@ -26,7 +26,6 @@ import { useAuth } from '@/app/hooks/useAuth';
 import { buildLoginUrl, safeRedirect } from '@/app/utils/redirect';
 import type { MilestoneResponse } from '@/app/types';
 import { useCurrentUserTarget, useUserTargetData } from './_hooks/useUserTargetData';
-import PageHeader from '@/app/components/PageHeader/PageHeader';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {
   useSaveUserTarget,
@@ -375,7 +374,7 @@ function UserTarget() {
   return (
     <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
       <TargetPlanTabs active="target" examTypeId={selectedExamTypeId} examTypes={examTypes} />
-      <PageHeader title={t('setTarget.title')} description={t('setTarget.subtitle')} />
+      <h1 className="visually-hidden">{t('setTarget.title')}</h1>
 
       <ExamPillPicker
         className={ui('pickerRow')}

@@ -24,7 +24,6 @@ import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.s
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
 import styles from './GeneratePlan.module.scss';
 import type { PlanResponse } from '@/app/types';
-import PageHeader from '@/app/components/PageHeader/PageHeader';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import {
   useActivePlan,
@@ -326,7 +325,7 @@ function GeneratePlan() {
   return (
     <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
       <TargetPlanTabs active="plan" examTypeId={sourceExamTypeId} examTypes={examTypes} />
-      <PageHeader title={t('generate.title')} description={t('generate.subtitle')} />
+      <h1 className="visually-hidden">{t('generate.title')}</h1>
 
       <ExamPillPicker
         className={ui('pickerRow')}

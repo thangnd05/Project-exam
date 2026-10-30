@@ -22,7 +22,6 @@ import { LearningPlanStatus } from '@/app/enums';
 import pageStyles from './TargetDashboard.module.scss';
 import planStyles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import uiStyles from '@/app/assets/styles/FlatUi.module.scss';
-import PageHeader from '@/app/components/PageHeader/PageHeader';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 
 const planCx = classNamesBind.bind(planStyles);
@@ -143,7 +142,7 @@ function TargetDashboard({ examCode }: TargetDashboardProps) {
   return (
     <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
       <TargetPlanTabs active="overview" examTypeId={examTypeId} examTypes={examTypes} />
-      <PageHeader title={t('dashboard.title')} description={t('dashboard.subtitle')} />
+      <h1 className="visually-hidden">{t('dashboard.title')}</h1>
 
       <ExamPillPicker
         className={ui('pickerRow')}

@@ -6,6 +6,8 @@ const cx = classNames.bind(styles);
 
 type EmptyStateProps = {
   icon?: LucideIcon;
+  // Hình minh hoạ riêng, hiển thị thay cho icon.
+  illustration?: React.ReactNode;
   title: React.ReactNode;
   description?: React.ReactNode;
   // Nút/link hành động (thử lại, xoá bộ lọc, đi tới trang khác...).
@@ -19,10 +21,14 @@ type EmptyStateProps = {
 
 // Trạng thái rỗng/lỗi dùng chung cho vùng nội dung chính của trang (danh sách, lưới, bảng tự dựng).
 // Ô "chưa có dữ liệu" nhỏ bên trong biểu đồ/thẻ thống kê không cần dùng component này.
-function EmptyState({ icon: Icon, title, description, action, tone = 'neutral', compact = false, className }: EmptyStateProps) {
+function EmptyState({ icon: Icon, illustration, title, description, action, tone = 'neutral', compact = false, className }: EmptyStateProps) {
   return (
     <div className={cx('wrapper', tone, { compact }, className)} role={tone === 'danger' ? 'alert' : undefined}>
-      {Icon && <Icon size="1em" className={cx('icon')} aria-hidden="true" />}
+      {illustration ? (
+        <div className={cx('illustration')}>{illustration}</div>
+      ) : (
+        Icon && <Icon size="1em" className={cx('icon')} aria-hidden="true" />
+      )}
       <h3 className={cx('title')}>{title}</h3>
       {description && <p className={cx('description')}>{description}</p>}
       {action && <div className={cx('action')}>{action}</div>}

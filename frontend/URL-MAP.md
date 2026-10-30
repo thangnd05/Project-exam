@@ -145,7 +145,9 @@ Tất cả 🔒, mỗi trang kiểm tra quyền riêng. Không có link từ gia
 **Footer** ([Footer](app/components/layouts/Footer/index.tsx))
 - `/` · `/exams` · `/learning-paths/create` · `/about` · `/contact` · `/privacy-policy` · `/terms`
 
-**Trang 404** → `/`
+**Giới thiệu** → `/` · `/contact`
+
+**Trang 404** → `/` · `/exams`
 
 ---
 

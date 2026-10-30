@@ -1,0 +1,233 @@
+@import 'app/assets/styles/mixins.scss';
+
+// Trang liên hệ có biểu mẫu theo mẫu FrostScope contact_form.html: cột thông tin kênh hỗ trợ + cột form gửi tin nhắn.
+// Bo góc 12px viết thẳng: --radius-md tính theo rem nên ở font gốc 10px chỉ còn 7.5px, không khớp mẫu.
+
+.page {
+  --contact-link: var(--frost-link);
+  --contact-link-hover: var(--brand-700);
+  --contact-field-bg: var(--slate-50);
+  --btn-ink-fg: var(--frost-ice-white);
+
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 46px 32px 96px;
+  font-family: var(--font-family);
+  color: var(--slate-700);
+
+  @include dark-theme {
+    --contact-link: var(--brand-700);
+    --contact-link-hover: var(--brand-800);
+    --contact-field-bg: var(--brand-50);
+    --btn-ink-fg: var(--brand-50);
+  }
+
+  // :where để reset không đè margin của các lớp bên dưới.
+  :where(h1, h2, p) {
+    margin: 0;
+  }
+}
+
+.header {
+  padding-bottom: 24px;
+  margin-bottom: 40px;
+  border-bottom: 1px solid rgb(var(--slate-300-rgb) / 0.8);
+}
+
+.title {
+  margin-bottom: 8px;
+  font-size: var(--font-size-4xl);
+  font-weight: 800;
+  line-height: calc(40 / 36);
+  letter-spacing: -0.025em;
+  color: var(--slate-900);
+}
+
+.intro {
+  max-width: 672px;
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--slate-600);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: start;
+  gap: 32px;
+}
+
+.card {
+  border: 1px solid rgb(var(--slate-200-rgb) / 0.8);
+  border-radius: var(--radius-card);
+  background: var(--bg-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.text {
+  font-size: var(--font-size-sm);
+  line-height: 1.625;
+  color: var(--slate-600);
+}
+
+/* ---------- Cột thông tin ---------- */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  grid-column: span 5;
+  gap: 16px;
+}
+
+.infoCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 20px;
+}
+
+.infoTitle {
+  font-size: var(--font-size-ssm);
+  font-weight: var(--font-weight-bold);
+  line-height: calc(20 / 14);
+  color: var(--slate-900);
+}
+
+.email {
+  padding: 10px 0 2px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: calc(4 / 3);
+  color: var(--contact-link);
+  text-decoration: underline;
+  transition: color 0.15s ease;
+
+  &:hover {
+    color: var(--contact-link-hover);
+  }
+}
+
+.note {
+  font-size: var(--font-size-xs2);
+  line-height: 1.5;
+  color: var(--slate-500);
+}
+
+/* ---------- Cột form ---------- */
+
+.formCard {
+  grid-column: span 7;
+  padding: 32px;
+}
+
+.formTitle {
+  margin-bottom: 4px;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  line-height: calc(28 / 18);
+  color: var(--slate-900);
+}
+
+.formSubtitle {
+  margin-bottom: 24px;
+  font-size: var(--font-size-sm);
+  line-height: calc(4 / 3);
+  color: var(--slate-500);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  line-height: calc(4 / 3);
+  color: var(--slate-700);
+}
+
+.control {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--slate-300);
+  border-radius: 12px;
+  background: var(--contact-field-bg);
+  font-family: inherit;
+  font-size: var(--font-size-ssm);
+  line-height: calc(20 / 14);
+  color: var(--slate-900);
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &::placeholder {
+    color: var(--slate-400);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: transparent;
+    background: var(--bg-white);
+    box-shadow: 0 0 0 2px var(--brand-800);
+  }
+}
+
+.textarea {
+  resize: vertical;
+}
+
+.actions {
+  padding-top: 14px;
+}
+
+// Viên thuốc cao 40px như mẫu, padding đã trừ viền 1px.
+.actions .submitBtn {
+  padding: 9px 23px;
+  font-size: var(--font-size-ssm);
+  line-height: calc(20 / 14);
+  box-shadow: var(--shadow-sm);
+
+  &:hover:not(:disabled) {
+    transform: scale(1.01);
+  }
+}
+
+.success {
+  padding: 12px;
+  border: 1px solid rgb(var(--green-200-rgb));
+  border-radius: 12px;
+  background: rgb(var(--green-50-rgb));
+  font-size: var(--font-size-sm);
+  line-height: calc(4 / 3);
+  color: rgb(var(--green-800-rgb));
+}
+
+@include down(lg) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sidebar,
+  .formCard {
+    grid-column: auto;
+  }
+}
+
+@include down(sm) {
+  .page {
+    padding: 24px 20px 64px;
+  }
+
+  .formCard {
+    padding: 24px;
+  }
+
+  .actions .submitBtn {
+    width: 100%;
+  }
+}

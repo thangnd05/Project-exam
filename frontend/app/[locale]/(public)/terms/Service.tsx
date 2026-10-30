@@ -7,7 +7,7 @@ import style from "@/app/[locale]/(public)/_components/poliSer.module.scss";
 
 const cx = classNames.bind(style);
 
-const DISPUTE_EMAIL = 'dispute@frostscope.com';
+const DISPUTE_EMAIL = 'legal@frostscope.com';
 
 const strong = (chunks: ReactNode) => <strong>{chunks}</strong>;
 const em = (chunks: ReactNode) => <em>{chunks}</em>;

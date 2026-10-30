@@ -57,7 +57,6 @@
     "unknownError": "Lỗi không xác định",
     "targetLoadError": "Không tải được mục tiêu",
     "title": "Sinh lộ trình vượt ải",
-    "subtitle": "Lộ trình chia thành các chặng, mỗi chặng là một phần thi. Mỗi chặng gồm nhiều ải luyện ngắn về một chủ đề, làm đủ % câu đúng là vượt.",
     "thisExamFallback": "kỳ thi này",
     "targetError": "Không tải được mục tiêu cho \"{exam}\": {error}.",
     "sources": {
@@ -175,7 +174,7 @@
     "practiceSource": "Lộ trình này chẩn đoán từ một <strong>bài luyện theo phần</strong> nên chỉ phủ các phần đã luyện. Làm bài thi thử trọn đề rồi sinh lại để có lộ trình đầy đủ.",
     "partsWithoutTasks": "Các phần thi sau chưa đạt mục tiêu nhưng tạm thời chưa có bài luyện, {siteShortName} đang bổ sung:",
     "roadmapTitle": "Bản đồ ải của bạn",
-    "roadmapDesc": "{parts} chặng · {tasks} ải. Mỗi chặng là một phần thi, mỗi ải là một lượt luyện ngắn về một chủ đề  đạt đủ % câu đúng là vượt ải."
+    "roadmapDesc": "{parts} chặng · {tasks} ải"
   },
   "mockGuide": {
     "heading": "Tiếp theo làm gì?",
@@ -231,7 +230,6 @@
   },
   "compare": {
     "title": "So sánh các lộ trình",
-    "subtitle": "Xem mức sẵn sàng ban đầu và tiến độ của từng lộ trình bạn đã tạo cho kỳ thi.",
     "emptyTitle": "Chưa đủ lộ trình để so sánh",
     "emptyDescription": "Cần ít nhất {min} lộ trình của kỳ thi này. Làm thêm bài thi thử rồi tạo lộ trình mới để so sánh.",
     "generateMore": "Tạo lộ trình mới",

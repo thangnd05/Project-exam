@@ -11,7 +11,7 @@ import Link from '@/app/i18n/navigation';
 import styles from './footer.module.scss';
 
 const CONTACT_EMAIL = 'contact@frostscope.com';
-const DISPUTE_EMAIL = 'dispute@frostscope.com';
+const DISPUTE_EMAIL = 'legal@frostscope.com';
 
 type FooterLabelKey =
   | 'examTypes'

@@ -7,7 +7,6 @@ import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import TargetPlanTabs from '@/app/features/my-target/TargetPlanTabs/TargetPlanTabs';
 import ExamPillPicker from '@/app/features/my-target/ExamPillPicker/ExamPillPicker';
-import PageHeader from '@/app/components/PageHeader/PageHeader';
 import { getStandardExamTypes } from '@/app/apis/examTypeApi';
 import { listPlans } from '@/app/apis/learningPlanApi';
 import routes from '@/app/configs/Routes';
@@ -60,7 +59,7 @@ function PlanCompare() {
   return (
     <div className={classNames(planCx('wrapper'), ui('pageRoot'))}>
       <TargetPlanTabs active="compare" examTypeId={examTypeId} examTypes={examTypes} />
-      <PageHeader title={t('compare.title')} description={t('compare.subtitle')} />
+      <h1 className="visually-hidden">{t('compare.title')}</h1>
 
       <ExamPillPicker
         className={ui('pickerRow')}

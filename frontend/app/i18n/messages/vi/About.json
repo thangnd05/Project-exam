@@ -3,35 +3,69 @@
     "title": "Giới thiệu {siteName} | Nền tảng luyện thi chứng chỉ Cloud cá nhân hóa",
     "description": "Tìm hiểu {siteName}, nền tảng giúp người học đánh giá năng lực, nhận diện lỗ hổng kiến thức và xây dựng lộ trình ôn thi chứng chỉ cloud."
   },
-  "title": "Giới thiệu về hệ thống {siteShortName}",
-  "intro": "Xin chào! Chào mừng bạn đến với <strong>{siteShortName}</strong>  nền tảng học tập và kiểm tra trực tuyến hiện đại, được xây dựng để hỗ trợ giáo viên và học sinh trong việc tạo, tham gia và quản lý bài thi một cách nhanh chóng, thuận tiện và hiệu quả.",
-  "goals": {
-    "title": "Mục tiêu phát triển",
-    "intro": "Ứng dụng được thiết kế nhằm giúp các trường học, trung tâm hoặc cá nhân có thể dễ dàng:",
+  "schema": {
+    "description": "Nền tảng đánh giá năng lực và cá nhân hóa lộ trình luyện thi chứng chỉ Cloud Computing, DevOps và Kubernetes chuẩn Blueprint.",
+    "slogan": "Từ nay đến ngày thi lộ trình dành riêng cho bạn"
+  },
+  "title": "Giới Thiệu Về {siteName}",
+  "subtitle": "Nền tảng đánh giá năng lực & cá nhân hóa lộ trình luyện thi chứng chỉ Cloud, DevOps và Kubernetes",
+  "what": {
+    "title": "1. {siteName} là gì?",
+    "overview": "{siteName} là nền tảng công nghệ giáo dục chuyên sâu về đánh giá năng lực và cá nhân hóa lộ trình luyện thi chứng chỉ điện toán đám mây (Cloud Computing), DevOps và hạ tầng Container/Kubernetes dành cho kỹ sư công nghệ và người học tại Việt Nam.",
+    "philosophy": "Khác biệt hoàn toàn với các kho đề thi tĩnh truyền thống, {siteName} vận hành dựa trên triết lý: <strong>Tập trung cải thiện phần kiến thức bạn còn thiếu, thay vì bắt bạn ôn lại toàn bộ những gì bạn đã nắm vững.</strong> Nền tảng giúp người học chuyển hóa trạng thái từ mơ hồ về năng lực bản thân sang sự tự tin và có phương hướng rõ ràng trước khi bước vào kỳ thi chính thức."
+  },
+  "problem": {
+    "title": "2. Vấn đề của phương pháp luyện thi truyền thống",
+    "intro": "Lệ phí thi các chứng chỉ công nghệ quốc tế (AWS, Microsoft Azure, Google Cloud Platform, The Linux Foundation) thường dao động từ 100 USD đến hơn 300 USD cho mỗi lần thi. Tuy nhiên, phần lớn kỹ sư khi tự ôn luyện thường gặp phải những trở ngại lớn:",
     "items": [
-      "Tạo bài kiểm tra theo từng kỹ năng hoặc môn học.",
-      "Quản lý lớp học, danh sách học viên và bài thi theo từng lớp.",
-      "Theo dõi tiến độ làm bài, chấm điểm tự động và hiển thị kết quả ngay lập tức.",
-      "Tổ chức kỳ thi online có thời gian, số lần làm và giới hạn truy cập theo lớp."
+      { "label": "Ôn tập dàn trải, không có trọng tâm:", "text": "Người học thường giải hàng trăm câu hỏi trắc nghiệm một cách ngẫu nhiên mà không biết tỷ lệ nắm vững thực tế của mình trong từng chủ đề (Domain)." },
+      { "label": "Học vẹt đáp án thay vì hiểu bản chất:", "text": "Việc giải đề tĩnh không phân biệt được người trả lời đúng do nắm chắc nguyên lý kiến trúc hay do may mắn đoán trúng đáp án." },
+      { "label": "Không có phương án đo lường độ sẵn sàng:", "text": "Người học thường đi thi theo cảm tính mà không có chỉ số tin cậy (Readiness) để biết mình đã đủ điều kiện vượt qua bài thi thực tế hay chưa." }
+    ],
+    "outro": "{siteName} ra đời nhằm giải quyết triệt để những bất cập này thông qua chu kỳ đánh giá năng lực và thích ứng bài học theo thời gian thực."
+  },
+  "cycle": {
+    "title": "3. Chu kỳ học tập 4 giai đoạn tại {siteName}",
+    "intro": "Toàn bộ hành trình của người học trên nền tảng được tổ chức khép kín qua 4 giai đoạn logic:",
+    "stages": [
+      { "title": "Giai đoạn 1: Đánh giá ban đầu (Quick Scope)", "text": "Bài kiểm tra nhanh mô phỏng thực tế với khối lượng tinh gọn (khoảng 25% độ dài đề thi thật) giúp hệ thống quan sát hiện trạng kiến thức ngay khi bạn bắt đầu tiếp cận chứng chỉ mà không cần tốn quá nhiều giờ đồng hồ." },
+      { "title": "Giai đoạn 2: Trực quan hóa năng lực (Skill Map & Gap Report)", "text": "Hệ thống tự động phân tách kết quả thi thành bản đồ kỹ năng trực quan, nhận diện chính xác phần kiến thức bạn còn yếu trong từng Domain cụ thể (ví dụ: Networking, Security, Compute, Storage hoặc IAM) kèm mức độ chắc chắn của câu trả lời." },
+      { "title": "Giai đoạn 3: Luyện tập trọng tâm thích ứng (My Path & Daily Focus)", "text": "Hệ thống kiến tạo lộ trình cá nhân hóa dựa trên ngày thi mục tiêu và thời gian học mỗi ngày của bạn. Kế hoạch hằng ngày phân phối các bài luyện tập tập trung (Focus Drill) và thuật toán ngắt quãng (Smart Review) để củng cố đúng kiến thức sắp phai mờ." },
+      { "title": "Giai đoạn 4: Kiểm chứng hoàn chỉnh (Full Mock Test & Readiness)", "text": "Trước ngày thi thật, người học thực hiện các bài thi mô phỏng đầy đủ (Full Mock) với áp lực thời gian và cấu trúc câu hỏi sát chuẩn khảo thí thực tế nhằm đo lường mức độ sẵn sàng (Readiness Index)." }
     ]
   },
-  "features": {
-    "title": "Tính năng nổi bật",
+  "certifications": {
+    "title": "4. Danh mục chứng chỉ công nghệ hỗ trợ",
+    "intro": "{siteName} liên tục cập nhật ngân hàng đề thi và tình huống kỹ thuật bám sát cấu trúc đề cương kiểm tra (Exam Blueprint) chính thức từ các nhà cung cấp công nghệ hàng đầu thế giới:",
     "items": [
-      { "label": "Tạo đề thi linh hoạt:", "text": "Giáo viên có thể tự tạo đề hoặc chọn câu hỏi từ ngân hàng đề." },
-      { "label": "Quản lý lớp học:", "text": "Tạo lớp, duyệt học viên tham gia, và theo dõi tiến trình học tập." },
-      { "label": "Phân quyền người dùng:", "text": "Phân biệt rõ vai trò." },
-      { "label": "Lưu trữ đa phương tiện:", "text": "Hỗ trợ chèn hình ảnh, âm thanh và tài liệu cho từng câu hỏi." },
-      { "label": "Báo cáo thống kê:", "text": "Tổng hợp điểm, thời gian làm bài và kết quả học tập chi tiết." }
+      { "label": "Amazon Web Services (AWS):", "text": "Các kỳ thi từ nền tảng đến chuyên sâu bao gồm AWS Certified Cloud Practitioner (CLF-C02), Solutions Architect Associate (SAA-C03), Developer Associate (DVA-C02), SysOps Administrator Associate (SOA-C02), Solutions Architect Professional (SAP-C02), DevOps Engineer Professional (DOP-C02) và các chứng chỉ chuyên khoa Security, Advanced Networking, Machine Learning." },
+      { "label": "Microsoft Azure:", "text": "Azure Fundamentals (AZ-900), Azure Administrator Associate (AZ-104), Azure Solutions Architect Expert (AZ-305) và Azure DevOps Engineer Expert (AZ-400)." },
+      { "label": "Google Cloud Platform (GCP):", "text": "Associate Cloud Engineer (ACE), Professional Cloud Architect (PCA) và Professional Cloud DevOps Engineer." },
+      { "label": "Hạ tầng Linux & Kubernetes:", "text": "Linux Professional Institute (LPI LPIC-1/LPIC-2), Certified Kubernetes Administrator (CKA), Certified Kubernetes Application Developer (CKAD) của The Linux Foundation / CNCF." }
     ]
   },
-  "community": {
-    "title": "Định hướng cộng đồng",
-    "body": "<strong>{siteShortName}</strong> không chỉ là nơi kiểm tra kiến thức, mà còn là môi trường học tập tương tác, nơi giáo viên có thể chia sẻ tài liệu, và học viên có thể học hỏi lẫn nhau thông qua các lớp học trực tuyến."
+  "principles": {
+    "title": "5. Nguyên tắc chất lượng & Tính độc lập",
+    "intro": "Để đảm bảo giá trị học tập thực chất và tuân thủ các chuẩn mực đạo đức trong đào tạo công nghệ, {siteName} tuân thủ nghiêm ngặt các nguyên tắc sau:",
+    "items": [
+      { "label": "Tôn trọng quyền sở hữu trí tuệ:", "text": "Toàn bộ câu hỏi, giải thích chi tiết và tình huống thực hành trên {siteName} do đội ngũ kỹ sư của chúng tôi độc lập biên soạn bám sát tài liệu Blueprint công khai. Chúng tôi tuyệt đối không sử dụng câu hỏi rò rỉ bất hợp pháp (brain dumps) vi phạm thỏa thuận thi của các trung tâm khảo thí." },
+      { "label": "Độc lập với các hãng công nghệ:", "text": "{siteName} là nền tảng đào tạo độc lập, không được tài trợ, ủy quyền hay đại diện cho Amazon Web Services, Microsoft, Google hay The Linux Foundation. Các thương hiệu, biểu trưng thuộc quyền sở hữu của các tổ chức tương ứng." },
+      { "label": "Minh bạch về kết quả:", "text": "Điểm số đo lường trên {siteName} là công cụ sư phạm đánh giá mức độ thuần thục kiến thức, không thay thế cho kết quả thi thực tế và không cấu thành lời hứa đỗ cam kết phi thực tế." },
+      { "label": "Bảo mật dữ liệu học tập:", "text": "Chúng tôi cam kết không bán, không thương mại hóa dữ liệu cá nhân hay lịch sử học tập của người dùng cho bất kỳ bên thứ ba nào." }
+    ]
+  },
+  "mission": {
+    "title": "6. Sứ mệnh cùng kỹ sư Việt Nam",
+    "why": "Trong kỷ nguyên Cloud-Native và chuyển đổi số mạnh mẽ, chứng chỉ công nghệ quốc tế không chỉ là một tấm bằng mà là minh chứng cho năng lực tư duy kiến trúc, kỹ năng vận hành hệ thống và tiêu chuẩn làm việc toàn cầu.",
+    "goal": "Sứ mệnh của {siteName} là đồng hành cùng mọi kỹ sư phần mềm, kỹ sư hệ thống, kỹ sư DevOps và người học công nghệ tại Việt Nam: giúp bạn tiết kiệm hàng chục giờ ôn tập vô ích, hiểu sâu bản chất kiến trúc và tự tin chinh phục những nấc thang mới trong sự nghiệp."
   },
   "contact": {
-    "title": "Liên hệ & Góp ý",
-    "body": "Nếu bạn có góp ý hoặc mong muốn cải thiện tính năng nào, hãy liên hệ với chúng tôi. Mỗi phản hồi đều giúp <strong>{siteShortName}</strong> phục vụ bạn tốt hơn."
-  },
-  "thankYou": "Cảm ơn bạn đã tin tưởng và sử dụng hệ thống. Chúc bạn học tập và giảng dạy hiệu quả!"
+    "title": "7. Kênh liên hệ chính thức",
+    "intro": "Chúng tôi luôn sẵn sàng lắng nghe mọi góp ý của người học để không ngừng nâng cao chất lượng nền tảng:",
+    "website": "Địa chỉ website:",
+    "support": "Hỗ trợ học tập & kỹ thuật:",
+    "legal": "Kênh pháp lý & bản quyền:",
+    "direct": "Kênh liên hệ trực tiếp:",
+    "directLink": "Trang liên hệ {siteName}"
+  }
 }

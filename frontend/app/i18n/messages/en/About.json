@@ -3,35 +3,69 @@
     "title": "About {siteName} | Personalized cloud certification exam prep platform",
     "description": "Learn about {siteName}, the platform that helps learners assess their skills, identify knowledge gaps and build a cloud certification study plan."
   },
-  "title": "About the {siteShortName} system",
-  "intro": "Hello! Welcome to <strong>{siteShortName}</strong>, a modern online learning and testing platform built to help teachers and students create, take, and manage exams quickly, conveniently, and effectively.",
-  "goals": {
-    "title": "Our goals",
-    "intro": "The application is designed to help schools, learning centers, and individuals easily:",
+  "schema": {
+    "description": "A platform for skills assessment and personalized, Blueprint-aligned exam preparation for Cloud Computing, DevOps and Kubernetes certifications.",
+    "slogan": "From now until exam day, a study path made just for you"
+  },
+  "title": "About {siteName}",
+  "subtitle": "A platform for skills assessment & personalized exam preparation for Cloud, DevOps and Kubernetes certifications",
+  "what": {
+    "title": "1. What is {siteName}?",
+    "overview": "{siteName} is an education technology platform specializing in skills assessment and personalized exam preparation for Cloud Computing, DevOps and Container/Kubernetes infrastructure certifications, built for technology engineers and learners in Vietnam.",
+    "philosophy": "Unlike traditional static exam banks, {siteName} is built on one philosophy: <strong>Focus on improving the knowledge you are missing, rather than making you review everything you have already mastered.</strong> The platform helps learners move from uncertainty about their own abilities to confidence and a clear direction before they sit the official exam."
+  },
+  "problem": {
+    "title": "2. The problem with traditional exam prep",
+    "intro": "Exam fees for international technology certifications (AWS, Microsoft Azure, Google Cloud Platform, The Linux Foundation) typically range from 100 USD to more than 300 USD per attempt. Yet most engineers preparing on their own run into major obstacles:",
     "items": [
-      "Create tests by skill or subject.",
-      "Manage classes, student rosters, and exams for each class.",
-      "Track test progress, grade automatically, and display results instantly.",
-      "Run online exams with time limits, attempt limits, and class-based access restrictions."
+      { "label": "Scattered study with no focus:", "text": "Learners often work through hundreds of multiple-choice questions at random without knowing their actual mastery of each topic (Domain)." },
+      { "label": "Memorizing answers instead of understanding:", "text": "Static question banks cannot tell whether someone answered correctly because they understand the architectural principle or because they guessed right." },
+      { "label": "No way to measure readiness:", "text": "Learners often book the exam on gut feeling, with no reliable indicator (Readiness) of whether they are prepared to pass the real exam." }
+    ],
+    "outro": "{siteName} was created to resolve these shortcomings through a cycle of skills assessment and real-time lesson adaptation."
+  },
+  "cycle": {
+    "title": "3. The 4-stage learning cycle at {siteName}",
+    "intro": "A learner's entire journey on the platform is organized into a closed loop of 4 logical stages:",
+    "stages": [
+      { "title": "Stage 1: Initial assessment (Quick Scope)", "text": "A realistic quick test with a compact format (about 25% of the length of the real exam) lets the system see where your knowledge stands as soon as you start on a certification, without taking up many hours." },
+      { "title": "Stage 2: Skills visualization (Skill Map & Gap Report)", "text": "The system automatically breaks your results down into a visual skill map, pinpointing the knowledge you are weak on in each specific Domain (for example Networking, Security, Compute, Storage or IAM) along with how certain your answers were." },
+      { "title": "Stage 3: Adaptive focused practice (My Path & Daily Focus)", "text": "The system builds a personalized path based on your target exam date and daily study time. The daily plan distributes focused exercises (Focus Drill) and spaced repetition (Smart Review) to reinforce exactly the knowledge that is starting to fade." },
+      { "title": "Stage 4: Full validation (Full Mock Test & Readiness)", "text": "Before the real exam, learners take complete mock exams (Full Mock) under time pressure, with a question structure close to the actual testing standard, to measure their readiness (Readiness Index)." }
     ]
   },
-  "features": {
-    "title": "Key features",
+  "certifications": {
+    "title": "4. Supported technology certifications",
+    "intro": "{siteName} continually updates its question bank and technical scenarios to follow the official Exam Blueprints of the world's leading technology providers:",
     "items": [
-      { "label": "Flexible test creation:", "text": "Teachers can build their own tests or pick questions from the question bank." },
-      { "label": "Class management:", "text": "Create classes, approve student enrollment, and track learning progress." },
-      { "label": "User roles:", "text": "Clearly separated roles and permissions." },
-      { "label": "Multimedia storage:", "text": "Attach images, audio, and documents to each question." },
-      { "label": "Statistical reports:", "text": "Summaries of scores, time spent, and detailed learning results." }
+      { "label": "Amazon Web Services (AWS):", "text": "Exams from foundational to advanced, including AWS Certified Cloud Practitioner (CLF-C02), Solutions Architect Associate (SAA-C03), Developer Associate (DVA-C02), SysOps Administrator Associate (SOA-C02), Solutions Architect Professional (SAP-C02), DevOps Engineer Professional (DOP-C02) and the Security, Advanced Networking and Machine Learning specialties." },
+      { "label": "Microsoft Azure:", "text": "Azure Fundamentals (AZ-900), Azure Administrator Associate (AZ-104), Azure Solutions Architect Expert (AZ-305) and Azure DevOps Engineer Expert (AZ-400)." },
+      { "label": "Google Cloud Platform (GCP):", "text": "Associate Cloud Engineer (ACE), Professional Cloud Architect (PCA) and Professional Cloud DevOps Engineer." },
+      { "label": "Linux & Kubernetes infrastructure:", "text": "Linux Professional Institute (LPI LPIC-1/LPIC-2), Certified Kubernetes Administrator (CKA) and Certified Kubernetes Application Developer (CKAD) from The Linux Foundation / CNCF." }
     ]
   },
-  "community": {
-    "title": "Community focus",
-    "body": "<strong>{siteShortName}</strong> is not just a place to test your knowledge but also an interactive learning environment where teachers can share materials and students can learn from one another through online classes."
+  "principles": {
+    "title": "5. Quality principles & independence",
+    "intro": "To deliver real learning value and uphold ethical standards in technology training, {siteName} strictly follows these principles:",
+    "items": [
+      { "label": "Respect for intellectual property:", "text": "All questions, detailed explanations and practice scenarios on {siteName} are written independently by our team of engineers, following publicly available Blueprint documents. We never use illegally leaked questions (brain dumps) that violate the exam agreements of testing centers." },
+      { "label": "Independence from technology vendors:", "text": "{siteName} is an independent training platform and is not sponsored by, authorized by or representing Amazon Web Services, Microsoft, Google or The Linux Foundation. All trademarks and logos belong to their respective organizations." },
+      { "label": "Transparency about results:", "text": "Scores on {siteName} are a teaching tool for assessing knowledge mastery. They do not replace real exam results and do not constitute an unrealistic promise that you will pass." },
+      { "label": "Learning data privacy:", "text": "We are committed to never selling or commercializing users' personal data or learning history to any third party." }
+    ]
+  },
+  "mission": {
+    "title": "6. Our mission with Vietnamese engineers",
+    "why": "In the era of Cloud-Native and rapid digital transformation, an international technology certification is more than a credential: it is evidence of architectural thinking, systems operations skills and global working standards.",
+    "goal": "The mission of {siteName} is to support every software engineer, systems engineer, DevOps engineer and technology learner in Vietnam: helping you save dozens of hours of wasted study, understand architecture deeply and confidently reach new steps in your career."
   },
   "contact": {
-    "title": "Contact & Feedback",
-    "body": "If you have feedback or would like to see a feature improved, please get in touch. Every piece of feedback helps <strong>{siteShortName}</strong> serve you better."
-  },
-  "thankYou": "Thank you for trusting and using our system. We wish you effective learning and teaching!"
+    "title": "7. Official contact channels",
+    "intro": "We are always ready to hear feedback from learners so we can keep improving the platform:",
+    "website": "Website:",
+    "support": "Learning & technical support:",
+    "legal": "Legal & copyright:",
+    "direct": "Direct contact:",
+    "directLink": "{siteName} contact page"
+  }
 }

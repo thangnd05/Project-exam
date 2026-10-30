@@ -5,9 +5,10 @@ import classNames from 'classnames';
 import classNamesBind from 'classnames/bind';
 import { toast } from 'react-toastify';
 import { useTranslations } from 'next-intl';
-import { MapIcon, ArrowLeftRight, CircleAlert } from 'lucide-react';
+import { ArrowLeftRight, CircleAlert } from 'lucide-react';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import EmptyState from '@/app/components/EmptyState/EmptyState';
+import EmptyPlanIllustration from '@/app/[locale]/(guest)/learning-paths/create/_components/EmptyPlanIllustration';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
 import ConfirmDeleteModal from '@/app/components/modal/ConfirmDeleteModal';
 import ExamPillPicker from '@/app/features/my-target/ExamPillPicker/ExamPillPicker';
@@ -282,7 +283,7 @@ const LearningPlanList = forwardRef<LearningPlanListHandle, LearningPlanListProp
       {!loading && !error && plans.length === 0 && (
         <EmptyState
           compact
-          icon={MapIcon}
+          illustration={<EmptyPlanIllustration />}
           title={emptyMessage || t('common.noPlansForExam')}
           action={emptyAction}
         />

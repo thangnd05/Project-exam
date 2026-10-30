@@ -21,9 +21,10 @@
   },
   "notFound": {
     "pageTitle": "404",
-    "title": "Oops, where did this page go?",
-    "description": "The link you followed doesn't exist or has been removed. Use the button below to head back.",
-    "backHome": "Back to homepage"
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist, has been removed, or its link has changed.",
+    "backHome": "Back to homepage",
+    "examTypes": "Exam library"
   },
   "comingSoon": {
     "pageTitle": "Coming soon",
