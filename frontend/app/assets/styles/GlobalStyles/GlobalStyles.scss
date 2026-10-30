@@ -861,6 +861,15 @@ li {
   color: var(--primary-text) !important;
 }
 
+// Bootstrap đọc --bs-primary-rgb (dạng có dấu phẩy) nên không map được từ token brand; ghi đè trực tiếp.
+.bg-primary {
+  background-color: rgb(var(--primary-rgb) / var(--bs-bg-opacity, 1)) !important;
+}
+
+.badge.bg-primary {
+  --bs-badge-color: var(--text-on-brand);
+}
+
 .tag-badge {
   font-size: var(--font-size-ssm) !important;
   padding: 0.6rem 1.2rem !important;

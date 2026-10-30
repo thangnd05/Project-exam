@@ -48,7 +48,7 @@ const TagSelector = ({ tags = [], selectedIds = [], onToggle, label: labelProp }
         return (
             <Badge
                 bg={selected ? 'primary' : 'light'}
-                text={selected ? 'white' : 'dark'}
+                text={selected ? undefined : 'dark'}
                 role="button"
                 className="border px-2 py-1 fw-medium tag-badge"
                 onClick={() => onToggle?.(tag.tagId)}

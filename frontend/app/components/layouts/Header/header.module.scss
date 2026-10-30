@@ -293,8 +293,9 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 40px;
-  padding: 3px 12px 3px 4px;
+  // Cố định 40px (bằng StreakBadge); avatar có khung vẫn lọt nhờ padding dọc 0.
+  height: 40px;
+  padding: 0 12px 0 3px;
   border: 1px solid var(--surface-dark-border);
   border-radius: var(--radius-pill);
   transition: border-color 0.2s ease, background-color 0.2s ease;

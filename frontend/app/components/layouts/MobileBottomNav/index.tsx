@@ -274,7 +274,8 @@ function MobileBottomNav() {
                         >
                           {t('profile')}
                         </ButtonPrime>
-                        <ButtonPrime
+                        {/* Tạm ẩn lối vào trang chứng chỉ. */}
+                        {/* <ButtonPrime
                           as="link"
                           href={routes.myCertificates}
                           variant="ghost"
@@ -283,7 +284,7 @@ function MobileBottomNav() {
                           onClick={closeSheet}
                         >
                           {t('myCertificates')}
-                        </ButtonPrime>
+                        </ButtonPrime> */}
                         <ButtonPrime
                           variant="ghost"
                           fullWidth

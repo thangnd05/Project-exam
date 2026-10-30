@@ -211,10 +211,10 @@ function ProfileOverview() {
                   <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => router.push(routes.resources)}>
                     <span>{t('quickActions.resources')}</span>
                   </ButtonPrime>
-                  <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => router.push(routes.myCertificates)}>
+                  {/* Trang chứng chỉ, Thẻ ghi nhớ, Lớp học, Ngân hàng câu hỏi, Bài viết đang tạm ẩn trên web nên ẩn luôn lối tắt. */}
+                  {/* <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => router.push(routes.myCertificates)}>
                     <span>{t('quickActions.myCertificates')}</span>
-                  </ButtonPrime>
-                  {/* Thẻ ghi nhớ, Lớp học, Ngân hàng câu hỏi, Bài viết đang tạm ẩn trên web nên ẩn luôn lối tắt. */}
+                  </ButtonPrime> */}
                   {/* <ButtonPrime variant="soft" size="lg" fullWidth className={cx('actionBtn')} onClick={() => router.push(routes.myAlbums)}>
                     <span>{t('quickActions.flashcards')}</span>
                   </ButtonPrime>

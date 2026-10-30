@@ -13,7 +13,8 @@ import type {Vendor} from '@/app/[locale]/(public)/_lib/certificationMeta';
 import QuickTestConfirmModal from '@/app/[locale]/(public)/_components/HeroSection/QuickTestConfirmModal';
 import {useQuickTestEntry} from '@/app/[locale]/(public)/_components/HeroSection/hooks/useQuickTestEntry';
 import RankScopeModal from './RankScopeModal';
-import {RANK_BOARD_KEY, displayName, initials, useRankBoard} from './useRankBoard';
+import RankAvatar from './RankAvatar';
+import {RANK_BOARD_KEY, displayName, useRankBoard} from './useRankBoard';
 import styles from './RankScope.module.scss';
 
 const cx = classNames.bind(styles);
@@ -103,7 +104,7 @@ function RankScope() {
         <div key={`${exam.examTypeId}-${entry.rank}-${name}`} className={cx('row', 'dataRow', tone)}>
           <div className={cx('rankNo')}>{String(rank).padStart(2, '0')}</div>
           <div className={cx('person')}>
-            <span className={cx('avatar')} aria-hidden="true">{initials(name)}</span>
+            <RankAvatar className={cx('avatar')} name={name} src={entry.avatarUrl} />
             <p className={cx('personName')}>{name}</p>
           </div>
           <div className={cx('cert')}>

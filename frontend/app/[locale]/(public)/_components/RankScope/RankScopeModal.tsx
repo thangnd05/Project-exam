@@ -8,7 +8,8 @@ import { X } from 'lucide-react';
 
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import type {Vendor} from '@/app/[locale]/(public)/_lib/certificationMeta';
-import {displayName, initials, useRankBoard} from './useRankBoard';
+import RankAvatar from './RankAvatar';
+import {displayName, useRankBoard} from './useRankBoard';
 import styles from './RankScopeModal.module.scss';
 
 const cx = classNames.bind(styles);
@@ -56,7 +57,7 @@ function RankScopeModal({show, onClose, onJoin}: RankScopeModalProps) {
         <div key={`${exam.examTypeId}-${entry.rank}-${name}`} className={cx('row', tone)}>
           <div className={cx('who')}>
             <span className={cx('rankNo')}>{String(rank).padStart(2, '0')}</span>
-            <span className={cx('avatar')} aria-hidden="true">{initials(name)}</span>
+            <RankAvatar className={cx('avatar')} name={name} src={entry.avatarUrl} />
             <div className={cx('meta')}>
               <p className={cx('name')}>{name}</p>
               <p className={cx('exam')}>{exam.name}</p>

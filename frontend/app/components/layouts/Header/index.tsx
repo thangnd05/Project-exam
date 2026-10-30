@@ -402,9 +402,10 @@ function Header() {
                       <Dropdown.Item as={Link} href={routes.dashboard}>
                         {t('nav.profile')}
                       </Dropdown.Item>
-                      <Dropdown.Item as={Link} href={routes.myCertificates}>
+                      {/* Tạm ẩn lối vào trang chứng chỉ. */}
+                      {/* <Dropdown.Item as={Link} href={routes.myCertificates}>
                         {t('nav.myCertificates')}
-                      </Dropdown.Item>
+                      </Dropdown.Item> */}
                       <Dropdown.Item as="button" type="button" onClick={() => setShowSettings(true)}>
                         {t('nav.settings')}
                       </Dropdown.Item>
