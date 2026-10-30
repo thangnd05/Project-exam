@@ -3,6 +3,7 @@
 import { useParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { ArrowLeft } from 'lucide-react';
 import classNames from 'classnames/bind';
 import RecoveryResourceLink from '@/app/features/resources/RecoveryResourceLink/RecoveryResourceLink';
 import { formatDateTime } from '@/app/utils/format-date-time';
@@ -82,7 +83,7 @@ function TaskHistory() {
           size="sm"
           href={`/dashboard/learning-paths/${learningPlanId}`}
         >
-          ← {t('common.planName', { sequence: plan.planSequence ?? '?' })}
+          <ArrowLeft size={16} /> {t('common.planName', { sequence: plan.planSequence ?? '?' })}
         </ButtonPrime>
       </div>
 

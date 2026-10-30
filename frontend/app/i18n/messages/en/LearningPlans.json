@@ -292,7 +292,7 @@
     "passed": "Task passed",
     "failed": "Task not passed",
     "correct": "{correct}/{total} correct",
-    "next": "Next task →",
+    "next": "Next task",
     "redo": "Redo this task",
     "pickAnother": "Choose another task"
   },

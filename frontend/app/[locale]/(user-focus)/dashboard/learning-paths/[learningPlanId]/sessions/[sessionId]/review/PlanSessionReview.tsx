@@ -4,6 +4,7 @@ import { useRouter } from '@/app/i18n/navigation';
 import { useParams, useSearchParams } from 'next/navigation';
 import classNames from 'classnames/bind';
 import { useTranslations } from 'next-intl';
+import { ArrowLeft } from 'lucide-react';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import PlanResultView from '@/app/features/learning-plans/PlanResultView/PlanResultView';
 import { toPlanResult } from '@/app/features/learning-plans/planResult';
@@ -50,7 +51,7 @@ function PlanSessionReview() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <ButtonPrime as="link" variant="ghost" size="sm" href={backTo}>
-            ← {taskId ? t('review.taskHistory') : t('common.plan')}
+            <ArrowLeft size={16} /> {taskId ? t('review.taskHistory') : t('common.plan')}
           </ButtonPrime>
         </div>
         <div className={cx('alert', 'alertDanger')}>

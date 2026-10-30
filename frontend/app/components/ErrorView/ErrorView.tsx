@@ -19,19 +19,22 @@ function ErrorView({ error, reset }: ErrorViewProps) {
 
   return (
     <div className={styles.wrapper}>
-      <h2 className={styles.title}>{t('title')}</h2>
-      <p className={styles.message}>
-        {t('message')}
-      </p>
-      <div className={styles.actions}>
-        <ButtonPrime variant="primary" size="lg" onClick={reset}>
-          {t('retry')}
-        </ButtonPrime>
-        <ButtonPrime variant="outline" size="lg" onClick={() => window.location.reload()}>
-          {t('reload')}
-        </ButtonPrime>
+      <div className={styles.content}>
+        <p className={styles.code}>500</p>
+        <h1 className={styles.title}>{t('title')}</h1>
+        <p className={styles.message}>
+          {t('message')}
+        </p>
+        <div className={styles.actions}>
+          <ButtonPrime variant="ink" onClick={reset}>
+            {t('retry')}
+          </ButtonPrime>
+          <ButtonPrime variant="outline" onClick={() => window.location.reload()}>
+            {t('reload')}
+          </ButtonPrime>
+        </div>
+        {error.digest ? <span className={styles.digest}>{t('code', { digest: error.digest })}</span> : null}
       </div>
-      {error.digest ? <span className={styles.digest}>{t('code', { digest: error.digest })}</span> : null}
     </div>
   );
 }

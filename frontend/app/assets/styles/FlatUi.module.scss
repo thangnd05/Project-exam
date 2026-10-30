@@ -134,7 +134,8 @@
     min-width: 220px;
   }
 
-  a:not(.btnPrimary):not(.btnSecondary) {
+  // Chỉ link trong câu chữ; nút ButtonPrime as="link" đứng ngoài <span> giữ màu của variant.
+  > span a {
     font-weight: 600;
     color: var(--brand-700);
   }

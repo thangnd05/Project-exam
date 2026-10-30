@@ -1,10 +1,4 @@
 {
-  "errorBoundary": {
-    "title": "Ôi, có gì đó trục trặc rồi!",
-    "message": "Mình xin lỗi vì sự cố. Bạn thử tải lại trang hoặc quay lại trang trước nhé!",
-    "reload": "Tải lại trang",
-    "back": "Quay lại"
-  },
   "auth": {
     "sessionExpired": "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại."
   },

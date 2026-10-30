@@ -1,36 +1,63 @@
+@import 'app/assets/styles/mixins.scss';
+
+// Cùng khuôn với trang 404 (NotFound.module.scss).
 .wrapper {
-  min-height: 60vh;
+  min-height: 70vh;
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  gap: 1.6rem;
-  padding: 2.4rem;
+  align-items: center;
+  padding: 2rem 1.6rem;
+}
+
+.content {
+  max-width: 44.8rem;
   text-align: center;
 }
 
+.code {
+  font-family: var(--font-mono);
+  font-size: 9.6rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.8rem;
+  color: var(--brand-800);
+  user-select: none;
+
+  @include down(sm) {
+    font-size: 7.2rem;
+  }
+}
+
 .title {
-  font-size: var(--font-size-xxl);
+  font-size: var(--font-size-2xl);
   font-weight: 700;
+  letter-spacing: -0.025em;
+  margin: 0 0 1.2rem;
   color: var(--text-color);
-  margin: 0;
+
+  @include down(sm) {
+    font-size: var(--font-size-xl);
+  }
 }
 
 .message {
-  font-size: var(--font-size-md);
+  font-size: var(--font-size-ssm);
+  line-height: 1.6;
+  margin: 0 0 3.2rem;
   color: var(--text-secondary);
-  max-width: 52rem;
-  margin: 0;
 }
 
 .actions {
   display: flex;
-  gap: 1.2rem;
   flex-wrap: wrap;
   justify-content: center;
+  gap: 1.2rem;
 }
 
 .digest {
+  display: block;
+  margin-top: 1.6rem;
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
   font-family: var(--font-mono);

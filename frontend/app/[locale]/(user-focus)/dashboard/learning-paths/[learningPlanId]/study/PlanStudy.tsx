@@ -6,6 +6,7 @@ import { useSearchParamsState } from '@/app/hooks/useSearchParamsState';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Container } from 'react-bootstrap';
+import { ArrowLeft } from 'lucide-react';
 import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import ConfirmModal from '@/app/components/modal/ConfirmModal';
@@ -256,7 +257,7 @@ function PlanStudy() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <ButtonPrime as="link" variant="ghost" size="sm" href={`/dashboard/learning-paths/${learningPlanId}`}>
-            ← {t('common.plan')}
+            <ArrowLeft size={16} /> {t('common.plan')}
           </ButtonPrime>
         </div>
         <div className={cx('alert', 'alertDanger')}>{error || t('study.cannotOpen')}</div>
@@ -308,7 +309,7 @@ function PlanStudy() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <ButtonPrime as="link" variant="ghost" size="sm" href={`/dashboard/learning-paths/${learningPlanId}`}>
-            ← {t('common.plan')}
+            <ArrowLeft size={16} /> {t('common.plan')}
           </ButtonPrime>
         </div>
 

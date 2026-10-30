@@ -10,7 +10,6 @@ import { CosmeticProvider } from '@/app/contexts/CosmeticContext';
 import StreakCelebration from '@/app/features/gamification/streak/StreakCelebration';
 import ScrollHandler from '@/app/components/layouts/ScrollToTopOnRouteChange';
 import VisitTracker from '@/app/components/layouts/VisitTracker';
-import ErrorBoundary from '@/app/components/ErrorBoundary/ErrorBoundary';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -35,7 +34,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
               />
               <div className="App">
                 <StreakCelebration />
-                <ErrorBoundary>{children}</ErrorBoundary>
+                {children}
               </div>
             </CosmeticProvider>
           </CoinProvider>

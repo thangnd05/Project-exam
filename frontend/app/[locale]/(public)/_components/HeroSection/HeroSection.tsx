@@ -1,6 +1,7 @@
 'use client';
 import classNames from 'classnames/bind';
 import { motion } from 'framer-motion';
+import { Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import routes from '@/app/configs/Routes';
@@ -54,16 +55,7 @@ function HeroSection() {
             <motion.ul className={cx('highlights')} {...rise(0.24)}>
               {HIGHLIGHTS.map((key) => (
                 <li key={key}>
-                  <svg
-                    className={cx('check')}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2.5}
-                    aria-hidden="true"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
+                  <Check className={cx('check')} strokeWidth={2.5} aria-hidden="true" />
                   <span>{t(`highlights.${key}`)}</span>
                 </li>
               ))}

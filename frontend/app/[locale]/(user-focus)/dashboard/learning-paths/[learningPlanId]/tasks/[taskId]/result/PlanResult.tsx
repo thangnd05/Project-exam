@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import { useRouter } from '@/app/i18n/navigation';
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { ArrowLeft } from 'lucide-react';
 import classNames from 'classnames/bind';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
 import PlanCongratsModal, { markCongratsSeen } from '@/app/features/learning-plans/PlanCongratsModal/PlanCongratsModal';
@@ -64,7 +65,7 @@ function PlanResult() {
       <div className={cx('wrapper')}>
         <div className={cx('headerBar')}>
           <ButtonPrime variant="ghost" size="sm" onClick={goToPicker}>
-            ← {t('common.plan')}
+            <ArrowLeft size={16} /> {t('common.plan')}
           </ButtonPrime>
         </div>
         <div className={cx('alert', 'alertDanger')}>

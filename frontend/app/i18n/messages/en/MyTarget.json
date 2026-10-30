@@ -107,7 +107,7 @@
     }
   },
   "achieved": {
-    "back": "← Target overview",
+    "back": "Target overview",
     "examType": "Exam type",
     "noTarget": "You haven’t set a target for this exam yet.",
     "setTarget": "Set target",

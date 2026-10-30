@@ -4,6 +4,7 @@ import Link from '@/app/i18n/navigation';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { ArrowLeft } from 'lucide-react';
 import classNames from 'classnames/bind';
 import { formatDateTime } from '@/app/utils/format-date-time';
 import { useTargetAchieved } from '@/app/features/my-target/hooks/useTargetAchieved';
@@ -41,7 +42,7 @@ function TargetAchieved() {
     <div className={cx('wrapper')}>
       <div className={cx('headerBar')}>
         <ButtonPrime as="link" href={routes.targetDashboard} variant="ghost" size="sm">
-          {t('achieved.back')}
+          <ArrowLeft size={16} /> {t('achieved.back')}
         </ButtonPrime>
       </div>
 

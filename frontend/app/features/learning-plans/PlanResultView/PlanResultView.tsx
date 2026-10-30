@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { useTranslations } from 'next-intl';
+import { ArrowRight } from 'lucide-react';
 import classNames from 'classnames/bind';
 import styles from '@/app/assets/styles/diagnostic/PersonalizedPlan.module.scss';
 import ButtonPrime from '@/app/components/Button/ButtonPrime';
@@ -80,7 +81,7 @@ function PlanResultView({ result, onRetry, onPickAnother, onNext }: PlanResultVi
         <div className={cx('resultActions')}>
           {result.passed && onNext && (
             <ButtonPrime variant="primary" size="sm" onClick={onNext}>
-              {t('resultView.next')}
+              {t('resultView.next')} <ArrowRight size={16} />
             </ButtonPrime>
           )}
           <ButtonPrime variant={result.passed && onNext ? 'outline' : 'primary'} size="sm" onClick={onRetry}>

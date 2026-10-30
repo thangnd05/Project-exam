@@ -8,7 +8,7 @@
   "save": "Lưu",
   "error": {
     "title": "Trang gặp sự cố",
-    "message": "Đã có lỗi xảy ra khi tải nội dung. Bạn thử lại giúp mình nhé - nếu vẫn lỗi thì tải lại trang.",
+    "message": "Đã có lỗi xảy ra khi tải nội dung. Vui lòng thử lại, nếu vẫn lỗi hãy tải lại trang.",
     "retry": "Thử lại",
     "reload": "Tải lại trang",
     "code": "Mã lỗi: {digest}"
